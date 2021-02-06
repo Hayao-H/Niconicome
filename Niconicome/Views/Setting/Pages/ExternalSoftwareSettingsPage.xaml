@@ -1,0 +1,109 @@
+﻿<Page x:Class="Niconicome.Views.Setting.Pages.ExternalSoftwareSettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Niconicome.Views.Setting.Pages"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
+        xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignBackground}"
+        FontFamily="Yu Gothic"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="外部ソフト設定">
+    <Page.DataContext>
+        <vm:ExternalSoftwareSettingsViewModel/>
+    </Page.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="15*"/>
+        </Grid.RowDefinitions>
+        <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
+            <TextBlock Text="外部ソフト設定" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
+        </Border>
+        <StackPanel Margin="8" Grid.Row="1">
+            <TextBlock Padding="8" TextWrapping="Wrap">
+                実行ファイルパスは実行ファイルの絶対パスを指定してください。(例: C:\video\player.exe)<LineBreak/>
+                ただし、実行ファイルのパスが通っている場合は、ファイル名を利用することが出来ます。<LineBreak/>
+                ※Windowsの環境変数についての更に詳しい情報は<Hyperlink NavigateUri="https://www.atmarkit.co.jp/ait/articles/1805/11/news035.html"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>
+                    @IT様の記事</Hyperlink>をご覧ください。
+            </TextBlock>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ApplicationExport" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="「アプリで開く(A)」のパス(_A)" Target="{Binding ElementName=videoappa}"/>
+                </StackPanel>
+                <TextBox Margin="10 0 0 0" Text="{Binding PlayerAPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="videoappa"/>
+            </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ApplicationExport" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="「アプリで開く(B)」のパス(_B)" Target="{Binding ElementName=videoappb}"/>
+                </StackPanel>
+                <TextBox Margin="10 0 0 0" Text="{Binding PlayerBPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="videoappb"/>
+            </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Link" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="「アプリにURLを送る」のパス(_U)" Target="{Binding ElementName=appurl}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppUrlPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="appurl"/>
+                    <Label Content="パラメーター"/>
+                    <TextBox Text="{Binding AppUrlParam,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
+                </StackPanel>
+            </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="PlayBox" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="「アプリにIDを送る」のパス(_I)" Target="{Binding ElementName=appid}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppIdPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="appid"/>
+                    <Label Content="パラメーター"/>
+                    <TextBox Text="{Binding AppIdParam,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
+                </StackPanel>
+            </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ApplicationCog" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="ffmpegのパス(_F)" Target="{Binding ElementName=ffmpegpath}"/>
+                </StackPanel>
+                    <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="ffmpegpath"/>
+            </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+        </StackPanel>
+    </Grid>
+</Page>

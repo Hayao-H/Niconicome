@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">      <link rel="preconnect" href="https://nicovideo.cdn.nimg.jp/web/"><link rel="preconnect" href="https://ads.nicovideo.jp/"><link rel="preconnect" href="https://nicovideo.cdn.nimg.jp/web/"><link rel="preconnect" href="http://nmsg.nicovideo.jp/api/"><link rel="preconnect" href="https://ads.nicovideo.jp/"><link rel="preconnect" href="https://public.api.nicovideo.jp/"><link rel="preconnect" href="https://www.googletagmanager.com">      <link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/styles/pages/watch_failover2flash.css?423f64f8" id="js-failover2flash-css">      <link rel="preload" href="https://res.ads.nicovideo.jp/assets/js/ads2.js?ref=video" as="script"><link rel="preload" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/failover2flash/watch_failover2flash.js?025a757e" crossorigin="anonymous" as="script"><link rel="preload" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/legacy/watch_dll_f92a05c7cabed85c6263.js" crossorigin="anonymous" as="script"><link rel="preload" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/legacy/watch_app_0366e2496a747fa71552.js" crossorigin="anonymous" as="script">      <link rel="shortcut icon" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/favicon.ico"><link rel="icon" type="image/png" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/32.png" sizes="32x32"><link rel="icon" type="image/png" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/48.png" sizes="48x48"><link rel="icon" type="image/png" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/96.png" sizes="96x96"><link rel="icon" type="image/png" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/144.png" sizes="144x144">
+
+    <title>新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師 - ニコニコ動画</title>    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <script type="text/javascript">
+      window.watch__startTime = Date.now();
+      window.NativeDate = Date; 
+                  
+      if (Math.random() < 1) {
+        window.Ads = { protocol: 'https:' };
+      }
+      
+    </script>
+
+    <meta property="fb:app_id" content="378853695459932">
+    <meta name="keywords" content="陰陽師,レッツゴー！陰陽師,公式,音楽,ゲーム,β時代の英雄,重要ニコニコ文化財,sm13→,3月6日投稿動画,豪血寺一族,全ての元凶">
+<meta name="description" content="新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師 レッツゴー！陰陽師（フルコーラスバージョン）">
+<meta name="thumbnail" content="https://img.cdn.nimg.jp/s/nicovideo/thumbnails/9/9.original/r1280x720l?key=8d46976aca8120e4969537a0c10b47590a67740a5994c11969d4ae7fa5c2bf74">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, post-check=0, pre-check=0">
+<meta http-equiv="Expires" content="Thu, 01 Dec 1994 16:00:00 GMT">
+<meta property="og:title" content="新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師">
+<meta property="og:description" content="新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師 レッツゴー！陰陽師（フルコーラスバージョン）">
+<meta property="og:type" content="video.other">
+<meta property="og:video" content="https://embed.nicovideo.jp/watch/sm9?autoplay=1">
+<meta property="og:video:url" content="https://embed.nicovideo.jp/watch/sm9?autoplay=1">
+<meta property="og:video:secure_url" content="https://embed.nicovideo.jp/watch/sm9?autoplay=1">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="640">
+<meta property="og:video:height" content="360">
+  <meta property="og:video:tag" content="陰陽師">
+  <meta property="og:video:tag" content="レッツゴー！陰陽師">
+  <meta property="og:video:tag" content="公式">
+  <meta property="og:video:tag" content="音楽">
+  <meta property="og:video:tag" content="ゲーム">
+  <meta property="og:video:tag" content="β時代の英雄">
+  <meta property="og:video:tag" content="重要ニコニコ文化財">
+  <meta property="og:video:tag" content="sm13→">
+  <meta property="og:video:tag" content="3月6日投稿動画">
+  <meta property="og:video:tag" content="豪血寺一族">
+  <meta property="og:video:tag" content="全ての元凶">
+<meta property="og:site_name" content="ニコニコ動画">
+<meta property="og:url" content="https://www.nicovideo.jp/watch/sm9">
+<meta property="og:image" content="https://img.cdn.nimg.jp/s/nicovideo/thumbnails/9/9.original/r1280x720l?key=8d46976aca8120e4969537a0c10b47590a67740a5994c11969d4ae7fa5c2bf74">
+  <meta property="og:locale" content="ja_JP"><meta property="og:locale:alternate" content="zh_TW"><meta property="og:locale:alternate" content="en_US"><meta property="video:duration" content="320">
+<meta property="video:release_date" content="2007-03-06T00:33+0900">
+<meta property="mixi:device-mobile" content="http://m.nicovideo.jp/watch/sm9?cp_webto=mixi_check_pc">
+<meta property="mixi:device-docomo" content="http://m.nicovideo.jp/watch/sm9?uid=NULLGWDOCOMO&guid=ON&cp_webto=mixi_check_pc">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://img.cdn.nimg.jp/s/nicovideo/thumbnails/9/9.original/r1280x720l?key=8d46976aca8120e4969537a0c10b47590a67740a5994c11969d4ae7fa5c2bf74">
+<meta name="twitter:site" content="@nico_nico_info">
+<meta name="twitter:title" content="新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師">
+<meta name="twitter:description" content="レッツゴー！陰陽師（フルコーラスバージョン）">
+<meta name="twitter:app:country" content="jp"/>
+<meta name="twitter:app:name:iphone" content="ニコニコ動画"/>
+<meta name="twitter:app:id:iphone" content="307764057"/>
+<meta name="twitter:app:url:iphone" content="nicovideo://sm9"/>
+<meta name="twitter:app:name:googleplay" content="niconico"/>
+<meta name="twitter:app:id:googleplay" content="jp.nicovideo.android"/>
+<meta name="twitter:app:url:googleplay" content="nico://watch/sm9" />
+<meta property="al:ios:url" content="nico://sm9?utm_source=facebook&utm_medium=video_player&utm_content=sm9&utm_campaign=facebook_app_links">
+<meta property="al:ios:app_store_id" content="307764057">
+<meta property="al:ios:app_name" content="ニコニコ動画">
+<meta property="al:android:url" content="https://www.nicovideo.jp/watch/sm9?utm_source=facebook&utm_medium=video_player&utm_content=sm9&utm_campaign=facebook_app_links">
+<meta property="al:android:app_name" content="ニコニコ動画">
+<meta property="al:android:package" content="jp.nicovideo.android">
+<meta property="al:web:url" content="nico://sm9?utm_source=facebook&utm_medium=video_player&utm_content=sm9&utm_campaign=facebook_app_links">
+<meta property="al:web:url" content="https://www.nicovideo.jp/watch/sm9">
+<meta property="al:web:should_fallback" content="true">
+<meta name="msapplication-task" content="name=ニコニコ動画; action-uri=https://www.nicovideo.jp/; icon-uri=https://nicovideo.cdn.nimg.jp/web/img/favicon.ico">
+<link rel="alternate" href="https://embed.nicovideo.jp/watch/sm9" />
+<link rel="canonical" href="https://www.nicovideo.jp/watch/sm9">
+
+    <script type="text/javascript">
+  window.NicoGoogleTagManagerDataLayer = [];
+
+  const data = {};
+
+    data.user = (function() {
+    const user = {};
+
+              user.login_status = 'not_login';
+    
+    return user;
+  })();
+
+    data.content = (function() {
+    const content = {};
+
+                    content.player_type = 'html5';
+      content.genre = "未設定";
+      content.content_type = "user";
+
+                          return content;
+  })();
+
+  window.NicoGoogleTagManagerDataLayer.push(data);
+</script>
+
+    <script>
+  
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','NicoGoogleTagManagerDataLayer','GTM-KXT7G5G');
+  
+</script>
+
+    
+    
+
+    <link rel="stylesheet" type="text/css" href="https://nicovideo.cdn.nimg.jp/web/styles/pages/watch.css?5db9eb2f">
+  </head>
+  <body class="is-beforeInitialize ja-jp">
+
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KXT7G5G" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+    <div class="BaseLayout">
+            <link href="https://nicovideo.cdn.nimg.jp/web/styles/modules/navigation/common_header/common_header.css?1593591677" rel="stylesheet">
+<div id="CommonHeader" class="CommonHeader" data-common-header="{&quot;initConfig&quot;:{&quot;frontendId&quot;:6,&quot;frontendVersion&quot;:&quot;0&quot;,&quot;site&quot;:&quot;niconico&quot;,&quot;debug&quot;:{&quot;showAppeal&quot;:false},&quot;baseUrl&quot;:{&quot;accountUrl&quot;:&quot;https:\/\/account.nicovideo.jp&quot;,&quot;channelUrl&quot;:&quot;https:\/\/ch.nicovideo.jp&quot;,&quot;communityUrl&quot;:&quot;https:\/\/com.nicovideo.jp&quot;,&quot;nicoadUrl&quot;:&quot;https:\/\/nicoad.nicovideo.jp&quot;,&quot;niconicoUrl&quot;:&quot;https:\/\/www.nicovideo.jp&quot;},&quot;customization&quot;:{&quot;cmnhdRef&quot;:{&quot;page&quot;:&quot;watch&quot;},&quot;nextUrl&quot;:&quot;\/watch\/sm9&quot;,&quot;logoutNextUrl&quot;:&quot;\/&quot;,&quot;size&quot;:{&quot;hMargin&quot;:&quot;auto&quot;,&quot;maxWidth&quot;:&quot;1024px&quot;,&quot;minWidth&quot;:&quot;1024px&quot;},&quot;userPanelLinks&quot;:[{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/video_top&quot;,&quot;label&quot;:&quot;\u30cb\u30b3\u30cb\u30b3\u52d5\u753bTOP&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/ranking&quot;,&quot;label&quot;:&quot;\u30e9\u30f3\u30ad\u30f3\u30b0&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/my\/mylist\/deflist&quot;,&quot;label&quot;:&quot;\u3042\u3068\u3067\u898b\u308b&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/my\/mylist&quot;,&quot;label&quot;:&quot;\u30de\u30a4\u30ea\u30b9\u30c8&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/my\/history&quot;,&quot;label&quot;:&quot;\u8996\u8074\u5c65\u6b74&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/my\/fav\/user&quot;,&quot;label&quot;:&quot;\u30d5\u30a9\u30ed\u30fc\u4e2d&quot;},{&quot;href&quot;:&quot;https:\/\/www.upload.nicovideo.jp\/garage\/&quot;,&quot;label&quot;:&quot;\u6295\u7a3f\u52d5\u753b\uff0f\u52d5\u753b\u3092\u6295\u7a3f\u3059\u308b&quot;},{&quot;href&quot;:&quot;https:\/\/blog.nicovideo.jp\/niconews\/category\/videotop\/&quot;,&quot;label&quot;:&quot;\u30cb\u30b3\u30cb\u30b3\u30a4\u30f3\u30d5\u30a9&quot;}]},&quot;user&quot;:{&quot;isLogin&quot;:false}},&quot;language&quot;:&quot;ja&quot;,&quot;commonHeaderBaseUrl&quot;:&quot;https:\/\/secure-dcdn.cdn.nimg.jp\/&quot;}"></div>
+
+            
+      <div id="js-app"></div>
+      <div id="js-initial-watch-data" data-api-data="{&quot;video&quot;:{&quot;id&quot;:&quot;sm9&quot;,&quot;title&quot;:&quot;\u65b0\u30fb\u8c6a\u8840\u5bfa\u4e00\u65cf -\u7169\u60a9\u89e3\u653e - \u30ec\u30c3\u30c4\u30b4\u30fc\uff01\u9670\u967d\u5e2b&quot;,&quot;originalTitle&quot;:&quot;\u65b0\u30fb\u8c6a\u8840\u5bfa\u4e00\u65cf -\u7169\u60a9\u89e3\u653e - \u30ec\u30c3\u30c4\u30b4\u30fc\uff01\u9670\u967d\u5e2b&quot;,&quot;description&quot;:&quot;\u30ec\u30c3\u30c4\u30b4\u30fc\uff01\u9670\u967d\u5e2b\uff08\u30d5\u30eb\u30b3\u30fc\u30e9\u30b9\u30d0\u30fc\u30b8\u30e7\u30f3\uff09&quot;,&quot;originalDescription&quot;:&quot;\u30ec\u30c3\u30c4\u30b4\u30fc\uff01\u9670\u967d\u5e2b\uff08\u30d5\u30eb\u30b3\u30fc\u30e9\u30b9\u30d0\u30fc\u30b8\u30e7\u30f3\uff09&quot;,&quot;thumbnailURL&quot;:&quot;https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/9\/9&quot;,&quot;largeThumbnailURL&quot;:&quot;https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/9\/9.original\/a960x540l?key=00208e6cfc9ead0306cfa0291c2734a15cdea8f58df302b5ac8ed05428ef1190&quot;,&quot;postedDateTime&quot;:&quot;2007\/03\/06 00:33:00&quot;,&quot;originalPostedDateTime&quot;:null,&quot;width&quot;:null,&quot;height&quot;:null,&quot;duration&quot;:320,&quot;viewCount&quot;:19979547,&quot;mylistCount&quot;:181074,&quot;translation&quot;:false,&quot;translator&quot;:null,&quot;dmcInfo&quot;:{&quot;session_api&quot;:{&quot;recipe_id&quot;:&quot;nicovideo-sm9&quot;,&quot;player_id&quot;:&quot;nicovideo-6-jjkVf21yoZ_1611284225270&quot;,&quot;videos&quot;:[&quot;archive_h264_360p&quot;,&quot;archive_h264_360p_low&quot;],&quot;audios&quot;:[&quot;archive_aac_128kbps&quot;,&quot;archive_aac_64kbps&quot;],&quot;movies&quot;:[],&quot;protocols&quot;:[&quot;http&quot;,&quot;hls&quot;],&quot;auth_types&quot;:{&quot;http&quot;:&quot;ht2&quot;,&quot;hls&quot;:&quot;ht2&quot;},&quot;service_user_id&quot;:&quot;6-jjkVf21yoZ_1611284225270&quot;,&quot;token&quot;:&quot;{\&quot;service_id\&quot;:\&quot;nicovideo\&quot;,\&quot;player_id\&quot;:\&quot;nicovideo-6-jjkVf21yoZ_1611284225270\&quot;,\&quot;recipe_id\&quot;:\&quot;nicovideo-sm9\&quot;,\&quot;service_user_id\&quot;:\&quot;6-jjkVf21yoZ_1611284225270\&quot;,\&quot;protocols\&quot;:[{\&quot;name\&quot;:\&quot;http\&quot;,\&quot;auth_type\&quot;:\&quot;ht2\&quot;},{\&quot;name\&quot;:\&quot;hls\&quot;,\&quot;auth_type\&quot;:\&quot;ht2\&quot;}],\&quot;videos\&quot;:[\&quot;archive_h264_360p\&quot;,\&quot;archive_h264_360p_low\&quot;],\&quot;audios\&quot;:[\&quot;archive_aac_128kbps\&quot;,\&quot;archive_aac_64kbps\&quot;],\&quot;movies\&quot;:[],\&quot;created_time\&quot;:1611284225000,\&quot;expire_time\&quot;:1611370625000,\&quot;content_ids\&quot;:[\&quot;out1\&quot;],\&quot;heartbeat_lifetime\&quot;:120000,\&quot;content_key_timeout\&quot;:600000,\&quot;priority\&quot;:0,\&quot;transfer_presets\&quot;:[]}&quot;,&quot;signature&quot;:&quot;198ea79a44b09ea1100544e183c783f52b3f4dd7d19f2fa6ffb6a4e13e67afd5&quot;,&quot;content_id&quot;:&quot;out1&quot;,&quot;heartbeat_lifetime&quot;:120000,&quot;content_key_timeout&quot;:600000,&quot;priority&quot;:0,&quot;transfer_presets&quot;:[],&quot;urls&quot;:[{&quot;url&quot;:&quot;https:\/\/api.dmc.nico\/api\/sessions&quot;,&quot;is_well_known_port&quot;:true,&quot;is_ssl&quot;:true}]},&quot;storyboard_session_api&quot;:null,&quot;quality&quot;:{&quot;videos&quot;:[{&quot;id&quot;:&quot;archive_h264_360p&quot;,&quot;level_index&quot;:1,&quot;available&quot;:true,&quot;bitrate&quot;:600000,&quot;resolution&quot;:{&quot;width&quot;:320,&quot;height&quot;:240},&quot;label&quot;:&quot;360p&quot;},{&quot;id&quot;:&quot;archive_h264_360p_low&quot;,&quot;level_index&quot;:0,&quot;available&quot;:true,&quot;bitrate&quot;:300000,&quot;resolution&quot;:{&quot;width&quot;:480,&quot;height&quot;:360},&quot;label&quot;:&quot;\u4f4e\u753b\u8cea&quot;}],&quot;audios&quot;:[{&quot;id&quot;:&quot;archive_aac_128kbps&quot;,&quot;available&quot;:true,&quot;bitrate&quot;:128000,&quot;sampling_rate&quot;:44100,&quot;loudness&quot;:{&quot;integratedLoudness&quot;:-6.5,&quot;truePeak&quot;:0.8000000000000000444089209850062616169452667236328125},&quot;loudness_correction_value&quot;:[{&quot;type&quot;:&quot;video&quot;,&quot;value&quot;:0.375837404288444199007557244840427301824092864990234375},{&quot;type&quot;:&quot;pureAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;pureAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;pureAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;nicoadVideoIntroduce&quot;,&quot;value&quot;:0.89125093813374556273032567332847975194454193115234375},{&quot;type&quot;:&quot;nicoadBillboard&quot;,&quot;value&quot;:1},{&quot;type&quot;:&quot;marquee&quot;,&quot;value&quot;:1}]},{&quot;id&quot;:&quot;archive_aac_64kbps&quot;,&quot;available&quot;:true,&quot;bitrate&quot;:64000,&quot;sampling_rate&quot;:44100,&quot;loudness&quot;:{&quot;integratedLoudness&quot;:-6.5,&quot;truePeak&quot;:0.8000000000000000444089209850062616169452667236328125},&quot;loudness_correction_value&quot;:[{&quot;type&quot;:&quot;video&quot;,&quot;value&quot;:0.375837404288444199007557244840427301824092864990234375},{&quot;type&quot;:&quot;pureAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;pureAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;pureAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;nicoadVideoIntroduce&quot;,&quot;value&quot;:0.89125093813374556273032567332847975194454193115234375},{&quot;type&quot;:&quot;nicoadBillboard&quot;,&quot;value&quot;:1},{&quot;type&quot;:&quot;marquee&quot;,&quot;value&quot;:1}]}]},&quot;import_version&quot;:3,&quot;tracking_id&quot;:&quot;WIt7car2WzVastZRNrQnJcXhmjHlF4wQDK9MDXIYGUL8WKo81mxHC\/Ojy8Bv8fnln\/XpczwvAdirdvxiYVSTSzVLq+4SS4nThkKcxU4vF50=&quot;},&quot;backCommentType&quot;:null,&quot;channelId&quot;:null,&quot;isCommentExpired&quot;:false,&quot;isWide&quot;:null,&quot;isOfficialAnime&quot;:null,&quot;isDeleted&quot;:false,&quot;isTranslated&quot;:false,&quot;isR18&quot;:false,&quot;isAdult&quot;:false,&quot;isNicowari&quot;:null,&quot;isPublic&quot;:true,&quot;isPublishedNicoscript&quot;:null,&quot;isNoNGS&quot;:null,&quot;isCommonsTreeExists&quot;:true,&quot;isNoIchiba&quot;:false,&quot;isOfficial&quot;:false,&quot;isMonetized&quot;:false,&quot;smileInfo&quot;:{&quot;url&quot;:&quot;https:\/\/smile-cca42.sv.nicovideo.jp\/smile?v=9.0468&quot;,&quot;isSlowLine&quot;:false,&quot;currentQualityId&quot;:&quot;auto&quot;,&quot;qualityIds&quot;:[&quot;auto&quot;,&quot;low&quot;],&quot;loudnessCorrectionValue&quot;:[{&quot;type&quot;:&quot;video&quot;,&quot;value&quot;:1},{&quot;type&quot;:&quot;pureAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdPreroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;pureAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdMidroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;pureAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;houseAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;networkAdPostroll&quot;,&quot;value&quot;:0.7079457843841379105498390345019288361072540283203125},{&quot;type&quot;:&quot;nicoadVideoIntroduce&quot;,&quot;value&quot;:0.89125093813374556273032567332847975194454193115234375},{&quot;type&quot;:&quot;nicoadBillboard&quot;,&quot;value&quot;:1},{&quot;type&quot;:&quot;marquee&quot;,&quot;value&quot;:1}]},&quot;likedCount&quot;:null},&quot;player&quot;:{&quot;isContinuous&quot;:false},&quot;thread&quot;:{&quot;commentCount&quot;:5126853,&quot;hasOwnerThread&quot;:null,&quot;mymemoryLanguage&quot;:null,&quot;serverUrl&quot;:&quot;https:\/\/nmsg.nicovideo.jp\/api\/&quot;,&quot;subServerUrl&quot;:&quot;https:\/\/nmsg.nicovideo.jp\/api\/&quot;,&quot;ids&quot;:{&quot;default&quot;:&quot;1173108780&quot;,&quot;nicos&quot;:null,&quot;community&quot;:null}},&quot;commentComposite&quot;:{&quot;threads&quot;:[{&quot;id&quot;:1173108780,&quot;fork&quot;:1,&quot;isActive&quot;:false,&quot;postkeyStatus&quot;:0,&quot;isDefaultPostTarget&quot;:false,&quot;isThreadkeyRequired&quot;:false,&quot;isLeafRequired&quot;:false,&quot;label&quot;:&quot;owner&quot;,&quot;isOwnerThread&quot;:true,&quot;hasNicoscript&quot;:true},{&quot;id&quot;:1173108780,&quot;fork&quot;:0,&quot;isActive&quot;:true,&quot;postkeyStatus&quot;:0,&quot;isDefaultPostTarget&quot;:true,&quot;isThreadkeyRequired&quot;:false,&quot;isLeafRequired&quot;:true,&quot;label&quot;:&quot;default&quot;,&quot;isOwnerThread&quot;:false,&quot;hasNicoscript&quot;:false},{&quot;id&quot;:1173108780,&quot;fork&quot;:2,&quot;isActive&quot;:true,&quot;postkeyStatus&quot;:0,&quot;isDefaultPostTarget&quot;:false,&quot;isThreadkeyRequired&quot;:false,&quot;isLeafRequired&quot;:true,&quot;label&quot;:&quot;easy&quot;,&quot;isOwnerThread&quot;:false,&quot;hasNicoscript&quot;:false}],&quot;layers&quot;:[{&quot;index&quot;:0,&quot;isTranslucent&quot;:false,&quot;threadIds&quot;:[{&quot;id&quot;:1173108780,&quot;fork&quot;:1}]},{&quot;index&quot;:1,&quot;isTranslucent&quot;:false,&quot;threadIds&quot;:[{&quot;id&quot;:1173108780,&quot;fork&quot;:0},{&quot;id&quot;:1173108780,&quot;fork&quot;:2}]}]},&quot;tags&quot;:[{&quot;id&quot;:&quot;1348286&quot;,&quot;name&quot;:&quot;\u9670\u967d\u5e2b&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:true,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;1348992&quot;,&quot;name&quot;:&quot;\u30ec\u30c3\u30c4\u30b4\u30fc\uff01\u9670\u967d\u5e2b&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:true,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;1348995&quot;,&quot;name&quot;:&quot;\u516c\u5f0f&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:true,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;73234594&quot;,&quot;name&quot;:&quot;\u97f3\u697d&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:true,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:true,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;73241329&quot;,&quot;name&quot;:&quot;\u30b2\u30fc\u30e0&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:true,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:true,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;303779624&quot;,&quot;name&quot;:&quot;\u03b2\u6642\u4ee3\u306e\u82f1\u96c4&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:false,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;304139425&quot;,&quot;name&quot;:&quot;\u91cd\u8981\u30cb\u30b3\u30cb\u30b3\u6587\u5316\u8ca1&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:false,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;306314096&quot;,&quot;name&quot;:&quot;sm13\u2192&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:false,&quot;isLocked&quot;:false,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;306402809&quot;,&quot;name&quot;:&quot;3\u67086\u65e5\u6295\u7a3f\u52d5\u753b&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:false,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;306438490&quot;,&quot;name&quot;:&quot;\u8c6a\u8840\u5bfa\u4e00\u65cf&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:false,&quot;isRepresentedTag&quot;:false},{&quot;id&quot;:&quot;306445756&quot;,&quot;name&quot;:&quot;\u5168\u3066\u306e\u5143\u51f6&quot;,&quot;isCategory&quot;:false,&quot;isCategoryCandidate&quot;:false,&quot;isDictionaryExists&quot;:true,&quot;isLocked&quot;:false,&quot;isRepresentedTag&quot;:false}],&quot;playlist&quot;:null,&quot;owner&quot;:{&quot;id&quot;:&quot;4&quot;,&quot;nickname&quot;:&quot;\u4e2d\u306e \u3055\u3093&quot;,&quot;iconURL&quot;:&quot;https:\/\/secure-dcdn.cdn.nimg.jp\/nicoaccount\/usericon\/0\/4.jpg?1271141672&quot;,&quot;nicoliveInfo&quot;:null,&quot;channelInfo&quot;:null,&quot;isUserVideoPublic&quot;:true,&quot;isUserMyVideoPublic&quot;:true,&quot;isUserOpenListPublic&quot;:true},&quot;viewer&quot;:{&quot;id&quot;:0,&quot;nicosid&quot;:&quot;1611284225.2073175373&quot;,&quot;nickname&quot;:&quot;&quot;,&quot;prefecture&quot;:null,&quot;sex&quot;:null,&quot;age&quot;:null,&quot;isPremium&quot;:false,&quot;isPrivileged&quot;:false,&quot;isPostLocked&quot;:false,&quot;isHtrzm&quot;:false,&quot;isTwitterConnection&quot;:false,&quot;isBicentennial&quot;:false},&quot;community&quot;:null,&quot;mainCommunity&quot;:null,&quot;channel&quot;:null,&quot;ad&quot;:{&quot;vastMetaData&quot;:[{&quot;id&quot;:0,&quot;type&quot;:&quot;preroll&quot;,&quot;timingMS&quot;:null,&quot;skippableType&quot;:1,&quot;pod&quot;:1},{&quot;id&quot;:0,&quot;type&quot;:&quot;postroll&quot;,&quot;timingMS&quot;:null,&quot;skippableType&quot;:1,&quot;pod&quot;:2}],&quot;vastReason&quot;:&quot;non_premium_user_ads&quot;},&quot;lead&quot;:{&quot;videoEndBannerIn&quot;:null,&quot;videoEndOverlay&quot;:null},&quot;context&quot;:{&quot;playFrom&quot;:null,&quot;initialPlaybackPosition&quot;:null,&quot;initialPlaybackType&quot;:null,&quot;playLength&quot;:null,&quot;watchId&quot;:&quot;sm9&quot;,&quot;isNoMovie&quot;:null,&quot;isNoRelatedVideo&quot;:null,&quot;isNoNicotic&quot;:null,&quot;isNeedPayment&quot;:false,&quot;isNeedAdmission&quot;:false,&quot;isPremiumOnly&quot;:false,&quot;isAdultRatingNG&quot;:true,&quot;isTranslatable&quot;:false,&quot;isTagUneditable&quot;:false,&quot;tagUneditableReason&quot;:&quot;NEED_LOGIN&quot;,&quot;isVideoOwner&quot;:false,&quot;isThreadOwner&quot;:false,&quot;userCanShowEditorMenu&quot;:false,&quot;isOwnerThreadEditable&quot;:null,&quot;isDisabledMarquee&quot;:null,&quot;isDefaultCommentInvisible&quot;:false,&quot;accessFrom&quot;:null,&quot;csrfToken&quot;:null,&quot;userkey&quot;:&quot;&quot;,&quot;watchAuthKey&quot;:null,&quot;watchTrackId&quot;:&quot;jjkVf21yoZ_1611284225270&quot;,&quot;watchPageServerTime&quot;:1611284225433,&quot;isAuthenticationRequired&quot;:false,&quot;isPeakTime&quot;:null,&quot;ngRevision&quot;:0,&quot;categoryName&quot;:null,&quot;categoryKey&quot;:null,&quot;categoryGroupName&quot;:null,&quot;categoryGroupKey&quot;:null,&quot;isMyMemory&quot;:false,&quot;ownerNGList&quot;:[],&quot;linkedChannelVideos&quot;:null,&quot;isAllowEmbedPlayer&quot;:true,&quot;genreName&quot;:&quot;\u672a\u8a2d\u5b9a&quot;,&quot;genreKey&quot;:&quot;none&quot;,&quot;representedTags&quot;:[],&quot;isLiked&quot;:false,&quot;highestRepresentedTagRanking&quot;:[],&quot;highestGenreRanking&quot;:null},&quot;liveTopics&quot;:{&quot;items&quot;:[{&quot;id&quot;:&quot;lv330137350&quot;,&quot;title&quot;:&quot;\u3010\u6c34\u7740\u59ff\u3011\u3067\u30d4\u30a8\u30fc\u30eb\u30de\u30eb\u30b3\u30ea\u30fc\u30cb\u306e\u30c9\u30fc\u30ca\u30c4&quot;,&quot;thumbnailURL&quot;:&quot;https:\/\/secure-dcdn.cdn.nimg.jp\/comch\/community-icon\/64x64\/co1058064.jpg?1584754486&quot;,&quot;point&quot;:170,&quot;isHigh&quot;:true,&quot;elapsedTimeM&quot;:13,&quot;communityId&quot;:&quot;co1058064&quot;,&quot;communityName&quot;:&quot;\u2606\u30cf\u30e0\u30cf\u30e0\u30e9\u30b8\u30aa\u306a\u306e\u3060\u26062nd&quot;},{&quot;id&quot;:&quot;lv330124725&quot;,&quot;title&quot;:&quot;\u3010DQ6\u3011\u8ee2\u8077\u7981\u6b62+\u30e2\u30f3\u30b9\u30bf\u30fc\u7e1b\u308a\u3067\u3084\u308b\u3088\uff01\u3010\u30e0\u30c9\u30fc\u6483\u7834\u304b\u3089\uff01\u3011\u203bDQ\u30c9\u7d20\u4eba&quot;,&quot;thumbnailURL&quot;:&quot;https:\/\/secure-dcdn.cdn.nimg.jp\/comch\/community-icon\/64x64\/co5193936.jpg?1608791033&quot;,&quot;point&quot;:70,&quot;isHigh&quot;:false,&quot;elapsedTimeM&quot;:177,&quot;communityId&quot;:&quot;co5193936&quot;,&quot;communityName&quot;:&quot;\u306a\u3081\u8535\u306e\u30ec\u30c8\u30ed\u30b2\u30fc\u30e0Ch&quot;}]},&quot;dataLayer&quot;:[],&quot;watchRecommendationRecipe&quot;:&quot;eyJpZCI6InZpZGVvX3dhdGNoX3JlY29tbWVuZGF0aW9uIiwidmlkZW9JZCI6InNtOSJ9&quot;,&quot;series&quot;:null,&quot;wakutkool&quot;:{&quot;information&quot;:null,&quot;bgImages&quot;:[],&quot;addContents&quot;:null,&quot;addVideo&quot;:null,&quot;tagRelatedBanner&quot;:{&quot;title&quot;:&quot;\u5b87\u5b99\u958b\u62d3\u653e\u7f6e\u7cfbSLG\u300c\u661f\u9593\u30d1\u30a4\u30aa\u30cb\u30a2\u300d\u30b5\u30fc\u30d3\u30b9\u958b\u59cb&quot;,&quot;imageUrl&quot;:&quot;https:\/\/secure-dcdn.cdn.nimg.jp\/nicocc\/wakutkool\/v2\/nicovideo-watch-tag-banner\/117132_02d07bde.jpg&quot;,&quot;description&quot;:&quot;\u81ea\u3089\u9020\u308a\u4e0a\u3052\u305f\u9023\u5408\u8266\u968a\u3092\u99c6\u3063\u3066\u3001\u5730\u7403\u6587\u660e\u306b\u5dee\u3059\u4e00\u7b4b\u306e\u5149\u3068\u306a\u308c\uff01&quot;,&quot;isEvent&quot;:false,&quot;linkUrl&quot;:&quot;http:\/\/app.nicovideo.jp\/app\/ap661&quot;,&quot;isNewWindow&quot;:false},&quot;tagRelatedMarquee&quot;:{&quot;title&quot;:&quot;\u3010\u30b2\u30b9\u30c8\uff1a\u514e\u97a0\u307e\u308a\u3011\u30ad\u30ba\u30ca\u30a2\u30a4 \u30e9\u30a4\u30d6\u76f4\u524d\u7279\u756a\uff01&quot;,&quot;linkUrl&quot;:&quot;https:\/\/live.nicovideo.jp\/watch\/lv330095102&quot;,&quot;isNewWindow&quot;:false}},&quot;easyComment&quot;:{&quot;phrases&quot;:[{&quot;text&quot;:&quot;\u3046\u307d\u3064&quot;,&quot;nicodic&quot;:{&quot;title&quot;:&quot;\u3046\u307d\u3064&quot;,&quot;viewTitle&quot;:&quot;\u3046\u307d\u3064&quot;,&quot;summary&quot;:&quot;\u3046\u307d\u3064\u3068\u306f\u3046\uff50\u4e59\u306e\u3053\u3068\u3067\u3046\uff50(\u30a2\u30c3\u30d7\u30ed\u30fc\u30c9)\u4e59(\u304a\u75b2\u308c\u69d8\u3067\u3059)\u3068\u3044\u3046\u610f\u5473\u3002\u8a9e\u6e90\u306f\u3046\uff50\u3068\u4e59\u3092\u30ed\u30fc\u30de\u5b57\u3067\u6253\u3064\u3068\u300c\u3046\u307d\u3064\u300d\uff08up otu\u2192u po tu\uff09\u306b\u306a\u308b\u3053\u3068\u304b\u3089\u3002\n\u985e\u7fa9\u8a9e\u306b\u3046\u3071\u308a\u304c\u3042\u308b\u3002\n\u95a2\u9023\u9805\u76ee\n&quot;,&quot;link&quot;:&quot;https:\/\/dic.nicovideo.jp\/a\/%E3%81%86%E3%81%BD%E3%81%A4&quot;}},{&quot;text&quot;:&quot;www&quot;,&quot;nicodic&quot;:{&quot;title&quot;:&quot;www&quot;,&quot;viewTitle&quot;:&quot;www&quot;,&quot;summary&quot;:&quot;www\u3068\u306f\n World Wide Web\uff08\u30ef\u30fc\u30eb\u30c9\u30ef\u30a4\u30c9\u30a6\u30a7\u30d6\uff09\n ASIAN KUNG-FU GENERATION\u306e4th\u30d5\u30eb\u30a2\u30eb\u30d0\u30e0\u300e\u30ef\u30fc\u30eb\u30c9\u00a0\u30ef\u30fc\u30eb\u30c9\u00a0\u30ef\u30fc\u30eb\u30c9\u300f\u306e\u7701\u7565\u8868\u8a18\n QuinRose&quot;,&quot;link&quot;:&quot;https:\/\/dic.nicovideo.jp\/a\/www&quot;}},{&quot;text&quot;:&quot;\u3059\u304d&quot;,&quot;nicodic&quot;:null},{&quot;text&quot;:&quot;\u3053\u3053\u3059\u304d&quot;,&quot;nicodic&quot;:{&quot;title&quot;:&quot;\u3053\u3053\u3059\u304d&quot;,&quot;viewTitle&quot;:&quot;\u3053\u3053\u3059\u304d&quot;,&quot;summary&quot;:&quot;\u767a\u7965\n\u30a2\u30a4\u30de\u30b9MAD\u300c\u3082\u3063\u3068\u3059\u3044\u307f\u3093\u3076\u305d\u304f\u300d\u304c\u767a\u7965\u3067\u3042\u308b\n\u666e\u53ca\n\u30cb\u30b3\u30cb\u30b3\u52d5\u753b\u3067\u306e\u516c\u5f0f\u30a2\u30cb\u30e1\u914d\u4fe1\u4ee5\u964d\u3001\u4ed6\u306e\u30a2\u30cb\u30e1\u306eOP\u3067\u300c\u3053\u3053\u3059\u304d\u300d\u3068\u3044\u3046\u30b3\u30e1\u30f3\u30c8\u304c\u5ea6\u3005\u898b\u53d7\u3051\u3089\u308c\u3066\u3044\u305f\u304c\u3001\n\u300c\u82b1\u54b2\u304f\u3044\u308d\u306f\u300d\u306eOP\u3067\u306e\u5f3e&quot;,&quot;link&quot;:&quot;https:\/\/dic.nicovideo.jp\/a\/%E3%81%93%E3%81%93%E3%81%99%E3%81%8D&quot;}},{&quot;text&quot;:&quot;\uff01\uff1f&quot;,&quot;nicodic&quot;:{&quot;title&quot;:&quot;!?&quot;,&quot;viewTitle&quot;:&quot;\uff01\uff1f&quot;,&quot;summary&quot;:&quot;\u6982\u8981!?\n!?\u3068\u306f\&quot;\u5f37\u70c8\&quot;\u304b\u3064\&quot;\u7406\u89e3\u4e0d\u80fd\&quot;\u306a\u9a5a\u304d\u3092\u793a\u3059\u7d04\u7269\uff08\u8a18\u53f7\uff09\u3067\u3042\u308b\u2026!?\n\u5c02\u9580\u7528\u8a9e\u3067\u306f\u300c\u611f\u5606\u7b26\u7591\u554f\u7b26\u300d\u3068\u3044\u3046\u540d\u524d\u3067\u3042\u308b\u3002\u6295\u3052\u3084\u308a\u3058\u3083\u306d\u3048\u304b!?\n\u7565\u3059\u308b\u3068\u300c\u611f\u5606\u4fee\u8f9e\u7591\u554f\u7b26\u300d\u3068\u3044\u3046\u9577\u3063\u305f\u3089\u3057\u3044\u4e0a\u306b\u3088&quot;,&quot;link&quot;:&quot;https:\/\/dic.nicovideo.jp\/a\/%21%3F&quot;}},{&quot;text&quot;:&quot;\u304a\u3064&quot;,&quot;nicodic&quot;:{&quot;title&quot;:&quot;\u304a\u3064&quot;,&quot;viewTitle&quot;:&quot;\u304a\u3064&quot;,&quot;summary&quot;:&quot;\u4e59\u3068\u306f\u3001\u4ee5\u4e0b\u306e\u3053\u3068\u3092\u8868\u3059\u3002\n \u4e59\uff08\u304a\u3064\u3001\u304d\u306e\u3068\uff09 - \u5341\u5e72\u306e\u7b2c2\u4f4d\u3002\u4e94\u884c\u306f\u6728\u3001\u9670\u967d\u306f\u9670\u3002\u8349\u82b1\u3092\u8c61\u5fb4\u3057\u3001\u5354\u8abf\u30fb\u793e\u4ea4\u30fb\u548c\u5408\u3092\u610f\u5473\u3059\u308b\u3002\n \u4e59\uff08\u304a\u3064\uff09 - \u7532\u3067\u59cb\u307e\u308b\u9806\u4f4d\u306e\u7b2c2\u4f4d\u3002\u300c\u4e59\u7a2e\u300d\u300c\u7532\u4e59\u3064\u3051\u304c\u305f\u3044\u300d&quot;,&quot;link&quot;:&quot;https:\/\/dic.nicovideo.jp\/a\/%E3%81%8A%E3%81%A4&quot;}},{&quot;text&quot;:&quot;88888888&quot;,&quot;nicodic&quot;:{&quot;title&quot;:&quot;88888888&quot;,&quot;viewTitle&quot;:&quot;88888888&quot;,&quot;summary&quot;:&quot;8\u306f\u6574\u6570\u306e\u3072\u3068\u3064\u30027\u306e\u6b21\u30019\u306e\u524d\u3002\n\u6982\u8981\n \u9178\u7d20(O)\u306e\u539f\u5b50\u756a\u53f7\u3002\n \u6a2a\u306b\u5012\u3059\u3068\u221e\u306b\u306a\u3063\u3066\u3057\u307e\u3046\u306e\u3067\u6ce8\u610f\u30028\u304b\u3089\u305a\u3044\u3076\u3093\u96e2\u308c\u3066\u3057\u307e\u3046\u3002\n \u300c\u516b\u300d\u306f\u672b\u5e83\u304c\u308a\u306e\u5f62\u3092\u3057\u3066\u3044\u308b\u305f\u3081\u3001\u7e01\u8d77\u306e\u826f\u3044\u6570\u3068\u3055\u308c\u308b\u3002\n &quot;,&quot;link&quot;:&quot;https:\/\/dic.nicovideo.jp\/a\/88888888&quot;}}]}}" data-environment="{&quot;baseURL&quot;:{&quot;web&quot;:&quot;https:\/\/www.nicovideo.jp&quot;,&quot;res&quot;:&quot;https:\/\/nicovideo.cdn.nimg.jp\/web&quot;,&quot;dic&quot;:&quot;https:\/\/dic.nicovideo.jp&quot;,&quot;flapi&quot;:&quot;https:\/\/flapi.nicovideo.jp&quot;,&quot;live&quot;:&quot;https:\/\/live.nicovideo.jp&quot;,&quot;live2&quot;:&quot;https:\/\/live2.nicovideo.jp&quot;,&quot;com&quot;:&quot;https:\/\/com.nicovideo.jp&quot;,&quot;ch&quot;:&quot;https:\/\/ch.nicovideo.jp&quot;,&quot;secureCh&quot;:&quot;https:\/\/secure.ch.nicovideo.jp&quot;,&quot;commons&quot;:&quot;https:\/\/commons.nicovideo.jp&quot;,&quot;commonsAPI&quot;:&quot;https:\/\/api.commons.nicovideo.jp&quot;,&quot;embed&quot;:&quot;https:\/\/embed.nicovideo.jp&quot;,&quot;ext&quot;:&quot;https:\/\/ext.nicovideo.jp&quot;,&quot;nicoMs&quot;:&quot;https:\/\/nico.ms&quot;,&quot;ichiba&quot;:&quot;https:\/\/ichiba.nicovideo.jp&quot;,&quot;ads&quot;:&quot;https:\/\/ads.nicovideo.jp&quot;,&quot;account&quot;:&quot;https:\/\/account.nicovideo.jp&quot;,&quot;secure&quot;:&quot;https:\/\/secure.nicovideo.jp&quot;,&quot;premium&quot;:&quot;https:\/\/premium.nicovideo.jp&quot;,&quot;ex&quot;:&quot;http:\/\/ex.nicovideo.jp&quot;,&quot;qa&quot;:&quot;https:\/\/qa.nicovideo.jp&quot;,&quot;publicAPI&quot;:&quot;https:\/\/public.api.nicovideo.jp&quot;,&quot;commonsPublicAPI&quot;:&quot;https:\/\/public-api.commons.nicovideo.jp\/&quot;,&quot;app&quot;:&quot;http:\/\/app.nicovideo.jp&quot;,&quot;appClientAPI&quot;:&quot;http:\/\/app-cliapi.nicovideo.jp&quot;,&quot;point&quot;:&quot;https:\/\/point.nicovideo.jp&quot;,&quot;enquete&quot;:&quot;http:\/\/enquete.nicovideo.jp&quot;,&quot;notification&quot;:&quot;https:\/\/notification.nicovideo.jp&quot;,&quot;upload&quot;:&quot;https:\/\/www.upload.nicovideo.jp&quot;,&quot;sugoiSearchSystem&quot;:&quot;https:\/\/sug.search.nicovideo.jp&quot;,&quot;nicoad&quot;:&quot;https:\/\/nicoad.nicovideo.jp&quot;,&quot;nicoadAPI&quot;:&quot;https:\/\/api.nicoad.nicovideo.jp&quot;,&quot;secureDCDN&quot;:&quot;https:\/\/secure-dcdn.cdn.nimg.jp&quot;,&quot;seiga&quot;:&quot;https:\/\/seiga.nicovideo.jp&quot;,&quot;nvapi&quot;:&quot;https:\/\/nvapi.nicovideo.jp&quot;},&quot;playlistToken&quot;:&quot;0_1611284225_bc6ddcafad87733b68f5f60aafc3f5a20bad8e5b&quot;,&quot;i18n&quot;:{&quot;language&quot;:&quot;ja-jp&quot;,&quot;locale&quot;:&quot;ja_JP&quot;,&quot;area&quot;:&quot;JP&quot;,&quot;footer&quot;:null},&quot;urls&quot;:{&quot;playerHelp&quot;:&quot;https:\/\/qa.nicovideo.jp\/faq\/show\/6116&quot;},&quot;isMonitoringLogUser&quot;:false,&quot;frontendId&quot;:6,&quot;frontendVersion&quot;:&quot;0&quot;,&quot;newPlaylistRate&quot;:1,&quot;newRelatedVideos&quot;:true}" hidden></div>
+      <div id="js-failover2flash" class="failover2flash" style="display: none;">
+  <div class="failover2flash-header">
+    <h1 class="failover2flash-logo">
+      <a href="/video_top">ニコニコ動画</a>
+    </h1>
+  </div>
+
+    <p class="failover2flash-late">ページの読み込みに時間がかかっています</p>
+
+    <p class="failover2flash-error">エラーが発生しました</p>
+
+  <div class="failover2flash-buttonArea">
+    <button id="js-failover2flash-reload" class="failover2flash-reload">再読み込み</button>
+  </div>
+</div>
+      <link href="https://nicovideo.cdn.nimg.jp/web/styles/footer.css?1603771323" rel="stylesheet">
+<footer class="FooterContainer" data-footer-is-login="true">
+  <a href="javascript:void(0)" class="FooterContainer-pageTop" onclick="window.scrollTo(0, 0)">▲ページトップ</a>
+
+                
+    <div class="FooterContainer-information">
+    <div class="FooterContainer-informationInner">
+
+            <h1 class="FooterContainer-pageLogo">
+        <a href="/video_top" class="FooterContainer-pageLogoLink">
+          <img src="https://nicovideo.cdn.nimg.jp/web/images/logo/logo_nicovideo_white.svg" alt="ニコニコ動画">
+        </a>
+      </h1>
+
+            <div classs="FooterContainer-linksContainer">
+
+                <ul class="FooterContainer-links"  data-footer-watch-links style="display: none;">
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/faq/show/6116?site_domain=default">使い方</a></li>
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/faq/show/195?site_domain=default">動画が視聴できない</a></li>
+          <li class="FooterContainer-link FooterContainer-requiredLoginLink FooterContainer-attentionLink"><a href="#" data-footer-comment-allegation-base-url="https://secure.nicovideo.jp/secure/comment_allegation/" data-footer-comment-allegation-link>コメント/タグ通報</a></li>
+          <li class="FooterContainer-link FooterContainer-requiredLoginLink FooterContainer-attentionLink"><a href="#" data-footer-video-allegation-base-url="https://www.nicovideo.jp/allegation/" data-footer-video-allegation-link>動画通報</a></li>
+        </ul>
+
+        <ul class="FooterContainer-links">
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/faq/show/5008?site_domain=default">ご意見・ご要望</a></li>
+          <li class="FooterContainer-link"><a href="https://secure.nicovideo.jp/form/feedback_bugreport">不具合報告</a></li>
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/">ヘルプ</a></li>
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/faq/show/1112">動作環境</a></li>
+          <li class="FooterContainer-link"><a href="https://account.nicovideo.jp/rules/account">利用規約</a></li>
+          <li class="FooterContainer-link"><a target="_blank" href="http://dwango.co.jp/">運営会社</a></li>
+        </ul>
+        <ul class="FooterContainer-links">
+          <li class="FooterContainer-link FooterContainer-breakLink"><a href="http://ex.nicovideo.jp/smile/guideline/">権利侵害に関する動画投稿ガイドライン</a></li>
+          <li class="FooterContainer-link"><a href="https://license-search.nicovideo.jp/">動画に使用できる音源の検索</a></li>
+          <li class="FooterContainer-link"><a href="http://info.nicovideo.jp/base/phishing.html">フィッシング詐欺にご注意ください</a></li>        </ul>
+        <ul class="FooterContainer-links">
+          <li class="FooterContainer-link"><a href="https://site.nicovideo.jp/sales_ads">広告出稿に関するお問い合わせ</a></li>
+                  </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="FooterContainer-additionals">
+    <div class="FooterContainer-additionalsInner">
+
+      <div class="FooterContainer-metadata">
+        <div class="FooterContainer-metadataItem">
+          <span class="FooterContainer-metadataLabel">総動画数</span>
+          <span class="FooterContainer-metadataValue">18,283,022</span>
+          <span class="FooterContainer-metadataLinks">
+                      </span>
+        </div>
+        <div class="FooterContainer-metadataItem">
+          <span class="FooterContainer-metadataLabel">総再生数</span>
+          <span class="FooterContainer-metadataValue">115,255,438,122</span>
+        </div>
+        <div class="FooterContainer-metadataItem">
+          <span class="FooterContainer-metadataLabel">総コメント数</span>
+          <span class="FooterContainer-metadataValue">5,934,780,291</span>
+        </div>
+        <address class="FooterContainer-metadataAddress">©DWANGO Co., Ltd.</address>
+      </div>
+
+
+      
+    </div>
+  </div>
+
+</footer>
+<script charset="utf-8" src="https://nicovideo.cdn.nimg.jp/web/scripts/modules/view/Footer.js?1599530746" async="1" defer="1"></script>
+
+
+      <script type="text/javascript" src="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/failover2flash/watch_failover2flash.js?025a757e"></script>
+      <script type="text/javascript" charset="utf-8" src="https://res.ads.nicovideo.jp/assets/js/ads2.js?ref=video"></script>
+                    <script type="text/javascript" src="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/legacy/watch_dll_f92a05c7cabed85c6263.js" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/legacy/watch_app_0366e2496a747fa71552.js" crossorigin="anonymous"></script>
+      
+      <script type="text/javascript">
+  
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-1089346-5']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+  
+</script>
+
+          </div>
+
+          <script type="application/ld+json">
+        {"@context":"http:\/\/schema.org","@type":"VideoObject","@id":"https:\/\/www.nicovideo.jp\/watch\/sm9","name":"新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師","description":"レッツゴー！陰陽師（フルコーラスバージョン）","caption":"レッツゴー！陰陽師（フルコーラスバージョン）","url":"https:\/\/www.nicovideo.jp\/watch\/sm9","duration":"PT320S","uploadDate":"2007-03-06T00:33:00+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm9?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":19979548},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":181074}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/9\/9.original\/r1280x720l?key=8d46976aca8120e4969537a0c10b47590a67740a5994c11969d4ae7fa5c2bf74"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/9\/9","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/9\/9.original\/r1280x720l?key=8d46976aca8120e4969537a0c10b47590a67740a5994c11969d4ae7fa5c2bf74","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/9\/9"],"requiresSubscription":false,"commentCount":5126853,"keywords":"陰陽師,レッツゴー！陰陽師,公式,音楽,ゲーム,β時代の英雄,重要ニコニコ文化財,sm13→,3月6日投稿動画,豪血寺一族,全ての元凶","playerType":"HTML5 Flash","provider":{"@type":"Organization","name":"niconico"},"author":{"@type":"Person","name":"中の","description":"【実態に即してプロフを更新しました】\n今は主にゲーム系のお仕事をしています。","url":"https:\/\/www.nicovideo.jp\/user\/4"}}
+      </script>
+        <script type="application/ld+json">
+      {"@context":"http:\/\/schema.org","@type":"WebSite","name":"niconico","url":"https:\/\/www.nicovideo.jp\/"}
+    </script>
+    <script type="application/ld+json">
+      {"@context":"http:\/\/schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"item":{"@id":"https:\/\/www.nicovideo.jp\/video_top","name":"ニコニコ動画"}},{"@type":"ListItem","position":2,"item":{"@id":"https:\/\/www.nicovideo.jp\/tag\/陰陽師","name":"陰陽師"}}]}
+    </script>
+
+  </body>
+</html>

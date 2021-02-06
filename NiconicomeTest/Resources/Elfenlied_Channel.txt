@@ -1,0 +1,2050 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+<html class="gecko ">
+
+<head>
+<script type="text/javascript">
+  try {
+    window.NicoGoogleTagManagerDataLayer = [];
+
+    var data = {};
+
+        data.user = (function () {
+      var user = {};
+
+                  user.login_status = 'not_login';
+      
+      return user;
+      })();
+
+    data.content = (function () {
+      var content = {};
+      content.community_id = '3760945';
+      content.ch_screen_name = 'elfenlied';
+      content.channel_id = 'ch2635292';
+      content.ch_monthly_charge = null;
+      return content;
+    })();
+
+    window.NicoGoogleTagManagerDataLayer.push(data);
+    } catch (e) {}
+</script>
+
+<!-- Google Tag Manager For Channel Access Analytics -->
+
+
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','NicoChannelAccessAnalyticsGtmDataLayer','GTM-K8M6VGZ');</script>
+
+
+    
+    
+    
+    
+        
+<script>
+        window.NicoChannelAccessAnalyticsGtmDataLayer.push({
+        'event': 'TriggerAccessAnalytics',
+        'PageParameter.ChannelId': 'ch2635292',
+        'PageParameter.ContentId': null,
+        'PageParameter.ContentBillingType': null,
+        'PageParameter.FrontendId': 32
+    });
+        window.NicoGoogleTagManagerDataLayer.push({
+        'ch_access_analytics': {
+            'channel_id': 'ch2635292',
+            'content_id': null,
+            'content_billing_type': null,
+            'membership_status': '取得不可（非ログイン）',
+            'login_status': '非ログイン'
+        }
+    });
+</script>
+<!-- End Google Tag Manager For Channel Access Analytics --><!-- Google Tag Manager -->
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','NicoGoogleTagManagerDataLayer','GTM-KXT7G5G');</script>
+
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager For Google Optimize -->
+    
+            
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','NicoChGoogleTagManagerForOptimizeDataLayer','GTM-K8CLHPH');</script>
+        
+    
+        <!-- End Google Tag Manager For Google Optimize  --><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="copyright" content="(C) DWANGO Co., Ltd.">
+
+
+
+    
+
+<title>エルフェンリート [第1話無料] - ニコニコチャンネル:アニメ</title>
+    <meta name="keywords" content="2000年代,2004年,アニメ,エルフェンリート,きしもとせいじ,コミック原作,中田亮大,中田譲治,伊藤聖,全話配信,吉岡たかを,大河広行,小林沙苗,小西香葉,岡本倫,松岡由貴,瀬山武司,白井久男,神戸守,第1話無料,細井治,能登麻美子,萩原えみこ,近藤由紀夫,鈴木千尋,青木智由紀,動画,無料,ニコニコチャンネル,niconico">    <meta name="description" content="二角奇人（ディクロニウス）は、人間の突然変異体･･････頭から生えた角を持ち、第6感とも言える特殊な能力と手を持っていた。人類を淘汰する可能性をも秘めた彼らミュータントたちは、その危険な能力のため、国家...">    
+        
+
+                                
+            
+        
+        
+        
+        
+        
+                
+        
+                
+        
+
+        
+
+                                            
+<meta property="og:title" content="エルフェンリート [第1話無料] - ニコニコチャンネル:アニメ">
+<meta property="og:site_name" content="エルフェンリート">
+<meta property="og:description" content="二角奇人（ディクロニウス）は、人間の突然変異体･･････頭から生えた角を持ち、第6感とも言える特殊な能力と手を持っていた。...">
+<meta property="og:url" content="https://ch.nicovideo.jp/elfenlied">
+<meta property="og:image" content="https://img.cdn.nimg.jp/s/comch/channel-icon/original/ch2635292/6815998.jpg/512x512l_FFFFFFFF?key=82b554b7c47030dd31e6455b108dc76b56030f5b9143d316bae30cfcb6c57a6f">
+<meta property="og:type" content="website">
+<meta property="fb:app_id" content="1080595878705344">
+<meta name="twitter:card" content="summary">
+                                    <link rel="canonical" href="https://ch.nicovideo.jp/elfenlied">
+
+
+    
+
+                        <link rel="alternate" media="only screen and (max-width: 640px)" href="https://sp.ch.nicovideo.jp/elfenlied" />
+
+    <link rel="shortcut icon" href="https://ch.nicovideo.jp/favicon.ico?111206">
+
+<link rel="stylesheet" href="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/css/legacy-less/base.css?1612247611">
+
+
+
+
+
+
+<link rel="alternate" type="application/rss+xml" title="エルフェンリート チャンネル動画" href="/elfenlied/video?rss=2.0">
+
+
+            <link rel="stylesheet" href="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/css/legacy-less/channel-channel_top.css?1612247611">
+    <style type="text/css"><!--
+section.site_body {background-color:#000000;background-image:url(https://secure-dcdn.cdn.nimg.jp/nicochannel/material/design/3760945/bg.jpg);background-position:center top;background-repeat:no-repeat;background-attachment:fixed;color:#ffffff;}
+section.site_body a {color:#ec4c99;}
+section.site_body a:visited {color:#c62673;}
+
+div#channel-main  {background-color:#000000;background-position:left top;background-repeat:no-repeat;background-attachment:scroll;color:#ffffff;}
+div#channel-main a {color:#ec4c99;}
+div#channel-main a:visited {color:#c62673;}
+
+--></style>
+
+
+
+
+
+
+
+<link rel="stylesheet" href="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/css/legacy-less/campaign-ticket_sale-ticket_sale.css?1612247611">
+
+
+
+
+<script>
+var is_login   = false;
+var is_premium = false;
+var is_channel = true;
+var user_is_joinable = false;
+var nicopo_balance = false;
+var page_code  = "channel_view"||null;
+var page_id    = "ch_page"||null;
+var user       = null,
+    ad_age     = null;
+var community = {
+    "type":"normal"
+};
+var channeloption = {
+    "first_month_free_flag":false};
+var show_danimestore_invitation = false</script>
+
+
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/prototype.1.6.1.min.js"></script>
+<script>Element.addMethods();</script>
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/jquery/jquery-1.8.3.min.js"></script>
+<script>jQuery.noConflict();</script>
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/common.js?1612247611"></script>
+
+
+
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/swfobject.js?v1.5.1"></script>
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/nicolib.js?1612247611"></script><script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/ads.js?1612247611"></script>
+
+    
+<script src="https://res.ads.nicovideo.jp/assets/js/ads2.js?ref=ch"></script>
+
+
+
+
+
+
+
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/base_cp.js?1612247611"></script>
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/jarty.js"></script><script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/parts/nico_review.js?1612247611"></script>
+<script>
+Nico.LazyImage.margin=400;
+Nico.LazyImage.attrName="data-original";
+Nico.LazyImage.initialize();
+</script>
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/google_analytics.js"></script>
+    <script>
+                        ga('create', 'UA-96548570-4', 'auto', {
+            'name': 'chfrontAll',
+            'sampleRate': 5
+        });
+        ga('require', 'GTM-K8CLHPH');         ga('chfrontAll.send', 'pageview');
+    </script>
+
+
+
+</head>
+
+            
+                    
+        
+<body id="channel_top"class="
+ ja  channel personal">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KXT7G5G" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- Google Tag Manager For Google Optimize (noscript) -->
+    
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K8CLHPH" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    
+        
+<!-- End Google Tag Manager For Google Optimize (noscript) -->
+
+
+
+                <div id="CommonHeader" class="c-siteCommonHeaderUnit"></div>
+
+<!---->
+<!---->
+
+
+<script>
+    window.onCommonHeaderReady = function(commonHeader) {
+        commonHeader.mount('#CommonHeader', {
+                        frontendId: 32,
+            site: 'channel',
+            nextUrl: '%2Felfenlied',
+            user: {
+                                isLogin: false            },
+            customization: {
+                size: {
+                    maxWidth: '1024px',
+                    minWidth: '1024px'
+                },
+                userPanelLinks: [
+                    {
+                        href : '/my/purchased',
+                        label: '購入したもの'
+                    },
+                    {
+                        href : '/my/following',
+                        label: '登録したチャンネル'
+                    },
+                    {
+                        href : '/my/mail/subscribing',
+                        label: '購読中のブロマガ'
+                    },
+                    {
+                        href : '/start',
+                        label: 'チャンネルを開設'
+                    },
+                                        {
+                        href : '/portal/anime',
+                        label: 'アニメ'
+                    },
+                    {
+                        href : '/portal/blomaga',
+                        label: 'ブロマガ'
+                    },
+                    {
+                        href : '/chlist',
+                        label: 'その他のカテゴリ'
+                    }
+                ],
+                helpLink: {
+                    href: 'https://qa.nicovideo.jp/category/show/429?site_domain=default'
+                }
+            }
+        });
+    };
+</script>
+<script type="text/javascript" src="https://secure-dcdn.cdn.nimg.jp/common-header/res/2.0.2/pc/CommonHeaderLoader.min.js"></script>    
+        <header class="site">
+                                            <div id="head_cp">
+    <div class="head_inner">
+
+    <nav class="head_breadcrumb" id="head_cp_breadcrumb">
+        <h1 class="channel_name"><a href="/elfenlied">エルフェンリート</a></h1>
+        <div class="site_logo"><a href="https://ch.nicovideo.jp/"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/base/niconico_channel_small.png" alt="ニコニコチャンネル"></a></div>
+
+                                <div class="channel_category">
+                <a href="/portal/anime">
+                    アニメ
+                </a>
+                <menu class="switch_category">
+                    <span class="other">▼</span>
+                    <ul id="other_categories_list" style="display:none;">
+                        <li ><a href="/portal/event">イベント</a>
+<li ><a href="/portal/blomaga">ブロマガ</a>
+<li class="selected"><a href="/portal/anime">アニメ</a>
+<li ><a href="/portal/movie">映画・ドラマ</a>
+<li ><a href="/portal/media">社会・言論</a>
+<li ><a href="/portal/tokusatsu">特撮</a>
+<li ><a href="/portal/music">音楽</a>
+<li ><a href="/portal/entertainment">エンタメ</a>
+<li ><a href="/portal/sports">スポーツ</a>
+<li ><a href="/portal/showbiz">芸能</a>
+<li ><a href="/portal/life">生活</a>
+<li ><a href="/portal/politics">政治</a>
+<li ><a href="/portal/game">ゲーム</a>
+<li ><a href="/portal/variety">バラエティ</a>
+<li ><a href="/portal/gravure">グラビア</a>                    </ul>
+                </menu>
+            </div>
+            <script>Ch.categoryDropdown.init();</script>
+            </nav>
+
+        <menu id="head_sns_share" class="sns_share">
+        <!--SNS共有-->
+        
+        
+                                        <div class="sns_button twitter">
+            <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-url="https://ch.nicovideo.jp/elfenlied" data-text="エルフェンリート #nicoch" data-count="none" data-lang="ja">Tweet</a>
+        </div>
+
+        <div class="sns_button facebook">
+            <iframe src="https://www.facebook.com/plugins/like.php?href=https://ch.nicovideo.jp/elfenlied&locale=&app_id=227837487254498&amp;send=false&amp;layout=button&amp;width=100&amp;show_faces=false&amp;action=like&amp;colorscheme=light&amp;font&amp;height=21" scrolling="no" frameborder="0" allowTransparency="true"
+            style="width:110px; height:21px"></iframe>
+                    </div>
+
+        <!--その他のSNS: hatebu gp+-->
+        <div class="sns_other">
+            <button class="btn_share_toggle"><span class="down">▼</span><span class="up">▲</span></button>
+            <div id="head_sns_share_more">
+                <ul>
+                    <li class="hatebu"><a href="http://b.hatena.ne.jp/entry/s/ch.nicovideo.jp/elfenlied" class="hatena-bookmark-button" data-hatena-bookmark-title="エルフェンリート - ニコニコチャンネル" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20"></a>
+                </ul>
+            </div>
+        </div>
+        
+        <script>
+        jQuery(".btn_share_toggle").on("click",function(){
+            var sns_other = jQuery(".sns_other");
+            var sns_other_panel = jQuery("#head_sns_share_more");
+            var target_height = sns_other_panel.find("ul").outerHeight();
+            var expanded_class = "expanded";
+            if(sns_other.hasClass(expanded_class)){
+                //close it
+                sns_other_panel.animate({"height":"0"},150);
+                sns_other.removeClass(expanded_class);
+            }else{
+                //open it
+                sns_other_panel.animate({"height":target_height},150);
+                sns_other.addClass(expanded_class);
+            }
+        });
+        </script>
+        
+    </menu>
+    
+    </div>
+    </div>
+    <div id="head_cp_menu">
+    <div class="head_inner">
+                                <nav class="current channel" id="cp_menu">
+                <ul>
+                                                                    
+                                    
+                        <li class="selected">
+                            <a href="/elfenlied">トップ</a>
+
+                                                                                <li class="">
+                                <a href="/elfenlied/video">動画</a>
+                        
+                                                                                <li class="">
+                                <a href="/elfenlied/pack">動画パック</a>
+                        
+                        
+                        
+                        
+                        
+                                                    </ul>
+            </nav>
+                    
+        <div class="join_leave">
+                                            <div class="cell">
+            <a href="https://account.nicovideo.jp/login?next_url=%2Felfenlied&site=channel&time=1612315604&hash_key=350f2cc7"
+            class="btn_follow bookmark send-ga-ga360-event"
+            onmouseover="jQuery('#please_login').show(); return false;"
+            onmouseout="jQuery('#please_login').hide(); return false;"
+            data-ga-category="ヘッダー" data-ga-action="フォロー" data-ga-event-tag="nicoch_click_header-follow-button">
+            <span class="labels">
+                <span class="off">フォロー</span>
+            </span>
+            </a>
+        </div>
+    
+                            <div class="cell ">
+    <a class="btn_app send-ga-ga360-event"
+    href="https://ex.ch.nicovideo.jp/channel/elfenlied/app?page=share&amp;from=pc_cp_header" target="_blank"
+    data-ga-category="ヘッダー" data-ga-action="アプリ" data-ga-event-tag="nicoch_click_header-app-button">
+        アプリ
+    </a>
+</div>                    </div>
+
+    </div>
+    </div>    
+    
+    
+    
+
+                    
+            
+                                
+        
+        
+    <script>
+
+    //共有ボタンに展開イベントを割り振り
+    var panel	= jQuery("#shareMenuBar"),
+            trigger = jQuery("#shareMenuTrigger");
+    jQuery("#shareMenuTrigger").click(function(event){
+        if(panel.is(':visible')){
+            toggleShareMenu(false);
+        }else{
+            toggleShareMenu(true);
+        }
+        return false;
+    });
+
+    //ヘッダーの初月無料プランリンクclick後に、入会プラン周りを目立たせる
+    jQuery("a#first_month_free_flag").click(function(){
+        var joinMenu = jQuery("#cp_joinmenu");
+        var animateDuration = 500;
+        var isScroll = Ch.smoothScroll("#cp_joinmenu", {"duration": animateDuration});
+        joinMenu
+            .wrapInner('<div class="cp_joinmenu_cnt"></div>')
+            .append('<span class="bg_cp_joinmenu"></span>')
+            .css({"position":"relative"});
+        var cnt = joinMenu.find(".cp_joinmenu_cnt");
+        var bg = joinMenu.find(".bg_cp_joinmenu");
+        cnt.css({"position":"relative", "z-index":"1"});
+        bg.css({
+            "position":"absolute",
+            "top":0,
+            "left":0,
+            "z-index":0,
+            "width": joinMenu.innerWidth(),
+            "height": joinMenu.innerHeight(),
+            "background": "#fff",
+            "opacity":"0"
+        });
+        setTimeout(function(){
+            bg.animate({"opacity":"1"},100).animate({"opacity":"0"},1000,function(){this.remove()})
+        }, animateDuration);
+        if(isScroll) {return false;}
+    });
+
+    </script>
+    
+
+
+
+
+
+    <div id="head_ticket_sale">
+        <div id="template-vars-channel-ticket-sales"></div>
+        <script type="text/x-template"
+                data-wktk-id="channel-ticket-sales"
+                data-wktk-name="channel-ticket-sales"
+                data-wktk-selector="#head_ticket_sale"
+                data-waku-wrapper-id="head_ticket_sale"
+        >
+            {{#each items}}
+            <div class="item">
+                                                    
+                    <div class="banner"><a href="/ch2635292/join?a=a"><img src="{{values.bannerImagePc.url}}"></a></div>
+                    {{#if @last}}
+                        <p class="text"><a href="/ch2635292/join?a=a">入会してチケットを申し込む</a></p>
+                    {{/if}}
+                
+                            </div>
+            {{/each}}
+        </script>
+    </div>
+                        </header>
+
+    <section class="site_body">
+                
+        <article class="content white" data-page-id="ch_page">
+            
+        
+            <div id="channel-main">
+                        <style type="text/css">
+
+
+.p-saveid289732 div.p-header
+{
+    color:inherit;    }
+
+.p-saveid289732 div.p-header h3.p-title
+{
+            border: 1px none #FFFFFF;
+    
+            }
+
+.p-saveid289732 .p-body
+{
+            border: 1px none #FFFFFF;
+                    background-image:none;
+        color:inherit;}
+
+
+
+.p-saveid289739 div.p-header
+{
+    color:#DE1666;    }
+
+.p-saveid289739 div.p-header h3.p-title
+{
+            border: 1px none #FFFFFF;
+    
+            }
+
+.p-saveid289739 .p-body
+{
+            border: 1px none #FFFFFF;
+                    background-image:none;
+        color:#DE1666;}
+
+.p-saveid289739  .g-contents
+{
+    width: ;
+    overflow: hidden;
+}
+
+.p-saveid289740 div.p-header
+{
+    color:inherit;    }
+
+.p-saveid289740 div.p-header h3.p-title
+{
+    
+            }
+
+.p-saveid289740 .p-body
+{
+                    background-image:none;
+        color:inherit;}
+
+
+.p-saveid290266 div.p-header
+{
+    color:inherit;    }
+
+.p-saveid290266 div.p-header h3.p-title
+{
+    
+            }
+
+.p-saveid290266 .p-body
+{
+                    background-image:none;
+        color:inherit;}
+
+
+
+
+.p-saveid289737 div.p-header
+{
+    color:inherit;    }
+
+.p-saveid289737 div.p-header h3.p-title
+{
+    
+            }
+
+.p-saveid289737 .p-body
+{
+            border: 1px none #FFFFFF;
+                    background-image:none;
+        color:inherit;}
+
+.p-saveid289737   .g-videolist .g-video {
+    background-color:   ;
+    color:   inherit;
+}
+
+.p-saveid289737  .rank-bg-color {
+    background-color:   ;
+    color:   inherit;
+}
+
+.p-saveid289737   .g-thumbnailL .g-video-summary {
+    background-color:   ;
+    color:   ;
+}
+
+.p-saveid289737   .g-thumbnailM .g-video-summary {
+    background-color:   ;
+    color:   ;
+}
+
+
+
+.p-saveid289733 div.p-header
+{
+    color:inherit;    }
+
+.p-saveid289733 div.p-header h3.p-title
+{
+    
+            }
+
+.p-saveid289733 .p-body
+{
+            border: 1px none #FFFFFF;
+                    background-image:none;
+        color:inherit;}
+
+.p-saveid289733  .g-contents
+{
+    width: ;
+    overflow: hidden;
+}
+
+
+.p-saveid289734 div.p-header
+{
+    color:inherit;    }
+
+.p-saveid289734 div.p-header h3.p-title
+{
+    
+            }
+
+.p-saveid289734 .p-body
+{
+            border: 1px none #FFFFFF;
+                    background-image:none;
+        color:inherit;}
+
+.p-saveid289734  .g-contents
+{
+    width: ;
+    overflow: hidden;
+}
+
+
+.p-saveid289735 div.p-header
+{
+    color:inherit;    }
+
+.p-saveid289735 div.p-header h3.p-title
+{
+    
+            }
+
+.p-saveid289735 .p-body
+{
+            border: 1px none #FFFFFF;
+                    background-image:none;
+        color:inherit;}
+
+.p-saveid289735  .g-contents
+{
+    width: ;
+    overflow: hidden;
+}
+</style>                <table id="layout" border="0" cellpadding="0" cellspacing="0">
+<col><col><col>
+<tr><td colspan="1" rowspan="3">
+<div class="parts p-image cols1 design1 p-saveid289732" id="nico_parts_289732">
+
+
+
+
+
+
+    <div class="p-header">
+            </div>
+    <div class="p-body ">
+
+<img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/material/design/3760945/main.png" alt=""
+  >
+            </div>
+    <div class="p-footer"></div>
+
+    </div>
+
+
+</td>
+<td colspan="2" rowspan="1">
+<div class="parts p-text cols2 design1 p-saveid289739" id="nico_parts_289739">
+
+
+
+
+
+
+    <div class="p-header">
+            </div>
+    <div class="p-body ">
+
+    <div class="g-contents"><font size="3"><b>※この作品では過激な暴力シーンや性的シーンが描写されております。<br />
+ご視聴に際しあらかじめご了承下さい。</b></font></div>
+            </div>
+    <div class="p-footer"></div>
+
+    </div>
+
+
+</td>
+
+</tr>
+<tr>
+<td colspan="2" rowspan="1">
+<div class="parts p-thumb_watch cols2 design1 p-saveid289740" id="nico_parts_289740">
+
+
+
+
+
+
+    <div class="p-header">
+                <h3 class="p-imgtitle"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/material/design/3760945/index_popular.png" alt=""></h3>
+            </div>
+    <div class="p-body g-has-title">
+
+
+  
+    <div class="g-thumb-watch" rel="auto_choice_video_ON">
+    <div class="ex_player"></div>
+    <script type="text/javascript" charset="utf-8"
+        src="https://embed.nicovideo.jp/watch/so32628045/script?w=632&h=370&noShare=1&noTags=1&noVideoDetail=1">
+    </script>
+    <p class="g-thumb-watch_link">
+      <span style="width:632px">
+        <a href="https://www.nicovideo.jp/watch/so32628045">コメント投稿は視聴ページへ</a>
+      </span>
+    </p>
+  </div>
+              </div>
+    <div class="p-footer"></div>
+
+    </div>
+
+
+</td>
+
+</tr>
+<tr>
+<td colspan="2" rowspan="1">
+<div class="parts p-video_pack cols2 design2 p-saveid290266" id="nico_parts_290266">
+
+
+
+
+
+
+
+    <div class="p-header">
+                <h3 class="p-imgtitle"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/material/design/3760945/index_pack.png" alt=""></h3>
+            </div>
+    <div class="p-body g-has-title">
+<div class="p-video_pack">
+
+
+    
+    
+    <table width="100%">
+        <tr valign="top">
+            <td width="104">
+                <div class="pack_thumb pack_thumb_M">
+                    <a class="pack_thumb_sheet" href="ch2635292/pack/pk9326"
+                    title="パック詳細へ"
+                    ><span class="purchase_type"><span class="inner ppv all_pay">有料</span></span><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628048/32628048" class="lazyimage video_img_M"
+                    ></a>
+                </div>
+            </td>
+            <td>
+                
+                <!-- タイトル・説明文 -->
+                <h3><a href="ch2635292/pack/pk9326"><strong>エルフェンリート　全話パック『第2話～EXTRA』</strong></a></h3>
+                <p style="margin:4px 0;">
+                                エルフェンリートの全話パックです。第2話～EXTRAが含まれています。
+                                </p>
+
+                                            <!-- 視聴期間  価格 -->
+    <table align="right" class="ppv_status">
+        <tr>
+                    <td class="bottom_price_container">
+                <p>
+                <span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"
+                ><var>1,980</var>pt</span>
+                <span class="ppv_length">30日間</span>
+                </p>
+            </td>
+                </tr>
+    </table>
+        
+                
+                <ul class="videos_in_pack">
+                                    <li>
+                    <a href="/ch2635292/video/so32628048"
+                    class="video_in_pack" title="エルフェンリート　第2話 掃討　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628048/32628048" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628052"
+                    class="video_in_pack" title="エルフェンリート　第3話 胸裡　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628052/32628052" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628055"
+                    class="video_in_pack" title="エルフェンリート　第4話 触撃　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628055/32628055" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628056"
+                    class="video_in_pack" title="エルフェンリート　第5話 落掌　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628056/32628056" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628057"
+                    class="video_in_pack" title="エルフェンリート　第6話 衷情　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628057/32628057" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628060"
+                    class="video_in_pack" title="エルフェンリート　第7話 際会　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628060/32628060" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628063"
+                    class="video_in_pack" title="エルフェンリート　第8話 嚆矢　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628063/32628063" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628064"
+                    class="video_in_pack" title="エルフェンリート　第9話 追憶　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628064/32628064" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628070"
+                    class="video_in_pack" title="エルフェンリート　第10話 嬰児　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628070/32628070" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628072"
+                    class="video_in_pack" title="エルフェンリート　第11話 錯綜　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628072/32628072" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628074"
+                    class="video_in_pack" title="エルフェンリート　第12話 泥濘　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628074/32628074" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628079"
+                    class="video_in_pack" title="エルフェンリート　第13話 不還　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628079/32628079" class="lazyimage video_img_S"></a>
+                                    <li>
+                    <a href="/ch2635292/video/so32628084"
+                    class="video_in_pack" title="エルフェンリート　EXTRA 通り雨にて 或いは、少女はいかにしてその心情に至ったか?　"
+                    ><img data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628084/32628084" class="lazyimage video_img_S"></a>
+                                </ul>
+
+            </td>
+        </tr>
+
+    </table>
+
+
+</div>            </div>
+    <div class="p-footer"></div>
+
+    </div>
+
+
+</td>
+
+</tr>
+<tr><td>
+</td>
+<td colspan="2" rowspan="1">
+<div class="parts p-video cols2 design4 p-saveid289737" id="nico_parts_289737">
+
+
+
+
+
+
+
+    <div class="p-header">
+                <h3 class="p-imgtitle"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/material/design/3760945/index_allvideo.png" alt="動画一覧"></h3>
+            </div>
+    <div class="p-body g-has-title">
+
+    
+
+
+            <div style="padding-bottom:4px;">
+        <table cellpadding="0" cellspacing="0"
+    class="g-videolist g-thumbnailSS g-video-mini"
+    width="100%">
+            
+        <col width="50%" span="2">
+                            <tr class="rank-bg-color">
+                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-odd g-item-first from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS ">
+            <div class="mini_ppv_price">
+    
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628045"
+ title="エルフェンリート　第1話 邂逅　
+"><img 
+class="lazyimage g-thumbnail-image  "data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628045/32628045"></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628045"
+ title="エルフェンリート　第1話 邂逅　
+"
+                >エルフェンリート　第1話 邂逅　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+                                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-even from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628048"
+ title="エルフェンリート　第2話 掃討　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628048/32628048"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628048"
+ title="エルフェンリート　第2話 掃討　
+"
+                >エルフェンリート　第2話 掃討　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+            </td>
+            </tr>
+                                <tr class="rank-bg-color">
+                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-odd from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628052"
+ title="エルフェンリート　第3話 胸裡　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628052/32628052"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628052"
+ title="エルフェンリート　第3話 胸裡　
+"
+                >エルフェンリート　第3話 胸裡　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+                                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-even from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628055"
+ title="エルフェンリート　第4話 触撃　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628055/32628055"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628055"
+ title="エルフェンリート　第4話 触撃　
+"
+                >エルフェンリート　第4話 触撃　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+            </td>
+            </tr>
+                                <tr class="rank-bg-color">
+                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-odd from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628056"
+ title="エルフェンリート　第5話 落掌　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628056/32628056"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628056"
+ title="エルフェンリート　第5話 落掌　
+"
+                >エルフェンリート　第5話 落掌　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+                                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-even from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628057"
+ title="エルフェンリート　第6話 衷情　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628057/32628057"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628057"
+ title="エルフェンリート　第6話 衷情　
+"
+                >エルフェンリート　第6話 衷情　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+            </td>
+            </tr>
+                                <tr class="rank-bg-color">
+                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-odd from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628060"
+ title="エルフェンリート　第7話 際会　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628060/32628060"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628060"
+ title="エルフェンリート　第7話 際会　
+"
+                >エルフェンリート　第7話 際会　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+                                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-even from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628063"
+ title="エルフェンリート　第8話 嚆矢　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628063/32628063"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628063"
+ title="エルフェンリート　第8話 嚆矢　
+"
+                >エルフェンリート　第8話 嚆矢　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+            </td>
+            </tr>
+                                <tr class="rank-bg-color">
+                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-odd from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628064"
+ title="エルフェンリート　第9話 追憶　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628064/32628064"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628064"
+ title="エルフェンリート　第9話 追憶　
+"
+                >エルフェンリート　第9話 追憶　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+                                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-even from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628070"
+ title="エルフェンリート　第10話 嬰児　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628070/32628070"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628070"
+ title="エルフェンリート　第10話 嬰児　
+"
+                >エルフェンリート　第10話 嬰児　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+            </td>
+            </tr>
+                                <tr class="rank-bg-color">
+                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-odd from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628072"
+ title="エルフェンリート　第11話 錯綜　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628072/32628072"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628072"
+ title="エルフェンリート　第11話 錯綜　
+"
+                >エルフェンリート　第11話 錯綜　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+                                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-even from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628074"
+ title="エルフェンリート　第12話 泥濘　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628074/32628074"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628074"
+ title="エルフェンリート　第12話 泥濘　
+"
+                >エルフェンリート　第12話 泥濘　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+            </td>
+            </tr>
+                                <tr class="rank-bg-color">
+                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-odd from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628079"
+ title="エルフェンリート　第13話 不還　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628079/32628079"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628079"
+ title="エルフェンリート　第13話 不還　
+"
+                >エルフェンリート　第13話 不還　</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+                                <td width="50%"  valign="top">
+    
+    
+        
+
+
+
+
+<div class="g-video g-item-even g-item-last from_video">
+
+        <div class="g-video-mini">
+        <div class="g-video-inside-SS g-has-price">
+            <div class="mini_ppv_price">
+    
+            <table class="ppv_status" border="0" cellpadding="0" cellspacing="0" align="right">
+        <tr valign="middle">
+        <td><!--SSまたはSSLで横幅が1の時は日数を表示しない--><p><span class="nicopo"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/common/icon/nicopo.16x16.png" align="absmiddle" alt="ニコニコポイント"><var>220</var>pt</span></p></td>
+        </tr>
+        </table>
+    
+
+<!---->
+
+<!----></div>
+            <div class="g-video-left">
+                <p class="g-video-thumbnail"><a class="thumb_anchor g-video-link" href="https://www.nicovideo.jp/watch/so32628084"
+ title="エルフェンリート　EXTRA 通り雨にて 或いは、少女はいかにしてその心情に至ったか?　
+"><img 
+class="lazyimage g-thumbnail-image  g-thumbnail-image-needaction"data-original="https://nicovideo.cdn.nimg.jp/thumbnails/32628084/32628084"><span class="purchase_type" title="ニコニコポイントで購入できます"><span class="inner ppv all_pay">有料</span></span></a></p>
+            </div>
+            <div class="g-video-right">
+                <p class="g-video-title"
+                ><a class="g-video-link" href="https://www.nicovideo.jp/watch/so32628084"
+ title="エルフェンリート　EXTRA 通り雨にて 或いは、少女はいかにしてその心情に至ったか?　
+"
+                >エルフェンリート　EXTRA 通り雨にて 或いは、少女はいかにしてその心情...</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+            </td>
+            </tr>
+                </table>
+
+        </div>
+        
+
+
+            </div>
+    <div class="p-footer"></div>
+
+    </div>
+
+
+</td>
+
+</tr>
+<tr><td>
+</td>
+<td colspan="2" rowspan="1">
+<div class="parts p-text cols2 design1 p-saveid289733" id="nico_parts_289733">
+
+
+
+
+
+
+    <div class="p-header">
+                <h3 class="p-imgtitle"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/material/design/3760945/index_intro.png" alt="あらすじ"></h3>
+            </div>
+    <div class="p-body g-has-title">
+
+    <div class="g-contents">二角奇人（ディクロニウス）は、人間の突然変異体･･････頭から生えた角を持ち、第6感とも言える特殊な能力と手を持っていた。人類を淘汰する可能性をも秘めた彼らミュータントたちは、その危険な能力のため、国家施設に隔離、研究されていた。しかし、偶発的事故により、ディクロニウスの少女ルーシーは拘束を破り、警備員らを殺戮、研究所を逃げ出す。が、その途中で記憶喪失となってしまう。過去と記憶を無くしたルーシーは、鎌倉・由比が浜に流れ着くが、その浜辺でコウタとユカに出会い、「にゅう」と名付けられ、コウタの住む楓荘に居候することになる･･････。<br />
+<br />
+</div>
+            </div>
+    <div class="p-footer"></div>
+
+    </div>
+
+
+</td>
+
+</tr>
+<tr><td>
+</td>
+<td colspan="1" rowspan="1">
+<div class="parts p-text cols1 design1 p-saveid289734" id="nico_parts_289734">
+
+
+
+
+
+
+    <div class="p-header">
+                <h3 class="p-imgtitle"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/material/design/3760945/index_staff.png" alt="スタッフ"></h3>
+            </div>
+    <div class="p-body g-has-title">
+
+    <div class="g-contents">原作：岡本 倫（「週刊ヤングジャンプ、ヤングジャンプ・コミックス」集英社刊）<br />
+監督：神戸 守<br />
+シリーズ構成：吉岡たかを<br />
+キャラクターデザイン・総作画監督：きしもとせいじ<br />
+メカデザイン：大河広行<br />
+美術設定：青木智由紀<br />
+美術監督：伊藤 聖<br />
+色彩設計：中田亮大<br />
+撮影監督：白井久男<br />
+編集：瀬山武司<br />
+音楽：小西香葉、近藤由紀夫<br />
+エンディングテーマ「be your girl」河辺千恵子（バップ）<br />
+制作：ARMS<br />
+製作著作：バップ、ジェンコ<br />
+販売元・発売元：バップ</div>
+            </div>
+    <div class="p-footer"></div>
+
+    </div>
+
+
+</td>
+<td colspan="1" rowspan="1">
+<div class="parts p-text cols1 design1 p-saveid289735" id="nico_parts_289735">
+
+
+
+
+
+
+    <div class="p-header">
+                <h3 class="p-imgtitle"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/material/design/3760945/index_cast2.png" alt="キャスト"></h3>
+            </div>
+    <div class="p-body g-has-title">
+
+    <div class="g-contents">コウタ：鈴木千尋<br />
+にゅう／ルーシー：小林沙苗<br />
+ユカ：能登麻美子<br />
+マユ：萩原えみこ<br />
+ナナ：松岡由貴<br />
+蔵間：細井　治<br />
+坂東：中田譲治</div>
+            </div>
+    <div class="p-footer"></div>
+
+    </div>
+
+
+</td>
+</tr>
+<tr><td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr><td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr><td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr><td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr><td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+
+</table>
+            
+                
+        </div>
+        <script>
+                        
+                jQuery("table#layout .dummy").remove();
+            
+        </script>
+    
+        
+        </article>
+    </section>
+
+    <footer class="site">
+                    
+
+    
+                        
+                                    
+
+
+
+    
+    <div id="foot_cp_outer">
+        <div class="foot_inner">
+
+            <div id="cp_symbol">
+                
+
+
+
+
+
+
+<span class="thumb_wrapper thumb_wrapper_ch ">
+
+            <a href="/ch2635292"
+        title="エルフェンリート"
+        class="thumb_ch thumb_100 ">
+                <img data-original="https://secure-dcdn.cdn.nimg.jp/comch/channel-icon/128x128/ch2635292.jpg?1517303959" class="lazyimage">
+                                                </a>
+    
+    
+</span>            </div>
+
+            <div id="cp_profile">
+                <div class="inner_box">
+                    <h3 class="cp_chname">エルフェンリート</h3>
+                                            <p class="cp_viewname">提供：株式会社ドワンゴ</p>
+                                        <ul class="cp_footmenu"><li><a href="javascript:void(0);" onclick="window.open('/blogparts/ch2635292', 'ch_blogparts_popup', 'scrollbars=yes,resizable=yes,width=600,height=560');">貼り付けタグを取得する</a></li><li><a href="https://ch.nicovideo.jp/letter/ch2635292">ご意見・ご要望はこちら</a></li></ul>
+                </div>
+                                                            <div class="inner_box">
+                            <h3>タグ</h3>
+                            <ul class="cp_tags">
+                                                                    <li><a href="/search/2000%E5%B9%B4%E4%BB%A3?mode=t">2000年代</a></li>
+                                                                    <li><a href="/search/2004%E5%B9%B4?mode=t">2004年</a></li>
+                                                                    <li><a href="/search/%E3%82%A2%E3%83%8B%E3%83%A1?mode=t">アニメ</a></li>
+                                                                    <li><a href="/search/%E3%82%A8%E3%83%AB%E3%83%95%E3%82%A7%E3%83%B3%E3%83%AA%E3%83%BC%E3%83%88?mode=t">エルフェンリート</a></li>
+                                                                    <li><a href="/search/%E3%81%8D%E3%81%97%E3%82%82%E3%81%A8%E3%81%9B%E3%81%84%E3%81%98?mode=t">きしもとせいじ</a></li>
+                                                                    <li><a href="/search/%E3%82%B3%E3%83%9F%E3%83%83%E3%82%AF%E5%8E%9F%E4%BD%9C?mode=t">コミック原作</a></li>
+                                                                    <li><a href="/search/%E4%B8%AD%E7%94%B0%E4%BA%AE%E5%A4%A7?mode=t">中田亮大</a></li>
+                                                                    <li><a href="/search/%E4%B8%AD%E7%94%B0%E8%AD%B2%E6%B2%BB?mode=t">中田譲治</a></li>
+                                                                    <li><a href="/search/%E4%BC%8A%E8%97%A4%E8%81%96?mode=t">伊藤聖</a></li>
+                                                                    <li><a href="/search/%E5%85%A8%E8%A9%B1%E9%85%8D%E4%BF%A1?mode=t">全話配信</a></li>
+                                                                    <li><a href="/search/%E5%90%89%E5%B2%A1%E3%81%9F%E3%81%8B%E3%82%92?mode=t">吉岡たかを</a></li>
+                                                                    <li><a href="/search/%E5%A4%A7%E6%B2%B3%E5%BA%83%E8%A1%8C?mode=t">大河広行</a></li>
+                                                                    <li><a href="/search/%E5%B0%8F%E6%9E%97%E6%B2%99%E8%8B%97?mode=t">小林沙苗</a></li>
+                                                                    <li><a href="/search/%E5%B0%8F%E8%A5%BF%E9%A6%99%E8%91%89?mode=t">小西香葉</a></li>
+                                                                    <li><a href="/search/%E5%B2%A1%E6%9C%AC%E5%80%AB?mode=t">岡本倫</a></li>
+                                                                    <li><a href="/search/%E6%9D%BE%E5%B2%A1%E7%94%B1%E8%B2%B4?mode=t">松岡由貴</a></li>
+                                                                    <li><a href="/search/%E7%80%AC%E5%B1%B1%E6%AD%A6%E5%8F%B8?mode=t">瀬山武司</a></li>
+                                                                    <li><a href="/search/%E7%99%BD%E4%BA%95%E4%B9%85%E7%94%B7?mode=t">白井久男</a></li>
+                                                                    <li><a href="/search/%E7%A5%9E%E6%88%B8%E5%AE%88?mode=t">神戸守</a></li>
+                                                                    <li><a href="/search/%E7%AC%AC1%E8%A9%B1%E7%84%A1%E6%96%99?mode=t">第1話無料</a></li>
+                                                                    <li><a href="/search/%E7%B4%B0%E4%BA%95%E6%B2%BB?mode=t">細井治</a></li>
+                                                                    <li><a href="/search/%E8%83%BD%E7%99%BB%E9%BA%BB%E7%BE%8E%E5%AD%90?mode=t">能登麻美子</a></li>
+                                                                    <li><a href="/search/%E8%90%A9%E5%8E%9F%E3%81%88%E3%81%BF%E3%81%93?mode=t">萩原えみこ</a></li>
+                                                                    <li><a href="/search/%E8%BF%91%E8%97%A4%E7%94%B1%E7%B4%80%E5%A4%AB?mode=t">近藤由紀夫</a></li>
+                                                                    <li><a href="/search/%E9%88%B4%E6%9C%A8%E5%8D%83%E5%B0%8B?mode=t">鈴木千尋</a></li>
+                                                                    <li><a href="/search/%E9%9D%92%E6%9C%A8%E6%99%BA%E7%94%B1%E7%B4%80?mode=t">青木智由紀</a></li>
+                                                            </ul>
+                        </div>
+                                                                <div class="inner_box">
+                            <h3>説明文</h3>
+                            <p>二角奇人（ディクロニウス）は、人間の突然変異体･･････頭から生えた角を持ち、第6感とも言える特殊な能力と手を持っていた。人類を淘汰する可能性をも秘めた彼らミュータントたちは、その危険な能力のため、国家施設に隔離、研究されていた。しかし、偶発的事故により、ディクロニウスの少女ルーシーは拘束を破り、警備員らを殺戮、研究所を逃げ出す。が、その途中で記憶喪失となってしまう。過去と記憶を無くしたルーシーは、鎌倉・由比が浜に流れ着くが、その浜辺でコウタとユカに出会い、「にゅう」と名付けられ、コウタの住む楓荘に居候することになる･･････。</p>
+                        </div>
+                                                            <div class="nanime_link">
+                        <script
+                            type="text/x-template"
+                            data-wktk-id="watch-portal-link"
+                            data-wktk-name="watch-portal-link"
+                            data-wktk-selector=".nanime_link"
+                        >
+                            
+                                <div class="inner_box">
+                                    <h3>ポータルサイトリンク</h3>
+                                    <ul>
+                                        <li><a href="{{items.[0].values.portalFirstLink.context}}?from=ch_article_2635292" target="_blank">{{items.[0].values.portalFirstText.context}}</a>
+                                        </li>
+                                        <li><a href="{{items.[0].values.portalSecondLink.context}}?from=ch_article_2635292" target="_blank">{{items.[0].values.portalSecondText.context}}</a>
+                                        </li>
+                                        <li><a href="{{items.[0].values.portalThirdLink.context}}?from=ch_article_2635292" target="_blank">{{items.[0].values.portalThirdText.context}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            
+                        </script>
+                    </div>
+                            </div>
+
+            <div id="join"></div>
+
+            <div id="cp_joinmenu">
+                <div class="join_leave">
+
+                                    </div>
+            </div>
+        </div>
+    </div>
+
+<div id="foot_common">
+    <div class="foot_inner">
+
+        <nav id="foot_nav_other" class="foot_common_nav">
+            <h3 class="nav_title">総合</h3>
+            <ul>
+                <li><a href="https://ch.nicovideo.jp/">ニコニコチャンネル トップ</a>
+                <li><a href="http://site.nicovideo.jp/ch/app/" target="_blank">アプリ niconico ch</a>
+                <li><a href="/channel_catalog">開設されたチャンネル</a>
+                <li><a href="/static/rule.html">利用規約</a>
+                <li><a href="/static/tokutei.html">特定商取引法の表示</a>
+                <li><a href="https://qa.nicovideo.jp/category/show/429?site_domain=default">ヘルプ</a>
+                <li><a href="http://dwango.co.jp/" target="_blank">運営会社</a>
+            </ul>
+        </nav>
+
+        <nav id="foot_nav_categories" class="foot_common_nav">
+            <h3 class="nav_title">カテゴリとポータル</h3>
+            <ul>
+                <li><a href="https://ch.nicovideo.jp/portal/event">イベント</a>
+                <li><a href="https://ch.nicovideo.jp/portal/blomaga">ブロマガ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/anime">アニメ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/movie">映画・ドラマ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/media">社会・言論</a>
+                <li><a href="https://ch.nicovideo.jp/portal/tokusatsu">特撮</a>
+            </ul>
+            <ul>
+                <li><a href="https://ch.nicovideo.jp/portal/music">音楽</a>
+                <li><a href="https://ch.nicovideo.jp/portal/entertainment">エンタメ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/sports">スポーツ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/showbiz">芸能</a>
+                <li><a href="https://ch.nicovideo.jp/portal/life">生活</a>
+                <li><a href="https://ch.nicovideo.jp/portal/politics">政治</a>
+                <li><a href="https://ch.nicovideo.jp/portal/game">ゲーム</a>
+                <li><a href="https://ch.nicovideo.jp/portal/variety">バラエティ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/gravure">グラビア</a>
+            </ul>
+        </nav>
+
+        <nav id="foot_nav_account" class="foot_common_nav">
+            <h3 class="nav_title">アカウント</h3>
+            <ul>
+                            <li><a href="https://account.nicovideo.jp/register">アカウント新規登録</a>
+                <li><a href="https://account.nicovideo.jp/login?next_url=%2Felfenlied&site=channel&time=1612315604&hash_key=350f2cc7">ログインページ</a>
+                        </ul>
+        </nav>
+
+        <nav id="foot_nav_cpsupport" class="foot_common_nav">
+            <h3 class="nav_title">開設／お問い合わせ</h3>
+            <ul>
+                <li><a href="/start" class="wbr"><span>チャンネルを</span><span>開設する</span></a>
+                <li><a href="/blomaga" class="wbr"><span>ブログを</span><span>開設する</span></a>
+                <li><a href="/start/mediaplan">
+                    ブログを開設する<small>(大手メディアプラン)</small>
+                </a>
+                <li><a href="https://qa.nicovideo.jp/faq/show/5008?site_domain=default" class="wbr">
+                    <span>niconicoへのご意見・ご要望</span>
+                </a>
+                <li><a href="http://site.nicovideo.jp/sales_ads" class="wbr"><span>広告出稿に</span><span>関する</span><span>お問い合わせ</span></a>
+            </ul>
+        </nav>
+
+        
+        <small id="foot_copyright">
+            <p><a href="http://dwango.co.jp/" target="_blank">&copy; DWANGO Co., Ltd.</a></p>
+        </small>
+
+    </div>
+</div>        
+                
+    </footer>
+
+            
+                <div class="nicoch_modal" id="timeshift_modal" style="display:none;">
+    <div class="nicoch_modal_overlay" onclick="TimeShift.registHide()"></div>
+    <div class="nicoch_modal_window" id="watching_reservation_regist">
+        <p class="modal_close">
+            <a href="javascript:TimeShift.registHide()">&times;</a>
+        </p>
+        <div class="modal_body load_spinner" id="watching_reservation_info"></div>
+    </div>
+</div>    
+        <div class="nicoch_notifybar" style="display:none" title="クリックで閉じる">
+    <h6 class="title"></h6>
+    <div class="body"></div>
+    <span class="close">&times;</span>
+</div>
+        <div id="loginbox_mask" style="display: none;"></div>
+<section id="loginbox_balloon" style="display: none;">
+    <h1></h1>
+    <dl class="login">
+        <dt><a class="button"></a></dt>
+        <dd></dd>
+    </dl>
+    <dl class="register">
+        <dt><a class="button"></a></dt>
+        <dd></dd>
+    </dl>
+</section>
+
+
+<script>
+var MSG_loginbox = {
+    title : "niconicoアカウントにログイン",
+    login : {
+        label : "ログイン",
+        url : "https://account.nicovideo.jp/login?next_url=%2Felfenlied&site=channel&time=1612315604&hash_key=350f2cc7",
+        description : "アカウントをお持ちの方はログイン<br>してください。"
+    },
+    register : {
+        label : "アカウント登録",
+        url : "",
+        description : "まだアカウントをお持ちでない方でも<br>無料で作成できます。"
+    }
+};
+Ch.loginbox.init();
+</script>
+
+        
+<script src="https://platform.twitter.com/widgets.js" defer async></script>
+<script src="https://b.st-hatena.com/js/bookmark_button.js" defer async></script>
+<div id="fb-root"></div>
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/timeshift.js?1612247611"></script>
+
+
+<script>
+if (parent != window) {
+    var allowed = false;
+
+    document.addEventListener('click', function(e) {
+        if (!allowed) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }, true);
+
+    window.addEventListener('message', function(e) {
+        if (e.origin == 'https://ch.nicovideo.jp/') {
+            allowed = true;
+        }
+    }, true);
+}
+</script>
+<script>
+var ptSampleRate = 0;
+</script>
+
+
+<script type="text/javascript">
+window._pt_lt = new Date().getTime();
+window._pt_sp_2 = [];
+_pt_sp_2.push('setAccount,4ef1ca6b');
+_pt_sp_2.push('setSampleRate,' + ptSampleRate);
+var _protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+(function() {
+    var atag = document.createElement('script');
+    atag.type = 'text/javascript';
+    atag.async = true;
+    atag.src = _protocol + 'js.ptengine.jp/pta.js';
+    var stag = document.createElement('script');
+    stag.type = 'text/javascript';
+    stag.async = true;
+    stag.src = _protocol + 'js.ptengine.jp/pts.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(atag, s);
+    s.parentNode.insertBefore(stag, s);
+})();
+</script>
+
+
+<script type="text/javascript" src="https://secure-dcdn.cdn.nimg.jp/nicocc/wktkjs/1.0.0/wktk.min.js"></script>
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/nicoslider.js?1612247611"></script>
+<script>
+
+    WKTK.init({
+        baseURL: 'https://public.api.nicovideo.jp/',
+        frontendId: 32,
+        responseType: 'pc'
+        // 個別チャンネルの場合は、WKTKのtagsを設定する
+        
+        ,tags: ['ch2635292']
+        
+    });
+    // 枠ツクールタグがあった場合、NicoSliderは枠が完成してから実行する
+    var wktkElements = document.querySelectorAll('[data-wktk-id]');
+    Array.prototype.slice.call(wktkElements).forEach(function(element, index, elements){
+        // 枠固有のパラメータを取得する
+        var templateVars = document.getElementById('template-vars-' + element.dataset.wktkId);
+        var templateData = templateVars ? templateVars.dataset : {};
+
+        WKTK.set(element.dataset.wktkId, {
+            templateData: templateData,
+            onEmpty: function () {
+                // コンテンツがなかったら枠ごと消す
+                if (typeof element.dataset.wakuWrapperId != 'undefined') {
+                    document.getElementById(element.dataset.wakuWrapperId).hide();// prototype.jsに依存
+                }
+            },
+            onLoad: function (items) {
+                // チケット連携枠では表示しているチャンネルのチケット情報のみを渡す
+                if (element.dataset.wktkId === 'channel-ticket-sales') {
+                    return {
+                        items: items.filter(function (item) {
+                            return item.values.channelId.context === '2635292';
+                        })
+                    }
+                } else {
+                    return {items: items};
+                }
+            },
+            onData: function(){
+                // 枠ツクールの枠がある場合に、最後の枠が描画されてからNicoSliderを実行
+                if(index === elements.length - 1){
+                    new NicoSlider();
+                }
+            }
+        });
+    });
+    // 枠ツクールがなかった場合は即時実行
+    if(wktkElements.length == 0){
+        new NicoSlider();
+    }
+    WKTK.fetch();
+
+</script>
+
+<script>
+
+    var sendGaAndGa360Event = function (e) {
+        var el = e.currentTarget;
+        var category = el.hasAttribute('data-ga-category') ? el.getAttribute('data-ga-category') : '';
+        var action = el.hasAttribute('data-ga-action') ? el.getAttribute('data-ga-action') : '';
+        var eventTag = el.hasAttribute('data-ga-event-tag') ? el.getAttribute('data-ga-event-tag') : '';
+
+        var isDebug = cookie('ch_debug') || false;
+        if (category === '' || action === '' || eventTag === '') {
+            if (isDebug) {
+                console.log('GAイベントパラメーターのいずれかが未設定です。イベントは送信されません');
+                console.log({category: category, action: action, eventTag: eventTag});
+            }
+            return true;
+        }
+
+        ga('chfrontAll.send', 'event', category, action, location.pathname);
+        NicoGoogleTagManagerDataLayer.push({'event': eventTag});
+    };
+
+    document.querySelectorAll('.send-ga-ga360-event').forEach(function (el) {
+        el.addEventListener('click', sendGaAndGa360Event);
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+﻿<Page x:Class="Niconicome.Views.Setting.Pages.RestorePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Niconicome.Views.Setting.Pages"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
+        xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignBackground}"
+        FontFamily="Yu Gothic"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="回復">
+    <Page.DataContext>
+        <vm:RestorePageViewModel/>
+    </Page.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="15*"/>
+        </Grid.RowDefinitions>
+        <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
+            <TextBlock Text="回復" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
+        </Border>
+        <StackPanel Margin="8" Grid.Row="1">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="DatabaseCheck" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="バックアップ"/>
+            </StackPanel>
+            <StackPanel Margin="10 0 0 0">
+                <ListView ItemsSource="{Binding Backups}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="名前" DisplayMemberBinding="{Binding Name}"/>
+                            <GridViewColumn Header="作成日" DisplayMemberBinding="{Binding CreatedOn,StringFormat=yyyy/MM/dd HH:mm}"/>
+                            <GridViewColumn Header="ファイルサイズ" DisplayMemberBinding="{Binding FileSize,StringFormat={}{0}kB}"/>
+                        </GridView>
+                    </ListView.View>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                            <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=StackPanel}}"/>
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
+                                        <MenuItem Header="バックアップを削除する" Command="{Binding RemovebackupCommand}" CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                        <MenuItem Header="バックアップを適用する" Command="{Binding ApplyBackupCommand}" CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+                <DockPanel Margin="5 0 20 0">
+                    <Label Content="名前" VerticalAlignment="Bottom"/>
+                    <TextBox Width="300" VerticalContentAlignment="Bottom" Text="{Binding BackupName,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"/>
+                    <Button Content="バックアップを作成する"  Margin="0 8 0 0" HorizontalAlignment="Right" Command="{Binding CreatebackupCommand}"/>
+                </DockPanel>
+            </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="FileDownload" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="保存したファイル"/>
+            </StackPanel>
+            <StackPanel Margin="10 0">
+                <TextBlock TextWrapping="Wrap" Style="{StaticResource MaterialDesignTextBlock}" Opacity=".8">
+                    現在の実行ディレクトリ以下に存在する保存済のファイルを探索します。<LineBreak/>
+                    実行ディレクトリ以下にファイルを保存していて、かつフォルダー名を変更した際などに有用です。
+                </TextBlock>
+                <Button Margin="0 5" Content="保存したファイルを再読み込みする" HorizontalAlignment="Right" Command="{Binding LoadSavedFiles}"/>
+            </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="Alert" Foreground="HotPink">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="危険地帯"/>
+            </StackPanel>
+            <StackPanel Margin="10 0">
+                <Button Margin="0 5" Content="設定を初期化する" HorizontalAlignment="Right" Background="#ec407e" BorderBrush="Red" Command="{Binding ResetSettingsCommand}"/>
+                <Button Margin="0 5" Content="データを初期化する" HorizontalAlignment="Right" Background="#ec407e" BorderBrush="Red" Command="{Binding ResetDataCommand}" ToolTip="全ての動画・プレイリストを削除します。"/>
+            </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+        </StackPanel>
+    </Grid>
+</Page>

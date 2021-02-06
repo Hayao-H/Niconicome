@@ -1,0 +1,52 @@
+﻿<Window x:Class="Niconicome.Views.SearchPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignBackground}"
+        FontFamily="Yu Gothic"
+        x:Name="window"
+        WindowStartupLocation="CenterOwner"
+        Title="動画を検索する" Height="500" Width="400">
+    <Window.DataContext>
+        <vm:SearchViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="16*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 5">
+            <ComboBox Margin="5 0" VerticalAlignment="Bottom" VerticalContentAlignment="Bottom"  ItemsSource="{Binding SearchSettings}" SelectedValue="{Binding CurrentSetting,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
+            <TextBox Width="200" Text="{Binding Input,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Top"  materialDesign:HintAssist.Hint="検索キーワード" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+        </StackPanel>
+        <DockPanel Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+            <Label VerticalAlignment="Bottom"  Content="取得するページ:"/>
+            <TextBlock VerticalAlignment="Center" Width="50" Text="{Binding Page,UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Margin="5 0" Command="{Binding IncrementPageCommand}">
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="Plus"/>
+                </Button.Content>
+            </Button>
+            <Button Command="{Binding DecrementPageCommand}">
+                <Button.Content>
+                    <materialDesign:PackIcon Kind="Minus"/>
+                </Button.Content>
+            </Button>
+        </DockPanel>
+        <ScrollViewer Grid.Row="2">
+            <TextBlock Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="8" FontSize="14" TextWrapping="Wrap" />
+        </ScrollViewer>
+        <Button Grid.Row="3" Margin="80 0" Content="検索" Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=window}"/>
+    </Grid>
+</Window>

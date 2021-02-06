@@ -1,0 +1,42 @@
+﻿<Window x:Class="Niconicome.Views.LogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows"
+        xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignBackground}"
+        FontFamily="Yu Gothic"
+        WindowStartupLocation="CenterOwner"
+        Title="出力" Height="450" Width="400">
+    <Window.DataContext>
+        <vm:LogWindowViewModel/>
+    </Window.DataContext>
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <DockPanel HorizontalAlignment="Right">
+            <Button ToolTip="出力をクリア" Command="{Binding ClearMessageCommand}">
+                <materialDesign:PackIcon Kind="Delete"/>
+            </Button>
+            <Button Margin="10 0 0 0" ToolTip="出力をコピー" Command="{Binding CopyMessageCommand}">
+                <materialDesign:PackIcon Kind="Clipboard"/>
+            </Button>
+        </DockPanel>
+        <TextBox Padding="4" BorderThickness="1" BorderBrush="#e7e7e7" IsReadOnly="True" Grid.Row="1" Text="{Binding Message,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}">
+            <i:Interaction.Behaviors>
+                <vm:LogWindowBehavior/>
+            </i:Interaction.Behaviors>
+        </TextBox>
+    </Grid>
+</Window>
