@@ -16,6 +16,7 @@
         Background="{DynamicResource MaterialDesignBackground}"
         FontFamily="Yu Gothic"
         WindowStartupLocation="CenterScreen"
+        Style="{StaticResource Window_Style}"
         Title="Niconicome" Height="850" Width="1600">
     <i:Interaction.Behaviors>
         <vm:MainWindowBehavior/>

@@ -16,6 +16,7 @@
         Background="{DynamicResource MaterialDesignBackground}"
         FontFamily="Yu Gothic"
         WindowStartupLocation="CenterOwner"
+        Style="{StaticResource Window_Style}"
         Title="出力" Height="450" Width="400">
     <Window.DataContext>
         <vm:LogWindowViewModel/>

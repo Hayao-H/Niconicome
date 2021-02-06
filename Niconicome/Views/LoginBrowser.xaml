@@ -17,6 +17,7 @@
         mc:Ignorable="d"
         x:Name="Window"
         WindowStartupLocation="CenterOwner"
+        Style="{StaticResource Window_Style}"
         Title="ブラウザーでログイン" Height="800" Width="400">
     <Window.DataContext>
         <vm:LoginBrowserViewModel/>

@@ -15,6 +15,12 @@
     <PublishTrimmed>false</PublishTrimmed>
     <Deterministic>false</Deterministic>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Version>0.0.0</Version>
+    <PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
+    <Copyright>c2021 Hayao-H</Copyright>
+    <Authors>Hayao-H</Authors>
+    <PackageIcon>icon.png</PackageIcon>
+    <ApplicationIcon>app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -27,9 +33,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Views\Setting\Pages\AppinfoPage.xaml" />
+    <None Remove="src\app.ico" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.14.0" />
     <PackageReference Include="CredentialManagement" Version="1.0.2" />
@@ -45,9 +51,24 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
     <PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Resource Include="src\app.ico" />
+  </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

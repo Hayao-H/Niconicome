@@ -17,6 +17,7 @@
         FontFamily="Yu Gothic"
         x:Name="window"
         WindowStartupLocation="CenterOwner"
+        Style="{StaticResource Window_Style}"
         Title="プレイリスト情報を編集" Height="400" Width="300">
     <Window.DataContext>
         <vm:PlaylistEditViewModel/>
