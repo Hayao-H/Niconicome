@@ -18,9 +18,9 @@
 - Webview2・JavaScriptベースのプラグイン機能(未定・[ClearScript](https://github.com/microsoft/ClearScript)使用予定)。
 ## 実行する
 #### 要件
-- [.NET Desktop Runtime 5.0.2](https://dotnet.microsoft.com/download/dotnet/5.0)以上のインストール
-- (パスが通っていない場合)実行ディレクトリーにbinフォルダーを作成してffmpeg.exeを配置する。([詳細](#ffmpegについて))
+- [.NET Desktop Runtime 5.0.2](https://dotnet.microsoft.com/download/dotnet/5.0)以上のインストール  
 **※必ず.NET "Desktop" Runtimeをインストールしてください。.NET Runtime(Desktopなし)はコンソールアプリケーション専用です。**
+- (パスが通っていない場合)実行ディレクトリーにbinフォルダーを作成してffmpeg.exeを配置する。([詳細](#ffmpegについて))
 #### インストール
 .NET5ランタイムのインストール以外には特に設定は必要ありません。実行ファイルを任意のディレクトリに保存して実行してください。
 #### アンインストール
