@@ -1,4 +1,5 @@
 # Niconicome(α)
+![.Net5 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net5%20CI/CD/badge.svg)  
 ニコニコ動画のコンテンツをダウンロードします。  
 ※テスト版のためバグが頻発する可能性があります。恐れ入りますが[Issues](https://github.com/Hayao-H/Niconicome/issues)からご報告ください。
 
@@ -43,4 +44,10 @@ WPFと.NET5を用いて開発しています。したがって、対応OSはそ�
 - .NET5&WPF
 - Visual Studio Community 2019
 - VS Code
+## スクリーンショット
+![img-001](Niconicome/src/doc/img/img-001.jpg)
+![img-002](Niconicome/src/doc/img/img-002.jpg)
+![img-003](Niconicome/src/doc/img/img-003.jpg)
+![img-004](Niconicome/src/doc/img/img-004.jpg)
+![img-005](Niconicome/src/doc/img/img-005.jpg)
 
