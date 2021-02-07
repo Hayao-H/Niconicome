@@ -1,5 +1,5 @@
 name: .Net5 CI/CD
-on: 
+on:  
   push:
     tags: 
       - 'v*'
@@ -62,7 +62,7 @@ jobs:
     - name: Build
       shell: powershell
       run: |
-        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r ${{matrix.rid}} -p:PublishSingleFile=true --self-contained false  -o ${{ matrix.rid }}
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r ${{matrix.rid}} -p:PublishSingleFile=true --self-contained true  -o ${{ matrix.rid }}
         Compress-Archive -Path ${{ matrix.rid }} -DestinationPath ${{ matrix.rid }}.zip -CompressionLevel fastest
     - name: Upload Release Asset
       id: upload-release-asset 
