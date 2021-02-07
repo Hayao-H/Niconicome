@@ -1,8 +1,8 @@
 name: .Net5 CI/CD
-on: [push] 
-  #push:
-  #  tags: 
-  #    - 'v*'
+on:  
+  push:
+    tags: 
+      - 'v*'
 
 jobs:
   test:
@@ -14,16 +14,7 @@ jobs:
       NUGET_XMLDOC_MODE: skip
     steps:
     - uses: actions/checkout@v1
-    - name: Cache dotnet runtime
-      id: cache-dotnet
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        path: C:\Program Files\dotnet
-        key: ${{ runner.os }}-dotnet
     - name: Setup .NET Core 5.0.*
-      if: steps.cache-dotnet.outputs.cache-hit != 'true'
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.*
@@ -64,16 +55,7 @@ jobs:
       NUGET_XMLDOC_MODE: skip
     steps:
     - uses: actions/checkout@v1
-    - name: Cache dotnet runtime
-      id: cache-dotnet
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        path: C:\Program Files\dotnet
-        key: ${{ runner.os }}-dotnet
     - name: Setup .NET 5.0
-      if: steps.cache-dotnet.outputs.cache-hit != 'true'
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.*
