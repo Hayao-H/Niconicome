@@ -156,7 +156,7 @@ namespace Niconicome.ViewModels.Mainpage
                 window.Show();
             });
 
-            this.AddVideoFromClipboardCommand = new CommandBase<object>(_ => this.Playlist is not null, _ =>
+            this.AddVideoFromClipboardCommand = new CommandBase<object>(_ => this.Playlist is not null, async _ =>
             {
                 if (this.Playlist == null) return;
                 int playlistId = this.Playlist.Id;
@@ -167,12 +167,29 @@ namespace Niconicome.ViewModels.Mainpage
                 Utils::INiconicoUtils reader = new Utils::NiconicoUtils();
                 var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistTree.ContainsVideo(i, playlistId)).ToList();
 
-                foreach (var id in ids)
+                var result = await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(ids, this.Playlist.Id, (result) =>
                 {
-                    this.AddVideoCommand.Execute(id);
+                    var video = new BindableTreeVideoInfo()
+                    {
+                        Title = "取得失敗",
+                        ThumbUrl = "https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg",
+                        Message = result.Message
+                    };
+                    this.Videos.Add(video);
+
+                }, video =>
+                {
+                    WS::Mainpage.PlaylistTree.Refresh();
+                    WS::Mainpage.CurrentPlaylist.Update(playlistId);
+                });
+
+                WS::Mainpage.Messagehandler.AppendMessage($"{result.SucceededCount}件の動画を登録しました。");
+                if (!result.IsSucceededAll)
+                {
+                    WS::Mainpage.Messagehandler.AppendMessage($"{result.FailedCount}件の動画の追加に失敗しました。");
                 }
-                WS::Mainpage.Messagehandler.AppendMessage($"{ids.Count}件の動画を登録しました。");
-                this.SnackbarMessageQueue.Enqueue($"{ids.Count}件の動画を登録しました。");
+
+                this.SnackbarMessageQueue.Enqueue($"{result.SucceededCount}件の動画を登録しました。");
             });
 
             this.OpenNetworkSettingsCommand = new CommandBase<object>(_ => this.Playlist is not null, _ =>
@@ -214,13 +231,14 @@ namespace Niconicome.ViewModels.Mainpage
                 if (videoCount < 1) return;
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画を更新します。");
+                WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count()}件の動画を更新します。");
 
                 this.RefreshCommandIcon = MaterialDesign::PackIconKind.Close;
                 this.StartFetching();
 
                 this.cts = new CancellationTokenSource();
 
-                await WS::Mainpage.NetworkVideoHandler.UpdateVideosAsync(this.Videos.Where(v => v.IsSelected), this.Playlist.Folderpath, video => WS::Mainpage.CurrentPlaylist.Update(playlistId, video), this.cts.Token);
+               var result = await WS::Mainpage.NetworkVideoHandler.UpdateVideosAsync(this.Videos.Where(v => v.IsSelected), this.Playlist.Folderpath, video => WS::Mainpage.CurrentPlaylist.Update(playlistId, video), this.cts.Token);
 
                 WS::Mainpage.PlaylistTree.Refresh();
                 WS::Mainpage.CurrentPlaylist.Update(playlistId);
@@ -228,7 +246,13 @@ namespace Niconicome.ViewModels.Mainpage
                 this.FetchingCompleted();
                 this.RefreshCommandIcon = MaterialDesign::PackIconKind.Refresh;
 
-                this.SnackbarMessageQueue.Enqueue($"{videoCount}件の動画を更新しました。");
+                this.SnackbarMessageQueue.Enqueue($"{result.SucceededCount}件の動画を更新しました。");
+                WS::Mainpage.Messagehandler.AppendMessage($"{result.SucceededCount}件の動画を更新しました。");
+
+                if (!result.IsSucceededAll)
+                {
+                    WS::Mainpage.Messagehandler.AppendMessage($"{result.FailedCount}件の動画の更新に失敗しました。");
+                }
 
             });
 
