@@ -234,47 +234,6 @@ namespace Niconicome.Models.Playlist
         }
 
         /// <summary>
-        /// 動画を追加する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistId"></param>
-        public int AddVideo(ITreeVideoInfo video, int playlistId)
-        {
-            try
-            {
-                this.handler.GetPlaylist(playlistId)?.Videos?.Add(video);
-                return this.playlistStoreHandler.AddVideo(video, playlistId);
-            }
-            catch (Exception e)
-            {
-                var logger = Utils::DIFactory.Provider.GetRequiredService<Utils::ILogger>();
-                logger.Error("動画の追加に失敗しました。", e);
-                this.errorMessanger.FireError($"{video.NiconicoId}の保存に失敗しました。操作は反映されません。");
-                return -1;
-            }
-        }
-
-        /// <summary>
-        /// 動画を削除する
-        /// </summary>
-        /// <param name="videoID"></param>
-        /// <param name="playlistId"></param>
-        public void RemoveVideo(int videoID, int playlistId)
-        {
-            try
-            {
-                this.handler.GetPlaylist(playlistId)?.Videos?.RemoveAll(v => v.Id == videoID);
-                this.playlistStoreHandler.RemoveVideo(videoID, playlistId);
-            }
-            catch (Exception e)
-            {
-                var logger = Utils::DIFactory.Provider.GetRequiredService<Utils::ILogger>();
-                logger.Error("動画の削除に失敗しました。", e);
-                this.errorMessanger.FireError($"動画の削除に失敗しました。操作は反映されません。");
-            }
-        }
-
-        /// <summary>
         /// リモートプレイリストとして設定する
         /// </summary>
         /// <param name="playlistId"></param>
@@ -294,16 +253,6 @@ namespace Niconicome.Models.Playlist
         {
             this.playlistStoreHandler.SetAsLocalPlaylist(playlistId);
             this.SetPlaylists();
-        }
-
-        /// <summary>
-        /// 動画情報を更新する
-        /// </summary>
-        /// <param name="video"></param>
-        public void UpdateVideo(ITreeVideoInfo video, bool enableRefresh = true)
-        {
-            this.videoStoreHandler.Update(video);
-            if (enableRefresh) this.SetPlaylists();
         }
 
         /// <summary>
