@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: 5.0.*
     - name: Build
-      run: dotnet build --no-dependencies -c Debug
+      run: dotnet build -c Debug
     - name: Test
       run: dotnet test
 
