@@ -1,8 +1,5 @@
 name: .Net5 CI/CD
-on:  
-  push:
-    tags: 
-      - 'v*'
+on: [push]
 
 jobs:
   test:
