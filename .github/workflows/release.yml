@@ -58,11 +58,34 @@ jobs:
     - name: Setup .NET 5.0
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.*
+        dotnet-version: 5.0.*    
+    - name: Cache ffmpeg
+      id: cache-ffmpeg
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg
+      with:
+        path: ffmpeg
+        key: ${{ runner.os }}-ffmpeg
+    - name:  Download ffmpeg
+      if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
+      shell: powershell
+      run: |
+        mkdir tmp -force
+        mkdir ffmpeg/bin
+        cd tmp
+        Invoke-WebRequest https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2021-02-08-12-47/ffmpeg-n4.3.1-221-gd08bcbffff-win64-gpl-4.3.zip -o ffbin.zip
+        Expand-Archive ffbin.zip -Force
+        $item = Get-Childitem -Recurse -Filter ffmpeg.exe
+        cd ..
+        move $item[0].Fullname ./ffmpeg/bin
+        del tmp -r
+        
     - name: Build
       shell: powershell
       run: |
         dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r ${{matrix.rid}} -p:PublishSingleFile=true --self-contained true  -o ${{ matrix.rid }}
+        copy ./ffmpeg/bin ${{ matrix.rid }}
         Compress-Archive -Path ${{ matrix.rid }} -DestinationPath ${{ matrix.rid }}.zip -CompressionLevel fastest
     - name: Upload Release Asset
       id: upload-release-asset 
