@@ -79,7 +79,7 @@ jobs:
         Expand-Archive ffbin.zip -Force
         $item = Get-Childitem -Recurse -Filter ffmpeg.exe
         cd ..
-        move $item[0].Fullname ./ffmpeg/bin
+        move $item[0].Fullname ffmpeg/bin
         del tmp -r
         
     - name: Build
