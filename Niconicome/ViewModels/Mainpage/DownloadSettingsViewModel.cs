@@ -39,7 +39,11 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.DownloadCommand = new CommandBase<object>(_ => this.playlist is not null && !this.isDownloadingField, async _ =>
                {
-                   if (this.playlist is null) return;
+                   if (this.playlist is null)
+                   {
+                       this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
+                       return;
+                   }
 
                    if (!WS::Mainpage.Session.IsLogin)
                    {
