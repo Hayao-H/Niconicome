@@ -1,5 +1,9 @@
 # Niconicome(α)
-![.Net5 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net5%20CI/CD/badge.svg)  
+[![.Net5 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net5%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net5+CI%2FCD%22) 
+[![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
+![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)
+
 ニコニコ動画のコンテンツをダウンロードします。  
 ※テスト版のためバグが頻発する可能性があります。恐れ入りますが[Issues](https://github.com/Hayao-H/Niconicome/issues)からご報告ください。
 
@@ -20,8 +24,9 @@
 #### 要件
 - ~~[.NET Desktop Runtime 5.0.2](https://dotnet.microsoft.com/download/dotnet/5.0)以上のインストール  
 **※必ず.NET "Desktop" Runtimeをインストールしてください。.NET Runtime(Desktopなし)はコンソールアプリケーション専用です。**~~  
-*v0.0.1以降からはランタイムのインストールが不要になりました。(#1)*
-- (パスが通っていない場合)実行ディレクトリーにbinフォルダーを作成してffmpeg.exeを配置する。([詳細](#ffmpegについて))
+**v0.0.1以降からはランタイムのインストールが不要になりました。(#1)**  
+- ~~(パスが通っていない場合)実行ディレクトリーにbinフォルダーを作成してffmpeg.exeを配置する。([詳細](#ffmpegについて))~~  
+**v0.0.2以降からはffmpegが同梱されています**
 #### インストール
 .NET5ランタイムのインストール以外には特に設定は必要ありません。実行ファイルを任意のディレクトリに保存して実行してください。
 #### アンインストール
@@ -31,8 +36,8 @@
 「ブラウザーでログイン」機能の利用には、WebView2 86.0.616.0以上のインストールが必要です。
 [こちら](https://go.microsoft.com/fwlink/p/?LinkId=2124703)(ブートストラップリンク)からダウンロードしてください。また、ダウンロードページは[こちら](https://developer.microsoft.com/ja-jp/microsoft-edge/webview2/)です。
 ### ffmpegについて
-本アプリケーションは動画の変換にffmpegを使用しています。デフォルトでは、ffmpegは実行ディレクトリのbinフォルダーにffmpeg.exeとして配置する必要があります。  
-[こちら](https://github.com/BtbN/FFmpeg-Builds/releases)のリポジトリから圧縮ファイル(ffmpeg-n4.*.*-△○■-win64-gpl-4.3.zipのようなファイル名)をダウンロードして解凍後配置してください。(ffmpegのパスは***設定>>外部ソフト設定>>ffmpegのパス***から指定することが出来ます。)
+~~本アプリケーションは動画の変換にffmpegを使用しています。デフォルトでは、ffmpegは実行ディレクトリのbinフォルダーにffmpeg.exeとして配置する必要があります。  
+[こちら](https://github.com/BtbN/FFmpeg-Builds/releases)のリポジトリから圧縮ファイル(ffmpeg-n4.*.*-△○■-win64-gpl-4.3.zipのようなファイル名)をダウンロードして解凍後配置してください。(ffmpegのパスは***設定>>外部ソフト設定>>ffmpegのパス***から指定することが出来ます。)~~
 ## 対応OS
 WPFと.NET5を用いて開発しています。したがって、対応OSはそちらのサポートに依存します。現在、
 - Windows 7 SP1 ESU
