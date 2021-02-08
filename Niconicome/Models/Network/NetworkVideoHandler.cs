@@ -16,11 +16,18 @@ namespace Niconicome.Models.Network
         bool IsVideoDownloaded(string niconicoId);
         string GetFilePath(string niconicoId);
         string GetFilePath(string niconicoId, string foldername);
-        Task AddVideosAsync(IEnumerable<string> videosId, int playlistId, Action<IResult> onFailed, Action<ITreeVideoInfo> onSucceed);
+        Task<INetworkResult> AddVideosAsync(IEnumerable<string> videosId, int playlistId, Action<IResult> onFailed, Action<ITreeVideoInfo> onSucceed);
         Task AddVideosAsync(IEnumerable<ITreeVideoInfo> videos, int playlistId);
-        Task UpdateVideosAsync(IEnumerable<ITreeVideoInfo> videos, string folderPath, Action<ITreeVideoInfo> onSucceeded, CancellationToken ct);
+        Task<INetworkResult> UpdateVideosAsync(IEnumerable<ITreeVideoInfo> videos, string folderPath, Action<ITreeVideoInfo> onSucceeded, CancellationToken ct);
         Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<ITreeVideoInfo> ids, Action<ITreeVideoInfo, ITreeVideoInfo> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting);
         Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<string> ids, Action<ITreeVideoInfo, ITreeVideoInfo> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting);
+    }
+
+    public interface INetworkResult
+    {
+        bool IsSucceededAll { get; }
+        int SucceededCount { get; }
+        int FailedCount { get; }
     }
 
     /// <summary>
@@ -61,20 +68,23 @@ namespace Niconicome.Models.Network
         /// <param name="onfailed"></param>
         /// <param name="onSucceed"></param>
         /// <returns></returns>
-        public async Task AddVideosAsync(IEnumerable<string> videoIds, int playlistId, Action<IResult> onfailed, Action<ITreeVideoInfo> onSucceed)
+        public async Task<INetworkResult> AddVideosAsync(IEnumerable<string> videoIds, int playlistId, Action<IResult> onfailed, Action<ITreeVideoInfo> onSucceed)
         {
             var playlist = this.playlistTreeHandler.GetPlaylist(playlistId);
 
-            if (playlist is null) return;
+            var netResult = new NetworkResult();
+
+            if (playlist is null) return netResult;
 
             int videosCount = videoIds.Count();
 
-            if (videosCount == 0) return;
+            if (videosCount == 0) return netResult;
 
             this.messageHandler.AppendMessage($"{videosCount}件の動画を追加します。");
 
             await this.GetTreeVideoInfosAsync(videoIds.Copy(), async (newVideo, video) =>
             {
+                netResult.SucceededCount++;
                 await this.videoThumnailUtility.SetThumbPathAsync(newVideo);
                 int id = this.videoHandler.AddVideo(newVideo, playlist.Id);
                 newVideo.Id = id;
@@ -82,6 +92,7 @@ namespace Niconicome.Models.Network
                 onSucceed(newVideo);
             }, (result, video) =>
             {
+                netResult.FailedCount++;
                 onfailed(result);
                 this.messageHandler.AppendMessage($"動画の取得に失敗しました。(詳細: {result.Message})");
             }, (video, index) =>
@@ -92,7 +103,11 @@ namespace Niconicome.Models.Network
                 video.Message = "待機中...(15s)";
             });
 
-            this.messageHandler.AppendMessage($"動画の追加処理が完了しました。({videosCount}件)");
+            if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
+
+            this.messageHandler.AppendMessage($"動画の追加処理が完了しました。({netResult.SucceededCount}件)");
+
+            return netResult;
         }
 
         /// <summary>
@@ -132,9 +147,10 @@ namespace Niconicome.Models.Network
         /// <param name="onSucceeded"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task UpdateVideosAsync(IEnumerable<ITreeVideoInfo> videos, string folderPath, Action<ITreeVideoInfo> onSucceeded, CancellationToken ct)
+        public async Task<INetworkResult> UpdateVideosAsync(IEnumerable<ITreeVideoInfo> videos, string folderPath, Action<ITreeVideoInfo> onSucceeded, CancellationToken ct)
         {
             videos = videos.Copy();
+            var netResult = new NetworkResult();
             var i = 0;
             int videosCount = videos.Count();
 
@@ -142,6 +158,7 @@ namespace Niconicome.Models.Network
 
             await this.GetTreeVideoInfosAsync(videos.Copy(), async (newVideo, video) =>
             {
+                netResult.SucceededCount++;
                 video.IsSelected = false;
                 video.Message = "情報を更新しました。";
                 newVideo.Id = video.Id;
@@ -152,6 +169,7 @@ namespace Niconicome.Models.Network
                 onSucceeded(newVideo);
             }, (result, video) =>
             {
+                netResult.FailedCount++;
                 video.Message = "情報の更新に失敗しました。";
                 this.messageHandler.AppendMessage($"{video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
             }, (video, _) =>
@@ -163,7 +181,9 @@ namespace Niconicome.Models.Network
                 video.Message = "待機中...(15s)";
             });
 
-            this.messageHandler.AppendMessage($"{videosCount}件の動画情報を更新しました。");
+            if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
+
+            this.messageHandler.AppendMessage($"{netResult.SucceededCount}件の動画情報を更新しました。");
         }
 
         /// <summary>
@@ -260,4 +280,23 @@ namespace Niconicome.Models.Network
                 (Path.GetDirectoryName(p) ?? string.Empty) == foldername);
         }
     }
+
+    public class NetworkResult : INetworkResult
+    {
+        /// <summary>
+        /// 全ての処理に成功
+        /// </summary>
+        public bool IsSucceededAll { get; set; }
+
+        /// <summary>
+        /// 成功したコンテンツの数
+        /// </summary>
+        public int SucceededCount { get; set; }
+
+        /// <summary>
+        /// 失敗したコンテンツの数
+        /// </summary>
+        public int FailedCount { get; set; }
+    }
+
 }
