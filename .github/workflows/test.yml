@@ -1,15 +1,19 @@
-name: Test
+name: ffmpeg
 on: [push]
 
 jobs:
-
-  publish:
+  ffmpeg:
     runs-on: windows-latest
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-      NUGET_XMLDOC_MODE: skip
     steps:
+    - uses: actions/checkout@v1
+    - name: Cache ffmpeg
+      id: cache-ffmpeg
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg
+      with:
+        path: ffmpeg
+        key: ${{ runner.os }}-ffmpegbin
     - name:  Download ffmpeg
       if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
       shell: powershell
@@ -22,9 +26,10 @@ jobs:
         $item = Get-Childitem -Recurse -Filter ffmpeg.exe
         cd ..
         move $item[0].Fullname ./ffmpeg/bin
-        echo $item[0].Fullname
-        cd ffmpeg/bin
-        ls
-        cd ..
-        cd ..
         del tmp -r
+    - name: Check ffmpeg
+      shell: powershell
+      run: |
+        cd ffmpeg/bin
+        $files = ls -name
+        echo $files
