@@ -1,7 +1,7 @@
 name: .Net5 CI/CD
-on:  
+on: 
   push:
-    tags: 
+    tags:
       - 'v*'
 
 jobs:
@@ -66,7 +66,7 @@ jobs:
         cache-name: cache-ffmpeg
       with:
         path: ffmpeg
-        key: ${{ runner.os }}-ffmpeg
+        key: ${{ runner.os }}-ffmpegbin
     - name:  Download ffmpeg
       if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
       shell: powershell
@@ -85,7 +85,7 @@ jobs:
       shell: powershell
       run: |
         dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r ${{matrix.rid}} -p:PublishSingleFile=true --self-contained true  -o ${{ matrix.rid }}
-        copy ./ffmpeg/bin ${{ matrix.rid }}
+        Copy-Item -recurse ./ffmpeg/bin ${{ matrix.rid }}
         Compress-Archive -Path ${{ matrix.rid }} -DestinationPath ${{ matrix.rid }}.zip -CompressionLevel fastest
     - name: Upload Release Asset
       id: upload-release-asset 
