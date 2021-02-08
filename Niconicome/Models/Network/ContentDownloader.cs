@@ -390,6 +390,10 @@ namespace Niconicome.Models.Network
                             video.Message = "既にダウンロード済の為スキップ";
                             this.currentParallelDownloadingCount--;
                             currentResult.SucceededCount++;
+                            if (currentResult.FirstVideo is null)
+                            {
+                                currentResult.FirstVideo = video;
+                            }
                             this.StartNextDownload(setting, tcs,currentResult, token);
                             return;
                         }
@@ -420,6 +424,10 @@ namespace Niconicome.Models.Network
 
                 this.currentParallelDownloadingCount--;
                 currentResult.SucceededCount++;
+                if (currentResult.FirstVideo is null)
+                {
+                    currentResult.FirstVideo = video;
+                }
                 this.StartNextDownload(setting, tcs,currentResult, token);
             }
             else
