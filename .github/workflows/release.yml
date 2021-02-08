@@ -86,7 +86,7 @@ jobs:
       shell: powershell
       run: |
         dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r ${{matrix.rid}} -p:PublishSingleFile=true --self-contained true  -o ${{ matrix.rid }}
-        Copy-Item -Recurse ffpeg/bin ${{ matrix.rid }}
+        Copy-Item -Recurse ffmpeg/bin ${{ matrix.rid }}
         Compress-Archive -Path ${{ matrix.rid }} -DestinationPath ${{ matrix.rid }}.zip -CompressionLevel fastest
     - name: Upload Release Asset
       id: upload-release-asset 
