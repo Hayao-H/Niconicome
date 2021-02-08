@@ -25,9 +25,9 @@ namespace Niconicome.Models.Network
 
     public interface INetworkResult
     {
-        bool IsSucceededAll { get; }
-        int SucceededCount { get; }
-        int FailedCount { get; }
+        bool IsSucceededAll { get; set; }
+        int SucceededCount { get; set; }
+        int FailedCount { get; set; }
     }
 
     /// <summary>
@@ -184,6 +184,8 @@ namespace Niconicome.Models.Network
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
 
             this.messageHandler.AppendMessage($"{netResult.SucceededCount}件の動画情報を更新しました。");
+
+            return netResult;
         }
 
         /// <summary>
