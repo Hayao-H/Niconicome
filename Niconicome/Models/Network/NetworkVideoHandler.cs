@@ -28,6 +28,7 @@ namespace Niconicome.Models.Network
         bool IsSucceededAll { get; set; }
         int SucceededCount { get; set; }
         int FailedCount { get; set; }
+        ITreeVideoInfo? FirstVideo { get; set; }
     }
 
     /// <summary>
@@ -299,6 +300,12 @@ namespace Niconicome.Models.Network
         /// 失敗したコンテンツの数
         /// </summary>
         public int FailedCount { get; set; }
+
+        /// <summary>
+        /// 動画情報
+        /// </summary>
+        public ITreeVideoInfo? FirstVideo { get; set; }
+
     }
 
 }
