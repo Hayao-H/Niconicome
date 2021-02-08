@@ -62,25 +62,25 @@
        x="0"
        y="0">
       <meshrow
-         id="meshrow5190">
+         id="meshrow1028">
         <meshpatch
-           id="meshpatch5192">
+           id="meshpatch1030">
           <stop
-             path="c 8,0  16,0  24,0"
+             path="c 8,0  16.0001,-1.23783e-06  24,0"
              style="stop-color:#ffffff;stop-opacity:1"
-             id="stop5194" />
+             id="stop1032" />
           <stop
-             path="c 0,8  0,16  0,24"
+             path="c 9.61035e-05,8  9.8e-05,16  9.8e-05,24"
              style="stop-color:#009faf;stop-opacity:1"
-             id="stop5196" />
+             id="stop1034" />
           <stop
              path="c -8,0  -16,0  -24,0"
              style="stop-color:#ffffff;stop-opacity:1"
-             id="stop5198" />
+             id="stop1036" />
           <stop
-             path="c 0,-8  0,-16  0,-24"
+             path="c 0,-8  0,-16  -9.8e-05,-24"
              style="stop-color:#009faf;stop-opacity:1"
-             id="stop5200" />
+             id="stop1038" />
         </meshpatch>
       </meshrow>
     </meshgradient>
@@ -96,7 +96,7 @@
      inkscape:pagecheckerboard="true"
      showgrid="false"
      inkscape:document-rotation="0"
-     inkscape:current-layer="svg857"
+     inkscape:current-layer="layer1"
      inkscape:document-units="px"
      inkscape:cy="61.866849"
      inkscape:cx="-4.3814108"
@@ -117,7 +117,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -132,11 +132,11 @@
        height="24"
        x="0"
        y="0"
-       transform="matrix(3.9756092,0,0,3.975693,0.29269251,0.30794294)" />
+       transform="matrix(3.9756092,0,0,3.975693,0.29269251,0.30794294)"
+       ry="5.2192159" />
   </g>
   <g
-     aria-label="N
-"
+     aria-label="N "
      transform="scale(1.144875,0.87345781)"
      id="text838"
      style="font-style:normal;font-weight:normal;font-size:25.1949px;line-height:1.25;font-family:sans-serif;fill:#e1f5fe;fill-opacity:1;stroke:none;stroke-width:0.629872">
