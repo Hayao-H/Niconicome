@@ -66,7 +66,7 @@ jobs:
         cache-name: cache-ffmpeg
       with:
         path: ffmpeg
-        key: ${{ runner.os }}-ffmpegbin
+        key: ${{ runner.os }}-ffmpegbin-4.3.1-v0
     - name:  Download ffmpeg
       if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
       shell: powershell
@@ -74,6 +74,7 @@ jobs:
         mkdir tmp -force
         mkdir ffmpeg/bin
         cd tmp
+        $ProgressPreference = 'SilentlyContinue'
         Invoke-WebRequest https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2021-02-08-12-47/ffmpeg-n4.3.1-221-gd08bcbffff-win64-gpl-4.3.zip -o ffbin.zip
         Expand-Archive ffbin.zip -Force
         $item = Get-Childitem -Recurse -Filter ffmpeg.exe
@@ -85,7 +86,7 @@ jobs:
       shell: powershell
       run: |
         dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r ${{matrix.rid}} -p:PublishSingleFile=true --self-contained true  -o ${{ matrix.rid }}
-        Copy-Item -recurse ./ffmpeg/bin ${{ matrix.rid }}
+        Copy-Item -Recurse ffpeg/bin ${{ matrix.rid }}
         Compress-Archive -Path ${{ matrix.rid }} -DestinationPath ${{ matrix.rid }}.zip -CompressionLevel fastest
     - name: Upload Release Asset
       id: upload-release-asset 
