@@ -39,7 +39,11 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.DownloadCommand = new CommandBase<object>(_ => this.playlist is not null && !this.isDownloadingField, async _ =>
                {
-                   if (this.playlist is null) return;
+                   if (this.playlist is null)
+                   {
+                       this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
+                       return;
+                   }
 
                    if (!WS::Mainpage.Session.IsLogin)
                    {
@@ -75,10 +79,11 @@ namespace Niconicome.ViewModels.Mainpage
 
                    WS::Mainpage.Messagehandler.AppendMessage($"動画のダウンロードを開始します。({videoCount}件)");
                    this.SnackbarMessageQueue.Enqueue($"動画のダウンロードを開始します。({videoCount}件)");
+                   INetworkResult? result = null;
 
                    try
                    {
-                       await WS::Mainpage.Videodownloader.DownloadVideos(videos, setting, cts.Token);
+                       result = await WS::Mainpage.Videodownloader.DownloadVideos(videos, setting, cts.Token);
 
                    }
                    catch (Exception e)
@@ -87,14 +92,30 @@ namespace Niconicome.ViewModels.Mainpage
                        this.SnackbarMessageQueue.Enqueue($"ダウンロード中にエラーが発生しました。");
                    }
 
-                   if (videoCount > 1)
+                   if (result?.SucceededCount > 1)
                    {
-                       WS::Mainpage.Messagehandler.AppendMessage($"{firstVideo.NiconicoId}ほか{videoCount-1}件の動画をダウンロードしました。");
-                       this.SnackbarMessageQueue.Enqueue($"{firstVideo.NiconicoId}ほか{videoCount-1}件の動画をダウンロードしました。");
+                       if (result?.FirstVideo is not null)
+                       {
+                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+
+                           if (!result.IsSucceededAll)
+                           {
+                               WS::Mainpage.Messagehandler.AppendMessage($"{result.FailedCount}件の動画のダウンロードに失敗しました。");
+                           }
+                       }
+                   }
+                   else if (result.SucceededCount == 1)
+                   {
+                       if (result?.FirstVideo is not null)
+                       {
+                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo}をダウンロードしました。");
+                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo}をダウンロードしました。");
+                       }
                    } else
                    {
-                       WS::Mainpage.Messagehandler.AppendMessage($"{firstVideo.NiconicoId}をダウンロードしました。");
-                       this.SnackbarMessageQueue.Enqueue($"{firstVideo.NiconicoId}をダウンロードしました。");
+                       WS::Mainpage.Messagehandler.AppendMessage($"ダウンロード出来ませんでした。");
+                       this.SnackbarMessageQueue.Enqueue($"ダウンロード出来ませんでした。");
                    }
 
                    this.CompleteDownload();
