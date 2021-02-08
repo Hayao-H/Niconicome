@@ -21,7 +21,7 @@ namespace Niconicome.Models.Network
 {
     public interface IContentDownloader
     {
-        Task DownloadVideos(IEnumerable<ITreeVideoInfo> videos, DownloadSettings setting, CancellationToken token);
+        Task<INetworkResult> DownloadVideos(IEnumerable<ITreeVideoInfo> videos, DownloadSettings setting, CancellationToken token);
     }
 
     public interface IDownloadSettings
@@ -281,16 +281,18 @@ namespace Niconicome.Models.Network
         /// <param name="setting"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public Task DownloadVideos(IEnumerable<ITreeVideoInfo> videos, DownloadSettings setting, CancellationToken token)
+        public Task<INetworkResult> DownloadVideos(IEnumerable<ITreeVideoInfo> videos, DownloadSettings setting, CancellationToken token)
         {
+            this.totalVideos = 0;
             this.downloadVideos.Clear();
             this.currentParallelDownloadingCount = 0;
             this.AddVideos(videos);
-            var tcs = new TaskCompletionSource();
+            var tcs = new TaskCompletionSource<INetworkResult>();
+            var result = new NetworkResult();
 
             while (this.CanDownloadNext(token))
             {
-                var _ = this.DownloadAndNext(setting, tcs, token);
+                var _ = this.DownloadAndNext(setting, tcs,result, token);
             }
 
             return tcs.Task;
@@ -309,11 +311,17 @@ namespace Niconicome.Models.Network
         private readonly List<IVideoToDownload> downloadVideos = new();
 
         /// <summary>
+        /// ダウンロードする動画の数
+        /// </summary>
+        private int totalVideos;
+
+        /// <summary>
         /// ダウンロードする動画を追加する
         /// </summary>
         /// <param name="video"></param>
         private void AddVideo(ITreeVideoInfo video)
         {
+            this.totalVideos ++ ;
             if (this.downloadVideos.Any(v => v.Video.Id == video.Id)) return;
             this.downloadVideos.Add(new VideoToDownload(video, this.downloadVideos.Count));
         }
@@ -347,7 +355,7 @@ namespace Niconicome.Models.Network
         /// <param name="tcs"></param>
         /// <param name="token"></param>
         /// <returns></returns>this.messageHandler
-        private async Task DownloadAndNext(DownloadSettings setting, TaskCompletionSource tcs, CancellationToken token)
+        private async Task DownloadAndNext(DownloadSettings setting, TaskCompletionSource<INetworkResult> tcs, INetworkResult currentResult, CancellationToken token)
         {
             if (!token.IsCancellationRequested || this.CanDownloadNext(token))
             {
@@ -381,7 +389,12 @@ namespace Niconicome.Models.Network
                             video.IsSelected = false;
                             video.Message = "既にダウンロード済の為スキップ";
                             this.currentParallelDownloadingCount--;
-                            this.StartNextDownload(setting, tcs, token);
+                            currentResult.SucceededCount++;
+                            if (currentResult.FirstVideo is null)
+                            {
+                                currentResult.FirstVideo = video;
+                            }
+                            this.StartNextDownload(setting, tcs,currentResult, token);
                             return;
                         }
                     }
@@ -392,6 +405,7 @@ namespace Niconicome.Models.Network
 
                 if (!result.IsSucceeded)
                 {
+                    currentResult.FailedCount++;
                     this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードに失敗しました。");
                     this.messageHandler.AppendMessage($"詳細: {result.Message}");
                 }
@@ -409,11 +423,20 @@ namespace Niconicome.Models.Network
                 }
 
                 this.currentParallelDownloadingCount--;
-                this.StartNextDownload(setting, tcs, token);
+                currentResult.SucceededCount++;
+                if (currentResult.FirstVideo is null)
+                {
+                    currentResult.FirstVideo = video;
+                }
+                this.StartNextDownload(setting, tcs,currentResult, token);
             }
             else
             {
-                if (!tcs.Task.IsCompleted) tcs.SetResult();
+                if (currentResult.SucceededCount == this.totalVideos)
+                {
+                    currentResult.IsSucceededAll = true;
+                }
+                if (!tcs.Task.IsCompleted) tcs.SetResult(currentResult);
 
             }
 
@@ -425,11 +448,15 @@ namespace Niconicome.Models.Network
         /// </summary>
         /// <param name="tcs"></param>
         /// <param name="token"></param>
-        private async void StartNextDownload(DownloadSettings setting, TaskCompletionSource tcs, CancellationToken token)
+        private async void StartNextDownload(DownloadSettings setting, TaskCompletionSource<INetworkResult> tcs, INetworkResult currentResult, CancellationToken token)
         {
             if (!this.CanDownloadNext(token) && this.IsDownloadCompleted())
             {
-                if (!tcs.Task.IsCompleted) tcs.SetResult();
+                if (currentResult.SucceededCount == this.totalVideos)
+                {
+                    currentResult.IsSucceededAll = true;
+                }
+                if (!tcs.Task.IsCompleted) tcs.SetResult(currentResult);
                 return;
             }
             else if (this.NeedWait())
@@ -440,13 +467,13 @@ namespace Niconicome.Models.Network
 
             if (token.IsCancellationRequested)
             {
-                if (!tcs.Task.IsCompleted) tcs.SetResult();
+                if (!tcs.Task.IsCompleted) tcs.SetResult(currentResult);
                 return;
             }
 
             while (this.CanDownloadNext(token))
             {
-                var _ = this.DownloadAndNext(setting, tcs, token);
+                var _ = this.DownloadAndNext(setting, tcs,currentResult, token);
             }
         }
 
