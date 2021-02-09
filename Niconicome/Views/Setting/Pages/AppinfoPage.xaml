@@ -53,6 +53,20 @@
                 <TextBlock Margin="5 0" VerticalAlignment="Center" Text="{Binding Version}" HorizontalAlignment="Right"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="Link" Foreground="SkyBlue" VerticalAlignment="Center" >
+                    <materialDesign:PackIcon.RenderTransform>
+                        <ScaleTransform ScaleX="1.6" ScaleY="1.6" CenterY="9"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <TextBlock Margin="10 0" Text="リンク"/>
+            </StackPanel>
+            <TextBlock Padding="20 0">
+                <Hyperlink NavigateUri="https://github.com/Hayao-H/Niconicome"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>プロジェクトページ</Hyperlink><LineBreak/>
+                <Hyperlink NavigateUri="https://join.slack.com/t/niconicome/shared_invite/zt-m6lkfs8x-FOFfXexhB0JlhnUVps0qEA"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Slack</Hyperlink><LineBreak/>
+                <Hyperlink NavigateUri="https://twitter.com/NiconicomeD"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Twitter</Hyperlink>
+            </TextBlock>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <Expander>
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
