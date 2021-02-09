@@ -66,7 +66,7 @@ jobs:
         cache-name: cache-ffmpeg
       with:
         path: ffmpeg
-        key: ${{ runner.os }}-ffmpegbin-4.3.1-v0
+        key: ${{ runner.os }}-ffmpegbin-4.3.1-v1
     - name:  Download ffmpeg
       if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
       shell: powershell
