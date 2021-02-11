@@ -105,7 +105,7 @@ namespace Niconicome.ViewModels.Mainpage
                            }
                        }
                    }
-                   else if (result.SucceededCount == 1)
+                   else if (result?.SucceededCount == 1)
                    {
                        if (result?.FirstVideo is not null)
                        {

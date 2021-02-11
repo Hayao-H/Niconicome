@@ -38,6 +38,9 @@ namespace Niconicome.ViewModels.Mainpage
             //プレイリスト選択変更イベントを購読する
             WS::Mainpage.CurrentPlaylist.SelectedItemChanged += this.OnSelectedPlaylistChanged;
 
+            //プレイリスト内容更新のイベントを購読する
+            WS::Mainpage.CurrentPlaylist.VideosChanged += (e, s) => this.ChangePlaylistTitle();
+
             this.showMessageBox = showMessageBox;
 
             this.SnackbarMessageQueue = WS::Mainpage.SnackbarMessageQueue;
@@ -896,7 +899,18 @@ namespace Niconicome.ViewModels.Mainpage
                 string name = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.Name;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
                 WS::Mainpage.SnackbarMessageQueue.Enqueue($"プレイリスト:{name}");
-                this.PlaylistTitle = $"{this.Playlist.Name}({this.Playlist.Videos.Count}件)";
+                this.ChangePlaylistTitle();
+            }
+        }
+
+        /// <summary>
+        /// プレイリストのタイトルを変更する
+        /// </summary>
+        private void ChangePlaylistTitle()
+        {
+            if (this.Playlist is not null)
+            {
+                this.PlaylistTitle = $"{this.Playlist.Name}({this.Videos.Count}件)";
             }
         }
 

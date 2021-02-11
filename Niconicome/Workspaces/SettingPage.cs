@@ -21,6 +21,6 @@ namespace Niconicome.Workspaces
         public static IRestore Restore { get; private set; } = DIFactory.Provider.GetRequiredService<IRestore>();
         public static MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; private set; } = new MaterialDesign::SnackbarMessageQueue();
         public static ICurrent Current { get; private set; } = DIFactory.Provider.GetRequiredService<ICurrent>();
-        public static IPlaylistTreeHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistTreeHandler>();
+        public static IPlaylistVideoHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistVideoHandler>();
     }
 }
