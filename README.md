@@ -4,7 +4,6 @@
 [![Github Release](https://img.shields.io/badge/release-v0.0.3-blue)](https://github.com/Hayao-H/Niconicome/releases)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
-<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ニコニコ動画のコンテンツをダウンロードします。  
 ※テスト版のためバグが頻発する可能性があります。恐れ入りますが[Issues](https://github.com/Hayao-H/Niconicome/issues)からご報告ください。  
