@@ -91,7 +91,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// プレイリストのツリー
         /// </summary>
-        public IPlaylistTreeHandler? PlaylistTreeHandler { get; private set; }
+        public IPlaylistVideoHandler? PlaylistTreeHandler { get; private set; }
 
         /// <summary>
         /// プレイリストのツリー
