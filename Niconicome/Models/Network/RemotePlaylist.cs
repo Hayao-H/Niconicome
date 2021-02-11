@@ -8,17 +8,16 @@ using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Playlist = Niconicome.Models.Playlist;
 using Search = Niconicome.Models.Domain.Niconico.Search;
 using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
-using Niconicome.Models.Domain.Niconico.Video.Channel;
 
 namespace Niconicome.Models.Network
 {
 
     public interface IRemotePlaylistHandler
     {
-        Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos);
-        Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos);
-        Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::ITreeVideoInfo> videos);
-        Task<INetworkResult> TryGetChannelVideosAsync(string id,List<Playlist::ITreeVideoInfo> videos,Action<string> onMessage);
+        Task<bool> TryGetMylistVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos);
+        Task<bool> TryGetUserVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos);
+        Task<bool> TryGetWatchLaterAsync(List<Playlist::ITreeVideoInfo> videos);
+        Task<bool> TryGetChannelVideosAsync(string id,List<Playlist::ITreeVideoInfo> videos);
         Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType,int page);
         string? ExceptionDetails { get; }
     }
@@ -71,9 +70,8 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos)
+        public async Task<bool> TryGetMylistVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos)
         {
-            var resultInfo = new NetworkResult();
             List<Playlist::ITreeVideoInfo> result;
             try
             {
@@ -82,17 +80,14 @@ namespace Niconicome.Models.Network
             }
             catch
             {
-                resultInfo.IsFailed = true;
                 this.ExceptionDetails = this.mylistHandler.CurrentException?.Message;
-                return resultInfo;
+                return false;
             }
 
-            if (result.Count == 0) return resultInfo;
+            if (result.Count == 0) return false;
 
             videos.AddRange(result);
-            resultInfo.IsSucceededAll = true;
-            resultInfo.SucceededCount = videos.Count;
-            return resultInfo;
+            return true;
         }
 
         /// <summary>
@@ -101,9 +96,8 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos)
+        public async Task<bool> TryGetUserVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos)
         {
-            var resultInfo = new NetworkResult();
             List<Playlist::ITreeVideoInfo> result;
 
             try
@@ -113,16 +107,13 @@ namespace Niconicome.Models.Network
             }
             catch
             {
-                resultInfo.IsFailed = true;
                 this.ExceptionDetails = this.userHandler.CurrentException?.Message;
-                return resultInfo;
+                return false;
             }
-            if (result.Count == 0) return resultInfo;
+            if (result.Count == 0) return false;
 
             videos.AddRange(result);
-            resultInfo.IsSucceededAll = true;
-            resultInfo.SucceededCount = videos.Count;
-            return resultInfo;
+            return true;
         }
 
         /// <summary>
@@ -150,9 +141,8 @@ namespace Niconicome.Models.Network
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::ITreeVideoInfo> videos)
+        public async Task<bool> TryGetWatchLaterAsync(List<Playlist::ITreeVideoInfo> videos)
         {
-            var resultInfo = new NetworkResult();
             List<Playlist::ITreeVideoInfo> result;
             try
             {
@@ -161,17 +151,14 @@ namespace Niconicome.Models.Network
             }
             catch
             {
-                resultInfo.IsFailed = true;
                 this.ExceptionDetails = this.mylistHandler.CurrentException?.Message;
-                return resultInfo;
+                return false;
             }
 
-            if (result.Count == 0) return resultInfo;
+            if (result.Count == 0) return false;
 
             videos.AddRange(result);
-            resultInfo.IsSucceededAll = true;
-            resultInfo.SucceededCount = videos.Count;
-            return resultInfo;
+            return true;
         }
 
         /// <summary>
@@ -180,30 +167,24 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetChannelVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos, Action<string> onMessage)
+        public async Task<bool> TryGetChannelVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos)
         {
-            var resultInfo = new NetworkResult();
-            IChannelResult result;
+            List<Playlist::ITreeVideoInfo> result;
             try
             {
-                result = await this.channelVideoHandler.GetVideosAsync(id,onMessage);
+                result = await this.channelVideoHandler.GetVideosAsync(id);
 
             }
             catch
             {
-                resultInfo.IsFailed = true;
                 this.ExceptionDetails = this.channelVideoHandler.CurrentException?.Message;
-                return resultInfo;
+                return false;
             }
 
-            resultInfo.FailedCount = result.FailedCounts;
-            resultInfo.IsSucceededAll = result.IsSucceededAll;
-            resultInfo.SucceededCount = result.RetrievedVideos.Count;
+            if (result.Count == 0) return false;
 
-            if (result.RetrievedVideos.Count == 0) return resultInfo;
-
-            videos.AddRange(result.RetrievedVideos);
-            return resultInfo;
+            videos.AddRange(result);
+            return true;
         }
 
 

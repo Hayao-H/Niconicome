@@ -17,13 +17,12 @@ namespace Niconicome.Models.Playlist
         void Update(int playlistId, ITreeVideoInfo video);
         ITreePlaylistInfo? CurrentSelectedPlaylist { get; set; }
         event EventHandler SelectedItemChanged;
-        event EventHandler VideosChanged;
         ObservableCollection<ITreeVideoInfo> Videos { get; }
     }
 
     class Current : ICurrent
     {
-        public Current(IPlaylistVideoHandler handler, ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility)
+        public Current(IPlaylistTreeHandler handler,ICacheHandler cacheHandler, IVideoHandler videoHandler,IVideoThumnailUtility videoThumnailUtility)
         {
             this.handler = handler;
             this.cacheHandler = cacheHandler;
@@ -32,17 +31,14 @@ namespace Niconicome.Models.Playlist
             this.Videos = new ObservableCollection<ITreeVideoInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Videos, new object());
             this.SelectedItemChanged += this.OnSelectedItemChanged;
-            this.VideosChanged += this.OnVideoschanged;
-
         }
 
         ~Current()
         {
             this.SelectedItemChanged -= this.OnSelectedItemChanged;
-            this.VideosChanged -= this.OnVideoschanged;
         }
 
-        private readonly IPlaylistVideoHandler handler;
+        private readonly IPlaylistTreeHandler handler;
 
         private readonly IVideoThumnailUtility videoThumnailUtility;
 
@@ -81,29 +77,11 @@ namespace Niconicome.Models.Playlist
         }
 
         /// <summary>
-        /// 動画のコレクション変更時に発火するイベント
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnVideoschanged(object? sender, EventArgs e)
-        {
-
-        }
-
-        /// <summary>
         /// イベントを発火させる
         /// </summary>
         private void RaiseSelectedItemChanged()
         {
             this.SelectedItemChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// 動画変更イベントを発火させる
-        /// </summary>
-        private void RaiseVideoschanged()
-        {
-            this.VideosChanged.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -124,15 +102,15 @@ namespace Niconicome.Models.Playlist
                 if (this.CurrentSelectedPlaylist is not null)
                 {
                     int id = this.CurrentSelectedPlaylist.Id;
-                    var videos = this.handler.GetPlaylist(id)?.Videos.Copy();
+                    ITreePlaylistInfo? playlist = this.handler.GetPlaylist(id);
+                    IEnumerable<ITreeVideoInfo>? videos = playlist?.Videos.Copy();
 
-                    if (videos is not null)
+                    if (videos is not null && videos.Any())
                     {
                         foreach (var oldVideo in videos)
                         {
                             var video = this.videoHandler.GetVideo(oldVideo.Id);
                             video.MessageGuid = oldVideo.MessageGuid;
-                            video.Message = oldVideo.Message;
                             bool isValid = this.videoThumnailUtility.IsValidThumbnail(video);
                             bool hasCache = this.videoThumnailUtility.HasThumbnailCache(video);
                             if (!isValid || !hasCache)
@@ -154,8 +132,6 @@ namespace Niconicome.Models.Playlist
                                 continue;
                             }
                         }
-
-                        this.RaiseVideoschanged();
                     }
 
                 }
@@ -175,8 +151,7 @@ namespace Niconicome.Models.Playlist
             if (!this.Videos.Any(v => v.Id == video.Id))
             {
                 this.Videos.Add(video);
-            }
-            else
+            } else
             {
                 int index = this.Videos.FindIndex(v => v.Id == video.Id);
                 if (index == -1) return;
@@ -187,8 +162,7 @@ namespace Niconicome.Models.Playlist
 
         }
 
-        public event EventHandler SelectedItemChanged;
 
-        public event EventHandler VideosChanged;
+        public event EventHandler SelectedItemChanged;
     }
 }

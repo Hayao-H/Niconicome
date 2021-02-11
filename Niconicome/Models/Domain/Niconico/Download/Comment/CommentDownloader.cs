@@ -63,7 +63,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             {
                 try
                 {
-                    await session.EnsureSessionAsync(settings.NiconicoId,false);
+                    await session.EnsureSessionAsync(settings.NiconicoId);
                 }
                 catch (Exception e)
                 {

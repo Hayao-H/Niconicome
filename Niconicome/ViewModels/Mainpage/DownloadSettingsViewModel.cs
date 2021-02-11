@@ -96,8 +96,8 @@ namespace Niconicome.ViewModels.Mainpage
                    {
                        if (result?.FirstVideo is not null)
                        {
-                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
-                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
 
                            if (!result.IsSucceededAll)
                            {
@@ -105,12 +105,12 @@ namespace Niconicome.ViewModels.Mainpage
                            }
                        }
                    }
-                   else if (result?.SucceededCount == 1)
+                   else if (result.SucceededCount == 1)
                    {
                        if (result?.FirstVideo is not null)
                        {
-                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
-                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
+                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo}をダウンロードしました。");
+                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo}をダウンロードしました。");
                        }
                    } else
                    {

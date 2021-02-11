@@ -21,12 +21,9 @@ using State = Niconicome.Models.Local.State;
 
 namespace Niconicome.Models.Playlist
 {
-    public interface IPlaylistVideoHandler
+    public interface IPlaylistTreeHandler
     {
         int AddPlaylist(int parentId);
-        void AddVideo(ITreeVideoInfo video, int playlistId);
-        void RemoveVideo(int videoId, int playlistId);
-        void UpdateVideo(ITreeVideoInfo video, int playlistId);
         void DeletePlaylist(int playlistID);
         void Update(ITreePlaylistInfo newpaylist);
         void Refresh();
@@ -55,6 +52,8 @@ namespace Niconicome.Models.Playlist
         ITreePlaylistInfo? GetParent(int id);
         ITreePlaylistInfo GetRoot();
         ITreePlaylistInfo GetTree();
+
+
     }
 
     public interface ITreePlaylistInfo : IClonable<ITreePlaylistInfo>
@@ -123,12 +122,10 @@ namespace Niconicome.Models.Playlist
 
     /// <summary>
     /// ViewModelから触るAPI
-    /// これはあくまでメモリ上への動画データしか変更できないため、
-    /// DBのデータを変更したい場合は別途VideoHandlerクラスのインスタンスを利用する必要がある
     /// </summary>
-    public class PlaylistVideoHandler : IPlaylistVideoHandler
+    public class PlaylistTreeHandler : IPlaylistTreeHandler
     {
-        public PlaylistVideoHandler(ITreePlaylistInfoHandler handler, IPlaylistStoreHandler playlistStoreHandler, IVideoStoreHandler videoStoreHandler, State::IErrorMessanger errorMessanger)
+        public PlaylistTreeHandler(ITreePlaylistInfoHandler handler, IPlaylistStoreHandler playlistStoreHandler, IVideoStoreHandler videoStoreHandler, State::IErrorMessanger errorMessanger)
         {
             this.Playlists = new ObservableCollection<ITreePlaylistInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Playlists, new object());
@@ -149,39 +146,37 @@ namespace Niconicome.Models.Playlist
 
         public ObservableCollection<ITreePlaylistInfo> Playlists { get; private set; }
 
-        /// <summary>
-        /// 動画をメモリ上のプレイリストに追加する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistId"></param>
-       　public void AddVideo(ITreeVideoInfo video, int playlistId)
-        {
-            var playlist = this.handler.GetPlaylist(playlistId);
-            playlist?.Videos.AddUnique(video,list=>!list.Any(v=>v.Id==video.Id));
-        }
 
         /// <summary>
-        /// 動画をメモリ上のプレイリストから削除する
+        /// プレイリストを初期化する
         /// </summary>
-        /// <param name="videoId"></param>
-        /// <param name="playlistId"></param>
-        public void RemoveVideo(int videoId, int playlistId)
+        private void SetPlaylists()
         {
-            var playlist = this.handler.GetPlaylist(playlistId);
-            playlist?.Videos.RemoveAll(v => v.Id == videoId);
-        }
 
-        /// <summary>
-        /// 動画情報を更新する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistId"></param>
-        public void UpdateVideo(ITreeVideoInfo video, int playlistId)
-        {
-            this.RemoveVideo(video.Id, playlistId);
-            this.AddVideo(video, playlistId);
-        }
+            //プレイリストを取得する
+            var playlists = this.playlistStoreHandler.GetAllPlaylists().Select(p =>
+             {
+                 var childPlaylists = this.playlistStoreHandler.GetChildPlaylists(p.Id);
+                 var converted = BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
+                 if (p.Videos.Count > 0)
+                 {
+                     var videos = p.Videos.Select(v =>
+                     {
+                         var video = this.videoStoreHandler.GetVideo(v.Id);
+                         if (video is null) return new BindableTreeVideoInfo();
+                         return BindableTreeVideoInfo.ConvertToTreeVideoInfo(video);
+                     }).Where(v => !v.Title.IsNullOrEmpty()).Distinct(v => v.Id);
+                     converted.Videos.AddRange(videos);
+                 }
+                 return converted;
+             });
 
+
+            this.handler.MergeRange(playlists);
+            ITreePlaylistInfo treePlaylistInfo = handler.GetTree();
+            this.Playlists.Clear();
+            this.Playlists.Add(treePlaylistInfo);
+        }
 
         /// <summary>
         /// プレイリストを追加
@@ -318,37 +313,6 @@ namespace Niconicome.Models.Playlist
                 this.playlistStoreHandler.Update(newpaylist);
                 this.SetPlaylists();
             }
-        }
-
-        /// <summary>
-        /// プレイリストを初期化する
-        /// </summary>
-        private void SetPlaylists()
-        {
-
-            //プレイリストを取得する
-            var playlists = this.playlistStoreHandler.GetAllPlaylists().Select(p =>
-            {
-                var childPlaylists = this.playlistStoreHandler.GetChildPlaylists(p.Id);
-                var converted = BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
-                if (p.Videos.Count > 0)
-                {
-                    var videos = p.Videos.Select(v =>
-                    {
-                        var video = this.videoStoreHandler.GetVideo(v.Id);
-                        if (video is null) return new BindableTreeVideoInfo();
-                        return BindableTreeVideoInfo.ConvertToTreeVideoInfo(video);
-                    }).Where(v => !v.Title.IsNullOrEmpty()).Distinct(v => v.Id);
-                    converted.Videos.AddRange(videos);
-                }
-                return converted;
-            });
-
-
-            this.handler.MergeRange(playlists);
-            ITreePlaylistInfo treePlaylistInfo = handler.GetTree();
-            this.Playlists.Clear();
-            this.Playlists.Add(treePlaylistInfo);
         }
 
     }

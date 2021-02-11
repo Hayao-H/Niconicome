@@ -20,7 +20,6 @@ using MaterialDesign = MaterialDesignThemes.Wpf;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
-using Niconicome.Models.Network;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -38,9 +37,6 @@ namespace Niconicome.ViewModels.Mainpage
         {
             //プレイリスト選択変更イベントを購読する
             WS::Mainpage.CurrentPlaylist.SelectedItemChanged += this.OnSelectedPlaylistChanged;
-
-            //プレイリスト内容更新のイベントを購読する
-            WS::Mainpage.CurrentPlaylist.VideosChanged += (e, s) => this.ChangePlaylistTitle();
 
             this.showMessageBox = showMessageBox;
 
@@ -303,22 +299,17 @@ namespace Niconicome.ViewModels.Mainpage
 
                      int playlistId = this.Playlist.Id;
                      var videos = new List<ITreeVideoInfo>();
-                     INetworkResult result = this.Playlist.RemoteType switch
+                     bool result = this.Playlist.RemoteType switch
                      {
                          RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(this.Playlist.RemoteId, videos),
                          RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(this.Playlist.RemoteId, videos),
                          RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos, m => WS::Mainpage.Messagehandler.AppendMessage(m)),
-                         _ => new NetworkResult(),
+                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos),
+                         _ => false,
                      };
 
-                     if (!result.IsFailed)
+                     if (result)
                      {
-                         if (!result.IsSucceededAll)
-                         {
-                             WS::Mainpage.Messagehandler.AppendMessage($"{result.FailedCount}件の取得に失敗しました。");
-                         }
-
                          videos = videos.Where(v => !WS::Mainpage.PlaylistTree.ContainsVideo(v.NiconicoId, playlistId)).ToList();
 
                          if (videos.Count == 0)
@@ -905,18 +896,7 @@ namespace Niconicome.ViewModels.Mainpage
                 string name = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.Name;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
                 WS::Mainpage.SnackbarMessageQueue.Enqueue($"プレイリスト:{name}");
-                this.ChangePlaylistTitle();
-            }
-        }
-
-        /// <summary>
-        /// プレイリストのタイトルを変更する
-        /// </summary>
-        private void ChangePlaylistTitle()
-        {
-            if (this.Playlist is not null)
-            {
-                this.PlaylistTitle = $"{this.Playlist.Name}({this.Videos.Count}件)";
+                this.PlaylistTitle = $"{this.Playlist.Name}({this.Playlist.Videos.Count}件)";
             }
         }
 

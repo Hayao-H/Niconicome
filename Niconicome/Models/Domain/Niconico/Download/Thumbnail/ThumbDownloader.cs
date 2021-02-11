@@ -50,7 +50,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 
             if (session.Video is null)
             {
-                await session.EnsureSessionAsync(settings.NiconicoId,false);
+                await session.EnsureSessionAsync(settings.NiconicoId);
 
                 if (!session.IsSessionEnsured)
                 {
@@ -58,6 +58,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
                     {
                         WatchSessionState.HttpRequestFailure => "視聴ページの取得に失敗しました。",
                         WatchSessionState.PageAnalyzingFailure => "視聴ページの解析に失敗しました。",
+                        WatchSessionState.EncryptedVideo => "暗号化された動画のため、ダウンロードできません。",
                         WatchSessionState.SessionEnsuringFailure => "セッションの確立に失敗しました。",
                         _ => "不明なエラーにより、セッションの確立に失敗しました。"
                     };
