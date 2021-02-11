@@ -20,6 +20,7 @@ using MaterialDesign = MaterialDesignThemes.Wpf;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
+using Niconicome.Models.Network;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -302,17 +303,22 @@ namespace Niconicome.ViewModels.Mainpage
 
                      int playlistId = this.Playlist.Id;
                      var videos = new List<ITreeVideoInfo>();
-                     bool result = this.Playlist.RemoteType switch
+                     INetworkResult result = this.Playlist.RemoteType switch
                      {
                          RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(this.Playlist.RemoteId, videos),
                          RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(this.Playlist.RemoteId, videos),
                          RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos),
-                         _ => false,
+                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos, m => WS::Mainpage.Messagehandler.AppendMessage(m)),
+                         _ => new NetworkResult(),
                      };
 
-                     if (result)
+                     if (!result.IsFailed)
                      {
+                         if (!result.IsSucceededAll)
+                         {
+                             WS::Mainpage.Messagehandler.AppendMessage($"{result.FailedCount}件の取得に失敗しました。");
+                         }
+
                          videos = videos.Where(v => !WS::Mainpage.PlaylistTree.ContainsVideo(v.NiconicoId, playlistId)).ToList();
 
                          if (videos.Count == 0)

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using Niconicome.Models.Domain.Local.Playlist;
+using Niconicome.Models.Network;
 using Playlist = Niconicome.Models.Playlist;
 using WS = Niconicome.Workspaces;
 
@@ -72,18 +73,18 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     this.Message = "情報を取得中です...";
 
-                    bool result = this.CurrentSetting.NetworkMode switch
+                    INetworkResult result = this.CurrentSetting.NetworkMode switch
                     {
                         Playlist::RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(id, videos),
                         Playlist::RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(id, videos),
                         Playlist::RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                        Playlist::RemoteType.Channel=> await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(id,videos),
-                        Playlist::RemoteType.None => true,
-                        _ => false
+                        Playlist::RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(id, videos, m => this.Message = m),
+                        Playlist::RemoteType.None => new NetworkResult(),
+                        _ => new NetworkResult()
                     };
 
 
-                    if (!result)
+                    if (result.IsFailed)
                     {
                         string detail = WS::Mainpage.RemotePlaylistHandler.ExceptionDetails ?? "None";
                         string logfile = WS::Mainpage.LocalInfo.LogFileName;
@@ -96,13 +97,24 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                         return;
                     }
+                    else if (result.SucceededCount == 0)
+                    {
+                        this.Message = "取得に成功しましたが、動画は一件も存在しませんでした。";
+                    }
+                    else if (!result.IsSucceededAll)
+                    {
+                        this.Message = $"{result.FailedCount}件の取得に失敗しました。";
+                    }
 
                     int playlistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.Id;
 
 
-                    await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, playlistID);
-                    WS::Mainpage.PlaylistTree.Refresh();
-                    WS::Mainpage.CurrentPlaylist.Update(playlistID);
+                    if (videos.Count > 0)
+                    {
+                        await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, playlistID);
+                        WS::Mainpage.PlaylistTree.Refresh();
+                        WS::Mainpage.CurrentPlaylist.Update(playlistID);
+                    }
 
 
                     switch (this.CurrentSetting.NetworkMode)
@@ -118,7 +130,14 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                             break;
                     }
 
-                    window.Close();
+                    if (result.IsSucceededAll)
+                    {
+                        window.Close();
+                    }
+
+
+                    this.isfetching = false;
+                    this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
                 }
 
 
