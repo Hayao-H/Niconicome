@@ -126,10 +126,14 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// <returns></returns>
         private async Task<IEnumerable<ITreeVideoInfo>> ConvertToTreeVideoInfo(IEnumerable<string> ids)
         {
-            return await ids.Select(async (id) =>
+            return await ids.Select(async (id, index) =>
                 {
+                    if (index % 4 == 0)
+                    {
+                        await Task.Delay(10 * 1000);
+                    }
                     var videoInfo = new VIdeoInfo();
-                    var result = await this.watch.TryGetVideoInfoAsync(id, videoInfo,WatchInfo::WatchInfoOptions.NoDmcData);
+                    var result = await this.watch.TryGetVideoInfoAsync(id, videoInfo, WatchInfo::WatchInfoOptions.NoDmcData);
                     return videoInfo.ConvertToTreeVideoInfo();
                 }).WhenAll();
         }
