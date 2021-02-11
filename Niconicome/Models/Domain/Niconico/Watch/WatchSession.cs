@@ -138,9 +138,11 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         {
             this.CheckSessionExpired();
 
+            var options = isVideoDownload ? WatchInfoOptions.Default : WatchInfoOptions.NoDmcData;
+
             try
             {
-                this.Video = await this.watchInfo.GetVideoInfoAsync(nicoId,WatchInfoOptions.Default);
+                this.Video = await this.watchInfo.GetVideoInfoAsync(nicoId,options);
             }
             catch
             {
