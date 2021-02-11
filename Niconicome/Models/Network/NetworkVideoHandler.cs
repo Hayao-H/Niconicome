@@ -25,6 +25,7 @@ namespace Niconicome.Models.Network
 
     public interface INetworkResult
     {
+        bool IsFailed { get; set; }
         bool IsSucceededAll { get; set; }
         int SucceededCount { get; set; }
         int FailedCount { get; set; }
@@ -286,6 +287,12 @@ namespace Niconicome.Models.Network
 
     public class NetworkResult : INetworkResult
     {
+        /// <summary>
+        /// 処理失敗フラグ
+        /// </summary>
+        public bool IsFailed { get; set; }
+
+
         /// <summary>
         /// 全ての処理に成功
         /// </summary>
