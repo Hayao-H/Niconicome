@@ -101,7 +101,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                     this.messenger.RemoveHandler(onMessage);
                     return this.GetCancelledResult();
                 }
-                await session.EnsureSessionAsync(settings.NiconicoId);
+                await session.EnsureSessionAsync(settings.NiconicoId,true);
 
                 if (!session.IsSessionEnsured)
                 {
