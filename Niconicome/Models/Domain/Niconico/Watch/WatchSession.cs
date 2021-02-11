@@ -14,7 +14,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 {
     public interface IWatchSession : IDisposable
     {
-        Task EnsureSessionAsync(string id);
+        Task EnsureSessionAsync(string id,bool isVideoDownload);
         bool IsSessionEnsured { get; }
         bool IsSessionExipired { get; }
         string PlaylistUrl { get; }
@@ -134,7 +134,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="nicoId"></param>
         /// <returns></returns>
-        public async Task EnsureSessionAsync(string nicoId)
+        public async Task EnsureSessionAsync(string nicoId, bool isVideoDownload)
         {
             this.CheckSessionExpired();
 
@@ -150,6 +150,14 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                     WatchInfoHandlerState.HttpRequestFailure => WatchSessionState.HttpRequestFailure,
                     _ => WatchSessionState.PageAnalyzingFailure
                 };
+                return;
+            }
+
+            if (!isVideoDownload)
+            {
+                this.State = WatchSessionState.OK;
+                this.IsSessionEnsured = true;
+                this.logger.Log($"{nicoId}の取得に成功しましたが、セッションの確立は行いませんでした。");
                 return;
             }
 
