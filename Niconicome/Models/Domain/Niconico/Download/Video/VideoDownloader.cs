@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Text;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Niconico.Watch;
-using Niconicome.Models.Domain.Niconico.Dmc;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Domain.Niconico.Dmc;
+using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video
 {
