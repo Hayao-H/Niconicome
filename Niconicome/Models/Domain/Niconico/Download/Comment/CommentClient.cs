@@ -42,7 +42,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
     public interface ICommentClient
     {
-        Task<ICommentCollection> DownloadCommentInternalAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger, CancellationToken token);
+        Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger,IDownloadContext context, CancellationToken token);
     }
 
     public class CommentDownloadSettings : ICommentDownloadSettings
@@ -89,7 +89,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public async Task<ICommentCollection> DownloadCommentInternalAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger, CancellationToken token)
+        public async Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger,IDownloadContext context, CancellationToken token)
         {
             var comments = CommentCollection.GetInstance();
             Response::Chat? first;
@@ -106,11 +106,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
                 if (index > 0)
                 {
-                    this.logger.Log($"過去ログをダウンロードしました。({index}個目、{retlieved.Count}コメント)");
+                    this.logger.Log($"過去ログをダウンロードしました。({index}個目, {retlieved.Count}コメント, {context.GetLogContent()})");
                 }
                 else
                 {
-                    this.logger.Log($"現行スレッドをダウンロードしました。({retlieved.Count}コメント)");
+                    this.logger.Log($"現行スレッドをダウンロードしました。({retlieved.Count}コメント, {context.GetLogContent()})");
                 }
 
                 first = comments.GetFirstComment(false);
@@ -137,7 +137,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             comments.Distinct();
 
-            this.logger.Log($"コメントのダウンロードが完了しました。({comments.Count}コメント)");
+            this.logger.Log($"コメントのダウンロードが完了しました。({comments.Count}コメント, {context.GetLogContent()})");
 
             return comments;
 
