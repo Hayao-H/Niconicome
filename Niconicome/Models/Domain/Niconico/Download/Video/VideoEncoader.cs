@@ -14,7 +14,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface IVideoEncoader
     {
-        Task EncodeAsync(IEncodeSettings settings, IDownloadMessenger messenger,CancellationToken token);
+        Task EncodeAsync(IEncodeSettings settings, IDownloadMessenger messenger, CancellationToken token);
         string Mp4FilePath { get; }
     }
 
@@ -34,7 +34,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     class VideoEncoader : IVideoEncoader
     {
 
-        public VideoEncoader(ITsMerge tsMerge,File::IEncodeutility encodeutility)
+        public VideoEncoader(ITsMerge tsMerge, File::IEncodeutility encodeutility)
         {
             this.tsMerge = tsMerge;
             this.encodeutility = encodeutility;
@@ -56,12 +56,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public string Mp4FilePath { get; private set; } = string.Empty;
 
 
-        public async Task EncodeAsync(IEncodeSettings settings, IDownloadMessenger messenger,CancellationToken token)
+        public async Task EncodeAsync(IEncodeSettings settings, IDownloadMessenger messenger, CancellationToken token)
         {
             string tsFolderName = Path.GetDirectoryName(settings.TsFilePaths.First()) ?? string.Empty;
             string targetFilePath = Path.Combine(tsFolderName, "combined.ts");
             string mp4Foldername = this.GetFolderPath(settings.FolderName);
-            string mp4Filename = this.GetFilePath(settings.FileName, mp4Foldername,settings.IsOverwriteEnable);
+            string mp4Filename = this.GetFilePath(settings.FileName, mp4Foldername, settings.IsOverwriteEnable);
 
             if (!Directory.Exists(mp4Foldername))
             {
@@ -73,11 +73,22 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             if (token.IsCancellationRequested) return;
 
             messenger.SendMessage("セグメントファイルの結合を開始");
-            try
-            {
-                this.tsMerge.Merge(settings.TsFilePaths, targetFilePath);
-            }
-            catch (Exception e)
+            var e = await Task.Run(() =>
+             {
+                 Exception? e = null;
+
+                 try
+                 {
+                     this.tsMerge.Merge(settings.TsFilePaths, targetFilePath);
+                 }
+                 catch (Exception ex)
+                 {
+                     return ex;
+                 }
+
+                 return e;
+             });
+            if (e is not null)
             {
                 throw new IOException($"セグメントファイルのマージ中にエラーが発生しました。(詳細: {e.Message})");
             }
@@ -86,7 +97,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             if (token.IsCancellationRequested) return;
 
             messenger.SendMessage("ffmpegで変換を開始(.ts=>.mp4)");
-            await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename,token,File::EncodeOptions.Copy);
+            await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, token, File::EncodeOptions.Copy);
             messenger.SendMessage("ffmpegの変換が完了");
         }
 
