@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Text;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Niconico.Watch;
-using Niconicome.Models.Domain.Niconico.Dmc;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Domain.Niconico.Dmc;
+using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video
 {
@@ -101,7 +100,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                     this.messenger.RemoveHandler(onMessage);
                     return this.GetCancelledResult();
                 }
-                await session.EnsureSessionAsync(settings.NiconicoId,true);
+                await session.EnsureSessionAsync(settings.NiconicoId, true);
 
                 if (!session.IsSessionEnsured)
                 {
@@ -342,10 +341,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 var task = taskHandler.RetrieveNextTask();
                 byte[] data;
 
-                if ((task.SequenceZero + 1) % 200 == 0)
+                if ((task.SequenceZero + 1) > this.maxParallelDownloadCount)
                 {
                     this.isSleeping = true;
-                    await Task.Delay(20 * 1000, token);
+                    await Task.Delay(1 * 1000, token);
                     this.isSleeping = false;
                 }
 
