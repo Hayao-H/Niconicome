@@ -11,8 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface ISegmentWriter
     {
-        void Write(byte[] data, IDownloadTask task);
-        string FolderName { get; }
+        void Write(byte[] data, IDownloadTask task,IDownloadContext context);
         string FolderNameAbs { get; }
         IEnumerable<string> FilesPath { get; }
         IEnumerable<string> FilesPathAbs { get; }
@@ -20,15 +19,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     class SegmentWriter : ISegmentWriter
     {
-
-        public SegmentWriter()
-        {
-            this.FolderName = Path.Combine("tmp", Guid.NewGuid().ToString("D"));
-            if (!Directory.Exists(this.FolderName))
-            {
-                Directory.CreateDirectory(this.FolderName);
-            }
-        }
 
         /// <summary>
         /// ファイル名のリスト
@@ -40,11 +30,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         /// <param name="data"></param>
         /// <param name="task"></param>
-        public void Write(byte[] data, IDownloadTask task)
+        public void Write(byte[] data, IDownloadTask task, IDownloadContext context)
         {
+            this.folderName = Path.Combine("tmp",context.Id);
+
+            if (!Directory.Exists(this.folderName))
+            {
+                Directory.CreateDirectory(this.folderName);
+            }
+
             this.innerFileNames.Add(task.FileName);
             this.innerFileNames.Sort();
-            string targetPath = Path.Combine(this.FolderName, task.FileName);
+            string targetPath = Path.Combine(this.folderName, task.FileName);
             using var fs = File.Create(targetPath);
             fs.Write(data);
         }
@@ -52,20 +49,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <summary>
         /// フォルダー名
         /// </summary>
-        public string FolderName { get; init; }
+        private string? folderName;
 
         /// <summary>
-        /// フォルダー名(絶対)
+        /// 完全なフォルダー名
         /// </summary>
-        public string FolderNameAbs
-        {
-            get => Path.Combine(AppContext.BaseDirectory, this.FolderName);
-        }
+        public string FolderNameAbs { get => Path.Combine(AppContext.BaseDirectory, this.folderName??string.Empty); }
+
 
         /// <summary>
         /// ファイル名のリスト
         /// </summary>
-        public IEnumerable<string> FilesPath => this.innerFileNames.Select(p => Path.Combine(this.FolderName, p));
+        public IEnumerable<string> FilesPath => this.innerFileNames.Select(p => Path.Combine(this.folderName??"tmp", p));
 
         /// <summary>
         /// ファイル名のリスト(絶対)
