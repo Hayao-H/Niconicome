@@ -101,7 +101,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                     this.messenger.RemoveHandler(onMessage);
                     return this.GetCancelledResult();
                 }
-                await session.EnsureSessionAsync(settings.NiconicoId,true);
+                await session.EnsureSessionAsync(settings.NiconicoId, true);
 
                 if (!session.IsSessionEnsured)
                 {
@@ -342,10 +342,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 var task = taskHandler.RetrieveNextTask();
                 byte[] data;
 
-                if ((task.SequenceZero + 1) % 200 == 0)
+                if ((task.SequenceZero + 1) > this.maxParallelDownloadCount)
                 {
                     this.isSleeping = true;
-                    await Task.Delay(20 * 1000, token);
+                    await Task.Delay(1 * 1000, token);
                     this.isSleeping = false;
                 }
 
