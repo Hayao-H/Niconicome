@@ -13,6 +13,7 @@ namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
         int SkippedCount { get; }
         int SucceededCount { get; }
         int FailedCount { get; }
+        IXenoPlaylist RootPlaylist { get; }
         List<IXenoPlaylist> Playlists { get; }
     }
     public interface IXenoRootParser
@@ -22,11 +23,18 @@ namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
 
     public class XenoParseResult : IXenoParseResult
     {
+        public XenoParseResult(IXenoPlaylist root)
+        {
+            this.RootPlaylist = root;
+        }
+
         public int SucceededCount { get; set; }
 
         public int SkippedCount { get; set; }
 
         public int FailedCount { get; set; }
+
+        public IXenoPlaylist RootPlaylist { get; init; }
 
         public List<IXenoPlaylist> Playlists { get; init; } = new();
 
@@ -52,10 +60,10 @@ namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
         /// <returns></returns>
         public IXenoParseResult ParseText(string text)
         {
-            var result = new XenoParseResult();
             var currentLayer = 0;
             IXenoPlaylist currentParent = new XenoPlaylist("Root");
             IXenoPlaylist candidateParent = currentParent;
+            var result = new XenoParseResult(currentParent);
 
             foreach (var line in text.Split(Environment.NewLine).Select((content, index) => new { content, index }))
             {
