@@ -1,4 +1,4 @@
-﻿using Niconicome.Models.Domain.Local.External.Inport.Xeno;
+﻿using Niconicome.Models.Domain.Local.External.Import.Xeno;
 
 
 namespace NiconicomeTest.Stabs.Models.Domain.Local.Extarnal.Inport.Xeno

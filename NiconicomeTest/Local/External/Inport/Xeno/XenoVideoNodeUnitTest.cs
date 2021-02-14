@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Niconicome.Models.Domain.Local.External.Inport.Xeno;
+using Niconicome.Models.Domain.Local.External.Import.Xeno;
 
 namespace NiconicomeTest.Local.External.Inport.Xeno
 {
