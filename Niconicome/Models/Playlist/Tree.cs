@@ -37,6 +37,8 @@ namespace Niconicome.Models.Playlist
         bool ContainsVideo(string niconicoId, int playlistId);
         ITreePlaylistInfo? GetPlaylist(int id);
         ITreePlaylistInfo? GetParent(ITreePlaylistInfo child);
+        ITreePlaylistInfo? GetRootPlaylist();
+        IEnumerable<ITreePlaylistInfo> GetAllPlaylists();
         ObservableCollection<ITreePlaylistInfo> Playlists { get; }
     }
 
@@ -319,6 +321,26 @@ namespace Niconicome.Models.Playlist
                 this.SetPlaylists();
             }
         }
+
+        /// <summary>
+        /// 全てのプレイリストを取得する
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ITreePlaylistInfo> GetAllPlaylists()
+        {
+            return this.playlistStoreHandler.GetAllPlaylists().Select(p => BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p));
+        }
+
+        /// <summary>
+        /// ルートプレイリストを取得
+        /// </summary>
+        /// <returns></returns>
+        public ITreePlaylistInfo? GetRootPlaylist()
+        {
+            return BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(this.playlistStoreHandler.GetRootPlaylist());
+        }
+
+
 
         /// <summary>
         /// プレイリストを初期化する
