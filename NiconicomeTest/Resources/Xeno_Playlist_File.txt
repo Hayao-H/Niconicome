@@ -1,0 +1,62 @@
+1	32		履歴
+2	0		最近再生した動画	<最近再生した動画の一覧>
+2	0		最近ダウンロードした動画	<最近何かのDLを試みた一覧>
+2	0		最近ダウンロードに失敗した動画	<最近何かのDLに失敗した一覧>
+1	32		アニメ
+2	32		新しいフォルダ
+3	32		新しいフォルダ
+4	0		東方	G:\[app]niconico\NicomentXenoglossia\down\東方.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	96		エルフェンリート	https://ch.nicovideo.jp/elfenlied	list\アニメ\エルフェンリート
+3	10		新しいフォルダ
+2	0	s=7	かくしごと	https://ch.nicovideo.jp/kakushigoto-anime	list\アニメ\かくしごと
+2	0	s=7	かぐや様は告らせたい？ 天才たちの恋愛頭脳戦	https://ch.nicovideo.jp/kaguya_love_anime	list\アニメ\かぐや様は告らせたい？ 天才たちの恋愛頭脳戦
+2	0		ご注文はうさぎですか？	https://ch.nicovideo.jp/gochiusa	list\アニメ\ご注文はうさぎですか？
+2	0		ソウナンですか？	https://ch.nicovideo.jp/sounandesuka	list\アニメ\ソウナンですか？
+2	0	s=7	ソマリと森の神様	https://ch.nicovideo.jp/somali-anime	list\アニメ\ソマリと森の神様
+2	0	s=7	ちはやふる3	https://ch.nicovideo.jp/chihayafuru3	list\アニメ\ちはやふる3
+2	0	s=7	チャージマン研	https://ch.nicovideo.jp/chargeman-ken	list\アニメ\チャージマン研
+2	0		ひぐらしのなく頃に解	https://ch.nicovideo.jp/oyashirosama02	list\アニメ\ひぐらしのなく頃に解
+2	0	s=7	ひぐらしのなく頃に業	https://ch.nicovideo.jp/higurashianime_202010	list\アニメ\ひぐらしのなく頃に業
+2	0		ひぐらしのなく頃に礼	https://ch.nicovideo.jp/oyashirosama03	list\アニメ\ひぐらしのなく頃に礼
+2	0		ヒナまつり	https://ch.nicovideo.jp/hina-matsuri	list\アニメ\ヒナまつり
+2	0	s=7	プランダラ	https://ch.nicovideo.jp/plunderer	list\アニメ\プランダラ
+2	0		ルパン三世PART5	https://ch.nicovideo.jp/lupin-pt5	list\アニメ\ルパン三世PART5
+2	0	s=7	虚構推理	https://ch.nicovideo.jp/kyokousuiri	list\アニメ\虚構推理
+2	0		女子高生の無駄づかい	https://ch.nicovideo.jp/jyoshimuda	list\アニメ\女子高生の無駄づかい
+2	0	s=7	波よ聞いてくれ	https://ch.nicovideo.jp/namiyo-anime	list\アニメ\波よ聞いてくれ
+2	0		幼女戦記	https://ch.nicovideo.jp/youjo-senki	list\アニメ\幼女戦記
+2	0		涼宮ハルヒの憂鬱	https://ch.nicovideo.jp/haruhi_2009	list\アニメ\涼宮ハルヒの憂鬱
+2	0	s=7	恋する小惑星	https://ch.nicovideo.jp/koiastv	list\アニメ\恋する小惑星
+1	32		保存したリスト	<保存したリストの一覧>
+2	0		JAZZ	G:\[app]niconico\NicomentXenoglossia\down\JAZZ.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		MAD	G:\[app]niconico\NicomentXenoglossia\down\MAD.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		Undertale	G:\[app]niconico\NicomentXenoglossia\down\Undertale.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		ちょぼらうにょぽみ	G:\[app]niconico\NicomentXenoglossia\down\ちょぼらうにょぽみ-永琳が匙を投げた患者.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		VOCALOID	G:\[app]niconico\NicomentXenoglossia\down\VOCALOID.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		アニソン	G:\[app]niconico\NicomentXenoglossia\down\アニソン.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		オペラ座の怪人	G:\[app]niconico\NicomentXenoglossia\down\オペラ座の怪人.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		キッチンやらないO	G:\[app]niconico\NicomentXenoglossia\down\キッチンやらないO.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		コマンドー	G:\[app]niconico\NicomentXenoglossia\down\コマンドー.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		シコシコ動画	G:\[app]niconico\NicomentXenoglossia\down\シコシコ動画.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		その他エンタメ	G:\[app]niconico\NicomentXenoglossia\down\その他エンタメ.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		とあるシリーズ	G:\[app]niconico\NicomentXenoglossia\down\とあるシリーズ.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		ネタ	G:\[app]niconico\NicomentXenoglossia\down\ネタ.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		ひぐらしのなく頃に	G:\[app]niconico\NicomentXenoglossia\down\ひぐらしのなく頃に.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		ファミマ入店音	G:\[app]niconico\NicomentXenoglossia\down\ファミマ入店音.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		ポプテピピック	G:\[app]niconico\NicomentXenoglossia\down\ポプテピピック.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		まともじゃねぇ吹き替えバーロー	G:\[app]niconico\NicomentXenoglossia\down\まともじゃねぇ吹き替えバーロー.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		ゆっくり	G:\[app]niconico\NicomentXenoglossia\down\ゆっくり.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		兄貴系動画	G:\[app]niconico\NicomentXenoglossia\down\兄貴系動画.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		作業用BGM	G:\[app]niconico\NicomentXenoglossia\down\作業用BGM.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		生放送	G:\[app]niconico\NicomentXenoglossia\down\生放送.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		東方（アレンジ）	G:\[app]niconico\NicomentXenoglossia\down\東方（アレンジ）.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		東方（その他エンタメ）	G:\[app]niconico\NicomentXenoglossia\down\東方（その他エンタメ）.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		東方（原曲）	G:\[app]niconico\NicomentXenoglossia\down\東方（原曲）.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		東方（総合）	G:\[app]niconico\NicomentXenoglossia\down\東方（総合）.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		東方原曲メドレー①	G:\[app]niconico\NicomentXenoglossia\down\東方原曲メドレー①.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		東方原曲メドレー②	G:\[app]niconico\NicomentXenoglossia\down\東方原曲メドレー②.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		東方手書き劇場	G:\[app]niconico\NicomentXenoglossia\down\東方手書き劇場.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		虹色☆ハニー	G:\[app]niconico\NicomentXenoglossia\down\虹色☆ハニー.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		保管庫	G:\[app]niconico\NicomentXenoglossia\down\保管庫.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		坊歌ロイド	G:\[app]niconico\NicomentXenoglossia\down\坊歌ロイド.txt	G:\[app]niconico\NicomentXenoglossia\down
+2	0		東方	G:\[app]niconico\NicomentXenoglossia\down\東方.txt	G:\[app]niconico\NicomentXenoglossia\down

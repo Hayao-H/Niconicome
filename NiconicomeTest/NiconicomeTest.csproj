@@ -35,8 +35,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Stabs\Models\Domain\Local\" />
-  </ItemGroup>
-
 </Project>
