@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Local.External.Import.Xeno
@@ -65,7 +66,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
             IXenoPlaylist candidateParent = currentParent;
             var result = new XenoParseResult(currentParent);
 
-            foreach (var line in text.Split(Environment.NewLine).Select((content, index) => new { content, index }))
+            foreach (var line in text.Split(Environment.NewLine).Select((content, index) => new { content, index }).Where(l=>!l.content.IsNullOrEmpty()))
             {
                 IXenoRootNode node;
                 try
