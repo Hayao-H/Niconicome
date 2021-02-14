@@ -37,7 +37,7 @@
                     </materialDesign:PackIcon>
                     <Label Content="NicomentXenoglossiaからインポート" />
                 </StackPanel>
-                <StackPanel Margin="0 5" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Margin="10 5" Orientation="Horizontal" VerticalAlignment="Center">
                     <Label VerticalContentAlignment="Center" Content="手順1: 「設定：固定URL.txt」ファイルを選択"/>
                     <materialDesign:PackIcon Kind="Check" Visibility="{Binding XenoPathCheckVisibility}" Margin="8 0" Foreground="Green">
                         <materialDesign:PackIcon.RenderTransform>
@@ -46,21 +46,24 @@
                     </materialDesign:PackIcon>
                     <Button Content="参照" Command="{Binding SetXenoPathCommand}"/>
                 </StackPanel>
-                <StackPanel Margin="0 5" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Margin="10 5" Orientation="Horizontal" VerticalAlignment="Center">
                     <Label VerticalContentAlignment="Center" Content="手順2: 追加先プレイリスト"/>
                     <ComboBox ItemsSource="{Binding SelectablePlaylists}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedParent,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
-                <StackPanel Margin="0 5" Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Margin="10 5" Orientation="Horizontal" VerticalAlignment="Center">
                     <Label VerticalContentAlignment="Center" Content="手順3: インポート開始！"/>
                     <ProgressBar
                         Style="{StaticResource MaterialDesignCircularProgressBar}"
                         Value="35"
                         Margin="8 0"
-                        IsIndeterminate="False"
+                        IsIndeterminate="True"
                         Visibility="{Binding XenoImportProgressVisibility}"/>
-                    <Button Content="開始"/>
+                    <Button Content="開始" Margin="0 0 10 0" Command="{Binding ImportFromXenoCommand}"/>
+                    <Button Content="キャンセル" Command="{Binding ImportCancellCommand}"/>
                 </StackPanel>
-                <TextBlock Margin="0 6" Padding="4"/>
+                <ScrollViewer Height="200">
+                    <TextBlock Margin="10 6" Text="{Binding Message}" Padding="4" TextWrapping="Wrap"/>
+                </ScrollViewer>
             </StackPanel>
             <Separator BorderThickness="1" Margin="0 5" BorderBrush="#e7e7e7"/>
         </StackPanel>

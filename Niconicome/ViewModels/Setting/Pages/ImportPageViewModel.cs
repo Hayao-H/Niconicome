@@ -9,6 +9,7 @@ using System.Windows;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Local.External.Import;
+using System.Threading;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
@@ -54,7 +55,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                  this.Message = "インポートを開始します。";
                  this.StartFetch();
                  this.XenoImportProgressVisibility = Visibility.Visible;
-
+                 this.importCTS = new CancellationTokenSource();
 
                  var setting = new XenoImportSettings()
                  {
@@ -67,7 +68,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
                  try
                  {
-                     result = await WS::SettingPage.XenoImportManager.InportFromXeno(setting, m => this.Message = m);
+                     result = await WS::SettingPage.XenoImportManager.InportFromXeno(setting, m => this.Message = m, this.importCTS.Token);
                  }
                  catch (Exception e)
                  {
@@ -94,6 +95,14 @@ namespace Niconicome.ViewModels.Setting.Pages
 
              });
 
+            this.ImportCancellCommand = new CommandBase<object>(_ => this.isFetching, _ =>
+            {
+                this.importCTS?.Cancel();
+                this.importCTS = null;
+                this.CompleteFetch();
+                this.XenoImportProgressVisibility = Visibility.Hidden;
+            });
+
             this.SelectedParent = WS::SettingPage.PlaylistTreeHandler.GetRootPlaylist();
 
             this.SelectablePlaylists = new List<ITreePlaylistInfo>();
@@ -107,9 +116,11 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         private ITreePlaylistInfo? selectedParent;
 
-        private StringBuilder message = new();
+        private readonly StringBuilder message = new();
 
         private string xenoFilePath = string.Empty;
+
+        private CancellationTokenSource? importCTS;
 
         private bool isFetching;
 
@@ -151,6 +162,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         public CommandBase<object> SetXenoPathCommand { get; init; }
 
         /// <summary>
+        /// インポートをキャンセル
+        /// </summary>
+        public CommandBase<object> ImportCancellCommand { get; init; }
+
+        /// <summary>
         /// 選択可能なプレイリスト
         /// </summary>
         public List<ITreePlaylistInfo> SelectablePlaylists { get; init; }
@@ -171,6 +187,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         {
             this.SetXenoPathCommand.RaiseCanExecutechanged();
             this.ImportFromXenoCommand.RaiseCanExecutechanged();
+            this.ImportCancellCommand.RaiseCanExecutechanged();
         }
     }
 }

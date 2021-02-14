@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Network;
 using Niconicome.Models.Playlist;
 using Xeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
@@ -56,7 +58,7 @@ namespace Niconicome.Models.Local.External.Import
 
     public interface IXenoImportGeneralManager
     {
-        Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage);
+        Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage,CancellationToken token);
     }
 
     /// <summary>
@@ -88,7 +90,7 @@ namespace Niconicome.Models.Local.External.Import
         /// <param name="settings"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        public async Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage)
+        public async Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage,CancellationToken token)
         {
             var taskResult = new XenoImportTaskResult();
             var result = this.importManager.TryImportData(settings.DataFilePath, out Xeno.IXenoImportResult? inportResult);
@@ -101,12 +103,12 @@ namespace Niconicome.Models.Local.External.Import
             {
                 foreach (var child in inportResult.PlaylistInfo.Children)
                 {
-                    await this.AddPlaylistAsync(child, settings.TargetPlaylistId, taskResult, onMessage);
+                    await this.AddPlaylistAsync(child, settings.TargetPlaylistId, taskResult, onMessage,token);
                 }
             }
             else
             {
-                await this.AddPlaylistAsync(inportResult.PlaylistInfo, settings.TargetPlaylistId, taskResult, onMessage);
+                await this.AddPlaylistAsync(inportResult.PlaylistInfo, settings.TargetPlaylistId, taskResult, onMessage,token);
 
             }
 
@@ -122,20 +124,31 @@ namespace Niconicome.Models.Local.External.Import
         /// <param name="onMessage"></param>
         /// <param name="recurse"></param>
         /// <returns></returns>
-        private async Task AddPlaylistAsync(ITreePlaylistInfo playlistInfo, int parentId, IXenoImportTaskResult result, Action<string> onMessage, bool recurse = true)
+        private async Task AddPlaylistAsync(ITreePlaylistInfo playlistInfo, int parentId, IXenoImportTaskResult result, Action<string> onMessage, CancellationToken token)
         {
+            if (token.IsCancellationRequested)
+            {
+                onMessage("処理をキャンセルします。");
+                return;
+            }
+
             var id = this.playlistVideoHandler.AddPlaylist(parentId);
             var playlist = this.playlistVideoHandler.GetPlaylist(id);
             if (playlist is null) return;
 
+            onMessage("-".Repeat(30));
             onMessage($"プレイリスト「{playlistInfo.Name}」の追加処理を開始します。");
 
             playlist.Name = playlistInfo.Name;
             if (playlistInfo.IsRemotePlaylist)
             {
+                onMessage("待機中(10s)");
+                await Task.Delay(10 * 1000,token);
+
                 playlist.IsRemotePlaylist = true;
                 playlist.RemoteType = RemoteType.Channel;
                 playlist.RemoteId = playlistInfo.RemoteId;
+                this.playlistVideoHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
 
                 var videos = new List<ITreeVideoInfo>();
                 var rResult = await this.remotePlaylistHandler.TryGetChannelVideosAsync(playlistInfo.RemoteId, videos, m => onMessage(m));
@@ -165,14 +178,19 @@ namespace Niconicome.Models.Local.External.Import
                 });
             }
 
+            this.playlistVideoHandler.Update(playlist);
+
             onMessage($"プレイリスト「{playlistInfo.Name}」を追加しました。");
 
-            if (recurse)
+            if (token.IsCancellationRequested)
             {
-                foreach (var child in playlistInfo.Children)
-                {
-                    await this.AddPlaylistAsync(child, id, result, onMessage, true);
-                }
+                onMessage("処理をキャンセルします。");
+                return;
+            }
+
+            foreach (var child in playlistInfo.Children)
+            {
+                await this.AddPlaylistAsync(child, id, result, onMessage, token);
             }
 
         }
