@@ -53,7 +53,9 @@ namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
         public IXenoParseResult ParseText(string text)
         {
             var result = new XenoParseResult();
-            var currentParent = new XenoPlaylist("Root");
+            var currentLayer = 0;
+            IXenoPlaylist currentParent = new XenoPlaylist("Root");
+            IXenoPlaylist candidateParent = currentParent;
 
             foreach (var line in text.Split(Environment.NewLine).Select((content, index) => new { content, index }))
             {
@@ -69,6 +71,15 @@ namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
                     continue;
                 }
 
+                if (currentLayer > node.Layer)
+                {
+                    currentParent = this.BackToSpecifiedLayer(currentParent, node.Layer, currentLayer);
+                } else if (currentLayer < node.Layer)
+                {
+                    currentParent = candidateParent;
+                }
+
+
                 var playlist = this.ConvertToXenoPlaylist(node, currentParent, out bool cResult);
                 if (cResult)
                 {
@@ -78,7 +89,13 @@ namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
                 else
                 {
                     result.FailedCount++;
+                    continue;
                 }
+
+
+                candidateParent = playlist;
+                currentLayer = node.Layer;
+
 
             }
 
@@ -123,7 +140,24 @@ namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
             }
 
             result = true;
-            return new XenoPlaylist(node.Title,parent);
+            return new XenoPlaylist(node.Title, parent);
+        }
+
+        /// <summary>
+        /// 指定したレイヤーまで戻る
+        /// </summary>
+        /// <param name="playlist"></param>
+        /// <param name="target"></param>
+        /// <param name="current"></param>
+        /// <returns></returns>
+        private IXenoPlaylist BackToSpecifiedLayer(IXenoPlaylist playlist, int target, int current)
+        {
+            foreach (var i in Enumerable.Range(0, current - target))
+            {
+                if (playlist.ParentPlaylist is not null) playlist = playlist.ParentPlaylist;
+            }
+
+            return playlist;
         }
     }
 }
