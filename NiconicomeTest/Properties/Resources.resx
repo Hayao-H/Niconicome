@@ -142,4 +142,10 @@
   <data name="User_Video_Response" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\User_Video_Response.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
   </data>
+  <data name="Xeno_Playlist_File" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Xeno_Playlist_File.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
+  </data>
+  <data name="Xeno_Video_File" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Xeno_Video_file.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
+  </data>
 </root>
