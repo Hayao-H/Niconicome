@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Utils;
 
-namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
+namespace Niconicome.Models.Domain.Local.External.Import.Xeno
 {
 
     public interface IXenoVideoParseResult

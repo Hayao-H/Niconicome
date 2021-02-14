@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
+namespace Niconicome.Models.Domain.Local.External.Import.Xeno
 {
     public interface IXenoPlaylist
     {

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Niconicome.Models.Playlist;
 
-namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
+namespace Niconicome.Models.Domain.Local.External.Import.Xeno
 {
     public interface IXenoPlaylistConverter
     {
@@ -22,7 +22,8 @@ namespace Niconicome.Models.Domain.Local.External.Inport.Xeno
             {
                 Name = playlist.Name,
                 IsRemotePlaylist = playlist.IsChannel,
-                RemoteType = playlist.IsChannel ? RemoteType.Channel : RemoteType.None
+                RemoteType = playlist.IsChannel ? RemoteType.Channel : RemoteType.None,
+                RemoteId = playlist.ChannelId??string.Empty,
             };
 
             converted.Videos.AddRange(playlist.Videos.Select(v => new NonBindableTreeVideoInfo() { NiconicoId = v }));
