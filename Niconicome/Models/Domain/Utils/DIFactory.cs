@@ -23,6 +23,8 @@ using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
+using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
+using Import = Niconicome.Models.Local.External.Import;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -107,6 +109,11 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Playlist::IVideoHandler, Playlist::VideoHandler>();
             services.AddTransient<Channel::IChannelPageHtmlParser, Channel::ChannelPageHtmlParser>();
             services.AddTransient<Channel::IChannelVideoHandler, Channel::ChannelVideoHandler>();
+            services.AddTransient<DomainXeno::IXenoImportManager, DomainXeno::XenoImportManager>();
+            services.AddTransient<DomainXeno::IXenoRootParser, DomainXeno::XenoRootParser>();
+            services.AddTransient<DomainXeno::IXenoVideoNodeParser, DomainXeno::XenoVideoNodeParser>();
+            services.AddTransient<DomainXeno::IXenoPlaylistConverter, DomainXeno::XenoPlaylistConverter>();
+            services.AddTransient<Import::IXenoImportGeneralManager, Import::XenoImportGeneralManager>();
 
             return services.BuildServiceProvider();
         }
