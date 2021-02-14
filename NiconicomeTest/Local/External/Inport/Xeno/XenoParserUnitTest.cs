@@ -46,6 +46,7 @@ namespace NiconicomeTest.Local.External.Inport.Xeno
 
             Assert.That(result.SucceededCount,Is.EqualTo(62));
             Assert.That(result.Playlists.First().Name, Is.EqualTo("履歴"));
+            Assert.That(result.Playlists[7].ParentPlaylist?.Name, Is.EqualTo("新しいフォルダ"));
         }
     }
 }
