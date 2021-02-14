@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local;
-using Microsoft.Extensions.DependencyInjection;
-using Niconicome.Models.Domain.Local.Store;
-using MaterialDesign = MaterialDesignThemes.Wpf;
-using Niconicome.Models.Playlist;
+using Niconicome.Models.Local.External.Import;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Playlist;
+using MaterialDesign = MaterialDesignThemes.Wpf;
 
 namespace Niconicome.Workspaces
 {
@@ -22,5 +17,6 @@ namespace Niconicome.Workspaces
         public static MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; private set; } = new MaterialDesign::SnackbarMessageQueue();
         public static ICurrent Current { get; private set; } = DIFactory.Provider.GetRequiredService<ICurrent>();
         public static IPlaylistVideoHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistVideoHandler>();
+        public static IXenoImportGeneralManager XenoImportManager { get; private set; } = DIFactory.Provider.GetRequiredService<IXenoImportGeneralManager>();
     }
 }
