@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.State;
 
-namespace Niconicome.Models.Domain.Local.File
+namespace Niconicome.Models.Domain.Local.LocalFile
 {
 
     public interface IEncodeutility

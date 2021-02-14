@@ -11,7 +11,7 @@ using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using Download = Niconicome.Models.Domain.Niconico.Download;
-using File = Niconicome.Models.Domain.Local.File;
+using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 using Local = Niconicome.Models.Local;
 using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
@@ -91,7 +91,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::ILocalSettingHandler, Local::LocalSettingHandler>();
             services.AddTransient<INiconicoUtils, NiconicoUtils>();
             services.AddSingleton<State::ILocalState, State::LocalState>();
-            services.AddTransient<File::IEncodeutility, File::Encodeutility>();
+            services.AddTransient<LocalFile::IEncodeutility, LocalFile::Encodeutility>();
             services.AddTransient<Store::IVideoFileStorehandler, Store::VideoFileStorehandler>();
             services.AddTransient<Local::IRestore, Local::Restore>();
             services.AddTransient<Local::IBackuphandler, Local::BackupHandler>();

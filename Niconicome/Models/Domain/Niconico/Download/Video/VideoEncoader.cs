@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Utils;
-using File = Niconicome.Models.Domain.Local.File;
+using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video
 {
@@ -34,7 +34,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     class VideoEncoader : IVideoEncoader
     {
 
-        public VideoEncoader(ITsMerge tsMerge, File::IEncodeutility encodeutility)
+        public VideoEncoader(ITsMerge tsMerge, LocalFile::IEncodeutility encodeutility)
         {
             this.tsMerge = tsMerge;
             this.encodeutility = encodeutility;
@@ -48,7 +48,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <summary>
         /// エンコーダー
         /// </summary>
-        private readonly File::IEncodeutility encodeutility;
+        private readonly LocalFile::IEncodeutility encodeutility;
 
         /// <summary>
         /// ファイル名
@@ -97,7 +97,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             if (token.IsCancellationRequested) return;
 
             messenger.SendMessage("ffmpegで変換を開始(.ts=>.mp4)");
-            await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, token, File::EncodeOptions.Copy);
+            await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, token, LocalFile::EncodeOptions.Copy);
             messenger.SendMessage("ffmpegの変換が完了");
         }
 
