@@ -8,6 +8,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Playlist;
 using State = Niconicome.Models.Local.State;
+using DWatch = Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Network
 {
@@ -220,7 +221,7 @@ namespace Niconicome.Models.Network
 
                 onStarted(item.video, item.index);
 
-                IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, videoInfo);
+                IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, videoInfo, DWatch::WatchInfoOptions.NoDmcData);
 
                 if (result.IsSucceeded)
                 {
@@ -230,7 +231,7 @@ namespace Niconicome.Models.Network
                 }
                 else
                 {
-                    onFailed(result,item.video);
+                    onFailed(result, item.video);
                 }
             }
 
