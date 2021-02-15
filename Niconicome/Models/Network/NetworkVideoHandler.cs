@@ -103,6 +103,7 @@ namespace Niconicome.Models.Network
             }, video =>
             {
                 video.Message = "待機中...(15s)";
+                this.messageHandler.AppendMessage("待機中...(15s)");
             });
 
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
@@ -174,13 +175,15 @@ namespace Niconicome.Models.Network
                 netResult.FailedCount++;
                 video.Message = "情報の更新に失敗しました。";
                 this.messageHandler.AppendMessage($"{video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
-            }, (video, _) =>
+            }, (video, i) =>
             {
                 video.Message = "情報を取得中...";
+                this.messageHandler.AppendMessage($"情報を取得中...({i + 1}/{videosCount})");
             },
             video =>
             {
                 video.Message = "待機中...(15s)";
+                this.messageHandler.AppendMessage("待機中...(15s)");
             });
 
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
