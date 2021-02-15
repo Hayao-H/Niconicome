@@ -103,6 +103,7 @@ namespace Niconicome.Models.Network
             }, video =>
             {
                 video.Message = "待機中...(15s)";
+                this.messageHandler.AppendMessage("待機中...(15s)");
             });
 
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
@@ -174,13 +175,15 @@ namespace Niconicome.Models.Network
                 netResult.FailedCount++;
                 video.Message = "情報の更新に失敗しました。";
                 this.messageHandler.AppendMessage($"{video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
-            }, (video, _) =>
+            }, (video, i) =>
             {
                 video.Message = "情報を取得中...";
+                this.messageHandler.AppendMessage($"情報を取得中...({i + 1}/{videosCount})");
             },
             video =>
             {
                 video.Message = "待機中...(15s)";
+                this.messageHandler.AppendMessage("待機中...(15s)");
             });
 
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
@@ -208,16 +211,14 @@ namespace Niconicome.Models.Network
             {
                 if (item.index > 0 && (item.index + 1) % 5 == 0)
                 {
-                    this.messageHandler.AppendMessage($"待機中...(15s)");
-                    await Task.Delay(15 * 1000);
                     onWaiting(item.video);
+                    await Task.Delay(15 * 1000);
                 }
 
 
                 var videoInfo = new VIdeoInfo();
 
                 onStarted(item.video, item.index);
-                this.messageHandler.AppendMessage($"{item.video.NiconicoId}の情報を取得中...({item.index + 1}/{videosCount})");
 
                 IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, videoInfo);
 
@@ -225,12 +226,11 @@ namespace Niconicome.Models.Network
                 {
                     var newVideo = videoInfo.ConvertToTreeVideoInfo();
                     onSucceeded(newVideo, item.video);
-                    this.messageHandler.AppendMessage($"{item.video.NiconicoId}の情報を更新しました。({item.index + 1}/{videosCount})");
                     videos.Add(newVideo);
                 }
                 else
                 {
-                    this.messageHandler.AppendMessage($"{item.video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
+                    onFailed(result,item.video);
                 }
             }
 
