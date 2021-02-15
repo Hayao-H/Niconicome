@@ -61,7 +61,7 @@
                     <Button Content="開始" Margin="0 0 10 0" Command="{Binding ImportFromXenoCommand}"/>
                     <Button Content="キャンセル" Command="{Binding ImportCancellCommand}"/>
                 </StackPanel>
-                <ScrollViewer Height="200">
+                <ScrollViewer Height="300">
                     <TextBlock Margin="10 6" Text="{Binding Message}" Padding="4" TextWrapping="Wrap"/>
                 </ScrollViewer>
             </StackPanel>
