@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Niconicome.Extensions.System;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Utils;
@@ -11,19 +14,22 @@ namespace Niconicome.Models.Local
 
     public interface IRestore
     {
-        void ResetSettings();
+        void AddVideoDirectory(string path);
         void DeleteAllVideosAndPlaylists();
+        void DeleteVideoDirectory(string path);
+        IEnumerable<IBackupData> GetAllBackups();
+        List<string> GetAllVideoDirectories();
         void JustifySavedFilePaths();
+        void ResetSettings();
+        bool TryApplyBackup(string guid);
         bool TryCreateBackup(string name);
         bool TryRemoveBackup(string guid);
-        bool TryApplyBackup(string guid);
-        IEnumerable<IBackupData> GetAllBackups();
     }
 
     public class Restore : IRestore
     {
 
-        public Restore(IDataBase dataBase, ILogger logger, IBackuphandler backuphandler, INiconicoUtils niconicoUtils, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler)
+        public Restore(IDataBase dataBase, ILogger logger, IBackuphandler backuphandler, INiconicoUtils niconicoUtils, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoDirectoryStoreHandler videoDirectoryStoreHandler)
         {
             this.dataBase = dataBase;
             this.logger = logger;
@@ -31,6 +37,7 @@ namespace Niconicome.Models.Local
             this.niconicoUtils = niconicoUtils;
             this.fileStorehandler = fileStorehandler;
             this.settingHandler = settingHandler;
+            this.videoDirectoryStoreHandler = videoDirectoryStoreHandler;
         }
 
         /// <summary>
@@ -62,6 +69,11 @@ namespace Niconicome.Models.Local
         /// 設定のハンドラ
         /// </summary>
         private readonly ILocalSettingHandler settingHandler;
+
+        /// <summary>
+        /// 保存フォルダー
+        /// </summary>
+        private readonly IVideoDirectoryStoreHandler videoDirectoryStoreHandler;
 
         /// <summary>
         /// 全ての設定をリセット
@@ -155,14 +167,21 @@ namespace Niconicome.Models.Local
         /// </summary>
         public void JustifySavedFilePaths()
         {
-            string[] filePaths;
-            try
+            var directories = this.GetAllVideoDirectories();
+            var filePaths = new List<string>();
+            directories.AddUnique(AppContext.BaseDirectory);
+            
+
+            foreach (var directory in directories)
             {
-                filePaths = Directory.GetFiles(AppContext.BaseDirectory, "*.mp4", SearchOption.AllDirectories);
-            }
-            catch
-            {
-                filePaths = new string[0];
+                try
+                {
+                    filePaths.AddRange(Directory.GetFiles(directory, "*.mp4", SearchOption.AllDirectories));
+                }
+                catch
+                {
+                    continue;
+                }
             }
 
             foreach (var file in filePaths)
@@ -179,9 +198,34 @@ namespace Niconicome.Models.Local
 
             this.fileStorehandler.Clean();
 
-
         }
 
+        /// <summary>
+        /// 保存ディレクトリーを追加する
+        /// </summary>
+        /// <param name="path"></param>
+        public void AddVideoDirectory(string path)
+        {
+            this.videoDirectoryStoreHandler.AddDirectory(path);
+        }
+
+        /// <summary>
+        /// 保存ディレクトリーを削除する
+        /// </summary>
+        /// <param name="path"></param>
+        public void DeleteVideoDirectory(string path)
+        {
+            this.videoDirectoryStoreHandler.DeleteDirectory(path);
+        }
+
+        /// <summary>
+        /// 全ての保存ディレクトリーを取得する
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetAllVideoDirectories()
+        {
+            return this.videoDirectoryStoreHandler.GetVideoDirectories().Select(v => v.Path ?? string.Empty).Where(p => !p.IsNullOrEmpty()).ToList();
+        }
 
 
 
