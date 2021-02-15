@@ -114,6 +114,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainXeno::IXenoVideoNodeParser, DomainXeno::XenoVideoNodeParser>();
             services.AddTransient<DomainXeno::IXenoPlaylistConverter, DomainXeno::XenoPlaylistConverter>();
             services.AddTransient<Import::IXenoImportGeneralManager, Import::XenoImportGeneralManager>();
+            services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
 
             return services.BuildServiceProvider();
         }
