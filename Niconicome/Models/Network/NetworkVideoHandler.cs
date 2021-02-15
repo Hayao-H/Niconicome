@@ -210,7 +210,7 @@ namespace Niconicome.Models.Network
 
             foreach (var item in ids.Select((video, index) => new { video, index }))
             {
-                if (item.index > 0 && (item.index + 1) % 5 == 0)
+                if (item.index > 0 && (item.index + 1) % 3 == 0)
                 {
                     onWaiting(item.video);
                     await Task.Delay(15 * 1000);
