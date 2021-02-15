@@ -149,7 +149,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
             foreach (var item in ids.Select((id, index) => new { id, index }))
             {
-                if ((item.index + 1) % 5 == 0)
+                if ((item.index + 1) % 3 == 0)
                 {
                     onMessage("待機中(10s)");
                     await Task.Delay(10 * 1000);
