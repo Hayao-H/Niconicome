@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using UVideo = Niconicome.Models.Domain.Niconico.Video;
+using Niconicome.Models.Domain.Niconico.Video.Channel;
+using Niconicome.Models.Local.State;
 using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Playlist = Niconicome.Models.Playlist;
 using Search = Niconicome.Models.Domain.Niconico.Search;
-using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
-using Niconicome.Models.Domain.Niconico.Video.Channel;
+using UVideo = Niconicome.Models.Domain.Niconico.Video;
 
 namespace Niconicome.Models.Network
 {
@@ -18,20 +16,21 @@ namespace Niconicome.Models.Network
         Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos);
         Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos);
         Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::ITreeVideoInfo> videos);
-        Task<INetworkResult> TryGetChannelVideosAsync(string id,List<Playlist::ITreeVideoInfo> videos,Action<string> onMessage);
-        Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType,int page);
+        Task<INetworkResult> TryGetChannelVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos, Action<string> onMessage);
+        Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType, int page);
         string? ExceptionDetails { get; }
     }
 
     public class RemotePlaylistHandler : IRemotePlaylistHandler
     {
-        public RemotePlaylistHandler(Mylist::IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler,Search::ISearch search,Mylist::IWatchLaterHandler watchLaterHandler,Channel::IChannelVideoHandler channelVideoHandler)
+        public RemotePlaylistHandler(Mylist::IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Search::ISearch search, Mylist::IWatchLaterHandler watchLaterHandler, IChannelVideoHandler channelVideoHandler, IMessageHandler messageHandler)
         {
             this.mylistHandler = mylistHandler;
             this.userHandler = userHandler;
             this.searchClient = search;
             this.watchLaterHandler = watchLaterHandler;
             this.channelVideoHandler = channelVideoHandler;
+            this.messageHandler = messageHandler;
         }
 
         /// <summary>
@@ -57,12 +56,17 @@ namespace Niconicome.Models.Network
         /// <summary>
         /// チャンネル動画のハンドラ
         /// </summary>
-        private readonly Channel::IChannelVideoHandler channelVideoHandler;
+        private readonly IChannelVideoHandler channelVideoHandler;
 
         /// <summary>
         /// 例外の詳細情報
         /// </summary>
         public string? ExceptionDetails { get; private set; }
+
+        /// <summary>
+        /// 出力
+        /// </summary>
+        private readonly IMessageHandler messageHandler;
 
 
         /// <summary>
@@ -131,13 +135,14 @@ namespace Niconicome.Models.Network
         /// <param name="keyword"></param>
         /// <param name="searchType"></param>
         /// <returns></returns>
-        public async Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType,int page)
+        public async Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType, int page)
         {
             Search::ISearchResult result;
             try
             {
-                result = await this.searchClient.SearchAsync(keyword, searchType,page);
-            }catch
+                result = await this.searchClient.SearchAsync(keyword, searchType, page);
+            }
+            catch
             {
                 return new Search::SearchResult { Message = "不明なエラーが発生しました。" };
             }
@@ -186,7 +191,11 @@ namespace Niconicome.Models.Network
             IChannelResult result;
             try
             {
-                result = await this.channelVideoHandler.GetVideosAsync(id,onMessage);
+                result = await this.channelVideoHandler.GetVideosAsync(id, m =>
+                {
+                    onMessage(m);
+                    this.messageHandler.AppendMessage(m);
+                });
 
             }
             catch
