@@ -66,7 +66,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
             IXenoPlaylist candidateParent = currentParent;
             var result = new XenoParseResult(currentParent);
 
-            foreach (var line in text.Split(Environment.NewLine).Select((content, index) => new { content, index }).Where(l=>!l.content.IsNullOrEmpty()))
+            foreach (var line in text.Split(Environment.NewLine).Select((content, index) => new { content, index }).Where(l => !l.content.IsNullOrEmpty()))
             {
                 IXenoRootNode node;
                 try
@@ -83,7 +83,8 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
                 if (currentLayer > node.Layer)
                 {
                     currentParent = this.BackToSpecifiedLayer(currentParent, node.Layer, currentLayer);
-                } else if (currentLayer < node.Layer)
+                }
+                else if (currentLayer < node.Layer)
                 {
                     currentParent = candidateParent;
                 }
@@ -137,14 +138,14 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
                         var playlist = new XenoPlaylist(node.Title, listPath[(listPath.LastIndexOf("/") + 1)..], parent);
                         return playlist;
                     }
-                    else if (File.Exists(node.ListPath))
-                    {
-                        var vResult = this.videoNodeParser.ParseFromFile(node.ListPath);
-                        var playlist = new XenoPlaylist(node.Title, parent);
-                        result = true;
-                        playlist.Videos.AddRange(vResult.Videos.Select(v => v.NiconicoId!));
-                        return playlist;
-                    }
+                }
+                else if (File.Exists(node.ListPath))
+                {
+                    var vResult = this.videoNodeParser.ParseFromFile(node.ListPath);
+                    var playlist = new XenoPlaylist(node.Title, parent);
+                    result = true;
+                    playlist.Videos.AddRange(vResult.Videos.Select(v => v.NiconicoId!));
+                    return playlist;
                 }
             }
 
