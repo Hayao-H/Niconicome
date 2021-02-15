@@ -18,4 +18,13 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public List<string> FilePaths { get; private set; } = new();
     }
+
+    public class VideoDirectory : IStorable
+    {
+        public static string TableName { get; private set; } = "videodirectory";
+
+        public int Id { get; set; }
+
+        public string? Path { get; set; }
+    }
 }
