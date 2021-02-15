@@ -99,6 +99,10 @@ namespace Niconicome.Models.Local.External.Import
 
             taskResult.FailedPlaylistCount = inportResult.FailedCount;
 
+            onMessage($"{inportResult.SucceededCount}件のプレイリストデータを移行します。");
+            taskResult.SucceededPaylistCount += inportResult.SucceededCount;
+            taskResult.FailedPlaylistCount += inportResult.FailedCount;
+
             if (settings.AddDirectly)
             {
                 foreach (var child in inportResult.PlaylistInfo.Children)
@@ -136,7 +140,7 @@ namespace Niconicome.Models.Local.External.Import
             var playlist = this.playlistVideoHandler.GetPlaylist(id);
             if (playlist is null) return;
 
-            onMessage("-".Repeat(30));
+            onMessage("-".Repeat(50));
             onMessage($"プレイリスト「{playlistInfo.Name}」の追加処理を開始します。");
 
             playlist.Name = playlistInfo.Name;
@@ -156,9 +160,11 @@ namespace Niconicome.Models.Local.External.Import
                 if (!rResult.IsFailed)
                 {
                     await this.networkVideoHandler.AddVideosAsync(videos, id);
+                    result.SucceededVideoCount += rResult.SucceededCount;
                     if (!rResult.IsSucceededAll)
                     {
                         onMessage($"{rResult.FailedCount}件の動画の取得に失敗しました。");
+                        result.FailedVideoCount += rResult.FailedCount;
                     }
                 }
                 else
@@ -168,13 +174,14 @@ namespace Niconicome.Models.Local.External.Import
             }
             else
             {
-                await this.networkVideoHandler.AddVideosAsync(playlist.Videos.Select(v => v.NiconicoId), id, r =>
+                await this.networkVideoHandler.AddVideosAsync(playlistInfo.Videos.Select(v => v.NiconicoId), id, r =>
                 {
                     result.FailedVideoCount++;
                     onMessage(r.Message);
                 }, v =>
                 {
                     result.SucceededVideoCount++;
+                    onMessage($"{v.NiconicoId}の登録に成功しました。");
                 });
             }
 
