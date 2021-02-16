@@ -9,6 +9,7 @@ using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Playlist;
 using State = Niconicome.Models.Local.State;
 using DWatch = Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Extensions.System;
 
 namespace Niconicome.Models.Network
 {
@@ -110,6 +111,7 @@ namespace Niconicome.Models.Network
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
 
             this.messageHandler.AppendMessage($"動画の追加処理が完了しました。({netResult.SucceededCount}件)");
+            this.messageHandler.AppendMessage("-".Repeat(50));
 
             return netResult;
         }
@@ -190,6 +192,7 @@ namespace Niconicome.Models.Network
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
 
             this.messageHandler.AppendMessage($"{netResult.SucceededCount}件の動画情報を更新しました。");
+            this.messageHandler.AppendMessage("-".Repeat(50));
 
             return netResult;
         }
