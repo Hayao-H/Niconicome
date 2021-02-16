@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
+using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Local;
-using WS = Niconicome.Workspaces;
 using MD = MaterialDesignThemes.Wpf;
-using Niconicome.Extensions;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
@@ -22,6 +19,8 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.Backups = new ObservableCollection<IBackupData>();
             this.Backups.Addrange(WS::SettingPage.Restore.GetAllBackups());
             this.SnackbarMessageQueue = WS::SettingPage.SnackbarMessageQueue;
+
+            this.VideoDirectories = new ObservableCollection<string>(WS::SettingPage.Restore.GetAllVideoDirectories());
 
             this.CreatebackupCommand = new CommandBase<object>(_ => true, _ =>
             {
@@ -89,20 +88,47 @@ namespace Niconicome.ViewModels.Setting.Pages
                 }
             });
 
-            this.ResetDataCommand = new CommandBase<object>(_ => true,_=>
-            {
+            this.ResetDataCommand = new CommandBase<object>(_ => true, _ =>
+             {
 
-                var confirm = this.showMessage("本当に全ての動画・プレイリストを削除しますか？この操作は元に戻すことができません。", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                if (confirm != MessageBoxResult.Yes) return;
-                WS::SettingPage.Restore.DeleteAllVideosAndPlaylists();
-                this.SnackbarMessageQueue.Enqueue("データをリセットしました。");
-                WS::SettingPage.PlaylistTreeHandler.Refresh();
-                WS::SettingPage.PlaylistTreeHandler.Refresh();
-            });
+                 var confirm = this.showMessage("本当に全ての動画・プレイリストを削除しますか？この操作は元に戻すことができません。", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                 if (confirm != MessageBoxResult.Yes) return;
+                 WS::SettingPage.Restore.DeleteAllVideosAndPlaylists();
+                 this.SnackbarMessageQueue.Enqueue("データをリセットしました。");
+                 WS::SettingPage.PlaylistTreeHandler.Refresh();
+                 WS::SettingPage.PlaylistTreeHandler.Refresh();
+             });
 
             this.LoadSavedFiles = new CommandBase<object>(_ => true, _ =>
             {
                 WS::SettingPage.Restore.JustifySavedFilePaths();
+            });
+
+            this.AddVideoDirCommand = new CommandBase<object>(_ => true, _ =>
+            {
+                if (this.VIdeoDir.IsNullOrEmpty())
+                {
+                    this.SnackbarMessageQueue.Enqueue("パスを指定してください。");
+                    return;
+                }
+
+                if (!Directory.Exists(this.VIdeoDir))
+                {
+                    this.SnackbarMessageQueue.Enqueue("そのようなディレクトリーは存在しません。");
+                    return;
+                }
+
+                WS::SettingPage.Restore.AddVideoDirectory(this.VIdeoDir);
+                this.VideoDirectories.Add(this.VIdeoDir);
+                this.VIdeoDir = string.Empty;
+            });
+
+            this.DeleteVideoDirectoryCommand = new CommandBase<string>(_ => true, arg =>
+            {
+                if (arg is null or not string) return;
+                WS::SettingPage.Restore.DeleteVideoDirectory(arg);
+                this.VideoDirectories.Clear();
+                this.VideoDirectories.Addrange(WS::SettingPage.Restore.GetAllVideoDirectories());
             });
         }
 
@@ -112,6 +138,13 @@ namespace Niconicome.ViewModels.Setting.Pages
         }
 
         private string backupNameField = string.Empty;
+
+        private string videodirField = string.Empty;
+
+        /// <summary>
+        /// 保存ディレクトリー名
+        /// </summary>
+        public string VIdeoDir { get => this.videodirField; set => this.SetProperty(ref this.videodirField, value); }
 
         /// <summary>
         /// バックアップ名
@@ -152,6 +185,21 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// 保存したファイルを再読み込み
         /// </summary>
         public CommandBase<object> LoadSavedFiles { get; init; }
+
+        /// <summary>
+        /// 保存ディレクトリを追加
+        /// </summary>
+        public CommandBase<object> AddVideoDirCommand { get; init; }
+
+        /// <summary>
+        /// 保存ディレクトリを削除
+        /// </summary>
+        public CommandBase<string> DeleteVideoDirectoryCommand { get; init; }
+
+        /// <summary>
+        /// 保存フォルダー
+        /// </summary>
+        public ObservableCollection<string> VideoDirectories { get; init; }
 
         /// <summary>
         /// メッセージキュー

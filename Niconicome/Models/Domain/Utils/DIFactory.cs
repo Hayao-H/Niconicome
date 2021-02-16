@@ -11,7 +11,7 @@ using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using Download = Niconicome.Models.Domain.Niconico.Download;
-using File = Niconicome.Models.Domain.Local.File;
+using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 using Local = Niconicome.Models.Local;
 using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
@@ -23,6 +23,8 @@ using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
+using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
+using Import = Niconicome.Models.Local.External.Import;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -91,7 +93,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::ILocalSettingHandler, Local::LocalSettingHandler>();
             services.AddTransient<INiconicoUtils, NiconicoUtils>();
             services.AddSingleton<State::ILocalState, State::LocalState>();
-            services.AddTransient<File::IEncodeutility, File::Encodeutility>();
+            services.AddTransient<LocalFile::IEncodeutility, LocalFile::Encodeutility>();
             services.AddTransient<Store::IVideoFileStorehandler, Store::VideoFileStorehandler>();
             services.AddTransient<Local::IRestore, Local::Restore>();
             services.AddTransient<Local::IBackuphandler, Local::BackupHandler>();
@@ -107,6 +109,12 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Playlist::IVideoHandler, Playlist::VideoHandler>();
             services.AddTransient<Channel::IChannelPageHtmlParser, Channel::ChannelPageHtmlParser>();
             services.AddTransient<Channel::IChannelVideoHandler, Channel::ChannelVideoHandler>();
+            services.AddTransient<DomainXeno::IXenoImportManager, DomainXeno::XenoImportManager>();
+            services.AddTransient<DomainXeno::IXenoRootParser, DomainXeno::XenoRootParser>();
+            services.AddTransient<DomainXeno::IXenoVideoNodeParser, DomainXeno::XenoVideoNodeParser>();
+            services.AddTransient<DomainXeno::IXenoPlaylistConverter, DomainXeno::XenoPlaylistConverter>();
+            services.AddTransient<Import::IXenoImportGeneralManager, Import::XenoImportGeneralManager>();
+            services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
 
             return services.BuildServiceProvider();
         }

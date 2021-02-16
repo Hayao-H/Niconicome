@@ -11,7 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 {
     interface ICommentDownloader
     {
-        Task<IDownloadResult> DownloadComment(IWatchSession session, ICommentDownloadSettings settings, Action<string> onMessage, CancellationToken token);
+        Task<IDownloadResult> DownloadComment(IWatchSession session, ICommentDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token);
     }
 
     class CommentDownloader : ICommentDownloader
@@ -46,7 +46,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="onMessage"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<IDownloadResult> DownloadComment(IWatchSession session, ICommentDownloadSettings settings, Action<string> onMessage, CancellationToken token)
+        public async Task<IDownloadResult> DownloadComment(IWatchSession session, ICommentDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
             this.messenger.AddHandler(onMessage);
 
@@ -55,7 +55,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 this.messenger.RemoveHandler(onMessage);
                 return new DownloadResult()
                 {
-                    Message = "セッションが失効しています。"
+                    Message = $"セッションが失効しています。({context.GetLogContent()})"
                 };
             }
 
@@ -86,12 +86,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             }
 
             this.messenger.SendMessage("コメントのダウンロードを開始します。");
-            this.logger.Log($"{settings.NiconicoId}のコメントダウンロードを開始します。");
+            this.logger.Log($"{settings.NiconicoId}のコメントダウンロードを開始します。({context.GetLogContent()})");
 
             ICommentCollection result;
             try
             {
-                result = await this.client.DownloadCommentInternalAsync(session.Video!.DmcInfo, settings, this.messenger, token);
+                result = await this.client.DownloadCommentAsync(session.Video!.DmcInfo, settings, this.messenger,context, token);
             }
             catch (Exception e)
             {
@@ -119,7 +119,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             catch (Exception e)
             {
                 this.messenger.RemoveHandler(onMessage);
-                this.logger.Error("コメントの解析に失敗しました。", e);
+                this.logger.Error($"コメントの解析に失敗しました。({context.GetLogContent()})", e);
                 return new DownloadResult()
                 {
                     Message = $"コメントの解析に失敗しました。(詳細:{e.Message})"
@@ -136,7 +136,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 return this.GetCancelledResult();
             }
 
-            this.messenger.SendMessage("コメントの書き込みを開始します。");
+            this.messenger.SendMessage($"コメントの書き込みを開始します。");
             try
             {
                 this.commentStream.Write(data, settings.FolderName, settings.IsOverwriteEnable);
@@ -144,14 +144,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             catch (Exception e)
             {
                 this.messenger.RemoveHandler(onMessage);
-                this.logger.Error("コメントの書き込みに失敗しました。", e);
+                this.logger.Error($"コメントの書き込みに失敗しました。({context.GetLogContent()})", e);
                 return new DownloadResult()
                 {
                     Message = $"コメントの書き込みに失敗しました。(詳細:{e.Message})"
                 };
             }
             this.messenger.SendMessage("コメントのダウンロードが完了しました。");
-            this.logger.Log("コメントのダウンロードが完了しました。");
+            this.logger.Log($"コメントのダウンロードが完了しました。({context.GetLogContent()})");
 
             this.messenger.RemoveHandler(onMessage);
             return new DownloadResult()

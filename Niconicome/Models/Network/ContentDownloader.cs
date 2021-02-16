@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Domain.Niconico.Download;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local;
@@ -96,7 +97,7 @@ namespace Niconicome.Models.Network
         /// <param name="niconicoid"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        private async Task<IDownloadResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, CancellationToken token)
+        private async Task<IDownloadResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
         {
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
             var vSettings = settings.ConvertToVideoDownloadSettings(fileNameFormat, false);
@@ -104,7 +105,7 @@ namespace Niconicome.Models.Network
             Download::IDownloadResult result;
             try
             {
-                result = await videoDownloader.DownloadVideoAsync(vSettings, onMessage, session, token);
+                result = await videoDownloader.DownloadVideoAsync(vSettings, onMessage, session,context, token);
             }
             catch (Exception e)
             {
@@ -146,7 +147,7 @@ namespace Niconicome.Models.Network
         /// <param name="onMessage"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        private async Task<IDownloadResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, CancellationToken token)
+        private async Task<IDownloadResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage,IDownloadContext context, CancellationToken token)
         {
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
             var cSettings = settings.ConvertToCommentDownloadSetting(fileNameFormat);
@@ -154,7 +155,7 @@ namespace Niconicome.Models.Network
             Download::IDownloadResult result;
             try
             {
-                result = await commentDownloader.DownloadComment(session, cSettings, onMessage, token);
+                result = await commentDownloader.DownloadComment(session, cSettings, onMessage,context, token);
             }
             catch (Exception e)
             {
@@ -173,12 +174,13 @@ namespace Niconicome.Models.Network
         private async Task<IDownloadResult> TryDownloadContentAsync(IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
         {
             var result = new DownloadResult();
+            var context = new DownloadContext(setting.NiconicoId);
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
             if (setting.Video)
             {
-                var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, session, token);
+                var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, session,context, token);
                 if (!vResult.IsSucceeded)
                 {
                     result.IsSucceeded = false;
@@ -212,7 +214,7 @@ namespace Niconicome.Models.Network
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
             if (setting.Comment)
             {
-                var cResult = await this.TryDownloadCommentAsync(setting, session, OnMessage, token);
+                var cResult = await this.TryDownloadCommentAsync(setting, session, OnMessage,context, token);
                 if (!cResult.IsSucceeded)
                 {
                     result.IsSucceeded = false;

@@ -8,6 +8,8 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Playlist;
 using State = Niconicome.Models.Local.State;
+using DWatch = Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Extensions.System;
 
 namespace Niconicome.Models.Network
 {
@@ -103,11 +105,13 @@ namespace Niconicome.Models.Network
             }, video =>
             {
                 video.Message = "待機中...(15s)";
+                this.messageHandler.AppendMessage("待機中...(15s)");
             });
 
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
 
             this.messageHandler.AppendMessage($"動画の追加処理が完了しました。({netResult.SucceededCount}件)");
+            this.messageHandler.AppendMessage("-".Repeat(50));
 
             return netResult;
         }
@@ -174,18 +178,21 @@ namespace Niconicome.Models.Network
                 netResult.FailedCount++;
                 video.Message = "情報の更新に失敗しました。";
                 this.messageHandler.AppendMessage($"{video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
-            }, (video, _) =>
+            }, (video, i) =>
             {
                 video.Message = "情報を取得中...";
+                this.messageHandler.AppendMessage($"情報を取得中...({i + 1}/{videosCount})");
             },
             video =>
             {
                 video.Message = "待機中...(15s)";
+                this.messageHandler.AppendMessage("待機中...(15s)");
             });
 
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
 
             this.messageHandler.AppendMessage($"{netResult.SucceededCount}件の動画情報を更新しました。");
+            this.messageHandler.AppendMessage("-".Repeat(50));
 
             return netResult;
         }
@@ -206,31 +213,28 @@ namespace Niconicome.Models.Network
 
             foreach (var item in ids.Select((video, index) => new { video, index }))
             {
-                if (item.index > 0 && (item.index + 1) % 5 == 0)
+                if (item.index > 0 && (item.index + 1) % 3 == 0)
                 {
-                    this.messageHandler.AppendMessage($"待機中...(15s)");
-                    await Task.Delay(15 * 1000);
                     onWaiting(item.video);
+                    await Task.Delay(15 * 1000);
                 }
 
 
                 var videoInfo = new VIdeoInfo();
 
                 onStarted(item.video, item.index);
-                this.messageHandler.AppendMessage($"{item.video.NiconicoId}の情報を取得中...({item.index + 1}/{videosCount})");
 
-                IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, videoInfo);
+                IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, videoInfo, DWatch::WatchInfoOptions.NoDmcData);
 
                 if (result.IsSucceeded)
                 {
                     var newVideo = videoInfo.ConvertToTreeVideoInfo();
                     onSucceeded(newVideo, item.video);
-                    this.messageHandler.AppendMessage($"{item.video.NiconicoId}の情報を更新しました。({item.index + 1}/{videosCount})");
                     videos.Add(newVideo);
                 }
                 else
                 {
-                    this.messageHandler.AppendMessage($"{item.video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
+                    onFailed(result, item.video);
                 }
             }
 

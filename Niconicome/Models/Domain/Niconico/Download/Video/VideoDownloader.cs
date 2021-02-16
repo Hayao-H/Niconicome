@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Text;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Niconico.Watch;
-using Niconicome.Models.Domain.Niconico.Dmc;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Domain.Niconico.Dmc;
+using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video
 {
@@ -27,7 +26,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface IVideoDownloadHelper
     {
-        Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, CancellationToken token);
+        Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token);
         IEnumerable<string> GetAllFileAbsPaths();
         string FolderName { get; }
     }
@@ -47,8 +46,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface IVideoDownloader
     {
-        Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> OnMessage, CancellationToken token);
-        Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> OnMessage, IWatchSession session, CancellationToken token);
+        Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> OnMessage, IDownloadContext context, CancellationToken token);
+        Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> OnMessage, IWatchSession session, IDownloadContext context, CancellationToken token);
     }
 
     public interface IVideoDownloadSettings
@@ -82,12 +81,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             if (!this.session.IsSessionExipired) this.session.Dispose();
         }
 
-        public async Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> onMessage, IWatchSession session, CancellationToken token)
+        public async Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
         {
             this.messenger.AddHandler(onMessage);
+            this.logger.Log($"動画のダウンロードを開始しました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
 
             if (session.IsSessionExipired)
             {
+                this.logger.Log("セッションが失効していたため動画のダウンロードをキャンセルします。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.RemoveHandler(onMessage);
                 return new DownloadResult() { Issucceeded = false, Message = "セッションが失効済のためダウンロード出来ません。" };
             }
@@ -97,11 +98,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             {
                 if (token.IsCancellationRequested)
                 {
+                    this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                     this.messenger.SendMessage("ダウンロードをキャンセル");
                     this.messenger.RemoveHandler(onMessage);
                     return this.GetCancelledResult();
                 }
-                await session.EnsureSessionAsync(settings.NiconicoId,true);
+                await session.EnsureSessionAsync(settings.NiconicoId, true);
 
                 if (!session.IsSessionEnsured)
                 {
@@ -127,6 +129,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             if (token.IsCancellationRequested)
             {
+                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -138,6 +141,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             if (token.IsCancellationRequested)
             {
+                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -145,7 +149,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             try
             {
-                await this.videoDownloadHelper.DownloadAsync(targetStream, this.messenger, token);
+                await this.videoDownloadHelper.DownloadAsync(targetStream, this.messenger, context, token);
 
             }
             catch (Exception e)
@@ -162,6 +166,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             if (token.IsCancellationRequested)
             {
                 this.DeleteTmpFolder();
+                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -182,6 +187,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
             catch (TaskCanceledException)
             {
+                this.logger.Log("ユーザーの操作によって動画の変換処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("動画の変換中にキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 this.DeleteTmpFolder();
@@ -205,9 +211,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             return new DownloadResult() { Issucceeded = true, VideoFileName = fileName, VerticalResolution = targetStream.Resolution!.Vertical };
         }
 
-        public async Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> onMessage, CancellationToken token)
+        public async Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
-            return await this.DownloadVideoAsync(settings, onMessage, this.session, token);
+            return await this.DownloadVideoAsync(settings, onMessage, this.session, context, token);
         }
 
         /// <summary>
@@ -297,7 +303,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         /// <param name="taskHandler"></param>
         /// <returns></returns>
-        public Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, CancellationToken token)
+        public Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
         {
             var taskCompletionSource = new TaskCompletionSource();
 
@@ -311,7 +317,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                     if (!taskCompletionSource.Task.IsCompleted) taskCompletionSource.SetResult();
                     break;
                 }
-                var _ = this.DownloadAndNextAsync(taskHandler, taskCompletionSource, messenger, token);
+                var _ = this.DownloadAndNextAsync(taskHandler, taskCompletionSource, messenger, context, token);
             }
 
             return taskCompletionSource.Task;
@@ -333,7 +339,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <param name="taskHandler"></param>
         /// <param name="taskCompletionSource"></param>
         /// <returns></returns>
-        private async Task DownloadAndNextAsync(IDownloadTaskHandler taskHandler, TaskCompletionSource taskCompletionSource, IDownloadMessenger messenger, CancellationToken token)
+        private async Task DownloadAndNextAsync(IDownloadTaskHandler taskHandler, TaskCompletionSource taskCompletionSource, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
         {
 
             if (!taskHandler.IsCompleted && !token.IsCancellationRequested)
@@ -342,16 +348,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 var task = taskHandler.RetrieveNextTask();
                 byte[] data;
 
-                if ((task.SequenceZero + 1) % 200 == 0)
+                if ((task.SequenceZero + 1) > this.maxParallelDownloadCount)
                 {
                     this.isSleeping = true;
-                    await Task.Delay(20 * 1000, token);
+                    await Task.Delay(1 * 1000, token);
                     this.isSleeping = false;
                 }
 
                 try
                 {
-                    data = await this.DownloadInternalAsync(task.Url);
+                    data = await this.DownloadInternalAsync(task.Url, context);
                 }
                 catch (Exception e)
                 {
@@ -363,7 +369,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                     return;
                 }
 
-                this.logger.Log($"セグメント(idx:{task.SequenceZero})を取得しました。");
+                this.logger.Log($"セグメント(idx:{task.SequenceZero})を取得しました。(context_id:{context.Id},content_id:{context.NiconicoId})");
 
                 if (token.IsCancellationRequested)
                 {
@@ -374,7 +380,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
                 try
                 {
-                    this.writer.Write(data, task);
+                    this.writer.Write(data, task, context);
                 }
                 catch (Exception e)
                 {
@@ -387,7 +393,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
                 while (this.CanDownloadNext(taskHandler, token))
                 {
-                    var _ = this.DownloadAndNextAsync(taskHandler, taskCompletionSource, messenger, token);
+                    var _ = this.DownloadAndNextAsync(taskHandler, taskCompletionSource, messenger, context, token);
                 }
 
                 --this.currentParallelDownloadCount;
@@ -419,7 +425,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         private bool isSleeping;
 
-        private async Task<byte[]> DownloadInternalAsync(string url, int retryAttempt = 0)
+        private async Task<byte[]> DownloadInternalAsync(string url, IDownloadContext context, int retryAttempt = 0)
         {
             var res = await this.http.GetAsync(new Uri(url));
             if (!res.IsSuccessStatusCode)
@@ -429,11 +435,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 {
                     retryAttempt++;
                     await Task.Delay(10 * 1000);
-                    return await this.DownloadInternalAsync(url, retryAttempt);
+                    return await this.DownloadInternalAsync(url, context, retryAttempt);
                 }
                 else
                 {
-                    throw new HttpRequestException($"セグメントファイルの取得に失敗しました。(status: {(int)res.StatusCode}, reason_phrase: {res.ReasonPhrase}, url: {url})");
+                    throw new HttpRequestException($"セグメントファイルの取得に失敗しました。(status: {(int)res.StatusCode}, reason_phrase: {res.ReasonPhrase}, url: {url}, context_id:{context.Id},content_id:{context.NiconicoId})");
                 }
             }
 

@@ -23,7 +23,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
     public interface IChannelVideoHandler
     {
-        Task<IChannelResult> GetVideosAsync(string channelId, Action<string> onMessage);
+        Task<IChannelResult> GetVideosAsync(string channelId,IEnumerable<string> registeredVideo, Action<string> onMessage);
         Exception? CurrentException { get; }
     }
 
@@ -50,7 +50,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public async Task<IChannelResult> GetVideosAsync(string channelId, Action<string> onMessage)
+        public async Task<IChannelResult> GetVideosAsync(string channelId, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
             var result = new ChannelResult();
 
@@ -65,7 +65,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
                 throw new HttpRequestException();
             }
 
-            IEnumerable<string> ids;
+            List<string> ids;
             try
             {
                 ids = this.GetIdsFromHtml(html).ToList();
@@ -77,7 +77,12 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
                 throw new InvalidOperationException();
             }
 
-            onMessage($"チャンネル内で{ids.Count()}件の動画を発見しました。");
+            onMessage($"チャンネル内で{ids.Count}件の動画を発見しました。");
+            var dupe = ids.Where(i => registeredVideo.Contains(i));
+            onMessage($"{dupe.Count()}件の動画が既に登録済みのためスキップされます。");
+
+            ids.RemoveAll(id => registeredVideo.Contains(id));
+
             IEnumerable<ITreeVideoInfo> videos;
             try
             {
@@ -149,7 +154,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
             foreach (var item in ids.Select((id, index) => new { id, index }))
             {
-                if ((item.index + 1) % 5 == 0)
+                if ((item.index + 1) % 3 == 0)
                 {
                     onMessage("待機中(10s)");
                     await Task.Delay(10 * 1000);

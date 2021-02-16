@@ -52,7 +52,7 @@ namespace NiconicomeTest.NetWork
         [Test]
         public void 非暗号化動画のページをパースする()
         {
-            IDmcInfo? info = this.parser?.GetDmcInfo(Properties.Resources.Niconico_Onmyoji, WatchInfoOptions.Default);
+            IDmcInfo? info = this.parser?.GetDmcInfo(Properties.Resources.Niconico_Onmyoji,"sm9", WatchInfoOptions.Default);
 
             //nullチェック
             Assert.IsNotNull(info);
@@ -72,7 +72,7 @@ namespace NiconicomeTest.NetWork
         [Test]
         public void 暗号化動画ページをパースする()
         {
-            IDmcInfo? info = this.parser?.GetDmcInfo(Properties.Resources.Niconico_Kakushigoto, WatchInfoOptions.Default);
+            IDmcInfo? info = this.parser?.GetDmcInfo(Properties.Resources.Niconico_Kakushigoto, "so36605534", WatchInfoOptions.Default);
 
             //nullチェック
             Assert.IsNotNull(info);
@@ -136,7 +136,7 @@ namespace NiconicomeTest.NetWork
 
         public bool HasJsDataElement { get; init; }
 
-        public IDmcInfo GetDmcInfo(string source, WatchInfoOptions options)
+        public IDmcInfo GetDmcInfo(string source,string niconicoId, WatchInfoOptions options)
         {
             return new DmcInfo()
             {

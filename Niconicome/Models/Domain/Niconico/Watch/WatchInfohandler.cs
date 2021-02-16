@@ -69,7 +69,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     }
     public interface IWatchPageHtmlParser
     {
-        IDmcInfo GetDmcInfo(string sourceHtml, WatchInfoOptions options);
+        IDmcInfo GetDmcInfo(string sourceHtml,string niconicoId, WatchInfoOptions options);
         bool HasJsDataElement { get; }
     }
 
@@ -132,7 +132,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             try
             {
                 //htmlをパース
-                info = this.parser.GetDmcInfo(source,options);
+                info = this.parser.GetDmcInfo(source,id,options);
             }
             catch (Exception e)
             {
@@ -167,10 +167,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="sourceHtml"></param>
         /// <returns></returns>
-        public IDmcInfo GetDmcInfo(string sourceHtml, WatchInfoOptions options)
+        public IDmcInfo GetDmcInfo(string sourceHtml,string niconicoId, WatchInfoOptions options)
         {
             var document = HtmlParser.ParseDocument(sourceHtml);
-            return this.ConvertToDmcData(this.GetApiData(document),options);
+            return this.ConvertToDmcData(this.GetApiData(document),niconicoId,options);
         }
 
         /// <summary>
@@ -206,14 +206,14 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="original"></param>
         /// <returns></returns>
-        private IDmcInfo ConvertToDmcData(WatchJson::DataApiData original, WatchInfoOptions options)
+        private IDmcInfo ConvertToDmcData(WatchJson::DataApiData original,string niconicoId, WatchInfoOptions options)
         {
             var info = new DmcInfo
             {
                 //タイトル
                 Title = original?.Video?.Title ?? string.Empty,
                 //ID
-                Id = original?.Video?.Id ?? string.Empty
+                Id = niconicoId,
             };
 
             //投稿日解析
