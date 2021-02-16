@@ -155,7 +155,7 @@ namespace Niconicome.Models.Local.External.Import
                 this.playlistVideoHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
 
                 var videos = new List<ITreeVideoInfo>();
-                var rResult = await this.remotePlaylistHandler.TryGetChannelVideosAsync(playlistInfo.RemoteId, videos, new List<string>(), m => onMessage(m));
+                var rResult = await this.remotePlaylistHandler.TryGetChannelVideosAsync(playlistInfo.RemoteId, videos, new List<string>(), m => { });
 
                 if (!rResult.IsFailed)
                 {
@@ -177,11 +177,9 @@ namespace Niconicome.Models.Local.External.Import
                 await this.networkVideoHandler.AddVideosAsync(playlistInfo.Videos.Select(v => v.NiconicoId), id, r =>
                 {
                     result.FailedVideoCount++;
-                    onMessage(r.Message);
                 }, v =>
                 {
                     result.SucceededVideoCount++;
-                    onMessage($"{v.NiconicoId}の登録に成功しました。");
                 });
             }
 
