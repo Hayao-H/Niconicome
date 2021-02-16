@@ -34,7 +34,7 @@ namespace Niconicome.Models.Domain.Local.LocalFile
 
         private readonly ILocalState localState;
 
-        private readonly ILogger logger; 
+        private readonly ILogger logger;
 
         /// <summary>
         /// 非同期でエンコードする
@@ -120,7 +120,8 @@ namespace Niconicome.Models.Domain.Local.LocalFile
         {
 
             string defaultPath = Path.Combine(AppContext.BaseDirectory, "bin", "ffmpeg.exe");
-            var path = this.settingHandler.GetStringSetting(Settings.FfmpegPath) ?? defaultPath;
+            string? ffmpegPath = this.settingHandler.GetStringSetting(Settings.FfmpegPath);
+            var path = string.IsNullOrEmpty(ffmpegPath) ? defaultPath : ffmpegPath;
 
             return path;
         }
