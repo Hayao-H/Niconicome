@@ -37,11 +37,12 @@ namespace Niconicome.Models.Network
 
     public class Watch : IWatch
     {
-        public Watch(WatchInfo::IWatchInfohandler handler, ILocalSettingHandler settingHandler, INiconicoUtils utils)
+        public Watch(WatchInfo::IWatchInfohandler handler, ILocalSettingHandler settingHandler, INiconicoUtils utils, ILogger logger)
         {
             this.handler = handler;
             this.settingHandler = settingHandler;
             this.utils = utils;
+            this.logger = logger;
         }
 
         private readonly WatchInfo::IWatchInfohandler handler;
@@ -50,6 +51,8 @@ namespace Niconicome.Models.Network
 
         private readonly INiconicoUtils utils;
 
+        private readonly ILogger logger;
+
         /// <summary>
         /// 動画情報を取得する
         /// </summary>
@@ -57,6 +60,34 @@ namespace Niconicome.Models.Network
         /// <param name="info"></param>
         /// <returns></returns>
         public async Task<IResult> TryGetVideoInfoAsync(string nicoId, IVideoInfo info, WatchInfo::WatchInfoOptions options = WatchInfo::WatchInfoOptions.Default)
+        {
+            IResult result;
+
+            try
+            {
+                result = await this.GetVideoInfoAsync(nicoId, info, options);
+            }
+            catch (Exception e)
+            {
+                var failedResult = new Result();
+                this.logger.Error($"動画情報の取得中にエラーが発生しました。(id:{nicoId})", e);
+                failedResult.IsSucceeded = false;
+                failedResult.Message = $"動画情報の取得中にエラーが発生しました。(詳細: id:{nicoId}, message: {e.Message})";
+                return failedResult;
+            }
+
+            return result;
+
+        }
+
+        /// <summary>
+        /// 実装
+        /// </summary>
+        /// <param name="nicoId"></param>
+        /// <param name="info"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        private async Task<IResult> GetVideoInfoAsync(string nicoId, IVideoInfo info, WatchInfo::WatchInfoOptions options = WatchInfo::WatchInfoOptions.Default)
         {
             WatchInfo::IDomainVideoInfo retrieved;
             var result = new Result();
@@ -121,7 +152,6 @@ namespace Niconicome.Models.Network
 
 
             return result;
-
         }
     }
 
