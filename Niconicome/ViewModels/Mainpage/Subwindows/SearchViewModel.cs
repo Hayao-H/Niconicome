@@ -46,6 +46,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     this.StartFetching();
 
                     int playlistId = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? -1;
+                    var videos = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Videos.Select(v => v.NiconicoId) ?? new List<string>();
 
                     if (playlistId == -1) return;
 
@@ -60,14 +61,14 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     this.Message = $"{result.Videos.Count()}件の動画が見つかりました。";
 
-                    var _ = Task.Run(async () =>
-                    {
-                        await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(result.Videos.Select(v => v.Id), playlistId, result => { }, video => WS::Mainpage.CurrentPlaylist.Update(playlistId,video));
-                        WS::Mainpage.PlaylistTree.Refresh();
-                        WS::Mainpage.CurrentPlaylist.Update(playlistId);
-                    }); 
+                    var dupe = result.Videos.Select(v => v.Id).Where(v => videos.Contains(v));
+                    this.Message = $"{dupe.Count()}件の動画が既に登録されているのでスキップします。";
 
-                    window.Close();
+                    await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(result.Videos.Select(v => v.Id).Where(v => !dupe.Contains(v)), playlistId, result => { }, video => WS::Mainpage.CurrentPlaylist.Update(playlistId, video));
+                    WS::Mainpage.PlaylistTree.Refresh();
+                    WS::Mainpage.CurrentPlaylist.Update(playlistId);
+
+                    this.CompleteFetching();
                 }
 
 
