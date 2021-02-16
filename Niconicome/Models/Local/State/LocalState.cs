@@ -5,6 +5,7 @@
     {
         bool IsSettingWindowOpen { get; set; }
         bool IsDebugMode { get; set; }
+        bool IsImportingFromXeno { get; set; }
     }
 
     public class LocalState : ILocalState
@@ -18,6 +19,11 @@
         /// デバッグフラグ
         /// </summary>
         public bool IsDebugMode { get; set; }
+
+        /// <summary>
+        /// インポート中フラグ
+        /// </summary>
+        public bool IsImportingFromXeno { get; set; }
 
     }
 }

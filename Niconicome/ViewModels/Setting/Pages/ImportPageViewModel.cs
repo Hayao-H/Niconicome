@@ -56,6 +56,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                  this.StartFetch();
                  this.XenoImportProgressVisibility = Visibility.Visible;
                  this.importCTS = new CancellationTokenSource();
+                 WS::SettingPage.State.IsImportingFromXeno = true;
 
                  var setting = new XenoImportSettings()
                  {
@@ -80,6 +81,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
                  this.CompleteFetch();
                  this.XenoImportProgressVisibility = Visibility.Hidden;
+                 WS::SettingPage.State.IsImportingFromXeno = false;
 
              });
 
@@ -89,6 +91,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                 this.importCTS = null;
                 this.CompleteFetch();
                 this.XenoImportProgressVisibility = Visibility.Hidden;
+                WS::SettingPage.State.IsImportingFromXeno = false;
             });
 
             this.SelectedParent = WS::SettingPage.PlaylistTreeHandler.GetRootPlaylist();
