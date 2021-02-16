@@ -58,7 +58,7 @@ namespace Niconicome.Models.Local.External.Import
 
     public interface IXenoImportGeneralManager
     {
-        Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage,CancellationToken token);
+        Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage, CancellationToken token);
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ namespace Niconicome.Models.Local.External.Import
         /// <param name="settings"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        public async Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage,CancellationToken token)
+        public async Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage, CancellationToken token)
         {
             var taskResult = new XenoImportTaskResult();
             var result = this.importManager.TryImportData(settings.DataFilePath, out Xeno.IXenoImportResult? inportResult);
@@ -107,12 +107,12 @@ namespace Niconicome.Models.Local.External.Import
             {
                 foreach (var child in inportResult.PlaylistInfo.Children)
                 {
-                    await this.AddPlaylistAsync(child, settings.TargetPlaylistId, taskResult, onMessage,token);
+                    await this.AddPlaylistAsync(child, settings.TargetPlaylistId, taskResult, onMessage, token);
                 }
             }
             else
             {
-                await this.AddPlaylistAsync(inportResult.PlaylistInfo, settings.TargetPlaylistId, taskResult, onMessage,token);
+                await this.AddPlaylistAsync(inportResult.PlaylistInfo, settings.TargetPlaylistId, taskResult, onMessage, token);
 
             }
 
@@ -147,7 +147,7 @@ namespace Niconicome.Models.Local.External.Import
             if (playlistInfo.IsRemotePlaylist)
             {
                 onMessage("待機中(10s)");
-                await Task.Delay(10 * 1000,token);
+                await Task.Delay(10 * 1000, token);
 
                 playlist.IsRemotePlaylist = true;
                 playlist.RemoteType = RemoteType.Channel;
@@ -155,7 +155,7 @@ namespace Niconicome.Models.Local.External.Import
                 this.playlistVideoHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
 
                 var videos = new List<ITreeVideoInfo>();
-                var rResult = await this.remotePlaylistHandler.TryGetChannelVideosAsync(playlistInfo.RemoteId, videos, m => onMessage(m));
+                var rResult = await this.remotePlaylistHandler.TryGetChannelVideosAsync(playlistInfo.RemoteId, videos, new List<string>(), m => onMessage(m));
 
                 if (!rResult.IsFailed)
                 {

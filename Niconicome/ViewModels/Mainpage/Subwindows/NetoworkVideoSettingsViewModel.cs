@@ -78,7 +78,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                         Playlist::RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(id, videos),
                         Playlist::RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(id, videos),
                         Playlist::RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                        Playlist::RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(id, videos, m => this.Message = m),
+                        Playlist::RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(id, videos, new List<string>(), m => this.Message = m),
                         Playlist::RemoteType.None => new NetworkResult(),
                         _ => new NetworkResult()
                     };
