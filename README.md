@@ -5,9 +5,13 @@
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
+## 概要
+
 ニコニコ動画のコンテンツをダウンロードします。  
 ※テスト版のためバグが頻発する可能性があります。恐れ入りますが[Issues](https://github.com/Hayao-H/Niconicome/issues)からご報告ください。  
 操作方法など詳しくは[Wiki](https://github.com/Hayao-H/Niconicome/wiki)をご覧ください。
+
+---
 
 ## 機能
 - 動画・サムネイル・コメントのダウンロード。
@@ -24,6 +28,9 @@
 ### 今後追加予定の機能
 - Webview2・JavaScriptベースのプラグイン機能(未定・[ClearScript](https://github.com/microsoft/ClearScript)使用予定)。
 
+---
+
+## 注意
 ## 32bit版Windowsをお使いの方へ【重要】
 同梱のffmpegは64bit版となっております。ご自分の責任の下に32bit版のffmpegのバイナリに差し替えてください。  
 [「ffmpeg windows 32bit」のGoogle検索結果](https://www.google.com/search?q=ffmpeg+windows+32bit)
@@ -32,6 +39,9 @@
 - 現在のNiconicomeの標準ログイン機能では二段階認証などに対応できません。
 - 二段階認証・OAuthを利用する場合、ログインウィンドウの「ブルザーでログイン」をクリックして表示されるウィンドウでログインする必要があります。
 - この際に[WebView2](#webview2について)が必要になります。
+- 詳しくは[こちら](./wiki/操作#ブラウザーでログイン)をご覧ください。
+
+---
 
 ## 実行する
 #### インストール
@@ -42,6 +52,9 @@
 ### WebView2について
 - 「ブラウザーでログイン」機能の利用には、WebView2 86.0.616.0以上のインストールが必要です。
 [こちら](https://go.microsoft.com/fwlink/p/?LinkId=2124703)(ブートストラップリンク)からダウンロードしてください。また、ダウンロードページは[こちら](https://developer.microsoft.com/ja-jp/microsoft-edge/webview2/)です。
+
+---
+
 ## 対応OS
 WPFと.NET5を用いて開発しています。したがって、対応OSはそちらのサポートに依存します。現在、
 - Windows 7 SP1 ESU
@@ -50,10 +63,16 @@ WPFと.NET5を用いて開発しています。したがって、対応OSはそ�
 
 に対応しています。詳しくは[こちら](https://docs.microsoft.com/ja-jp/dotnet/core/install/windows?tabs=net50)をご覧ください。  
 ※動作確認はWindows10 homeでのみ行っております。
-#### 開発環境
-- .NET5&WPF
+
+---
+
+## 開発環境
+- .NET5 & WPF
 - Visual Studio Community 2019
 - VS Code
+
+---
+
 ## スクリーンショット
 ![img-001](Niconicome/src/doc/img/img-001.jpg)
 ![img-002](Niconicome/src/doc/img/img-002.jpg)
