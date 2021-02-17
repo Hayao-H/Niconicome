@@ -25,8 +25,13 @@
 - Webview2・JavaScriptベースのプラグイン機能(未定・[ClearScript](https://github.com/microsoft/ClearScript)使用予定)。
 
 ## 32bit版Windowsをお使いの方へ【重要】
-同梱のffmpegは64bit版となっております。ご自分の責任の下に32bit版のffmpegのバイナリに差し替えてください。
-https://www.google.com/search?q=ffmpeg+windows+32bit
+同梱のffmpegは64bit版となっております。ご自分の責任の下に32bit版のffmpegのバイナリに差し替えてください。  
+[「ffmpeg windows 32bit」のGoogle検索結果](https://www.google.com/search?q=ffmpeg+windows+32bit)
+
+## 二段階認証及びOAuth(外部ログイン提携)をご利用の方へ【重要】
+- 現在のNiconicomeの標準ログイン機能では二段階認証などに対応できません。
+- 二段階認証・OAuthを利用する場合、ログインウィンドウの「ブルザーでログイン」をクリックして表示されるウィンドウでログインする必要があります。
+- この際に[WebView2](#webview2について)が必要になります。
 
 ## 実行する
 #### インストール
@@ -35,7 +40,7 @@ https://www.google.com/search?q=ffmpeg+windows+32bit
 現在、レジストリは使用していませんが、パスワードの保存にWIndowsの資格情報マネージャーの機能を使っています。パスワードを保存している場合は、「コントロールパネル>>資格情報マネージャー>>Windows資格情報」で「https://nicovideo.jp」を削除してください。  
 **※他のアプリケーションがこの項目を使用している可能性があります。資格情報の削除は、影響を充分に理解した上で行ってください。**
 ### WebView2について
-「ブラウザーでログイン」機能の利用には、WebView2 86.0.616.0以上のインストールが必要です。
+- 「ブラウザーでログイン」機能の利用には、WebView2 86.0.616.0以上のインストールが必要です。
 [こちら](https://go.microsoft.com/fwlink/p/?LinkId=2124703)(ブートストラップリンク)からダウンロードしてください。また、ダウンロードページは[こちら](https://developer.microsoft.com/ja-jp/microsoft-edge/webview2/)です。
 ## 対応OS
 WPFと.NET5を用いて開発しています。したがって、対応OSはそちらのサポートに依存します。現在、
