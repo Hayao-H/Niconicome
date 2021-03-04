@@ -192,7 +192,7 @@ namespace Niconicome.Models.Network
             var context = new DownloadContext(setting.NiconicoId);
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
-            await session.GetVideoDataAsync(setting.NiconicoId, !setting.Video);
+            await session.GetVideoDataAsync(setting.NiconicoId, setting.Video);
 
             if (session.State != WatchSessionState.GotPage || session.Video is null)
             {

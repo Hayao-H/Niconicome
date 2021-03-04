@@ -159,7 +159,7 @@ namespace Niconicome.Models.Playlist
        　public void AddVideo(ITreeVideoInfo video, int playlistId)
         {
             var playlist = this.handler.GetPlaylist(playlistId);
-            playlist?.Videos.AddUnique(video,list=>!list.Any(v=>v.Id==video.Id));
+            playlist?.Videos.AddUnique(video, list => !list.Any(v => v.Id == video.Id));
         }
 
         /// <summary>
@@ -1058,12 +1058,21 @@ namespace Niconicome.Models.Playlist
     /// </summary>
     public class BindableTreeVideoInfo : NonBindableTreeVideoInfo, ITreeVideoInfo
     {
-        private bool isSelectedField;
+        public BindableTreeVideoInfo()
+        {
+            VideoMessanger.VideoMessageChange += this.ListenMessageChange;
+        }
 
+        ~BindableTreeVideoInfo()
+        {
+            VideoMessanger.VideoMessageChange -= this.ListenMessageChange;
+        }
+
+        private bool isSelectedField;
 
         public override string Message
         {
-            get => VideoMessanger.GetMessage(this.MessageGuid); 
+            get => VideoMessanger.GetMessage(this.MessageGuid);
             set
             {
                 VideoMessanger.Write(this.MessageGuid, value);
@@ -1085,6 +1094,13 @@ namespace Niconicome.Models.Playlist
             return converted;
         }
 
+        protected void ListenMessageChange(object? sender,VideoMessageChangeEventArgs e)
+        {
+            if (e.ID == this.MessageGuid)
+            {
+                this.OnPropertyChanged(nameof(this.Message));
+            }
+        }
     }
 
     /// <summary>
