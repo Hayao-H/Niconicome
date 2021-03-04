@@ -10,6 +10,7 @@ using Niconicome.Models.Playlist;
 using State = Niconicome.Models.Local.State;
 using DWatch = Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Utils;
 
 namespace Niconicome.Models.Network
 {
@@ -21,8 +22,8 @@ namespace Niconicome.Models.Network
         Task<INetworkResult> AddVideosAsync(IEnumerable<string> videosId, int playlistId, Action<IResult> onFailed, Action<ITreeVideoInfo> onSucceed);
         Task AddVideosAsync(IEnumerable<ITreeVideoInfo> videos, int playlistId);
         Task<INetworkResult> UpdateVideosAsync(IEnumerable<ITreeVideoInfo> videos, string folderPath, Action<ITreeVideoInfo> onSucceeded, CancellationToken ct);
-        Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<ITreeVideoInfo> ids, Action<ITreeVideoInfo, ITreeVideoInfo> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting);
-        Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<string> ids, Action<ITreeVideoInfo, ITreeVideoInfo> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting);
+        Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<ITreeVideoInfo> ids, Action<ITreeVideoInfo, ITreeVideoInfo, int> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting);
+        Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<string> ids, Action<ITreeVideoInfo, ITreeVideoInfo, int> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting);
     }
 
     public interface INetworkResult
@@ -48,10 +49,10 @@ namespace Niconicome.Models.Network
 
         private readonly State::IMessageHandler messageHandler;
 
-
         private readonly IVideoFileStorehandler fileStorehandler;
 
         private readonly IVideoThumnailUtility videoThumnailUtility;
+
 
         public NetworkVideoHandler(IWatch watchPageHandler, IPlaylistVideoHandler playlistTreeHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility)
         {
@@ -86,13 +87,13 @@ namespace Niconicome.Models.Network
 
             this.messageHandler.AppendMessage($"{videosCount}件の動画を追加します。");
 
-            await this.GetTreeVideoInfosAsync(videoIds.Copy(), async (newVideo, video) =>
+            await this.GetTreeVideoInfosAsync(videoIds.Copy(), async (newVideo, video, i) =>
             {
                 netResult.SucceededCount++;
                 await this.videoThumnailUtility.SetThumbPathAsync(newVideo);
                 int id = this.videoHandler.AddVideo(newVideo, playlist.Id);
                 newVideo.Id = id;
-                this.messageHandler.AppendMessage($"{video.NiconicoId}を追加しました。");
+                this.messageHandler.AppendMessage($"{video.NiconicoId}を追加しました。({i + 1}/{videosCount})");
                 onSucceed(newVideo);
             }, (result, video) =>
             {
@@ -157,12 +158,11 @@ namespace Niconicome.Models.Network
         {
             videos = videos.Copy();
             var netResult = new NetworkResult();
-            var i = 0;
             int videosCount = videos.Count();
 
             this.messageHandler.AppendMessage($"{videosCount}件の動画情報を更新します。");
 
-            await this.GetTreeVideoInfosAsync(videos.Copy(), async (newVideo, video) =>
+            await this.GetTreeVideoInfosAsync(videos.Copy(), async (newVideo, video, i) =>
             {
                 netResult.SucceededCount++;
                 video.IsSelected = false;
@@ -191,7 +191,6 @@ namespace Niconicome.Models.Network
 
             if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
 
-            this.messageHandler.AppendMessage($"{netResult.SucceededCount}件の動画情報を更新しました。");
             this.messageHandler.AppendMessage("-".Repeat(50));
 
             return netResult;
@@ -206,37 +205,41 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<ITreeVideoInfo> ids, Action<ITreeVideoInfo, ITreeVideoInfo> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting)
+        public async Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<ITreeVideoInfo> ids, Action<ITreeVideoInfo, ITreeVideoInfo, int> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting)
         {
             int videosCount = ids.Count();
             var videos = new List<ITreeVideoInfo>();
+            var handler = new ParallelTasksHandler<NetworkVideoParallelTask>(3, 5, 15);
 
             foreach (var item in ids.Select((video, index) => new { video, index }))
             {
-                if (item.index > 0 && (item.index + 1) % 3 == 0)
+
+                var task = new NetworkVideoParallelTask(async _ =>
                 {
-                    onWaiting(item.video);
-                    await Task.Delay(15 * 1000);
-                }
+                    var videoInfo = new VIdeoInfo();
 
+                    onStarted(item.video, item.index);
 
-                var videoInfo = new VIdeoInfo();
+                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, videoInfo, DWatch::WatchInfoOptions.NoDmcData);
 
-                onStarted(item.video, item.index);
+                    if (result.IsSucceeded)
+                    {
+                        var newVideo = videoInfo.ConvertToTreeVideoInfo();
+                        onSucceeded(newVideo, item.video, item.index);
+                        videos.Add(newVideo);
+                    }
+                    else
+                    {
+                        onFailed(result, item.video);
+                    }
+                }, index => { onWaiting(item.video); });
 
-                IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, videoInfo, DWatch::WatchInfoOptions.NoDmcData);
+                handler.AddTaskToQueue(task);
 
-                if (result.IsSucceeded)
-                {
-                    var newVideo = videoInfo.ConvertToTreeVideoInfo();
-                    onSucceeded(newVideo, item.video);
-                    videos.Add(newVideo);
-                }
-                else
-                {
-                    onFailed(result, item.video);
-                }
             }
+
+            await handler.ProcessTasksAsync();
+
 
             return videos;
         }
@@ -250,7 +253,7 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<string> ids, Action<ITreeVideoInfo, ITreeVideoInfo> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting)
+        public async Task<IEnumerable<ITreeVideoInfo>> GetTreeVideoInfosAsync(IEnumerable<string> ids, Action<ITreeVideoInfo, ITreeVideoInfo, int> onSucceeded, Action<IResult, ITreeVideoInfo> onFailed, Action<ITreeVideoInfo, int> onStarted, Action<ITreeVideoInfo> onWaiting)
         {
             return await this.GetTreeVideoInfosAsync(ids.Select(i => new BindableTreeVideoInfo() { NiconicoId = i }), onSucceeded, onFailed, onStarted, onWaiting);
         }
@@ -317,6 +320,21 @@ namespace Niconicome.Models.Network
         /// </summary>
         public ITreeVideoInfo? FirstVideo { get; set; }
 
+    }
+
+    public class NetworkVideoParallelTask : IParallelTask<NetworkVideoParallelTask>
+    {
+        public NetworkVideoParallelTask(Func<NetworkVideoParallelTask, Task> taskFunction, Action<int> onwait)
+        {
+            this.TaskFunction = taskFunction;
+            this.OnWait = onwait;
+        }
+
+        public Guid TaskId { get; init; } = Guid.NewGuid();
+
+        public Func<NetworkVideoParallelTask, Task> TaskFunction { get; init; }
+
+        public Action<int> OnWait { get; init; }
     }
 
 }
