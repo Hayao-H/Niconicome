@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using MS.WindowsAPICodePack.Internal;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Download;
@@ -59,10 +60,28 @@ namespace Niconicome.Models.Network
         int Index { get; }
     }
 
+    public interface ILocalContentHandler
+    {
+        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo);
+        IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath);
+    }
+
+    public interface ILocalContentInfo
+    {
+        bool CommentExist { get; init; }
+        bool ThumbExist { get; init; }
+        bool VideoExist { get; init; }
+        bool VIdeoExistInOnotherFolder { get; init; }
+        string? LocalPath { get; init; }
+    }
+
+    /// <summary>
+    /// DL実処理
+    /// </summary>
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IVideoFileStorehandler fileStorehandler, INetworkVideoHandler networkVideoHandler, IMessageHandler messageHandler, IVideoHandler videoHandler)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IVideoFileStorehandler fileStorehandler, INetworkVideoHandler networkVideoHandler, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -70,6 +89,7 @@ namespace Niconicome.Models.Network
             this.networkVideoHandler = networkVideoHandler;
             this.videoHandler = videoHandler;
             this.messageHandler = messageHandler;
+            this.localContentHandler = localContentHandler;
         }
 
         private readonly ILogger logger;
@@ -83,6 +103,8 @@ namespace Niconicome.Models.Network
         private readonly INetworkVideoHandler networkVideoHandler;
 
         private readonly IMessageHandler messageHandler;
+
+        private readonly ILocalContentHandler localContentHandler;
 
         /// <summary>
         /// 非同期で動画をダウンロードする
@@ -170,52 +192,121 @@ namespace Niconicome.Models.Network
             var context = new DownloadContext(setting.NiconicoId);
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
+            await session.GetVideoDataAsync(setting.NiconicoId, !setting.Video);
+
+            if (session.State != WatchSessionState.GotPage || session.Video is null)
+            {
+                result.IsSucceeded = false;
+                result.Message = session.State switch
+                {
+                    WatchSessionState.PaymentNeeded => "視聴ページの解析に失敗しました。",
+                    WatchSessionState.HttpRequestFailure => "視聴ページの取得に失敗しました。",
+                    WatchSessionState.PageAnalyzingFailure => "視聴ページの解析に失敗しました。",
+                    _ => "不明なエラーにより、視聴ページの取得に失敗しました。"
+                };
+                return result;
+            }
+
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+            ILocalContentInfo? info = null;
+            if (setting.Skip)
+            {
+                string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo);
+            }
+
+
             if (setting.Video)
             {
-                var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, session, context, token);
-                if (!vResult.IsSucceeded)
+                if (!info?.VideoExist ?? true)
                 {
-                    result.IsSucceeded = false;
-                    result.Message = vResult.Message ?? "None";
-                    return result;
+                    var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, session, context, token);
+                    if (!vResult.IsSucceeded)
+                    {
+                        result.IsSucceeded = false;
+                        result.Message = vResult.Message ?? "None";
+                        return result;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = true;
+                        result.VideoFileName = vResult.VideoFileName ?? string.Empty;
+                        result.VideoVerticalResolution = vResult.VideoVerticalResolution;
+                    }
                 }
-                else
+                else if (info?.VideoExist ?? false)
                 {
+                    OnMessage("動画を保存済みのためスキップしました。");
                     result.IsSucceeded = true;
-                    result.VideoFileName = vResult.VideoFileName ?? string.Empty;
-                    result.VideoVerticalResolution = vResult.VideoVerticalResolution;
+                }
+                else if (setting.FromAnotherFolder && (info?.VIdeoExistInOnotherFolder ?? false) && info?.LocalPath is not null)
+                {
+                    var vResult = this.localContentHandler.MoveDownloadedFile(setting.NiconicoId, info.LocalPath, setting.FolderPath);
+                    if (!vResult.IsSucceeded)
+                    {
+                        result.IsSucceeded = false;
+                        result.Message = vResult.Message ?? "None";
+                        return result;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = true;
+                        result.VideoFileName = vResult.VideoFileName ?? string.Empty;
+                        OnMessage("別フォルダーに保存済みの動画をコピーしました。");
+                    }
                 }
             }
 
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+            //サムネイル
             if (setting.Thumbnail)
             {
-                var tResult = await this.TryDownloadThumbAsync(setting, session);
-                if (!tResult.IsSucceeded)
+                if (!info?.ThumbExist ?? true)
                 {
-                    result.IsSucceeded = false;
-                    result.Message = tResult.Message ?? "None";
-                    return result;
+                    var tResult = await this.TryDownloadThumbAsync(setting, session);
+                    if (!tResult.IsSucceeded)
+                    {
+                        result.IsSucceeded = false;
+                        result.Message = tResult.Message ?? "None";
+                        return result;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = true;
+                    }
                 }
-                else
+                else if (info?.ThumbExist ?? false)
                 {
+                    OnMessage("サムネイルを保存済みのためスキップしました。");
                     result.IsSucceeded = true;
                 }
             }
 
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+            //コメント
             if (setting.Comment)
             {
-                var cResult = await this.TryDownloadCommentAsync(setting, session, OnMessage, context, token);
-                if (!cResult.IsSucceeded)
+                if (!info?.CommentExist ?? true)
                 {
-                    result.IsSucceeded = false;
-                    result.Message = cResult.Message ?? "None";
-                    return result;
+
+                    var cResult = await this.TryDownloadCommentAsync(setting, session, OnMessage, context, token);
+                    if (!cResult.IsSucceeded)
+                    {
+                        result.IsSucceeded = false;
+                        result.Message = cResult.Message ?? "None";
+                        return result;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = true;
+                    }
                 }
-                else
+                else if (info?.CommentExist ?? false)
                 {
+                    OnMessage("コメントを保存済みのためスキップしました。");
                     result.IsSucceeded = true;
                 }
             }
@@ -223,50 +314,6 @@ namespace Niconicome.Models.Network
             if (session.IsSessionEnsured) session.Dispose();
 
             return result;
-        }
-
-        /// <summary>
-        /// ダウンロード済のファイルをコピーする
-        /// </summary>
-        /// <param name="niconicoId"></param>
-        /// <param name="downloadedFilePath"></param>
-        /// <param name="destinationPath"></param>
-        /// <returns></returns>
-        private IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath)
-        {
-            if (!File.Exists(downloadedFilePath))
-            {
-                return new DownloadResult() { Message = "そのようなファイルは存在しません。" };
-            }
-
-            if (!Directory.Exists(destinationPath))
-            {
-                try
-                {
-                    Directory.CreateDirectory(destinationPath);
-                }
-                catch (Exception e)
-                {
-                    this.logger.Error("移動先フォルダーの作成に失敗しました。", e);
-                    return new DownloadResult() { Message = "移動先フォルダーの作成に失敗しました。" };
-                }
-            }
-
-            string filename = Path.GetFileName(downloadedFilePath);
-            try
-            {
-                File.Copy(downloadedFilePath, Path.Combine(destinationPath, filename));
-            }
-            catch (Exception e)
-            {
-                this.logger.Error("ファイルのコピーに失敗しました。", e);
-                return new DownloadResult() { Message = $"ファイルのコピーに失敗しました。" };
-            }
-
-            this.fileStorehandler.Add(niconicoId, Path.Combine(destinationPath, filename));
-
-            return new DownloadResult() { IsSucceeded = true };
-
         }
 
         /// <summary>
@@ -301,39 +348,7 @@ namespace Niconicome.Models.Network
                     this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロード処理を開始しました。");
 
                     string folderPath = setting.FolderPath;
-                    bool isDownloaded = this.networkVideoHandler.IsVideoDownloaded(video.NiconicoId);
                     bool skippedFlag = false;
-
-                    //動画をDL済みの場合
-                    if (isDownloaded)
-                    {
-                        IDownloadResult? moveResult = null;
-                        bool isSameFolder = video.CheckDownloaded(folderPath);
-
-                        if (!isSameFolder && setting.FromAnotherFolder)
-                        {
-                            string downloadedPath = this.networkVideoHandler.GetFilePath(video.NiconicoId);
-                            moveResult = this.MoveDownloadedFile(video.NiconicoId, downloadedPath, folderPath);
-                        }
-
-                        if ((isSameFolder && setting.Skip) || (moveResult?.IsSucceeded ?? false))
-                        {
-                            video.Message = "既にダウンロード済の為動画のダウンロードをスキップ";
-                            this.messageHandler.AppendMessage($"{video.NiconicoId}は既にダウンロード済の為動画のダウンロードをスキップしました。");
-                            skippedFlag = true;
-                            if (setting.Video && !setting.Thumbnail)
-                            {
-                                video.IsSelected = false;
-                                video.Message = "既にダウンロード済の為スキップ";
-                                result.SucceededCount++;
-                                if (result.FirstVideo is null)
-                                {
-                                    result.FirstVideo = video;
-                                }
-                                return;
-                            }
-                        }
-                    }
 
 
                     var downloadResult = await this.TryDownloadContentAsync(setting with { NiconicoId = video.NiconicoId, Video = !skippedFlag && setting.Video }, msg => video.Message = msg, token);
@@ -363,7 +378,8 @@ namespace Niconicome.Models.Network
                         result.FirstVideo = video;
                     }
 
-                } else
+                }
+                else
                 {
                     handler.CancellAllTasks();
                 }
@@ -389,6 +405,9 @@ namespace Niconicome.Models.Network
 
     }
 
+    /// <summary>
+    /// DL結果
+    /// </summary>
     class DownloadResult : IDownloadResult
     {
         public bool IsSucceeded { get; set; }
@@ -400,6 +419,9 @@ namespace Niconicome.Models.Network
 
     }
 
+    /// <summary>
+    /// DL設定
+    /// </summary>
     public record DownloadSettings : IDownloadSettings
     {
         public bool Video { get; set; }
@@ -502,5 +524,122 @@ namespace Niconicome.Models.Network
 
         public ITreeVideoInfo Video { get; init; }
 
+    }
+
+    /// <summary>
+    /// ローカルデータの処理
+    /// </summary>
+    public class LocalContentHandler : ILocalContentHandler
+    {
+        public LocalContentHandler(INiconicoUtils niconicoUtils, IVideoFileStorehandler videoFileStorehandler, ILogger logger)
+        {
+            this.niconicoUtils = niconicoUtils;
+            this.videoFileStorehandler = videoFileStorehandler;
+            this.logger = logger;
+        }
+
+        private readonly INiconicoUtils niconicoUtils;
+
+        private readonly IVideoFileStorehandler videoFileStorehandler;
+
+        private readonly ILogger logger;
+
+        /// <summary>
+        /// ローカルの保存状況を取得する
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="format"></param>
+        /// <param name="dmcInfo"></param>
+        /// <returns></returns>
+        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo)
+        {
+            string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4");
+            string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml");
+            string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".jpg");
+            bool videoExist = this.videoFileStorehandler.Exists(dmcInfo.Id);
+            string? localPath = null;
+
+            if (videoExist)
+            {
+                localPath = this.videoFileStorehandler.GetFilePath(dmcInfo.Id);
+            }
+
+            return new LocalContentInfo()
+            {
+                VideoExist = File.Exists(Path.Combine(folderPath, videoFIlename)),
+                CommentExist = File.Exists(Path.Combine(folderPath, commentFIlename)),
+                ThumbExist = File.Exists(Path.Combine(folderPath, thumbFIlename)),
+                VIdeoExistInOnotherFolder = videoExist,
+                LocalPath = localPath,
+            };
+        }
+
+        /// <summary>
+        /// ダウンロード済のファイルをコピーする
+        /// </summary>
+        /// <param name="niconicoId"></param>
+        /// <param name="downloadedFilePath"></param>
+        /// <param name="destinationPath"></param>
+        /// <returns></returns>
+        public IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath)
+        {
+            if (!File.Exists(downloadedFilePath))
+            {
+                return new DownloadResult() { Message = "そのようなファイルは存在しません。" };
+            }
+
+            if (!Directory.Exists(destinationPath))
+            {
+                try
+                {
+                    Directory.CreateDirectory(destinationPath);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error("移動先フォルダーの作成に失敗しました。", e);
+                    return new DownloadResult() { Message = "移動先フォルダーの作成に失敗しました。" };
+                }
+            }
+
+            string filename = Path.GetFileName(downloadedFilePath);
+            try
+            {
+                File.Copy(downloadedFilePath, Path.Combine(destinationPath, filename));
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("ファイルのコピーに失敗しました。", e);
+                return new DownloadResult() { Message = $"ファイルのコピーに失敗しました。" };
+            }
+
+            this.videoFileStorehandler.Add(niconicoId, Path.Combine(destinationPath, filename));
+
+            return new DownloadResult() { IsSucceeded = true };
+
+        }
+
+    }
+
+    /// <summary>
+    /// ローカル情報
+    /// </summary>
+    public class LocalContentInfo : ILocalContentInfo
+    {
+        public LocalContentInfo(string? localPath)
+        {
+            this.LocalPath = localPath;
+        }
+
+        public LocalContentInfo() : this(null) { }
+
+        public bool VideoExist { get; init; }
+
+        public bool VIdeoExistInOnotherFolder { get; init; }
+
+        public bool CommentExist { get; init; }
+
+        public bool ThumbExist { get; init; }
+
+        public string? LocalPath { get; init; }
     }
 }
