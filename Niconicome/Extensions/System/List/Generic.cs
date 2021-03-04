@@ -76,6 +76,17 @@ namespace Niconicome.Extensions.System.List
         {
             return (await Task.WhenAll(source)).AsEnumerable();
         }
+
+        /// <summary>
+        /// WhenAllを後付けで実行する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public async static Task WhenAll(this IEnumerable<Task> source)
+        {
+            await Task.WhenAll(source);
+        }
     }
 
     public class EqualityComparer<T, TMem> : IEqualityComparer<T>
