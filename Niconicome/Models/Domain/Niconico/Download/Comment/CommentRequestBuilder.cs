@@ -131,6 +131,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             var data = new List<Request::Comment>();
             int index = 0;
 
+            //２回目以降のthread_leafリクエストはcontentが100ではなく25になる
+            var leave_second_flag = false;
+
             data.Add(this.GetPingContent(PingType.StartRequest, 0));
             foreach (var thread in dmcInfo.CommentThreads)
             {
@@ -144,7 +147,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 if (!options.OwnerComment && thread.IsOwnerThread) continue;
 
                 data.Add(this.GetPingContent(PingType.StartContent, index));
-                var itemThread = new Request::Comment() { Thread = await this.GetThreadAsync(thread, dmcInfo,options) };
+                var itemThread = new Request::Comment() { Thread = await this.GetThreadAsync(thread, dmcInfo, options) };
                 data.Add(itemThread);
                 data.Add(this.GetPingContent(PingType.EndContent, index));
                 ++index;
@@ -153,10 +156,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 if (thread.IsLeafRequired)
                 {
                     data.Add(this.GetPingContent(PingType.StartContent, index));
-                    var itemLeaf = new Request::Comment() { ThreadLeaves = await this.GetThreadLeavesAsync(thread, dmcInfo,options) };
+                    var itemLeaf = new Request::Comment() { ThreadLeaves = await this.GetThreadLeavesAsync(thread, dmcInfo, options, leave_second_flag) };
                     data.Add(itemLeaf);
                     data.Add(this.GetPingContent(PingType.EndContent, index));
                     ++index;
+                    leave_second_flag = true;
                 }
 
             }
@@ -173,7 +177,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<Request::Thread> GetThreadAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo,ICommentOptions options)
+        private async Task<Request::Thread> GetThreadAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo, ICommentOptions options)
         {
             var data = new Request::Thread
             {
@@ -230,18 +234,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<Request::ThreadLeaves> GetThreadLeavesAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo, ICommentOptions options)
+        private async Task<Request::ThreadLeaves> GetThreadLeavesAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo, ICommentOptions options, bool isSecondLeaf)
         {
             double min = Math.Ceiling((double)(dmcInfo.Duration / 60));
+            string humOrQuarter = isSecondLeaf ? "25" : "100,500";
 
             var data = new ThreadLeaves
             {
                 Thread = thread.Id.ToString(),
                 Language = 0,
                 UserId = dmcInfo.UserId,
-                Content = $"0-{min}:100,500,nicoru:100",
+                Content = $"0-{min}:{humOrQuarter},nicoru:100",
                 Scores = 1,
-                Nicoru = 3
+                Nicoru = 3,
+                Fork = thread.Fork
             };
 
             if (thread.IsThreadkeyRequired)
@@ -261,7 +267,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (options.When != default)
             {
                 data.When = options.When;
-            } else
+            }
+            else
             {
                 data.When = null;
             }

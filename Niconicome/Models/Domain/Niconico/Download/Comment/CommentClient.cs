@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -27,11 +28,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
     public interface ICommentCollection
     {
-        IEnumerable<Response::Comment> Comments { get; }
+        List<Response::Comment> Comments { get; }
         Response::Thread? Thread { get; }
         int Count { get; }
         void Add(Response::Comment comment, bool sort = true);
-        void Add(IEnumerable<Response::Comment> comments);
+        void Add(List<Response::Comment> comments, bool addSafe = true);
         void Clear();
         void Distinct();
         void Where(Func<Response::Comment, bool> predicate);
@@ -42,7 +43,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
     public interface ICommentClient
     {
-        Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger,IDownloadContext context, CancellationToken token);
+        Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token);
     }
 
     public class CommentDownloadSettings : ICommentDownloadSettings
@@ -89,7 +90,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public async Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger,IDownloadContext context, CancellationToken token)
+        public async Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
         {
             var comments = CommentCollection.GetInstance();
             Response::Chat? first;
@@ -99,8 +100,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             do
             {
                 if (index > 0) messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目)");
-                long? when = comments.Count == 0 ? 0 : comments.GetFirstComment(false)?.Date - 1;
-                List<Response::Comment> retlieved = await this.GetCommentsAsync(dmcInfo, settings, when) ;
+                first = comments.GetFirstComment(false);
+                long? when = comments.Count == 0 ? 0 : first?.Date - 1;
+                List<Response::Comment> retlieved = await this.GetCommentsAsync(dmcInfo, settings, when);
 
                 comments.Add(retlieved);
 
@@ -197,10 +199,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private readonly List<Response::Comment> comments;
 
+        private const int CountToThrough = 160;
+
         /// <summary>
         /// コメント
         /// </summary>
-        public IEnumerable<Response::Comment> Comments { get => this.comments; }
+        public List<Response::Comment> Comments { get => this.comments; }
 
 
         /// <summary>
@@ -246,8 +250,21 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// 複数のコメントを追加する
         /// </summary>
         /// <param name="comments"></param>
-        public void Add(IEnumerable<Response::Comment> comments)
+        public void Add(List<Response::Comment> comments, bool addSafe = true)
         {
+
+            if (addSafe)
+            {
+                var newCollection = CommentCollection.GetInstance();
+                newCollection.Add(comments, false);
+                if (newCollection.Count > CommentCollection.CountToThrough)
+                {
+                    newCollection.Comments.RemoveRange(0, CommentCollection.CountToThrough);
+                    comments.Clear();
+                    comments.AddRange(newCollection.Comments);
+                }
+            }
+
             foreach (var comment in comments)
             {
                 this.Add(comment, false);
