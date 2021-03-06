@@ -51,7 +51,9 @@ namespace Niconicome.Models.Domain.Local.Store
         public STypes::Playlist? GetPlaylist(int id)
         {
 
-            return this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, id);
+            return this.databaseInstance.GetCollection<STypes::Playlist>(STypes::Playlist.TableName)
+                    .Include(p => p.Videos)
+                    .FindById(id);
         }
 
         /// <summary>
@@ -74,7 +76,9 @@ namespace Niconicome.Models.Domain.Local.Store
 
             if (this.databaseInstance.Exists<STypes::Playlist>(STypes::Playlist.TableName, parentId))
             {
-                var parent = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, parentId);
+                var parent = this.databaseInstance.GetCollection<STypes::Playlist>(STypes::Playlist.TableName)
+                    .Include(p => p.Videos)
+                    .FindById(parentId);
 
                 //動画を保持している場合はキャンセル
                 if (parent!.IsConcretePlaylist) return -1;
@@ -174,7 +178,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="playlistId"></param>
         /// <param name="remoteId"></param>
         /// <param name="type"></param>
-        public void SetAsRemotePlaylist(int playlistId,string remoteId,RemoteType type)
+        public void SetAsRemotePlaylist(int playlistId, string remoteId, RemoteType type)
         {
             if (this.Exists(playlistId))
             {
@@ -263,7 +267,9 @@ namespace Niconicome.Models.Domain.Local.Store
                 }
                 if (playlist.Videos.Count > 0)
                 {
-                    playlist.Videos.Distinct(v => v.Id);
+                    var videos = playlist.Videos.Distinct(v => v.NiconicoId).Copy();
+                    playlist.Videos.Clear();
+                    playlist.Videos.AddRange(videos);
                     this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
                 }
                 return true;
@@ -419,7 +425,7 @@ namespace Niconicome.Models.Domain.Local.Store
             playlist!.Videos.RemoveAll(v => v.Id == videoId);
             this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
         }
-    
+
         /// <summary>
         /// プレイリストを更新する
         /// </summary>
