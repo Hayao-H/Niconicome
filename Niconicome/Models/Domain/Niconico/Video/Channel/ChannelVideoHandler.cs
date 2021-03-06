@@ -15,7 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 {
     public interface IChannelResult
     {
-        List<ITreeVideoInfo> RetrievedVideos { get; }
+        List<IVideoListInfo> RetrievedVideos { get; }
 
         int FailedCounts { get; }
         bool IsSucceededAll { get; }
@@ -83,7 +83,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
             ids.RemoveAll(id => registeredVideo.Contains(id));
 
-            IEnumerable<ITreeVideoInfo> videos;
+            IEnumerable<IVideoListInfo> videos;
             try
             {
                 videos = await this.ConvertToTreeVideoInfo(ids, onMessage, result);
@@ -147,10 +147,10 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<ITreeVideoInfo>> ConvertToTreeVideoInfo(IEnumerable<string> ids, Action<string> onMessage, ChannelResult cResult)
+        private async Task<IEnumerable<IVideoListInfo>> ConvertToTreeVideoInfo(IEnumerable<string> ids, Action<string> onMessage, ChannelResult cResult)
         {
             int allVideos = ids.Count();
-            var allResult = new List<ITreeVideoInfo>();
+            var allResult = new List<IVideoListInfo>();
 
             foreach (var item in ids.Select((id, index) => new { id, index }))
             {
@@ -182,7 +182,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
     /// </summary>
     public class ChannelResult : IChannelResult
     {
-        public List<ITreeVideoInfo> RetrievedVideos { get; init; } = new();
+        public List<IVideoListInfo> RetrievedVideos { get; init; } = new();
 
         public int FailedCounts { get; set; }
 

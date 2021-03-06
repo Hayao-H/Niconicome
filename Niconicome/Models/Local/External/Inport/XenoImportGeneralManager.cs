@@ -154,7 +154,7 @@ namespace Niconicome.Models.Local.External.Import
                 playlist.RemoteId = playlistInfo.RemoteId;
                 this.playlistVideoHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
 
-                var videos = new List<ITreeVideoInfo>();
+                var videos = new List<IVideoListInfo>();
                 var rResult = await this.remotePlaylistHandler.TryGetChannelVideosAsync(playlistInfo.RemoteId, videos, new List<string>(), m => { });
 
                 if (!rResult.IsFailed)

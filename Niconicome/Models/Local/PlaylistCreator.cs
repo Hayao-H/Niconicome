@@ -12,7 +12,7 @@ namespace Niconicome.Models.Local
 {
     public interface IPlaylistCreator
     {
-        bool TryCreatePlaylist(IEnumerable<Playlist::ITreeVideoInfo> videos, string playlistName, string directoryPath, PlaylistType type);
+        bool TryCreatePlaylist(IEnumerable<Playlist::IVideoListInfo> videos, string playlistName, string directoryPath, PlaylistType type);
     }
 
 
@@ -38,7 +38,7 @@ namespace Niconicome.Models.Local
         /// <param name="directoryPath"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool TryCreatePlaylist(IEnumerable<Playlist::ITreeVideoInfo> videos,string playlistName, string directoryPath, PlaylistType type)
+        public bool TryCreatePlaylist(IEnumerable<Playlist::IVideoListInfo> videos,string playlistName, string directoryPath, PlaylistType type)
         {
             videos = videos.Where(v => v.CheckDownloaded(directoryPath));
             if (!videos.Any()) return false;

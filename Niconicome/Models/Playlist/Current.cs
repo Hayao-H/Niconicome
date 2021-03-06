@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Network;
 using Niconicome.Models.Network;
 
@@ -14,22 +15,23 @@ namespace Niconicome.Models.Playlist
     public interface ICurrent
     {
         void Update(int playlistId);
-        void Update(int playlistId, ITreeVideoInfo video);
+        void Update(int playlistId, IVideoListInfo video);
         ITreePlaylistInfo? CurrentSelectedPlaylist { get; set; }
         event EventHandler SelectedItemChanged;
         event EventHandler VideosChanged;
-        ObservableCollection<ITreeVideoInfo> Videos { get; }
+        ObservableCollection<IVideoListInfo> Videos { get; }
     }
 
     class Current : ICurrent
     {
-        public Current(IPlaylistVideoHandler handler, ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility)
+        public Current(IPlaylistVideoHandler handler, ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,IPlaylistStoreHandler playlistStoreHandler)
         {
             this.handler = handler;
             this.cacheHandler = cacheHandler;
             this.videoHandler = videoHandler;
             this.videoThumnailUtility = videoThumnailUtility;
-            this.Videos = new ObservableCollection<ITreeVideoInfo>();
+            this.playlistStoreHandler = playlistStoreHandler;
+            this.Videos = new ObservableCollection<IVideoListInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Videos, new object());
             this.SelectedItemChanged += this.OnSelectedItemChanged;
             this.VideosChanged += this.OnVideoschanged;
@@ -50,12 +52,19 @@ namespace Niconicome.Models.Playlist
 
         private readonly ICacheHandler cacheHandler;
 
-        public ObservableCollection<ITreeVideoInfo> Videos { get; init; }
+        private readonly IPlaylistStoreHandler playlistStoreHandler;
+
+        public ObservableCollection<IVideoListInfo> Videos { get; init; }
 
         /// <summary>
         /// 選択中のプレイリスト
         /// </summary>
         private ITreePlaylistInfo? currentSelectedPlaylistField;
+
+        /// <summary>
+        /// ひとつまえに選択中だったプレイリスト
+        /// </summary>
+        private ITreePlaylistInfo? prevSelectedPlaylist;
 
         /// <summary>
         /// 公開プロパティー
@@ -65,6 +74,11 @@ namespace Niconicome.Models.Playlist
             get { return this.currentSelectedPlaylistField; }
             set
             {
+                this.prevSelectedPlaylist = this.CurrentSelectedPlaylist;
+                this.prevSelectedPlaylist?.Videos.Clear();
+                this.prevSelectedPlaylist?.Videos.AddRange(this.Videos);
+                this.SavePrevPlaylistVideos();
+
                 this.currentSelectedPlaylistField = value;
                 this.RaiseSelectedItemChanged();
             }
@@ -107,6 +121,20 @@ namespace Niconicome.Models.Playlist
         }
 
         /// <summary>
+        /// 選択解除されたプレイリストを保持する
+        /// </summary>
+        private void SavePrevPlaylistVideos()
+        {
+            if (this.prevSelectedPlaylist is null) return;
+
+            foreach (var video in this.prevSelectedPlaylist.Videos)
+            {
+                var info = new LightVideoListInfo(video.MessageGuid, this.prevSelectedPlaylist.Id, video.Id, video.IsSelected);
+                LightVideoListinfoHandler.AddVideo(info);
+            }
+        }
+
+        /// <summary>
         /// 動画リストを更新する
         /// </summary>
         public void Update(int playlistId)
@@ -124,15 +152,22 @@ namespace Niconicome.Models.Playlist
                 if (this.CurrentSelectedPlaylist is not null)
                 {
                     int id = this.CurrentSelectedPlaylist.Id;
-                    var videos = this.handler.GetPlaylist(id)?.Videos.Copy();
+                    var videos = this.playlistStoreHandler.GetPlaylist(id)?.Videos.Copy();
 
                     if (videos is not null)
                     {
                         foreach (var oldVideo in videos)
                         {
                             var video = this.videoHandler.GetVideo(oldVideo.Id);
-                            video.MessageGuid = oldVideo.MessageGuid;
-                            video.Message = oldVideo.Message;
+                            var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(oldVideo.Id, playlistId);
+
+                            if (lightVideo is not null)
+                            {
+                                video.MessageGuid = lightVideo.MessageGuid;
+                                video.IsSelected = lightVideo.IsSelected;
+                                video.Message = VideoMessanger.GetMessage(lightVideo.MessageGuid);
+                            }
+
                             bool isValid = this.videoThumnailUtility.IsValidThumbnail(video);
                             bool hasCache = this.videoThumnailUtility.HasThumbnailCache(video);
                             if (!isValid || !hasCache)
@@ -168,7 +203,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="playlistId"></param>
         /// <param name="video"></param>
-        public void Update(int playlistId, ITreeVideoInfo video)
+        public void Update(int playlistId, IVideoListInfo video)
         {
 
             if (this.Videos.Count == 0) return;

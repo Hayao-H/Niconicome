@@ -13,10 +13,10 @@ namespace Niconicome.Models.Network
 
     public interface IRemotePlaylistHandler
     {
-        Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos);
-        Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos);
-        Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::ITreeVideoInfo> videos);
-        Task<INetworkResult> TryGetChannelVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage);
+        Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::IVideoListInfo> videos);
+        Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::IVideoListInfo> videos);
+        Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::IVideoListInfo> videos);
+        Task<INetworkResult> TryGetChannelVideosAsync(string id, List<Playlist::IVideoListInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage);
         Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType, int page);
         string? ExceptionDetails { get; }
     }
@@ -75,10 +75,10 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos)
+        public async Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::IVideoListInfo> videos)
         {
             var resultInfo = new NetworkResult();
-            List<Playlist::ITreeVideoInfo> result;
+            List<Playlist::IVideoListInfo> result;
             try
             {
                 result = await this.mylistHandler.GetVideosAsync(id);
@@ -105,10 +105,10 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos)
+        public async Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::IVideoListInfo> videos)
         {
             var resultInfo = new NetworkResult();
-            List<Playlist::ITreeVideoInfo> result;
+            List<Playlist::IVideoListInfo> result;
 
             try
             {
@@ -155,10 +155,10 @@ namespace Niconicome.Models.Network
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::ITreeVideoInfo> videos)
+        public async Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::IVideoListInfo> videos)
         {
             var resultInfo = new NetworkResult();
-            List<Playlist::ITreeVideoInfo> result;
+            List<Playlist::IVideoListInfo> result;
             try
             {
                 result = await this.watchLaterHandler.GetVideosAsync();
@@ -185,7 +185,7 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetChannelVideosAsync(string id, List<Playlist::ITreeVideoInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        public async Task<INetworkResult> TryGetChannelVideosAsync(string id, List<Playlist::IVideoListInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
             var resultInfo = new NetworkResult();
             IChannelResult result;

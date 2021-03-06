@@ -14,7 +14,7 @@ namespace Niconicome.Models.Playlist
     /// </summary>
     public interface IVideoFilter
     {
-        IEnumerable<ITreeVideoInfo> FilterVideos(string word, IEnumerable<ITreeVideoInfo> source, FilterringOptions option = FilterringOptions.None);
+        IEnumerable<IVideoListInfo> FilterVideos(string word, IEnumerable<IVideoListInfo> source, FilterringOptions option = FilterringOptions.None);
     }
 
     public class VideoFilter : IVideoFilter
@@ -25,9 +25,9 @@ namespace Niconicome.Models.Playlist
         /// <param name="word"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        public IEnumerable<ITreeVideoInfo> FilterVideos(string word, IEnumerable<ITreeVideoInfo> source, FilterringOptions option = FilterringOptions.None)
+        public IEnumerable<IVideoListInfo> FilterVideos(string word, IEnumerable<IVideoListInfo> source, FilterringOptions option = FilterringOptions.None)
         {
-            var result = new List<ITreeVideoInfo>();
+            var result = new List<IVideoListInfo>();
             string[] keywords = Regex.Replace(word, @"[\s]", ",").Split(",");
 
             if (option != FilterringOptions.OnlyByTag)
@@ -47,9 +47,9 @@ namespace Niconicome.Models.Playlist
         /// <param name="keywords"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        private IEnumerable<ITreeVideoInfo> FilterVideoByTitle(string[] keywords, IEnumerable<ITreeVideoInfo> source)
+        private IEnumerable<IVideoListInfo> FilterVideoByTitle(string[] keywords, IEnumerable<IVideoListInfo> source)
         {
-            var result = new List<ITreeVideoInfo>();
+            var result = new List<IVideoListInfo>();
             foreach (var word in keywords.Select(k=>k.ToLower()))
             {
                 result.AddRange(source.Where(v => v.Title.ToLower().Contains(word)));
@@ -64,9 +64,9 @@ namespace Niconicome.Models.Playlist
         /// <param name="tags"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        private IEnumerable<ITreeVideoInfo> FilterByTag(string[] tags, IEnumerable<ITreeVideoInfo> source)
+        private IEnumerable<IVideoListInfo> FilterByTag(string[] tags, IEnumerable<IVideoListInfo> source)
         {
-            var result = new List<ITreeVideoInfo>();
+            var result = new List<IVideoListInfo>();
             foreach (var tag in tags)
             {
                 result.AddRange(source.Where(v => v.Tags.Contains(tag)));
