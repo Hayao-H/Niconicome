@@ -24,9 +24,8 @@ namespace Niconicome.Models.Playlist
 
     class Current : ICurrent
     {
-        public Current(IPlaylistVideoHandler handler, ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,IPlaylistStoreHandler playlistStoreHandler)
+        public Current(ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,IPlaylistStoreHandler playlistStoreHandler)
         {
-            this.handler = handler;
             this.cacheHandler = cacheHandler;
             this.videoHandler = videoHandler;
             this.videoThumnailUtility = videoThumnailUtility;
@@ -43,8 +42,6 @@ namespace Niconicome.Models.Playlist
             this.SelectedItemChanged -= this.OnSelectedItemChanged;
             this.VideosChanged -= this.OnVideoschanged;
         }
-
-        private readonly IPlaylistVideoHandler handler;
 
         private readonly IVideoThumnailUtility videoThumnailUtility;
 
