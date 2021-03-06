@@ -3,6 +3,7 @@ using Niconicome.Models.Domain.Niconico.Download.Comment;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
 using System.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace NiconicomeTest.NetWork.Download.Comment
 {
@@ -20,7 +21,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
                 Chat = new Response::Chat()
                 {
                     Content = "One",
-                    No=1,
+                    No = 1,
                 }
             };
             var com2 = new Response::Comment()
@@ -28,7 +29,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
                 Chat = new Response::Chat()
                 {
                     Content = "One",
-                    No=2,
+                    No = 2,
                 }
             };
             var com3 = new Response::Comment()
@@ -36,7 +37,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
                 Chat = new Response::Chat()
                 {
                     Content = "Two",
-                    No=3,
+                    No = 3,
                 }
             };
             var com4 = new Response::Comment()
@@ -44,7 +45,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
                 Chat = new Response::Chat()
                 {
                     Content = "Three",
-                    No=4,
+                    No = 4,
                 }
             };
             var thread = new Response::Comment()
@@ -52,10 +53,10 @@ namespace NiconicomeTest.NetWork.Download.Comment
                 Thread = new Response::Thread()
                 {
                     ThreadThread = "12345",
-                    LastRes = (int)new DateTimeOffset(DateTime.Now.Ticks,new TimeSpan(9,0,0)).ToUnixTimeSeconds()
+                    LastRes = (int)new DateTimeOffset(DateTime.Now.Ticks, new TimeSpan(9, 0, 0)).ToUnixTimeSeconds()
                 }
             };
-            this.collection.Add(new Response::Comment[] { com1, com2, com3, com4, thread });
+            this.collection.Add(new List<Response::Comment>() { com1, com2, com3, com4, thread });
         }
 
         [Test]
