@@ -12,6 +12,7 @@ namespace Niconicome.Models.Playlist
         int AddVideo(IVideoListInfo video, int playlidtId);
         void RemoveVideo(int videoID, int playlistID);
         void Update(IVideoListInfo video);
+        bool Exist(int id);
         IEnumerable<IVideoListInfo> GetAllVideos();
         IVideoListInfo GetVideo(int id);
 
@@ -92,8 +93,20 @@ namespace Niconicome.Models.Playlist
         /// <returns></returns>
         public IVideoListInfo GetVideo(int id)
         {
-            return BindableVIdeoListInfo.ConvertDbDataToVideoListInfo(this.videoStoreHandler.GetVideo(id));
+            if (!this.videoStoreHandler.Exists(id)) throw new InvalidOperationException($"動画({id})はデータベースに存在しません。");
+            return BindableVIdeoListInfo.ConvertDbDataToVideoListInfo(this.videoStoreHandler.GetVideo(id)!);
         }
+
+        /// <summary>
+        /// 動画の存在をチェックする
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public bool Exist(int id)
+        {
+            return this.videoStoreHandler.Exists(id);
+        }
+
 
 
     }

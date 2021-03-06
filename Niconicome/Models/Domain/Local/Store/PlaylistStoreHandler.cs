@@ -10,7 +10,7 @@ namespace Niconicome.Models.Domain.Local.Store
     public interface IPlaylistStoreHandler
     {
         STypes::Playlist GetRootPlaylist();
-        STypes::Playlist GetPlaylist(int id);
+        STypes::Playlist? GetPlaylist(int id);
         public int AddPlaylist(int parentID, string name);
         public int AddVideo(IVideoListInfo video, int playlistId);
         public void RemoveVideo(int id, int playlistId);
@@ -48,7 +48,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public STypes::Playlist GetPlaylist(int id)
+        public STypes::Playlist? GetPlaylist(int id)
         {
 
             return this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, id);
@@ -60,7 +60,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <returns></returns>
         public STypes::Playlist GetRootPlaylist()
         {
-            return this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot);
+            return this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot)!;
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 var parent = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, parentId);
 
                 //動画を保持している場合はキャンセル
-                if (parent.IsConcretePlaylist) return -1;
+                if (parent!.IsConcretePlaylist) return -1;
 
                 //5階層よりも深い場合はキャンセル
                 if (parent.Layer > 5) return -1;
@@ -160,7 +160,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 var playlist = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlistID);
 
                 //ルートプレイリストは削除禁止
-                if (playlist.IsRoot || playlist.Layer == 1) return;
+                if (playlist!.IsRoot || playlist.Layer == 1) return;
 
                 this.RemoveChildPlaylist(playlistID);
 
@@ -179,7 +179,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.Exists(playlistId))
             {
                 var playlist = this.GetPlaylist(playlistId);
-                playlist.IsRemotePlaylist = true;
+                playlist!.IsRemotePlaylist = true;
                 playlist.RemoteId = remoteId;
 
                 switch (type)
@@ -222,7 +222,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.Exists(playlistId))
             {
                 var playlist = this.GetPlaylist(playlistId);
-                playlist.IsRemotePlaylist = false;
+                playlist!.IsRemotePlaylist = false;
                 playlist.IsMylist = false;
                 playlist.IsUserVideos = false;
                 playlist.IsWatchLater = false;
@@ -289,7 +289,7 @@ namespace Niconicome.Models.Domain.Local.Store
         {
             if (!this.Exists(newPlaylist.Id)) throw new InvalidOperationException($"指定したプレイリストが存在しません。(id:{newPlaylist.Id})");
             var dbPlaylist = this.GetPlaylist(newPlaylist.Id);
-            dbPlaylist.PlaylistName = newPlaylist.Name;
+            dbPlaylist!.PlaylistName = newPlaylist.Name;
             dbPlaylist.FolderPath = newPlaylist.Folderpath;
             this.Update(dbPlaylist);
         }
@@ -329,8 +329,8 @@ namespace Niconicome.Models.Domain.Local.Store
 
             if (this.Exists(id) && this.Exists(destId))
             {
-                STypes::Playlist destination = this.GetPlaylist(destId);
-                STypes::Playlist target = this.GetPlaylist(id);
+                STypes::Playlist destination = this.GetPlaylist(destId)!;
+                STypes::Playlist target = this.GetPlaylist(id)!;
 
                 //フォルダー・プレイリストでない場合はキャンセル
                 if (destination.IsConcretePlaylist) return;
@@ -389,9 +389,9 @@ namespace Niconicome.Models.Domain.Local.Store
 
             var playlist = this.GetPlaylist(playlistId);
             int videoId = this.videoHandler.AddVideo(videoData, playlistId);
-            var video = this.videoHandler.GetVideo(videoId);
+            var video = this.videoHandler.GetVideo(videoId)!;
 
-            if (playlist.Videos is null) playlist.Videos = new List<STypes.Video>();
+            if (playlist!.Videos is null) playlist.Videos = new List<STypes.Video>();
 
             if (playlist.Videos.Any(v => v.NiconicoId == videoData.NiconicoId)) return -1;
 
@@ -416,7 +416,7 @@ namespace Niconicome.Models.Domain.Local.Store
             var playlist = this.GetPlaylist(playlistId);
 
             this.videoHandler.RemoveVideo(videoId, playlistId);
-            playlist.Videos.RemoveAll(v => v.Id == videoId);
+            playlist!.Videos.RemoveAll(v => v.Id == videoId);
             this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
         }
     
