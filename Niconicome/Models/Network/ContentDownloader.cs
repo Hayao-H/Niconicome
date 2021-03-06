@@ -81,12 +81,10 @@ namespace Niconicome.Models.Network
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IVideoFileStorehandler fileStorehandler, INetworkVideoHandler networkVideoHandler, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
-            this.fileStorehandler = fileStorehandler;
-            this.networkVideoHandler = networkVideoHandler;
             this.videoHandler = videoHandler;
             this.messageHandler = messageHandler;
             this.localContentHandler = localContentHandler;
@@ -96,11 +94,7 @@ namespace Niconicome.Models.Network
 
         private readonly ILocalSettingHandler settingHandler;
 
-        private readonly IVideoFileStorehandler fileStorehandler;
-
         private readonly IVideoHandler videoHandler;
-
-        private readonly INetworkVideoHandler networkVideoHandler;
 
         private readonly IMessageHandler messageHandler;
 
