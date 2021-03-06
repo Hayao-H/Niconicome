@@ -9,11 +9,11 @@ namespace Niconicome.Models.Playlist
 {
     public interface IVideoHandler
     {
-        int AddVideo(ITreeVideoInfo video, int playlidtId);
+        int AddVideo(IVideoListInfo video, int playlidtId);
         void RemoveVideo(int videoID, int playlistID);
-        void Update(ITreeVideoInfo video);
-        IEnumerable<ITreeVideoInfo> GetAllVideos();
-        ITreeVideoInfo GetVideo(int id);
+        void Update(IVideoListInfo video);
+        IEnumerable<IVideoListInfo> GetAllVideos();
+        IVideoListInfo GetVideo(int id);
 
     }
 
@@ -48,7 +48,7 @@ namespace Niconicome.Models.Playlist
         /// <param name="video"></param>
         /// <param name="playlidtId"></param>
         /// <returns></returns>
-        public int AddVideo(ITreeVideoInfo video, int playlidtId)
+        public int AddVideo(IVideoListInfo video, int playlidtId)
         {
             int id = this.playlistStoreHandler.AddVideo(video, playlidtId);
             this.playlistVideoHandler.AddVideo(video, playlidtId);
@@ -70,7 +70,7 @@ namespace Niconicome.Models.Playlist
         /// 動画情報を更新する
         /// </summary>
         /// <param name="video"></param>
-        public void Update(ITreeVideoInfo video)
+        public void Update(IVideoListInfo video)
         {
             this.videoStoreHandler.Update(video);
         }
@@ -80,9 +80,9 @@ namespace Niconicome.Models.Playlist
         /// 全ての動画を取得する
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ITreeVideoInfo> GetAllVideos()
+        public IEnumerable<IVideoListInfo> GetAllVideos()
         {
-            return this.videoStoreHandler.GetAllVideos().Select(v => BindableTreeVideoInfo.ConvertToTreeVideoInfo(v));
+            return this.videoStoreHandler.GetAllVideos().Select(v => BindableVIdeoListInfo.ConvertDbDataToVideoListInfo(v));
         }
 
         /// <summary>
@@ -90,9 +90,9 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ITreeVideoInfo GetVideo(int id)
+        public IVideoListInfo GetVideo(int id)
         {
-            return BindableTreeVideoInfo.ConvertToTreeVideoInfo(this.videoStoreHandler.GetVideo(id));
+            return BindableVIdeoListInfo.ConvertDbDataToVideoListInfo(this.videoStoreHandler.GetVideo(id));
         }
 
 

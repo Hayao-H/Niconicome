@@ -24,9 +24,9 @@ namespace Niconicome.Models.Playlist
     public interface IPlaylistVideoHandler
     {
         int AddPlaylist(int parentId);
-        void AddVideo(ITreeVideoInfo video, int playlistId);
+        void AddVideo(IVideoListInfo video, int playlistId);
         void RemoveVideo(int videoId, int playlistId);
-        void UpdateVideo(ITreeVideoInfo video, int playlistId);
+        void UpdateVideo(IVideoListInfo video, int playlistId);
         void DeletePlaylist(int playlistID);
         void Update(ITreePlaylistInfo newpaylist);
         void Refresh();
@@ -67,7 +67,7 @@ namespace Niconicome.Models.Playlist
         string Folderpath { get; set; }
         List<int> ChildrensIds { get; }
         List<ITreePlaylistInfo> Children { get; }
-        List<ITreeVideoInfo> Videos { get; set; }
+        List<IVideoListInfo> Videos { get; set; }
         int ParentId { get; set; }
         bool IsExpanded { get; set; }
         bool IsRoot { get; set; }
@@ -94,34 +94,6 @@ namespace Niconicome.Models.Playlist
 
     }
 
-    public interface ITreeVideoInfo : IClonable<ITreeVideoInfo>
-    {
-        int Id { get; set; }
-
-        int ViewCount { get; set; }
-        string NiconicoId { get; set; }
-        string Title { get; set; }
-        bool IsDeleted { get; set; }
-        bool IsSelected { get; set; }
-        string Owner { get; set; }
-        string LargeThumbUrl { get; set; }
-        string ThumbUrl { get; set; }
-        string Message { get; set; }
-        string ThumbPath { get; set; }
-        string FileName { get; set; }
-        string BindableThumbPath { get; }
-        string MessageGuid { get; set; }
-        IEnumerable<string> Tags { get; set; }
-        DateTime UploadedOn { get; set; }
-        Uri GetNiconicoPageUri();
-        bool CheckDownloaded(string folderPath);
-        string GetFilePath(string folderPath);
-        static BindableTreeVideoInfo ConvertToTreeVideoInfo(STypes::Video video)
-        {
-            video.Void();
-            return new BindableTreeVideoInfo();
-        }
-    }
 
     /// <summary>
     /// ViewModelから触るAPI
@@ -130,13 +102,12 @@ namespace Niconicome.Models.Playlist
     /// </summary>
     public class PlaylistVideoHandler : IPlaylistVideoHandler
     {
-        public PlaylistVideoHandler(ITreePlaylistInfoHandler handler, IPlaylistStoreHandler playlistStoreHandler, IVideoStoreHandler videoStoreHandler, State::IErrorMessanger errorMessanger)
+        public PlaylistVideoHandler(ITreePlaylistInfoHandler handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger)
         {
             this.Playlists = new ObservableCollection<ITreePlaylistInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Playlists, new object());
             this.handler = handler;
             this.playlistStoreHandler = playlistStoreHandler;
-            this.videoStoreHandler = videoStoreHandler;
             this.errorMessanger = errorMessanger;
             this.Refresh();
         }
@@ -144,8 +115,6 @@ namespace Niconicome.Models.Playlist
         private readonly ITreePlaylistInfoHandler handler;
 
         private readonly IPlaylistStoreHandler playlistStoreHandler;
-
-        private readonly IVideoStoreHandler videoStoreHandler;
 
         private readonly State::IErrorMessanger errorMessanger;
 
@@ -156,7 +125,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="video"></param>
         /// <param name="playlistId"></param>
-       　public void AddVideo(ITreeVideoInfo video, int playlistId)
+       　public void AddVideo(IVideoListInfo video, int playlistId)
         {
             var playlist = this.handler.GetPlaylist(playlistId);
             playlist?.Videos.AddUnique(video, list => !list.Any(v => v.Id == video.Id));
@@ -178,7 +147,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="video"></param>
         /// <param name="playlistId"></param>
-        public void UpdateVideo(ITreeVideoInfo video, int playlistId)
+        public void UpdateVideo(IVideoListInfo video, int playlistId)
         {
             this.RemoveVideo(video.Id, playlistId);
             this.AddVideo(video, playlistId);
@@ -340,8 +309,6 @@ namespace Niconicome.Models.Playlist
             return BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(this.playlistStoreHandler.GetRootPlaylist());
         }
 
-
-
         /// <summary>
         /// プレイリストを初期化する
         /// </summary>
@@ -352,18 +319,7 @@ namespace Niconicome.Models.Playlist
             var playlists = this.playlistStoreHandler.GetAllPlaylists().Select(p =>
             {
                 var childPlaylists = this.playlistStoreHandler.GetChildPlaylists(p.Id);
-                var converted = BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
-                if (p.Videos.Count > 0)
-                {
-                    var videos = p.Videos.Select(v =>
-                    {
-                        var video = this.videoStoreHandler.GetVideo(v.Id);
-                        if (video is null) return new BindableTreeVideoInfo();
-                        return BindableTreeVideoInfo.ConvertToTreeVideoInfo(video);
-                    }).Where(v => !v.Title.IsNullOrEmpty()).Distinct(v => v.Id);
-                    converted.Videos.AddRange(videos);
-                }
-                return converted;
+                return BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
             });
 
 
@@ -658,7 +614,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// 動画情報のリスト
         /// </summary>
-        public List<ITreeVideoInfo> Videos { get; set; } = new();
+        public List<IVideoListInfo> Videos { get; set; } = new();
 
         /// <summary>
         /// 親プレイリストのID
@@ -866,241 +822,6 @@ namespace Niconicome.Models.Playlist
             return converted;
         }
 
-    }
-
-    /// <summary>
-    /// バインド不可能な動画情報
-    /// </summary>
-    public class NonBindableTreeVideoInfo : BindableBase, ITreeVideoInfo
-    {
-
-        /// <summary>
-        /// ID
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// 再生回数
-        /// </summary>
-        public int ViewCount { get; set; }
-
-        /// <summary>
-        /// ニコニコ動画におけるID
-        /// </summary>
-        public string NiconicoId { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 動画タイトル
-        /// </summary>
-        public string Title { get; set; } = string.Empty;
-
-        /// <summary>
-        /// ファイル名
-        /// </summary>
-        public string FileName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 削除フラグ
-        /// </summary>
-        public bool IsDeleted { get; set; }
-
-        /// <summary>
-        /// 選択フラグ
-        /// </summary>
-        public virtual bool IsSelected { get; set; }
-
-        /// <summary>
-        /// 投稿者名
-        /// </summary>
-        public string Owner { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 大きなサムネイルのURL
-        /// </summary>
-        public string LargeThumbUrl { get; set; } = string.Empty;
-
-        /// <summary>
-        /// サムネイルのURL
-        /// </summary>
-        public string ThumbUrl { get; set; } = string.Empty;
-
-        /// <summary>
-        /// サムネイルのパス
-        /// </summary>
-        public string ThumbPath { get; set; } = string.Empty;
-
-        /// <summary>
-        /// バインド可能なサムネイルフィルパス
-        /// </summary>
-        public string BindableThumbPath
-        {
-            get
-            {
-                var dir = AppContext.BaseDirectory;
-                if (this.ThumbPath is null || this.ThumbPath == string.Empty)
-                {
-                    var cacheHandler = Utils::DIFactory.Provider.GetRequiredService<Net::ICacheHandler>();
-                    string cachePath = cacheHandler.GetCachePath("0", Net.CacheType.Thumbnail);
-                    return Path.Combine(dir, cachePath);
-                }
-                else
-                {
-                    return Path.Combine(dir, this.ThumbPath);
-
-                }
-            }
-        }
-
-        /// <summary>
-        /// タグ
-        /// </summary>
-        public IEnumerable<string> Tags { get; set; } = new List<string>();
-
-        /// <summary>
-        /// メッセージ
-        /// </summary>
-        public virtual string Message { get; set; } = string.Empty;
-
-        /// <summary>
-        /// メッセージID
-        /// </summary>
-        public string MessageGuid { get; set; } = Guid.NewGuid().ToString("D");
-
-        /// <summary>
-        /// 投稿日時
-        /// </summary>
-        public DateTime UploadedOn { get; set; } = DateTime.Now;
-
-        /// <summary>
-        /// 視聴ページのURIを取得する
-        /// </summary>
-        /// <returns></returns>
-        public Uri GetNiconicoPageUri()
-        {
-            return new Uri($"https://nico.ms/{this.NiconicoId}");
-        }
-
-        public bool CheckDownloaded(string folderPath)
-        {
-            if (this.FileName.IsNullOrEmpty())
-            {
-                return false;
-            }
-            else
-            {
-                return File.Exists(Path.Combine(folderPath, this.FileName));
-            }
-        }
-
-        /// <summary>
-        /// ファイルパスを取得する
-        /// </summary>
-        /// <param name="folderName"></param>
-        /// <returns></returns>
-        public string GetFilePath(string folderName)
-        {
-            if (this.FileName.IsNullOrEmpty())
-            {
-                return string.Empty;
-            }
-            else
-            {
-                return Path.Combine(folderName, this.FileName);
-            }
-        }
-
-        /// <summary>
-        /// DBのデータをTreeVideoInfo型のインスタンスに変換する
-        /// </summary>
-        /// <param name="dbVideo"></param>
-        /// <returns></returns>
-        public static NonBindableTreeVideoInfo ConvertToTreeVideoInfo(STypes::Video dbVideo)
-        {
-            var converted = new NonBindableTreeVideoInfo();
-            NonBindableTreeVideoInfo.SetData(converted, dbVideo);
-            return converted;
-        }
-
-        /// <summary>
-        /// オブジェクトをクローンする
-        /// </summary>
-        /// <returns></returns>
-        public ITreeVideoInfo Clone()
-        {
-            return (ITreeVideoInfo)this.MemberwiseClone();
-        }
-
-        /// <summary>
-        /// データを設定する
-        /// </summary>
-        /// <param name="videoInfo"></param>
-        /// <param name="dbVideo"></param>
-        protected static void SetData(ITreeVideoInfo videoInfo, STypes::Video dbVideo)
-        {
-            videoInfo.Id = dbVideo.Id;
-            videoInfo.NiconicoId = dbVideo.NiconicoId;
-            videoInfo.Title = dbVideo.Title;
-            videoInfo.IsDeleted = dbVideo.IsDeleted;
-            videoInfo.Owner = dbVideo.Owner?.Nickname ?? string.Empty;
-            videoInfo.UploadedOn = dbVideo.UploadedOn;
-            videoInfo.LargeThumbUrl = dbVideo.LargeThumbUrl;
-            videoInfo.ThumbUrl = dbVideo.ThumbUrl;
-            videoInfo.ThumbPath = dbVideo.ThumbPath;
-            videoInfo.FileName = dbVideo.FileName;
-            videoInfo.IsSelected = dbVideo.IsSelected;
-            videoInfo.Tags = dbVideo.Tags ?? new List<string>();
-            videoInfo.ViewCount = dbVideo.ViewCount;
-        }
-    }
-
-    /// <summary>
-    /// バインド可能な動画情報
-    /// </summary>
-    public class BindableTreeVideoInfo : NonBindableTreeVideoInfo, ITreeVideoInfo
-    {
-        public BindableTreeVideoInfo()
-        {
-            VideoMessanger.VideoMessageChange += this.ListenMessageChange;
-        }
-
-        ~BindableTreeVideoInfo()
-        {
-            VideoMessanger.VideoMessageChange -= this.ListenMessageChange;
-        }
-
-        private bool isSelectedField;
-
-        public override string Message
-        {
-            get => VideoMessanger.GetMessage(this.MessageGuid);
-            set
-            {
-                VideoMessanger.Write(this.MessageGuid, value);
-                this.OnPropertyChanged();
-            }
-        }
-
-        public override bool IsSelected { get => this.isSelectedField; set => this.SetProperty(ref this.isSelectedField, value); }
-
-        /// <summary>
-        /// DBのデータをTreeVideoInfo型のインスタンスに変換する
-        /// </summary>
-        /// <param name="dbVideo"></param>
-        /// <returns></returns>
-        public new static BindableTreeVideoInfo ConvertToTreeVideoInfo(STypes::Video dbVideo)
-        {
-            var converted = new BindableTreeVideoInfo();
-            NonBindableTreeVideoInfo.SetData(converted, dbVideo);
-            return converted;
-        }
-
-        protected void ListenMessageChange(object? sender,VideoMessageChangeEventArgs e)
-        {
-            if (e.ID == this.MessageGuid)
-            {
-                this.OnPropertyChanged(nameof(this.Message));
-            }
-        }
     }
 
     /// <summary>

@@ -17,7 +17,7 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
 
     public interface IWatchLaterHandler
     {
-        Task<List<ITreeVideoInfo>> GetVideosAsync();
+        Task<List<IVideoListInfo>> GetVideosAsync();
         Exception? CurrentException { get; }
     }
 
@@ -32,7 +32,7 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// 「あとで見る」を取得する
         /// </summary>
         /// <returns></returns>
-        public async Task<List<ITreeVideoInfo>> GetVideosAsync()
+        public async Task<List<IVideoListInfo>> GetVideosAsync()
         {
             return await this.GetVideosAsync("0");
         }

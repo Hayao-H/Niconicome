@@ -15,7 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Video
 {
     public interface IUserVideoHandler
     {
-        Task<List<ITreeVideoInfo>> GetVideosAsync(string userId);
+        Task<List<IVideoListInfo>> GetVideosAsync(string userId);
         Exception? CurrentException { get; }
     }
 
@@ -39,7 +39,7 @@ namespace Niconicome.Models.Domain.Niconico.Video
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<List<ITreeVideoInfo>> GetVideosAsync(string userId)
+        public async Task<List<IVideoListInfo>> GetVideosAsync(string userId)
         {
             var rawData = await this.GetAllVideosInternalAsync(userId);
             return this.ConvertToTreeVideoInfo(rawData);
@@ -109,10 +109,10 @@ namespace Niconicome.Models.Domain.Niconico.Video
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        private List<ITreeVideoInfo> ConvertToTreeVideoInfo(List<UVideo::Video> videos)
+        private List<IVideoListInfo> ConvertToTreeVideoInfo(List<UVideo::Video> videos)
         {
-            var converted = new List<ITreeVideoInfo>();
-            converted.AddRange(videos.Select(v => new BindableTreeVideoInfo() { Title = v.Title, NiconicoId = v.Id, UploadedOn = v.RegisteredAt, ThumbUrl = v.Thumbnail.MiddleUrl, LargeThumbUrl = v.Thumbnail.LargeUrl }));
+            var converted = new List<IVideoListInfo>();
+            converted.AddRange(videos.Select(v => new BindableVIdeoListInfo() { Title = v.Title, NiconicoId = v.Id, UploadedOn = v.RegisteredAt, ThumbUrl = v.Thumbnail.MiddleUrl, LargeThumbUrl = v.Thumbnail.LargeUrl }));
             return converted;
         }
     }

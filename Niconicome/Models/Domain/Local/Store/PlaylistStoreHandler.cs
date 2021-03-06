@@ -12,7 +12,7 @@ namespace Niconicome.Models.Domain.Local.Store
         STypes::Playlist GetRootPlaylist();
         STypes::Playlist GetPlaylist(int id);
         public int AddPlaylist(int parentID, string name);
-        public int AddVideo(ITreeVideoInfo video, int playlistId);
+        public int AddVideo(IVideoListInfo video, int playlistId);
         public void RemoveVideo(int id, int playlistId);
         public void Update(ITreePlaylistInfo newplaylist);
         IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self);
@@ -383,7 +383,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="videoData"></param>
         /// <param name="playlistId"></param>
         /// <returns></returns>
-        public int AddVideo(ITreeVideoInfo videoData, int playlistId)
+        public int AddVideo(IVideoListInfo videoData, int playlistId)
         {
             if (!this.Exists(playlistId)) throw new InvalidOperationException($"指定したプレイリストが存在しません。(id:{playlistId})");
 

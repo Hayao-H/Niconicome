@@ -8,9 +8,9 @@ namespace Niconicome.Models.Domain.Local.Store
 {
     public interface IVideoStoreHandler
     {
-        int AddVideo(ITreeVideoInfo video, int playlistId);
+        int AddVideo(IVideoListInfo video, int playlistId);
         void RemoveVideo(int videoID, int playlistID);
-        void Update(ITreeVideoInfo video);
+        void Update(IVideoListInfo video);
         IEnumerable<STypes::Video> GetAllVideos();
         STypes::Video GetVideo(int Id);
         STypes::Video GetVideo(string niconicoId);
@@ -46,7 +46,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="video"></param>
         /// <param name="playlistId"></param>
-        public int AddVideo(ITreeVideoInfo videoData, int playlistId)
+        public int AddVideo(IVideoListInfo videoData, int playlistId)
         {
             int videoId;
 
@@ -126,7 +126,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// 情報を更新する
         /// </summary>
         /// <param name="videoData"></param>
-        public void Update(ITreeVideoInfo videoData)
+        public void Update(IVideoListInfo videoData)
         {
             if (this.Exists(videoData.Id))
             {
@@ -192,7 +192,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="dbVideo"></param>
         /// <param name="videoData"></param>
-        private void SetData(STypes::Video dbVideo, ITreeVideoInfo videoData)
+        private void SetData(STypes::Video dbVideo, IVideoListInfo videoData)
         {
             dbVideo.NiconicoId = videoData.NiconicoId;
             dbVideo.Title = videoData.Title;

@@ -24,7 +24,7 @@ namespace Niconicome.Models.Network
 {
     public interface IContentDownloader
     {
-        Task<INetworkResult> DownloadVideos(IEnumerable<ITreeVideoInfo> videos, DownloadSettings setting, CancellationToken token);
+        Task<INetworkResult> DownloadVideos(IEnumerable<IVideoListInfo> videos, DownloadSettings setting, CancellationToken token);
     }
 
     public interface IDownloadSettings
@@ -56,7 +56,7 @@ namespace Niconicome.Models.Network
 
     public interface IVideoToDownload
     {
-        ITreeVideoInfo Video { get; }
+        IVideoListInfo Video { get; }
         int Index { get; }
     }
 
@@ -333,7 +333,7 @@ namespace Niconicome.Models.Network
         /// <param name="setting"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> DownloadVideos(IEnumerable<ITreeVideoInfo> videos, DownloadSettings setting, CancellationToken token)
+        public async Task<INetworkResult> DownloadVideos(IEnumerable<IVideoListInfo> videos, DownloadSettings setting, CancellationToken token)
         {
             int totalVideos = videos.Count();
             var handler = new ParallelTasksHandler<DownloadTaskParallel>(3, 5, 15);
@@ -493,13 +493,13 @@ namespace Niconicome.Models.Network
     /// </summary>
     public class VideoToDownload : IVideoToDownload
     {
-        public VideoToDownload(ITreeVideoInfo video, int index)
+        public VideoToDownload(IVideoListInfo video, int index)
         {
             this.Video = video;
             this.Index = index;
         }
 
-        public ITreeVideoInfo Video { get; set; }
+        public IVideoListInfo Video { get; set; }
 
         public int Index { get; set; }
     }
@@ -509,7 +509,7 @@ namespace Niconicome.Models.Network
     /// </summary>
     public class DownloadTaskParallel : IParallelTask<DownloadTaskParallel>
     {
-        public DownloadTaskParallel(Func<DownloadTaskParallel, Task> taskFunction, Action<int> onwait, ITreeVideoInfo video)
+        public DownloadTaskParallel(Func<DownloadTaskParallel, Task> taskFunction, Action<int> onwait, IVideoListInfo video)
         {
             this.TaskFunction = taskFunction;
             this.OnWait = onwait;
@@ -522,7 +522,7 @@ namespace Niconicome.Models.Network
 
         public Action<int> OnWait { get; init; }
 
-        public ITreeVideoInfo Video { get; init; }
+        public IVideoListInfo Video { get; init; }
 
     }
 
