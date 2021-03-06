@@ -10,12 +10,12 @@ namespace Niconicome.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] String name = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        protected virtual bool SetProperty<T>(ref T field, T value, [CallerMemberName] String name = null)
+        protected virtual bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? name = null)
         {
             if (field?.Equals(value) ?? false) return false;
             field = value;

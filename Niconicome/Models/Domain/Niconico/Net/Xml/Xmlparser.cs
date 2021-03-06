@@ -40,12 +40,12 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml
         /// <typeparam name="T"></typeparam>
         /// <param name="content"></param>
         /// <returns></returns>
-        public static T Deserialize<T>(string content)
+        public static T? Deserialize<T>(string content)
         {
             using var stream = new StringReader(content);
             var serializer = new XmlSerializer(typeof(T));
 
-            T data = (T)serializer.Deserialize(stream);
+            T? data = (T?)serializer.Deserialize(stream);
 
             if (data != null)
             {
