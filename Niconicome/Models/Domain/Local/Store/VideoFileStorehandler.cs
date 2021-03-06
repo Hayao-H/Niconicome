@@ -14,7 +14,7 @@ namespace Niconicome.Models.Domain.Local.Store
     {
         bool Exists(string niconicoId);
         IEnumerable<string> GetFilePaths(string niconicoId);
-        string GetFilePath(string niconicoId);
+        string? GetFilePath(string niconicoId);
         void Add(string niconicoId, string filePath);
         void Delete(string niconicoId, string filePath);
         void Clean();
@@ -38,7 +38,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="niconicoId"></param>
         /// <returns></returns>
-        private Types.VideoFile GetFileData(string niconicoId)
+        private Types.VideoFile? GetFileData(string niconicoId)
         {
             return this.dataBase.GetRecord<Types.VideoFile>(Types.VideoFile.TableName, v => v.NiconicoId == niconicoId);
         }
@@ -53,7 +53,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.dataBase.Exists<Types.VideoFile>(Types.VideoFile.TableName, v => v.NiconicoId == niconicoId))
             {
                 var data = this.GetFileData(niconicoId);
-                return data.FilePaths.Any(p => IO::File.Exists(p));
+                return data!.FilePaths.Any(p => IO::File.Exists(p));
             }
             else
             {
@@ -69,6 +69,7 @@ namespace Niconicome.Models.Domain.Local.Store
         public IEnumerable<string> GetFilePaths(string niconicoId)
         {
             var data = this.GetFileData(niconicoId);
+            if (data is null) return Enumerable.Empty<string>();
             return data.FilePaths.Where(p => IO::File.Exists(p));
         }
 
@@ -77,10 +78,10 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="niconicoId"></param>
         /// <returns></returns>
-        public string GetFilePath(string niconicoId)
+        public string? GetFilePath(string niconicoId)
         {
             var data = this.GetFileData(niconicoId);
-            return data.FilePaths.First(p => IO::File.Exists(p));
+            return data?.FilePaths.First(p => IO::File.Exists(p));
         }
 
         /// <summary>
@@ -93,7 +94,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (!this.Exists(niconicoId)) return;
             var data = this.GetFileData(niconicoId);
 
-            if (data.FilePaths.Contains(filePath))
+            if (data!.FilePaths.Contains(filePath))
             {
                 data.FilePaths.Remove(filePath);
                 this.dataBase.Update(data, Types.VideoFile.TableName);
@@ -135,7 +136,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.Exists(niconicoId))
             {
                 var data = this.GetFileData(niconicoId);
-                data.FilePaths.AddUnique(filePath);
+                data!.FilePaths.AddUnique(filePath);
                 this.dataBase.Update(data, Types.VideoFile.TableName);
             }
             else

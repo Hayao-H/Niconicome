@@ -12,8 +12,8 @@ namespace Niconicome.Models.Domain.Local.Store
         void RemoveVideo(int videoID, int playlistID);
         void Update(IVideoListInfo video);
         IEnumerable<STypes::Video> GetAllVideos();
-        STypes::Video GetVideo(int Id);
-        STypes::Video GetVideo(string niconicoId);
+        STypes::Video? GetVideo(int Id);
+        STypes::Video? GetVideo(string niconicoId);
         bool Exists(int id);
         bool Exists(string niconicoId);
         void JustifyVideos();
@@ -53,7 +53,7 @@ namespace Niconicome.Models.Domain.Local.Store
             //既にデータベースに存在する場合は再利用
             if (this.Exists(videoData.NiconicoId))
             {
-                var video = this.GetVideo(videoData.NiconicoId);
+                var video = this.GetVideo(videoData.NiconicoId)!;
                 if (video.PlaylistIds is null)
                 {
                     video.PlaylistIds = new List<int>();
@@ -95,7 +95,7 @@ namespace Niconicome.Models.Domain.Local.Store
             }
             else
             {
-                var video = this.GetVideo(videoID);
+                var video = this.GetVideo(videoID)!;
 
                 //動画側の参照を切る
                 if (video.PlaylistIds is not null)
@@ -130,7 +130,7 @@ namespace Niconicome.Models.Domain.Local.Store
         {
             if (this.Exists(videoData.Id))
             {
-                var video = this.GetVideo(videoData.Id);
+                var video = this.GetVideo(videoData.Id)!;
                 this.SetData(video, videoData);
                 this.Update(video);
             }
@@ -150,7 +150,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public STypes::Video GetVideo(int id)
+        public STypes::Video? GetVideo(int id)
         {
             var video = this.databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, id);
             return video;
@@ -161,7 +161,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public STypes::Video GetVideo(string niconicoId)
+        public STypes::Video? GetVideo(string niconicoId)
         {
             var video = this.databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, video => video.NiconicoId == niconicoId);
             return video;
@@ -219,7 +219,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 {
                     bool exists = this.databaseInstance.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlistId);
                     if (!exists) return false;
-                    var playlist = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlistId);
+                    var playlist = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlistId)!;
                     bool contains = playlist.Videos.Select(v => v.Id).Contains(video.Id);
                     return contains;
                 }).Distinct().ToList();
