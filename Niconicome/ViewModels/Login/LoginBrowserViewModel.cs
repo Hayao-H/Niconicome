@@ -9,6 +9,8 @@ using Microsoft.Web.WebView2.Core;
 using System.Windows;
 using Niconicome.Models.Domain.Utils;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
+using Utils = Niconicome.Models.Domain.Utils;
+using System.Threading.Tasks;
 
 namespace Niconicome.ViewModels.Login
 {
@@ -31,19 +33,21 @@ namespace Niconicome.ViewModels.Login
     class WebViewBehavior : Behavior<WebView2>
     {
 
-        private readonly Handlers::CoreWebview2Handler handler = new();
+        private readonly Handlers::ICoreWebview2Handler handler = Utils::DIFactory.Provider.GetRequiredService<Handlers::ICoreWebview2Handler>();
+
+        private bool isInitializeCompleted = false;
 
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.AssociatedObject.NavigationCompleted += this.OnNavigate;
+            this.AssociatedObject.NavigationStarting += this.OnNavigate;
             this.AssociatedObject.CoreWebView2InitializationCompleted += this.OnInitialized;
         }
 
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            this.AssociatedObject.NavigationCompleted -= this.OnNavigate;
+            this.AssociatedObject.NavigationStarting -= this.OnNavigate;
             this.AssociatedObject.CoreWebView2InitializationCompleted -= this.OnInitialized;
         }
 
@@ -63,21 +67,50 @@ namespace Niconicome.ViewModels.Login
 
         private async void OnNavigate(object? sender, EventArgs e)
         {
-            var cookies = new List<CoreWebView2Cookie>();
+            if (!this.isInitializeCompleted)
+            {
+                return;
+            }
 
-            await handler.GetAndSetCookiesAsync(DIFactory.Provider.GetRequiredService<ICookieManager>(), this.AssociatedObject.CoreWebView2, @"https://nicovideo.jp", cookies);
+            var cookies = await this.handler.GetCookiesAsync(this.AssociatedObject.CoreWebView2, @"https://nicovideo.jp");
+
 
             if (cookies.Any(cookie => cookie.Name == "user_session"))
             {
-                await NiconicoContext.Context.RefreshUser();
-                (this.AssociatedObject.DataContext as LoginBrowserViewModel)?.RaiseLoginSucceeded();
-                this.Window?.Close();
+                await this.SetCookiesAndExitAsync(cookies);
             }
         }
 
-        private async void OnInitialized(object? sender,EventArgs e)
+        private async void OnInitialized(object? sender, EventArgs e)
         {
+            var cookies = await this.handler.GetCookiesAsync(this.AssociatedObject.CoreWebView2, @"https://nicovideo.jp");
+
+            if (cookies.Any(cookie => cookie.Name == "user_session" && cookie.Expires > DateTime.Now))
+            {
+                var result = MessageBox.Show("有効なセッションが存在します。ログインをスキップしますか？", "セッションの再利用", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    await this.SetCookiesAndExitAsync(cookies);
+                    return;
+                }
+            }
+
             await this.handler.DeleteBrowserCookiesAsync(this.AssociatedObject.CoreWebView2, @"https://nicovideo.jp");
+
+            this.isInitializeCompleted = true;
+        }
+
+        private async Task SetCookiesAndExitAsync(List<CoreWebView2Cookie> cookies)
+        {
+            var cookieManager = DIFactory.Provider.GetRequiredService<ICookieManager>();
+            foreach (var cookie in cookies)
+            {
+                cookieManager.AddCookie(cookie.Name, cookie.Value);
+            }
+            await NiconicoContext.Context.RefreshUser();
+            (this.AssociatedObject.DataContext as LoginBrowserViewModel)?.RaiseLoginSucceeded();
+            this.Window?.Close();
         }
     }
 

@@ -275,7 +275,8 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public string GetFilePath(string niconicoId)
         {
-            return this.fileStorehandler.GetFilePath(niconicoId);
+            if (!this.fileStorehandler.Exists(niconicoId)) throw new InvalidOperationException($"{niconicoId}は保存されていません。");
+            return this.fileStorehandler.GetFilePath(niconicoId)!;
         }
 
         /// <summary>

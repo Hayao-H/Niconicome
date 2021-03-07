@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Store = Niconicome.Models.Domain.Local.Store;
 
 namespace Niconicome.Models.Local.Application
@@ -37,9 +38,12 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         public void RunStartUptasks()
         {
-            this.RemoveTmpFolder();
-            this.JustifyData();
-            this.DeleteInvalidFilePath();
+            Task.Run(() =>
+            {
+                this.RemoveTmpFolder();
+                this.JustifyData();
+                this.DeleteInvalidFilePath();
+            });
         }
 
         /// <summary>

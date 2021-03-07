@@ -21,7 +21,7 @@ namespace Niconicome.ViewModels.Setting
         /// <param name="data"></param>
         /// <param name="settingname"></param>
         /// <param name="propertyname"></param>
-        protected void Savesetting<T>(ref T fiels, T data, Settings setting, [CallerMemberName] string propertyname = null)
+        protected void Savesetting<T>(ref T fiels, T data, Settings setting, [CallerMemberName] string? propertyname = null)
         {
             if (data is bool boolData)
             {

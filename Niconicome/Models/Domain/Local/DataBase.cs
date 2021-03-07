@@ -28,8 +28,8 @@ namespace Niconicome.Models.Domain.Local
         public ILiteCollection<T> GetCollection<T>(string tableName) where T : IStorable;
         public ILiteCollection<BsonDocument> GetCollection(string tableName);
         public int GetRecordCount(string tableName);
-        public T GetRecord<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable;
-        public T GetRecord<T>(string tableName, int id) where T : IStorable;
+        public T? GetRecord<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable;
+        public T? GetRecord<T>(string tableName, int id) where T : IStorable;
         public T? GetRecord<T>(string tableName, int id, int retry) where T : IStorable;
         public bool Exists<T>(string tablename, int id) where T : IStorable;
         public bool Exists<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable;
@@ -173,7 +173,7 @@ namespace Niconicome.Models.Domain.Local
         /// <param name="tablename"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public T GetRecord<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable
+        public T? GetRecord<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable
         {
             var collections = this.GetCollection<T>(tablename);
             return collections.FindOne(predicate);
@@ -186,7 +186,7 @@ namespace Niconicome.Models.Domain.Local
         /// <param name="tableName"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public T GetRecord<T>(string tableName, int id) where T : IStorable
+        public T? GetRecord<T>(string tableName, int id) where T : IStorable
         {
             var collections = this.GetCollection<T>(tableName);
             return collections.FindById(id);
@@ -203,7 +203,7 @@ namespace Niconicome.Models.Domain.Local
         {
             var collections = this.GetCollection<T>(tableName);
             var retryAttempts = 0;
-            T recored = collections.FindById(id);
+            T? recored = collections.FindById(id);
             while (recored == null && retryAttempts < retry)
             {
                 retryAttempts++;
