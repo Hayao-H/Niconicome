@@ -58,9 +58,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
             string fileName = generatedFIlename.IsNullOrEmpty() ? $"[{session.Video!.Id}]{session.Video!.Title}.jpg" : generatedFIlename;
 
 
-            string? thumbUrl = session.Video!.DmcInfo.ThumbInfo.Large;
+            string? thumbUrl;
+            if (!(session.Video!.DmcInfo.ThumbInfo.Large?.IsNullOrEmpty() ?? true))
+            {
+                thumbUrl = session.Video!.DmcInfo.ThumbInfo.Large;
+            } else if (!(session.Video!.DmcInfo.ThumbInfo.Normal?.IsNullOrEmpty() ?? true))
+            {
+                thumbUrl = session.Video!.DmcInfo.ThumbInfo.Normal;
+            } else
+            {
+                return new DownloadResult() { Issucceeded = false, Message = "サムネイルのURLを取得できませんでした。" };
+            }
 
-            if (thumbUrl.IsNullOrEmpty()) return new DownloadResult() { Issucceeded = false, Message = "サムネイルのURLを取得できませんでした。" };
 
             byte[] data;
             try
