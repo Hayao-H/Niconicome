@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AngleSharp.Dom;
-using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 
 namespace Niconicome.Models.Utils

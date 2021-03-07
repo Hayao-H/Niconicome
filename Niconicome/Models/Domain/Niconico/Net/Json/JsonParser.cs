@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 
 namespace Niconicome.Models.Domain.Niconico.Net.Json
 {
@@ -26,8 +28,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = false,
                 IgnoreNullValues = true,
-                //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-            };
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+        };
 
             T? instance = JsonSerializer.Deserialize<T>(source, options);
             //nullチェック
@@ -50,6 +53,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = false,
                 IgnoreNullValues = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
                 //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
             };
 

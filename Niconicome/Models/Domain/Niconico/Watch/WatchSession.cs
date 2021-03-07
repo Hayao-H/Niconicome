@@ -395,7 +395,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             data.Session.Protocol.Name = "http";
             data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Use_ssl = "yes";
             data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Use_well_known_port = "yes";
-            data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Transfer_preset = string.Empty;
+            data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Transfer_preset = "standard2";
             data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Segment_duration = 6000;
             data.Session.Session_operation_auth.Session_operation_auth_by_signature.Signature = sessionIfnfo.Signature;
             data.Session.Session_operation_auth.Session_operation_auth_by_signature.Token = sessionIfnfo.Token;
