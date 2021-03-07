@@ -13,6 +13,7 @@ namespace Niconicome.Models.Domain.Local.Handlers
         Task GetAndSetCookiesAsync(ICookieManager cookieManager, CoreWebView2 wv2,string domain,List<CoreWebView2Cookie> cookies);
         Task DeleteCookiesAsync(ICookieManager cookieManager, CoreWebView2 wv2, string domain);
         Task DeleteBrowserCookiesAsync(CoreWebView2 wv2, string domain);
+        Task<List<CoreWebView2Cookie>> GetCookiesAsync(CoreWebView2 wv2, string domain);
     }
 
     public class CoreWebview2Handler:ICoreWebview2Handler
@@ -96,26 +97,20 @@ namespace Niconicome.Models.Domain.Local.Handlers
         /// <returns></returns>
         private async Task InternalGetCookiesAsync(List<CoreWebView2Cookie> cookies, CoreWebView2 wv2, string domain)
         {
-            List<CoreWebView2Cookie> rawCookies;
+
             try
             {
-                //CookieManagerAPIが実装されたので、
-                //ブラウザーの開発者ツールからcookieを取得するのをやめた。
-                //不具合があったら戻す。
-                rawCookies = await wv2.CookieManager.GetCookiesAsync(domain);
+                cookies.AddRange(await wv2.CookieManager.GetCookiesAsync(domain));
             }
             catch (ArgumentException ex)
             {
                 this.logger.Error("ブラウザーからのクッキー取得に失敗しました。", ex);
-                return;
             }
             catch (Exception ex)
             {
                 this.logger.Error("ブラウザーからのクッキー取得に失敗しました。", ex);
-                return;
             }
 
-            cookies.AddRange(rawCookies);
         }
 
         /// <summary>
@@ -132,5 +127,21 @@ namespace Niconicome.Models.Domain.Local.Handlers
                 wv2.CookieManager.DeleteCookie(cookie);
             }
         }
+
+        /// <summary>
+        /// Cookieを取得する
+        /// </summary>
+        /// <param name="wv2"></param>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        public async Task<List<CoreWebView2Cookie>> GetCookiesAsync(CoreWebView2 wv2, string domain)
+        {
+            var cookies = new List<CoreWebView2Cookie>();
+
+            await this.InternalGetCookiesAsync(cookies, wv2, domain);
+
+            return cookies;
+        }
+
     }
 }
