@@ -42,6 +42,7 @@ namespace Niconicome.ViewModels.Setting
                 SettingPages.Restore => "/Views/Setting/Pages/RestorePage.xaml",
                 SettingPages.ApplicationInfo => "/Views/Setting/Pages/AppinfoPage.xaml",
                 SettingPages.Import => "/Views/Setting/Pages/ImportPage.xaml",
+                SettingPages.Download=> "/Views/Setting/Pages/DownloadSettingPage.xaml",
                 _ => "/Views/Setting/Pages/EmptyPage.xaml",
             };
             this.PageUri = new Uri(uri, UriKind.Relative);
@@ -111,6 +112,7 @@ namespace Niconicome.ViewModels.Setting
                 "アプリ情報" => SettingPages.ApplicationInfo,
                 "回復" => SettingPages.Restore,
                 "インポート" => SettingPages.Import,
+                "ダウンロード設定"=>SettingPages.Download,
                 _ => SettingPages.None
             };
         }
@@ -149,5 +151,6 @@ namespace Niconicome.ViewModels.Setting
         ApplicationInfo,
         Import,
         Restore,
+        Download,
     }
 }

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
@@ -24,6 +25,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         bool IsDownloadingLogEnable { get; }
         bool IsDownloadingOwnerCommentEnable { get; }
         bool IsDownloadingEasyCommentEnable { get; }
+        int CommentOffset { get; }
     }
 
     public interface ICommentCollection
@@ -63,6 +65,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         public bool IsDownloadingOwnerCommentEnable { get; set; }
 
         public bool IsDownloadingEasyCommentEnable { get; set; }
+        public int CommentOffset { get; set; }
+
     }
 
     /// <summary>
@@ -92,7 +96,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <returns></returns>
         public async Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
         {
-            var comments = CommentCollection.GetInstance();
+            var comments = CommentCollection.GetInstance(settings.CommentOffset);
             Response::Chat? first;
             int index = 0;
             long lastNo = 0;
@@ -138,6 +142,32 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             } while (first?.No > 1 && !token.IsCancellationRequested);
 
             comments.Distinct();
+
+            long prev = 0;
+            var skipped = new List<long>();
+
+            foreach (var comment in comments.Comments)
+            {
+                if (prev == 0)
+                {
+                    prev = comment.Chat!.No;
+                    continue;
+                }
+
+                if (prev + 1 != comment.Chat!.No)
+                {
+                    for (var i = 0; i < comment.Chat!.No - prev - 1; i++)
+                    {
+                        skipped.Add(prev + 1);
+                        prev++;
+                    }
+                } else
+                {
+                    prev++;
+                }
+            }
+
+            var skippedS = string.Join(Environment.NewLine, skipped);
 
             this.logger.Log($"コメントのダウンロードが完了しました。({comments.Count}コメント, {context.GetLogContent()})");
 
@@ -187,19 +217,22 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             this.Thread = original.Thread;
         }
 
-        public CommentCollection()
+        public CommentCollection(int cOffset)
         {
             this.comments = new List<Response.Comment>();
+            this.comThroughSetting = cOffset;
         }
 
-        public static ICommentCollection GetInstance()
+        public static ICommentCollection GetInstance(int cOffset = CommentCollection.NumberToThrough)
         {
-            return new CommentCollection();
+            return new CommentCollection(cOffset);
         }
 
         private readonly List<Response::Comment> comments;
 
-        private const int CountToThrough = 160;
+        public const int NumberToThrough = 40;
+
+        private readonly int comThroughSetting;
 
         /// <summary>
         /// コメント
@@ -257,9 +290,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             {
                 var newCollection = CommentCollection.GetInstance();
                 newCollection.Add(comments, false);
-                if (newCollection.Count > CommentCollection.CountToThrough)
+                if (newCollection.Count > this.comThroughSetting)
                 {
-                    newCollection.Comments.RemoveRange(0, CommentCollection.CountToThrough);
+                    newCollection.Comments.RemoveRange(0, this.comThroughSetting);
                     comments.Clear();
                     comments.AddRange(newCollection.Comments);
                 }

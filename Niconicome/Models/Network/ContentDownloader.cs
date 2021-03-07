@@ -43,7 +43,7 @@ namespace Niconicome.Models.Network
         uint VerticalResolution { get; }
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
-        Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat);
+        Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat,int commentOffset);
     }
 
     public interface IDownloadResult
@@ -158,8 +158,11 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         private async Task<IDownloadResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
+            var cOffset = this.settingHandler.GetIntSetting(Settings.CommentOffset);
+            if (cOffset < 0) cOffset = Cdl::CommentCollection.NumberToThrough;
+
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-            var cSettings = settings.ConvertToCommentDownloadSetting(fileNameFormat);
+            var cSettings = settings.ConvertToCommentDownloadSetting(fileNameFormat,cOffset);
             var commentDownloader = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
             Download::IDownloadResult result;
             try
@@ -465,7 +468,7 @@ namespace Niconicome.Models.Network
             };
         }
 
-        public Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat)
+        public Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat,int commentOffset)
         {
             return new Cdl::CommentDownloadSettings()
             {
@@ -475,7 +478,8 @@ namespace Niconicome.Models.Network
                 IsOverwriteEnable = this.Overwrite,
                 IsDownloadingEasyCommentEnable = this.DownloadEasy,
                 IsDownloadingLogEnable = this.DownloadLog,
-                IsDownloadingOwnerCommentEnable = this.DownloadOwner
+                IsDownloadingOwnerCommentEnable = this.DownloadOwner,
+                CommentOffset = commentOffset
             };
         }
 

@@ -30,6 +30,9 @@ namespace Niconicome.ViewModels.Setting
             else if (data is string stringData)
             {
                 WS::SettingPage.SettingHandler.SaveSetting(stringData, setting);
+            } else if (data is int intData)
+            {
+                WS::SettingPage.SettingHandler.SaveSetting(intData, setting);
             }
             else
             {
