@@ -14,6 +14,7 @@ namespace Niconicome.Models.Local
     {
         bool GetBoolSetting(Settings setting);
         string? GetStringSetting(Settings setting);
+        int GetIntSetting(Settings setting);
         void SaveSetting<T>(T data, Settings setting);
     }
 
@@ -67,6 +68,27 @@ namespace Niconicome.Models.Local
         }
 
         /// <summary>
+        /// 整数値の設定を取得する
+        /// </summary>
+        /// <param name="setting"></param>
+        /// <returns></returns>
+        public int GetIntSetting(Settings setting)
+        {
+            var settingname = this.GetSettingName(setting);
+            if (settingname is null) return 0;
+
+            if (this.settingHandler.Exists(settingname, SettingType.intSetting))
+            {
+                return this.settingHandler.GetIntSetting(settingname).Data;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+
+        /// <summary>
         /// 設定を保存する
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -84,7 +106,10 @@ namespace Niconicome.Models.Local
             else if (data is string stringData)
             {
                 this.settingHandler.SaveStringSetting(settingname, stringData);
-            }
+            } else if (data is int intData)
+            {
+                this.settingHandler.SaveIntSetting(settingname, intData);
+            } 
         }
 
         /// <summary>
@@ -96,15 +121,16 @@ namespace Niconicome.Models.Local
         {
             return settings switch
             {
-            Settings.FileNameFormat => STypes::SettingNames.FileNameFormat,
-            Settings.PlayerAPath => STypes::SettingNames.PlayerAPath,
-            Settings.PlayerBPath => STypes::SettingNames.PlayerBPath,
-            Settings.AppUrlPath => STypes::SettingNames.AppUrlPath,
-            Settings.AppUrlParam => STypes::SettingNames.AppUrlParam,
-            Settings.AppIdPath => STypes::SettingNames.AppIdPath,
-            Settings.AppIdParam => STypes::SettingNames.AppIdParam,
-            Settings.FfmpegPath => STypes::SettingNames.FFmpegPath,
-            Settings.DefaultFolder=>STypes::SettingNames.DefaultFolder,
+                Settings.FileNameFormat => STypes::SettingNames.FileNameFormat,
+                Settings.PlayerAPath => STypes::SettingNames.PlayerAPath,
+                Settings.PlayerBPath => STypes::SettingNames.PlayerBPath,
+                Settings.AppUrlPath => STypes::SettingNames.AppUrlPath,
+                Settings.AppUrlParam => STypes::SettingNames.AppUrlParam,
+                Settings.AppIdPath => STypes::SettingNames.AppIdPath,
+                Settings.AppIdParam => STypes::SettingNames.AppIdParam,
+                Settings.FfmpegPath => STypes::SettingNames.FFmpegPath,
+                Settings.DefaultFolder => STypes::SettingNames.DefaultFolder,
+                Settings.CommentOffset => STypes::SettingNames.CommentOffset,
                 _ => null
             };
         }
@@ -120,6 +146,7 @@ namespace Niconicome.Models.Local
         AppUrlParam,
         AppIdParam,
         FfmpegPath,
-        DefaultFolder
+        DefaultFolder,
+        CommentOffset,
     }
 }

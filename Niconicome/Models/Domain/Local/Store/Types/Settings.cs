@@ -12,7 +12,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     /// <summary>
     /// URL設定
     /// </summary>
-    public record UrlSetting:IStorable,ISetting
+    public record UrlSetting : IStorable, ISetting
     {
         public static string TableName { get; } = "urlsettings";
 
@@ -46,7 +46,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     public record AppSettingBool : IStorable
     {
         public static string TableName { get; } = "appsettingsbool";
-        
+
         [BsonId]
         public int Id { get; set; }
 
@@ -63,7 +63,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
 
     /// <summary>
-    /// アプリケーションの設定(真偽値)
+    /// アプリケーションの設定(文字列)
     /// </summary>
     public record AppSettingString : IStorable
     {
@@ -83,6 +83,27 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public string? Value { get; set; }
     }
 
+    /// <summary>
+    /// アプリケーションの設定(整数値)
+    /// </summary>
+    public record AppSettingInt : IStorable
+    {
+        public static string TableName { get; } = "appsettingsint";
+
+        [BsonId]
+        public int Id { get; set; }
+
+        /// <summary>
+        /// 設定名
+        /// </summary>
+        public string? SettingName { get; set; }
+
+        /// <summary>
+        /// 設定値
+        /// </summary>
+        public int Value { get; set; } = -1;
+    }
+
     public static class SettingNames
     {
         public static string FileNameFormat { get; private set; } = "filenameformat";
@@ -94,6 +115,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string AppIdParam { get; private set; } = "appidparam";
         public static string FFmpegPath { get; private set; } = "ffmpegpath";
         public static string DefaultFolder { get; private set; } = "defaultfolder";
+        public static string CommentOffset { get; private set; } = "commentoffset";
 
     }
 }
