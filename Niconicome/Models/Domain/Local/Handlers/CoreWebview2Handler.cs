@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.Wpf;
 using Niconicome.Models.Domain.Niconico;
-using System.Diagnostics;
-using Utils = Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Local.Handlers
 {
@@ -21,6 +17,13 @@ namespace Niconicome.Models.Domain.Local.Handlers
 
     public class CoreWebview2Handler:ICoreWebview2Handler
     {
+        public CoreWebview2Handler(ILogger logger)
+        {
+            this.logger = logger;
+        }
+
+        private readonly ILogger logger;
+
         /// <summary>
         /// WebView2のクッキーをコンテキストに設定する
         /// </summary>
@@ -103,12 +106,12 @@ namespace Niconicome.Models.Domain.Local.Handlers
             }
             catch (ArgumentException ex)
             {
-                Utils::Logger.GetLogger().Error("ブラウザーからのクッキー取得に失敗しました。", ex);
+                this.logger.Error("ブラウザーからのクッキー取得に失敗しました。", ex);
                 return;
             }
             catch (Exception ex)
             {
-                Utils::Logger.GetLogger().Error("ブラウザーからのクッキー取得に失敗しました。", ex);
+                this.logger.Error("ブラウザーからのクッキー取得に失敗しました。", ex);
                 return;
             }
 
