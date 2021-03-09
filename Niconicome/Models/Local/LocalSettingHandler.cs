@@ -131,6 +131,15 @@ namespace Niconicome.Models.Local
                 Settings.FfmpegPath => STypes::SettingNames.FFmpegPath,
                 Settings.DefaultFolder => STypes::SettingNames.DefaultFolder,
                 Settings.CommentOffset => STypes::SettingNames.CommentOffset,
+                Settings.DLVideo=>STypes::SettingNames.IsDownloadingVideoEnable,
+                Settings.DLComment=> STypes::SettingNames.IsDownloadingCommentEnable,
+                Settings.DLKako=> STypes::SettingNames.IsDownloadingKakoroguEnable,
+                Settings.DLEasy=> STypes::SettingNames.IsDownloadingEasyEnable,
+                Settings.DLThumb=> STypes::SettingNames.IsDownloadingThumbEnable,
+                Settings.DLOwner=> STypes::SettingNames.IsDownloadingOwnerEnable,
+                Settings.DLSkip=> STypes::SettingNames.IsSkipEnable,
+                Settings.DLCopy=> STypes::SettingNames.IsCopyEnable,
+                Settings.DLOverwrite=> STypes::SettingNames.IsOverwriteEnable,
                 _ => null
             };
         }
@@ -148,5 +157,14 @@ namespace Niconicome.Models.Local
         FfmpegPath,
         DefaultFolder,
         CommentOffset,
+        DLVideo,
+        DLComment,
+        DLKako,
+        DLEasy,
+        DLThumb,
+        DLOwner,
+        DLSkip,
+        DLCopy,
+        DLOverwrite,
     }
 }
