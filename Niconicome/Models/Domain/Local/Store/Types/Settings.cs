@@ -116,6 +116,15 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string FFmpegPath { get; private set; } = "ffmpegpath";
         public static string DefaultFolder { get; private set; } = "defaultfolder";
         public static string CommentOffset { get; private set; } = "commentoffset";
+        public static string IsDownloadingVideoEnable { get; private set; } = "isdownloadingvideoenable";
+        public static string IsDownloadingCommentEnable { get; private set; } = "isdownloadingcommentenable";
+        public static string IsDownloadingKakoroguEnable { get; private set; } = "isdownloadingkakoroguenable";
+        public static string IsDownloadingEasyEnable { get; private set; } = "isdownloadingeasyenable";
+        public static string IsDownloadingThumbEnable { get; private set; } = "isdownloadingthumbenable";
+        public static string IsDownloadingOwnerEnable { get; private set; } = "isdownloadingownerenable";
+        public static string IsOverwriteEnable { get; private set; } = "isoverwriteenable";
+        public static string IsSkipEnable { get; private set; } = "isskipenable";
+        public static string IsCopyEnable { get; private set; } = "iscopyenable";
 
     }
 }

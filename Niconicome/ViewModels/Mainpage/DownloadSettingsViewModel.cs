@@ -15,16 +15,21 @@ using Niconicome.Extensions.System.List;
 
 namespace Niconicome.ViewModels.Mainpage
 {
-    class DownloadSettingsViewModel : BindableBase
+    class DownloadSettingsViewModel : ConfigurableBase
     {
 
 
         public DownloadSettingsViewModel()
         {
-            this.IsDownloadingVideoEnable = true;
-            this.IsDownloadingCommentEnable = true;
-            this.IsDownloadingEasyComment = true;
-            this.IsDownloadingThumbEnable = true;
+            this.IsDownloadingVideoEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLVideo);
+            this.IsDownloadingCommentEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLComment);
+            this.isDownloadingCommentLogEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLKako);
+            this.IsDownloadingEasyComment = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLEasy);
+            this.IsDownloadingThumbEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLThumb);
+            this.isDownloadingOwnerCommentField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLOwner);
+            this.isOverwriteEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLOverwrite);
+            this.isSkippingEnablefield = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLSkip);
+            this.isCopyFromAnotherFolderEnableFIeld = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLCopy);
 
             var s1 = new ResolutionSetting("1920x1080");
             var s2 = new ResolutionSetting("1280x720");
@@ -32,7 +37,8 @@ namespace Niconicome.ViewModels.Mainpage
             var s4 = new ResolutionSetting("640x360");
             var s5 = new ResolutionSetting("426x240");
 
-            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5 };
+            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5
+    };
             this.selectedResolutionField = s1;
 
             this.SnackbarMessageQueue = WS::Mainpage.SnackbarMessageQueue;
@@ -112,7 +118,8 @@ namespace Niconicome.ViewModels.Mainpage
                            WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
                            this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
                        }
-                   } else
+                   }
+                   else
                    {
                        WS::Mainpage.Messagehandler.AppendMessage($"ダウンロード出来ませんでした。");
                        this.SnackbarMessageQueue.Enqueue($"ダウンロード出来ませんでした。");
@@ -176,47 +183,47 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画ダウンロードフラグ
         /// </summary>
-        public bool IsDownloadingVideoEnable { get => this.isDownloadingVideoEnableField; set => this.SetProperty(ref this.isDownloadingVideoEnableField, value); }
+        public bool IsDownloadingVideoEnable { get => this.isDownloadingVideoEnableField; set => this.Savesetting(ref this.isDownloadingVideoEnableField, value, Settings.DLVideo); }
 
         /// <summary>
         /// コメントダウンロードフラグ
         /// </summary>
-        public bool IsDownloadingCommentEnable { get => this.isDownloadingCommentEnableField; set => this.SetProperty(ref this.isDownloadingCommentEnableField, value); }
+        public bool IsDownloadingCommentEnable { get => this.isDownloadingCommentEnableField; set => this.Savesetting(ref this.isDownloadingCommentEnableField, value, Settings.DLComment); }
 
         /// <summary>
         /// 過去ログダウンロードフラグ
         /// </summary>
-        public bool IsDownloadingCommentLogEnable { get => this.isDownloadingCommentLogEnableField; set => this.SetProperty(ref this.isDownloadingCommentLogEnableField, value); }
+        public bool IsDownloadingCommentLogEnable { get => this.isDownloadingCommentLogEnableField; set => this.Savesetting(ref this.isDownloadingCommentLogEnableField, value, Settings.DLKako); }
 
         /// <summary>
         /// 投稿者コメント
         /// </summary>
-        public bool IsDownloadingOwnerComment { get => this.isDownloadingOwnerCommentField; set => this.SetProperty(ref this.isDownloadingOwnerCommentField, value); }
+        public bool IsDownloadingOwnerComment { get => this.isDownloadingOwnerCommentField; set => this.Savesetting(ref this.isDownloadingOwnerCommentField, value, Settings.DLOwner); }
 
         /// <summary>
         /// かんたんコメント
         /// </summary>
-        public bool IsDownloadingEasyComment { get => this.isDownloadingEasyCommentFIeld; set => this.SetProperty(ref this.isDownloadingEasyCommentFIeld, value); }
+        public bool IsDownloadingEasyComment { get => this.isDownloadingEasyCommentFIeld; set => this.Savesetting(ref this.isDownloadingEasyCommentFIeld, value, Settings.DLEasy); }
 
         /// <summary>
         /// サムネイルダウンロードフラグ
         /// </summary>
-        public bool IsDownloadingThumbEnable { get => this.isDownloadingThumbEnableField; set => this.SetProperty(ref this.isDownloadingThumbEnableField, value); }
+        public bool IsDownloadingThumbEnable { get => this.isDownloadingThumbEnableField; set => this.Savesetting(ref this.isDownloadingThumbEnableField, value, Settings.DLThumb); }
 
         /// <summary>
         /// 上書き保存フラグ
         /// </summary>
-        public bool IsOverwriteEnable { get => this.isOverwriteEnableField; set => this.SetProperty(ref this.isOverwriteEnableField, value); }
+        public bool IsOverwriteEnable { get => this.isOverwriteEnableField; set => this.Savesetting(ref this.isOverwriteEnableField, value, Settings.DLOverwrite); }
 
         /// <summary>
         /// ダウンロード済をスキップ
         /// </summary>
-        public bool IsSkippingEnable { get => this.isSkippingEnablefield; set => this.SetProperty(ref this.isSkippingEnablefield, value); }
+        public bool IsSkippingEnable { get => this.isSkippingEnablefield; set => this.Savesetting(ref this.isSkippingEnablefield, value, Settings.DLSkip); }
 
         /// <summary>
         /// 別フォルダーからコピー
         /// </summary>
-        public bool IsCopyFromAnotherFolderEnable { get => this.isCopyFromAnotherFolderEnableFIeld; set => this.SetProperty(ref this.isCopyFromAnotherFolderEnableFIeld, value); }
+        public bool IsCopyFromAnotherFolderEnable { get => this.isCopyFromAnotherFolderEnableFIeld; set => this.Savesetting(ref this.isCopyFromAnotherFolderEnableFIeld, value, Settings.DLCopy); }
 
 
         /// <summary>
