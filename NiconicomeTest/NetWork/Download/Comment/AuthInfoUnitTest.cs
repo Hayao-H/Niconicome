@@ -31,5 +31,27 @@ namespace NiconicomeTest.NetWork.Download.Comment
             Assert.That(async () => await auth.GetAuthInfoAsync("1234"), Throws.TypeOf<HttpRequestException>())
 ;
         }
+
+        [Test]
+        public async Task Waybackkeryの取得に成功した場合()
+        {
+            var content = new StringContent("waybackkey=1615124254.eszTcMSplyHZNMoxeW6Hdb4vcTA");
+            var http = new NicoHttpStab(content, content);
+            var auth = new OfficialVideoUtils(http);
+            var info = await auth.GetWaybackkeyAsync("1234");
+
+            Assert.That(info, Is.EqualTo("1615124254.eszTcMSplyHZNMoxeW6Hdb4vcTA"));
+        }
+
+        [Test]
+        public void Waybackkeyの取得に失敗した場合()
+        {
+            var content = new StringContent("error");
+            var http = new NicoHttpStab(content, content);
+            var auth = new OfficialVideoUtils(http);
+
+            Assert.That(async () => await auth.GetWaybackkeyAsync("1234"), Throws.TypeOf<HttpRequestException>())
+;
+        }
     }
 }

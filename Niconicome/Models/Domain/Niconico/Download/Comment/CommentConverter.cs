@@ -5,6 +5,7 @@ using Xml = Niconicome.Models.Domain.Niconico.Net.Xml.Comment;
 using System.Text;
 using System.Threading.Tasks;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
+using Utils = Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment
 {
@@ -116,17 +117,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                      Anonymity = c.Anonymity ?? 0,
                      UserId = c.UserId,
                      Mail = c.Mail,
-                     Text = c.Content,
+                     Text = Utils::XmlUtils.RemoveSymbols(c.Content),
                  }
             ).ToList(),
                 Thread = new Xml::PacketThread()
                 {
-                    Resultcode = comments.Thread?.Resultcode ?? 0,
-                    Thread = comments.Thread?.ThreadThread ?? string.Empty,
-                    ServerTime = comments.Thread?.ServerTime ?? 0,
-                    LastRes = comments.Thread?.LastRes ?? 0,
-                    Ticket = comments.Thread?.Ticket,
-                    Revision = comments.Thread?.Revision ?? 0
+                    Resultcode = comments.ThreadInfo?.Resultcode ?? 0,
+                    Thread = comments.ThreadInfo?.ThreadThread ?? string.Empty,
+                    ServerTime = comments.ThreadInfo?.ServerTime ?? 0,
+                    LastRes = comments.ThreadInfo?.LastRes ?? 0,
+                    Ticket = comments.ThreadInfo?.Ticket,
+                    Revision = comments.ThreadInfo?.Revision ?? 0
                 },
             };
         }

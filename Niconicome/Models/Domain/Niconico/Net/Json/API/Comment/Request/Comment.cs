@@ -34,11 +34,14 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request
         [JsonPropertyName("language")]
         public int Language { get; set; }
 
+        [JsonPropertyName("when")]
+        public long? When { get; set; }
+
         [JsonPropertyName("user_id")]
         public string UserId { get; set; } = string.Empty;
 
-        [JsonPropertyName("userkey")]
-        public string? UserKey { get; set; }
+        [JsonPropertyName("force_184")]
+        public string? Force184 { get; set; }
 
         [JsonPropertyName("with_global")]
         public int WithGlobal { get; set; }
@@ -49,17 +52,17 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request
         [JsonPropertyName("nicoru")]
         public int Nicoru { get; set; }
 
-        [JsonPropertyName("force_184")]
-        public string? Force184 { get; set; }
-
-        [JsonPropertyName("threadkey")]
-        public string? Threadkey { get; set; } 
-
         [JsonPropertyName("res_from")]
         public int? ResFrom { get; set; }
 
-        [JsonPropertyName("when")]
-        public long? When { get; set; }
+        [JsonPropertyName("userkey")]
+        public string? UserKey { get; set; }
+
+        [JsonPropertyName("threadkey")]
+        public string? Threadkey { get; set; }
+
+        [JsonPropertyName("waybackkey")]
+        public string? Waybackkey { get; set; }
     }
 
     public class ThreadLeaves
@@ -72,6 +75,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request
 
         [JsonPropertyName("language")]
         public int Language { get; set; }
+
+        [JsonPropertyName("when")]
+        public long? When { get; set; }
 
         [JsonPropertyName("user_id")]
         public string UserId { get; set; } = string.Empty;
@@ -94,11 +100,10 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request
         [JsonPropertyName("userkey")]
         public string? UserKey { get; set; }
 
-        [JsonPropertyName("when")]
-        public long? When { get; set; }
+        [JsonPropertyName("waybackkey")]
+        public string? Waybackkey { get; set; }
 
     }
-
 
 
 

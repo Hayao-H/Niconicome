@@ -71,6 +71,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             try
             {
                 result = await this.client.DownloadCommentAsync(session.Video!.DmcInfo, settings, this.messenger,context, token);
+            } catch (TaskCanceledException)
+            {
+                this.messenger.RemoveHandler(onMessage);
+                return new DownloadResult()
+                {
+                    Message = $"キャンセルされました。"
+                };
             }
             catch (Exception e)
             {
