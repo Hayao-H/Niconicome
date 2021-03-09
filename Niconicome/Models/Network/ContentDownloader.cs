@@ -43,12 +43,13 @@ namespace Niconicome.Models.Network
         uint VerticalResolution { get; }
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
-        Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat,int commentOffset);
+        Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset);
     }
 
     public interface IDownloadResult
     {
         bool IsSucceeded { get; }
+        bool IsCanceled { get; }
         string? Message { get; }
         string? VideoFileName { get; }
         uint VideoVerticalResolution { get; }
@@ -162,7 +163,7 @@ namespace Niconicome.Models.Network
             if (cOffset < 0) cOffset = Cdl::CommentCollection.NumberToThrough;
 
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-            var cSettings = settings.ConvertToCommentDownloadSetting(fileNameFormat,cOffset);
+            var cSettings = settings.ConvertToCommentDownloadSetting(fileNameFormat, cOffset);
             var commentDownloader = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
             Download::IDownloadResult result;
             try
@@ -263,6 +264,9 @@ namespace Niconicome.Models.Network
                 if (!info?.ThumbExist ?? true)
                 {
                     var tResult = await this.TryDownloadThumbAsync(setting, session);
+
+                    if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
                     if (!tResult.IsSucceeded)
                     {
                         result.IsSucceeded = false;
@@ -290,6 +294,9 @@ namespace Niconicome.Models.Network
                 {
 
                     var cResult = await this.TryDownloadCommentAsync(setting, session, OnMessage, context, token);
+
+                    if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
                     if (!cResult.IsSucceeded)
                     {
                         result.IsSucceeded = false;
@@ -320,7 +327,7 @@ namespace Niconicome.Models.Network
         private IDownloadResult CancelledDownloadAndGetResult()
         {
 
-            return new DownloadResult() { Message = "キャンセルされました。" };
+            return new DownloadResult() { Message = "キャンセルされました。", IsCanceled = true };
         }
 
         /// <summary>
@@ -350,7 +357,13 @@ namespace Niconicome.Models.Network
 
                     var downloadResult = await this.TryDownloadContentAsync(setting with { NiconicoId = video.NiconicoId, Video = !skippedFlag && setting.Video }, msg => video.Message = msg, token);
 
-                    if (!downloadResult.IsSucceeded)
+                    if (downloadResult.IsCanceled)
+                    {
+                        result.FailedCount++;
+                        this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードがキャンセルされました。");
+                        video.Message = "ダウンロードをキャンセル";
+                    }
+                    else if (!downloadResult.IsSucceeded)
                     {
                         result.FailedCount++;
                         this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードに失敗しました。");
@@ -367,9 +380,9 @@ namespace Niconicome.Models.Network
                             video.FileName = downloadResult.VideoFileName;
                             this.videoHandler.Update(video);
                         }
+                        result.SucceededCount++;
                     }
 
-                    result.SucceededCount++;
                     if (result.FirstVideo is null)
                     {
                         result.FirstVideo = video;
@@ -408,6 +421,8 @@ namespace Niconicome.Models.Network
     class DownloadResult : IDownloadResult
     {
         public bool IsSucceeded { get; set; }
+        public bool IsCanceled { get; set; }
+
         public string? Message { get; set; }
         public string? VideoFileName { get; set; }
 
@@ -468,7 +483,7 @@ namespace Niconicome.Models.Network
             };
         }
 
-        public Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat,int commentOffset)
+        public Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset)
         {
             return new Cdl::CommentDownloadSettings()
             {
