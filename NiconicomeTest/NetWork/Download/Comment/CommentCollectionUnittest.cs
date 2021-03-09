@@ -15,13 +15,14 @@ namespace NiconicomeTest.NetWork.Download.Comment
         [SetUp]
         public void SetUp()
         {
-            this.collection = CommentCollection.GetInstance();
+            this.collection = CommentCollection.GetInstance(0, 12345, 0);
             var com1 = new Response::Comment()
             {
                 Chat = new Response::Chat()
                 {
                     Content = "One",
                     No = 1,
+                    Thread = "12345",
                 }
             };
             var com2 = new Response::Comment()
@@ -30,6 +31,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
                 {
                     Content = "One",
                     No = 2,
+                    Thread = "12345",
                 }
             };
             var com3 = new Response::Comment()
@@ -38,6 +40,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
                 {
                     Content = "Two",
                     No = 3,
+                    Thread = "12345",
                 }
             };
             var com4 = new Response::Comment()
@@ -46,6 +49,17 @@ namespace NiconicomeTest.NetWork.Download.Comment
                 {
                     Content = "Three",
                     No = 4,
+                    Thread = "12345",
+                }
+            };
+
+            var com5 = new Response::Comment()
+            {
+                Chat = new Response::Chat()
+                {
+                    Content = "Four",
+                    No = 5,
+                    Thread = "12346",
                 }
             };
             var thread = new Response::Comment()
@@ -56,13 +70,13 @@ namespace NiconicomeTest.NetWork.Download.Comment
                     LastRes = (int)new DateTimeOffset(DateTime.Now.Ticks, new TimeSpan(9, 0, 0)).ToUnixTimeSeconds()
                 }
             };
-            this.collection.Add(new List<Response::Comment>() { com1, com2, com3, com4, thread });
+            this.collection.Add(new List<Response::Comment>() { com1, com2, com3, com4, com5, thread });
         }
 
         [Test]
         public void 要素数を調べる()
         {
-            Assert.That(this.collection!.Count, Is.EqualTo(4));
+            Assert.That(this.collection!.Count, Is.EqualTo(5));
         }
 
         [Test]
@@ -75,7 +89,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
         [Test]
         public void スレッド情報を取得する()
         {
-            Assert.That(this.collection!.Thread?.ThreadThread, Is.EqualTo("12345"));
+            Assert.That(this.collection!.ThreadInfo?.ThreadThread, Is.EqualTo("12345"));
         }
 
         [Test]
@@ -96,7 +110,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
         public void 全てのコメントを取得する()
         {
             var comments = this.collection!.GetAllComments();
-            Assert.That(comments.Count(), Is.EqualTo(4));
+            Assert.That(comments.Count(), Is.EqualTo(5));
         }
     }
 }

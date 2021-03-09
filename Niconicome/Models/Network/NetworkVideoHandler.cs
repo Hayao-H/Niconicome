@@ -30,6 +30,7 @@ namespace Niconicome.Models.Network
     {
         bool IsFailed { get; set; }
         bool IsSucceededAll { get; set; }
+        bool IsCanceled { get; set; }
         int SucceededCount { get; set; }
         int FailedCount { get; set; }
         IVideoListInfo? FirstVideo { get; set; }
@@ -305,6 +306,12 @@ namespace Niconicome.Models.Network
         /// 全ての処理に成功
         /// </summary>
         public bool IsSucceededAll { get; set; }
+
+        /// <summary>
+        /// キャンセルフラグ
+        /// </summary>
+        public bool IsCanceled { get; set; }
+
 
         /// <summary>
         /// 成功したコンテンツの数
