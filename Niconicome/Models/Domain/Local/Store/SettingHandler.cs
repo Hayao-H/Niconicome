@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions;
 using Niconicome.Models.Network;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Domain.Local.Store
@@ -14,6 +15,7 @@ namespace Niconicome.Models.Domain.Local.Store
     {
         boolSetting,
         stringSetting,
+        intSetting,
     }
 
     public interface ISettingData<T>
@@ -26,12 +28,14 @@ namespace Niconicome.Models.Domain.Local.Store
     {
         ISettingData<bool> GetBoolSetting(string settingName);
         ISettingData<string> GetStringSetting(string settingName);
+        ISettingData<int> GetIntSetting(string settingName);
         bool Exists(string settingName, SettingType settingType);
         void SaveBoolSetting(string settingName, bool data);
         void SaveStringSetting(string settingName, string data);
+        void SaveIntSetting(string settingName, int data);
     }
 
-   public class SettingHandler : ISettingHandler
+    public class SettingHandler : ISettingHandler
     {
         public SettingHandler(IDataBase database)
         {
@@ -53,7 +57,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 throw new InvalidOperationException($"設定名{settingName}はテーブル{tableName}に存在しません。");
             }
 
-            return new SettingData<bool>(this.database.GetRecord<STypes::AppSettingBool>(tableName, s => s.SettingName == settingName).Value, settingName);
+            return new SettingData<bool>(this.database.GetRecord<STypes::AppSettingBool>(tableName, s => s.SettingName == settingName)!.Value, settingName);
         }
 
         /// <summary>
@@ -69,8 +73,25 @@ namespace Niconicome.Models.Domain.Local.Store
                 throw new InvalidOperationException($"設定名{settingName}はテーブル{tableName}に存在しません。");
             }
 
-            return new SettingData<string>(this.database.GetRecord<STypes::AppSettingString>(tableName, s => s.SettingName == settingName).Value ?? string.Empty, settingName);
+            return new SettingData<string>(this.database.GetRecord<STypes::AppSettingString>(tableName, s => s.SettingName == settingName)!.Value ?? string.Empty, settingName);
         }
+
+        /// <summary>
+        /// 整数値設定を取得
+        /// </summary>
+        /// <param name="settingName"></param>
+        /// <returns></returns>
+        public ISettingData<int> GetIntSetting(string settingName)
+        {
+            string tableName = this.GetTableName(SettingType.intSetting);
+            if (!this.Exists(settingName, SettingType.intSetting))
+            {
+                throw new InvalidOperationException($"設定名{settingName}はテーブル{tableName}に存在しません。");
+            }
+
+            return new SettingData<int>(this.database.GetRecord<STypes::AppSettingInt>(tableName, s => s.SettingName == settingName)!.Value, settingName);
+        }
+
 
         /// <summary>
         /// 設定の存在を確かめる
@@ -103,7 +124,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.Exists(settingName, SettingType.boolSetting))
             {
                 var setting = this.database.GetRecord<STypes::AppSettingBool>(tableName, s => s.SettingName == settingName);
-                data.Id = setting.Id;
+                data.Id = setting!.Id;
                 this.database.Update(data, tableName);
             }
             else
@@ -125,7 +146,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.Exists(settingName, SettingType.stringSetting))
             {
                 var setting = this.database.GetRecord<STypes::AppSettingString>(tableName, s => s.SettingName == settingName);
-                data.Id = setting.Id;
+                data.Id = setting!.Id;
                 this.database.Update(data, tableName);
             }
             else
@@ -133,6 +154,29 @@ namespace Niconicome.Models.Domain.Local.Store
                 this.database.Store(data, tableName);
             }
         }
+
+        /// <summary>
+        /// 整数値の設定を保存する
+        /// </summary>
+        /// <param name="settingName"></param>
+        /// <param name="data"></param>
+        public void SaveIntSetting(string settingName, int value)
+        {
+            string tableName = this.GetTableName(SettingType.intSetting);
+            var data = new STypes::AppSettingInt() { Value = value, SettingName = settingName };
+
+            if (this.Exists(settingName, SettingType.intSetting))
+            {
+                var setting = this.database.GetRecord<STypes::AppSettingInt>(tableName, s => s.SettingName == settingName);
+                data.Id = setting!.Id;
+                this.database.Update(data, tableName);
+            }
+            else
+            {
+                this.database.Store(data, tableName);
+            }
+        }
+
 
         /// <summary>
         /// テーブル名を取得する
@@ -145,6 +189,7 @@ namespace Niconicome.Models.Domain.Local.Store
             {
                 SettingType.boolSetting => STypes::AppSettingBool.TableName,
                 SettingType.stringSetting => STypes::AppSettingString.TableName,
+                SettingType.intSetting => STypes::AppSettingInt.TableName,
                 _ => STypes::AppSettingString.TableName,
             };
         }

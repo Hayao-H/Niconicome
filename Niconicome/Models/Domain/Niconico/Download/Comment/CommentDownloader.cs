@@ -50,30 +50,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         {
             this.messenger.AddHandler(onMessage);
 
-            if (session.IsSessionExipired)
+           if (session.Video is null)
             {
-                this.messenger.RemoveHandler(onMessage);
-                return new DownloadResult()
-                {
-                    Message = $"セッションが失効しています。({context.GetLogContent()})"
-                };
-            }
-
-            if (!session.IsSessionEnsured)
-            {
-                try
-                {
-                    await session.EnsureSessionAsync(settings.NiconicoId,false);
-                }
-                catch (Exception e)
-                {
-                    this.messenger.RemoveHandler(onMessage);
-                    this.logger.Error("セッションの確立に失敗しました。", e);
-                    return new DownloadResult()
-                    {
-                        Message = $"セッションの確立に失敗しました。(詳細:{e.Message})"
-                    };
-                }
+                throw new InvalidOperationException("動画情報が未取得です。");
             }
 
             string fileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml");
@@ -92,6 +71,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             try
             {
                 result = await this.client.DownloadCommentAsync(session.Video!.DmcInfo, settings, this.messenger,context, token);
+            } catch (TaskCanceledException)
+            {
+                this.messenger.RemoveHandler(onMessage);
+                return new DownloadResult()
+                {
+                    Message = $"キャンセルされました。"
+                };
             }
             catch (Exception e)
             {

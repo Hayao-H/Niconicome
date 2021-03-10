@@ -50,29 +50,26 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 
             if (session.Video is null)
             {
-                await session.EnsureSessionAsync(settings.NiconicoId,false);
-
-                if (!session.IsSessionEnsured)
-                {
-                    string message = this.session.State switch
-                    {
-                        WatchSessionState.HttpRequestFailure => "視聴ページの取得に失敗しました。",
-                        WatchSessionState.PageAnalyzingFailure => "視聴ページの解析に失敗しました。",
-                        WatchSessionState.SessionEnsuringFailure => "セッションの確立に失敗しました。",
-                        _ => "不明なエラーにより、セッションの確立に失敗しました。"
-                    };
-
-                    return new DownloadResult() { Issucceeded = false, Message = message };
-                }
+                throw new InvalidOperationException("動画情報が未取得です。");
             }
 
 
             var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".jpg");
             string fileName = generatedFIlename.IsNullOrEmpty() ? $"[{session.Video!.Id}]{session.Video!.Title}.jpg" : generatedFIlename;
 
-            string? thumbUrl = session.Video!.DmcInfo.ThumbInfo.Large;
 
-            if (thumbUrl.IsNullOrEmpty()) return new DownloadResult() { Issucceeded = false, Message = "サムネイルのURLを取得できませんでした。" };
+            string? thumbUrl;
+            if (!(session.Video!.DmcInfo.ThumbInfo.Large?.IsNullOrEmpty() ?? true))
+            {
+                thumbUrl = session.Video!.DmcInfo.ThumbInfo.Large;
+            } else if (!(session.Video!.DmcInfo.ThumbInfo.Normal?.IsNullOrEmpty() ?? true))
+            {
+                thumbUrl = session.Video!.DmcInfo.ThumbInfo.Normal;
+            } else
+            {
+                return new DownloadResult() { Issucceeded = false, Message = "サムネイルのURLを取得できませんでした。" };
+            }
+
 
             byte[] data;
             try
@@ -154,7 +151,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         private string GetFilePath(string filePath, string foldername, bool overwrite)
         {
             foldername = this.GetFolderName(foldername);
-            filePath = Regex.Replace(filePath, @"[\(\),/\\]", "");
             filePath = Path.Combine(foldername, filePath);
             if (!overwrite)
             {

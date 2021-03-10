@@ -45,7 +45,7 @@ namespace Niconicome.Models.Domain.Utils
                          .Replace("\"", "")
                          + suffix
                          + extension;
-            filename = Regex.Replace(filename, @"[\\/\(\):\*\?\<\>\|]", "");
+            filename = Regex.Replace(filename, @"[\\/:\*\?\<\>\|""]", "");
             return filename;
         }
 

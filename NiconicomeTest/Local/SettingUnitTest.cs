@@ -38,5 +38,14 @@ namespace NiconicomeTest.Local
             Assert.IsTrue(this.handler!.Exists("test", SettingType.stringSetting));
             Assert.AreEqual("hoge",this.handler!.GetStringSetting("test").Data);
         }
+
+        [Test]
+        public void 整数値設定を保存する()
+        {
+            this.handler!.SaveIntSetting("test", 123);
+
+            Assert.IsTrue(this.handler!.Exists("test", SettingType.intSetting));
+            Assert.AreEqual(123, this.handler!.GetIntSetting("test").Data);
+        }
     }
 }

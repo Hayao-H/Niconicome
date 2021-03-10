@@ -21,7 +21,7 @@ namespace Niconicome.ViewModels.Setting
         /// <param name="data"></param>
         /// <param name="settingname"></param>
         /// <param name="propertyname"></param>
-        protected void Savesetting<T>(ref T fiels, T data, Settings setting, [CallerMemberName] string propertyname = null)
+        protected void Savesetting<T>(ref T fiels, T data, Settings setting, [CallerMemberName] string? propertyname = null)
         {
             if (data is bool boolData)
             {
@@ -30,6 +30,9 @@ namespace Niconicome.ViewModels.Setting
             else if (data is string stringData)
             {
                 WS::SettingPage.SettingHandler.SaveSetting(stringData, setting);
+            } else if (data is int intData)
+            {
+                WS::SettingPage.SettingHandler.SaveSetting(intData, setting);
             }
             else
             {

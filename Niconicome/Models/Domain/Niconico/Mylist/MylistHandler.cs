@@ -15,7 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
 {
     public interface IMylistHandler
     {
-        Task<List<ITreeVideoInfo>> GetVideosAsync(string playlistId);
+        Task<List<IVideoListInfo>> GetVideosAsync(string playlistId);
         Exception? CurrentException { get; }
     }
 
@@ -42,7 +42,7 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// </summary>
         /// <param name="mylistId"></param>
         /// <returns></returns>
-        public virtual async Task<List<ITreeVideoInfo>> GetVideosAsync(string mylistId)
+        public virtual async Task<List<IVideoListInfo>> GetVideosAsync(string mylistId)
         {
             var rawdata = await this.GetAllMylistVideos(mylistId);
             var converted = this.ConvertToTreeVideoInfo(rawdata);
@@ -121,11 +121,11 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        protected List<ITreeVideoInfo> ConvertToTreeVideoInfo(IEnumerable<Mylist::Video> source)
+        protected List<IVideoListInfo> ConvertToTreeVideoInfo(IEnumerable<Mylist::Video> source)
         {
-            var converted = new List<ITreeVideoInfo>();
+            var converted = new List<IVideoListInfo>();
 
-            converted.AddRange(source.Select(video => new BindableTreeVideoInfo()
+            converted.AddRange(source.Select(video => new BindableVIdeoListInfo()
             {
                 Title = video.Title,
                 UploadedOn = video.RegisteredAt,

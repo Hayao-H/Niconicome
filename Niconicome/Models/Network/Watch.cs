@@ -8,6 +8,7 @@ using Niconicome.Models.Playlist;
 using Niconicome.Models.Local;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Extensions.System;
 
 namespace Niconicome.Models.Network
 {
@@ -21,7 +22,7 @@ namespace Niconicome.Models.Network
         DateTime UploadedOn { get; set; }
         Uri LargeThumbUri { get; set; }
         Uri ThumbUri { get; set; }
-        ITreeVideoInfo ConvertToTreeVideoInfo();
+        IVideoListInfo ConvertToTreeVideoInfo();
     }
 
     public interface IWatch
@@ -136,12 +137,12 @@ namespace Niconicome.Models.Network
             //サムネイル
             if (retrieved.DmcInfo is not null && retrieved.DmcInfo.ThumbInfo is not null)
             {
-                if (retrieved.DmcInfo.ThumbInfo.Large is not null)
+                if (!retrieved.DmcInfo.ThumbInfo.Large.IsNullOrEmpty())
                 {
                     info.LargeThumbUri = new Uri(retrieved.DmcInfo.ThumbInfo.Large);
                 }
 
-                if (retrieved.DmcInfo.ThumbInfo.Normal is not null)
+                if (!retrieved.DmcInfo.ThumbInfo.Normal.IsNullOrEmpty())
                 {
                     info.ThumbUri = new Uri(retrieved.DmcInfo.ThumbInfo.Normal);
                 }
@@ -183,9 +184,9 @@ namespace Niconicome.Models.Network
         /// Viewから参照可能な形式に変換する
         /// </summary>
         /// <returns></returns>
-        public ITreeVideoInfo ConvertToTreeVideoInfo()
+        public IVideoListInfo ConvertToTreeVideoInfo()
         {
-            return new BindableTreeVideoInfo()
+            return new BindableVIdeoListInfo()
             {
                 Title = this.Title,
                 NiconicoId = this.Id,

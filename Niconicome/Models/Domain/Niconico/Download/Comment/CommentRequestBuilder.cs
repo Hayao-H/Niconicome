@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web;
 using Niconicome.Models.Domain.Niconico.Net.Json;
@@ -14,6 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
     public interface IOfficialVideoUtils
     {
         Task<ICommentAuthInfo> GetAuthInfoAsync(string threadId);
+        Task<string> GetWaybackkeyAsync(string threadId);
     }
 
     public interface ICommentAuthInfo
@@ -72,6 +74,31 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             return new CommentAuthInfo(threadkey, force184);
         }
+
+        /// <summary>
+        /// Waybackkeyを取得する
+        /// </summary>
+        /// <param name="threadId"></param>
+        /// <returns></returns>
+        public async Task<string> GetWaybackkeyAsync(string threadId)
+        {
+            string data;
+            try
+            {
+                data = await this.http.GetStringAsync(new Uri($"https://flapi.nicovideo.jp/api/getwaybackkey?thread={threadId}"));
+            }
+            catch (Exception e)
+            {
+                throw new HttpRequestException($"waybackkeyの取得に失敗しました。(詳細:{e.Message})");
+            }
+
+            var deserialized = HttpUtility.ParseQueryString(data);
+            var waybackkey = deserialized["waybackkey"];
+
+            if (waybackkey is null) throw new HttpRequestException($"waybcakkeyの形式が不正です。(data:{data})");
+
+            return waybackkey;
+        }
     }
 
     /// <summary>
@@ -106,6 +133,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private ICommentAuthInfo? authInfo;
 
+        private int commandIndex = 0;
+
+        private int requestIndex = 0;
+
         /// <summary>
         /// リクエストメッセージを取得する
         /// </summary>
@@ -129,9 +160,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         private async Task<List<Request::Comment>> GetRequestDataInternalAsync(IDmcInfo dmcInfo, ICommentOptions options)
         {
             var data = new List<Request::Comment>();
-            int index = 0;
+            var initialIndex = this.commandIndex;
 
-            data.Add(this.GetPingContent(PingType.StartRequest, 0));
+            data.Add(this.GetPingContent(PingType.StartRequest, this.requestIndex));
             foreach (var thread in dmcInfo.CommentThreads)
             {
                 //非activeスレッドはスキップ
@@ -140,27 +171,34 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 //easyコメントをスキップ
                 if (options.NoEasyComment && thread.Label == "easy") continue;
 
+                //過去ログの場合コミュニティーコメントはスキップ
+                //if (options.When != default && thread.Label == "community") continue;
+
                 //投コメ
                 if (!options.OwnerComment && thread.IsOwnerThread) continue;
 
-                data.Add(this.GetPingContent(PingType.StartContent, index));
-                var itemThread = new Request::Comment() { Thread = await this.GetThreadAsync(thread, dmcInfo,options) };
+                data.Add(this.GetPingContent(PingType.StartContent, this.commandIndex));
+                var itemThread = new Request::Comment() { Thread = await this.GetThreadAsync(thread, dmcInfo, options) };
                 data.Add(itemThread);
-                data.Add(this.GetPingContent(PingType.EndContent, index));
-                ++index;
+                data.Add(this.GetPingContent(PingType.EndContent, this.commandIndex));
+                ++this.commandIndex;
 
                 //leaf
                 if (thread.IsLeafRequired)
                 {
-                    data.Add(this.GetPingContent(PingType.StartContent, index));
-                    var itemLeaf = new Request::Comment() { ThreadLeaves = await this.GetThreadLeavesAsync(thread, dmcInfo,options) };
+                    data.Add(this.GetPingContent(PingType.StartContent, this.commandIndex));
+                    var itemLeaf = new Request::Comment() { ThreadLeaves = await this.GetThreadLeavesAsync(thread, dmcInfo, options, thread.Label == "easy") };
                     data.Add(itemLeaf);
-                    data.Add(this.GetPingContent(PingType.EndContent, index));
-                    ++index;
+                    data.Add(this.GetPingContent(PingType.EndContent, this.commandIndex));
+                    ++this.commandIndex;
+                    //leave_second_flag = true;
                 }
 
             }
-            data.Add(this.GetPingContent(PingType.EndRequest, 0));
+            data.Add(this.GetPingContent(PingType.EndRequest, this.requestIndex));
+            ++this.requestIndex;
+
+            this.commandIndex = initialIndex + data.Count;
 
             return data;
 
@@ -173,7 +211,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<Request::Thread> GetThreadAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo,ICommentOptions options)
+        private async Task<Request::Thread> GetThreadAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo, ICommentOptions options)
         {
             var data = new Request::Thread
             {
@@ -197,28 +235,38 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 data.ResFrom = null;
             }
 
+
+
+            if (options.When != default)
+            {
+                data.When = options.When;
+
+                data.Waybackkey = await this.officialVideoUtils.GetWaybackkeyAsync(data.Thread_);
+            }
+            else
+            {
+                data.When = null;
+            }
+
             if (thread.IsThreadkeyRequired)
             {
                 if (this.authInfo is null)
                 {
                     this.authInfo = await this.officialVideoUtils.GetAuthInfoAsync(data.Thread_);
                 }
-                data.Threadkey = this.authInfo.ThreadKey;
                 data.Force184 = this.authInfo.Force184;
+                data.Threadkey = this.authInfo.ThreadKey;
             }
-            else
+            else if (options.When == default)
             {
                 data.UserKey = dmcInfo.Userkey;
             }
 
-            if (options.When != default)
-            {
-                data.When = options.When;
-            }
-            else
-            {
-                data.When = null;
-            }
+            ///if (options.When != default)
+            ///{
+            ///    data.Waybackkey = await this.officialVideoUtils.GetWaybackkeyAsync(data.Thread_);
+            ///}
+
 
             return data;
         }
@@ -230,18 +278,22 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<Request::ThreadLeaves> GetThreadLeavesAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo, ICommentOptions options)
+        private async Task<Request::ThreadLeaves> GetThreadLeavesAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo, ICommentOptions options, bool isEasy)
         {
-            double min = Math.Ceiling((double)(dmcInfo.Duration / 60));
+            double divided = dmcInfo.Duration / 60d;
+            double min = Math.Ceiling(divided);
+            string humOrQuarter = isEasy ? "25" : options.When == default ? "100,1000" : "0,1000";
+            string nicoru = isEasy || options.When == default ? ",nicoru:100" : "";
 
             var data = new ThreadLeaves
             {
                 Thread = thread.Id.ToString(),
                 Language = 0,
                 UserId = dmcInfo.UserId,
-                Content = $"0-{min}:100,500,nicoru:100",
+                Content = $"0-{min}:{humOrQuarter}{nicoru}",
                 Scores = 1,
-                Nicoru = 3
+                Nicoru = 3,
+                Fork = thread.Fork
             };
 
             if (thread.IsThreadkeyRequired)
@@ -253,7 +305,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 data.Threadkey = this.authInfo.ThreadKey;
                 data.Force184 = this.authInfo.Force184;
             }
-            else
+            else if (options.When == default)
             {
                 data.UserKey = dmcInfo.Userkey;
             }
@@ -261,7 +313,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (options.When != default)
             {
                 data.When = options.When;
-            } else
+
+                //data.Waybackkey = await this.officialVideoUtils.GetWaybackkeyAsync(data.Thread);
+
+            }
+            else
             {
                 data.When = null;
             }

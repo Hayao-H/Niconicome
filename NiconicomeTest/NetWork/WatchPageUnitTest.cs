@@ -11,6 +11,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Playlist;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using System.Net.Http;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
 
 namespace NiconicomeTest.NetWork
 {
@@ -26,7 +27,7 @@ namespace NiconicomeTest.NetWork
         {
             var content = new StringContent(Properties.Resources.sm9_page);
             var http = new NicoHttpStab(content, content);
-            this.info = new WatchInfohandler(http, new WatchPageHtmlPaserStab(this.title));
+            this.info = new WatchInfohandler(http, new WatchPageHtmlPaserStab(this.title),new LoggerStab());
         }
 
         [Test]

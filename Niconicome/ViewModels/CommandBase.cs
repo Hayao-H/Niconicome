@@ -27,7 +27,7 @@ namespace Niconicome.ViewModels
         }
         public void Execute(object? param)
         {
-            this.execute((T)param);
+            this.execute((T?)param);
         }
 
         public void RaiseCanExecutechanged()

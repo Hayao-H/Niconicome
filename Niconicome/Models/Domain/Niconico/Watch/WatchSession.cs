@@ -14,12 +14,13 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 {
     public interface IWatchSession : IDisposable
     {
-        Task EnsureSessionAsync(string id,bool isVideoDownload);
+        Task EnsureSessionAsync(string id, bool isVideoDownload);
+        Task GetVideoDataAsync(string id, bool isVideoDownload);
         bool IsSessionEnsured { get; }
         bool IsSessionExipired { get; }
         string PlaylistUrl { get; }
         WatchSessionState State { get; }
-        public IDomainVideoInfo? Video { get;  }
+        public IDomainVideoInfo? Video { get; }
 
         Task<Dmc::IStreamsCollection> GetAvailableStreamsAsync();
     }
@@ -48,6 +49,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         PaymentNeeded,
         SessionEnsuringFailure,
         UnknownError,
+        GotPage,
         OK
     }
 
@@ -106,7 +108,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// セッション確立済みフラグ
         /// </summary>
         public bool IsSessionEnsured { get; private set; }
-        
+
         /// <summary>
         /// セッション失効フラグ
         /// </summary>
@@ -130,19 +132,17 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public WatchSessionState State { get; private set; } = WatchSessionState.NotInitialized;
 
         /// <summary>
-        /// 視聴セッションを確立する
+        /// 動画情報を取得する
         /// </summary>
-        /// <param name="nicoId"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public async Task EnsureSessionAsync(string nicoId, bool isVideoDownload)
+        public async Task GetVideoDataAsync(string id, bool isVideoDownload)
         {
-            this.CheckSessionExpired();
-
             var options = isVideoDownload ? WatchInfoOptions.Default : WatchInfoOptions.NoDmcData;
 
             try
             {
-                this.Video = await this.watchInfo.GetVideoInfoAsync(nicoId,options);
+                this.Video = await this.watchInfo.GetVideoInfoAsync(id, options);
             }
             catch
             {
@@ -155,14 +155,30 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 return;
             }
 
-            if (!isVideoDownload)
-            {
-                this.State = WatchSessionState.OK;
-                this.IsSessionEnsured = true;
-                this.logger.Log($"{nicoId}の取得に成功しましたが、セッションの確立は行いませんでした。");
-                return;
-            }
+            this.State = WatchSessionState.GotPage;
+        }
 
+        /// <summary>
+        /// 視聴セッションを確立する
+        /// </summary>
+        /// <param name="nicoId"></param>
+        /// <returns></returns>
+        public async Task EnsureSessionAsync(string nicoId, bool isVideoDownload)
+        {
+            this.CheckSessionExpired();
+
+            if (this.Video is null && this.State == WatchSessionState.NotInitialized)
+            {
+                await this.GetVideoDataAsync(nicoId, isVideoDownload);
+
+                if (!isVideoDownload)
+                {
+                    this.State = WatchSessionState.OK;
+                    this.IsSessionEnsured = true;
+                    this.logger.Log($"{nicoId}の取得に成功しましたが、セッションの確立は行いませんでした。");
+                    return;
+                }
+            }
 
             if (this.Video is null)
             {
@@ -176,7 +192,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 if (this.Video.DmcInfo?.IsEncrypted ?? false)
                 {
                     this.State = WatchSessionState.EncryptedVideo;
-                } else
+                }
+                else
                 {
                     this.State = WatchSessionState.PaymentNeeded;
                 }
@@ -225,7 +242,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             {
                 foreach (var childStream in stream.PlaylistUrls)
                 {
-                    await this.GetAvailableStreamsAsync(childStream.AbsoluteUri, streams,childStream.Resolution);
+                    await this.GetAvailableStreamsAsync(childStream.AbsoluteUri, streams, childStream.Resolution);
                 }
             }
             else
@@ -237,7 +254,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 streams.Add(stream);
             }
         }
-      
+
         /// <summary>
         /// 取得可能なストリームの一覧を返す
         /// </summary>
@@ -298,7 +315,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                         this.logger.Error($"ハートビートの送信に失敗しました。(status: {(int)res.StatusCode}, reason_phrase: {res.ReasonPhrase})");
                         this.IsSessionEnsured = false;
                         return;
-                    } else
+                    }
+                    else
                     {
                         this.logger.Log($"ハートビートを送信しました。(url: {url})");
                     }
@@ -377,7 +395,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             data.Session.Protocol.Name = "http";
             data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Use_ssl = "yes";
             data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Use_well_known_port = "yes";
-            data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Transfer_preset = string.Empty;
+            data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Transfer_preset = "standard2";
             data.Session.Protocol.Parameters.Http_parameters.Parameters.Hls_parameters.Segment_duration = 6000;
             data.Session.Session_operation_auth.Session_operation_auth_by_signature.Signature = sessionIfnfo.Signature;
             data.Session.Session_operation_auth.Session_operation_auth_by_signature.Token = sessionIfnfo.Token;

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
-using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Utils;
 using DmcRequest = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request;
-using Utils = Niconicome.Models.Domain.Utils;
 using WatchJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage;
 
 namespace Niconicome.Models.Domain.Niconico.Watch
@@ -41,6 +39,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         IEnumerable<string> Tags { get; set; }
         bool IsDownloadsble { get; set; }
         bool IsEncrypted { get; set; }
+        bool IsOfficial { get; set; }
         DateTime UploadedOn { get; set; }
         IThumbInfo ThumbInfo { get; }
         ISessionInfo SessionInfo { get; }
@@ -69,7 +68,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     }
     public interface IWatchPageHtmlParser
     {
-        IDmcInfo GetDmcInfo(string sourceHtml,string niconicoId, WatchInfoOptions options);
+        IDmcInfo GetDmcInfo(string sourceHtml, string niconicoId, WatchInfoOptions options);
         bool HasJsDataElement { get; }
     }
 
@@ -87,10 +86,11 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     /// </summary>
     public class WatchInfohandler : IWatchInfohandler
     {
-        public WatchInfohandler(INicoHttp http, IWatchPageHtmlParser parser)
+        public WatchInfohandler(INicoHttp http, IWatchPageHtmlParser parser, ILogger logger)
         {
             this.http = http;
             this.parser = parser;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -103,6 +103,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         private readonly INicoHttp http;
 
+        private readonly ILogger logger;
+
 
         public WatchInfoHandlerState State { get; private set; } = WatchInfoHandlerState.RequestHasNotCompleted;
 
@@ -113,26 +115,28 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public async Task<IDomainVideoInfo> GetVideoInfoAsync(string id, WatchInfoOptions options)
         {
             string source;
-            var logger = Utils::DIFactory.Provider.GetRequiredService<Utils::ILogger>();
             Uri url = NiconicoContext.Context.GetPageUri(id);
 
-            try
-            {
-                source = await this.http.GetStringAsync(url);
-            }
-            catch (Exception e)
-            {
-                logger.Error($"動画情報の取得に失敗しました(url: {url.AbsoluteUri})", e);
-                this.State = WatchInfoHandlerState.HttpRequestFailure;
-                throw new HttpRequestException();
-            }
+            var res = await this.http.GetAsync(url);
+            source = await res.Content.ReadAsStringAsync();
+
+            //try
+            //{
+            //    source = await this.http.GetStringAsync(url);
+            //}
+            //catch (Exception e)
+            //{
+            //    this.logger.Error($"動画情報の取得に失敗しました(url: {url.AbsoluteUri})", e);
+            //    this.State = WatchInfoHandlerState.HttpRequestFailure;
+            //    throw new HttpRequestException();
+            //}
 
             IDmcInfo info;
 
             try
             {
                 //htmlをパース
-                info = this.parser.GetDmcInfo(source,id,options);
+                info = this.parser.GetDmcInfo(source, id, options);
             }
             catch (Exception e)
             {
@@ -144,7 +148,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 {
                     this.State = WatchInfoHandlerState.JsonParsingFailure;
                 }
-                logger.Error($"視聴ページの解析に失敗しました。(id:{id})", e);
+                this.logger.Error($"視聴ページの解析に失敗しました。(id:{id})", e);
                 throw new InvalidOperationException();
 
             }
@@ -167,10 +171,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="sourceHtml"></param>
         /// <returns></returns>
-        public IDmcInfo GetDmcInfo(string sourceHtml,string niconicoId, WatchInfoOptions options)
+        public IDmcInfo GetDmcInfo(string sourceHtml, string niconicoId, WatchInfoOptions options)
         {
             var document = HtmlParser.ParseDocument(sourceHtml);
-            return this.ConvertToDmcData(this.GetApiData(document),niconicoId,options);
+            return this.ConvertToDmcData(this.GetApiData(document), niconicoId, options);
         }
 
         /// <summary>
@@ -206,7 +210,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="original"></param>
         /// <returns></returns>
-        private IDmcInfo ConvertToDmcData(WatchJson::DataApiData original,string niconicoId, WatchInfoOptions options)
+        private IDmcInfo ConvertToDmcData(WatchJson::DataApiData original, string niconicoId, WatchInfoOptions options)
         {
             var info = new DmcInfo
             {
@@ -242,6 +246,9 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             //ユーザー情報
             info.UserId = original?.Video?.DmcInfo?.User?.UserId.ToString() ?? string.Empty;
             info.Userkey = original?.Context?.Userkey ?? string.Empty;
+
+            //公式フラグ
+            info.IsOfficial = original?.Video?.IsOfficial ?? false;
 
             //時間
             info.Duration = original?.Video?.Duration ?? 0;
@@ -289,7 +296,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             if (sessionApiData.Audios is null) throw new InvalidOperationException($"SessionAPIDataのAudiosプロパティーがnullです。");
             if (sessionApiData.Audios.Count == 0) throw new InvalidOperationException($"SessionAPIDataのAudiosにデータが存在しません。");
 
-            var videoSrc = sessionApiData.Videos.Select((value, index) => new { value, index }).ToList();
+            var videoSrc = sessionApiData.Videos.OrderBy(s => s).Select((value, index) => new { value, index }).ToList();
             string audio = sessionApiData.Audios[0];
             var sets = new DmcRequest::Content_Src_Id_Sets();
 
@@ -303,6 +310,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 {
                     idsData.Src_id_to_mux.Video_src_ids.Add(videoSrc[i].value);
                 }
+
+                idsData.Src_id_to_mux.Video_src_ids = idsData.Src_id_to_mux.Video_src_ids.OrderByDescending(s => s).ToList();
 
                 sets.Content_src_ids.Add(idsData);
 
@@ -381,6 +390,11 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// 暗号化フラグ
         /// </summary>
        　public bool IsEncrypted { get; set; }
+
+        /// <summary>
+        /// 公式動画フラグ
+        /// </summary>
+        public bool IsOfficial { get; set; }
 
 
         /// <summary>

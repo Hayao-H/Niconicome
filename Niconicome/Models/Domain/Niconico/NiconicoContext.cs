@@ -69,7 +69,7 @@ namespace Niconicome.Models.Domain.Niconico
             bool exists = this.dataBase.Exists<UrlSetting>(UrlSetting.TableName, setting => setting.SettingName == settingName);
             if (exists)
             {
-                return this.dataBase.GetRecord<UrlSetting>(UrlSetting.TableName, setting => setting.SettingName == settingName).GetUrl();
+                return this.dataBase.GetRecord<UrlSetting>(UrlSetting.TableName, setting => setting.SettingName == settingName)!.GetUrl();
             }
             else
             {
@@ -143,7 +143,7 @@ namespace Niconicome.Models.Domain.Niconico
         /// <param name="value"></param>
         public void AddCookie(string name, string value)
         {
-            Cookie cookie = new Cookie(name, value);
+            var cookie = new Cookie(name, value);
             this.CookieContainer.Add(this.niconicoBaseUri, cookie);
         }
 
@@ -382,15 +382,19 @@ namespace Niconicome.Models.Domain.Niconico
             if (result.IsSuccessStatusCode)
             {
                 var response = await result.Content.ReadAsStringAsync();
-                Response xmlData;
+                Response? xmlData;
 
                 try
                 {
                     xmlData = Xmlparser.Deserialize<Response>(response);
                 }
-                catch (Exception e)
+                catch
                 {
-                    Console.Error.WriteLine(e.Message);
+                    return string.Empty;
+                }
+
+                if (xmlData is null)
+                {
                     return string.Empty;
                 }
 
