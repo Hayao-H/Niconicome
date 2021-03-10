@@ -386,19 +386,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         public void Add(List<Response::Comment> comments, bool addSafe = true)
         {
 
-            if (addSafe && this.comThroughSetting > 0 && comments.Count > this.comThroughSetting)
-            {
-                var filtered = comments.Copy().Where(c => c.Chat is not null).ToList();
-                if (filtered.Count > this.comThroughSetting)
-                {
-                    filtered.RemoveRange(0, this.comThroughSetting);
-                    comments.Clear();
-                    comments.AddRange(filtered);
-                }
-            }
+            ///if (addSafe && this.comThroughSetting > 0 && comments.Count > this.comThroughSetting)
+            ///{
+            ///    var filtered = comments.Copy().Where(c => c.Chat is not null).ToList();
+            ///    if (filtered.Count > this.comThroughSetting)
+            ///    {
+            ///        filtered.RemoveRange(0, this.comThroughSetting);
+            ///        comments.Clear();
+            ///        comments.AddRange(filtered);
+            ///    }
+            ///}
 
             //bool chatStarted = false;
             bool nicoruEnded = false;
+            int skipped = 0;
 
             foreach (var item in comments)
             {
@@ -411,6 +412,15 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                     else if (!nicoruEnded && item.Chat.Nicoru is null)
                     {
                         nicoruEnded = true;
+                    }
+                }
+
+                if (addSafe && this.comThroughSetting > 0 && item.Chat is not null)
+                {
+                    if (skipped < this.comThroughSetting)
+                    {
+                        ++skipped;
+                        continue;
                     }
                 }
 

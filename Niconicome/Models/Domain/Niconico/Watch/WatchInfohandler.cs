@@ -39,6 +39,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         IEnumerable<string> Tags { get; set; }
         bool IsDownloadsble { get; set; }
         bool IsEncrypted { get; set; }
+        bool IsOfficial { get; set; }
         DateTime UploadedOn { get; set; }
         IThumbInfo ThumbInfo { get; }
         ISessionInfo SessionInfo { get; }
@@ -246,6 +247,9 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             info.UserId = original?.Video?.DmcInfo?.User?.UserId.ToString() ?? string.Empty;
             info.Userkey = original?.Context?.Userkey ?? string.Empty;
 
+            //公式フラグ
+            info.IsOfficial = original?.Video?.IsOfficial ?? false;
+
             //時間
             info.Duration = original?.Video?.Duration ?? 0;
 
@@ -386,6 +390,11 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// 暗号化フラグ
         /// </summary>
        　public bool IsEncrypted { get; set; }
+
+        /// <summary>
+        /// 公式動画フラグ
+        /// </summary>
+        public bool IsOfficial { get; set; }
 
 
         /// <summary>

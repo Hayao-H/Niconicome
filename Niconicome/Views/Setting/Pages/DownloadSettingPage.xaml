@@ -19,9 +19,6 @@
         FontFamily="Yu Gothic"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="ダウンロード設定">
-    <Page.DataContext>
-        <vm:DownloadSettingPageViewModel/>
-    </Page.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -31,15 +28,25 @@
             <TextBlock Text="ダウンドード設定" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
         </Border>
         <StackPanel Margin="8" Grid.Row="1">
-            <StackPanel Orientation="Horizontal">
+            <DockPanel>
                 <materialDesign:PackIcon Kind="Comment" Foreground="SkyBlue">
                     <materialDesign:PackIcon.RenderTransform>
                         <TranslateTransform Y="7"/>
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
                 <Label Content="コメントのオフセット"/>
-                <TextBox Margin="10 0" Width="60" Text="{Binding CommentOffsetFIeld,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-            </StackPanel>
+                <TextBox HorizontalAlignment="Right" Margin="10 0" Width="60" Text="{Binding CommentOffsetFIeld,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+             <DockPanel Visibility="Hidden">
+                <materialDesign:PackIcon Kind="AutoFix" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="公式動画でコメントのオフセットを無効にする(推奨)"/>
+                <ToggleButton HorizontalAlignment="Right" Margin="10 0" IsChecked="{Binding IsAutoSwitchOffsetEnable}"/>
+            </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
 

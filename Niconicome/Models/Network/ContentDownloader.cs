@@ -160,7 +160,10 @@ namespace Niconicome.Models.Network
         private async Task<IDownloadResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
             var cOffset = this.settingHandler.GetIntSetting(Settings.CommentOffset);
+            var autoSwicth = this.settingHandler.GetBoolSetting(Settings.SwitchOffset);
+
             if (cOffset < 0) cOffset = Cdl::CommentCollection.NumberToThrough;
+            if (autoSwicth && session.Video!.DmcInfo.IsOfficial) cOffset = 0;
 
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
             var cSettings = settings.ConvertToCommentDownloadSetting(fileNameFormat, cOffset);
