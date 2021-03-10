@@ -140,6 +140,7 @@ namespace Niconicome.Models.Local
                 Settings.DLSkip=> STypes::SettingNames.IsSkipEnable,
                 Settings.DLCopy=> STypes::SettingNames.IsCopyEnable,
                 Settings.DLOverwrite=> STypes::SettingNames.IsOverwriteEnable,
+                Settings.SwitchOffset=>STypes::SettingNames.IsAutoSwitchOffsetEnable,
                 _ => null
             };
         }
@@ -166,5 +167,6 @@ namespace Niconicome.Models.Local
         DLSkip,
         DLCopy,
         DLOverwrite,
+        SwitchOffset,
     }
 }

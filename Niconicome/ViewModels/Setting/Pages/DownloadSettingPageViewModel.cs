@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using WS = Niconicome.Workspaces;
 using Local = Niconicome.Models.Local;
 using System.ComponentModel;
+using Niconicome.Models.Local;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
@@ -21,9 +22,12 @@ namespace Niconicome.ViewModels.Setting.Pages
             {
                 this.commentOffsetField = cOffset;
             }
+            this.isAutoSwitchOffsetEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.SwitchOffset);
         }
 
         private int commentOffsetField;
+
+        private bool isAutoSwitchOffsetEnableField;
 
         /// <summary>
         /// コメントのオフセット
@@ -38,11 +42,18 @@ namespace Niconicome.ViewModels.Setting.Pages
             }
         }
 
+        /// <summary>
+        /// オフセット調節
+        /// </summary>
+        public bool IsAutoSwitchOffsetEnable { get => this.isAutoSwitchOffsetEnableField; set => this.Savesetting(ref this.isAutoSwitchOffsetEnableField, value,Settings.SwitchOffset); }
+
     }
 
     [Obsolete("Desinger", true)]
     class DownloadSettingPageViewModelD
     {
         public int CommentOffsetFIeld { get; set; } = 40;
+
+        public bool IsAutoSwitchOffsetEnable { get; set; } = true;
     }
 }
