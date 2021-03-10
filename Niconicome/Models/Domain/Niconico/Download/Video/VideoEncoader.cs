@@ -110,7 +110,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         private string GetFilePath(string filename, string folderpath, bool overwrite = false)
         {
 
-            filename = Regex.Replace(filename, @"[\\/]", "");
             string mp4Foldername = this.GetFolderPath(folderpath);
             string path = Path.Combine(mp4Foldername, filename);
             if (!overwrite)

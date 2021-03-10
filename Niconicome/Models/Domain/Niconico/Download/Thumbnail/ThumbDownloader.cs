@@ -151,7 +151,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         private string GetFilePath(string filePath, string foldername, bool overwrite)
         {
             foldername = this.GetFolderName(foldername);
-            filePath = Regex.Replace(filePath, @"[\(\),/\\]", "");
             filePath = Path.Combine(foldername, filePath);
             if (!overwrite)
             {
