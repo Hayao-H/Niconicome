@@ -64,7 +64,8 @@
             <TextBlock Padding="20 0">
                 <Hyperlink NavigateUri="https://github.com/Hayao-H/Niconicome"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>プロジェクトページ</Hyperlink><LineBreak/>
                 <Hyperlink NavigateUri="https://join.slack.com/t/niconicome/shared_invite/zt-m6lkfs8x-FOFfXexhB0JlhnUVps0qEA"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Slack</Hyperlink><LineBreak/>
-                <Hyperlink NavigateUri="https://twitter.com/NiconicomeD"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Twitter</Hyperlink>
+                <Hyperlink NavigateUri="https://twitter.com/NiconicomeD"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Twitter</Hyperlink><LineBreak/>
+                <Hyperlink NavigateUri="https://github.com/Hayao-H/Niconicome/wiki"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>wiki</Hyperlink>
             </TextBlock>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <Expander>
