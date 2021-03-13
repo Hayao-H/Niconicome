@@ -11,6 +11,7 @@ using Niconicome.Models.Domain.Utils;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Utils = Niconicome.Models.Domain.Utils;
 using System.Threading.Tasks;
+using Niconicome.ViewModels.Controls;
 
 namespace Niconicome.ViewModels.Login
 {
@@ -87,9 +88,9 @@ namespace Niconicome.ViewModels.Login
 
             if (cookies.Any(cookie => cookie.Name == "user_session" && cookie.Expires > DateTime.Now))
             {
-                var result = MessageBox.Show("有効なセッションが存在します。ログインをスキップしますか？", "セッションの再利用", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = await MaterialMessageBox.Show("有効なセッションが存在します。ログインをスキップしますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
 
-                if (result == MessageBoxResult.Yes)
+                if (result == MaterialMessageBoxResult.Yes)
                 {
                     await this.SetCookiesAndExitAsync(cookies);
                     return;

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
+using Niconicome.ViewModels.Controls;
 
 namespace Niconicome.Models.Local.State
 {
@@ -20,20 +22,20 @@ namespace Niconicome.Models.Local.State
     class ErrorMessenger : IErrorMessanger
     {
 
-        public ErrorMessenger(Func<string, MessageBoxResult> showMessageBoxFunc)
+        public ErrorMessenger(Func<string, Task<MaterialMessageBoxResult>> showMessageBoxFunc)
         {
             this.showMessageBox = showMessageBoxFunc;
             this.Error += this.OnError;
         }
 
-        public ErrorMessenger() : this((message) => MessageBox.Show(message, "エラーが発生しました", MessageBoxButton.OK, MessageBoxImage.Error)) { }
+        public ErrorMessenger() : this((message) => MaterialMessageBox.Show(message, MessageBoxButtons.OK, MessageBoxIcons.Error)) { }
 
         public event EventHandler<IErrorEventArgs> Error;
 
         /// <summary>
         /// メッセージボックス(DI)
         /// </summary>
-        private readonly Func<string, MessageBoxResult> showMessageBox;
+        private readonly Func<string, Task<MaterialMessageBoxResult>> showMessageBox;
 
         /// <summary>
         /// エラーを通知する
