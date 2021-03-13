@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CredentialManagement;
 
-namespace Niconicome.Models.Auth
+namespace Niconicome.Models.Domain.Niconico
 {
 
     public interface IUserCredential
@@ -19,7 +19,7 @@ namespace Niconicome.Models.Auth
         void Save(string username, string password);
         bool IsPasswordSaved { get; }
         IUserCredential GetUserCredential();
-        static IUserCredential GetUserCredential(string username,string password)
+        static IUserCredential GetUserCredential(string username, string password)
         {
             return new UserCredential(username, password);
         }
@@ -28,7 +28,7 @@ namespace Niconicome.Models.Auth
     /// <summary>
     /// ユーザーアカウントマネージャー
     /// </summary>
-    class AccountManager:IAccountManager
+    class AccountManager : IAccountManager
     {
         private readonly string siteName = "https://nicovideo.jp";
 
