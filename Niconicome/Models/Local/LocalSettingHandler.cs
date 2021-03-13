@@ -141,6 +141,7 @@ namespace Niconicome.Models.Local
                 Settings.DLCopy=> STypes::SettingNames.IsCopyEnable,
                 Settings.DLOverwrite=> STypes::SettingNames.IsOverwriteEnable,
                 Settings.SwitchOffset=>STypes::SettingNames.IsAutoSwitchOffsetEnable,
+                Settings.AutologinEnable=>STypes::SettingNames.IsAutologinEnable,
                 _ => null
             };
         }
@@ -168,5 +169,6 @@ namespace Niconicome.Models.Local
         DLCopy,
         DLOverwrite,
         SwitchOffset,
+        AutologinEnable,
     }
 }

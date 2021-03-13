@@ -24,6 +24,14 @@ namespace Niconicome.ViewModels.Mainpage
 
         public MainWindowViewModel()
         {
+            if (WS::Mainpage.Session.IsLogin)
+            {
+                this.OnLogin(this, EventArgs.Empty);
+            } else
+            {
+                WS::Mainpage.StartUp.AutoLoginSucceeded += this.OnLogin;
+            }
+
 
             this.LoginCommand = new CommandBase<object>(
                     (object? arg) => true,
@@ -38,17 +46,7 @@ namespace Niconicome.ViewModels.Mainpage
                                 ShowInTaskbar = true
                             };
 #pragma warning disable CS8602
-                            (loginpage.DataContext as Login.LoginWindowViewModel).LoginSucceeded += (s, e) =>
-#pragma warning restore CS8602
-                            {
-                                this.IsLogin = true;
-                                INiconicoContext context = NiconicoContext.Context;
-                                this.user = NiconicoContext.User;
-                                this.LoginBtnVal = "ログアウト";
-                                this.OnPropertyChanged(nameof(this.LoginBtnTooltip));
-                                this.OnPropertyChanged(nameof(this.Username));
-                                this.OnPropertyChanged(nameof(this.UserImage));
-                            };
+                            (loginpage.DataContext as Login.LoginWindowViewModel).LoginSucceeded += this.OnLogin;
                             loginpage.Show();
                         }
                         else
@@ -173,6 +171,21 @@ namespace Niconicome.ViewModels.Mainpage
                 this.message.AppendLine(value);
                 this.OnPropertyChanged(nameof(this.message));
             }
+        }
+
+        /// <summary>
+        /// ログイン成功時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLogin(object? sender,EventArgs e)
+        {
+            this.IsLogin = true;
+            this.user = NiconicoContext.User;
+            this.LoginBtnVal = "ログアウト";
+            this.OnPropertyChanged(nameof(this.LoginBtnTooltip));
+            this.OnPropertyChanged(nameof(this.Username));
+            this.OnPropertyChanged(nameof(this.UserImage));
         }
 
 
