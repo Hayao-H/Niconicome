@@ -42,133 +42,135 @@
         <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
             <TextBlock Text="アプリ情報" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
         </Border>
-        <StackPanel Margin="8" Grid.Row="1">
-            <DockPanel>
-                <materialDesign:PackIcon Kind="InfoCircle" Foreground="SkyBlue" VerticalAlignment="Center" >
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="9"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
-                <Label Content="アプリケーションバージョン" Margin="4 0" FontSize="20"/>
-                <TextBlock Margin="5 0" VerticalAlignment="Center" Text="{Binding Version}" HorizontalAlignment="Right"/>
-            </DockPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-            <StackPanel Orientation="Horizontal">
-                <materialDesign:PackIcon Kind="Link" Foreground="SkyBlue" VerticalAlignment="Center" >
-                    <materialDesign:PackIcon.RenderTransform>
-                        <ScaleTransform ScaleX="1.6" ScaleY="1.6" CenterY="9"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
-                <TextBlock Margin="10 0" Text="リンク"/>
-            </StackPanel>
-            <TextBlock Padding="20 0">
+        <ScrollViewer Grid.Row="1" Margin="8">
+            <StackPanel>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="InfoCircle" Foreground="SkyBlue" VerticalAlignment="Center" >
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="9"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="アプリケーションバージョン" Margin="4 0" FontSize="20"/>
+                    <TextBlock Margin="5 0" VerticalAlignment="Center" Text="{Binding Version}" HorizontalAlignment="Right"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Link" Foreground="SkyBlue" VerticalAlignment="Center" >
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform ScaleX="1.6" ScaleY="1.6" CenterY="9"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <TextBlock Margin="10 0" Text="リンク"/>
+                </StackPanel>
+                <TextBlock Padding="20 0">
                 <Hyperlink NavigateUri="https://github.com/Hayao-H/Niconicome"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>プロジェクトページ</Hyperlink><LineBreak/>
                 <Hyperlink NavigateUri="https://join.slack.com/t/niconicome/shared_invite/zt-m6lkfs8x-FOFfXexhB0JlhnUVps0qEA"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Slack</Hyperlink><LineBreak/>
                 <Hyperlink NavigateUri="https://twitter.com/NiconicomeD"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Twitter</Hyperlink><LineBreak/>
                 <Hyperlink NavigateUri="https://github.com/Hayao-H/Niconicome/wiki"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>wiki</Hyperlink>
-            </TextBlock>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-            <Expander>
-                <Expander.Header>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="License" Foreground="SkyBlue">
-                            <materialDesign:PackIcon.RenderTransform>
-                                <TranslateTransform Y="1"/>
-                            </materialDesign:PackIcon.RenderTransform>
-                        </materialDesign:PackIcon>
-                        <TextBlock Text="ライセンス情報"/>
-                    </StackPanel>
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Height="430">
-                    <StackPanel>
-                        <TextBlock Style="{StaticResource LicenseTitle}">
+                </TextBlock>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <Expander>
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <materialDesign:PackIcon Kind="License" Foreground="SkyBlue">
+                                <materialDesign:PackIcon.RenderTransform>
+                                    <TranslateTransform Y="1"/>
+                                </materialDesign:PackIcon.RenderTransform>
+                            </materialDesign:PackIcon>
+                            <TextBlock Text="ライセンス情報"/>
+                        </StackPanel>
+                    </Expander.Header>
+                    <ScrollViewer VerticalScrollBarVisibility="Visible" Height="430">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="http://materialdesigninxaml.net/">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             MaterialDesignInXamlToolkit
                         </Hyperlink>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource LicenseBlock}">
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                        </TextBlock>
-                        
-                        <TextBlock Style="{StaticResource LicenseTitle}">
+                            </TextBlock>
+
+                            <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://github.com/ilyalozovyy/credentialmanagement">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             credentialmanagement
                         </Hyperlink>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource LicenseBlock}">
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/ilyalozovyy/credentialmanagement/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                        </TextBlock>
-                        
-                        <TextBlock Style="{StaticResource LicenseTitle}">
+                            </TextBlock>
+
+                            <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://github.com/contre/Windows-API-Code-Pack-1.1">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Windows-API-Code-Pack-1.1
                         </Hyperlink>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource LicenseBlock}">
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/aybe/Windows-API-Code-Pack-1.1/blob/master/LICENCE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                        </TextBlock>
+                            </TextBlock>
 
-                        <TextBlock Style="{StaticResource LicenseTitle}">
+                            <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://www.litedb.org/">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             LiteDB
                         </Hyperlink>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource LicenseBlock}">
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/mbdavid/LiteDB/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                        </TextBlock>
+                            </TextBlock>
 
-                        <TextBlock Style="{StaticResource LicenseTitle}">
+                            <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://anglesharp.github.io/">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             AngleSharp
                         </Hyperlink>
-                        </TextBlock>
-                        <TextBlock Style="{StaticResource LicenseBlock}">
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/AngleSharp/AngleSharp/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                        </TextBlock>
+                            </TextBlock>
 
-                    </StackPanel>
-                </ScrollViewer>
-            </Expander>
-        </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

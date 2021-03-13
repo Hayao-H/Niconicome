@@ -8,10 +8,11 @@ using Niconicome.Views;
 using Niconicome.ViewModels;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Auth;
-using WS= Niconicome.Workspaces;
+using WS = Niconicome.Workspaces;
 using Niconicome.Views.Setting;
 using System.ComponentModel;
 using Niconicome.Extensions;
+using Niconicome.ViewModels.Controls;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -28,6 +29,7 @@ namespace Niconicome.ViewModels.Mainpage
                     (object? arg) => true,
                     async (object? arg) =>
                     {
+
                         if (!this.IsLogin)
                         {
                             Window loginpage = new Loginxaml
@@ -214,7 +216,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.AssociatedObject.Closing -= this.OnClosing;
         }
 
-        private void OnClosing(object? sender,CancelEventArgs e)
+        private void OnClosing(object? sender, CancelEventArgs e)
         {
             if (sender is null || sender.AsNullable<Window>() is not Window window) return;
             if (window != Application.Current.MainWindow) return;

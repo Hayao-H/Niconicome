@@ -21,6 +21,8 @@ using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
 using Niconicome.Models.Network;
+using Niconicome.ViewModels.Controls;
+using System.Threading.Tasks;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -30,11 +32,11 @@ namespace Niconicome.ViewModels.Mainpage
     /// </summary>
     class VideoListViewModel : BindableBase
     {
-        public VideoListViewModel() : this((message, title, button, image) => MessageBox.Show(message, title, button, image))
+        public VideoListViewModel() : this((message, button,  image) => MaterialMessageBox.Show(message, button, image))
         {
 
         }
-        public VideoListViewModel(Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> showMessageBox)
+        public VideoListViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox)
         {
             //プレイリスト選択変更イベントを購読する
             WS::Mainpage.CurrentPlaylist.SelectedItemChanged += this.OnSelectedPlaylistChanged;
@@ -91,7 +93,7 @@ namespace Niconicome.ViewModels.Mainpage
                 });
             });
 
-            this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true, arg =>
+            this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true,async arg =>
             {
                 if (this.Playlist is null)
                 {
@@ -111,8 +113,8 @@ namespace Niconicome.ViewModels.Mainpage
                 : $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
 
 
-                var confirm = this.showMessageBox(confirmMessage, "削除の確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (confirm != MessageBoxResult.Yes) return;
+                var confirm = await this.showMessageBox(confirmMessage,MessageBoxButtons.Yes|MessageBoxButtons.No,MessageBoxIcons.Question);
+                if (confirm != MaterialMessageBoxResult.Yes) return;
 
                 foreach (var video in targetVideos)
                 {
@@ -790,7 +792,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// メッセージボックスを表示するコマンド
         /// </summary>
-        private readonly Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> showMessageBox;
+        private readonly Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox;
 
         /// <summary>
         /// 動画のリスト
