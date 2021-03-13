@@ -70,7 +70,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainNet::ICacheStraem, DomainNet::CacheStream>();
             services.AddTransient<Net::INetworkVideoHandler, Net::NetworkVideoHandler>();
             services.AddSingleton<State::IMessageHandler, State::MessageHandler>();
-            services.AddTransient<Auth::IAccountManager, Auth::AccountManager>();
+            services.AddTransient<Niconico::IAccountManager, Niconico::AccountManager>();
             services.AddTransient<DomainWatch::IDmcDataHandler, DomainWatch::DmcDataHandler>();
             services.AddTransient<DomainWatch::IWatchSession, DomainWatch::WatchSession>();
             services.AddTransient<DomainWatch::IWatchPlaylisthandler, DomainWatch::WatchPlaylistHandler>();
@@ -89,7 +89,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Search::ISearch, Search::Search>();
             services.AddTransient<Search::ISearchClient, Search::SearchClient>();
             services.AddSingleton<State::IErrorMessanger, State::ErrorMessenger>();
-            services.AddTransient<MyApplication::IStartUp, MyApplication::StartUp>();
+            services.AddSingleton<MyApplication::IStartUp, MyApplication::StartUp>();
             services.AddTransient<Store::ISettingHandler, Store::SettingHandler>();
             services.AddTransient<Local::ILocalSettingHandler, Local::LocalSettingHandler>();
             services.AddTransient<INiconicoUtils, NiconicoUtils>();
@@ -118,6 +118,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
             services.AddTransient<Net::ILocalContentHandler, Net::LocalContentHandler>();
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
+            services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();
+            services.AddSingleton<State::ISnackbarHandler, State::SnackbarHandler>();
 
             return services.BuildServiceProvider();
         }
