@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,6 +11,7 @@ using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System.Windows;
 using Niconicome.Models.Playlist;
+using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Mainpage.Subwindows;
 using Niconicome.Views;
 using Utils = Niconicome.Models.Domain.Utils;
@@ -23,16 +25,16 @@ namespace Niconicome.ViewModels.Mainpage
     /// </summary>
     class PlaylistTreeViewModel : BindableBase
     {
-        public PlaylistTreeViewModel() : this((text, title, button, icon) => MessageBox.Show(text, title, button, icon)) { }
+        public PlaylistTreeViewModel() : this((text, button, icon) => MaterialMessageBox.Show(text, button, icon)) { }
 
-        public PlaylistTreeViewModel(Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> showMessageBox)
+        public PlaylistTreeViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox)
         {
             this.ShowMessageBox = showMessageBox;
 
             //初期化失敗時
             void initializeFailed()
             {
-                this.ShowMessageBox("アプリケーションの初期化中にエラーが発生しました。詳しくはエラーログをご確認下さい。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.ShowMessageBox("アプリケーションの初期化中にエラーが発生しました。詳しくはエラーログをご確認下さい。", MessageBoxButtons.OK, MessageBoxIcons.Error);
                 Application.Current?.Shutdown();
             }
 
@@ -86,7 +88,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// メッセージボックスを表示する
         /// </summary>
-        private Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> ShowMessageBox { get; set; }
+        private Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> ShowMessageBox { get; set; }
 
         /// <summary>
         /// プレイリストのツリー
