@@ -54,8 +54,12 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.PlaylistTree.AddPlaylist(parent);
                 this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
-            this.RemovePlaylist = new CommandBase<int>((object? arg) => true, (int playlist) =>
+            this.RemovePlaylist = new CommandBase<int>((object? arg) => true, async (int playlist) =>
             {
+                var result = await this.ShowMessageBox("本当にプレイリストを削除しますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+
+                if (result != MaterialMessageBoxResult.Yes) return;
+
                 WS::Mainpage.PlaylistTree.DeletePlaylist(playlist);
                 this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
