@@ -27,6 +27,7 @@ namespace Niconicome.Models.Playlist
         string FileName { get; set; }
         string BindableThumbPath { get; }
         string MessageGuid { get; set; }
+        string ChannelId { get; set; }
         IEnumerable<string> Tags { get; set; }
         DateTime UploadedOn { get; set; }
         Uri GetNiconicoPageUri();
@@ -138,6 +139,11 @@ namespace Niconicome.Models.Playlist
         /// メッセージID
         /// </summary>
         public string MessageGuid { get; set; } = Guid.NewGuid().ToString("D");
+
+        /// <summary>
+        /// チャンネルID
+        /// </summary>
+        public string ChannelId { get; set; } = string.Empty;
 
         /// <summary>
         /// 投稿日時

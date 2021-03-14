@@ -19,6 +19,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.WatchPage
 
         [JsonPropertyName("context")]
         public Context Context { get; set; } = new();
+
+        [JsonPropertyName("channel")]
+        public Channel? Channel { get; set; }
     }
 
     public partial class CommentComposite
@@ -207,6 +210,12 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.WatchPage
 
         [JsonPropertyName("nickname")]
         public string? Nickname { get; set; }
+    }
+
+    public class Channel
+    {
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
     }
 
 }

@@ -32,7 +32,7 @@ namespace Niconicome.ViewModels.Mainpage
     /// </summary>
     class VideoListViewModel : BindableBase
     {
-        public VideoListViewModel() : this((message, button,  image) => MaterialMessageBox.Show(message, button, image))
+        public VideoListViewModel() : this((message, button, image) => MaterialMessageBox.Show(message, button, image))
         {
 
         }
@@ -90,59 +90,68 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     WS::Mainpage.PlaylistTree.Refresh();
                     WS::Mainpage.CurrentPlaylist.Update(playlistId);
+
+                    if (!video.ChannelId.IsNullOrEmpty())
+                    {
+                        WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelId}」です", "IDをコピー", () =>
+                        {
+                            Clipboard.SetText(video.ChannelId);
+                            WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
+                        });
+                    }
                 });
             });
 
-            this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true,async arg =>
-            {
-                if (this.Playlist is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
-                    return;
-                }
+            this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true, async arg =>
+             {
+                 if (this.Playlist is null)
+                 {
+                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
+                     return;
+                 }
 
-                var targetVideos = new List<IVideoListInfo>();
+                 var targetVideos = new List<IVideoListInfo>();
 
-                if (arg is not null && arg.AsNullable<IVideoListInfo>() is IVideoListInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
+                 if (arg is not null && arg.AsNullable<IVideoListInfo>() is IVideoListInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
 
-                targetVideos.AddRange(this.Videos.Where(v => v.IsSelected));
-                targetVideos = targetVideos.Distinct(v => v.Id).ToList();
+                 targetVideos.AddRange(this.Videos.Where(v => v.IsSelected));
+                 targetVideos = targetVideos.Distinct(v => v.Id).ToList();
 
-                string confirmMessage = targetVideos.Count == 1
-                ? $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」を削除しますか？"
-                : $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
+                 string confirmMessage = targetVideos.Count == 1
+                 ? $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」を削除しますか？"
+                 : $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
 
 
-                var confirm = await this.showMessageBox(confirmMessage,MessageBoxButtons.Yes|MessageBoxButtons.No,MessageBoxIcons.Question);
-                if (confirm != MaterialMessageBoxResult.Yes) return;
+                 var confirm = await this.showMessageBox(confirmMessage, MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+                 if (confirm != MaterialMessageBoxResult.Yes) return;
 
-                foreach (var video in targetVideos)
-                {
+                 foreach (var video in targetVideos)
+                 {
                     //取得失敗動画の場合
                     if (video.Title == "取得失敗")
-                    {
-                        this.Videos.Remove(video);
-                    }
-                    else
-                    {
-                        WS::Mainpage.VideoHandler.RemoveVideo(video.Id, this.Playlist.Id);
-                    }
-                }
+                     {
+                         this.Videos.Remove(video);
+                     }
+                     else
+                     {
+                         WS::Mainpage.VideoHandler.RemoveVideo(video.Id, this.Playlist.Id);
+                     }
+                 }
 
-                if (targetVideos.Count > 1)
-                {
+                 if (targetVideos.Count > 1)
+                 {
 
-                    WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                }
-                else
-                {
-                    WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}を削除しました。");
-                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}を削除しました。");
-                }
+                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                 }
+                 else
+                 {
+                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}を削除しました。");
+                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}を削除しました。");
+                 }
 
-                WS::Mainpage.CurrentPlaylist.Update(this.Playlist.Id);
-            });
+                 WS::Mainpage.CurrentPlaylist.Update(this.Playlist.Id);
+             });
 
             this.WatchOnNiconicoCommand = new CommandBase<IVideoListInfo>(_ => true, arg =>
             {
@@ -310,7 +319,7 @@ namespace Niconicome.ViewModels.Mainpage
                          RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(this.Playlist.RemoteId, videos),
                          RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(this.Playlist.RemoteId, videos),
                          RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos,this.Videos.Select(v=>v.NiconicoId), m => { }),
+                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos, this.Videos.Select(v => v.NiconicoId), m => { }),
                          _ => new NetworkResult(),
                      };
 
