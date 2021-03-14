@@ -17,6 +17,7 @@ namespace Niconicome.Models.Network
         string Title { get; set; }
         string Id { get; set; }
         string FileName { get; set; }
+        string ChannelID { get; set; }
         int ViewCount { get; set; }
         IEnumerable<string> Tags { get; set; }
         DateTime UploadedOn { get; set; }
@@ -128,6 +129,9 @@ namespace Niconicome.Models.Network
             //再生回数
             info.ViewCount = retrieved.ViewCount;
 
+            //チャンネルID
+            info.ChannelID = retrieved.ChannelID;
+
             //投稿日時
             if (retrieved.DmcInfo is not null)
             {
@@ -169,6 +173,8 @@ namespace Niconicome.Models.Network
 
         public string FileName { get; set; } = string.Empty;
 
+        public string ChannelID { get; set; } = string.Empty;
+
 
         public int ViewCount { get; set; }
 
@@ -196,6 +202,7 @@ namespace Niconicome.Models.Network
                 Tags = this.Tags,
                 ViewCount = this.ViewCount,
                 FileName = this.FileName,
+                ChannelId = this.ChannelID,
             };
         }
 

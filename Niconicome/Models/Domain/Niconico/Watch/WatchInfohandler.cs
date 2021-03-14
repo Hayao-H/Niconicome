@@ -23,6 +23,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     {
         string Title { get; set; }
         string Id { get; set; }
+        string ChannelID { get; set; }
         int ViewCount { get; }
         IEnumerable<string> Tags { get; set; }
         IDmcInfo DmcInfo { get; set; }
@@ -35,6 +36,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         string Owner { get; set; }
         string Userkey { get; }
         string UserId { get; }
+        string ChannelID { get; }
         int ViewCount { get; }
         int Duration { get; }
         IEnumerable<string> Tags { get; set; }
@@ -156,7 +158,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             }
 
             this.State = WatchInfoHandlerState.OK;
-            return new DomainVideoInfo() { Id = info.Id, Title = info.Title, Tags = info.Tags, DmcInfo = info, ViewCount = info.ViewCount };
+            return new DomainVideoInfo() { Id = info.Id, Title = info.Title, Tags = info.Tags, DmcInfo = info, ViewCount = info.ViewCount,ChannelID = info.ChannelID };
         }
     }
 
@@ -254,6 +256,9 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 
             //時間
             info.Duration = original?.Video?.Duration ?? 0;
+
+            //チャンネルID
+            info.ChannelID = original?.Channel?.Name ?? string.Empty;
 
             //Session情報
             if (!options.HasFlag(WatchInfoOptions.NoDmcData) && original?.Media?.Delivery is not null)
@@ -356,6 +361,11 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         public string FileName { get; set; } = string.Empty;
 
+        /// <summary>
+        /// チャンネルID
+        /// </summary>
+        public string ChannelID { get; set; } = string.Empty;
+
 
         /// <summary>
         /// 再生回数
@@ -389,6 +399,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public string Userkey { get; set; } = string.Empty;
 
         public string UserId { get; set; } = string.Empty;
+
+        public string ChannelID { get; set; } = string.Empty;
 
         public int ViewCount { get; set; }
 
