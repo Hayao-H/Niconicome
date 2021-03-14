@@ -1,14 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Local.Cookies
 {
-    public class ChromeCookieDecryptor
+    public interface IChromeCookieDecryptor
+    {
+        byte[] DecryptCookie(byte[] cipherRaw, byte[] key);
+        byte[] GetEncryptionKey(byte[] rawkey);
+        string ToUtf8String(byte[] data);
+    }
+
+    public class ChromeCookieDecryptor : IChromeCookieDecryptor
     {
         public ChromeCookieDecryptor(ILogger logger)
         {
@@ -30,7 +34,8 @@ namespace Niconicome.Models.Domain.Local.Cookies
             try
             {
                 plainText = ProtectedData.Unprotect(cipher, null, DataProtectionScope.CurrentUser);
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 this.logger.Error("cookie暗号化キーの復号に失敗しました。", e);
                 throw new InvalidOperationException($"cookie暗号化キーの復号に失敗しました。(詳細: {e.Message})");
@@ -45,7 +50,7 @@ namespace Niconicome.Models.Domain.Local.Cookies
         /// <param name="cipherRaw"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public byte[] DecryptCookie(byte[] cipherRaw,byte[] key)
+        public byte[] DecryptCookie(byte[] cipherRaw, byte[] key)
         {
             var cipher = cipherRaw[15..^16];
             var nonce = cipherRaw[3..15];
