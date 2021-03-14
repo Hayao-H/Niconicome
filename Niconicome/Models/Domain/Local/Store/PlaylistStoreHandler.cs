@@ -23,6 +23,7 @@ namespace Niconicome.Models.Domain.Local.Store
         bool Exists(int id);
         bool JustifyPlaylists(int Id);
         bool JustifyPlaylists(IEnumerable<int> Id);
+        bool ContainsVideo(string niconicoId, int playlistId);
         void Move(int id, int destId);
         void Copy(int id, int destId);
         void SetAsRemotePlaylist(int id, string remoteId, RemoteType type);
@@ -285,6 +286,20 @@ namespace Niconicome.Models.Domain.Local.Store
         public bool JustifyPlaylists(IEnumerable<int> ids)
         {
             return !ids.Select(id => this.JustifyPlaylists(id)).Any(ok => ok == false);
+        }
+
+
+        /// <summary>
+        /// 指定されたIDの動画を含むかどうかを返す
+        /// </summary>
+        /// <param name="videoId"></param>
+        /// <param name="playlistId"></param>
+        /// <returns></returns>
+        public bool ContainsVideo(string niconicoId, int playlistId)
+        {
+            var playlist = this.GetPlaylist(playlistId);
+            if (playlist is null) return false;
+            return playlist.Videos.Any(v => v.NiconicoId == niconicoId);
         }
 
         /// <summary>
