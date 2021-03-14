@@ -29,9 +29,9 @@ namespace Niconicome.ViewModels.Controls
                 DataContext = new MessageBoxViewModel(message, buttons, icon)
             };
 
-            object result = await DialogHost.Show(dialog, identifier);
+            object? result = await DialogHost.Show(dialog, identifier);
 
-            return (MaterialMessageBoxResult)result;
+            return (MaterialMessageBoxResult?)result ?? MaterialMessageBoxResult.No;
         }
     }
 
