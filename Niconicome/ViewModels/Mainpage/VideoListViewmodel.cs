@@ -46,7 +46,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.showMessageBox = showMessageBox;
 
-            this.SnackbarMessageQueue = WS::Mainpage.SnackbarMessageQueue;
+            this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
             //メッセージハンドラーにイベントハンドラを追加する
             WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
@@ -906,7 +906,7 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.Messagehandler.ClearMessage();
                 string name = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.Name;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
-                WS::Mainpage.SnackbarMessageQueue.Enqueue($"プレイリスト:{name}");
+                WS::Mainpage.SnaclbarHandler.Enqueue($"プレイリスト:{name}");
                 this.ChangePlaylistTitle();
             }
         }

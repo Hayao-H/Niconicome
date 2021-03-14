@@ -41,7 +41,7 @@ namespace Niconicome.ViewModels.Mainpage
     };
             this.selectedResolutionField = s1;
 
-            this.SnackbarMessageQueue = WS::Mainpage.SnackbarMessageQueue;
+            this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
             this.DownloadCommand = new CommandBase<object>(_ => this.playlist is not null && !this.isDownloadingField, async _ =>
                {

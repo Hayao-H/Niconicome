@@ -26,6 +26,8 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Import = Niconicome.Models.Local.External.Import;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
+using SQlite = Niconicome.Models.Domain.Local.SQLite;
+using Cookies = Niconicome.Models.Domain.Local.Cookies;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -70,7 +72,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainNet::ICacheStraem, DomainNet::CacheStream>();
             services.AddTransient<Net::INetworkVideoHandler, Net::NetworkVideoHandler>();
             services.AddSingleton<State::IMessageHandler, State::MessageHandler>();
-            services.AddTransient<Auth::IAccountManager, Auth::AccountManager>();
+            services.AddTransient<Niconico::IAccountManager, Niconico::AccountManager>();
             services.AddTransient<DomainWatch::IDmcDataHandler, DomainWatch::DmcDataHandler>();
             services.AddTransient<DomainWatch::IWatchSession, DomainWatch::WatchSession>();
             services.AddTransient<DomainWatch::IWatchPlaylisthandler, DomainWatch::WatchPlaylistHandler>();
@@ -88,7 +90,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Search::ISearch, Search::Search>();
             services.AddTransient<Search::ISearchClient, Search::SearchClient>();
             services.AddSingleton<State::IErrorMessanger, State::ErrorMessenger>();
-            services.AddTransient<MyApplication::IStartUp, MyApplication::StartUp>();
+            services.AddSingleton<MyApplication::IStartUp, MyApplication::StartUp>();
             services.AddTransient<Store::ISettingHandler, Store::SettingHandler>();
             services.AddTransient<Local::ILocalSettingHandler, Local::LocalSettingHandler>();
             services.AddTransient<INiconicoUtils, NiconicoUtils>();
@@ -117,6 +119,14 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
             services.AddTransient<Net::ILocalContentHandler, Net::LocalContentHandler>();
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
+            services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();
+            services.AddSingleton<State::ISnackbarHandler, State::SnackbarHandler>();
+            services.AddTransient<SQlite::ISQliteLoader, SQlite::SQliteLoader>();
+            services.AddTransient<SQlite::ISqliteCookieLoader, SQlite::SqliteCookieLoader>();
+            services.AddTransient<Cookies::IChromeCookieDecryptor, Cookies::ChromeCookieDecryptor>();
+            services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
+            services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
+            services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
 
             return services.BuildServiceProvider();
         }

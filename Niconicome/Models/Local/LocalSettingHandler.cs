@@ -142,6 +142,8 @@ namespace Niconicome.Models.Local
                 Settings.DLOverwrite=> STypes::SettingNames.IsOverwriteEnable,
                 Settings.SwitchOffset=>STypes::SettingNames.IsAutoSwitchOffsetEnable,
                 Settings.FFmpegShell=>STypes::SettingNames.UseShellWhenLaunchingFFmpeg,
+                Settings.AutologinEnable => STypes::SettingNames.IsAutologinEnable,
+                Settings.AutologinMode => STypes::SettingNames.AutoLoginMode,
                 _ => null
             };
         }
@@ -170,5 +172,7 @@ namespace Niconicome.Models.Local
         DLOverwrite,
         SwitchOffset,
         FFmpegShell,
+        AutologinEnable,
+        AutologinMode,
     }
 }

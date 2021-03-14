@@ -3,6 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Niconicome.Models.Auth;
+using Niconicome.Models.Local.State;
+using Niconicome.Models.Domain.Utils;
 using Store = Niconicome.Models.Domain.Local.Store;
 
 namespace Niconicome.Models.Local.Application
@@ -11,17 +14,22 @@ namespace Niconicome.Models.Local.Application
     public interface IStartUp
     {
         void RunStartUptasks();
+        event EventHandler? AutoLoginSucceeded;
     }
 
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler)
+        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger)
         {
+
             this.videoStoreHandler = videoStoreHandler;
             this.playlistStoreHandler = playlistStoreHandler;
             this.fileStorehandler = fileStorehandler;
             this.backuphandler = backuphandler;
+            this.autoLogin = autoLogin;
+            this.snackbarHandler = snackbarHandler;
+            this.logger = logger;
             this.DeleteInvalidbackup();
         }
 
@@ -33,16 +41,28 @@ namespace Niconicome.Models.Local.Application
 
         private readonly IBackuphandler backuphandler;
 
+        private readonly IAutoLogin autoLogin;
+
+        private readonly ISnackbarHandler snackbarHandler;
+
+        private readonly ILogger logger;
+
+        /// <summary>
+        /// 自動ログイン成功時
+        /// </summary>
+        public event EventHandler? AutoLoginSucceeded;
+
         /// <summary>
         /// スタートアップタスク
         /// </summary>
         public void RunStartUptasks()
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 this.RemoveTmpFolder();
                 this.JustifyData();
                 this.DeleteInvalidFilePath();
+                await this.Autologin();
             });
         }
 
@@ -88,6 +108,44 @@ namespace Niconicome.Models.Local.Application
         private void DeleteInvalidbackup()
         {
             this.backuphandler.Clean();
+        }
+
+        private async Task Autologin()
+        {
+            if (!this.autoLogin.IsAUtologinEnable) return;
+            if (!this.autoLogin.Canlogin())
+            {
+                this.snackbarHandler.Enqueue("自動ログインが出来ません。");
+                return;
+            }
+
+            bool result;
+
+            try
+            {
+                result = await this.autoLogin.LoginAsync();
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("自動ログインに失敗しました。", e);
+                this.snackbarHandler.Enqueue("自動ログインに失敗しました。");
+                return;
+            }
+
+            if (!result)
+            {
+                this.snackbarHandler.Enqueue("自動ログインに失敗しました。");
+                return;
+            }else
+            {
+                this.snackbarHandler.Enqueue("自動ログインに成功しました。");
+                this.RaiseLoginSucceeded();
+            }
+        }
+
+        private void RaiseLoginSucceeded()
+        {
+            this.AutoLoginSucceeded?.Invoke(this, EventArgs.Empty);
         }
     }
 }

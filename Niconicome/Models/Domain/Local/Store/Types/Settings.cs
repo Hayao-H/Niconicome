@@ -127,6 +127,8 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string IsCopyEnable { get; private set; } = "iscopyenable";
         public static string IsAutoSwitchOffsetEnable { get; set; } = "isautoswitchoffsetenable";
         public static string UseShellWhenLaunchingFFmpeg { get; set; } = "useshellwhenlaunchingffmpeg";
+        public static string IsAutologinEnable { get; private set; } = "isautologinenable";
+        public static string AutoLoginMode { get; private set; } = "autologinmode";
 
     }
 }
