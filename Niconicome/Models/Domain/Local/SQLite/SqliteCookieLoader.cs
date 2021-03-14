@@ -8,6 +8,9 @@ namespace Niconicome.Models.Domain.Local.SQLite
 {
     public interface IUserCookieRaw
     {
+        bool IsUserSessionExpires { get; }
+        bool IsUserSessionSecureExpires { get; }
+        bool IsNnicosidExpires { get; }
         byte[]? UserSession { get; }
         byte[]? UserSessionSecure { get; }
         byte[]? Nicosid { get; }
@@ -43,7 +46,7 @@ namespace Niconicome.Models.Domain.Local.SQLite
             using var loader = this.loader;
 
             var command =
-                $"Select name,encrypted_value " +
+                $"Select name,encrypted_value,expires_utc " +
                 $"From cookies " +
                 $"Where host_key = '.nicovideo.jp'";
 
@@ -56,22 +59,27 @@ namespace Niconicome.Models.Domain.Local.SQLite
                 var name = reader.GetString(0);
                 var stream = reader.GetStream(1);
                 var len = stream.Length;
+                var expires = reader.GetInt64(2);
+                var expiresDT = DateTimeOffset.FromUnixTimeSeconds(expires / 1000000 - 11644473600);
 
                 if (name == "user_session")
                 {
                     data.UserSession = new byte[stream.Length];
                     stream.Read(data.UserSession);
+                    data.IsUserSessionExpires = DateTime.Now > expiresDT.ToLocalTime();
                 }
                 else if (name == "user_session_secure")
                 {
                     data.UserSessionSecure = new byte[stream.Length];
                     stream.Read(data.UserSessionSecure);
+                    data.IsUserSessionSecureExpires = DateTime.Now > expiresDT.ToLocalTime();
 
                 }
                 else if (name == "nicosid")
                 {
                     data.Nicosid = new byte[stream.Length];
                     stream.Read(data.Nicosid);
+                    data.IsNnicosidExpires = DateTime.Now > expiresDT.ToLocalTime();
                 }
             }
 
@@ -79,13 +87,20 @@ namespace Niconicome.Models.Domain.Local.SQLite
         }
     }
 
-    public class UserCookieRaw :IUserCookieRaw{
+    public class UserCookieRaw : IUserCookieRaw
+    {
 
-       public byte[]? UserSession { get; set; }
+        public bool IsUserSessionExpires { get; set; }
 
-       public byte[]? UserSessionSecure { get; set; }
+        public bool IsUserSessionSecureExpires { get; set; }
 
-       public byte[]? Nicosid { get; set; }
+        public bool IsNnicosidExpires { get; set; }
+
+        public byte[]? UserSession { get; set; }
+
+        public byte[]? UserSessionSecure { get; set; }
+
+        public byte[]? Nicosid { get; set; }
     }
 
     public enum CookieType
