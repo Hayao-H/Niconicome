@@ -9,6 +9,7 @@ using Niconicome.Models.Auth;
 using System.Diagnostics;
 using Niconicome.Views;
 using Utils = Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Domain.Niconico;
 
 namespace Niconicome.ViewModels.Login
 {

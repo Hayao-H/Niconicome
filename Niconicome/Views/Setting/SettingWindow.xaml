@@ -31,6 +31,16 @@
                 </i:Interaction.Behaviors>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
+                        <materialDesign:PackIcon Kind="CogOutline" Foreground="#898989">
+                            <materialDesign:PackIcon.RenderTransform>
+                                <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
+                            </materialDesign:PackIcon.RenderTransform>
+                        </materialDesign:PackIcon>
+                        <TextBlock Padding="8 2 0 0" Text="一般設定" FontSize="20" Cursor="Hand"/>
+                    </DockPanel>
+                </Border>
+                <Border BorderThickness="6 0 0 0" Padding="5 4">
+                    <DockPanel>
                         <materialDesign:PackIcon Kind="File" Foreground="#898989">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>

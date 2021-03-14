@@ -125,7 +125,9 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string IsOverwriteEnable { get; private set; } = "isoverwriteenable";
         public static string IsSkipEnable { get; private set; } = "isskipenable";
         public static string IsCopyEnable { get; private set; } = "iscopyenable";
-        public static string IsAutoSwitchOffsetEnable { get; set; } = "isautoswitchoffsetenable";
+        public static string IsAutoSwitchOffsetEnable { get; private set; } = "isautoswitchoffsetenable";
+        public static string IsAutologinEnable { get; private set; } = "isautologinenable";
+        public static string AutoLoginMode { get; private set; } = "autologinmode";
 
     }
 }
