@@ -65,7 +65,6 @@
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                             <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}}"/>
-                            <Setter Property="Background" Value="White"/>
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
                                     <ContextMenu StaysOpen="False" DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}" >
