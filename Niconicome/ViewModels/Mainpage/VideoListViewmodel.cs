@@ -32,7 +32,7 @@ namespace Niconicome.ViewModels.Mainpage
     /// </summary>
     class VideoListViewModel : BindableBase
     {
-        public VideoListViewModel() : this((message, button,  image) => MaterialMessageBox.Show(message, button, image))
+        public VideoListViewModel() : this((message, button, image) => MaterialMessageBox.Show(message, button, image))
         {
 
         }
