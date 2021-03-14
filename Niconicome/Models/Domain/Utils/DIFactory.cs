@@ -26,6 +26,8 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Import = Niconicome.Models.Local.External.Import;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
+using SQlite = Niconicome.Models.Domain.Local.SQLite;
+using Cookies = Niconicome.Models.Domain.Local.Cookies;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -120,6 +122,12 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
             services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();
             services.AddSingleton<State::ISnackbarHandler, State::SnackbarHandler>();
+            services.AddTransient<SQlite::ISQliteLoader, SQlite::SQliteLoader>();
+            services.AddTransient<SQlite::ISqliteCookieLoader, SQlite::SqliteCookieLoader>();
+            services.AddTransient<Cookies::IChromeCookieDecryptor, Cookies::ChromeCookieDecryptor>();
+            services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
+            services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
+            services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
 
             return services.BuildServiceProvider();
         }
