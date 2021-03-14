@@ -12,7 +12,13 @@ using NiconicomeTest.Local.Cookies;
 
 namespace Niconicome.Models.Domain.Local.LocalFile
 {
-    public class CookieJsonLoader
+    public interface ICookieJsonLoader
+    {
+        byte[] GetEncryptedKey(string path);
+        string GetJsonPath(CookieType type);
+    }
+
+    public class CookieJsonLoader : ICookieJsonLoader
     {
         public CookieJsonLoader(ILogger logger)
         {
@@ -53,7 +59,8 @@ namespace Niconicome.Models.Domain.Local.LocalFile
             {
                 var source = File.OpenText(path).ReadToEnd();
                 data = JsonParser.DeSerialize<LocalStateType>(source);
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 this.logger.Error("Local Stateファイルの読み込みでエラーが発生しました。", e);
                 throw new IOException($"Local Stateファイルの読み込みでエラーが発生しました。(詳細:{e.Message})");
