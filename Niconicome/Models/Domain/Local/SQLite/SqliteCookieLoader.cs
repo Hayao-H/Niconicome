@@ -36,7 +36,7 @@ namespace Niconicome.Models.Domain.Local.SQLite
         {
             return type switch
             {
-                CookieType.Webview2 => @"Niconicome.exe.WebView2\Niconicome.exe.WebView2\Default\Cookies",
+                CookieType.Webview2 => @"Niconicome.exe.WebView2\EBWebView\Default\Cookies",
                 _ => throw new InvalidOperationException("そのような種別のCookieには対応していません。"),
             };
         }
