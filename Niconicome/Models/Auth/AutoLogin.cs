@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Local;
 
@@ -14,11 +15,12 @@ namespace Niconicome.Models.Auth
 
     class AutoLogin : IAutoLogin
     {
-        public AutoLogin(ISession session, IAccountManager accountManager, ILocalSettingHandler settingHandler)
+        public AutoLogin(ISession session, IAccountManager accountManager, ILocalSettingHandler settingHandler, IWebview2SharedLogin webview2SharedLogin)
         {
             this.session = session;
             this.accountManager = accountManager;
             this.settingHandler = settingHandler;
+            this.webview2SharedLogin = webview2SharedLogin;
         }
 
         private readonly ISession session;
@@ -26,6 +28,8 @@ namespace Niconicome.Models.Auth
         private readonly IAccountManager accountManager;
 
         private readonly ILocalSettingHandler settingHandler;
+
+        private readonly IWebview2SharedLogin webview2SharedLogin;
 
         /// <summary>
         /// 自動ログインが可能であるかどうか
@@ -46,9 +50,18 @@ namespace Niconicome.Models.Auth
         {
             if (!this.Canlogin()) throw new InvalidOperationException("自動ログインは不可能です。");
 
-            var cred = this.accountManager.GetUserCredential();
+            bool result = false;
+            var type = this.GetAutoLoginType();
 
-            var result = await this.session.Login(cred);
+            if (type == AutoLoginType.Normal)
+            {
+                var cred = this.accountManager.GetUserCredential();
+                result = await this.session.Login(cred);
+            }
+            else if (type == AutoLoginType.Webview2)
+            {
+                result = await this.webview2SharedLogin.TryLogin();
+            }
 
             return result;
         }
@@ -67,9 +80,18 @@ namespace Niconicome.Models.Auth
         /// <returns></returns>
         private AutoLoginType GetAutoLoginType()
         {
-            bool isCredencialSaved = this.accountManager.IsPasswordSaved;
+            var mode = this.settingHandler.GetStringSetting(Settings.AutologinMode) ?? AutoLoginTypeString.Normal;
 
-            if (isCredencialSaved) return AutoLoginType.Normal;
+            if (mode == AutoLoginTypeString.Normal)
+            {
+                bool isCredencialSaved = this.accountManager.IsPasswordSaved;
+                if (isCredencialSaved) return AutoLoginType.Normal;
+            }
+            else if (mode == AutoLoginTypeString.Webview2)
+            {
+                bool canLoginWithWebview2 = this.webview2SharedLogin.CanLogin();
+                if (canLoginWithWebview2) return AutoLoginType.Webview2;
+            }
 
             return AutoLoginType.None;
         }
@@ -78,6 +100,14 @@ namespace Niconicome.Models.Auth
     enum AutoLoginType
     {
         None,
-        Normal
+        Normal,
+        Webview2
+    }
+
+    static class AutoLoginTypeString
+    {
+        public const string Normal = "Normal";
+
+        public const string Webview2 = "Webview2";
     }
 }

@@ -38,6 +38,17 @@
                 <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsAutologinEnable}"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="AccountCog" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="自動ログインの種別"/>
+                <ComboBox HorizontalAlignment="Right" Width="300" ItemsSource="{Binding SelectableAutoLoginTypes}" SelectedItem="{Binding SelectedAutoLoginType}" DisplayMemberPath="DisplayValue"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
+        
     </Grid>
 </Page>
