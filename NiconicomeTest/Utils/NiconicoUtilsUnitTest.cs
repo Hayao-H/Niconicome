@@ -45,5 +45,16 @@ namespace NiconicomeTest.Utils
             var result = this.utils!.GetIdFromFIleName("[<id>]<title>", filename);
             Assert.That(result, Is.EqualTo(id));
         }
+
+        [TestCase("[123]hoge.mp4","123")]
+        [TestCase("[sm123]hoge","sm123")]
+        [TestCase("sm123hoge","sm123")]
+        [TestCase("hoge(nm2)","nm2")]
+        [TestCase("ssssso123hoge","so123")]
+        public void フォーマットなしでファイル名からIDを取得する(string filename,string id)
+        {
+            var result = this.utils!.GetIdFromFIleName(filename);
+            Assert.That(result, Is.EqualTo(id));
+        }
     }
 }

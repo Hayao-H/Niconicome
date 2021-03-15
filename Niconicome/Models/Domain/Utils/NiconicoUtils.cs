@@ -14,6 +14,7 @@ namespace Niconicome.Models.Domain.Utils
         List<string> GetNiconicoIdsFromText(string source);
         string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, string? suffix = null);
         string GetIdFromFIleName(string format, string filenameWithExt);
+        string GetIdFromFIleName(string filenameWithExt);
 
     }
 
@@ -64,6 +65,20 @@ namespace Niconicome.Models.Domain.Utils
             int endPoint = filename.IndexOf("]");
             if (startPoint == -1 || endPoint == -1) throw new InvalidOperationException("[id]を含まないファイル名です。");
             return filename[startPoint..endPoint];
+        }
+
+        /// <summary>
+        /// ファイル名からIDを取得する
+        /// </summary>
+        /// <param name="filenameWithExt"></param>
+        /// <returns></returns>
+        public string GetIdFromFIleName( string filenameWithExt)
+        {
+            string filename = Path.GetFileNameWithoutExtension(filenameWithExt) ?? string.Empty;
+            if (filename == string.Empty) throw new InvalidOperationException("ファイル名が空です。");
+
+            var match = Regex.Match(filenameWithExt, "(sm|nm|so)?[0-9]+");
+            return match.Value;
         }
 
 
