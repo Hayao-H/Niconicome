@@ -472,6 +472,7 @@ namespace Niconicome.Models.Network
                 FolderName = this.FolderPath,
                 IsAutoDisposingEnable = autodispose,
                 IsOverwriteEnable = this.Overwrite,
+                VerticalResolution = this.VerticalResolution,
             };
         }
 

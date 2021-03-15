@@ -79,7 +79,8 @@ namespace Niconicome.ViewModels.Mainpage
                        DownloadOwner = this.IsDownloadingOwnerComment,
                        FromAnotherFolder = this.IsCopyFromAnotherFolderEnable,
                        Skip = this.IsSkippingEnable,
-                       FolderPath = folderPath
+                       FolderPath = folderPath,
+                       VerticalResolution = this.SelectedResolution.Resolution.Vertical,
                    };
 
 
