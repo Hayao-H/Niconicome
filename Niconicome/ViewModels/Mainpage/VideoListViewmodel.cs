@@ -314,14 +314,8 @@ namespace Niconicome.ViewModels.Mainpage
 
                      int playlistId = this.Playlist.Id;
                      var videos = new List<IVideoListInfo>();
-                     INetworkResult result = this.Playlist.RemoteType switch
-                     {
-                         RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(this.Playlist.RemoteId, videos),
-                         RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(this.Playlist.RemoteId, videos),
-                         RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos, this.Videos.Select(v => v.NiconicoId), m => { }),
-                         _ => new NetworkResult(),
-                     };
+
+                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(this.Playlist.RemoteId, videos, this.Playlist.RemoteType, this.Videos.Select(v => v.NiconicoId), m => { });
 
                      if (!result.IsFailed)
                      {

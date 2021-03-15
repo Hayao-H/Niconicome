@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Playlist;
 using Niconicome.Models.Domain.Niconico.Video.Channel;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Playlist;
 using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Playlist = Niconicome.Models.Playlist;
 using Search = Niconicome.Models.Domain.Niconico.Search;
@@ -13,6 +15,7 @@ namespace Niconicome.Models.Network
 
     public interface IRemotePlaylistHandler
     {
+        Task<INetworkResult> TryGetRemotePlaylistAsync(string id, List<Playlist::IVideoListInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage);
         Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::IVideoListInfo> videos);
         Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::IVideoListInfo> videos);
         Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::IVideoListInfo> videos);
@@ -68,6 +71,28 @@ namespace Niconicome.Models.Network
         /// </summary>
         private readonly IMessageHandler messageHandler;
 
+        /// <summary>
+        /// 全てのタイプのリモートプレイリストをまとめて取得する
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="videos"></param>
+        /// <param name="remoteType"></param>
+        /// <param name="registeredVideo"></param>
+        /// <param name="onMessage"></param>
+        /// <returns></returns>
+        public async Task<INetworkResult> TryGetRemotePlaylistAsync(string id, List<Playlist::IVideoListInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        {
+            var result = remoteType switch
+            {
+                RemoteType.Mylist => await this.TryGetMylistVideosAsync(id, videos),
+                RemoteType.UserVideos => await this.TryGetUserVideosAsync(id, videos),
+                RemoteType.WatchLater => await this.TryGetWatchLaterAsync(videos),
+                RemoteType.Channel => await this.TryGetChannelVideosAsync(id, videos, registeredVideo, onMessage),
+                _ => new NetworkResult()
+            };
+
+            return result;
+        }
 
         /// <summary>
         /// マイリストの動画を非同期に取得する
