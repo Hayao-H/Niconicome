@@ -25,7 +25,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request
         public Session_Operation_Auth Session_operation_auth { get; set; } = new();
         public Content_Auth Content_auth { get; set; } = new();
         public Client_Info Client_info { get; set; } = new();
-        public float Priority { get; set; }
+        public double Priority { get; set; }
     }
 
     public class Keep_Method

@@ -64,10 +64,6 @@ namespace NiconicomeTest.NetWork
             //ID
             Assert.AreEqual("sm9", info?.Id);
 
-            //サムネイル
-            Assert.AreEqual("https://img.cdn.nimg.jp/s/nicovideo/thumbnails/9/9.original/a960x540l?key=00208e6cfc9ead0306cfa0291c2734a15cdea8f58df302b5ac8ed05428ef1190", info?.ThumbInfo?.Large);
-            Assert.AreEqual("https://nicovideo.cdn.nimg.jp/thumbnails/9/9", info?.ThumbInfo?.Normal);
-
         }
 
         [Test]
@@ -83,10 +79,6 @@ namespace NiconicomeTest.NetWork
 
             //ID
             Assert.AreEqual("so36605534", info?.Id);
-
-            //サムネイル
-            Assert.AreEqual("https://img.cdn.nimg.jp/s/nicovideo/thumbnails/36605534/36605534.47637468.original/a960x540l?key=cd9deaaa13ba3301b5a8e24dafa6fceea21b60a7ca9c11fcc9abcdf3198f8978", info?.ThumbInfo?.Large);
-            Assert.AreEqual("https://nicovideo.cdn.nimg.jp/thumbnails/36605534/36605534.47637468", info?.ThumbInfo?.Normal);
 
         }
     }

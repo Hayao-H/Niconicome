@@ -8,7 +8,7 @@ using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Request = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request;
-using WathJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage;
+using WathJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment
 {
@@ -131,8 +131,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private readonly IOfficialVideoUtils officialVideoUtils;
 
-        private ICommentAuthInfo? authInfo;
-
         private int commandIndex = 0;
 
         private int requestIndex = 0;
@@ -187,7 +185,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 if (thread.IsLeafRequired)
                 {
                     data.Add(this.GetPingContent(PingType.StartContent, this.commandIndex));
-                    var itemLeaf = new Request::Comment() { ThreadLeaves = await this.GetThreadLeavesAsync(thread, dmcInfo, options, thread.Label == "easy") };
+                    var itemLeaf = new Request::Comment() { ThreadLeaves = this.GetThreadLeaves(thread, dmcInfo, options, thread.Label == "easy") };
                     data.Add(itemLeaf);
                     data.Add(this.GetPingContent(PingType.EndContent, this.commandIndex));
                     ++this.commandIndex;
@@ -211,7 +209,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<Request::Thread> GetThreadAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo, ICommentOptions options)
+        private async Task<Request::Thread> GetThreadAsync(WathJson::Thread thread, IDmcInfo dmcInfo, ICommentOptions options)
         {
             var data = new Request::Thread
             {
@@ -250,12 +248,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             if (thread.IsThreadkeyRequired)
             {
-                if (this.authInfo is null)
-                {
-                    this.authInfo = await this.officialVideoUtils.GetAuthInfoAsync(data.Thread_);
-                }
-                data.Force184 = this.authInfo.Force184;
-                data.Threadkey = this.authInfo.ThreadKey;
+                //if (this.authInfo is null)
+                //{
+                //    this.authInfo = await this.officialVideoUtils.GetAuthInfoAsync(data.Thread_);
+                //}
+                data.Force184 = "1";
+                data.Threadkey = thread.Threadkey;
             }
             else if (options.When == default)
             {
@@ -278,7 +276,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<Request::ThreadLeaves> GetThreadLeavesAsync(WathJson::CommentThread thread, IDmcInfo dmcInfo, ICommentOptions options, bool isEasy)
+        private Request::ThreadLeaves GetThreadLeaves(WathJson::Thread thread, IDmcInfo dmcInfo, ICommentOptions options, bool isEasy)
         {
             double divided = dmcInfo.Duration / 60d;
             double min = Math.Ceiling(divided);
@@ -298,12 +296,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             if (thread.IsThreadkeyRequired)
             {
-                if (this.authInfo is null)
-                {
-                    this.authInfo = await this.officialVideoUtils.GetAuthInfoAsync(data.Thread);
-                }
-                data.Threadkey = this.authInfo.ThreadKey;
-                data.Force184 = this.authInfo.Force184;
+                //2021(R3)/03/15の変更でthreadkeyは別途取得が不要になった
+                //Force184は1でいいっぽい
+                ///if (this.authInfo is null)
+                ///{
+                ///    this.authInfo = await this.officialVideoUtils.GetAuthInfoAsync(data.Thread);
+                ///}
+                data.Threadkey = thread.Threadkey;
+                data.Force184 = "1";
             }
             else if (options.When == default)
             {
