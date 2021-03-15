@@ -6,9 +6,10 @@ using AngleSharp.Html.Dom;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 using Niconicome.Models.Domain.Utils;
 using DmcRequest = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request;
-using WatchJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage;
+using WatchJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 
 namespace Niconicome.Models.Domain.Niconico.Watch
 {
@@ -43,7 +44,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         DateTime UploadedOn { get; set; }
         IThumbInfo ThumbInfo { get; }
         ISessionInfo SessionInfo { get; }
-        List<WatchJson::CommentThread> CommentThreads { get; }
+        List<WatchJson::Thread> CommentThreads { get; }
     }
 
     public interface IThumbInfo
@@ -64,7 +65,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         int ContentKeyTimeout { get; set; }
         string? ServiceUserId { get; set; }
         string? PlayerId { get; set; }
-        float Priority { get; set; }
+        double Priority { get; set; }
     }
     public interface IWatchPageHtmlParser
     {
@@ -221,53 +222,52 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             };
 
             //投稿日解析
-            if (original is not null && original.Video is not null && original.Video.PostedDateTime is not null)
+            if (original is not null && original.Video is not null )
             {
-                var result = DateTime.TryParseExact(original.Video.PostedDateTime, "yyyy/MM/dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out DateTime d);
-                if (result) info.UploadedOn = d;
+                info.UploadedOn = original.Video.RegisteredAt.DateTime;
             }
 
             //サムネイル
-            info.ThumbInfo.Large = original?.Video?.LargeThumbnailUrl ?? string.Empty;
-            info.ThumbInfo.Normal = original?.Video?.ThumbnailUrl ?? string.Empty;
+            info.ThumbInfo.Large = original?.Video?.Thumbnail?.LargeUrl ?? (original?.Video?.Thumbnail?.Url??string.Empty);
+            info.ThumbInfo.Normal = original?.Video?.Thumbnail?.MiddleUrl ?? (original?.Video?.Thumbnail?.Url ?? string.Empty);
 
             //投稿者
             info.Owner = original?.Owner?.Nickname ?? string.Empty;
 
             //タグ
-            info.Tags = original?.Tags?.Select(t => t.Name ?? string.Empty).Where(t => !t.IsNullOrEmpty()) ?? new List<string>();
+            info.Tags = original?.Tag.Items?.Select(t => t.Name ?? string.Empty).Where(t => !t.IsNullOrEmpty()) ?? new List<string>();
 
             //再生回数
-            info.ViewCount = original?.Video?.ViewCount ?? 0;
+            info.ViewCount = original?.Video?.Count?.View ?? 0;
 
             //コメント情報
-            info.CommentThreads = original?.CommentComposite?.Threads ?? new List<WatchJson::CommentThread>();
+            info.CommentThreads = original?.Comment?.Threads ?? new List<WatchJson::Thread>();
 
             //ユーザー情報
-            info.UserId = original?.Video?.DmcInfo?.User?.UserId.ToString() ?? string.Empty;
-            info.Userkey = original?.Context?.Userkey ?? string.Empty;
+            ///info.UserId = original?.Video?.DmcInfo?.User?.UserId.ToString() ?? string.Empty;
+            ///info.Userkey = original?.Context?.Userkey ?? string.Empty;
 
             //公式フラグ
-            info.IsOfficial = original?.Video?.IsOfficial ?? false;
+            info.IsOfficial = original?.Channel is null;
 
             //時間
             info.Duration = original?.Video?.Duration ?? 0;
 
             //Session情報
-            if (!options.HasFlag(WatchInfoOptions.NoDmcData) && original?.Video?.DmcInfo?.SessionApi is not null)
+            if (!options.HasFlag(WatchInfoOptions.NoDmcData) && original?.Media?.Delivery is not null)
             {
-                info.SessionInfo.RecipeId = original?.Video?.DmcInfo?.SessionApi?.RecipeId;
-                info.SessionInfo.ContentId = original?.Video?.DmcInfo?.SessionApi?.ContentId;
-                info.SessionInfo.HeartbeatLifetime = original?.Video?.DmcInfo?.SessionApi?.HeartbeatLifetime ?? 0;
-                info.SessionInfo.Token = original?.Video?.DmcInfo?.SessionApi?.Token;
-                info.SessionInfo.Signature = original?.Video?.DmcInfo?.SessionApi?.Signature;
-                info.SessionInfo.AuthType = original?.Video?.DmcInfo?.SessionApi?.AuthTypes?.Http;
-                info.SessionInfo.ContentKeyTimeout = original?.Video?.DmcInfo?.SessionApi?.ContentKeyTimeout ?? 0;
-                info.SessionInfo.ServiceUserId = original?.Video?.DmcInfo?.SessionApi?.ServiceUserId;
-                info.SessionInfo.PlayerId = original?.Video?.DmcInfo?.SessionApi?.PlayerId;
-                info.SessionInfo.Priority = original?.Video?.DmcInfo?.SessionApi?.Priority ?? 1f;
-                info.SessionInfo.ContentSrcIdSets = this.GetContentSrcIdSets(original?.Video?.DmcInfo?.SessionApi);
-                info.IsDownloadsble = original?.Video?.DmcInfo?.Encryption == null;
+                info.SessionInfo.RecipeId = original?.Media?.Delivery.RecipeId;
+                info.SessionInfo.ContentId = original?.Media?.Delivery?.Movie?.ContentId;
+                info.SessionInfo.HeartbeatLifetime = original?.Media?.Delivery?.Movie?.Session?.HeartbeatLifetime ?? 0;
+                info.SessionInfo.Token = original?.Media?.Delivery?.Movie?.Session?.Token;
+                info.SessionInfo.Signature = original?.Media?.Delivery?.Movie?.Session?.Signature;
+                info.SessionInfo.AuthType = original?.Media?.Delivery?.Movie?.Session?.AuthTypes?.Http;
+                info.SessionInfo.ContentKeyTimeout = original?.Media?.Delivery?.Movie?.Session?.ContentKeyTimeout ?? 0;
+                info.SessionInfo.ServiceUserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId;
+                info.SessionInfo.PlayerId = original?.Media?.Delivery?.Movie?.Session?.PlayerId;
+                info.SessionInfo.Priority = original?.Media?.Delivery?.Movie?.Session?.Priority ?? 1f;
+                info.SessionInfo.ContentSrcIdSets = this.GetContentSrcIdSets(original?.Media?.Delivery?.Movie?.Session);
+                info.IsDownloadsble = original?.Media?.Delivery?.Encryption == null;
             }
             else
             {
@@ -275,7 +275,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             }
 
             //暗号化動画の場合はダウンロード不可
-            if (original?.Video?.DmcInfo?.Encryption is not null)
+            if (original?.Media?.Delivery?.Encryption is not null)
             {
                 info.IsDownloadsble = false;
                 info.IsEncrypted = true;
@@ -289,7 +289,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="sessionApiData"></param>
         /// <returns></returns>
-        private DmcRequest::Content_Src_Id_Sets GetContentSrcIdSets(WatchJson::SessionApi? sessionApiData)
+        private DmcRequest::Content_Src_Id_Sets GetContentSrcIdSets(WatchJson::Session? sessionApiData)
         {
             if (sessionApiData is null) throw new InvalidOperationException("SessionAPIDataがnullです。");
             if (sessionApiData.Videos is null) throw new InvalidOperationException($"SessionAPIDataのVideosプロパティーがnullです。");
@@ -415,7 +415,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// <summary>
         /// コメントスレッド
         /// </summary>
-        public List<WatchJson::CommentThread> CommentThreads { get; set; } = new();
+        public List<WatchJson::Thread> CommentThreads { get; set; } = new();
     }
 
     /// <summary>
@@ -443,7 +443,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 
         public string? PlayerId { get; set; }
 
-        public float Priority { get; set; }
+        public double Priority { get; set; }
     }
 
     /// <summary>
