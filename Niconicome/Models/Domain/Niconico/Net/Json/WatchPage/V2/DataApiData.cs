@@ -74,12 +74,21 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2
         public string Label { get; set; } = string.Empty;
     }
 
+    public class Keys
+    {
+        [JsonPropertyName("userKey")]
+        public string UserKey { get; set; } = string.Empty;
+    }
+
 
     public class Comment
     {
 
         [JsonPropertyName("threads")]
         public List<Thread> Threads { get; set; } = new();
+
+        [JsonPropertyName("keys")]
+        public Keys Keys { get; set; } = new();
     }
 
 

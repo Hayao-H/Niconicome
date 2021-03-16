@@ -222,13 +222,13 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             };
 
             //投稿日解析
-            if (original is not null && original.Video is not null )
+            if (original is not null && original.Video is not null)
             {
                 info.UploadedOn = original.Video.RegisteredAt.DateTime;
             }
 
             //サムネイル
-            info.ThumbInfo.Large = original?.Video?.Thumbnail?.LargeUrl ?? (original?.Video?.Thumbnail?.Url??string.Empty);
+            info.ThumbInfo.Large = original?.Video?.Thumbnail?.LargeUrl ?? (original?.Video?.Thumbnail?.Url ?? string.Empty);
             info.ThumbInfo.Normal = original?.Video?.Thumbnail?.MiddleUrl ?? (original?.Video?.Thumbnail?.Url ?? string.Empty);
 
             //投稿者
@@ -244,8 +244,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             info.CommentThreads = original?.Comment?.Threads ?? new List<WatchJson::Thread>();
 
             //ユーザー情報
-            ///info.UserId = original?.Video?.DmcInfo?.User?.UserId.ToString() ?? string.Empty;
-            ///info.Userkey = original?.Context?.Userkey ?? string.Empty;
+            info.UserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId ?? string.Empty;
+            info.Userkey = original?.Comment?.Keys?.UserKey ?? string.Empty;
 
             //公式フラグ
             info.IsOfficial = original?.Channel is null;
@@ -263,10 +263,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 info.SessionInfo.Signature = original?.Media?.Delivery?.Movie?.Session?.Signature;
                 info.SessionInfo.AuthType = original?.Media?.Delivery?.Movie?.Session?.AuthTypes?.Http;
                 info.SessionInfo.ContentKeyTimeout = original?.Media?.Delivery?.Movie?.Session?.ContentKeyTimeout ?? 0;
-                info.SessionInfo.ServiceUserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId;
                 info.SessionInfo.PlayerId = original?.Media?.Delivery?.Movie?.Session?.PlayerId;
                 info.SessionInfo.Priority = original?.Media?.Delivery?.Movie?.Session?.Priority ?? 1f;
                 info.SessionInfo.ContentSrcIdSets = this.GetContentSrcIdSets(original?.Media?.Delivery?.Movie?.Session);
+                info.SessionInfo.ServiceUserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId; 
                 info.IsDownloadsble = original?.Media?.Delivery?.Encryption == null;
             }
             else
