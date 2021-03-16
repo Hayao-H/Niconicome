@@ -135,6 +135,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2
 
         [JsonPropertyName("priority")]
         public double Priority { get; set; }
+
+        [JsonPropertyName("transferPresets")]
+        public List<string> TransferPrisets { get; set; } = new();
     }
 
     public class Movie

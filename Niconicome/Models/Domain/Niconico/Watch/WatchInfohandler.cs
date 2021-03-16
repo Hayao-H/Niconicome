@@ -65,6 +65,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         int ContentKeyTimeout { get; set; }
         string? ServiceUserId { get; set; }
         string? PlayerId { get; set; }
+        string? TransferPriset { get; set; }
         double Priority { get; set; }
     }
     public interface IWatchPageHtmlParser
@@ -264,9 +265,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 info.SessionInfo.AuthType = original?.Media?.Delivery?.Movie?.Session?.AuthTypes?.Http;
                 info.SessionInfo.ContentKeyTimeout = original?.Media?.Delivery?.Movie?.Session?.ContentKeyTimeout ?? 0;
                 info.SessionInfo.PlayerId = original?.Media?.Delivery?.Movie?.Session?.PlayerId;
-                info.SessionInfo.Priority = original?.Media?.Delivery?.Movie?.Session?.Priority ?? 1f;
+                info.SessionInfo.Priority = Math.Floor((original?.Media?.Delivery?.Movie?.Session?.Priority ?? 1) * 10) / 10;
                 info.SessionInfo.ContentSrcIdSets = this.GetContentSrcIdSets(original?.Media?.Delivery?.Movie?.Session);
-                info.SessionInfo.ServiceUserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId; 
+                info.SessionInfo.ServiceUserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId;
+                info.SessionInfo.TransferPriset = original?.Media?.Delivery?.Movie?.Session?.TransferPrisets?.FirstOrDefault()??string.Empty;
                 info.IsDownloadsble = original?.Media?.Delivery?.Encryption == null;
             }
             else
@@ -436,6 +438,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public string? Signature { get; set; }
 
         public string? AuthType { get; set; }
+
+        public string? TransferPriset { get; set; }
 
         public int ContentKeyTimeout { get; set; }
 
