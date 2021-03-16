@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -143,7 +144,10 @@ namespace Niconicome.Models.Domain.Niconico
         /// <param name="value"></param>
         public void AddCookie(string name, string value)
         {
-            var cookie = new Cookie(name, value);
+            var cookie = new Cookie(name, value)
+            {
+                Domain = ".nicovideo.jp"
+            };
             this.CookieContainer.Add(this.niconicoBaseUri, cookie);
         }
 
