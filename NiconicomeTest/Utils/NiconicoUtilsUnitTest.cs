@@ -56,5 +56,21 @@ namespace NiconicomeTest.Utils
             var result = this.utils!.GetIdFromFIleName(filename);
             Assert.That(result, Is.EqualTo(id));
         }
+
+        [TestCase("sm9",true)]
+        [TestCase("so123",true)]
+        [TestCase("123",true)]
+        [TestCase("nm9",true)]
+        [TestCase("nm123",true)]
+        [TestCase("hsm9", false)]
+        [TestCase("sm91a", false)]
+        [TestCase("a12", false)]
+        [TestCase("12d", false)]
+        public void ニコニコのIDをテストする(string testString,bool expectedResult)
+        {
+            var result = this.utils!.IsNiconicoID(testString);
+
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
     }
 }

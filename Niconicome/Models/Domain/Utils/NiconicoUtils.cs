@@ -15,6 +15,7 @@ namespace Niconicome.Models.Domain.Utils
         string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, string? suffix = null);
         string GetIdFromFIleName(string format, string filenameWithExt);
         string GetIdFromFIleName(string filenameWithExt);
+        bool IsNiconicoID(string testString);
 
     }
 
@@ -79,6 +80,16 @@ namespace Niconicome.Models.Domain.Utils
 
             var match = Regex.Match(filenameWithExt, "(sm|nm|so)?[0-9]+");
             return match.Value;
+        }
+
+        /// <summary>
+        /// 入力した文字列がニコニコのIDとして正しいかどうかを取得する
+        /// </summary>
+        /// <param name="testString"></param>
+        /// <returns></returns>
+        public bool IsNiconicoID(string testString)
+        {
+            return Regex.IsMatch(testString, "^(sm|nm|so)?[0-9]+$");
         }
 
 
