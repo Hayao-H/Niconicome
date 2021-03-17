@@ -245,7 +245,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             info.CommentThreads = original?.Comment?.Threads ?? new List<WatchJson::Thread>();
 
             //ユーザー情報
-            info.UserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId ?? string.Empty;
+            //info.UserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId ?? string.Empty;
+            info.UserId = NiconicoContext.User?.ID ?? string.Empty;
             info.Userkey = original?.Comment?.Keys?.UserKey ?? string.Empty;
 
             //公式フラグ
@@ -268,7 +269,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 info.SessionInfo.Priority = Math.Floor((original?.Media?.Delivery?.Movie?.Session?.Priority ?? 1) * 10) / 10;
                 info.SessionInfo.ContentSrcIdSets = this.GetContentSrcIdSets(original?.Media?.Delivery?.Movie?.Session);
                 info.SessionInfo.ServiceUserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId;
-                info.SessionInfo.TransferPriset = original?.Media?.Delivery?.Movie?.Session?.TransferPrisets?.FirstOrDefault()??string.Empty;
+                info.SessionInfo.TransferPriset = original?.Media?.Delivery?.Movie?.Session?.TransferPrisets?.FirstOrDefault() ?? string.Empty;
                 info.IsDownloadsble = original?.Media?.Delivery?.Encryption == null;
             }
             else

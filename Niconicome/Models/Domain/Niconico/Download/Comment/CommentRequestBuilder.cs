@@ -135,6 +135,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private int requestIndex = 0;
 
+        private string? wayBackkey;
+
         /// <summary>
         /// リクエストメッセージを取得する
         /// </summary>
@@ -164,19 +166,22 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             foreach (var thread in dmcInfo.CommentThreads)
             {
                 //非activeスレッドはスキップ
-                if (!thread.IsActive) continue;
+                //if (!thread.IsActive) continue;
 
                 //easyコメントをスキップ
                 if (options.NoEasyComment && thread.Label == "easy") continue;
 
-                //過去ログの場合コミュニティーコメントはスキップ
-                //if (options.When != default && thread.Label == "community") continue;
+                //過去ログの場合はwaybackkeyを取得
+                if (options.When != default)
+                {
+                    this.wayBackkey = await this.officialVideoUtils.GetWaybackkeyAsync(thread.Id.ToString());
+                }
 
                 //投コメ
                 if (!options.OwnerComment && thread.IsOwnerThread) continue;
 
                 data.Add(this.GetPingContent(PingType.StartContent, this.commandIndex));
-                var itemThread = new Request::Comment() { Thread = await this.GetThreadAsync(thread, dmcInfo, options) };
+                var itemThread = new Request::Comment() { Thread =this.GetThread(thread, dmcInfo, options) };
                 data.Add(itemThread);
                 data.Add(this.GetPingContent(PingType.EndContent, this.commandIndex));
                 ++this.commandIndex;
@@ -209,7 +214,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<Request::Thread> GetThreadAsync(WathJson::Thread thread, IDmcInfo dmcInfo, ICommentOptions options)
+        private Request::Thread GetThread(WathJson::Thread thread, IDmcInfo dmcInfo, ICommentOptions options)
         {
             var data = new Request::Thread
             {
@@ -238,8 +243,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (options.When != default)
             {
                 data.When = options.When;
-
-                data.Waybackkey = await this.officialVideoUtils.GetWaybackkeyAsync(data.Thread_);
+                data.Waybackkey = this.wayBackkey!;
             }
             else
             {
@@ -260,10 +264,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 data.UserKey = dmcInfo.Userkey;
             }
 
-            ///if (options.When != default)
-            ///{
-            ///    data.Waybackkey = await this.officialVideoUtils.GetWaybackkeyAsync(data.Thread_);
-            ///}
 
 
             return data;
@@ -313,9 +313,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (options.When != default)
             {
                 data.When = options.When;
-
-                //data.Waybackkey = await this.officialVideoUtils.GetWaybackkeyAsync(data.Thread);
-
+                data.Waybackkey = this.wayBackkey;
             }
             else
             {
