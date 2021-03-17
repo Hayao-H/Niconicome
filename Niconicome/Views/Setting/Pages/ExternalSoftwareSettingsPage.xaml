@@ -15,12 +15,10 @@
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
         Background="{DynamicResource MaterialDesignBackground}"
+      d:DataContext="{d:DesignInstance vm:ExternalSoftwareSettingsViewModelD,IsDesignTimeCreatable=True}"
         FontFamily="Yu Gothic"
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="800"
       Title="外部ソフト設定">
-    <Page.DataContext>
-        <vm:ExternalSoftwareSettingsViewModel/>
-    </Page.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -101,7 +99,16 @@
                     </materialDesign:PackIcon>
                     <Label Content="ffmpegのパス(_F)" Target="{Binding ElementName=ffmpegpath}"/>
                 </StackPanel>
-                    <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="ffmpegpath"/>
+                <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="ffmpegpath"/>
+                <DockPanel Margin="6">
+                    <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="FFmpegの起動にシェルを利用する"/>
+                    <ToggleButton IsChecked="{Binding   UseShellWhenLaunchingFFmpeg,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                </DockPanel>
             </StackPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>

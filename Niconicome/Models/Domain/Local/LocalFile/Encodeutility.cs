@@ -34,7 +34,7 @@ namespace Niconicome.Models.Domain.Local.LocalFile
 
         private readonly ILocalState localState;
 
-        private readonly ILogger logger; 
+        private readonly ILogger logger;
 
         /// <summary>
         /// 非同期でエンコードする
@@ -47,11 +47,12 @@ namespace Niconicome.Models.Domain.Local.LocalFile
         public async Task EncodeAsync(string inputFilePath, string outputFileName, CancellationToken token, EncodeOptions options = EncodeOptions.Default)
         {
             var errorOutput = new StringBuilder();
+            var useShell = this.settingHandler.GetBoolSetting(Settings.FFmpegShell);
 
             using var p = new Process();
-            p.StartInfo.FileName = Environment.GetEnvironmentVariable("ComSpec") ?? "cmd.exe";
+            p.StartInfo.FileName = useShell ? Environment.GetEnvironmentVariable("ComSpec") ?? "cmd.exe" : this.GetffmpegPath();
             p.StartInfo.UseShellExecute = false;
-            p.StartInfo.Arguments = this.GetCommand(inputFilePath, outputFileName, options);
+            p.StartInfo.Arguments = this.GetCommand(inputFilePath, outputFileName, options, useShell);
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.CreateNoWindow = true;
@@ -86,13 +87,17 @@ namespace Niconicome.Models.Domain.Local.LocalFile
         /// <param name="outputFileName"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private string GetCommand(string inputFilePath, string outputFileName, EncodeOptions options)
+        private string GetCommand(string inputFilePath, string outputFileName, EncodeOptions options, bool useShell)
         {
             var args = new List<string>();
             string ffmpegPath = this.GetffmpegPath();
 
-            args.Add("/c");
-            args.Add(ffmpegPath);
+            if (useShell)
+            {
+                args.Add("/c");
+                args.Add(ffmpegPath);
+            }
+
             args.Add($"-i \"{inputFilePath}\"");
             args.Add("-y");
 

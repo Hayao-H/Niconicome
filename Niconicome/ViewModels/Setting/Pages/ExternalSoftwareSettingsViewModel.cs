@@ -20,6 +20,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.appIdParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppIdParam)??string.Empty;
             this.appUrlParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppUrlParam)??string.Empty;
             this.ffmpegPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.FfmpegPath) ?? string.Empty;
+            this.useShellWhenLaunchingFFmpegFIeld = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.FFmpegShell);
         }
 
         private string playerAPathField;
@@ -35,6 +36,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         private string appUrlParamField;
 
         private string ffmpegPathField;
+
+        private bool useShellWhenLaunchingFFmpegFIeld;
 
         /// <summary>
         /// プレイヤーAのパス
@@ -70,5 +73,50 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// ffmpegのパス
         /// </summary>
         public string FfmpegPath { get => this.ffmpegPathField; set => this.Savesetting(ref this.ffmpegPathField, value, Settings.FfmpegPath); }
+
+        /// <summary>
+        /// シェルを利用する
+        /// </summary>
+        public bool UseShellWhenLaunchingFFmpeg { get => this.useShellWhenLaunchingFFmpegFIeld; set => this.Savesetting(ref this.useShellWhenLaunchingFFmpegFIeld, value,Settings.FFmpegShell); }
+    }
+
+    class ExternalSoftwareSettingsViewModelD
+    {
+        /// <summary>
+        /// プレイヤーAのパス
+        /// </summary>
+        public string PlayerAPath { get; set; } = "設定値";
+
+        /// <summary>
+        /// プレイヤーBのパス
+        /// </summary>
+        public string PlayerBPath { get; set; } = "設定値";
+
+        /// <summary>
+        /// Id
+        /// </summary>
+        public string AppIdPath { get; set; } = "設定値";
+
+        /// <summary>
+        /// Url
+        /// </summary>
+        public string AppUrlPath { get; set; } = "設定値";
+
+        /// <summary>
+        /// Id
+        /// </summary>
+        public string AppIdParam { get; set; } = "設定値";
+
+        /// <summary>
+        /// Url
+        /// </summary>
+        public string AppUrlParam { get; set; } = "設定値";
+
+        /// <summary>
+        /// ffmpegのパス
+        /// </summary>
+        public string FfmpegPath { get; set; } = "設定値";
+
+        public bool UseShellWhenLaunchingFFmpeg { get; set; } = true;
     }
 }
