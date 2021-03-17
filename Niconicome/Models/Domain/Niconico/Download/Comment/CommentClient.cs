@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Net.Json;
@@ -114,7 +116,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             {
                 if (index > 0) messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目)");
                 first = comments.GetFirstComment(false);
-                long? when = comments.Count == 0 ? 0 : first?.Date;
+                long? when = comments.Count == 0 ? 0 : first?.Date - 1;
                 List<Response::Comment> retlieved = await this.GetCommentsAsync(dmcInfo, settings, when);
 
                 comments.Add(retlieved);
@@ -400,6 +402,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             //bool chatStarted = false;
             bool nicoruEnded = false;
             int skipped = 0;
+            int cCounts = comments.Where(c => c.Chat is not null).Count();
+            var first = this.GetFirstComment();
+            bool isFirstIsOldEnough = first is null ? false : first.No < this.comThroughSetting + 10;
 
             foreach (var item in comments)
             {
@@ -415,7 +420,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                     }
                 }
 
-                if (addSafe && this.comThroughSetting > 0 && item.Chat is not null)
+                if (addSafe && !isFirstIsOldEnough && this.comThroughSetting > 0 && cCounts > this.comThroughSetting + 20 && item.Chat is not null)
                 {
                     if (skipped < this.comThroughSetting)
                     {
@@ -423,16 +428,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                         continue;
                     }
                 }
-
-                //if (!chatStarted && item.Chat is not null)
-                //{
-                //    chatStarted = true;
-                //}
-                //
-                //if (chatStarted && item.Ping is not null)
-                //{
-                //    break;
-                //}
                 this.Add(item, false);
             }
         }
