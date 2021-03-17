@@ -351,7 +351,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 if ((task.SequenceZero + 1) > this.maxParallelDownloadCount)
                 {
                     this.isSleeping = true;
-                    await Task.Delay(1 * 1000, token);
+                    await Task.Delay(3 * 1000, token);
                     this.isSleeping = false;
                 }
 

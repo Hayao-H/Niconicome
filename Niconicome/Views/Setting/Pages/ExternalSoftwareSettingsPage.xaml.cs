@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Niconicome.ViewModels.Setting.Pages;
 
 namespace Niconicome.Views.Setting.Pages
 {
@@ -22,7 +23,8 @@ namespace Niconicome.Views.Setting.Pages
     {
         public ExternalSoftwareSettingsPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
+            this.DataContext = new ExternalSoftwareSettingsViewModel();
         }
     }
 }
