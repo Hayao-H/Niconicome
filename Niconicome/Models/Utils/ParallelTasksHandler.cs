@@ -17,14 +17,15 @@ namespace Niconicome.Models.Utils
     class ParallelTasksHandler<T> where T : IParallelTask<T>
     {
 
-        public ParallelTasksHandler(int maxPallarelTasksCount, int waitInterval, int waitSeconds)
+        public ParallelTasksHandler(int maxPallarelTasksCount, int waitInterval, int waitSeconds, bool createThread = true)
         {
             this.maxPallarelTasksCount = maxPallarelTasksCount;
             this.waitInterval = waitInterval;
             this.waitSeconds = waitSeconds;
+            this.createThread = createThread;
         }
 
-        public ParallelTasksHandler(int maxPallarelTasksCount) : this(maxPallarelTasksCount, -1, -1) { }
+        public ParallelTasksHandler(int maxPallarelTasksCount, bool createThread = true) : this(maxPallarelTasksCount, -1, -1,createThread) { }
 
         /// <summary>
         /// 最大動機実行数
@@ -50,6 +51,11 @@ namespace Niconicome.Models.Utils
         /// ロックオブジェクト
         /// </summary>
         private readonly object lockobj = new();
+
+        /// <summary>
+        /// 別スレッド化フラグ
+        /// </summary>
+        private readonly bool createThread;
 
         /// <summary>
         /// 全ての並列タスク
@@ -137,33 +143,41 @@ namespace Niconicome.Models.Utils
                     continue;
                 }
 
-                var t = Task.Run(async () =>
-                 {
+                Func<Task> func = async () =>
+                {
 
-                     await semaphore.WaitAsync();
+                    await semaphore.WaitAsync();
 
-                     lock (this.lockobj)
-                     {
-                         index++;
-                     }
+                    lock (this.lockobj)
+                    {
+                        index++;
+                    }
 
-                     //待機処理
-                     if (this.waitInterval != -1 && index % this.waitInterval == 0)
-                     {
-                         mre.Reset();
-                         task.OnWait(index);
-                         await Task.Delay(this.waitSeconds * 1000);
-                         mre.Set();
-                     }
+                    //待機処理
+                    if (this.waitInterval != -1 && index % this.waitInterval == 0)
+                    {
+                        mre.Reset();
+                        task.OnWait(index);
+                        await Task.Delay(this.waitSeconds * 1000);
+                        mre.Set();
+                    }
 
-                     mre.Wait();
+                    mre.Wait();
 
-                     await Task.Run(async () => await task.TaskFunction(task));
+                    await Task.Run(async () => await task.TaskFunction(task));
 
-                     semaphore.Release();
-                 });
+                    semaphore.Release();
+                };
 
-                tasks.Add(t);
+                if (this.createThread)
+                {
+                    var t = Task.Run(func);
+                    tasks.Add(t);
+                } else
+                {
+                    var t = func();
+                    tasks.Add(t);
+                }
 
             }
 

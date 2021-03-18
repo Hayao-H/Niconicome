@@ -76,7 +76,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainWatch::IWatchPlaylisthandler, DomainWatch::WatchPlaylistHandler>();
             services.AddTransient<Dmc::IStreamhandler, Dmc::StreamHandler>();
             services.AddTransient<Dmc::IM3U8Handler, Dmc::M3U8Handler>();
-            services.AddTransient<DlVideo::IDownloadTaskHandler, DlVideo::DownloadTaskHandler>();
             services.AddTransient<DlVideo::IVideoDownloadHelper, DlVideo::VideoDownloadHelper>();
             services.AddTransient<DlVideo::IVideoDownloader, DlVideo::VideoDownloader>();
             services.AddTransient<DlVideo::ISegmentWriter, DlVideo::SegmentWriter>();

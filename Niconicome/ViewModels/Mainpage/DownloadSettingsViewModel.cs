@@ -56,7 +56,14 @@ namespace Niconicome.ViewModels.Mainpage
                        this.SnackbarMessageQueue.Enqueue("動画をダウンロードするにはログインが必要です。");
                        return;
                    }
-                   if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingCommentLogEnable && !this.IsDownloadingThumbEnable) return;
+
+                   if (!this.IsDownloadingCommentEnable && (this.IsDownloadingCommentLogEnable || this.IsDownloadingEasyComment || this.IsDownloadingOwnerComment))
+                   {
+                       this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
+                       return;
+                   }
+
+                   if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable  && !this.IsDownloadingThumbEnable) return;
 
                    var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
                    if (!videos.Any()) return;

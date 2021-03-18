@@ -311,7 +311,7 @@
                             </Style>
                         </ListView.Resources>
                     </ListView>
-                    <materialDesign:Snackbar Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
+                    <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="120 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
                 </Grid>
                 <TabControl Grid.Row="3" Margin="8">
                     <TabItem Header="設定">

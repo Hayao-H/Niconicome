@@ -15,7 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Download
         string GetLogContent();
     }
 
-    class DownloadContext:IDownloadContext
+    public class DownloadContext : IDownloadContext
     {
         public DownloadContext(string niconicoId)
         {
