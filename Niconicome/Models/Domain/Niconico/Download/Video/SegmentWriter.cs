@@ -11,7 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface ISegmentWriter
     {
-        void Write(byte[] data, IDownloadTask task,IDownloadContext context);
+        void Write(byte[] data, IParallelDownloadTask task, IDownloadContext context);
         string FolderNameAbs { get; }
         IEnumerable<string> FilesPath { get; }
         IEnumerable<string> FilesPathAbs { get; }
@@ -30,9 +30,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         /// <param name="data"></param>
         /// <param name="task"></param>
-        public void Write(byte[] data, IDownloadTask task, IDownloadContext context)
+        public void Write(byte[] data, IParallelDownloadTask task, IDownloadContext context)
         {
-            this.folderName = Path.Combine("tmp",context.Id);
+            this.folderName = Path.Combine("tmp", context.Id);
 
             if (!Directory.Exists(this.folderName))
             {
@@ -54,17 +54,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <summary>
         /// 完全なフォルダー名
         /// </summary>
-        public string FolderNameAbs { get => Path.Combine(AppContext.BaseDirectory, this.folderName??string.Empty); }
+        public string FolderNameAbs { get => Path.Combine(AppContext.BaseDirectory, this.folderName ?? string.Empty); }
 
 
         /// <summary>
         /// ファイル名のリスト
         /// </summary>
-        public IEnumerable<string> FilesPath => this.innerFileNames.Select(p => Path.Combine(this.folderName??"tmp", p));
+        public IEnumerable<string> FilesPath => this.innerFileNames.Select(p => Path.Combine(this.folderName ?? "tmp", p));
 
         /// <summary>
         /// ファイル名のリスト(絶対)
         /// </summary>
-        public IEnumerable<string> FilesPathAbs => this.innerFileNames.OrderBy(p=>int.Parse(p.Substring(0,p.IndexOf('.')))).Select(p => Path.Combine(this.FolderNameAbs, p));
+        public IEnumerable<string> FilesPathAbs => this.innerFileNames.OrderBy(p => int.Parse(p.Substring(0, p.IndexOf('.')))).Select(p => Path.Combine(this.FolderNameAbs, p));
     }
 }

@@ -299,7 +299,13 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             if (sessionApiData.Audios is null) throw new InvalidOperationException($"SessionAPIDataのAudiosプロパティーがnullです。");
             if (sessionApiData.Audios.Count == 0) throw new InvalidOperationException($"SessionAPIDataのAudiosにデータが存在しません。");
 
-            var videoSrc = sessionApiData.Videos.OrderBy(s => s).Select((value, index) => new { value, index }).ToList();
+            sessionApiData.Videos.Sort((a, b) =>
+            {
+                if (a.EndsWith("_low")) return -1;
+                if (b.EndsWith("_low")) return 1;
+                return string.Compare(a, b);
+            });
+            var videoSrc = sessionApiData.Videos.Select((value, index) => new { value, index }).ToList();
             string audio = sessionApiData.Audios[0];
             var sets = new DmcRequest::Content_Src_Id_Sets();
 
@@ -314,7 +320,13 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                     idsData.Src_id_to_mux.Video_src_ids.Add(videoSrc[i].value);
                 }
 
-                idsData.Src_id_to_mux.Video_src_ids = idsData.Src_id_to_mux.Video_src_ids.OrderByDescending(s => s).ToList();
+                //idsData.Src_id_to_mux.Video_src_ids = idsData.Src_id_to_mux.Video_src_ids.OrderByDescending(s => s).ToList();
+                idsData.Src_id_to_mux.Video_src_ids.Sort((a, b) =>
+                {
+                    if (a.EndsWith("_low")) return 1;
+                    if (b.EndsWith("_low")) return -1;
+                    return string.Compare(b, a);
+                });
 
                 sets.Content_src_ids.Add(idsData);
 

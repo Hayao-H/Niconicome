@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Dmc;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Utils;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video
 {
@@ -265,7 +266,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     public class VideoDownloadHelper : IVideoDownloadHelper
     {
 
-        public VideoDownloadHelper(INicoHttp http, ISegmentWriter writer, IDownloadTaskHandler taskHandler, ILogger logger)
+        public VideoDownloadHelper(INicoHttp http, ISegmentWriter writer, ILogger logger)
         {
             //最大並列ダウンロード数(既定:5)
             const int maxParallelDownloadCount = 5;
@@ -273,7 +274,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             this.maxParallelDownloadCount = maxParallelDownloadCount;
             this.http = http;
             this.writer = writer;
-            this.taskHandler = taskHandler;
             this.logger = logger;
         }
 
@@ -287,14 +287,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         private readonly ISegmentWriter writer;
 
-        /// <summary>
-        /// タスクハンドラ
-        /// </summary>
-        private readonly IDownloadTaskHandler taskHandler;
-
         private readonly ILogger logger;
-
-        private int currentParallelDownloadCount;
 
         private readonly int maxParallelDownloadCount;
 
@@ -303,24 +296,67 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         /// <param name="taskHandler"></param>
         /// <returns></returns>
-        public Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
+        public async Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
         {
-            var taskCompletionSource = new TaskCompletionSource();
+            var taskHandler = new ParallelTasksHandler<IParallelDownloadTask>(2, false);
+            var completed = 0;
+            var all = stream.StreamUrls.Count;
+            Exception? ex = null;
 
-            var tasks = this.taskHandler.ConvertToTasks(stream);
-            this.taskHandler.AddTasks(tasks);
-
-            for (var i = 0; i < this.maxParallelDownloadCount; i++)
+            var tasks = stream.StreamUrls.Select(url => new ParallelDownloadTask(async self =>
             {
+                if (token.IsCancellationRequested || ex is not null) return;
+
+                byte[] data;
+
+                try
+                {
+                    data = await this.DownloadInternalAsync(self.Url, self.Context);
+                }
+                catch (Exception e)
+                {
+                    ex = e;
+                    this.logger.Error($"セグメント(idx:{self.SequenceZero})の取得に失敗しました。", e);
+                    return;
+                }
+
+                this.logger.Log($"セグメント(idx:{self.SequenceZero})を取得しました。(context_id:{context.Id},content_id:{context.NiconicoId})");
+
                 if (token.IsCancellationRequested)
                 {
-                    if (!taskCompletionSource.Task.IsCompleted) taskCompletionSource.SetResult();
-                    break;
+                    return;
                 }
-                var _ = this.DownloadAndNextAsync(taskHandler, taskCompletionSource, messenger, context, token);
+
+
+                try
+                {
+                    this.writer.Write(data, self, context);
+                }
+                catch (Exception e)
+                {
+                    ex = e;
+                    return;
+                }
+
+                completed++;
+                messenger.SendMessage($"完了: {completed}/{all}");
+
+                await Task.Delay(1 * 1000);
+
+
+            }, context, url.AbsoluteUrl, url.SequenceZero, url.FileName));
+
+            foreach (var task in tasks)
+            {
+                taskHandler.AddTaskToQueue(task);
             }
 
-            return taskCompletionSource.Task;
+            await taskHandler.ProcessTasksAsync();
+
+            if (ex is not null)
+            {
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -332,99 +368,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             return this.writer.FilesPathAbs;
         }
 
-
-        /// <summary>
-        /// DownloadTaskの内容を取得して可能であれば次のタスクを取得する
-        /// </summary>
-        /// <param name="taskHandler"></param>
-        /// <param name="taskCompletionSource"></param>
-        /// <returns></returns>
-        private async Task DownloadAndNextAsync(IDownloadTaskHandler taskHandler, TaskCompletionSource taskCompletionSource, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
-        {
-
-            if (!taskHandler.IsCompleted && !token.IsCancellationRequested)
-            {
-                ++this.currentParallelDownloadCount;
-                var task = taskHandler.RetrieveNextTask();
-                byte[] data;
-
-                if ((task.SequenceZero + 1) > this.maxParallelDownloadCount)
-                {
-                    this.isSleeping = true;
-                    await Task.Delay(3 * 1000, token);
-                    this.isSleeping = false;
-                }
-
-                try
-                {
-                    data = await this.DownloadInternalAsync(task.Url, context);
-                }
-                catch (Exception e)
-                {
-                    if (!taskCompletionSource.Task.IsCompleted || !taskCompletionSource.Task.IsCanceled)
-                    {
-                        taskCompletionSource.SetException(e);
-                    }
-                    this.logger.Error($"セグメント(idx:{task.SequenceZero})の取得に失敗しました。");
-                    return;
-                }
-
-                this.logger.Log($"セグメント(idx:{task.SequenceZero})を取得しました。(context_id:{context.Id},content_id:{context.NiconicoId})");
-
-                if (token.IsCancellationRequested)
-                {
-                    if (!taskCompletionSource.Task.IsCompleted) taskCompletionSource.SetResult();
-                    return;
-                }
-
-
-                try
-                {
-                    this.writer.Write(data, task, context);
-                }
-                catch (Exception e)
-                {
-                    if (!taskCompletionSource.Task.IsCompleted) taskCompletionSource.SetException(e);
-                    return;
-                }
-
-                task.Completed = true;
-                messenger.SendMessage($"完了: {taskHandler.CurrentCompletedTasksCount}/{taskHandler.OriginalTasksCount}");
-
-                while (this.CanDownloadNext(taskHandler, token))
-                {
-                    var _ = this.DownloadAndNextAsync(taskHandler, taskCompletionSource, messenger, context, token);
-                }
-
-                --this.currentParallelDownloadCount;
-            }
-
-            if (!taskCompletionSource.Task.IsCompleted && (taskHandler.IsCompleted || token.IsCancellationRequested))
-            {
-                taskCompletionSource.SetResult();
-            }
-
-        }
-
-        /// <summary>
-        /// ダウンロード可能かどうかを取得する
-        /// </summary>
-        /// <returns></returns>
-        private bool CanDownloadNext(IDownloadTaskHandler taskHandler, CancellationToken token)
-        {
-            return !this.isSleeping && !token.IsCancellationRequested && this.currentParallelDownloadCount <= this.maxParallelDownloadCount && taskHandler.HasNextTask;
-        }
-
         /// <summary>
         /// フォルダー名
         /// </summary>
         public string FolderName => this.writer.FolderNameAbs;
 
         /// <summary>
-        /// スリープフラグ
+        /// 内部ダウンロードメソッド
         /// </summary>
-        private bool isSleeping;
-
+        /// <param name="url"></param>
+        /// <param name="context"></param>
+        /// <param name="retryAttempt"></param>
+        /// <returns></returns>
         private async Task<byte[]> DownloadInternalAsync(string url, IDownloadContext context, int retryAttempt = 0)
         {
             var res = await this.http.GetAsync(new Uri(url));
@@ -447,106 +402,34 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         }
     }
 
-    /// <summary>
-    /// ダウンロードタスクを管理する
-    /// </summary>
-    public class DownloadTaskHandler : IDownloadTaskHandler
+    public interface IParallelDownloadTask : IParallelTask<IParallelDownloadTask>
     {
-        public IDownloadTask RetrieveNextTask()
-        {
-            if (!this.HasNextTask) throw new InvalidOperationException("タスクが登録されていません。");
-            var task = this.innerTasks.First();
-            this.innerTasks.RemoveAt(0);
-            return task;
-        }
-
-        /// <summary>
-        /// ストリーム情報をタスクに変換する
-        /// </summary>
-        /// <param name="streamInfo"></param>
-        /// <returns></returns>
-        public IEnumerable<IDownloadTask> ConvertToTasks(IStreamInfo streamInfo)
-        {
-            var tasks = new List<IDownloadTask>();
-            foreach (var url in streamInfo.StreamUrls)
-            {
-                var task = new DownloadTask(url.AbsoluteUrl, url.SequenceZero, url.FileName);
-                tasks.Add(task);
-            }
-            return tasks;
-        }
-
-
-        /// <summary>
-        /// タスクを追加する
-        /// </summary>
-        /// <param name="tasks"></param>
-        public void AddTask(IDownloadTask task)
-        {
-            task.PostCompletedCallback = instance =>
-            {
-                this.innerTasks.RemoveAll(t => t.SequenceZero == task.SequenceZero);
-                this.CurrentCompletedTasksCount++;
-            };
-            this.innerTasks.Add(task);
-            this.OriginalTasksCount = this.CurrentTasksCount;
-            this.CurrentCompletedTasksCount = 0;
-        }
-
-        /// <summary>
-        /// 複数のタスクを追加する
-        /// </summary>
-        /// <param name="tasks"></param>
-        public void AddTasks(IEnumerable<IDownloadTask> tasks)
-        {
-            foreach (var task in tasks)
-            {
-                this.AddTask(task);
-            }
-        }
-
-        /// <summary>
-        /// 元のタスク数
-        /// </summary>
-        public int OriginalTasksCount { get; private set; }
-
-        /// <summary>
-        /// タスク数
-        /// </summary>
-        public int CurrentTasksCount => this.innerTasks.Count;
-
-        /// <summary>
-        /// 完了したタスク数
-        /// </summary>
-        public int CurrentCompletedTasksCount { get; private set; }
-
-        /// <summary>
-        /// 完了フラグ
-        /// </summary>
-        public bool IsCompleted => this.OriginalTasksCount == this.CurrentCompletedTasksCount;
-
-        /// <summary>
-        /// 次のタスクの存在を確認
-        /// </summary>
-        public bool HasNextTask => this.CurrentTasksCount > 0;
-
-        /// <summary>
-        /// 内部でデータを保持する
-        /// </summary>
-        private readonly List<IDownloadTask> innerTasks = new();
+        IDownloadContext Context { get; init; }
+        string FileName { get; init; }
+        int SequenceZero { get; init; }
+        string Url { get; init; }
     }
 
     /// <summary>
-    /// タスク
+    /// 並列DLタスク
     /// </summary>
-    public class DownloadTask : IDownloadTask
+    public class ParallelDownloadTask : IParallelDownloadTask
     {
-        public DownloadTask(string url, int sequenceZero, string filename)
+        public ParallelDownloadTask(Func<IParallelDownloadTask, Task> taskFunc, IDownloadContext context, string url, int sequenceZero, string filename)
         {
+            this.TaskFunction = taskFunc;
+            this.TaskId = Guid.NewGuid();
+            this.OnWait += (_) => { };
+            this.Context = context;
             this.Url = url;
             this.SequenceZero = sequenceZero;
             this.FileName = filename;
         }
+
+        /// <summary>
+        /// コンテクスト
+        /// </summary>
+        public IDownloadContext Context { get; init; }
 
         public string Url { get; init; }
 
@@ -557,45 +440,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         public int SequenceZero { get; init; }
 
-        /// <summary>
-        /// 完了フラグ
-        /// </summary>
-        public bool Completed
-        {
-            get => this.completedField;
-            set
-            {
-                if (value)
-                {
-                    if (this.PostCompletedCallback is not null)
-                    {
-                        this.PostCompletedCallback(this);
-                    }
-                }
-                this.IsDownloading = false;
-                this.completedField = value;
-            }
-        }
+        public Guid TaskId { get; init; }
 
-        /// <summary>
-        /// ダウンロード失敗
-        /// </summary>
-        public bool IsFailed { get; set; }
+        public Func<IParallelDownloadTask, Task> TaskFunction { get; init; }
 
-        /// <summary>
-        /// コールバック
-        /// </summary>
-        public Action<IDownloadTask>? PostCompletedCallback { get; set; }
-
-        private bool completedField;
-
-        /// <summary>
-        /// ダウンロード中フラグ
-        /// </summary>
-        public bool IsDownloading { get; set; }
-
+        public Action<int> OnWait { get; init; }
     }
-
 
     /// <summary>
     /// ダウンロード設定
