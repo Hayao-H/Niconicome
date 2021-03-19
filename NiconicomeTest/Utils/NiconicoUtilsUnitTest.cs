@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Playlist;
 
 namespace NiconicomeTest.Utils
 {
@@ -71,6 +72,34 @@ namespace NiconicomeTest.Utils
             var result = this.utils!.IsNiconicoID(testString);
 
             Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        [TestCase("https://www.nicovideo.jp/user/000/mylist/000?ref=pc_userpage_menu", RemoteType.Mylist)]
+        [TestCase("https://www.nicovideo.jp/my/watchlater?ref=pc_mypage_menu", RemoteType.WatchLater)]
+        [TestCase("https://ch.nicovideo.jp/elfenlied", RemoteType.Channel)]
+        [TestCase("https://www.nicovideo.jp/user/000/video?ref=pc_userpage_menud", RemoteType.UserVideos)]
+        [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage)]
+        [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage)]
+        public void リモートプレイリストの種別を取得する(string url,RemoteType expectedType)
+        {
+            var type = this.utils!.GetRemoteType(url);
+
+            Assert.That(expectedType, Is.EqualTo(type));
+        }
+
+        [TestCase("https://www.nicovideo.jp/user/000/mylist/000?ref=pc_userpage_menu",RemoteType.Mylist, "000")]
+        [TestCase("https://www.nicovideo.jp/user/000/mylist/000/?ref=pc_userpage_menu", RemoteType.Mylist, "000")]
+        [TestCase("https://ch.nicovideo.jp/elfenlied",RemoteType.Channel, "elfenlied")]
+        [TestCase("https://ch.nicovideo.jp/elfenlied/", RemoteType.Channel, "elfenlied")]
+        [TestCase("https://www.nicovideo.jp/user/000/video?ref=pc_userpage_menud", RemoteType.UserVideos,"000")]
+        [TestCase("https://www.nicovideo.jp/user/000/video/?ref=pc_userpage_menud", RemoteType.UserVideos, "000")]
+        [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage,"sm9")]
+        [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage,"sm9")]
+        public void リモートプレイリストのIDを取得する(string url,RemoteType type,string id)
+        {
+            var result = this.utils!.GetID(url,type);
+
+            Assert.That(result, Is.EqualTo(id));
         }
     }
 }

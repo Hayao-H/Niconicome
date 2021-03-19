@@ -819,6 +819,7 @@ namespace Niconicome.Models.Playlist
         Mylist,
         UserVideos,
         WatchLater,
-        Channel
+        Channel,
+        WatchPage
     }
 }

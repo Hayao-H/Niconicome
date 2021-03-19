@@ -70,7 +70,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<State::ILocalInfo, State::LocalInfo>();
             services.AddTransient<DomainNet::ICacheHandler, DomainNet::CacheHandler>();
             services.AddTransient<DomainNet::ICacheStraem, DomainNet::CacheStream>();
-            services.AddTransient<Net::INetworkVideoHandler, Net::NetworkVideoHandler>();
+            services.AddSingleton<Net::INetworkVideoHandler, Net::NetworkVideoHandler>();
             services.AddSingleton<State::IMessageHandler, State::MessageHandler>();
             services.AddTransient<Niconico::IAccountManager, Niconico::AccountManager>();
             services.AddTransient<DomainWatch::IDmcDataHandler, DomainWatch::DmcDataHandler>();
@@ -127,6 +127,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
             services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
             services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
+            services.AddTransient<LocalFile::ILocalDirectoryHandler, LocalFile::LocalDirectoryHandler>();
+            services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
 
             return services.BuildServiceProvider();
         }
