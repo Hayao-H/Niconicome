@@ -90,7 +90,7 @@ namespace Niconicome.Models.Domain.Niconico
         public CookieManager(IDbUrlHandler urlHandler)
         {
             this.urlHandler = urlHandler;
-            this.niconicoBaseUri = this.urlHandler.GetUriFromDB("NiconicoBaseUri", "https://nicovideo.jp");
+            this.niconicoBaseUri = new Uri("http://nicovideo.jp"); //this.urlHandler.GetUriFromDB("NiconicoBaseUri", "https://nicovideo.jp");
         }
 
         private readonly IDbUrlHandler urlHandler;
@@ -335,6 +335,8 @@ namespace Niconicome.Models.Domain.Niconico
         {
             if (this.IsLogin) return true;
 
+            this.cookieManager.DeleteAllCookies();
+
             var data = new Dictionary<string, string>()
             {
                 {"mail_tel",username },
@@ -372,6 +374,7 @@ namespace Niconicome.Models.Domain.Niconico
         {
             if (!this.IsLogin) return;
             await this.http.GetAsync(this.niconicoLogoutUri);
+            this.cookieManager.DeleteAllCookies();
         }
 
         /// <summary>
