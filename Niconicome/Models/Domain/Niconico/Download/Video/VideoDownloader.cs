@@ -27,7 +27,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface IVideoDownloadHelper
     {
-        Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token);
+        Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, int maxParallelDownloadCount, CancellationToken token);
         IEnumerable<string> GetAllFileAbsPaths();
         string FolderName { get; }
     }
@@ -59,6 +59,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         bool IsOverwriteEnable { get; }
         bool IsAutoDisposingEnable { get; }
         uint VerticalResolution { get; }
+        int MaxParallelDownloadCount { get; }
     }
 
     /// <summary>
@@ -150,7 +151,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             try
             {
-                await this.videoDownloadHelper.DownloadAsync(targetStream, this.messenger, context, token);
+                await this.videoDownloadHelper.DownloadAsync(targetStream, this.messenger, context, settings.MaxParallelDownloadCount, token);
 
             }
             catch (Exception e)
@@ -268,10 +269,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         public VideoDownloadHelper(INicoHttp http, ISegmentWriter writer, ILogger logger)
         {
-            //最大並列ダウンロード数(既定:5)
-            const int maxParallelDownloadCount = 5;
-
-            this.maxParallelDownloadCount = maxParallelDownloadCount;
             this.http = http;
             this.writer = writer;
             this.logger = logger;
@@ -289,16 +286,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         private readonly ILogger logger;
 
-        private readonly int maxParallelDownloadCount;
-
         /// <summary>
         /// 非同期でダウンロードする
         /// </summary>
         /// <param name="taskHandler"></param>
         /// <returns></returns>
-        public async Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
+        public async Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, int maxParallelDownloadCount, CancellationToken token)
         {
-            var taskHandler = new ParallelTasksHandler<IParallelDownloadTask>(2, false);
+            var taskHandler = new ParallelTasksHandler<IParallelDownloadTask>(maxParallelDownloadCount, false);
             var completed = 0;
             var all = stream.StreamUrls.Count;
             Exception? ex = null;
@@ -463,5 +458,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public bool IsAutoDisposingEnable { get; set; }
 
         public uint VerticalResolution { get; set; }
+
+        public int MaxParallelDownloadCount { get; set; }
+
     }
 }

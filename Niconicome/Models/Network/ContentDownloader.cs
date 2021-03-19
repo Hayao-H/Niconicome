@@ -41,7 +41,7 @@ namespace Niconicome.Models.Network
         string NiconicoId { get; }
         string FolderPath { get; }
         uint VerticalResolution { get; }
-        Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose);
+        Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
         Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset);
     }
@@ -110,7 +110,16 @@ namespace Niconicome.Models.Network
         private async Task<IDownloadResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
         {
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-            var vSettings = settings.ConvertToVideoDownloadSettings(fileNameFormat, false);
+            int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelSegDl);
+            if (maxParallel <= 0)
+            {
+                maxParallel = 1;
+            } else if (maxParallel > 5)
+            {
+                maxParallel = 5;
+            }
+
+            var vSettings = settings.ConvertToVideoDownloadSettings(fileNameFormat, false, maxParallel);
             var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::IVideoDownloader>();
             Download::IDownloadResult result;
             try
@@ -343,7 +352,13 @@ namespace Niconicome.Models.Network
         public async Task<INetworkResult> DownloadVideos(IEnumerable<IVideoListInfo> videos, DownloadSettings setting, CancellationToken token)
         {
             int totalVideos = videos.Count();
-            var handler = new ParallelTasksHandler<DownloadTaskParallel>(3, 5, 15);
+            int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelDL);
+            if (maxParallel <= 0)
+            {
+                maxParallel = 3;
+            }
+
+            var handler = new ParallelTasksHandler<DownloadTaskParallel>(maxParallel, 5, 15);
             var result = new NetworkResult();
 
             var tasks = videos.Select(v => new DownloadTaskParallel(async task =>
@@ -463,7 +478,7 @@ namespace Niconicome.Models.Network
 
         public string FolderPath { get; set; } = string.Empty;
 
-        public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose)
+        public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount)
         {
             return new Vdl::VideoDownloadSettings()
             {
@@ -473,6 +488,7 @@ namespace Niconicome.Models.Network
                 IsAutoDisposingEnable = autodispose,
                 IsOverwriteEnable = this.Overwrite,
                 VerticalResolution = this.VerticalResolution,
+                MaxParallelDownloadCount = maxParallelDLCount,
             };
         }
 

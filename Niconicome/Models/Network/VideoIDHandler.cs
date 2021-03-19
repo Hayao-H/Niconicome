@@ -90,7 +90,7 @@ namespace Niconicome.Models.Network
             {
                 var retlieved = await this.GetVideoListInfosAsync(inputText, registeredVideos, onMessage, onMessageVerbose);
                 videos.AddRange(retlieved);
-            } catch(Exception e)
+            } catch
             {
                 var result = new NetworkResult()
                 {

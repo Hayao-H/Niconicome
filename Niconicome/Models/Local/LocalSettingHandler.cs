@@ -144,6 +144,8 @@ namespace Niconicome.Models.Local
                 Settings.FFmpegShell=>STypes::SettingNames.UseShellWhenLaunchingFFmpeg,
                 Settings.AutologinEnable => STypes::SettingNames.IsAutologinEnable,
                 Settings.AutologinMode => STypes::SettingNames.AutoLoginMode,
+                Settings.MaxParallelDL=>STypes::SettingNames.MaxParallelDownloadCount,
+                Settings.MaxParallelSegDl=>STypes::SettingNames.MaxParallelSegmentDownloadCount,
                 _ => null
             };
         }
@@ -174,5 +176,7 @@ namespace Niconicome.Models.Local
         FFmpegShell,
         AutologinEnable,
         AutologinMode,
+        MaxParallelDL,
+        MaxParallelSegDl,
     }
 }
