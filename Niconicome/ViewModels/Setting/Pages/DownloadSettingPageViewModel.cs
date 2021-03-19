@@ -18,16 +18,36 @@ namespace Niconicome.ViewModels.Setting.Pages
             if (cOffset == -1)
             {
                 this.commentOffsetField = 40;
-            } else
+            }
+            else
             {
                 this.commentOffsetField = cOffset;
             }
             this.isAutoSwitchOffsetEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.SwitchOffset);
+
+            var maxP = WS::SettingPage.SettingHandler.GetIntSetting(Settings.MaxParallelDL);
+            var maxSP = WS::SettingPage.SettingHandler.GetIntSetting(Settings.MaxParallelSegDl);
+
+            if (maxP <= 0)
+            {
+                maxP = 3;
+            }
+            if (maxSP <= 0)
+            {
+                maxSP = 1;
+            }
+
+            this.maxParallelDownloadCountFIeld = maxP;
+            this.maxParallelSegmentDownloadCountField = maxSP;
         }
 
         private int commentOffsetField;
 
         private bool isAutoSwitchOffsetEnableField;
+
+        private int maxParallelDownloadCountFIeld;
+
+        private int maxParallelSegmentDownloadCountField;
 
         /// <summary>
         /// コメントのオフセット
@@ -45,8 +65,29 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// オフセット調節
         /// </summary>
-        public bool IsAutoSwitchOffsetEnable { get => this.isAutoSwitchOffsetEnableField; set => this.Savesetting(ref this.isAutoSwitchOffsetEnableField, value,Settings.SwitchOffset); }
+        public bool IsAutoSwitchOffsetEnable { get => this.isAutoSwitchOffsetEnableField; set => this.Savesetting(ref this.isAutoSwitchOffsetEnableField, value, Settings.SwitchOffset); }
 
+        /// <summary>
+        /// 最大並列DL数
+        /// </summary>
+        public int MaxParallelDownloadCount { get => this.maxParallelDownloadCountFIeld; set => this.Savesetting(ref this.maxParallelDownloadCountFIeld, value, Settings.MaxParallelDL); }
+
+        /// <summary>
+        /// 最大セグメント並列DL数
+        /// </summary>
+        public int MaxParallelSegmentDownloadCount
+        {
+            get => this.maxParallelSegmentDownloadCountField;
+            set
+            {
+                if (value > 5)
+                {
+                    WS::SettingPage.SnackbarMessageQueue.Enqueue("セグメントの最大並列ダウンロード数は5です");
+                    return;
+                }
+                this.Savesetting(ref this.maxParallelSegmentDownloadCountField, value, Settings.MaxParallelSegDl);
+            }
+        }
     }
 
     [Obsolete("Desinger", true)]
@@ -55,5 +96,9 @@ namespace Niconicome.ViewModels.Setting.Pages
         public int CommentOffsetFIeld { get; set; } = 40;
 
         public bool IsAutoSwitchOffsetEnable { get; set; } = true;
+
+        public int MaxParallelDownloadCount { get; set; } = 3;
+
+        public int MaxParallelSegmentDownloadCount { get; set; } = 1;
     }
 }
