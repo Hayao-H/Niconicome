@@ -106,31 +106,6 @@ namespace Niconicome.ViewModels.Mainpage
                         WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
                     });
                 }
-
-                ///await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(new List<string>() { niconicoId }, this.Playlist.Id, (result) =>
-                ///{
-                ///    var video = new BindableVIdeoListInfo()
-                ///    {
-                ///        Title = "取得失敗",
-                ///        ThumbUrl = "https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg",
-                ///        Message = result.Message
-                ///    };
-                ///    this.Videos.Add(video);
-                ///
-                ///}, video =>
-                ///{
-                ///    WS::Mainpage.PlaylistTree.Refresh();
-                ///    WS::Mainpage.CurrentPlaylist.Update(playlistId);
-                ///
-                ///    if (!video.ChannelId.IsNullOrEmpty())
-                ///    {
-                ///        WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelId}」です", "IDをコピー", () =>
-                ///        {
-                ///            Clipboard.SetText(video.ChannelId);
-                ///            WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
-                ///        });
-                ///    }
-                ///});
             });
 
             this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true, async arg =>

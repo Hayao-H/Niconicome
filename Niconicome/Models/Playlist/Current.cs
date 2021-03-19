@@ -159,6 +159,8 @@ namespace Niconicome.Models.Playlist
                             if (playlistId != (this.CurrentSelectedPlaylist?.Id ?? -1)) return;
 
                             var video = this.videoHandler.GetVideo(oldVideo.Id);
+
+                            //保持されている動画情報が亜あれば引き継ぐ
                             var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(oldVideo.Id, playlistId);
 
                             if (lightVideo is not null)
@@ -168,6 +170,7 @@ namespace Niconicome.Models.Playlist
                                 video.Message = VideoMessanger.GetMessage(lightVideo.MessageGuid);
                             }
 
+                            //サムネイル
                             bool isValid = this.videoThumnailUtility.IsValidThumbnail(video);
                             bool hasCache = this.videoThumnailUtility.HasThumbnailCache(video);
                             if (!isValid || !hasCache)

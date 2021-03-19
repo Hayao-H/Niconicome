@@ -180,6 +180,9 @@ namespace Niconicome.ViewModels.Mainpage
             //キャストできない場合はキャンセル
             if (this.AssociatedObject.SelectedItem.As<ITreePlaylistInfo>() is not ITreePlaylistInfo playlistInfo) return;
 
+            //nullの場合はキャンセル
+            if (playlistInfo is null) return;
+
             //変更がない場合はキャンセル
             if (WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id == playlistInfo.Id) return;
 
