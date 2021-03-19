@@ -25,7 +25,7 @@
             <RowDefinition Height="15*"/>
         </Grid.RowDefinitions>
         <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
-            <TextBlock Text="ダウンドード設定" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
+            <TextBlock Text="ダウンロード設定" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
         </Border>
         <StackPanel Margin="8" Grid.Row="1">
             <DockPanel>

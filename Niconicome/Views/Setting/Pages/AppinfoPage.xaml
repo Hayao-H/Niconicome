@@ -167,6 +167,23 @@
                         </Hyperlink>
                             </TextBlock>
 
+                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <Hyperlink NavigateUri="https://github.com/dotnet/efcore/">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Microsoft.Data.SQLite
+                        </Hyperlink>
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        <Hyperlink NavigateUri="https://github.com/dotnet/efcore/blob/main/LICENSE.txt">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Read license on github.com
+                        </Hyperlink>
+                            </TextBlock>
+                            
                         </StackPanel>
                     </ScrollViewer>
                 </Expander>
