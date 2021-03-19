@@ -76,30 +76,61 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(new List<string>() { niconicoId }, this.Playlist.Id, (result) =>
-                {
-                    var video = new BindableVIdeoListInfo()
-                    {
-                        Title = "取得失敗",
-                        ThumbUrl = "https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg",
-                        Message = result.Message
-                    };
-                    this.Videos.Add(video);
+                var videos = new List<IVideoListInfo>();
+                var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, this.Videos.Select(v => v.NiconicoId), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
-                }, video =>
+                if (result.IsFailed)
                 {
-                    WS::Mainpage.PlaylistTree.Refresh();
-                    WS::Mainpage.CurrentPlaylist.Update(playlistId);
+                    this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
+                    return;
+                } else if (videos.Count == 0)
+                {
 
-                    if (!video.ChannelId.IsNullOrEmpty())
+                    this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
+                    return;
+                }
+
+                await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos,this.Playlist.Id);
+
+                WS::Mainpage.PlaylistTree.Refresh();
+                WS::Mainpage.CurrentPlaylist.Update(playlistId);
+
+                this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
+
+                if (!videos.First().ChannelId.IsNullOrEmpty())
+                {
+                    var video = videos.First();
+                    WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName}」です", "IDをコピー", () =>
                     {
-                        WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelId}」です", "IDをコピー", () =>
-                        {
-                            Clipboard.SetText(video.ChannelId);
-                            WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
-                        });
-                    }
-                });
+                        Clipboard.SetText(video.ChannelId);
+                        WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
+                    });
+                }
+
+                ///await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(new List<string>() { niconicoId }, this.Playlist.Id, (result) =>
+                ///{
+                ///    var video = new BindableVIdeoListInfo()
+                ///    {
+                ///        Title = "取得失敗",
+                ///        ThumbUrl = "https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg",
+                ///        Message = result.Message
+                ///    };
+                ///    this.Videos.Add(video);
+                ///
+                ///}, video =>
+                ///{
+                ///    WS::Mainpage.PlaylistTree.Refresh();
+                ///    WS::Mainpage.CurrentPlaylist.Update(playlistId);
+                ///
+                ///    if (!video.ChannelId.IsNullOrEmpty())
+                ///    {
+                ///        WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelId}」です", "IDをコピー", () =>
+                ///        {
+                ///            Clipboard.SetText(video.ChannelId);
+                ///            WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
+                ///        });
+                ///    }
+                ///});
             });
 
             this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true, async arg =>
@@ -127,8 +158,8 @@ namespace Niconicome.ViewModels.Mainpage
 
                  foreach (var video in targetVideos)
                  {
-                    //取得失敗動画の場合
-                    if (video.Title == "取得失敗")
+                     //取得失敗動画の場合
+                     if (video.Title == "取得失敗")
                      {
                          this.Videos.Remove(video);
                      }
@@ -314,14 +345,8 @@ namespace Niconicome.ViewModels.Mainpage
 
                      int playlistId = this.Playlist.Id;
                      var videos = new List<IVideoListInfo>();
-                     INetworkResult result = this.Playlist.RemoteType switch
-                     {
-                         RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(this.Playlist.RemoteId, videos),
-                         RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(this.Playlist.RemoteId, videos),
-                         RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos, this.Videos.Select(v => v.NiconicoId), m => { }),
-                         _ => new NetworkResult(),
-                     };
+
+                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(this.Playlist.RemoteId, videos, this.Playlist.RemoteType, this.Videos.Select(v => v.NiconicoId), m => { });
 
                      if (!result.IsFailed)
                      {

@@ -156,6 +156,7 @@ namespace Niconicome.Models.Playlist
                         foreach (var oldVideo in videos)
                         {
                             if (!this.videoHandler.Exist(oldVideo.Id)) continue;
+                            if (playlistId != (this.CurrentSelectedPlaylist?.Id ?? -1)) return;
 
                             var video = this.videoHandler.GetVideo(oldVideo.Id);
                             var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(oldVideo.Id, playlistId);

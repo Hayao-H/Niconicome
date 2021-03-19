@@ -147,7 +147,7 @@
                                 <ColumnDefinition Width="3*"/>
                             </Grid.ColumnDefinitions>
                             <TextBox Text="{Binding InputString,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignTextBox}" FontSize="20" Margin="5,0" VerticalContentAlignment="Bottom" materialDesign:HintAssist.Hint="ID・検索キーワード入力窓" Padding="5 0"/>
-                            <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する" Command="{Binding AddVideoCommand}"/>
+                            <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する（インテリインプット）" Command="{Binding AddVideoCommand}"/>
                         </Grid>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <Button Margin="5,0" Grid.Column="0" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="入力したキーワードでフィルター" Command="{Binding FilterCommand}">
@@ -312,7 +312,7 @@
                             </Style>
                         </ListView.Resources>
                     </ListView>
-                    <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="120 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
+                    <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
                 </Grid>
                 <TabControl Grid.Row="3" Margin="8">
                     <TabItem Header="設定">
