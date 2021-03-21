@@ -110,8 +110,8 @@ namespace NiconicomeTest
                     var playlist1 = this.playlistStorehandler.GetPlaylist(playlist1Id);
                     var playlist2 = this.playlistStorehandler.GetPlaylist(playlist2Id);
 
-                    Assert.IsTrue(playlist1.IsRemotePlaylist);
-                    Assert.IsTrue(playlist2.IsRemotePlaylist);
+                    Assert.IsTrue(playlist1!.IsRemotePlaylist);
+                    Assert.IsTrue(playlist2!.IsRemotePlaylist);
                     Assert.IsTrue(playlist1.IsMylist);
                     Assert.IsTrue(playlist2.IsUserVideos);
                     Assert.IsFalse(playlist1.IsUserVideos);
@@ -131,7 +131,7 @@ namespace NiconicomeTest
 
                     var playlist = this.playlistStorehandler.GetPlaylist(playlistId);
 
-                    Assert.IsFalse(playlist.IsRemotePlaylist);
+                    Assert.IsFalse(playlist!.IsRemotePlaylist);
                     Assert.IsFalse(playlist.IsMylist);
                     Assert.IsFalse(playlist.IsUserVideos);
                 }

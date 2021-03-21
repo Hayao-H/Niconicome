@@ -45,7 +45,7 @@ namespace Niconicome.Models.Utils
         /// <summary>
         /// 実行フラグ
         /// </summary>
-        private bool IsProcessing;
+        public bool IsProcessing { get; private set; }
 
         /// <summary>
         /// ロックオブジェクト
