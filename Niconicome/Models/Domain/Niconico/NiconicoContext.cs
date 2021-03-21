@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Local;
@@ -90,7 +91,7 @@ namespace Niconicome.Models.Domain.Niconico
         public CookieManager(IDbUrlHandler urlHandler)
         {
             this.urlHandler = urlHandler;
-            this.niconicoBaseUri = new Uri("http://nicovideo.jp"); //this.urlHandler.GetUriFromDB("NiconicoBaseUri", "https://nicovideo.jp");
+            this.niconicoBaseUri = new Uri("http://nicovideo.jp"); 
         }
 
         private readonly IDbUrlHandler urlHandler;
@@ -184,15 +185,15 @@ namespace Niconicome.Models.Domain.Niconico
     {
         public NicoHttp(HttpClient client, IDbUrlHandler dbUrlHandler)
         {
-
-
             //ニコニコのアドレスを設定
             this.NiconicoBaseUri = dbUrlHandler.GetUriFromDB(nameof(this.NiconicoBaseUri), "https://nicovideo.jp");
             this.NiconicoLoginUri = dbUrlHandler.GetUriFromDB(nameof(this.NiconicoLoginUri), "https://secure.nicovideo.jp/secure/login?site=niconico");
             this.NiconicoLogoutUri = dbUrlHandler.GetUriFromDB(nameof(this.NiconicoLogoutUri), "https://account.nicovideo.jp/logout");
 
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+
             client.DefaultRequestHeaders.Referrer = this.NiconicoBaseUri;
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Niconicome/0.0.0.0)");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
             client.DefaultRequestHeaders.Add("X-Frontend-Id", "6");
             client.DefaultRequestHeaders.Add("X-Frontend-Version", "0");
 
