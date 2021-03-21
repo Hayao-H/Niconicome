@@ -131,7 +131,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             if (token.IsCancellationRequested)
             {
-                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -141,9 +141,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             var targetStream = streams.GetStream(settings.VerticalResolution);
 
+            context.ActualVerticalResolution = targetStream.Resolution?.Vertical ?? 0;
+
             if (token.IsCancellationRequested)
             {
-                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -168,7 +170,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             if (token.IsCancellationRequested)
             {
                 this.DeleteTmpFolder();
-                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -189,7 +191,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
             catch (TaskCanceledException)
             {
-                this.logger.Log("ユーザーの操作によって動画の変換処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+                this.logger.Log($"ユーザーの操作によって動画の変換処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("動画の変換中にキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 this.DeleteTmpFolder();
@@ -296,6 +298,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             var taskHandler = new ParallelTasksHandler<IParallelDownloadTask>(maxParallelDownloadCount, false);
             var completed = 0;
             var all = stream.StreamUrls.Count;
+            var resolution = context.ActualVerticalResolution == 0 ? string.Empty : $"（{context.ActualVerticalResolution}px）";
             Exception? ex = null;
 
             var tasks = stream.StreamUrls.Select(url => new ParallelDownloadTask(async self =>
@@ -311,7 +314,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 catch (Exception e)
                 {
                     ex = e;
-                    this.logger.Error($"セグメント(idx:{self.SequenceZero})の取得に失敗しました。", e);
+                    this.logger.Error($"セグメント(idx:{self.SequenceZero})の取得に失敗しました。(context_id:{context.Id},content_id:{context.NiconicoId})", e);
                     return;
                 }
 
@@ -334,7 +337,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 }
 
                 completed++;
-                messenger.SendMessage($"完了: {completed}/{all}");
+                messenger.SendMessage($"完了: {completed}/{all}{resolution}");
 
                 await Task.Delay(1 * 1000);
 

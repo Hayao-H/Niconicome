@@ -12,6 +12,7 @@ using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 using WS = Niconicome.Workspaces;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Network.Download;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -69,13 +70,12 @@ namespace Niconicome.ViewModels.Mainpage
                    if (!videos.Any()) return;
 
                    var cts = new CancellationTokenSource();
-                   this.downloacts = cts;
                    this.StartDownload();
 
                    int videoCount = videos.Count();
                    var firstVideo = videos.First();
                    string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
-                   var setting = new DownloadSettings()
+                   var setting = new DownloadSettings
                    {
                        Video = this.IsDownloadingVideoEnable,
                        Thumbnail = this.IsDownloadingThumbEnable,
@@ -94,10 +94,12 @@ namespace Niconicome.ViewModels.Mainpage
                    WS::Mainpage.Messagehandler.AppendMessage($"動画のダウンロードを開始します。({videoCount}件)");
                    this.SnackbarMessageQueue.Enqueue($"動画のダウンロードを開始します。({videoCount}件)");
                    INetworkResult? result = null;
+                   WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting);
+                   WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
 
                    try
                    {
-                       result = await WS::Mainpage.Videodownloader.DownloadVideos(videos, setting, cts.Token);
+                       result = await WS::Mainpage.Videodownloader.DownloadVideos();
 
                    }
                    catch (Exception e)
@@ -139,8 +141,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.CancelCommand = new CommandBase<object>(_ => this.isDownloadingField, _ =>
             {
-                this.downloacts?.Cancel();
-                this.downloacts = null;
+                WS::Mainpage.Videodownloader.Cancel();
                 this.CompleteDownload();
             });
 
@@ -170,8 +171,6 @@ namespace Niconicome.ViewModels.Mainpage
         private ResolutionSetting selectedResolutionField;
 
         private ITreePlaylistInfo? playlist;
-
-        private CancellationTokenSource? downloacts;
 
         /// <summary>
         /// ダウンロードフラグ

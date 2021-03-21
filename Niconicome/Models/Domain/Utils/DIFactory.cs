@@ -2,32 +2,33 @@
 using Microsoft.Extensions.DependencyInjection;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
+using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
 using DlComment = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DlThumb = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using DlVideo = Niconicome.Models.Domain.Niconico.Download.Video;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
+using DomainDownload = Niconicome.Models.Domain.Niconico.Download;
 using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
-using Download = Niconicome.Models.Domain.Niconico.Download;
-using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
+using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
+using Download = Niconicome.Models.Network.Download;
+using Handlers = Niconicome.Models.Domain.Local.Handlers;
+using Import = Niconicome.Models.Local.External.Import;
 using Local = Niconicome.Models.Local;
+using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using Playlist = Niconicome.Models.Playlist;
 using Search = Niconicome.Models.Domain.Niconico.Search;
+using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
-using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
-using Import = Niconicome.Models.Local.External.Import;
-using Handlers = Niconicome.Models.Domain.Local.Handlers;
-using SQlite = Niconicome.Models.Domain.Local.SQLite;
-using Cookies = Niconicome.Models.Domain.Local.Cookies;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -81,10 +82,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideo::IVideoDownloadHelper, DlVideo::VideoDownloadHelper>();
             services.AddTransient<DlVideo::IVideoDownloader, DlVideo::VideoDownloader>();
             services.AddTransient<DlVideo::ISegmentWriter, DlVideo::SegmentWriter>();
-            services.AddTransient<Download::IDownloadMessenger, Download::DownloadMessanger>();
+            services.AddTransient<DomainDownload::IDownloadMessenger, DomainDownload::DownloadMessanger>();
             services.AddTransient<DlVideo::IVideoEncoader, DlVideo::VideoEncoader>();
             services.AddTransient<DlVideo::ITsMerge, DlVideo::TsMerge>();
-            services.AddTransient<Net::IContentDownloader, Net::ContentDownloader>();
+            services.AddSingleton<Download::IContentDownloader, Download::ContentDownloader>();
             services.AddTransient<DlThumb::IThumbDownloader, DlThumb::ThumbDownloader>();
             services.AddTransient<Playlist::IVideoFilter, Playlist::VideoFilter>();
             services.AddTransient<Search::ISearch, Search::Search>();
@@ -117,7 +118,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainXeno::IXenoPlaylistConverter, DomainXeno::XenoPlaylistConverter>();
             services.AddTransient<Import::IXenoImportGeneralManager, Import::XenoImportGeneralManager>();
             services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
-            services.AddTransient<Net::ILocalContentHandler, Net::LocalContentHandler>();
+            services.AddTransient<Download::ILocalContentHandler, Download::LocalContentHandler>();
+            services.AddTransient<Download::IDownloadTaskPool, Download::DownloadTaskPool>();
+            services.AddSingleton<Download::IDownloadTasksHandler, Download::DownloadTasksHandler>();
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
             services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();
             services.AddSingleton<State::ISnackbarHandler, State::SnackbarHandler>();
