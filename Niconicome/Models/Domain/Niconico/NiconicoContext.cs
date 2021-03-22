@@ -88,13 +88,10 @@ namespace Niconicome.Models.Domain.Niconico
     public class CookieManager : ICookieManager
     {
 
-        public CookieManager(IDbUrlHandler urlHandler)
+        public CookieManager()
         {
-            this.urlHandler = urlHandler;
             this.niconicoBaseUri = new Uri("http://nicovideo.jp"); 
         }
-
-        private readonly IDbUrlHandler urlHandler;
 
         private readonly Uri niconicoBaseUri;
 
