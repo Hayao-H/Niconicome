@@ -21,7 +21,8 @@ namespace Niconicome.Models.Network.Download
     class DownloadTasksHandler : IDownloadTasksHandler
     {
 
-        public DownloadTasksHandler(IDownloadTaskPool staged,IDownloadTaskPool download) {
+        public DownloadTasksHandler(IDownloadTaskPool staged, IDownloadTaskPool download)
+        {
             this.StagedDownloadTaskPool = staged;
             this.DownloadTaskPool = download;
         }
@@ -43,7 +44,8 @@ namespace Niconicome.Models.Network.Download
         /// <param name="settings"></param>
         public void StageVIdeo(IVideoListInfo video, DownloadSettings settings)
         {
-            var task = new BindableDownloadTask(video, settings);
+            var task = new BindableDownloadTask(video.NiconicoId, video.Title, video.Id, settings);
+            task.MessageChange += (_, e) => { if (e.Message is not null) video.Message = e.Message; };
             this.StagedDownloadTaskPool.AddTask(task);
         }
 

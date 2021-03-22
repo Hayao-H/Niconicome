@@ -11,12 +11,14 @@ namespace Niconicome.Models.Network.Download
         Guid ID { get; }
         string DirectoryPath { get; }
         string Message { get; set; }
+        string NiconicoID { get; }
+        string Title { get; }
         int PlaylistID { get; }
+        int VideoID { get; }
         bool IsCanceled { get; set; }
         bool IsProcessing { get; set; }
         uint VerticalResolution { get; }
         DownloadSettings DownloadSettings { get; }
-        IVideoListInfo Video { get; }
         CancellationToken CancellationToken { get; }
         event EventHandler<DownloadTaskMessageChangedEventArgs>? MessageChange;
         void Cancel();
@@ -32,7 +34,7 @@ namespace Niconicome.Models.Network.Download
     /// </summary>
     public record DownloadTask : BindableRecordBase, IDownloadTask
     {
-        public DownloadTask(IVideoListInfo video, DownloadSettings downloadSettings)
+        public DownloadTask(string niconicpoID, string title, int videoID, DownloadSettings downloadSettings)
         {
             this.DirectoryPath = downloadSettings.FolderPath;
             this.VerticalResolution = downloadSettings.VerticalResolution;
@@ -40,7 +42,9 @@ namespace Niconicome.Models.Network.Download
             this.ID = Guid.NewGuid();
             this.PlaylistID = downloadSettings.PlaylistID;
             this.DownloadSettings = downloadSettings;
-            this.Video = video;
+            this.NiconicoID = niconicpoID;
+            this.VideoID = videoID;
+            this.Title = title;
             this.cts = new CancellationTokenSource();
             this.CancellationToken = this.cts.Token;
         }
@@ -68,6 +72,16 @@ namespace Niconicome.Models.Network.Download
         public string DirectoryPath { get; init; }
 
         /// <summary>
+        /// ニコニコ動画のID
+        /// </summary>
+        public string NiconicoID { get; init; }
+
+        /// <summary>
+        /// タイトル
+        /// </summary>
+        public string Title { get; init; }
+
+        /// <summary>
         /// メッセージ
         /// </summary>
         public virtual string Message
@@ -81,14 +95,14 @@ namespace Niconicome.Models.Network.Download
         }
 
         /// <summary>
-        /// 動画情報
-        /// </summary>
-        public IVideoListInfo Video { get; init; }
-
-        /// <summary>
         /// プレイリストID
         /// </summary>
         public int PlaylistID { get; init; }
+
+        /// <summary>
+        /// 動画ID
+        /// </summary>
+        public int VideoID { get; init; }
 
         /// <summary>
         /// キャンセルフラグ
@@ -138,7 +152,7 @@ namespace Niconicome.Models.Network.Download
     /// </summary>
     public record BindableDownloadTask : DownloadTask
     {
-        public BindableDownloadTask(IVideoListInfo video, DownloadSettings downloadSettings) : base(video, downloadSettings)
+        public BindableDownloadTask(string niconicpoID, string title, int videoID, DownloadSettings downloadSettings) : base(niconicpoID, title, videoID, downloadSettings)
         {
         }
 

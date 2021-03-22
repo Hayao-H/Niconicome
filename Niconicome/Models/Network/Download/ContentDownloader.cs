@@ -81,7 +81,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler,ICurrent current)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -89,6 +89,7 @@ namespace Niconicome.Models.Network.Download
             this.messageHandler = messageHandler;
             this.localContentHandler = localContentHandler;
             this.downloadTasksHandler = downloadTasksHandler;
+            this.current = current;
 
             int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelDL);
             if (maxParallel <= 0)
@@ -111,9 +112,11 @@ namespace Niconicome.Models.Network.Download
 
         private readonly IDownloadTasksHandler downloadTasksHandler;
 
+        private readonly ICurrent current;
+
         private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
 
-        public INetworkResult? CurrentResult { get;private set; }
+        public INetworkResult? CurrentResult { get; private set; }
 
         /// <summary>
         /// 非同期で動画をダウンロードする
@@ -378,40 +381,50 @@ namespace Niconicome.Models.Network.Download
             {
                 if (!e.Task.IsCanceled)
                 {
-                    var video = e.Task.Video;
                     var setting = e.Task.DownloadSettings;
+                    var task = e.Task;
+                    IVideoListInfo? video;
+                    if (this.videoHandler.Exist(task.VideoID))
+                    {
+                        video = this.videoHandler.GetVideo(task.VideoID);
+                    }
+                    else
+                    {
+                        video = null;
+                    }
 
-                    this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロード処理を開始しました。");
+                    this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロード処理を開始しました。");
 
                     string folderPath = setting.FolderPath;
                     bool skippedFlag = false;
 
 
-                    var downloadResult = await this.TryDownloadContentAsync(setting with { NiconicoId = video.NiconicoId, Video = !skippedFlag && setting.Video }, msg => video.Message = msg, e.Task.CancellationToken);
+                    var downloadResult = await this.TryDownloadContentAsync(setting with { NiconicoId = task.NiconicoID, Video = !skippedFlag && setting.Video }, msg => task.Message = msg, e.Task.CancellationToken);
 
                     if (downloadResult.IsCanceled)
                     {
                         this.CurrentResult.FailedCount++;
-                        this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードがキャンセルされました。");
-                        video.Message = "ダウンロードをキャンセル";
+                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードがキャンセルされました。");
+                        task.Message = "ダウンロードをキャンセル";
                     }
                     else if (!downloadResult.IsSucceeded)
                     {
                         this.CurrentResult.FailedCount++;
-                        this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードに失敗しました。");
+                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに失敗しました。");
                         this.messageHandler.AppendMessage($"詳細: {downloadResult.Message}");
                     }
                     else
                     {
                         string rMessage = downloadResult.VideoVerticalResolution == 0 ? string.Empty : $"(vertical:{downloadResult.VideoVerticalResolution}px)";
-                        this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードに成功しました。");
-                        video.IsSelected = false;
-                        video.Message = $"ダウンロード完了{rMessage}";
-                        if (!downloadResult.VideoFileName.IsNullOrEmpty())
+                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに成功しました。");
+
+                        task.Message = $"ダウンロード完了{rMessage}";
+                        if (!downloadResult.VideoFileName.IsNullOrEmpty() && video is not null)
                         {
                             video.FileName = downloadResult.VideoFileName;
                             this.videoHandler.Update(video);
                         }
+                        this.current.Uncheck(task.PlaylistID, task.VideoID);
                         this.CurrentResult.SucceededCount++;
                     }
 
@@ -430,10 +443,10 @@ namespace Niconicome.Models.Network.Download
                 }
             }, _ =>
             {
-                e.Task.Video.Message = "待機中...(15s)";
+                e.Task.Message = "待機中...(15s)";
                 this.messageHandler.AppendMessage($"待機中...(15s)");
 
-            }, e.Task.Video);
+            });
 
             this.parallelTasksHandler.AddTaskToQueue(t);
 
@@ -584,11 +597,10 @@ namespace Niconicome.Models.Network.Download
     /// </summary>
     public class DownloadTaskParallel : IParallelTask<DownloadTaskParallel>
     {
-        public DownloadTaskParallel(Func<DownloadTaskParallel, Task> taskFunction, Action<int> onwait, IVideoListInfo video)
+        public DownloadTaskParallel(Func<DownloadTaskParallel, Task> taskFunction, Action<int> onwait)
         {
             this.TaskFunction = taskFunction;
             this.OnWait = onwait;
-            this.Video = video;
         }
 
         public Guid TaskId { get; init; }
@@ -596,8 +608,6 @@ namespace Niconicome.Models.Network.Download
         public Func<DownloadTaskParallel, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
-
-        public IVideoListInfo Video { get; init; }
 
     }
 

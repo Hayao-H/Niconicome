@@ -64,7 +64,7 @@ namespace Niconicome.ViewModels.Mainpage
                        return;
                    }
 
-                   if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable  && !this.IsDownloadingThumbEnable) return;
+                   if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable) return;
 
                    var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
                    if (!videos.Any()) return;
@@ -88,6 +88,7 @@ namespace Niconicome.ViewModels.Mainpage
                        Skip = this.IsSkippingEnable,
                        FolderPath = folderPath,
                        VerticalResolution = this.SelectedResolution.Resolution.Vertical,
+                       PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
                    };
 
 
