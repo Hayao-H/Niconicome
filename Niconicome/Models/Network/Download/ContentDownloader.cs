@@ -379,8 +379,9 @@ namespace Niconicome.Models.Network.Download
 
             var t = new DownloadTaskParallel(async parallelTask =>
             {
-                if (!e.Task.IsCanceled)
+                if (!e.Task.IsCanceled&&!e.Task.IsDone)
                 {
+
                     var setting = e.Task.DownloadSettings;
                     var task = e.Task;
                     IVideoListInfo? video;
@@ -397,7 +398,7 @@ namespace Niconicome.Models.Network.Download
 
                     string folderPath = setting.FolderPath;
                     bool skippedFlag = false;
-
+                    e.Task.IsProcessing = true;
 
                     var downloadResult = await this.TryDownloadContentAsync(setting with { NiconicoId = task.NiconicoID, Video = !skippedFlag && setting.Video }, msg => task.Message = msg, e.Task.CancellationToken);
 
@@ -433,13 +434,15 @@ namespace Niconicome.Models.Network.Download
                         this.CurrentResult.FirstVideo = video;
                     }
 
-                    this.downloadTasksHandler.DownloadTaskPool.RemoveTask(e.Task);
+                    e.Task.IsProcessing = false;
+                    e.Task.IsDone = true;
+                    //this.downloadTasksHandler.DownloadTaskPool.RemoveTask(e.Task);
 
                 }
                 else
                 {
                     this.parallelTasksHandler.CancellAllTasks();
-                    this.downloadTasksHandler.DownloadTaskPool.Clear();
+                    //this.downloadTasksHandler.DownloadTaskPool.Clear();
                 }
             }, _ =>
             {

@@ -17,10 +17,12 @@ namespace Niconicome.Models.Network.Download
         int VideoID { get; }
         bool IsCanceled { get; set; }
         bool IsProcessing { get; set; }
+        bool IsDone { get; set; }
         uint VerticalResolution { get; }
         DownloadSettings DownloadSettings { get; }
         CancellationToken CancellationToken { get; }
         event EventHandler<DownloadTaskMessageChangedEventArgs>? MessageChange;
+        event EventHandler? ProcessingEnd;
         void Cancel();
     }
 
@@ -53,12 +55,22 @@ namespace Niconicome.Models.Network.Download
 
         protected readonly CancellationTokenSource cts;
 
+        protected bool isProcessingField;
+
         /// <summary>
         /// メッセージ変更イベントを発火させる
         /// </summary>
         protected void RaiseMessageChanged()
         {
             this.MessageChange?.Invoke(this, new DownloadTaskMessageChangedEventArgs() { Message = this.Message });
+        }
+
+        /// <summary>
+        /// 終了イベントを発火させる
+        /// </summary>
+        public void RaiseProcessingEnd()
+        {
+            this.ProcessingEnd?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -112,7 +124,23 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// 実行中フラグ
         /// </summary>
-        public virtual bool IsProcessing { get; set; }
+        public virtual bool IsProcessing
+        {
+            get => this.isProcessingField;
+            set
+            {
+                this.isProcessingField = value;
+                if (!value)
+                {
+                    this.RaiseProcessingEnd();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 完了フラグ
+        /// </summary>
+        public virtual bool IsDone { get; set; }
 
         /// <summary>
         /// /垂直解像度
@@ -129,6 +157,11 @@ namespace Niconicome.Models.Network.Download
         /// メッセージ変更イベント
         /// </summary>
         public event EventHandler<DownloadTaskMessageChangedEventArgs>? MessageChange;
+
+        /// <summary>
+        /// 終了イベント
+        /// </summary>
+        public event EventHandler? ProcessingEnd;
 
         /// <summary>
         /// トークン
@@ -156,9 +189,9 @@ namespace Niconicome.Models.Network.Download
         {
         }
 
-        private bool isProcessingField;
-
         private bool isCanceledField;
+
+        private bool isDoneField;
 
         public override string Message
         {
@@ -172,6 +205,19 @@ namespace Niconicome.Models.Network.Download
 
         public override bool IsCanceled { get => this.isCanceledField; set => this.SetProperty(ref this.isCanceledField, value); }
 
-        public override bool IsProcessing { get => this.isProcessingField; set => this.SetProperty(ref this.isProcessingField, value); }
+        public override bool IsProcessing
+        {
+            get => this.isProcessingField;
+            set
+            {
+                this.SetProperty(ref this.isProcessingField, value);
+                if (!value)
+                {
+                    this.RaiseProcessingEnd();
+                }
+            }
+        }
+
+        public override bool IsDone { get => this.isDoneField; set => this.SetProperty(ref this.isDoneField, value); }
     }
 }

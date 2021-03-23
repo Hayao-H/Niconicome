@@ -45,7 +45,15 @@ namespace Niconicome.Models.Network.Download
         public void StageVIdeo(IVideoListInfo video, DownloadSettings settings)
         {
             var task = new BindableDownloadTask(video.NiconicoId, video.Title, video.Id, settings);
-            task.MessageChange += (_, e) => { if (e.Message is not null) video.Message = e.Message; };
+            void onMessageChange(object? sender, DownloadTaskMessageChangedEventArgs e)
+            {
+                if (e.Message is not null) video.Message = e.Message;
+            }
+            task.MessageChange += onMessageChange;
+            task.ProcessingEnd += (_, _) =>
+            {
+                task.MessageChange -= onMessageChange;
+            };
             this.StagedDownloadTaskPool.AddTask(task);
         }
 
