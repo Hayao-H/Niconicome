@@ -17,7 +17,7 @@
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource Window_Style}"
         d:DataContext="{d:DesignInstance {x:Type vm:DownloadTasksWindowViewModelD}, IsDesignTimeCreatable=True}"
-        Title="ダウンロードタスク1管理" Height="600" Width="1200">
+        Title="ダウンロードタスク管理" Height="600" Width="1200">
     <Grid>
         <TabControl
             Style="{StaticResource MaterialDesignNavigatilRailTabControl}"
@@ -95,6 +95,12 @@
                                 </GridView.Columns>
                             </GridView>
                         </ListView.View>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
             </TabItem>
@@ -151,6 +157,12 @@
                                 </GridView.Columns>
                             </GridView>
                         </ListView.View>
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
                     </ListView>
                 </Grid>
             </TabItem>
