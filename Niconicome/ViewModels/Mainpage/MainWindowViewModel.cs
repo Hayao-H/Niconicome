@@ -71,6 +71,12 @@ namespace Niconicome.ViewModels.Mainpage
                 };
                 window.Show();
             });
+
+            this.OpenDownloadTaskWindowsCommand = new CommandBase<object>(_ => true,_=>
+            {
+                var windows = new DownloadTasksWindows();
+                windows.Show();
+            });
         }
 
         /// <summary>
@@ -131,6 +137,8 @@ namespace Niconicome.ViewModels.Mainpage
         public CommandBase<object> LoginCommand { get; private set; }
 
         public CommandBase<object> OpenSettingCommand { get; init; }
+
+        public CommandBase<object> OpenDownloadTaskWindowsCommand { get; init; }
 
         /// <summary>
         /// ログイン状態(フィールド)

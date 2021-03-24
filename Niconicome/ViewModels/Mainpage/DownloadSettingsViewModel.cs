@@ -13,6 +13,7 @@ using WS = Niconicome.Workspaces;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Network.Download;
+using Niconicome.Views;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -32,6 +33,8 @@ namespace Niconicome.ViewModels.Mainpage
             this.isSkippingEnablefield = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLSkip);
             this.isCopyFromAnotherFolderEnableFIeld = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLCopy);
 
+            WS::Mainpage.Videodownloader.CanDownloadChange += this.OnCanDownloadChange;
+
             var s1 = new ResolutionSetting("1920x1080");
             var s2 = new ResolutionSetting("1280x720");
             var s3 = new ResolutionSetting("854x480");
@@ -44,7 +47,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
-            this.DownloadCommand = new CommandBase<object>(_ => this.playlist is not null && !this.isDownloadingField, async _ =>
+            this.DownloadCommand = new CommandBase<object>(_ => this.playlist is not null && !this.IsDownloading, async _ =>
                {
                    if (this.playlist is null)
                    {
@@ -70,7 +73,6 @@ namespace Niconicome.ViewModels.Mainpage
                    if (!videos.Any()) return;
 
                    var cts = new CancellationTokenSource();
-                   this.StartDownload();
 
                    int videoCount = videos.Count();
                    var firstVideo = videos.First();
@@ -94,59 +96,70 @@ namespace Niconicome.ViewModels.Mainpage
 
                    WS::Mainpage.Messagehandler.AppendMessage($"動画のダウンロードを開始します。({videoCount}件)");
                    this.SnackbarMessageQueue.Enqueue($"動画のダウンロードを開始します。({videoCount}件)");
-                   INetworkResult? result = null;
                    WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting);
-                   WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
+                   WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == this.playlist.Id);
 
-                   try
-                   {
-                       result = await WS::Mainpage.Videodownloader.DownloadVideos();
+                   await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
 
-                   }
-                   catch (Exception e)
-                   {
-                       WS::Mainpage.Messagehandler.AppendMessage($"ダウンロード中にエラーが発生しました。(詳細: {e.Message})");
-                       this.SnackbarMessageQueue.Enqueue($"ダウンロード中にエラーが発生しました。");
-                   }
-
-                   if (result?.SucceededCount > 1)
-                   {
-                       if (result?.FirstVideo is not null)
-                       {
-                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
-                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
-
-                           if (!result.IsSucceededAll)
-                           {
-                               WS::Mainpage.Messagehandler.AppendMessage($"{result.FailedCount}件の動画のダウンロードに失敗しました。");
-                           }
-                       }
-                   }
-                   else if (result?.SucceededCount == 1)
-                   {
-                       if (result?.FirstVideo is not null)
-                       {
-                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
-                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
-                       }
-                   }
-                   else
-                   {
-                       WS::Mainpage.Messagehandler.AppendMessage($"ダウンロード出来ませんでした。");
-                       this.SnackbarMessageQueue.Enqueue($"ダウンロード出来ませんでした。");
-                   }
-
-                   this.CompleteDownload();
 
                });
 
-            this.CancelCommand = new CommandBase<object>(_ => this.isDownloadingField, _ =>
+            this.StageVideosCommand = new CommandBase<object>(_ => true, _ =>
+            {
+                if (this.playlist is null)
+                {
+                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ステージできません");
+                    return;
+                }
+
+                if (!this.IsDownloadingCommentEnable && (this.IsDownloadingCommentLogEnable || this.IsDownloadingEasyComment || this.IsDownloadingOwnerComment))
+                {
+                    this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
+                    return;
+                }
+
+                if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable) return;
+
+                var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
+                if (!videos.Any()) return;
+
+                int videoCount = videos.Count();
+                var firstVideo = videos.First();
+                string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
+
+                WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, new DownloadSettings
+                {
+                    Video = this.IsDownloadingVideoEnable,
+                    Thumbnail = this.IsDownloadingThumbEnable,
+                    Overwrite = this.IsOverwriteEnable,
+                    Comment = this.IsDownloadingCommentEnable,
+                    DownloadLog = this.IsDownloadingCommentLogEnable,
+                    DownloadEasy = this.IsDownloadingEasyComment,
+                    DownloadOwner = this.IsDownloadingOwnerComment,
+                    FromAnotherFolder = this.IsCopyFromAnotherFolderEnable,
+                    Skip = this.IsSkippingEnable,
+                    FolderPath = folderPath,
+                    VerticalResolution = this.SelectedResolution.Resolution.Vertical,
+                    PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
+                });
+
+                this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () => {
+                    var windows = new DownloadTasksWindows();
+                    windows.Show();
+                });
+            });
+
+            this.CancelCommand = new CommandBase<object>(_ => this.IsDownloading, _ =>
             {
                 WS::Mainpage.Videodownloader.Cancel();
-                this.CompleteDownload();
             });
 
             WS::Mainpage.CurrentPlaylist.SelectedItemChanged += this.OnSelectedChanged;
+        }
+
+        ~DownloadSettingsViewModel()
+        {
+            WS::Mainpage.Videodownloader.CanDownloadChange -= this.OnCanDownloadChange;
         }
 
         private bool isDownloadingVideoEnableField = true;
@@ -163,8 +176,6 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isOverwriteEnableField;
 
-        private bool isDownloadingField;
-
         private bool isSkippingEnablefield;
 
         private bool isCopyFromAnotherFolderEnableFIeld;
@@ -176,7 +187,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// ダウンロードフラグ
         /// </summary>
-        public bool IsDownloading { get => this.isDownloadingField; set => this.SetProperty(ref this.isDownloadingField, value); }
+        public bool IsDownloading { get => !WS::Mainpage.Videodownloader.CanDownload; }
 
         /// <summary>
         /// 動画をダウンロードする
@@ -187,6 +198,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// ダウンロードをキャンセルする
         /// </summary>
         public CommandBase<object> CancelCommand { get; init; }
+
+        /// <summary>
+        /// ステージする
+        /// </summary>
+        public CommandBase<object> StageVideosCommand { get; init; }
 
         /// <summary>
         /// 動画ダウンロードフラグ
@@ -264,15 +280,8 @@ namespace Niconicome.ViewModels.Mainpage
             }
         }
 
-        private void StartDownload()
+        private void OnCanDownloadChange(object? sender,EventArgs e)
         {
-            this.IsDownloading = true;
-            this.RaiseCanExecuteChange();
-        }
-
-        private void CompleteDownload()
-        {
-            this.IsDownloading = false;
             this.RaiseCanExecuteChange();
         }
     }

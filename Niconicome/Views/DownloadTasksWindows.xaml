@@ -1,0 +1,160 @@
+﻿<Window x:Class="Niconicome.Views.DownloadTasksWindows"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows"
+        xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignBackground}"
+        WindowStartupLocation="CenterOwner"
+        Style="{StaticResource Window_Style}"
+        d:DataContext="{d:DesignInstance {x:Type vm:DownloadTasksWindowViewModelD}, IsDesignTimeCreatable=True}"
+        Title="ダウンロードタスク1管理" Height="600" Width="1200">
+    <Grid>
+        <TabControl
+            Style="{StaticResource MaterialDesignNavigatilRailTabControl}"
+            materialDesign:ColorZoneAssist.Mode="PrimaryLight">
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+                <TabItem.Header>
+                    <materialDesign:PackIcon
+                         Kind="DownloadLock"
+                         Width="24"
+                         Height="24"
+                         ToolTip="登録済みタスク（ダウンロード待ち状態のタスク）"
+                    />
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="8*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                    Padding="5"
+                    Style="{DynamicResource MaterialDesignHeadline5TextBlock}">
+                        登録済みタスク
+                    </TextBlock>
+                    <DockPanel Grid.Row="1">
+                        <CheckBox Margin="10 0" HorizontalAlignment="Left" Content="キャンセル済みを表示" IsChecked="{Binding DisplayCanceled}"/>
+                        <CheckBox HorizontalAlignment="Left" Content="完了済みを表示" IsChecked="{Binding DisplayCompleted}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Margin="5 0" ToolTip="更新" Command="{Binding RefreshTaskCommand}">
+                                <materialDesign:PackIcon Kind="Reload"/>
+                            </Button>
+                            <Button Margin="4 0" Content="ダウンロード開始" Command="{Binding StartDownloadCommand}"/>
+                            <Button Margin="4 0" Content="全て中断" Command="{Binding CancelDownloadCommand}"/>
+                        </StackPanel>
+                    </DockPanel>
+                    <ListView Grid.Row="2" ItemsSource="{Binding Tasks}" >
+                        <ListView.View>
+                            <GridView>
+                                <GridView.Columns>
+                                    <GridViewColumn Header="ID"         DisplayMemberBinding="{Binding NiconicoID}"/>
+                                    <GridViewColumn Header="タイトル" DisplayMemberBinding="{Binding Title}">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ContentPresenter ToolTip="{Binding Title}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="状態">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ProgressBar ToolTip="DL中です" Style="{StaticResource MaterialDesignCircularProgressBar}" Value="35" IsIndeterminate="{Binding IsProcessing}" Visibility="{Binding IsProcessing,Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                    <materialDesign:PackIcon ToolTip="完了しました" Kind="Check" Foreground="Purple" Visibility="{Binding IsEnd,Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                        <materialDesign:PackIcon.RenderTransform>
+                                                            <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-8"/>
+                                                        </materialDesign:PackIcon.RenderTransform>
+                                                    </materialDesign:PackIcon>
+                                                    <materialDesign:PackIcon ToolTip="キャンセルされました" Kind="Close" Foreground="Red" Visibility="{Binding IsCancel,Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                        <materialDesign:PackIcon.RenderTransform>
+                                                            <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-8"/>
+                                                        </materialDesign:PackIcon.RenderTransform>
+                                                    </materialDesign:PackIcon>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="メッセージ" DisplayMemberBinding="{Binding Message}"/>
+                                    <GridViewColumn Header="中止">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="中止" Command="{Binding CancelCommand}" Background="HotPink" BorderThickness="0"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView.Columns>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </TabItem>
+            <TabItem Style="{StaticResource MaterialDesignNavigationRailTabItem}">
+                <TabItem.Header>
+                    <materialDesign:PackIcon
+                         Kind="Download"
+                         Width="24"
+                         Height="24"
+                         ToolTip="ステージング済みタスク（仮登録状態のタスク）"/>
+                </TabItem.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="8*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                    Padding="5"
+                    Style="{DynamicResource MaterialDesignHeadline5TextBlock}" Grid.RowSpan="2">
+                        ステージング（仮登録）済みタスク
+                    </TextBlock>
+                    <DockPanel Grid.Row="1">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Margin="5 0" ToolTip="更新" Command="{Binding RefreshStagedTaskCommand}">
+                                <materialDesign:PackIcon Kind="Reload"/>
+                            </Button>
+                            <Button Margin="4 0" Content="全て登録" Command="{Binding MoveTasksToQueue}" />
+                            <Button Margin="4 0" Content="全て削除" Command="{Binding ClearStagedCommand}" />
+                            <Button Margin="4 0" Content="選択したタスクを削除" Command="{Binding RemoveStagedTaskCommand}"/>
+                        </StackPanel>
+                    </DockPanel>
+                    <ListView Grid.Row="2" ItemsSource="{Binding StagedTasks}" >
+                        <ListView.View>
+                            <GridView>
+                                <GridView.Columns>
+                                    <GridViewColumn Header="選択">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding IsChecked,UpdateSourceTrigger=PropertyChanged}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="ID"         DisplayMemberBinding="{Binding NiconicoID}"/>
+                                    <GridViewColumn Header="タイトル" DisplayMemberBinding="{Binding Title}"/>
+                                    <GridViewColumn Header="解像度">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox ItemsSource="{Binding SelectableResolutions}" SelectedItem="{Binding SelectedResolution}" DisplayMemberPath="DisplayValue"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="メッセージ" DisplayMemberBinding="{Binding Message}"/>
+                                </GridView.Columns>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <materialDesign:Snackbar MessageQueue="{Binding Queue}"/>
+    </Grid>
+</Window>

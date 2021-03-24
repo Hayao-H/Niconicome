@@ -8,7 +8,7 @@
         xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource MaterialDesignLightForeground}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
@@ -25,365 +25,392 @@
         <vm:MainWindowViewModel/>
     </Window.DataContext>
     <materialDesign:DialogHost Identifier="default">
-
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="17*"/>
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column= "0" Background="#e7e7e7">
-                <Grid.DataContext>
-                    <vm:PlaylistTreeViewModel/>
-                </Grid.DataContext>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="18*"/>
-                </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" Margin="5">
-                    <Button Width="auto" HorizontalAlignment="Left" Command="{Binding PlaylistRefreshcommand}" ToolTip="プレイリストを更新する">
-                        <materialDesign:PackIcon Kind="Refresh" />
-                    </Button>
-                </StackPanel>
-                <TreeView ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
-                    <i:Interaction.Behaviors>
-                        <vm:PlaylistTreeBehavior/>
-                    </i:Interaction.Behaviors>
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="tree:ITreePlaylistInfo" ItemsSource="{Binding Children}">
-                            <StackPanel>
-                                <Grid Background="{Binding BackgroundColor}">
-                                    <Grid.ToolTip>
-                                        <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
-                                    </Grid.ToolTip>
-                                    <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                    <TextBlock Text="{Binding Name}"/>
-                                    <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                </Grid>
+        <DockPanel>
+            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
+                <materialDesign:DrawerHost.LeftDrawerContent>
+                    <Grid Width="250">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="17*"/>
+                        </Grid.RowDefinitions>
+                        <materialDesign:ColorZone materialDesign:ShadowAssist.ShadowDepth="Depth1" Padding="8" >
+                            <StackPanel Orientation="Vertical">
+                                <DockPanel>
+                                    <Image Source="{Binding UserImage}" Height="40"  Margin="5 0">
+                                        <i:Interaction.Behaviors>
+                                            <vm:UserImageBehavior/>
+                                        </i:Interaction.Behaviors>
+                                    </Image>
+                                    <TextBlock Text="{Binding Username}" Style="{DynamicResource MaterialDesignBody1TextBlock}" VerticalAlignment="Center" />
+                                </DockPanel>
+                                <Button Content="{Binding LoginBtnVal}"  Command="{Binding LoginCommand}" Margin="8 10" ToolTip="{Binding LoginBtnTooltip}"/>
                             </StackPanel>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                            <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}}"/>
-                            <Setter Property="ContextMenu">
-                                <Setter.Value>
-                                    <ContextMenu StaysOpen="False" DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}" >
-                                        <MenuItem Header="プレイリストを追加する"
-                                                  Command="{Binding AddPlaylist}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="Plus"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Header="このプレイリストを削除する"
-                                                  Command="{Binding RemovePlaylist}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="Delete"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Header="このプレイリストを編集する"
-                                                  Command="{Binding EditPlaylistCommand}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="Edit"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                    </ContextMenu>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                        </Style>
-                    </TreeView.ItemContainerStyle>
-                </TreeView>
-            </Grid>
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="19*"/>
-                </Grid.RowDefinitions>
-                <DockPanel HorizontalAlignment="Right">
-                    <Grid HorizontalAlignment="Right" Grid.Column="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Button Content="{Binding LoginBtnVal}" Command="{Binding LoginCommand}" Margin="10 0" Grid.Column="2" ToolTip="{Binding LoginBtnTooltip}"/>
-                        <TextBlock Text="{Binding Username}" Grid.Column="1" Style="{DynamicResource MaterialDesignBody1TextBlock}" VerticalAlignment="Center" />
-                        <Image Source="{Binding UserImage}"  Grid.Column="0" Margin="5">
-                            <i:Interaction.Behaviors>
-                                <vm:UserImageBehavior/>
-                            </i:Interaction.Behaviors>
-                        </Image>
-                    </Grid>
-                    <Button Margin="10,0" Grid.Column="0" Width="60" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="アプリケーション設定" Command="{Binding OpenSettingCommand}">
-                        <materialDesign:PackIcon Kind="cog">
-                            <materialDesign:PackIcon.RenderTransform>
-                                <ScaleTransform CenterY="8" CenterX="7" ScaleX="1.7" ScaleY="1.7"/>
-                            </materialDesign:PackIcon.RenderTransform>
-                        </materialDesign:PackIcon>
-                    </Button>
-                </DockPanel>
-                <Grid Grid.Row="1">
-                    <Grid.DataContext>
-                        <vm:VideoListViewModel/>
-                    </Grid.DataContext>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="3*"/>
-                        <RowDefinition Height="3*"/>
-                        <RowDefinition Height="23*"/>
-                        <RowDefinition Height="14*"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock FontSize="30" Text="{Binding PlaylistTitle,UpdateSourceTrigger=PropertyChanged}" Margin="10 0"/>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*"/>
-                            <ColumnDefinition Width="1*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="17*"/>
-                                <ColumnDefinition Width="3*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Text="{Binding InputString,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignTextBox}" FontSize="20" Margin="5,0" VerticalContentAlignment="Bottom" materialDesign:HintAssist.Hint="ID・検索キーワード入力窓" Padding="5 0"/>
-                            <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する（インテリインプット）" Command="{Binding AddVideoCommand}"/>
-                        </Grid>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Button Margin="5,0" Grid.Column="0" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="入力したキーワードでフィルター" Command="{Binding FilterCommand}">
-                                <materialDesign:PackIcon Kind="{Binding FilterIcon}">
-                                    <materialDesign:PackIcon.RenderTransform>
-                                        <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.8" ScaleY="1.8"/>
-                                    </materialDesign:PackIcon.RenderTransform>
-                                </materialDesign:PackIcon>
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
-                                        <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource Mode=Self}}"/>
-                                        <Setter Property="ContextMenu">
-                                            <Setter.Value>
-                                                <ContextMenu DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
-                                                    <MenuItem IsCheckable="True" Header="タグのみでフィルター" IsChecked="{Binding IsFilteringOnlyByTag}"/>
-                                                    <MenuItem IsCheckable="True" Header="データベースの全ての動画からフィルター" IsChecked="{Binding IsFilteringFromAllVideos}"/>
-                                                </ContextMenu>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-
-                            <Button Margin="5,0" Grid.Column="0" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="クリップボードから一括登録" Command="{Binding AddVideoFromClipboardCommand}">
-                                <materialDesign:PackIcon Kind="Clipboard">
-                                    <materialDesign:PackIcon.RenderTransform>
-                                        <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.8" ScaleY="1.8"/>
-                                    </materialDesign:PackIcon.RenderTransform>
-                                </materialDesign:PackIcon>
-                            </Button>
-
-                            <Button Margin="5,0" Grid.Column="1" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="検索して登録" Command="{Binding SearchCommand}">
-                                <materialDesign:PackIcon Kind="Magnify">
-                                    <materialDesign:PackIcon.RenderTransform>
-                                        <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.8" ScaleY="1.8"/>
-                                    </materialDesign:PackIcon.RenderTransform>
-                                </materialDesign:PackIcon>
-                            </Button>
-                            <Button Margin="5,0" Grid.Column="2" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="オンライン上のコンテンツとの同期設定" Command="{Binding OpenNetworkSettingsCommand}">
-                                <materialDesign:PackIcon Kind="Attachment">
-                                    <materialDesign:PackIcon.RenderTransform>
-                                        <ScaleTransform CenterY="8" CenterX="7" ScaleX="2" ScaleY="2"/>
-                                    </materialDesign:PackIcon.RenderTransform>
-                                </materialDesign:PackIcon>
-                            </Button>
-
-                            <Button Margin="5,0" Grid.Column="3" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="名前を編集" Command="{Binding EditPlaylistCommand}">
-                                <materialDesign:PackIcon Kind="Pencil">
-                                    <materialDesign:PackIcon.RenderTransform>
-                                        <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
-                                    </materialDesign:PackIcon.RenderTransform>
-                                </materialDesign:PackIcon>
-                            </Button>
-
-                            <Button Margin="5,0" Grid.Column="4" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="動画情報を更新する" Command="{Binding UpdateVideoCommand}">
-                                <materialDesign:PackIcon Kind="{Binding RefreshCommandIcon}">
-                                    <materialDesign:PackIcon.RenderTransform>
-                                        <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
-                                    </materialDesign:PackIcon.RenderTransform>
-                                </materialDesign:PackIcon>
-                            </Button>
-
-                            <Button Margin="5,0" Grid.Column="5" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="ネットワークと同期する" Command="{Binding SyncWithNetowrkCommand}">
-                                <materialDesign:PackIcon Kind="DatabaseSync">
-                                    <materialDesign:PackIcon.RenderTransform>
-                                        <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
-                                    </materialDesign:PackIcon.RenderTransform>
-                                </materialDesign:PackIcon>
-                            </Button>
+                        </materialDesign:ColorZone>
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">
+                            <MenuItem Header="設定" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenSettingCommand}" >
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="CogOutline"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="ダウンロード" HorizontalContentAlignment="Left"  Height="40"   Command="{Binding OpenDownloadTaskWindowsCommand}">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="Download"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
                         </StackPanel>
                     </Grid>
-                    <Grid Grid.Row="2">
-                        <ListView Name="videolist" ItemsSource="{Binding Videos,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" BorderThickness="1" BorderBrush="#e7e7e7" >
+                </materialDesign:DrawerHost.LeftDrawerContent>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="17*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column= "0" Background="#e7e7e7">
+                        <Grid.DataContext>
+                            <vm:PlaylistTreeViewModel/>
+                        </Grid.DataContext>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="16*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel Grid.Row="0">
+                            <Button Width="auto" Margin="6" HorizontalAlignment="Left" Command="{Binding PlaylistRefreshcommand}" ToolTip="プレイリストを更新する">
+                                <materialDesign:PackIcon Kind="Refresh" />
+                            </Button>
+                        </DockPanel>
+                        <TreeView ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
                             <i:Interaction.Behaviors>
-                                <vm:VideoListBehavior/>
+                                <vm:PlaylistTreeBehavior/>
                             </i:Interaction.Behaviors>
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="選択">
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn >
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Image Source="{Binding BindableThumbPath,UpdateSourceTrigger=PropertyChanged}" Height="80"/>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Width="150" Header="ID" DisplayMemberBinding="{Binding NiconicoId}"/>
-                                    <GridViewColumn Header="タイトル" DisplayMemberBinding="{Binding Title}"/>
-                                    <GridViewColumn Header="投稿日" DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
-                                    <GridViewColumn Header="再生回数" DisplayMemberBinding="{Binding ViewCount}"/>
-                                    <GridViewColumn Header="状態" DisplayMemberBinding="{Binding Message}"/>
-                                </GridView>
-                            </ListView.View>
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
-                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                    <Setter Property="Padding" Value="10"/>
-                                    <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}, Mode=FindAncestor}, Path=DataContext}"/>
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate DataType="tree:ITreePlaylistInfo" ItemsSource="{Binding Children}">
+                                    <StackPanel>
+                                        <Grid Background="{Binding BackgroundColor}">
+                                            <Grid.ToolTip>
+                                                <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
+                                            </Grid.ToolTip>
+                                            <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
+                                            <TextBlock Text="{Binding Name}"/>
+                                            <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                    <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}}"/>
                                     <Setter Property="ContextMenu">
                                         <Setter.Value>
-                                            <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag,RelativeSource={RelativeSource Self}}">
-                                                <MenuItem Header="動画を削除する" Command="{Binding RemoveVideoCommand}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                            <ContextMenu StaysOpen="False" DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}" >
+                                                <MenuItem Header="プレイリストを追加する"
+                                                  Command="{Binding AddPlaylist}"
+                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                    <MenuItem.Icon>
+                                                        <materialDesign:PackIcon Kind="Plus"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="このプレイリストを削除する"
+                                                  Command="{Binding RemovePlaylist}"
+                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                     <MenuItem.Icon>
                                                         <materialDesign:PackIcon Kind="Delete"/>
                                                     </MenuItem.Icon>
                                                 </MenuItem>
-                                                <MenuItem Header="ニコニコで視聴する" Command="{Binding WatchOnNiconicoCommand}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                <MenuItem Header="このプレイリストを編集する"
+                                                  Command="{Binding EditPlaylistCommand}"
+                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                     <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Web"/>
+                                                        <materialDesign:PackIcon Kind="Edit"/>
                                                     </MenuItem.Icon>
                                                 </MenuItem>
-                                                <MenuItem Header="保存フォルダーを開く" Command="{Binding OpenPlaylistFolder}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Folder"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
+                                            </ContextMenu>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                        </TreeView>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="19*"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel >
+                            <ToggleButton Margin="10 0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignHamburgerToggleButton}" x:Name="MenuToggleButton"/>
+                            <DockPanel HorizontalAlignment="Right">
+                                <Button Margin="10,0" Grid.Column="0" Width="60" VerticalAlignment="Center" ToolTip="アプリケーション設定" Command="{Binding OpenSettingCommand}">
+                                    <materialDesign:PackIcon Kind="cog">
+                                        <materialDesign:PackIcon.RenderTransform>
+                                            <ScaleTransform CenterY="8" CenterX="7" ScaleX="1.7" ScaleY="1.7"/>
+                                        </materialDesign:PackIcon.RenderTransform>
+                                    </materialDesign:PackIcon>
+                                </Button>
+                            </DockPanel>
+                        </DockPanel>
+                        <Grid Grid.Row="1">
+                            <Grid.DataContext>
+                                <vm:VideoListViewModel/>
+                            </Grid.DataContext>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="3*"/>
+                                <RowDefinition Height="3*"/>
+                                <RowDefinition Height="23*"/>
+                                <RowDefinition Height="14*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock FontSize="30" Text="{Binding PlaylistTitle,UpdateSourceTrigger=PropertyChanged}" Margin="10 0"/>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="17*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Text="{Binding InputString,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignTextBox}" FontSize="20" Margin="5,0" VerticalContentAlignment="Bottom" materialDesign:HintAssist.Hint="ID・検索キーワード入力窓" Padding="5 0"/>
+                                    <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する（インテリインプット）" Command="{Binding AddVideoCommand}"/>
+                                </Grid>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button Margin="5,0" Grid.Column="0" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="入力したキーワードでフィルター" Command="{Binding FilterCommand}">
+                                        <materialDesign:PackIcon Kind="{Binding FilterIcon}">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.8" ScaleY="1.8"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatMidBgButton}">
+                                                <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource Mode=Self}}"/>
+                                                <Setter Property="ContextMenu">
+                                                    <Setter.Value>
+                                                        <ContextMenu DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
+                                                            <MenuItem IsCheckable="True" Header="タグのみでフィルター" IsChecked="{Binding IsFilteringOnlyByTag}"/>
+                                                            <MenuItem IsCheckable="True" Header="データベースの全ての動画からフィルター" IsChecked="{Binding IsFilteringFromAllVideos}"/>
+                                                        </ContextMenu>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
 
-                                                <MenuItem Header="選択">
-                                                    <MenuItem Header="全て選択する" Command="{Binding SelectAllVideosCommand}"/>
-                                                    <MenuItem Header="全て選択解除する" Command="{Binding DisSelectAllVideosCommand}"/>
-                                                    <MenuItem Header="未ダウンロードの動画を選択する" Command="{Binding SelectAllNotDownloadedVideosCommand}"/>
-                                                    <MenuItem Header="未ダウンロードの動画を選択解除する" Command="{Binding DisSelectAllNotDownloadedVideosCommand}"/>
-                                                    <MenuItem Header="ダウンロード済の動画を選択する" Command="{Binding SelectAllDownloadedVideosCommand}"/>
-                                                    <MenuItem Header="ダウンロード済の動画を選択解除する" Command="{Binding DisSelectAllDownloadedVideosCommand}"/>
-                                                </MenuItem>
-                                                <MenuItem Header="開く">
-                                                    <MenuItem Header="アプリで開く(A)" Command="{Binding OpenInPlayerAcommand}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                    <MenuItem Header="アプリで開く(B)" Command="{Binding OpenInPlayerBcommand}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                </MenuItem>
-                                                <MenuItem Header="送る">
-                                                    <MenuItem Header="アプリにURLを送る" Command="{Binding SendUrlToappCommand}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                    <MenuItem Header="アプリにIDを送る" Command="{Binding SendIdToappCommand}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                            </MenuItem>
-                                            <MenuItem Header="プレイリストを作成">
-                                                <MenuItem Header=".aimppl4形式のファイルを作成する" Command="{Binding CreatePlaylistCommand}" CommandParameter="aimp"/>
-                                            </MenuItem>
-                                        </ContextMenu>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.Resources>
-                            <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
-                                <Style.Triggers>
-                                    <Trigger Property="Tag" Value="Selected">
-                                        <Setter Property="Background" Value="#757575"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ListView.Resources>
-                    </ListView>
-                    <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
-                </Grid>
-                <TabControl Grid.Row="3" Margin="8">
-                    <TabItem Header="設定">
-                        <StackPanel Orientation="Vertical">
-                            <StackPanel.DataContext>
-                                <vm:DownloadSettingsViewModel/>
-                            </StackPanel.DataContext>
-                            <Grid Margin="0 5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="auto"/>
-                                </Grid.RowDefinitions>
-                                <Label Content="ダウンロードする項目"/>
-                                <StackPanel Orientation="Horizontal" Grid.Row="1">
-                                    <CheckBox Margin="5 0" Content="動画" IsChecked="{Binding IsDownloadingVideoEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Margin="5 0" Content="コメント" IsChecked="{Binding IsDownloadingCommentEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Margin="5 0" Content="過去ログ" IsChecked="{Binding IsDownloadingCommentLogEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Margin="5 0" Content="投稿者コメント" IsChecked="{Binding IsDownloadingOwnerComment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Margin="5 0" Content="かんたんコメント" IsChecked="{Binding IsDownloadingEasyComment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Margin="5 0" Content="サムネイル" IsChecked="{Binding IsDownloadingThumbEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Button Margin="5,0" Grid.Column="0" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="クリップボードから一括登録" Command="{Binding AddVideoFromClipboardCommand}">
+                                        <materialDesign:PackIcon Kind="Clipboard">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.8" ScaleY="1.8"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                    </Button>
+
+                                    <Button Margin="5,0" Grid.Column="1" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="検索して登録" Command="{Binding SearchCommand}">
+                                        <materialDesign:PackIcon Kind="Magnify">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.8" ScaleY="1.8"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                    </Button>
+                                    <Button Margin="5,0" Grid.Column="2" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="オンライン上のコンテンツとの同期設定" Command="{Binding OpenNetworkSettingsCommand}">
+                                        <materialDesign:PackIcon Kind="Attachment">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="8" CenterX="7" ScaleX="2" ScaleY="2"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                    </Button>
+
+                                    <Button Margin="5,0" Grid.Column="3" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="名前を編集" Command="{Binding EditPlaylistCommand}">
+                                        <materialDesign:PackIcon Kind="Pencil">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                    </Button>
+
+                                    <Button Margin="5,0" Grid.Column="4" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="動画情報を更新する" Command="{Binding UpdateVideoCommand}">
+                                        <materialDesign:PackIcon Kind="{Binding RefreshCommandIcon}">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                    </Button>
+
+                                    <Button Margin="5,0" Grid.Column="5" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="ネットワークと同期する" Command="{Binding SyncWithNetowrkCommand}">
+                                        <materialDesign:PackIcon Kind="DatabaseSync">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                    </Button>
                                 </StackPanel>
                             </Grid>
-                            <Separator/>
-                            <StackPanel Margin="0 5" Orientation="Horizontal">
-                                <Label Content="優先解像度:" Margin="0 0 5 0"/>
-                                <ComboBox ItemsSource="{Binding Resolutions}" DisplayMemberPath="DisplayValue" SelectedItem="{Binding SelectedResolution,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            </StackPanel>
-                            <Separator/>
-                            <Grid Margin="0 5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="auto"/>
-                                    <RowDefinition Height="auto"/>
-                                </Grid.RowDefinitions>
-                                <Label Content="オプション"/>
-                                <DockPanel  Grid.Row="1">
-                                    <CheckBox Margin="5 0" Content="同名時に上書き" IsChecked="{Binding IsOverwriteEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Margin="5 0" Content="ダウンロード済をスキップ" IsChecked="{Binding IsSkippingEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Margin="5 0" Content="ファイルを別フォルダーからコピー" IsChecked="{Binding IsCopyFromAnotherFolderEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    <DockPanel HorizontalAlignment="Right">
-                                        <Button Content="中断" HorizontalAlignment="Right" Margin="10 0" Command="{Binding CancelCommand}"/>
-                                        <Button Content="ダウンロード" HorizontalAlignment="Right" Margin="10 0" Command="{Binding DownloadCommand}"/>
-                                    </DockPanel>
-                                </DockPanel>
+                            <Grid Grid.Row="2">
+                                <ListView Name="videolist" ItemsSource="{Binding Videos,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" BorderThickness="1" BorderBrush="#e7e7e7" >
+                                    <i:Interaction.Behaviors>
+                                        <vm:VideoListBehavior/>
+                                    </i:Interaction.Behaviors>
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="選択">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn >
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Image Source="{Binding BindableThumbPath,UpdateSourceTrigger=PropertyChanged}" Height="80"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Width="150" Header="ID" DisplayMemberBinding="{Binding NiconicoId}"/>
+                                            <GridViewColumn Header="タイトル" DisplayMemberBinding="{Binding Title}"/>
+                                            <GridViewColumn Header="投稿日" DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
+                                            <GridViewColumn Header="再生回数" DisplayMemberBinding="{Binding ViewCount}"/>
+                                            <GridViewColumn Header="状態" DisplayMemberBinding="{Binding Message}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            <Setter Property="Padding" Value="10"/>
+                                            <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}, Mode=FindAncestor}, Path=DataContext}"/>
+                                            <Setter Property="ContextMenu">
+                                                <Setter.Value>
+                                                    <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag,RelativeSource={RelativeSource Self}}">
+                                                        <MenuItem Header="動画を削除する" Command="{Binding RemoveVideoCommand}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                            <MenuItem.Icon>
+                                                                <materialDesign:PackIcon Kind="Delete"/>
+                                                            </MenuItem.Icon>
+                                                        </MenuItem>
+                                                        <MenuItem Header="ニコニコで視聴する" Command="{Binding WatchOnNiconicoCommand}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                            <MenuItem.Icon>
+                                                                <materialDesign:PackIcon Kind="Web"/>
+                                                            </MenuItem.Icon>
+                                                        </MenuItem>
+                                                        <MenuItem Header="保存フォルダーを開く" Command="{Binding OpenPlaylistFolder}">
+                                                            <MenuItem.Icon>
+                                                                <materialDesign:PackIcon Kind="Folder"/>
+                                                            </MenuItem.Icon>
+                                                        </MenuItem>
+
+                                                        <MenuItem Header="選択">
+                                                            <MenuItem Header="全て選択する" Command="{Binding SelectAllVideosCommand}"/>
+                                                            <MenuItem Header="全て選択解除する" Command="{Binding DisSelectAllVideosCommand}"/>
+                                                            <MenuItem Header="未ダウンロードの動画を選択する" Command="{Binding SelectAllNotDownloadedVideosCommand}"/>
+                                                            <MenuItem Header="未ダウンロードの動画を選択解除する" Command="{Binding DisSelectAllNotDownloadedVideosCommand}"/>
+                                                            <MenuItem Header="ダウンロード済の動画を選択する" Command="{Binding SelectAllDownloadedVideosCommand}"/>
+                                                            <MenuItem Header="ダウンロード済の動画を選択解除する" Command="{Binding DisSelectAllDownloadedVideosCommand}"/>
+                                                        </MenuItem>
+                                                        <MenuItem Header="開く">
+                                                            <MenuItem Header="アプリで開く(A)" Command="{Binding OpenInPlayerAcommand}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                            <MenuItem Header="アプリで開く(B)" Command="{Binding OpenInPlayerBcommand}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        </MenuItem>
+                                                        <MenuItem Header="送る">
+                                                            <MenuItem Header="アプリにURLを送る" Command="{Binding SendUrlToappCommand}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                            <MenuItem Header="アプリにIDを送る" Command="{Binding SendIdToappCommand}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                        </MenuItem>
+                                                        <MenuItem Header="プレイリストを作成">
+                                                            <MenuItem Header=".aimppl4形式のファイルを作成する" Command="{Binding CreatePlaylistCommand}" CommandParameter="aimp"/>
+                                                        </MenuItem>
+                                                    </ContextMenu>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.Resources>
+                                        <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+                                            <Style.Triggers>
+                                                <Trigger Property="Tag" Value="Selected">
+                                                    <Setter Property="Background" Value="#757575"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListView.Resources>
+                                </ListView>
+                                <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
                             </Grid>
-                            <ProgressBar Margin="2 5" IsIndeterminate="{Binding IsDownloading,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}"/>
-                        </StackPanel>
-                    </TabItem>
-                    <TabItem Header="出力">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="2*"/>
-                                <RowDefinition Height="5*"/>
-                            </Grid.RowDefinitions>
-                            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
-                                <Button Width="auto" Margin="4" Command="{Binding ClearMessageCommand}" ToolTip="出力をクリアする">
-                                    <materialDesign:PackIcon Kind="Delete"/>
-                                </Button>
-                                <Button Width="auto" Margin="4" Command="{Binding CopyMessageCommand}" ToolTip="出力内容をクリップボードにコピーする">
-                                    <materialDesign:PackIcon Kind="Clipboard"/>
-                                </Button>
-                                <Button Width="auto" Margin="4" Command="{Binding OpenLogWindowCommand}" ToolTip="出力内容を別ウィンドウで開く">
-                                    <materialDesign:PackIcon Kind="DockWindow"/>
-                                </Button>
-                            </StackPanel>
-                            <TextBox Grid.Row="1" Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="4" IsReadOnly="True"
+                            <TabControl Grid.Row="3" Margin="8">
+                                <TabItem Header="設定">
+                                    <StackPanel Orientation="Vertical">
+                                        <StackPanel.DataContext>
+                                            <vm:DownloadSettingsViewModel/>
+                                        </StackPanel.DataContext>
+                                        <Grid Margin="0 5">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition Height="auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Label Content="ダウンロードする項目"/>
+                                            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                                <CheckBox Margin="5 0" Content="動画" IsChecked="{Binding IsDownloadingVideoEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <CheckBox Margin="5 0" Content="コメント" IsChecked="{Binding IsDownloadingCommentEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <CheckBox Margin="5 0" Content="過去ログ" IsChecked="{Binding IsDownloadingCommentLogEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <CheckBox Margin="5 0" Content="投稿者コメント" IsChecked="{Binding IsDownloadingOwnerComment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <CheckBox Margin="5 0" Content="かんたんコメント" IsChecked="{Binding IsDownloadingEasyComment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <CheckBox Margin="5 0" Content="サムネイル" IsChecked="{Binding IsDownloadingThumbEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <Separator/>
+                                        <StackPanel Margin="0 5" Orientation="Horizontal">
+                                            <Label Content="優先解像度:" Margin="0 0 5 0"/>
+                                            <ComboBox ItemsSource="{Binding Resolutions}" DisplayMemberPath="DisplayValue" SelectedItem="{Binding SelectedResolution,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                        </StackPanel>
+                                        <Separator/>
+                                        <Grid Margin="0 5">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition Height="auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Label Content="オプション"/>
+                                            <DockPanel  Grid.Row="1">
+                                                <CheckBox Margin="5 0" Content="同名時に上書き" IsChecked="{Binding IsOverwriteEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <CheckBox Margin="5 0" Content="ダウンロード済をスキップ" IsChecked="{Binding IsSkippingEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <CheckBox Margin="5 0" Content="ファイルを別フォルダーからコピー" IsChecked="{Binding IsCopyFromAnotherFolderEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <DockPanel HorizontalAlignment="Right">
+                                                    <Button Content="ステージ" HorizontalAlignment="Right" Margin="10 0" Command="{Binding StageVideosCommand}"/>
+                                                    <Button Content="中断" HorizontalAlignment="Right" Margin="10 0" Command="{Binding CancelCommand}"/>
+                                                    <Button Content="ダウンロード" HorizontalAlignment="Right" Margin="10 0" Command="{Binding DownloadCommand}"/>
+                                                </DockPanel>
+                                            </DockPanel>
+                                        </Grid>
+                                        <ProgressBar Margin="2 5" IsIndeterminate="{Binding IsDownloading,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}"/>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem Header="出力">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="2*"/>
+                                            <RowDefinition Height="5*"/>
+                                        </Grid.RowDefinitions>
+                                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+                                            <Button Width="auto" Margin="4" Command="{Binding ClearMessageCommand}" ToolTip="出力をクリアする">
+                                                <materialDesign:PackIcon Kind="Delete"/>
+                                            </Button>
+                                            <Button Width="auto" Margin="4" Command="{Binding CopyMessageCommand}" ToolTip="出力内容をクリップボードにコピーする">
+                                                <materialDesign:PackIcon Kind="Clipboard"/>
+                                            </Button>
+                                            <Button Width="auto" Margin="4" Command="{Binding OpenLogWindowCommand}" ToolTip="出力内容を別ウィンドウで開く">
+                                                <materialDesign:PackIcon Kind="DockWindow"/>
+                                            </Button>
+                                        </StackPanel>
+                                        <TextBox Grid.Row="1" Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="4" IsReadOnly="True"
                                          BorderThickness="0 1 0 0" TextWrapping="Wrap"/>
-                            </Grid>
-                        </TabItem>
-                    </TabControl >
+                                    </Grid>
+                                </TabItem>
+                            </TabControl >
+                        </Grid>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Grid>
+
+            </materialDesign:DrawerHost>
+        </DockPanel>
     </materialDesign:DialogHost>
 </Window>
