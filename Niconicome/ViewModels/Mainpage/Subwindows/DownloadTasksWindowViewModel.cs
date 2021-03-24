@@ -2,18 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Documents;
-using AngleSharp.Dom;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Network.Download;
 using Niconicome.ViewModels.Mainpage.Utils;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
-using WS = Niconicome.Workspaces;
 using Material = MaterialDesignThemes.Wpf;
-using Niconicome.Models.Domain.Local.Store.Types;
-using Niconicome.Models.Network;
-using Niconicome.Extensions.System.List;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows
 {

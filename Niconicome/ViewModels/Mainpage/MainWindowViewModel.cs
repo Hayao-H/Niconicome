@@ -1,18 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Microsoft.Xaml.Behaviors;
-using Niconicome.Views;
-using Niconicome.ViewModels;
-using Niconicome.Models.Domain.Niconico;
-using Niconicome.Models.Auth;
-using WS = Niconicome.Workspaces;
-using Niconicome.Views.Setting;
-using System.ComponentModel;
 using Niconicome.Extensions;
-using Niconicome.ViewModels.Controls;
+using Niconicome.Models.Auth;
+using Niconicome.Models.Domain.Niconico;
+using Niconicome.Views;
+using Niconicome.Views.Setting;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
 {

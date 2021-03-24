@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using Niconicome.Extensions.System;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Local;
-using Niconicome.Models.Network;
+using Niconicome.Models.Network.Download;
 using Niconicome.Models.Playlist;
+using Niconicome.Views;
+using MaterialDesign = MaterialDesignThemes.Wpf;
 using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 using WS = Niconicome.Workspaces;
-using MaterialDesign = MaterialDesignThemes.Wpf;
-using Niconicome.Extensions.System.List;
-using Niconicome.Models.Network.Download;
-using Niconicome.Views;
 
 namespace Niconicome.ViewModels.Mainpage
 {
