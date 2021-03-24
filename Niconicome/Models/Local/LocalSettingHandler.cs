@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Niconicome.Models.Domain.Local.Store;
+﻿using Niconicome.Models.Domain.Local.Store;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Local
@@ -106,10 +101,11 @@ namespace Niconicome.Models.Local
             else if (data is string stringData)
             {
                 this.settingHandler.SaveStringSetting(settingname, stringData);
-            } else if (data is int intData)
+            }
+            else if (data is int intData)
             {
                 this.settingHandler.SaveIntSetting(settingname, intData);
-            } 
+            }
         }
 
         /// <summary>
@@ -131,21 +127,22 @@ namespace Niconicome.Models.Local
                 Settings.FfmpegPath => STypes::SettingNames.FFmpegPath,
                 Settings.DefaultFolder => STypes::SettingNames.DefaultFolder,
                 Settings.CommentOffset => STypes::SettingNames.CommentOffset,
-                Settings.DLVideo=>STypes::SettingNames.IsDownloadingVideoEnable,
-                Settings.DLComment=> STypes::SettingNames.IsDownloadingCommentEnable,
-                Settings.DLKako=> STypes::SettingNames.IsDownloadingKakoroguEnable,
-                Settings.DLEasy=> STypes::SettingNames.IsDownloadingEasyEnable,
-                Settings.DLThumb=> STypes::SettingNames.IsDownloadingThumbEnable,
-                Settings.DLOwner=> STypes::SettingNames.IsDownloadingOwnerEnable,
-                Settings.DLSkip=> STypes::SettingNames.IsSkipEnable,
-                Settings.DLCopy=> STypes::SettingNames.IsCopyEnable,
-                Settings.DLOverwrite=> STypes::SettingNames.IsOverwriteEnable,
-                Settings.SwitchOffset=>STypes::SettingNames.IsAutoSwitchOffsetEnable,
-                Settings.FFmpegShell=>STypes::SettingNames.UseShellWhenLaunchingFFmpeg,
+                Settings.DLVideo => STypes::SettingNames.IsDownloadingVideoEnable,
+                Settings.DLComment => STypes::SettingNames.IsDownloadingCommentEnable,
+                Settings.DLKako => STypes::SettingNames.IsDownloadingKakoroguEnable,
+                Settings.DLEasy => STypes::SettingNames.IsDownloadingEasyEnable,
+                Settings.DLThumb => STypes::SettingNames.IsDownloadingThumbEnable,
+                Settings.DLOwner => STypes::SettingNames.IsDownloadingOwnerEnable,
+                Settings.DLSkip => STypes::SettingNames.IsSkipEnable,
+                Settings.DLCopy => STypes::SettingNames.IsCopyEnable,
+                Settings.DLOverwrite => STypes::SettingNames.IsOverwriteEnable,
+                Settings.SwitchOffset => STypes::SettingNames.IsAutoSwitchOffsetEnable,
+                Settings.FFmpegShell => STypes::SettingNames.UseShellWhenLaunchingFFmpeg,
                 Settings.AutologinEnable => STypes::SettingNames.IsAutologinEnable,
                 Settings.AutologinMode => STypes::SettingNames.AutoLoginMode,
-                Settings.MaxParallelDL=>STypes::SettingNames.MaxParallelDownloadCount,
-                Settings.MaxParallelSegDl=>STypes::SettingNames.MaxParallelSegmentDownloadCount,
+                Settings.MaxParallelDL => STypes::SettingNames.MaxParallelDownloadCount,
+                Settings.MaxParallelSegDl => STypes::SettingNames.MaxParallelSegmentDownloadCount,
+                Settings.DLAllFromQueue => STypes::SettingNames.DownloadAllWhenPushDLButton,
                 _ => null
             };
         }
@@ -178,5 +175,6 @@ namespace Niconicome.Models.Local
         AutologinMode,
         MaxParallelDL,
         MaxParallelSegDl,
+        DLAllFromQueue,
     }
 }

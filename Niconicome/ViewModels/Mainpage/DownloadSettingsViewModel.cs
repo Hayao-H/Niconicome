@@ -89,12 +89,20 @@ namespace Niconicome.ViewModels.Mainpage
                        VerticalResolution = this.SelectedResolution.Resolution.Vertical,
                        PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
                    };
+                   var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
 
 
                    WS::Mainpage.Messagehandler.AppendMessage($"動画のダウンロードを開始します。({videoCount}件)");
                    this.SnackbarMessageQueue.Enqueue($"動画のダウンロードを開始します。({videoCount}件)");
                    WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting);
-                   WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == this.playlist.Id);
+                   
+                   if (dlFromQueue)
+                   {
+                       WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
+                   } else
+                   {
+                       WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == this.playlist.Id);
+                   }
 
                    await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
 
