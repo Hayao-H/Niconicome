@@ -482,14 +482,13 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         public async Task<INetworkResult?> DownloadVideos()
         {
-            this.RaiseCanDownloadChange();
 
             if (this.parallelTasksHandler.IsProcessing)
             {
                 return new NetworkResult();
             }
 
-            await this.parallelTasksHandler.ProcessTasksAsync();
+            await this.parallelTasksHandler.ProcessTasksAsync(()=> this.RaiseCanDownloadChange());
 
             this.RaiseCanDownloadChange();
 
@@ -661,7 +660,6 @@ namespace Niconicome.Models.Network.Download
                 CommentOffset = commentOffset
             };
         }
-
 
     }
 

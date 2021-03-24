@@ -14,6 +14,7 @@ namespace Niconicome.Models.Network.Download
 
         void ClearStaged();
         void MoveStagedToQueue(bool clearAfterMove = true);
+        void MoveStagedToQueue(Func<IDownloadTask, bool> predicate, bool clearAfterMove = true);
         void StageVIdeo(IVideoListInfo video, DownloadSettings settings);
         void StageVIdeos(IEnumerable<IVideoListInfo> videos, DownloadSettings settings);
     }
@@ -66,7 +67,7 @@ namespace Niconicome.Models.Network.Download
         {
             foreach (var video in videos)
             {
-                this.StageVIdeo(video, settings);
+                this.StageVIdeo(video, settings with { });
             }
         }
 
@@ -79,6 +80,15 @@ namespace Niconicome.Models.Network.Download
         }
 
         /// <summary>
+        /// フィルターして削除
+        /// </summary>
+        /// <param name="predicate"></param>
+        public void RemoveStaged(Predicate<IDownloadTask> predicate)
+        {
+            this.StagedDownloadTaskPool.RemoveTasks(predicate);
+        }
+
+        /// <summary>
         /// ステージング済みをキューに追加
         /// </summary>
         /// <param name="clearAfterMove"></param>
@@ -87,5 +97,19 @@ namespace Niconicome.Models.Network.Download
             this.DownloadTaskPool.AddTasks(this.StagedDownloadTaskPool.GetAllTasks());
             if (clearAfterMove) this.ClearStaged();
         }
+
+        /// <summary>
+        /// ステージング済みをフィルターして追加
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <param name="clearAfterMove"></param>
+        public void MoveStagedToQueue(Func<IDownloadTask, bool> predicate, bool clearAfterMove = true)
+        {
+            var videos = this.StagedDownloadTaskPool.GetAllTasks().Where(predicate);
+            this.DownloadTaskPool.AddTasks(videos);
+            if (clearAfterMove) this.RemoveStaged(t => predicate(t));
+
+        }
+
     }
 }

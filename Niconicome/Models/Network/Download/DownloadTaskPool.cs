@@ -14,6 +14,7 @@ namespace Niconicome.Models.Network.Download
         void AddTasks(IEnumerable<IDownloadTask> tasks);
         void RemoveTask(IDownloadTask task);
         void RemoveTasks(IEnumerable<IDownloadTask> tasks);
+        void RemoveTasks(Predicate<IDownloadTask> predicate);
         event EventHandler<TaskPoolChangeEventargs>? TaskPoolChange;
         void CancelAllTasks();
         void Clear(bool cancel = true);
@@ -124,6 +125,16 @@ namespace Niconicome.Models.Network.Download
                 this.RemoveTask(task);
             }
         }
+
+        /// <summary>
+        /// 複数のタスクを削除する
+        /// </summary>
+        /// <param name="predicate"></param>
+        public void RemoveTasks(Predicate<IDownloadTask> predicate)
+        {
+            this.innerList.RemoveAll(predicate);
+        }
+
 
         /// <summary>
         /// プール変更イベント
