@@ -23,6 +23,9 @@ namespace Niconicome.Models.Network.Download
         CancellationToken CancellationToken { get; }
         event EventHandler<DownloadTaskMessageChangedEventArgs>? MessageChange;
         event EventHandler? ProcessingEnd;
+        event EventHandler? ProcessStart;
+        event EventHandler? Done;
+        event EventHandler? TaskCancel;
         void Cancel();
     }
 
@@ -57,6 +60,8 @@ namespace Niconicome.Models.Network.Download
 
         protected bool isProcessingField;
 
+        protected bool isDoneField;
+
         /// <summary>
         /// メッセージ変更イベントを発火させる
         /// </summary>
@@ -68,9 +73,33 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// 終了イベントを発火させる
         /// </summary>
-        public void RaiseProcessingEnd()
+        protected void RaiseProcessingEnd()
         {
             this.ProcessingEnd?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// 開始イベントを発火させる
+        /// </summary>
+        protected void RaiseProcessingStart()
+        {
+            this.ProcessStart?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// 終了イベントを発火させる
+        /// </summary>
+        protected void RaiseDone()
+        {
+            this.Done?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// キャンセルイベントを発火させる
+        /// </summary>
+        protected void RaiseCancel()
+        {
+            this.TaskCancel?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -134,13 +163,28 @@ namespace Niconicome.Models.Network.Download
                 {
                     this.RaiseProcessingEnd();
                 }
+                else
+                {
+                    this.RaiseProcessingStart();
+                }
             }
         }
 
         /// <summary>
         /// 完了フラグ
         /// </summary>
-        public virtual bool IsDone { get; set; }
+        public virtual bool IsDone
+        {
+            get => this.isDoneField;
+            set
+            {
+                this.isDoneField = value;
+                if (value)
+                {
+                    this.RaiseDone();
+                }
+            }
+        }
 
         /// <summary>
         /// /垂直解像度
@@ -164,6 +208,21 @@ namespace Niconicome.Models.Network.Download
         public event EventHandler? ProcessingEnd;
 
         /// <summary>
+        /// 開始イベント
+        /// </summary>
+        public event EventHandler? ProcessStart;
+
+        /// <summary>
+        /// 完了イベント
+        /// </summary>
+        public event EventHandler? Done;
+
+        /// <summary>
+        /// キャンセルイベント
+        /// </summary>
+        public event EventHandler? TaskCancel;
+
+        /// <summary>
         /// トークン
         /// </summary>
         public CancellationToken CancellationToken { get; init; }
@@ -176,6 +235,7 @@ namespace Niconicome.Models.Network.Download
             this.cts.Cancel();
             this.IsCanceled = true;
             this.IsProcessing = false;
+            this.RaiseCancel();
         }
 
     }
@@ -190,8 +250,6 @@ namespace Niconicome.Models.Network.Download
         }
 
         private bool isCanceledField;
-
-        private bool isDoneField;
 
         public override string Message
         {
@@ -214,6 +272,10 @@ namespace Niconicome.Models.Network.Download
                 if (!value)
                 {
                     this.RaiseProcessingEnd();
+                }
+                else
+                {
+                    this.RaiseProcessingStart();
                 }
             }
         }

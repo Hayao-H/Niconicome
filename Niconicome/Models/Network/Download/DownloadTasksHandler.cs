@@ -44,7 +44,7 @@ namespace Niconicome.Models.Network.Download
         /// <param name="settings"></param>
         public void StageVIdeo(IVideoListInfo video, DownloadSettings settings)
         {
-            var task = new BindableDownloadTask(video.NiconicoId, video.Title, video.Id, settings);
+            var task = new DownloadTask(video.NiconicoId, video.Title, video.Id, settings);
             void onMessageChange(object? sender, DownloadTaskMessageChangedEventArgs e)
             {
                 if (e.Message is not null) video.Message = e.Message;
