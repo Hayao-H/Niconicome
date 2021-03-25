@@ -192,7 +192,7 @@ namespace Niconicome.Models.Playlist
 
                             var video = this.videoHandler.GetVideo(oldVideo.Id);
 
-                            //保持されている動画情報が亜あれば引き継ぐ
+                            //保持されている動画情報があれば引き継ぐ
                             var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(oldVideo.Id, playlistId);
 
                             if (lightVideo is not null)
@@ -242,7 +242,7 @@ namespace Niconicome.Models.Playlist
         {
 
             if (this.Videos.Count == 0) return;
-            if (!this.Videos.Any(v => v.Id == video.Id))
+            if (!this.Videos.Any(v => (v?.Id ?? 0) == video.Id))
             {
                 this.Videos.Add(video);
             }
