@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Network.Download
@@ -14,14 +12,17 @@ namespace Niconicome.Models.Network.Download
 
         void ClearStaged();
         void MoveStagedToQueue(bool clearAfterMove = true);
-        void StageVIdeo(IVideoListInfo video, DownloadSettings settings);
-        void StageVIdeos(IEnumerable<IVideoListInfo> videos, DownloadSettings settings);
+        void MoveStagedToQueue(Func<IDownloadTask, bool> predicate, bool clearAfterMove = true);
+        void StageVIdeo(IVideoListInfo video, DownloadSettings settings, bool allowDupe);
+        void StageVIdeos(IEnumerable<IVideoListInfo> videos, DownloadSettings settings, bool allowDupe);
+        bool ContainsStage(Func<IDownloadTask, bool> predicate);
     }
 
     class DownloadTasksHandler : IDownloadTasksHandler
     {
 
-        public DownloadTasksHandler(IDownloadTaskPool staged,IDownloadTaskPool download) {
+        public DownloadTasksHandler(IDownloadTaskPool staged, IDownloadTaskPool download)
+        {
             this.StagedDownloadTaskPool = staged;
             this.DownloadTaskPool = download;
         }
@@ -41,9 +42,18 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         /// <param name="video"></param>
         /// <param name="settings"></param>
-        public void StageVIdeo(IVideoListInfo video, DownloadSettings settings)
+        public void StageVIdeo(IVideoListInfo video, DownloadSettings settings, bool allowDupe)
         {
-            var task = new BindableDownloadTask(video, settings);
+            var task = new DownloadTask(video.NiconicoId, video.Title, video.Id, settings);
+            void onMessageChange(object? sender, DownloadTaskMessageChangedEventArgs e)
+            {
+                if (e.Message is not null) video.Message = e.Message;
+            }
+            task.MessageChange += onMessageChange;
+            task.ProcessingEnd += (_, _) =>
+            {
+                task.MessageChange -= onMessageChange;
+            };
             this.StagedDownloadTaskPool.AddTask(task);
         }
 
@@ -52,11 +62,11 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         /// <param name="videos"></param>
         /// <param name="settings"></param>
-        public void StageVIdeos(IEnumerable<IVideoListInfo> videos, DownloadSettings settings)
+        public void StageVIdeos(IEnumerable<IVideoListInfo> videos, DownloadSettings settings, bool allowDupe)
         {
             foreach (var video in videos)
             {
-                this.StageVIdeo(video, settings);
+                this.StageVIdeo(video, settings with { }, allowDupe);
             }
         }
 
@@ -69,6 +79,15 @@ namespace Niconicome.Models.Network.Download
         }
 
         /// <summary>
+        /// フィルターして削除
+        /// </summary>
+        /// <param name="predicate"></param>
+        public void RemoveStaged(Predicate<IDownloadTask> predicate)
+        {
+            this.StagedDownloadTaskPool.RemoveTasks(predicate);
+        }
+
+        /// <summary>
         /// ステージング済みをキューに追加
         /// </summary>
         /// <param name="clearAfterMove"></param>
@@ -77,5 +96,30 @@ namespace Niconicome.Models.Network.Download
             this.DownloadTaskPool.AddTasks(this.StagedDownloadTaskPool.GetAllTasks());
             if (clearAfterMove) this.ClearStaged();
         }
+
+        /// <summary>
+        /// ステージング済みをフィルターして追加
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <param name="clearAfterMove"></param>
+        public void MoveStagedToQueue(Func<IDownloadTask, bool> predicate, bool clearAfterMove = true)
+        {
+            var videos = this.StagedDownloadTaskPool.GetAllTasks().Where(predicate);
+            this.DownloadTaskPool.AddTasks(videos);
+            if (clearAfterMove) this.RemoveStaged(t => predicate(t));
+
+        }
+
+        /// <summary>
+        /// ステージング済みタスクを確認
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public bool ContainsStage(Func<IDownloadTask, bool> predicate)
+        {
+            return this.StagedDownloadTaskPool.HasTask(predicate);
+        }
+
+
     }
 }

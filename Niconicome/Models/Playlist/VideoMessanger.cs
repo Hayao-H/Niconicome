@@ -15,6 +15,8 @@ namespace Niconicome.Models.Playlist
 
         private static readonly Dictionary<string, string> messages = new();
 
+        private static object lockObj = new();
+
         public static event EventHandler<VideoMessageChangeEventArgs>? VideoMessageChange;
 
         /// <summary>
@@ -24,19 +26,22 @@ namespace Niconicome.Models.Playlist
         /// <param name="message"></param>
         public static void Write(string guid, string message)
         {
-            string old = string.Empty;
-
-            if (!VideoMessanger.messages.ContainsKey(guid))
+            lock (VideoMessanger.lockObj)
             {
-                VideoMessanger.messages.Add(guid, message);
-            }
-            else
-            {
-                old = VideoMessanger.messages[guid];
-                VideoMessanger.messages[guid] = message;
-            }
+                string old = string.Empty;
 
-            VideoMessanger.RaiseOnMessage(guid, old, message);
+                if (!VideoMessanger.messages.ContainsKey(guid))
+                {
+                    VideoMessanger.messages.Add(guid, message);
+                }
+                else
+                {
+                    old = VideoMessanger.messages[guid];
+                    VideoMessanger.messages[guid] = message;
+                }
+
+                VideoMessanger.RaiseOnMessage(guid, old, message);
+            }
 
         }
 
@@ -47,13 +52,16 @@ namespace Niconicome.Models.Playlist
         /// <returns></returns>
         public static string GetMessage(string guid)
         {
-            if (!VideoMessanger.messages.ContainsKey(guid))
+            lock (VideoMessanger.lockObj)
             {
-                return String.Empty;
-            }
-            else
-            {
-                return VideoMessanger.messages[guid];
+                if (!VideoMessanger.messages.ContainsKey(guid))
+                {
+                    return String.Empty;
+                }
+                else
+                {
+                    return VideoMessanger.messages[guid];
+                }
             }
         }
 

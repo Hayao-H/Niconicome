@@ -39,6 +39,8 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             this.maxParallelDownloadCountFIeld = maxP;
             this.maxParallelSegmentDownloadCountField = maxSP;
+            this.isDownloadFromQueueEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
+            this.isDupeOnStageAllowedField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
         }
 
         private int commentOffsetField;
@@ -48,6 +50,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         private int maxParallelDownloadCountFIeld;
 
         private int maxParallelSegmentDownloadCountField;
+
+        private bool isDownloadFromQueueEnableField;
+
+        private bool isDupeOnStageAllowedField;
 
         /// <summary>
         /// コメントのオフセット
@@ -88,6 +94,17 @@ namespace Niconicome.ViewModels.Setting.Pages
                 this.Savesetting(ref this.maxParallelSegmentDownloadCountField, value, Settings.MaxParallelSegDl);
             }
         }
+
+        /// <summary>
+        /// キューからもDLする
+        /// </summary>
+        public bool IsDownloadFromQueueEnable { get => this.isDownloadFromQueueEnableField; set => this.Savesetting(ref this.isDownloadFromQueueEnableField, value, Settings.DLAllFromQueue); }
+
+        /// <summary>
+        /// ステージングの際の重複を許可する
+        /// </summary>
+        public bool IsDupeOnStageAllowed { get => this.isDupeOnStageAllowedField; set => this.Savesetting(ref this.isDupeOnStageAllowedField, value, Settings.AllowDupeOnStage); }
+
     }
 
     [Obsolete("Desinger", true)]
@@ -100,5 +117,9 @@ namespace Niconicome.ViewModels.Setting.Pages
         public int MaxParallelDownloadCount { get; set; } = 3;
 
         public int MaxParallelSegmentDownloadCount { get; set; } = 1;
+
+        public bool IsDownloadFromQueueEnable { get; set; } = true;
+
+        public bool IsDupeOnStageAllowed { get; set; } = true;
     }
 }

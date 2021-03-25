@@ -16,6 +16,7 @@ namespace Niconicome.Models.Playlist
     {
         void Update(int playlistId);
         void Update(int playlistId, IVideoListInfo video);
+        void Uncheck(int playlistID, int videoID);
         ITreePlaylistInfo? CurrentSelectedPlaylist { get; set; }
         event EventHandler SelectedItemChanged;
         event EventHandler VideosChanged;
@@ -24,7 +25,7 @@ namespace Niconicome.Models.Playlist
 
     class Current : ICurrent
     {
-        public Current(ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,IPlaylistStoreHandler playlistStoreHandler)
+        public Current(ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility, IPlaylistStoreHandler playlistStoreHandler)
         {
             this.cacheHandler = cacheHandler;
             this.videoHandler = videoHandler;
@@ -80,6 +81,37 @@ namespace Niconicome.Models.Playlist
                 this.RaiseSelectedItemChanged();
             }
         }
+
+        /// <summary>
+        /// チェックを外す
+        /// </summary>
+        /// <param name="playlistID"></param>
+        /// <param name="videoID"></param>
+       　public void Uncheck(int playlistID, int videoID)
+        {
+            if (this.CurrentSelectedPlaylist is null) return;
+
+            if (playlistID == this.CurrentSelectedPlaylist.Id)
+            {
+                var video = this.Videos.FirstOrDefault(v => v.Id == videoID);
+                if (video is not null)
+                {
+                    video.IsSelected = false;
+                }
+            }
+            else
+            {
+                var messageGuid = string.Empty;
+                if (LightVideoListinfoHandler.Contains(new LightVideoListInfo(messageGuid, playlistID, videoID, false)))
+                {
+                    messageGuid = LightVideoListinfoHandler.GetLightVideoListInfo(videoID, playlistID)!.MessageGuid;
+                }
+
+                var video = new LightVideoListInfo(messageGuid, playlistID, videoID, false);
+                LightVideoListinfoHandler.AddVideo(video);
+            }
+        }
+
 
         /// <summary>
         /// プレイリスト変更時に発火するイベント
@@ -160,7 +192,7 @@ namespace Niconicome.Models.Playlist
 
                             var video = this.videoHandler.GetVideo(oldVideo.Id);
 
-                            //保持されている動画情報が亜あれば引き継ぐ
+                            //保持されている動画情報があれば引き継ぐ
                             var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(oldVideo.Id, playlistId);
 
                             if (lightVideo is not null)
@@ -210,7 +242,7 @@ namespace Niconicome.Models.Playlist
         {
 
             if (this.Videos.Count == 0) return;
-            if (!this.Videos.Any(v => v.Id == video.Id))
+            if (!this.Videos.Any(v => (v?.Id ?? 0) == video.Id))
             {
                 this.Videos.Add(video);
             }

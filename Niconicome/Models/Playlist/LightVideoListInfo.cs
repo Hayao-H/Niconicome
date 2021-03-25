@@ -23,8 +23,6 @@ namespace Niconicome.Models.Playlist
     {
         private static readonly List<ILightVideoListInfo> videoListInfos = new();
 
-        private static readonly object lockObj = new();
-
         public static bool Contains(ILightVideoListInfo video)
         {
             return LightVideoListinfoHandler.videoListInfos.Any(v => v.VideoId == video.VideoId && v.PlaylistId == video.PlaylistId);

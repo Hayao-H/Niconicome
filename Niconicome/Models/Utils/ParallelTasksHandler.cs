@@ -25,7 +25,7 @@ namespace Niconicome.Models.Utils
             this.createThread = createThread;
         }
 
-        public ParallelTasksHandler(int maxPallarelTasksCount, bool createThread = true) : this(maxPallarelTasksCount, -1, -1,createThread) { }
+        public ParallelTasksHandler(int maxPallarelTasksCount, bool createThread = true) : this(maxPallarelTasksCount, -1, -1, createThread) { }
 
         /// <summary>
         /// 最大動機実行数
@@ -118,7 +118,7 @@ namespace Niconicome.Models.Utils
         /// 実処理
         /// </summary>
         /// <returns></returns>
-        public async Task ProcessTasksAsync()
+        public async Task ProcessTasksAsync(Action? preAction = null)
         {
             //すでにタスクを実行中の場合はキャンセル
             if (this.IsProcessing) return;
@@ -131,6 +131,11 @@ namespace Niconicome.Models.Utils
             lock (this.lockobj)
             {
                 this.IsProcessing = true;
+            }
+
+            if (preAction is not null)
+            {
+                preAction();
             }
 
             //スレッドを作成して並列実行する
@@ -173,7 +178,8 @@ namespace Niconicome.Models.Utils
                 {
                     var t = Task.Run(func);
                     tasks.Add(t);
-                } else
+                }
+                else
                 {
                     var t = func();
                     tasks.Add(t);
