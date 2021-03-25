@@ -52,7 +52,7 @@
                     ※「\」でフォルダーを作成します。[&lt;id&gt;]&lt;title&gt;でxenoのデフォルトと同じフォーマットになります。
                 </TextBlock>
             </StackPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7"/>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="ContentSave" Foreground="SkyBlue">
@@ -64,7 +64,7 @@
                 </StackPanel>
                 <TextBox Margin="10 0 0 0" Text="{Binding DefaultFolder,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="defaultfolder"/>
             </StackPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7"/>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>
                 <materialDesign:PackIcon Kind="FindReplace" Foreground="SkyBlue">
                     <materialDesign:PackIcon.RenderTransform>
@@ -74,7 +74,7 @@
                 <Label Content="禁則文字をマルチバイト文字に置き換える" />
                 <ToggleButton IsChecked="{Binding IsReplaceSBToSBEnable,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"/>
             </DockPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7"/>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
     </Grid>
 </Page>

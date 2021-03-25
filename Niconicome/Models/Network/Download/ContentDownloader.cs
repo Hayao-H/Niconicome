@@ -40,6 +40,7 @@ namespace Niconicome.Models.Network.Download
         bool DownloadEasy { get; }
         bool DownloadLog { get; }
         bool DownloadOwner { get; }
+        bool IsReplaceStrictedEnable { get; }
         string NiconicoId { get; }
         string FolderPath { get; }
         uint VerticalResolution { get; }
@@ -66,7 +67,7 @@ namespace Niconicome.Models.Network.Download
 
     public interface ILocalContentHandler
     {
-        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo);
+        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted);
         IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath);
     }
 
@@ -245,7 +246,7 @@ namespace Niconicome.Models.Network.Download
             if (setting.Skip)
             {
                 string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo);
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable);
             }
 
             if (!Directory.Exists(setting.FolderPath))
@@ -494,7 +495,7 @@ namespace Niconicome.Models.Network.Download
                 return new NetworkResult();
             }
 
-            await this.parallelTasksHandler.ProcessTasksAsync(()=> this.RaiseCanDownloadChange());
+            await this.parallelTasksHandler.ProcessTasksAsync(() => this.RaiseCanDownloadChange());
 
             this.RaiseCanDownloadChange();
 
@@ -563,7 +564,7 @@ namespace Niconicome.Models.Network.Download
         /// DL可能フラグ
         /// </summary>
         public bool CanDownload { get => !this.parallelTasksHandler.IsProcessing; }
-        
+
         /// <summary>
         /// DL可能フラグ変更イベント
         /// </summary>
@@ -619,6 +620,8 @@ namespace Niconicome.Models.Network.Download
 
         public bool DownloadOwner { get; set; }
 
+        public bool IsReplaceStrictedEnable { get; set; }
+
         public uint VerticalResolution { get; set; }
 
         public int PlaylistID { get; set; }
@@ -638,6 +641,7 @@ namespace Niconicome.Models.Network.Download
                 IsOverwriteEnable = this.Overwrite,
                 VerticalResolution = this.VerticalResolution,
                 MaxParallelDownloadCount = maxParallelDLCount,
+                IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
             };
         }
 
@@ -649,6 +653,7 @@ namespace Niconicome.Models.Network.Download
                 FolderName = this.FolderPath,
                 FileNameFormat = fileFormat,
                 IsOverwriteEnable = this.Overwrite,
+                IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
             };
         }
 
@@ -663,7 +668,8 @@ namespace Niconicome.Models.Network.Download
                 IsDownloadingEasyCommentEnable = this.DownloadEasy,
                 IsDownloadingLogEnable = this.DownloadLog,
                 IsDownloadingOwnerCommentEnable = this.DownloadOwner,
-                CommentOffset = commentOffset
+                CommentOffset = commentOffset,
+                IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
             };
         }
 
@@ -729,11 +735,11 @@ namespace Niconicome.Models.Network.Download
         /// <param name="format"></param>
         /// <param name="dmcInfo"></param>
         /// <returns></returns>
-        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo)
+        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted)
         {
-            string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4");
-            string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml");
-            string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".jpg");
+            string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4", replaceStricted);
+            string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml", replaceStricted);
+            string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".jpg", replaceStricted);
             bool videoExist = this.videoFileStorehandler.Exists(dmcInfo.Id);
             string? localPath = null;
 

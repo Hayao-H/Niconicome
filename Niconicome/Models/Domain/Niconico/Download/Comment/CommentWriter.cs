@@ -28,6 +28,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="folderPath"></param>
         public void Write(IStoreCommentsData comments, string folderPath, bool overwrite)
         {
+            IOUtils.CreateDirectoryIfNotExist(folderPath, comments.Filename);
             string targetPath = this.GetFilePath(folderPath, comments.Filename, overwrite);
             this.WriteComments(comments.Chats, targetPath);
 

@@ -29,6 +29,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         string FolderName { get; }
         string FileNameFormat { get; }
         bool IsOverwriteEnable { get; }
+        bool IsReplaceStrictedEnable { get; }
     }
 
     /// <summary>
@@ -54,18 +55,22 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
             }
 
 
-            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".jpg");
+            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".jpg",settings.IsReplaceStrictedEnable);
             string fileName = generatedFIlename.IsNullOrEmpty() ? $"[{session.Video!.Id}]{session.Video!.Title}.jpg" : generatedFIlename;
+
+            IOUtils.CreateDirectoryIfNotExist(settings.FolderName, fileName);
 
 
             string? thumbUrl;
             if (!(session.Video!.DmcInfo.ThumbInfo.Large?.IsNullOrEmpty() ?? true))
             {
                 thumbUrl = session.Video!.DmcInfo.ThumbInfo.Large;
-            } else if (!(session.Video!.DmcInfo.ThumbInfo.Normal?.IsNullOrEmpty() ?? true))
+            }
+            else if (!(session.Video!.DmcInfo.ThumbInfo.Normal?.IsNullOrEmpty() ?? true))
             {
                 thumbUrl = session.Video!.DmcInfo.ThumbInfo.Normal;
-            } else
+            }
+            else
             {
                 return new DownloadResult() { Issucceeded = false, Message = "サムネイルのURLを取得できませんでした。" };
             }
@@ -190,6 +195,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         public string FileNameFormat { get; set; } = string.Empty;
 
         public bool IsOverwriteEnable { get; set; }
+
+        public bool IsReplaceStrictedEnable { get; set; }
+
 
     }
 

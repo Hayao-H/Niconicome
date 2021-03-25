@@ -28,6 +28,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         bool IsDownloadingLogEnable { get; }
         bool IsDownloadingOwnerCommentEnable { get; }
         bool IsDownloadingEasyCommentEnable { get; }
+        bool IsReplaceStrictedEnable { get; }
         int CommentOffset { get; }
     }
 
@@ -72,6 +73,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         public bool IsDownloadingOwnerCommentEnable { get; set; }
 
         public bool IsDownloadingEasyCommentEnable { get; set; }
+        
+        public bool IsReplaceStrictedEnable { get; set; }
+
         public int CommentOffset { get; set; }
 
     }

@@ -55,8 +55,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 throw new InvalidOperationException("動画情報が未取得です。");
             }
 
-            string fileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml");
-            string ownerFileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml", "[owner]");
+            string fileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml",settings.IsReplaceStrictedEnable);
+            string ownerFileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml",settings.IsReplaceStrictedEnable, "[owner]");
 
             if (token.IsCancellationRequested)
             {
