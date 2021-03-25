@@ -63,10 +63,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             string mp4Foldername = this.GetFolderPath(settings.FolderName);
             string mp4Filename = this.GetFilePath(settings.FileName, mp4Foldername, settings.IsOverwriteEnable);
 
-            if (!Directory.Exists(mp4Foldername))
-            {
-                Directory.CreateDirectory(mp4Foldername);
-            }
+            IOUtils.CreateDirectoryIfNotExist(mp4Foldername, mp4Filename);
 
             this.Mp4FilePath = mp4Filename;
 

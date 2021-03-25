@@ -115,6 +115,8 @@ namespace Niconicome.Models.Network
                 return result;
             }
 
+            var replaceStricted = this.settingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+
             //タイトル
             info.Title = retrieved.Title;
 
@@ -125,7 +127,7 @@ namespace Niconicome.Models.Network
             info.Tags = retrieved.Tags;
 
             //ファイル名
-            info.FileName = this.utils.GetFileName(filenameFormat, retrieved.DmcInfo, ".mp4");
+            info.FileName = this.utils.GetFileName(filenameFormat, retrieved.DmcInfo, ".mp4", replaceStricted);
 
             //再生回数
             info.ViewCount = retrieved.ViewCount;

@@ -74,6 +74,7 @@ namespace Niconicome.ViewModels.Mainpage
                    int videoCount = videos.Count();
                    var firstVideo = videos.First();
                    var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
+                   var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
                    string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
                    var setting = new DownloadSettings
                    {
@@ -89,6 +90,7 @@ namespace Niconicome.ViewModels.Mainpage
                        FolderPath = folderPath,
                        VerticalResolution = this.SelectedResolution.Resolution.Vertical,
                        PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
+                       IsReplaceStrictedEnable = replaceStricted,
                    };
                    var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
 
@@ -133,6 +135,7 @@ namespace Niconicome.ViewModels.Mainpage
                 int videoCount = videos.Count();
                 var firstVideo = videos.First();
                 var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
+                var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
                 string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
 
                 WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, new DownloadSettings
@@ -149,6 +152,7 @@ namespace Niconicome.ViewModels.Mainpage
                     FolderPath = folderPath,
                     VerticalResolution = this.SelectedResolution.Resolution.Vertical,
                     PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
+                    IsReplaceStrictedEnable = replaceStricted,
                 }, allowDupe);
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>

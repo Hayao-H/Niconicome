@@ -144,6 +144,7 @@ namespace Niconicome.Models.Local
                 Settings.MaxParallelSegDl => STypes::SettingNames.MaxParallelSegmentDownloadCount,
                 Settings.DLAllFromQueue => STypes::SettingNames.DownloadAllWhenPushDLButton,
                 Settings.AllowDupeOnStage => STypes::SettingNames.AllowDupeOnStage,
+                Settings.ReplaceSBToMB => STypes::SettingNames.ReplaceSingleByteToMultiByte,
                 _ => null
             };
         }
@@ -178,5 +179,6 @@ namespace Niconicome.Models.Local
         MaxParallelSegDl,
         DLAllFromQueue,
         AllowDupeOnStage,
+        ReplaceSBToMB,
     }
 }

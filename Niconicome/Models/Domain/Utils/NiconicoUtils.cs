@@ -14,12 +14,12 @@ namespace Niconicome.Models.Domain.Utils
     public interface INiconicoUtils
     {
         List<string> GetNiconicoIdsFromText(string source);
-        string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, string? suffix = null);
+        string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null);
         string GetIdFromFIleName(string format, string filenameWithExt);
         string GetIdFromFIleName(string filenameWithExt);
         bool IsNiconicoID(string testString);
         RemoteType GetRemoteType(string url);
-        string GetID(string url,RemoteType type);
+        string GetID(string url, RemoteType type);
     }
 
     public class NiconicoUtils : INiconicoUtils
@@ -41,16 +41,29 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="format"></param>
         /// <param name="session"></param>
         /// <returns></returns>
-        public string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, string? suffix = null)
+        public string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null)
         {
             string filename = format.Replace("<id>", dmcInfo.Id)
                          .Replace("<title>", dmcInfo.Title)
                          .Replace("<uploadedon>", dmcInfo.UploadedOn.ToString("yyyy/MM/dd HH:mm.ss"))
                          .Replace("<owner>", dmcInfo.Owner)
-                         .Replace("\"", "")
                          + suffix
                          + extension;
-            filename = Regex.Replace(filename, @"[\\/:\*\?\<\>\|""]", "");
+            if (replaceStricted)
+            {
+                filename = filename
+                    .Replace("/", "／")
+                    .Replace(":", "：")
+                    .Replace("*", "＊")
+                    .Replace("?", "？")
+                    .Replace("<", "＜")
+                    .Replace("<", "＞")
+                    .Replace("|", "｜")
+                    .Replace("\"", "”");
+            } else
+            {
+                filename = Regex.Replace(filename, @"[/:\*\?\<\>\|""]", "");
+            }
             return filename;
         }
 
@@ -76,7 +89,7 @@ namespace Niconicome.Models.Domain.Utils
         /// </summary>
         /// <param name="filenameWithExt"></param>
         /// <returns></returns>
-        public string GetIdFromFIleName( string filenameWithExt)
+        public string GetIdFromFIleName(string filenameWithExt)
         {
             string filename = Path.GetFileNameWithoutExtension(filenameWithExt) ?? string.Empty;
             if (filename == string.Empty) throw new InvalidOperationException("ファイル名が空です。");
@@ -117,7 +130,8 @@ namespace Niconicome.Models.Domain.Utils
             else if (Regex.IsMatch(url, @"^https?://(www\.)?nicovideo\.jp/user/\d+/video.*"))
             {
                 return RemoteType.UserVideos;
-            } else if (Regex.IsMatch(url, @"^https?://(www\.)?nicovideo\.jp/watch/(sm|nm|so)\d+.*"))
+            }
+            else if (Regex.IsMatch(url, @"^https?://(www\.)?nicovideo\.jp/watch/(sm|nm|so)\d+.*"))
             {
                 return RemoteType.WatchPage;
             }
@@ -130,7 +144,7 @@ namespace Niconicome.Models.Domain.Utils
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public string GetID(string url,RemoteType type)
+        public string GetID(string url, RemoteType type)
         {
             var li = url.LastIndexOf("?");
             if (li != -1)
@@ -144,18 +158,21 @@ namespace Niconicome.Models.Domain.Utils
                 if (!splited[^1].IsNullOrEmpty())
                 {
                     return splited[^1];
-                } else
+                }
+                else
                 {
                     return splited[^2];
                 }
-            } else if (type is RemoteType.UserVideos)
+            }
+            else if (type is RemoteType.UserVideos)
             {
 
                 var splited = url.Split("/");
                 if (!splited[^1].IsNullOrEmpty())
                 {
                     return splited[^2];
-                } else
+                }
+                else
                 {
                     return splited[^3];
                 }

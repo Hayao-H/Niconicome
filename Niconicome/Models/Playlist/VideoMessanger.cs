@@ -15,7 +15,7 @@ namespace Niconicome.Models.Playlist
 
         private static readonly Dictionary<string, string> messages = new();
 
-        private static object lockObj = new();
+        private static readonly object lockObj = new();
 
         public static event EventHandler<VideoMessageChangeEventArgs>? VideoMessageChange;
 

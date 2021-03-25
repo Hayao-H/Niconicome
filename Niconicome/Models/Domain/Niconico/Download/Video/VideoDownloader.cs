@@ -58,6 +58,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         string FileNameFormat { get; }
         bool IsOverwriteEnable { get; }
         bool IsAutoDisposingEnable { get; }
+        bool IsReplaceStrictedEnable { get; }
         uint VerticalResolution { get; }
         int MaxParallelDownloadCount { get; }
     }
@@ -125,7 +126,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
 
 
-            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".mp4")
+            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".mp4", settings.IsReplaceStrictedEnable)
                 : $"[{session.Video!.Id}]{session.Video!.Title}.mp4"
                 ;
 
@@ -459,6 +460,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public bool IsOverwriteEnable { get; set; }
 
         public bool IsAutoDisposingEnable { get; set; }
+        public bool IsReplaceStrictedEnable { get; set; }
 
         public uint VerticalResolution { get; set; }
 
