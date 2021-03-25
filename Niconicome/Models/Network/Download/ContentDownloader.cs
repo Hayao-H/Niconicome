@@ -248,6 +248,12 @@ namespace Niconicome.Models.Network.Download
                 info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo);
             }
 
+            if (!Directory.Exists(setting.FolderPath))
+            {
+                Directory.CreateDirectory(setting.FolderPath);
+            }
+
+            //動画
 
             if (setting.Video)
             {
