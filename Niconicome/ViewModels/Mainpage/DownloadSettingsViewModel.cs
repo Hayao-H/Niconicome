@@ -73,6 +73,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                    int videoCount = videos.Count();
                    var firstVideo = videos.First();
+                   var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
                    string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
                    var setting = new DownloadSettings
                    {
@@ -94,12 +95,13 @@ namespace Niconicome.ViewModels.Mainpage
 
                    WS::Mainpage.Messagehandler.AppendMessage($"動画のダウンロードを開始します。({videoCount}件)");
                    this.SnackbarMessageQueue.Enqueue($"動画のダウンロードを開始します。({videoCount}件)");
-                   WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting);
-                   
+                   WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting, allowDupe);
+
                    if (dlFromQueue)
                    {
                        WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
-                   } else
+                   }
+                   else
                    {
                        WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == this.playlist.Id);
                    }
@@ -130,6 +132,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 int videoCount = videos.Count();
                 var firstVideo = videos.First();
+                var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
                 string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
 
                 WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, new DownloadSettings
@@ -146,9 +149,10 @@ namespace Niconicome.ViewModels.Mainpage
                     FolderPath = folderPath,
                     VerticalResolution = this.SelectedResolution.Resolution.Vertical,
                     PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
-                });
+                }, allowDupe);
 
-                this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () => {
+                this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
+                {
                     var windows = new DownloadTasksWindows();
                     windows.Show();
                 });
@@ -285,7 +289,7 @@ namespace Niconicome.ViewModels.Mainpage
             }
         }
 
-        private void OnCanDownloadChange(object? sender,EventArgs e)
+        private void OnCanDownloadChange(object? sender, EventArgs e)
         {
             this.RaiseCanExecuteChange();
         }

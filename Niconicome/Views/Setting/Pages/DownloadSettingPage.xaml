@@ -77,6 +77,16 @@
                 <Label Content="メインページのダウンロードボタンでキューのタスク全てをDLする" ToolTip="無効にすると現在のプレイリストの動画のみDLします" />
                 <ToggleButton IsChecked="{Binding IsDownloadFromQueueEnable}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
             </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="ContentCopy" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="ステージ時の重複（同一プレイリスト内での登録）を許可する（非推奨）" ToolTip="無効にするとひとつのプレイリストから同じ動画を同時にDLすることが出来ません" />
+                <ToggleButton IsChecked="{Binding IsDupeOnStageAllowed}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+            </DockPanel>
         </StackPanel>
 
 
