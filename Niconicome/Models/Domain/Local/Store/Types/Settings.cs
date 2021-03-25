@@ -133,5 +133,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string MaxParallelSegmentDownloadCount { get; private set; } = "maxparallelsegmentdownloadcount";
         public static string DownloadAllWhenPushDLButton { get; private set; } = "downloadallwhenpushdlbutton";
         public static string AllowDupeOnStage { get; private set; } = "allowdupeonstage";
+        public static string ReplaceSingleByteToMultiByte { get; private set; } = "replacesinglebytetomultibyte";
     }
 }
