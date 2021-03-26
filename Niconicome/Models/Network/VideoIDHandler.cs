@@ -49,7 +49,7 @@ namespace Niconicome.Models.Network
             if (Path.IsPathRooted(inputText))
             {
                 onMessage("ローカルディレクトリーから動画を取得します");
-                var retlieved = await this.GetVideoListInfosFromLocalPath(inputText, (_, _, _) => { }, (_, _) => { }, (_, _) => { }, (_) => { });
+                var retlieved = await this.GetVideoListInfosFromLocalPath(inputText, onMessageVerbose);
                 videos.AddRange(retlieved);
                 return videos;
             }
@@ -74,14 +74,14 @@ namespace Niconicome.Models.Network
             if (this.niconicoUtils.IsNiconicoID(inputText))
             {
                 onMessage("IDを登録します");
-                var retlievedId = await this.GetVideoListInfosFromID(inputText, (_, _, _) => { }, (_, _) => { }, (_, _) => { }, (_) => { });
+                var retlievedId = await this.GetVideoListInfosFromID(inputText, onMessageVerbose);
                 videos.AddRange(retlievedId);
                 return videos;
             }
             else
             {
                 onMessage("動画を検索します");
-                var retlievedId = await this.GetVideoListInfosFromSearchResult(registeredVideos, inputText, (_, _, _) => { }, (_, _) => { }, (_, _) => { }, (_) => { });
+                var retlievedId = await this.GetVideoListInfosFromSearchResult(registeredVideos, inputText, onMessageVerbose);
                 videos.AddRange(retlievedId);
                 return videos;
             }
@@ -128,11 +128,26 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromLocalPath(string localPath, Action<IVideoListInfo, IVideoListInfo, int> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting)
+        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromLocalPath(string localPath, Action<string> onMessage)
         {
             var ids = this.localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
+            var videoCount = ids.Count();
 
-            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(ids, onSucceeded, onFailed, onStarted, onWaiting);
+            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(ids, (newVideo, video, i) =>
+            {
+                onMessage($"{video.NiconicoId}の情報を取得しました。({i + 1}/{videoCount})");
+
+            }, (result, video) =>
+            {
+                onMessage($"{video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
+            }, (video, i) =>
+            {
+                onMessage($"情報を取得中...({i + 1}/{videoCount})");
+            },
+            video =>
+            {
+                onMessage("待機中...(15s)");
+            });
 
             return videos;
         }
@@ -146,9 +161,23 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromID(string id, Action<IVideoListInfo, IVideoListInfo, int> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting)
+        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromID(string id, Action<string> onMessage)
         {
-            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(new List<string>() { id }, onSucceeded, onFailed, onStarted, onWaiting);
+            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(new List<string>() { id }, (newVideo, video, i) =>
+            {
+                onMessage($"{video.NiconicoId}の情報を取得しました。");
+
+            }, (result, video) =>
+            {
+                onMessage($"{video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
+            }, (video, i) =>
+            {
+                onMessage($"情報を取得中...");
+            },
+            video =>
+            {
+                onMessage("待機中...(15s)");
+            });
 
             return videos;
         }
@@ -180,7 +209,7 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromSearchResult(IEnumerable<string> registeredVideos, string keyword, Action<IVideoListInfo, IVideoListInfo, int> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting)
+        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromSearchResult(IEnumerable<string> registeredVideos, string keyword, Action<string> onMessage)
         {
             IEnumerable<IVideoListInfo> videos = new List<IVideoListInfo>();
 
@@ -188,10 +217,27 @@ namespace Niconicome.Models.Network
 
             if (!searchResult.IsSucceeded || searchResult.Videos is null)
             {
+                onMessage($"検索に失敗しました(詳細: {searchResult.Message ?? "none"})");
                 return videos;
             }
 
-            videos = await this.networkVideoHandler.GetVideoListInfosAsync(searchResult.Videos.Select(v => v.Id).Where(v => !registeredVideos.Contains(v)), onSucceeded, onFailed, onStarted, onWaiting);
+            int videoCount = searchResult.Videos.Count();
+
+            videos = await this.networkVideoHandler.GetVideoListInfosAsync(searchResult.Videos.Select(v => v.Id).Where(v => !registeredVideos.Contains(v)), (newVideo, video, i) =>
+            {
+                onMessage($"{video.NiconicoId}の情報を取得しました。({i + 1}/{videoCount})");
+
+            }, (result, video) =>
+            {
+                onMessage($"{video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
+            }, (video, i) =>
+            {
+                onMessage($"情報を取得中...({i + 1}/{videoCount})");
+            },
+            video =>
+            {
+                onMessage("待機中...(15s)");
+            });
 
             return videos;
 
