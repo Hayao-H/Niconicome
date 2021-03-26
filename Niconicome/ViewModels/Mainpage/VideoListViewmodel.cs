@@ -44,6 +44,7 @@ namespace Niconicome.ViewModels.Mainpage
             //プレイリスト内容更新のイベントを購読する
             WS::Mainpage.CurrentPlaylist.VideosChanged += (e, s) => this.ChangePlaylistTitle();
 
+
             this.showMessageBox = showMessageBox;
 
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
@@ -51,62 +52,63 @@ namespace Niconicome.ViewModels.Mainpage
             //メッセージハンドラーにイベントハンドラを追加する
             WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
 
-            //種々のコマンドを初期化する
-            this.AddVideoCommand = new CommandBase<object>(_ => this.Playlist is not null, async arg =>
-            {
-                if (this.Playlist is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
-                    return;
-                }
-                int playlistId = this.Playlist.Id;
+            #region コマンドの初期化
+            this.AddVideoCommand = new CommandBase<object>(_ => this.Playlist is not null && !WS::Mainpage.VideoIDHandler.IsProcessing, async arg =>
+              {
+                  if (this.Playlist is null)
+                  {
+                      this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
+                      return;
+                  }
+                  int playlistId = this.Playlist.Id;
 
-                string niconicoId;
-                if (arg is not null and string)
-                {
-                    niconicoId = (string)arg;
-                }
-                else if (this.InputString != string.Empty)
-                {
-                    niconicoId = this.InputString;
-                    this.InputString = string.Empty;
-                }
-                else
-                {
-                    return;
-                }
+                  string niconicoId;
+                  if (arg is not null and string)
+                  {
+                      niconicoId = (string)arg;
+                  }
+                  else if (this.InputString != string.Empty)
+                  {
+                      niconicoId = this.InputString;
+                      this.InputString = string.Empty;
+                  }
+                  else
+                  {
+                      return;
+                  }
 
-                var videos = new List<IVideoListInfo>();
-                var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, this.Videos.Select(v => v.NiconicoId), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+                  var videos = new List<IVideoListInfo>();
+                  var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, this.Videos.Select(v => v.NiconicoId), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
-                if (result.IsFailed)
-                {
-                    this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
-                    return;
-                } else if (videos.Count == 0)
-                {
+                  if (result.IsFailed)
+                  {
+                      this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
+                      return;
+                  }
+                  else if (videos.Count == 0)
+                  {
 
-                    this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
-                    return;
-                }
+                      this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
+                      return;
+                  }
 
-                await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos,this.Playlist.Id);
+                  await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, this.Playlist.Id);
 
-                WS::Mainpage.PlaylistTree.Refresh();
-                WS::Mainpage.CurrentPlaylist.Update(playlistId);
+                  WS::Mainpage.PlaylistTree.Refresh();
+                  WS::Mainpage.CurrentPlaylist.Update(playlistId);
 
-                this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
+                  this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
 
-                if (!videos.First().ChannelId.IsNullOrEmpty())
-                {
-                    var video = videos.First();
-                    WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName}」です", "IDをコピー", () =>
-                    {
-                        Clipboard.SetText(video.ChannelId);
-                        WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
-                    });
-                }
-            });
+                  if (!videos.First().ChannelId.IsNullOrEmpty())
+                  {
+                      var video = videos.First();
+                      WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName}」です", "IDをコピー", () =>
+                      {
+                          Clipboard.SetText(video.ChannelId);
+                          WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
+                      });
+                  }
+              });
 
             this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true, async arg =>
              {
@@ -657,6 +659,10 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストの作成に失敗しました。詳しくはログファイルを参照して下さい。");
                 }
             });
+            #endregion
+
+            //動画情報取得クラスの実行可能状態変更イベントを購読する
+            WS::Mainpage.VideoIDHandler.StateChange += (_, _) => this.AddVideoCommand.RaiseCanExecutechanged();
         }
 
         private MaterialDesign::PackIconKind refreshCommandIconField = MaterialDesign::PackIconKind.Refresh;
@@ -673,6 +679,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public MaterialDesign::PackIconKind RefreshCommandIcon { get => this.refreshCommandIconField; set => this.SetProperty(ref this.refreshCommandIconField, value); }
 
+        #region コマンド
         /// <summary>
         /// 動画を追加する
         /// </summary>
@@ -797,6 +804,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// プレイリスト作成コマンド
         /// </summary>
         public CommandBase<string> CreatePlaylistCommand { get; init; }
+        #endregion
 
         /// <summary>
         /// メッセージボックスを表示するコマンド
