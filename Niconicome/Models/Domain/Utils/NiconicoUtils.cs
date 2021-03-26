@@ -87,7 +87,7 @@ namespace Niconicome.Models.Domain.Utils
 
             } else
             {
-                return format.Replace("<uploadedon>", dt.ToString("yyyy/MM/dd HH:mm.ss"));
+                return format.Replace("<uploadedon>", dt.ToString("yyyy-MM-dd HH-mm-ss"));
             }
         }
 
