@@ -46,6 +46,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         bool IsEncrypted { get; set; }
         bool IsOfficial { get; set; }
         DateTime UploadedOn { get; set; }
+        DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; }
         ISessionInfo SessionInfo { get; }
         List<WatchJson::Thread> CommentThreads { get; }
@@ -437,6 +438,12 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// 投稿日時
         /// </summary>
         public DateTime UploadedOn { get; set; }
+
+        /// <summary>
+        /// DL開始日時
+        /// </summary>
+        public DateTime DownloadStartedOn { get; set; }
+
 
         /// <summary>
         /// サムネイル

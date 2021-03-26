@@ -106,13 +106,17 @@ namespace NiconicomeTest.Utils
         [TestCase("[<id>]<title>", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師")]
         [TestCase("[<id>]<title>（<owner>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（中の）")]
         [TestCase("[<id>]<title>（<uploadedon>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2007-03-06 00-33-00）")]
+        [TestCase("[<id>]<title>（<downloadon>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2021-03-26 20-30-00）")]
         [TestCase("[<id>]<title>（<uploadedon:yyyy年MM月dd日 HH時mm分ss秒>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2007年03月06日 00時33分00秒）")]
+        [TestCase("[<id>]<title>（<downloadon:yyyy年MM月dd日 HH時mm分ss秒>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2021年03月26日 20時30分00秒）")]
         public void 動画ファイル名を取得する(string format, string expectedResult)
         {
             var dt = DateTime.Parse("2007-03-06T00:33:00");
+            var dt2 = DateTime.Parse("2021-03-26T20:30:00");
             var dmc = new DmcInfo()
             {
                 UploadedOn = dt,
+                DownloadStartedOn = dt2,
                 Title = "新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師",
                 Owner = "中の",
                 Id = "sm9",

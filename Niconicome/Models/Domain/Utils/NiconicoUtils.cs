@@ -8,6 +8,7 @@ using Watch = Niconicome.Models.Domain.Niconico.Watch;
 using System.IO;
 using Niconicome.Models.Playlist;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -49,7 +50,7 @@ namespace Niconicome.Models.Domain.Utils
                          + suffix
                          + extension;
 
-            filename = this.GetDateReplacedString(filename, dmcInfo.UploadedOn);
+            filename = this.GetDateReplacedString(filename, dmcInfo);
 
             if (replaceStricted)
             {
@@ -77,17 +78,26 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="format"></param>
         /// <param name="dt"></param>
         /// <returns></returns>
-        private string GetDateReplacedString(string format,DateTime dt)
+        private string GetDateReplacedString(string format,IDmcInfo info)
         {
             if (Regex.IsMatch(format, "^.*<uploadedon:.+>.*$"))
             {
                 var match = Regex.Match(format, "<uploadedon:.+>");
                 var customFormat = match.Value[12..^1];
-                return format.Replace(match.Value, dt.ToString(customFormat));
+                return format.Replace(match.Value, info.UploadedOn.ToString(customFormat));
 
-            } else
+            } else if (Regex.IsMatch(format, "^.*<downloadon:.+>.*$"))
             {
-                return format.Replace("<uploadedon>", dt.ToString("yyyy-MM-dd HH-mm-ss"));
+                var match = Regex.Match(format, "<downloadon:.+>");
+                var customFormat = match.Value[12..^1];
+                return format.Replace(match.Value, info.DownloadStartedOn.ToString(customFormat));
+
+            }
+            else
+            {
+                return format.Replace("<uploadedon>", info.UploadedOn.ToString("yyyy-MM-dd HH-mm-ss"))
+                    .Replace("<downloadon>",info.DownloadStartedOn.ToString("yyyy-MM-dd HH-mm-ss"))
+                    ;
             }
         }
 

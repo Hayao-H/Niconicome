@@ -227,6 +227,11 @@ namespace Niconicome.Models.Network.Download
 
             await session.GetVideoDataAsync(setting.NiconicoId, setting.Video);
 
+            if (session.Video?.DmcInfo.DownloadStartedOn is not null)
+            {
+                session.Video.DmcInfo.DownloadStartedOn = DateTime.Now;
+            }
+
             if (session.State != WatchSessionState.GotPage || session.Video is null)
             {
                 result.IsSucceeded = false;
