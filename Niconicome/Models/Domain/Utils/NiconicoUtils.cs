@@ -45,10 +45,12 @@ namespace Niconicome.Models.Domain.Utils
         {
             string filename = format.Replace("<id>", dmcInfo.Id)
                          .Replace("<title>", dmcInfo.Title)
-                         .Replace("<uploadedon>", dmcInfo.UploadedOn.ToString("yyyy/MM/dd HH:mm.ss"))
                          .Replace("<owner>", dmcInfo.Owner)
                          + suffix
                          + extension;
+
+            filename = this.GetDateReplacedString(filename, dmcInfo.UploadedOn);
+
             if (replaceStricted)
             {
                 filename = filename
@@ -64,7 +66,29 @@ namespace Niconicome.Models.Domain.Utils
             {
                 filename = Regex.Replace(filename, @"[/:\*\?\<\>\|""]", "");
             }
+
+
             return filename;
+        }
+
+        /// <summary>
+        /// 日付情報を取得する
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private string GetDateReplacedString(string format,DateTime dt)
+        {
+            if (Regex.IsMatch(format, "^.*<uploadedon:.+>.*$"))
+            {
+                var match = Regex.Match(format, "<uploadedon:.+>");
+                var customFormat = match.Value[12..^1];
+                return format.Replace(match.Value, dt.ToString(customFormat));
+
+            } else
+            {
+                return format.Replace("<uploadedon>", dt.ToString("yyyy/MM/dd HH:mm.ss"));
+            }
         }
 
         /// <summary>
