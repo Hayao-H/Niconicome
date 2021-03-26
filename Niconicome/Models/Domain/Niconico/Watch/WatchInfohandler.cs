@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using Niconicome.Extensions.System;
@@ -125,18 +126,17 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             Uri url = NiconicoContext.Context.GetPageUri(id);
 
             var res = await this.http.GetAsync(url);
-            source = await res.Content.ReadAsStringAsync();
 
-            //try
-            //{
-            //    source = await this.http.GetStringAsync(url);
-            //}
-            //catch (Exception e)
-            //{
-            //    this.logger.Error($"動画情報の取得に失敗しました(url: {url.AbsoluteUri})", e);
-            //    this.State = WatchInfoHandlerState.HttpRequestFailure;
-            //    throw new HttpRequestException();
-            //}
+            try
+            {
+                source = await this.http.GetStringAsync(url);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error($"動画情報の取得に失敗しました(url: {url.AbsoluteUri})", e);
+                this.State = WatchInfoHandlerState.HttpRequestFailure;
+                throw new HttpRequestException();
+            }
 
             IDmcInfo info;
 
