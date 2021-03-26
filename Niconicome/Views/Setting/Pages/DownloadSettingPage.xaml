@@ -87,6 +87,16 @@
                 <Label Content="ステージ時の重複（同一プレイリスト内での登録）を許可する（非推奨）" ToolTip="無効にするとひとつのプレイリストから同じ動画を同時にDLすることが出来ません" />
                 <ToggleButton IsChecked="{Binding IsDupeOnStageAllowed}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
             </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="SortCalendarDescending" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="動画ファイルの更新日時を投稿日時にする" />
+                <ToggleButton IsChecked="{Binding IsOverrideVideoFileDTToUploadedDT}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+            </DockPanel>
         </StackPanel>
 
 

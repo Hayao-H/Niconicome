@@ -41,6 +41,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.maxParallelSegmentDownloadCountField = maxSP;
             this.isDownloadFromQueueEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
             this.isDupeOnStageAllowedField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
+            this.isOverrideVideoFileDTToUploadedDTField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
         }
 
         private int commentOffsetField;
@@ -54,6 +55,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         private bool isDownloadFromQueueEnableField;
 
         private bool isDupeOnStageAllowedField;
+
+        private bool isOverrideVideoFileDTToUploadedDTField;
 
         /// <summary>
         /// コメントのオフセット
@@ -105,6 +108,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public bool IsDupeOnStageAllowed { get => this.isDupeOnStageAllowedField; set => this.Savesetting(ref this.isDupeOnStageAllowedField, value, Settings.AllowDupeOnStage); }
 
+        /// <summary>
+        /// 動画ファイルの更新日時を投稿日時にする
+        /// </summary>
+        public bool IsOverrideVideoFileDTToUploadedDT { get => this.isOverrideVideoFileDTToUploadedDTField; set => this.Savesetting(ref this.isOverrideVideoFileDTToUploadedDTField, value, Settings.OverrideVideoFileDTToUploadedDT); }
+
+
     }
 
     [Obsolete("Desinger", true)]
@@ -121,5 +130,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public bool IsDownloadFromQueueEnable { get; set; } = true;
 
         public bool IsDupeOnStageAllowed { get; set; } = true;
+
+        public bool IsOverrideVideoFileDTToUploadedDT { get; set; } = true;
     }
 }
