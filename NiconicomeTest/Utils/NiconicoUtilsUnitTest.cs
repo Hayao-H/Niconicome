@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Domain.Niconico.Watch;
 
 namespace NiconicomeTest.Utils
 {
@@ -39,35 +40,35 @@ namespace NiconicomeTest.Utils
             Assert.AreEqual("123456", result[4]);
         }
 
-        [TestCase("[123]hoge.mp4","123")]
-        [TestCase("[sm123]hoge","sm123")]
-        public void ファイル名からIDを取得する(string filename,string id)
+        [TestCase("[123]hoge.mp4", "123")]
+        [TestCase("[sm123]hoge", "sm123")]
+        public void ファイル名からIDを取得する(string filename, string id)
         {
             var result = this.utils!.GetIdFromFIleName("[<id>]<title>", filename);
             Assert.That(result, Is.EqualTo(id));
         }
 
-        [TestCase("[123]hoge.mp4","123")]
-        [TestCase("[sm123]hoge","sm123")]
-        [TestCase("sm123hoge","sm123")]
-        [TestCase("hoge(nm2)","nm2")]
-        [TestCase("ssssso123hoge","so123")]
-        public void フォーマットなしでファイル名からIDを取得する(string filename,string id)
+        [TestCase("[123]hoge.mp4", "123")]
+        [TestCase("[sm123]hoge", "sm123")]
+        [TestCase("sm123hoge", "sm123")]
+        [TestCase("hoge(nm2)", "nm2")]
+        [TestCase("ssssso123hoge", "so123")]
+        public void フォーマットなしでファイル名からIDを取得する(string filename, string id)
         {
             var result = this.utils!.GetIdFromFIleName(filename);
             Assert.That(result, Is.EqualTo(id));
         }
 
-        [TestCase("sm9",true)]
-        [TestCase("so123",true)]
-        [TestCase("123",true)]
-        [TestCase("nm9",true)]
-        [TestCase("nm123",true)]
+        [TestCase("sm9", true)]
+        [TestCase("so123", true)]
+        [TestCase("123", true)]
+        [TestCase("nm9", true)]
+        [TestCase("nm123", true)]
         [TestCase("hsm9", false)]
         [TestCase("sm91a", false)]
         [TestCase("a12", false)]
         [TestCase("12d", false)]
-        public void ニコニコのIDをテストする(string testString,bool expectedResult)
+        public void ニコニコのIDをテストする(string testString, bool expectedResult)
         {
             var result = this.utils!.IsNiconicoID(testString);
 
@@ -80,26 +81,50 @@ namespace NiconicomeTest.Utils
         [TestCase("https://www.nicovideo.jp/user/000/video?ref=pc_userpage_menud", RemoteType.UserVideos)]
         [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage)]
         [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage)]
-        public void リモートプレイリストの種別を取得する(string url,RemoteType expectedType)
+        public void リモートプレイリストの種別を取得する(string url, RemoteType expectedType)
         {
             var type = this.utils!.GetRemoteType(url);
 
             Assert.That(expectedType, Is.EqualTo(type));
         }
 
-        [TestCase("https://www.nicovideo.jp/user/000/mylist/000?ref=pc_userpage_menu",RemoteType.Mylist, "000")]
+        [TestCase("https://www.nicovideo.jp/user/000/mylist/000?ref=pc_userpage_menu", RemoteType.Mylist, "000")]
         [TestCase("https://www.nicovideo.jp/user/000/mylist/000/?ref=pc_userpage_menu", RemoteType.Mylist, "000")]
-        [TestCase("https://ch.nicovideo.jp/elfenlied",RemoteType.Channel, "elfenlied")]
+        [TestCase("https://ch.nicovideo.jp/elfenlied", RemoteType.Channel, "elfenlied")]
         [TestCase("https://ch.nicovideo.jp/elfenlied/", RemoteType.Channel, "elfenlied")]
-        [TestCase("https://www.nicovideo.jp/user/000/video?ref=pc_userpage_menud", RemoteType.UserVideos,"000")]
+        [TestCase("https://www.nicovideo.jp/user/000/video?ref=pc_userpage_menud", RemoteType.UserVideos, "000")]
         [TestCase("https://www.nicovideo.jp/user/000/video/?ref=pc_userpage_menud", RemoteType.UserVideos, "000")]
-        [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage,"sm9")]
-        [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage,"sm9")]
-        public void リモートプレイリストのIDを取得する(string url,RemoteType type,string id)
+        [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage, "sm9")]
+        [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage, "sm9")]
+        public void リモートプレイリストのIDを取得する(string url, RemoteType type, string id)
         {
-            var result = this.utils!.GetID(url,type);
+            var result = this.utils!.GetID(url, type);
 
             Assert.That(result, Is.EqualTo(id));
+        }
+
+        [TestCase("[<id>]<title>", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師")]
+        [TestCase("[<id>]<title>（<owner>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（中の）")]
+        [TestCase("[<id>]<title>（<uploadedon>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2007-03-06 00-33-00）")]
+        [TestCase("[<id>]<title>（<downloadon>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2021-03-26 20-30-00）")]
+        [TestCase("[<id>]<title>（<uploadedon:yyyy年MM月dd日 HH時mm分ss秒>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2007年03月06日 00時33分00秒）")]
+        [TestCase("[<id>]<title>（<downloadon:yyyy年MM月dd日 HH時mm分ss秒>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2021年03月26日 20時30分00秒）")]
+        public void 動画ファイル名を取得する(string format, string expectedResult)
+        {
+            var dt = DateTime.Parse("2007-03-06T00:33:00");
+            var dt2 = DateTime.Parse("2021-03-26T20:30:00");
+            var dmc = new DmcInfo()
+            {
+                UploadedOn = dt,
+                DownloadStartedOn = dt2,
+                Title = "新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師",
+                Owner = "中の",
+                Id = "sm9",
+            };
+
+            var result = this.utils!.GetFileName(format, dmc, string.Empty, true);
+
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
     }
 }

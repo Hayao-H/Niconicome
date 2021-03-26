@@ -41,6 +41,7 @@ namespace Niconicome.Models.Network.Download
         bool DownloadLog { get; }
         bool DownloadOwner { get; }
         bool IsReplaceStrictedEnable { get; }
+        bool OverrideVideoFileDateToUploadedDT { get; }
         string NiconicoId { get; }
         string FolderPath { get; }
         uint VerticalResolution { get; }
@@ -226,6 +227,11 @@ namespace Niconicome.Models.Network.Download
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
             await session.GetVideoDataAsync(setting.NiconicoId, setting.Video);
+
+            if (session.Video?.DmcInfo.DownloadStartedOn is not null)
+            {
+                session.Video.DmcInfo.DownloadStartedOn = DateTime.Now;
+            }
 
             if (session.State != WatchSessionState.GotPage || session.Video is null)
             {
@@ -622,6 +628,8 @@ namespace Niconicome.Models.Network.Download
 
         public bool IsReplaceStrictedEnable { get; set; }
 
+        public bool OverrideVideoFileDateToUploadedDT { get; set; }
+
         public uint VerticalResolution { get; set; }
 
         public int PlaylistID { get; set; }
@@ -642,6 +650,7 @@ namespace Niconicome.Models.Network.Download
                 VerticalResolution = this.VerticalResolution,
                 MaxParallelDownloadCount = maxParallelDLCount,
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
+                IsOvwrridingFileDTEnable = this.OverrideVideoFileDateToUploadedDT,
             };
         }
 

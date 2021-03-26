@@ -48,7 +48,9 @@
                     &lt;title&gt; :動画タイトル,
                     &lt;id&gt; :動画ID,
                     &lt;uploadedon&gt; :投稿日時,<LineBreak/>
+                    &lt;downloadon&gt; :DL日時<LineBreak/>
                     &lt;owner&gt; :投稿者のニックネーム<LineBreak/>
+                    ※カスタム書式を利用できます。詳しくはwikiをご覧ください。<LineBreak/>
                     ※「\」でフォルダーを作成します。[&lt;id&gt;]&lt;title&gt;でxenoのデフォルトと同じフォーマットになります。
                 </TextBlock>
             </StackPanel>

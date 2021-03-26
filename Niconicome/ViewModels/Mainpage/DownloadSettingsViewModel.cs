@@ -75,6 +75,7 @@ namespace Niconicome.ViewModels.Mainpage
                    var firstVideo = videos.First();
                    var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
                    var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+                   var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
                    string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
                    var setting = new DownloadSettings
                    {
@@ -91,6 +92,7 @@ namespace Niconicome.ViewModels.Mainpage
                        VerticalResolution = this.SelectedResolution.Resolution.Vertical,
                        PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
                        IsReplaceStrictedEnable = replaceStricted,
+                       OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                    };
                    var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
 
@@ -136,6 +138,7 @@ namespace Niconicome.ViewModels.Mainpage
                 var firstVideo = videos.First();
                 var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
                 var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+                var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
                 string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
 
                 WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, new DownloadSettings
@@ -153,6 +156,7 @@ namespace Niconicome.ViewModels.Mainpage
                     VerticalResolution = this.SelectedResolution.Resolution.Vertical,
                     PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
                     IsReplaceStrictedEnable = replaceStricted,
+                    OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                 }, allowDupe);
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>

@@ -145,6 +145,7 @@ namespace Niconicome.Models.Local
                 Settings.DLAllFromQueue => STypes::SettingNames.DownloadAllWhenPushDLButton,
                 Settings.AllowDupeOnStage => STypes::SettingNames.AllowDupeOnStage,
                 Settings.ReplaceSBToMB => STypes::SettingNames.ReplaceSingleByteToMultiByte,
+                Settings.OverrideVideoFileDTToUploadedDT => STypes::SettingNames.OverideVideoFileDTToUploadedDT,
                 _ => null
             };
         }
@@ -180,5 +181,6 @@ namespace Niconicome.Models.Local
         DLAllFromQueue,
         AllowDupeOnStage,
         ReplaceSBToMB,
+        OverrideVideoFileDTToUploadedDT,
     }
 }

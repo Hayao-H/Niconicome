@@ -8,6 +8,7 @@ using Watch = Niconicome.Models.Domain.Niconico.Watch;
 using System.IO;
 using Niconicome.Models.Playlist;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -45,10 +46,12 @@ namespace Niconicome.Models.Domain.Utils
         {
             string filename = format.Replace("<id>", dmcInfo.Id)
                          .Replace("<title>", dmcInfo.Title)
-                         .Replace("<uploadedon>", dmcInfo.UploadedOn.ToString("yyyy/MM/dd HH:mm.ss"))
                          .Replace("<owner>", dmcInfo.Owner)
                          + suffix
                          + extension;
+
+            filename = this.GetDateReplacedString(filename, dmcInfo);
+
             if (replaceStricted)
             {
                 filename = filename
@@ -64,7 +67,38 @@ namespace Niconicome.Models.Domain.Utils
             {
                 filename = Regex.Replace(filename, @"[/:\*\?\<\>\|""]", "");
             }
+
+
             return filename;
+        }
+
+        /// <summary>
+        /// 日付情報を取得する
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        private string GetDateReplacedString(string format,IDmcInfo info)
+        {
+            if (Regex.IsMatch(format, "^.*<uploadedon:.+>.*$"))
+            {
+                var match = Regex.Match(format, "<uploadedon:.+>");
+                var customFormat = match.Value[12..^1];
+                return format.Replace(match.Value, info.UploadedOn.ToString(customFormat));
+
+            } else if (Regex.IsMatch(format, "^.*<downloadon:.+>.*$"))
+            {
+                var match = Regex.Match(format, "<downloadon:.+>");
+                var customFormat = match.Value[12..^1];
+                return format.Replace(match.Value, info.DownloadStartedOn.ToString(customFormat));
+
+            }
+            else
+            {
+                return format.Replace("<uploadedon>", info.UploadedOn.ToString("yyyy-MM-dd HH-mm-ss"))
+                    .Replace("<downloadon>",info.DownloadStartedOn.ToString("yyyy-MM-dd HH-mm-ss"))
+                    ;
+            }
         }
 
         /// <summary>

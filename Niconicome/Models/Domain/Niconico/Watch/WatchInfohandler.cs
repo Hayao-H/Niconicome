@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using Niconicome.Extensions.System;
@@ -46,6 +47,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         bool IsEncrypted { get; set; }
         bool IsOfficial { get; set; }
         DateTime UploadedOn { get; set; }
+        DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; }
         ISessionInfo SessionInfo { get; }
         List<WatchJson::Thread> CommentThreads { get; }
@@ -124,18 +126,17 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             Uri url = NiconicoContext.Context.GetPageUri(id);
 
             var res = await this.http.GetAsync(url);
-            source = await res.Content.ReadAsStringAsync();
 
-            //try
-            //{
-            //    source = await this.http.GetStringAsync(url);
-            //}
-            //catch (Exception e)
-            //{
-            //    this.logger.Error($"動画情報の取得に失敗しました(url: {url.AbsoluteUri})", e);
-            //    this.State = WatchInfoHandlerState.HttpRequestFailure;
-            //    throw new HttpRequestException();
-            //}
+            try
+            {
+                source = await this.http.GetStringAsync(url);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error($"動画情報の取得に失敗しました(url: {url.AbsoluteUri})", e);
+                this.State = WatchInfoHandlerState.HttpRequestFailure;
+                throw new HttpRequestException();
+            }
 
             IDmcInfo info;
 
@@ -437,6 +438,12 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// 投稿日時
         /// </summary>
         public DateTime UploadedOn { get; set; }
+
+        /// <summary>
+        /// DL開始日時
+        /// </summary>
+        public DateTime DownloadStartedOn { get; set; }
+
 
         /// <summary>
         /// サムネイル

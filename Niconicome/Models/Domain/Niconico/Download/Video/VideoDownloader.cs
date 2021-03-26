@@ -59,6 +59,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         bool IsOverwriteEnable { get; }
         bool IsAutoDisposingEnable { get; }
         bool IsReplaceStrictedEnable { get; }
+        bool IsOvwrridingFileDTEnable { get; }
         uint VerticalResolution { get; }
         int MaxParallelDownloadCount { get; }
     }
@@ -183,7 +184,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 FileName = fileName,
                 FolderName = settings.FolderName,
                 TsFilePaths = this.videoDownloadHelper.GetAllFileAbsPaths(),
-                IsOverwriteEnable = settings.IsOverwriteEnable
+                IsOverwriteEnable = settings.IsOverwriteEnable,
+                IsOverrideDTEnable = settings.IsOvwrridingFileDTEnable,
+                UploadedOn = session.Video.DmcInfo.UploadedOn,
             };
 
             try
@@ -460,7 +463,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public bool IsOverwriteEnable { get; set; }
 
         public bool IsAutoDisposingEnable { get; set; }
+
         public bool IsReplaceStrictedEnable { get; set; }
+
+        public bool IsOvwrridingFileDTEnable { get; set; }
+
 
         public uint VerticalResolution { get; set; }
 
