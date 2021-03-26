@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.LocalFile;
+using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist;
 
@@ -69,10 +71,21 @@ namespace Niconicome.Models.Network
                 }
             }
 
-            onMessage("IDを登録します");
-            var retlievedId = await this.GetVideoListInfosFromID(inputText, (_, _, _) => { }, (_, _) => { }, (_, _) => { }, (_) => { });
-            videos.AddRange(retlievedId);
-            return videos;
+            if (this.niconicoUtils.IsNiconicoID(inputText))
+            {
+                onMessage("IDを登録します");
+                var retlievedId = await this.GetVideoListInfosFromID(inputText, (_, _, _) => { }, (_, _) => { }, (_, _) => { }, (_) => { });
+                videos.AddRange(retlievedId);
+                return videos;
+            }
+            else
+            {
+                onMessage("動画を検索します");
+                var retlievedId = await this.GetVideoListInfosFromSearchResult(registeredVideos, inputText, (_, _, _) => { }, (_, _) => { }, (_, _) => { }, (_) => { });
+                videos.AddRange(retlievedId);
+                return videos;
+            }
+
         }
 
         /// <summary>
@@ -90,7 +103,8 @@ namespace Niconicome.Models.Network
             {
                 var retlieved = await this.GetVideoListInfosAsync(inputText, registeredVideos, onMessage, onMessageVerbose);
                 videos.AddRange(retlieved);
-            } catch
+            }
+            catch
             {
                 var result = new NetworkResult()
                 {
@@ -100,7 +114,7 @@ namespace Niconicome.Models.Network
                 return result;
             }
 
-             return new NetworkResult();
+            return new NetworkResult();
 
 
         }
@@ -154,6 +168,33 @@ namespace Niconicome.Models.Network
             await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(id, videos, type, registeredVideos, onMessage);
 
             return videos;
+        }
+
+        /// <summary>
+        /// 動画を検索する
+        /// </summary>
+        /// <param name="registeredVideos"></param>
+        /// <param name="keyword"></param>
+        /// <param name="onSucceeded"></param>
+        /// <param name="onFailed"></param>
+        /// <param name="onStarted"></param>
+        /// <param name="onWaiting"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromSearchResult(IEnumerable<string> registeredVideos, string keyword, Action<IVideoListInfo, IVideoListInfo, int> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting)
+        {
+            IEnumerable<IVideoListInfo> videos = new List<IVideoListInfo>();
+
+            var searchResult = await this.remotePlaylistHandler.TrySearchVideosAsync(keyword, SearchType.Keyword, 1);
+
+            if (!searchResult.IsSucceeded || searchResult.Videos is null)
+            {
+                return videos;
+            }
+
+            videos = await this.networkVideoHandler.GetVideoListInfosAsync(searchResult.Videos.Select(v => v.Id).Where(v => !registeredVideos.Contains(v)), onSucceeded, onFailed, onStarted, onWaiting);
+
+            return videos;
+
         }
     }
 }
