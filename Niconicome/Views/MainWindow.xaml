@@ -252,7 +252,7 @@
                                             <GridViewColumn Header="選択">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                            <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
@@ -264,7 +264,13 @@
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
                                             <GridViewColumn Width="150" Header="ID" DisplayMemberBinding="{Binding NiconicoId}"/>
-                                            <GridViewColumn Header="タイトル" DisplayMemberBinding="{Binding Title}"/>
+                                            <GridViewColumn Header="タイトル">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Title}" ToolTip="{Binding Title}"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
                                             <GridViewColumn Header="投稿日" DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
                                             <GridViewColumn Header="再生回数" DisplayMemberBinding="{Binding ViewCount}"/>
                                             <GridViewColumn Header="状態" DisplayMemberBinding="{Binding Message}"/>
