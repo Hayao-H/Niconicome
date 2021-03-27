@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
-using Niconicome.Extensions.System.List;
-using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Net.Json;
-using Niconicome.Models.Domain.Niconico.Net.Json.API.Search;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
@@ -30,6 +23,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         bool IsDownloadingEasyCommentEnable { get; }
         bool IsReplaceStrictedEnable { get; }
         int CommentOffset { get; }
+        int MaxcommentsCount { get; }
     }
 
     public interface ICommentClient
@@ -54,10 +48,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         public bool IsDownloadingOwnerCommentEnable { get; set; }
 
         public bool IsDownloadingEasyCommentEnable { get; set; }
-        
+
         public bool IsReplaceStrictedEnable { get; set; }
 
         public int CommentOffset { get; set; }
+
+        public int MaxcommentsCount { get; set; }
+
 
     }
 
@@ -125,6 +122,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                     lastNo = first?.No ?? 0;
                 }
 
+                if (settings.MaxcommentsCount > 0 && comments.Count > settings.MaxcommentsCount)
+                {
+                    var rmCount = comments.Count - settings.MaxcommentsCount;
+                    comments.RemoveFor(rmCount);
+                    break;
+                }
+
                 if (!settings.IsDownloadingLogEnable)
                 {
                     break;
@@ -188,5 +192,5 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         }
     }
 
-    
+
 }

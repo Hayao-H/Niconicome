@@ -20,6 +20,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public DownloadSettingsViewModel()
         {
+            this.isLimittingCommentCountEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.LimitCommentsCount);
+            this.maxCommentsCountField = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MaxCommentsCount);
             this.IsDownloadingVideoEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLVideo);
             this.IsDownloadingCommentEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLComment);
             this.isDownloadingCommentLogEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLKako);
@@ -38,7 +40,7 @@ namespace Niconicome.ViewModels.Mainpage
             var s4 = new ResolutionSetting("640x360");
             var s5 = new ResolutionSetting("426x240");
 
-            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5};
+            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5 };
             this.selectedResolutionField = s1;
 
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
@@ -92,6 +94,7 @@ namespace Niconicome.ViewModels.Mainpage
                        PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
                        IsReplaceStrictedEnable = replaceStricted,
                        OverrideVideoFileDateToUploadedDT = overrideVideoDT,
+                       MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
                    };
                    var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
 
@@ -156,6 +159,7 @@ namespace Niconicome.ViewModels.Mainpage
                     PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
                     IsReplaceStrictedEnable = replaceStricted,
                     OverrideVideoFileDateToUploadedDT = overrideVideoDT,
+                    MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
                 }, allowDupe);
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
@@ -195,6 +199,10 @@ namespace Niconicome.ViewModels.Mainpage
         private bool isSkippingEnablefield;
 
         private bool isCopyFromAnotherFolderEnableFIeld;
+
+        private bool isLimittingCommentCountEnableField;
+
+        private int maxCommentsCountField;
 
         private ResolutionSetting selectedResolutionField;
 
@@ -265,6 +273,15 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public bool IsCopyFromAnotherFolderEnable { get => this.isCopyFromAnotherFolderEnableFIeld; set => this.Savesetting(ref this.isCopyFromAnotherFolderEnableFIeld, value, Settings.DLCopy); }
 
+        /// <summary>
+        /// コメント取得数を制限する
+        /// </summary>
+        public bool IsLimittingCommentCountEnable { get => this.isLimittingCommentCountEnableField; set => this.Savesetting(ref this.isLimittingCommentCountEnableField, value, Settings.LimitCommentsCount); }
+
+        /// <summary>
+        /// コメントの最大取得数
+        /// </summary>
+        public int MaxCommentsCount { get => this.maxCommentsCountField; set => this.Savesetting(ref this.maxCommentsCountField, value, Settings.MaxCommentsCount); }
 
         /// <summary>
         /// 選択中の解像度
@@ -341,6 +358,10 @@ namespace Niconicome.ViewModels.Mainpage
         public bool IsSkippingEnable { get; set; } = true;
 
         public bool IsCopyFromAnotherFolderEnable { get; set; } = true;
+
+        public bool IsLimittingCommentCountEnable { get; set; } = true;
+
+        public int MaxCommentsCount { get; set; } = 2000;
 
         public ResolutionSetting SelectedResolution { get; set; }
 

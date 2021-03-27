@@ -356,6 +356,8 @@
                                                 <CheckBox Margin="5 0" Content="投稿者コメント" IsChecked="{Binding IsDownloadingOwnerComment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                 <CheckBox Margin="5 0" Content="かんたんコメント" IsChecked="{Binding IsDownloadingEasyComment,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                 <CheckBox Margin="5 0" Content="サムネイル" IsChecked="{Binding IsDownloadingThumbEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                <CheckBox Margin="5 0" Content="コメント取得数を制限" IsChecked="{Binding IsLimittingCommentCountEnable,UpdateSourceTrigger=PropertyChanged}" x:Name="limitComments"/>
+                                                <TextBox Margin="5 0" materialDesign:HintAssist.Hint="最大コメント数（数値）" Text="{Binding MaxCommentsCount,UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding ElementName=limitComments,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter}}" Width="150" HorizontalContentAlignment="Right"/>
                                             </StackPanel>
                                         </Grid>
                                         <Separator/>

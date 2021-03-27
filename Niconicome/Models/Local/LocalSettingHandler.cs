@@ -146,6 +146,8 @@ namespace Niconicome.Models.Local
                 Settings.AllowDupeOnStage => STypes::SettingNames.AllowDupeOnStage,
                 Settings.ReplaceSBToMB => STypes::SettingNames.ReplaceSingleByteToMultiByte,
                 Settings.OverrideVideoFileDTToUploadedDT => STypes::SettingNames.OverideVideoFileDTToUploadedDT,
+                Settings.MaxCommentsCount => STypes::SettingNames.MaxCommentCount,
+                Settings.LimitCommentsCount => STypes::SettingNames.LimitCommentCount,
                 _ => null
             };
         }
@@ -182,5 +184,7 @@ namespace Niconicome.Models.Local
         AllowDupeOnStage,
         ReplaceSBToMB,
         OverrideVideoFileDTToUploadedDT,
+        LimitCommentsCount,
+        MaxCommentsCount,
     }
 }

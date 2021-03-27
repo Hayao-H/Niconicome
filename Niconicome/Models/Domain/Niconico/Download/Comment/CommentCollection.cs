@@ -22,6 +22,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         void Distinct();
         void Sort();
         void Where(Func<Response::Comment, bool> predicate);
+        int RemoveFor(int count);
         ICommentCollection Clone();
         IEnumerable<Response::Chat> GetAllComments();
         Response::Chat? GetFirstComment(bool includeOwnerComment = true);
@@ -137,7 +138,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             {
                 if (this.isRoot)
                 {
-                    return this.childCollections.FirstOrDefault()?.ThreadInfo;
+                    return this.GetDefaultThread()?.ThreadInfo;
                 }
                 else
                 {
@@ -193,10 +194,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else if (comment.Chat is not null)
                 {
-                    //if (!this.commentsfield.Any(c => c.Chat!.No == comment.Chat.No))
-                    //{
                     this.commentsfield.Add(comment);
-                    //}
                 }
                 else
                 {
@@ -212,19 +210,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="comments"></param>
         public void Add(List<Response::Comment> comments, bool addSafe = true)
         {
-
-            ///if (addSafe && this.comThroughSetting > 0 && comments.Count > this.comThroughSetting)
-            ///{
-            ///    var filtered = comments.Copy().Where(c => c.Chat is not null).ToList();
-            ///    if (filtered.Count > this.comThroughSetting)
-            ///    {
-            ///        filtered.RemoveRange(0, this.comThroughSetting);
-            ///        comments.Clear();
-            ///        comments.AddRange(filtered);
-            ///    }
-            ///}
-
-            //bool chatStarted = false;
             bool nicoruEnded = false;
             int skipped = 0;
             int cCounts = comments.Where(c => c.Chat is not null).Count();
@@ -346,25 +331,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         {
             if (this.isRoot)
             {
-                //IEnumerable<Response::Chat?> GetFirstComents(IEnumerable<ICommentCollection> collection)
-                //{
-                //    return collection.Select(c => c.GetFirstComment()).Where(c => c is not null);
-                //}
 
-                var defaultThread = this.childCollections.FirstOrDefault(c => c.IsDefaultPostTarget);
+                var defaultThread = this.GetDefaultThread();
 
-                return defaultThread?.Comments.FirstOrDefault()?.Chat;
-
-                ////デフォルトスレッドに1がある場合はリターン
-                //if (GetFirstComents(defaultThread).Any(c => c!.No == 1))
-                //{
-                //    return GetFirstComents(defaultThread).FirstOrDefault(c => c!.No == 1);
-                //}
-                //
-                //var children = GetFirstComents(this.childCollections);
-                //if (!children.Any()) return null;
-                //var max = children.Max(c => c!.No);
-                //return children.FirstOrDefault(c => c!.No == max);
+                return defaultThread?.GetFirstComment();
             }
             else
             {
@@ -379,6 +349,32 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         {
             this.commentsfield.Sort((a, b) => (int)(a.Chat!.No - b.Chat!.No));
         }
+
+        /// <summary>
+        /// 指定した数のコメント削除する
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public int RemoveFor(int count)
+        {
+            if (this.isRoot)
+            {
+                var defaultThread = this.GetDefaultThread()?.RemoveFor(count) ?? 0;
+                return defaultThread;
+            }
+            else
+            {
+                if (count > this.commentsfield.Count)
+                {
+                    count = this.commentsfield.Count;
+                }
+                this.commentsfield.RemoveRange(0, count);
+
+                return count;
+            }
+        }
+
+        #region private
 
         /// <summary>
         /// 子コレクションを確認
@@ -415,6 +411,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         {
             return this.childCollections.First(c => c.Thread == thread && c.Fork == fork);
         }
+
+        /// <summary>
+        /// デフォルトスレッドを取得する
+        /// </summary>
+        /// <returns></returns>
+        private ICommentCollection? GetDefaultThread()
+        {
+            if (!this.isRoot) throw new InvalidOperationException("このコレクションはルートではないためデフォルトスレッドを取得できません。");
+
+            return this.childCollections.FirstOrDefault(c => c.IsDefaultPostTarget);
+        }
+
+        #endregion
     }
 
 }
