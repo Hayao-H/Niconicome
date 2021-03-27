@@ -22,8 +22,8 @@ namespace Niconicome.Models.Network
         Task<INetworkResult> AddVideosAsync(IEnumerable<string> videosId, int playlistId, Action<IResult> onFailed, Action<IVideoListInfo> onSucceed);
         Task AddVideosAsync(IEnumerable<IVideoListInfo> videos, int playlistId);
         Task<INetworkResult> UpdateVideosAsync(IEnumerable<IVideoListInfo> videos, string folderPath, Action<IVideoListInfo> onSucceeded, CancellationToken ct);
-        Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(IEnumerable<IVideoListInfo> ids, Action<IVideoListInfo, IVideoListInfo, int> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting);
-        Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<IVideoListInfo, IVideoListInfo, int> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting);
+        Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(IEnumerable<IVideoListInfo> ids, Action<IVideoListInfo, IVideoListInfo, int, object> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting);
+        Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<IVideoListInfo, IVideoListInfo, int, object> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting);
     }
 
     public interface INetworkResult
@@ -88,9 +88,12 @@ namespace Niconicome.Models.Network
 
             this.messageHandler.AppendMessage($"{videosCount}件の動画を追加します。");
 
-            await this.GetVideoListInfosAsync(videoIds.Copy(), async (newVideo, video, i) =>
+            await this.GetVideoListInfosAsync(videoIds.Copy(), async (newVideo, video, i, lockObj) =>
             {
-                netResult.SucceededCount++;
+                lock (lockObj)
+                {
+                    netResult.SucceededCount++;
+                }
                 await this.videoThumnailUtility.SetThumbPathAsync(newVideo);
                 int id = this.videoHandler.AddVideo(newVideo, playlist.Id);
                 newVideo.Id = id;
@@ -163,9 +166,12 @@ namespace Niconicome.Models.Network
 
             this.messageHandler.AppendMessage($"{videosCount}件の動画情報を更新します。");
 
-            await this.GetVideoListInfosAsync(videos.Copy(), async (newVideo, video, i) =>
+            await this.GetVideoListInfosAsync(videos.Copy(), async (newVideo, video, i, lockObj) =>
             {
-                netResult.SucceededCount++;
+                lock (lockObj)
+                {
+                    netResult.SucceededCount++;
+                }
                 video.IsSelected = false;
                 video.Message = "情報を更新しました。";
                 newVideo.Id = video.Id;
@@ -206,7 +212,7 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(IEnumerable<IVideoListInfo> ids, Action<IVideoListInfo, IVideoListInfo, int> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting)
+        public async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(IEnumerable<IVideoListInfo> ids, Action<IVideoListInfo, IVideoListInfo, int, object> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting)
         {
             int videosCount = ids.Count();
             var videos = new List<IVideoListInfo>();
@@ -215,7 +221,7 @@ namespace Niconicome.Models.Network
             foreach (var item in ids.Select((video, index) => new { video, index }))
             {
 
-                var task = new NetworkVideoParallelTask(async _ =>
+                var task = new NetworkVideoParallelTask(async (_, lockObj) =>
                 {
                     var videoInfo = new VIdeoInfo();
 
@@ -226,7 +232,7 @@ namespace Niconicome.Models.Network
                     if (result.IsSucceeded)
                     {
                         var newVideo = videoInfo.ConvertToTreeVideoInfo();
-                        onSucceeded(newVideo, item.video, item.index);
+                        onSucceeded(newVideo, item.video, item.index, lockObj);
                         videos.Add(newVideo);
                     }
                     else
@@ -254,7 +260,7 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<IVideoListInfo, IVideoListInfo, int> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting)
+        public async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<IVideoListInfo, IVideoListInfo, int, object> onSucceeded, Action<IResult, IVideoListInfo> onFailed, Action<IVideoListInfo, int> onStarted, Action<IVideoListInfo> onWaiting)
         {
             return await this.GetVideoListInfosAsync(ids.Select(i => new BindableVIdeoListInfo() { NiconicoId = i }), onSucceeded, onFailed, onStarted, onWaiting);
         }
@@ -332,7 +338,7 @@ namespace Niconicome.Models.Network
 
     public class NetworkVideoParallelTask : IParallelTask<NetworkVideoParallelTask>
     {
-        public NetworkVideoParallelTask(Func<NetworkVideoParallelTask, Task> taskFunction, Action<int> onwait)
+        public NetworkVideoParallelTask(Func<NetworkVideoParallelTask, object, Task> taskFunction, Action<int> onwait)
         {
             this.TaskFunction = taskFunction;
             this.OnWait = onwait;
@@ -340,7 +346,7 @@ namespace Niconicome.Models.Network
 
         public Guid TaskId { get; init; } = Guid.NewGuid();
 
-        public Func<NetworkVideoParallelTask, Task> TaskFunction { get; init; }
+        public Func<NetworkVideoParallelTask, object, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
     }

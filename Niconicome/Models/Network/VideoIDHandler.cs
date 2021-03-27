@@ -170,7 +170,7 @@ namespace Niconicome.Models.Network
             var ids = this.localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
             var videoCount = ids.Count();
 
-            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(ids, (newVideo, video, i) =>
+            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(ids, (newVideo, video, i, _) =>
             {
                 onMessage($"{video.NiconicoId}の情報を取得しました。({i + 1}/{videoCount})");
 
@@ -200,7 +200,7 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromID(string id, Action<string> onMessage)
         {
-            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(new List<string>() { id }, (newVideo, video, i) =>
+            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(new List<string>() { id }, (newVideo, video, i, _) =>
             {
                 onMessage($"{video.NiconicoId}の情報を取得しました。");
 
@@ -260,7 +260,7 @@ namespace Niconicome.Models.Network
 
             int videoCount = searchResult.Videos.Count();
 
-            videos = await this.networkVideoHandler.GetVideoListInfosAsync(searchResult.Videos.Select(v => v.Id).Where(v => !registeredVideos.Contains(v)), (newVideo, video, i) =>
+            videos = await this.networkVideoHandler.GetVideoListInfosAsync(searchResult.Videos.Select(v => v.Id).Where(v => !registeredVideos.Contains(v)), (newVideo, video, i, _) =>
             {
                 onMessage($"{video.NiconicoId}の情報を取得しました。({i + 1}/{videoCount})");
 

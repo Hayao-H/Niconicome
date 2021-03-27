@@ -52,6 +52,8 @@ namespace Niconicome.Models.Playlist
 
         private readonly IPlaylistStoreHandler playlistStoreHandler;
 
+        private readonly object lockObj = new();
+
         public ObservableCollection<IVideoListInfo> Videos { get; init; }
 
         /// <summary>
@@ -242,16 +244,20 @@ namespace Niconicome.Models.Playlist
         {
 
             if (this.Videos.Count == 0) return;
-            if (!this.Videos.Any(v => (v?.Id ?? 0) == video.Id))
+            
+            lock (this.lockObj)
             {
-                this.Videos.Add(video);
-            }
-            else
-            {
-                int index = this.Videos.FindIndex(v => v.Id == video.Id);
-                if (index == -1) return;
-                this.Videos.RemoveAt(index);
-                this.Videos.Insert(index, video);
+                if (!this.Videos.Any(v => (v?.Id ?? 0) == video.Id))
+                {
+                    this.Videos.Add(video);
+                }
+                else
+                {
+                    int index = this.Videos.FindIndex(v => v.Id == video.Id);
+                    if (index == -1) return;
+                    this.Videos.RemoveAt(index);
+                    this.Videos.Insert(index, video);
+                }
             }
 
 

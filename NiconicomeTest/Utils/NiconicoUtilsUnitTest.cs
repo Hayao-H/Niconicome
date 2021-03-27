@@ -101,7 +101,7 @@ namespace NiconicomeTest.Utils
             var result = this.utils!.GetID(url, type);
 
             Assert.That(result, Is.EqualTo(id));
-        }
+        } 
 
         [TestCase("[<id>]<title>", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師")]
         [TestCase("[<id>]<title>（<owner>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（中の）")]
