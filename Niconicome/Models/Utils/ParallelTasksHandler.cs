@@ -10,7 +10,7 @@ namespace Niconicome.Models.Utils
     public interface IParallelTask<T>
     {
         Guid TaskId { get; }
-        Func<T, Task> TaskFunction { get; }
+        Func<T, object, Task> TaskFunction { get; }
         Action<int> OnWait { get; }
     }
 
@@ -127,6 +127,7 @@ namespace Niconicome.Models.Utils
             int index = 0;
             var mre = new ManualResetEventSlim(true);
             var tasks = new List<Task>();
+            var lockObj = new object();
 
             lock (this.lockobj)
             {
@@ -169,7 +170,7 @@ namespace Niconicome.Models.Utils
 
                     mre.Wait();
 
-                    await Task.Run(async () => await task.TaskFunction(task));
+                    await Task.Run(async () => await task.TaskFunction(task, lockobj));
 
                     semaphore.Release();
                 };

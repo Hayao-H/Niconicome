@@ -305,7 +305,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             var resolution = context.ActualVerticalResolution == 0 ? string.Empty : $"（{context.ActualVerticalResolution}px）";
             Exception? ex = null;
 
-            var tasks = stream.StreamUrls.Select(url => new ParallelDownloadTask(async self =>
+            var tasks = stream.StreamUrls.Select(url => new ParallelDownloadTask(async (self, _) =>
             {
                 if (token.IsCancellationRequested || ex is not null) return;
 
@@ -417,7 +417,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     /// </summary>
     public class ParallelDownloadTask : IParallelDownloadTask
     {
-        public ParallelDownloadTask(Func<IParallelDownloadTask, Task> taskFunc, IDownloadContext context, string url, int sequenceZero, string filename)
+        public ParallelDownloadTask(Func<IParallelDownloadTask, object, Task> taskFunc, IDownloadContext context, string url, int sequenceZero, string filename)
         {
             this.TaskFunction = taskFunc;
             this.TaskId = Guid.NewGuid();
@@ -444,7 +444,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         public Guid TaskId { get; init; }
 
-        public Func<IParallelDownloadTask, Task> TaskFunction { get; init; }
+        public Func<IParallelDownloadTask, object, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
     }
