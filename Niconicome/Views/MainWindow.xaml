@@ -148,10 +148,7 @@
                                 </Button>
                             </DockPanel>
                         </DockPanel>
-                        <Grid Grid.Row="1">
-                            <Grid.DataContext>
-                                <vm:VideoListViewModel/>
-                            </Grid.DataContext>
+                        <Grid Grid.Row="1" x:Name="videoList" d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD},IsDesignTimeCreatable=True}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="3*"/>
                                 <RowDefinition Height="3*"/>
@@ -344,11 +341,8 @@
                                 <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
                             </Grid>
                             <TabControl Grid.Row="3" Margin="8">
-                                <TabItem Header="設定">
-                                    <StackPanel Orientation="Vertical">
-                                        <StackPanel.DataContext>
-                                            <vm:DownloadSettingsViewModel/>
-                                        </StackPanel.DataContext>
+                                <TabItem Header="設定" d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingsViewModelD},IsDesignTimeCreatable=True}">
+                                    <StackPanel Orientation="Vertical" x:Name="downloadSettings">
                                         <Grid Margin="0 5">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="auto"/>
@@ -415,7 +409,6 @@
                         </Grid>
                     </Grid>
                 </Grid>
-
             </materialDesign:DrawerHost>
         </DockPanel>
     </materialDesign:DialogHost>

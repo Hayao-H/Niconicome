@@ -38,8 +38,7 @@ namespace Niconicome.ViewModels.Mainpage
             var s4 = new ResolutionSetting("640x360");
             var s5 = new ResolutionSetting("426x240");
 
-            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5
-    };
+            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5};
             this.selectedResolutionField = s1;
 
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
@@ -301,6 +300,53 @@ namespace Niconicome.ViewModels.Mainpage
         {
             this.RaiseCanExecuteChange();
         }
+    }
+
+    class DownloadSettingsViewModelD
+    {
+        public DownloadSettingsViewModelD()
+        {
+            var s1 = new ResolutionSetting("1920x1080");
+            var s2 = new ResolutionSetting("1280x720");
+            var s3 = new ResolutionSetting("854x480");
+            var s4 = new ResolutionSetting("640x360");
+            var s5 = new ResolutionSetting("426x240");
+
+            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5 };
+            this.SelectedResolution = s1;
+        }
+
+        public bool IsDownloading { get => false; }
+
+        public CommandBase<object> DownloadCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public CommandBase<object> CancelCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public CommandBase<object> StageVideosCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public bool IsDownloadingVideoEnable { get; set; } = true;
+
+        public bool IsDownloadingCommentEnable { get; set; } = true;
+
+        public bool IsDownloadingCommentLogEnable { get; set; } = true;
+
+        public bool IsDownloadingOwnerComment { get; set; } = true;
+
+        public bool IsDownloadingEasyComment { get; set; } = true;
+
+        public bool IsDownloadingThumbEnable { get; set; } = true;
+
+        public bool IsOverwriteEnable { get; set; } = true;
+
+        public bool IsSkippingEnable { get; set; } = true;
+
+        public bool IsCopyFromAnotherFolderEnable { get; set; } = true;
+
+        public ResolutionSetting SelectedResolution { get; set; }
+
+        public List<ResolutionSetting> Resolutions { get; init; }
+
+        public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
     }
 
     class ResolutionSetting

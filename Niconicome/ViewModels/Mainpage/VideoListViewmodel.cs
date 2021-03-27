@@ -836,6 +836,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public bool IsFilteringFromAllVideos { get => this.isFilteringFromAllVideosEnableField; set => this.SetProperty(ref this.isFilteringFromAllVideosEnableField, value); }
 
+        /// <summary>
+        /// プレイリストのタイトル
+        /// </summary>
+        public string PlaylistTitle { get => this.playlistTitleFIeld; set => this.SetProperty(ref this.playlistTitleFIeld, value); }
+
         private string inputStringFIeld = string.Empty;
 
         private string playlistTitleFIeld = string.Empty;
@@ -844,15 +849,67 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isFilteringFromAllVideosEnableField;
 
+
+        /// <summary>
+        /// 並び替える
+        /// </summary>
+        /// <param name="sortType"></param>
+        /// <param name="orderBy"></param>
+        public void SetOrder(SortType sortType, OrderBy orderBy)
+        {
+            var videos = new List<IVideoListInfo>(this.Videos);
+            this.Videos.Clear();
+            if (orderBy != OrderBy.Descending)
+            {
+                this.Videos.Addrange(sortType switch
+                {
+                    SortType.DateTime => videos.OrderBy(v => v.UploadedOn),
+                    SortType.Id => videos.OrderBy(v => v.NiconicoId),
+                    SortType.Title => videos.OrderBy(v => v.Title),
+                    SortType.Selected => videos.OrderBy(v => !v.IsSelected ? 1 : 0),
+                    SortType.ViewCount => videos.OrderBy(v => v.ViewCount),
+                    _ => videos,
+                });
+            }
+            else
+            {
+                this.Videos.Addrange(sortType switch
+                {
+                    SortType.DateTime => videos.OrderByDescending(v => v.UploadedOn),
+                    SortType.Id => videos.OrderByDescending(v => v.NiconicoId),
+                    SortType.Title => videos.OrderByDescending(v => v.Title),
+                    SortType.Selected => videos.OrderByDescending(v => !v.IsSelected ? 1 : 0),
+                    SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount),
+                    _ => videos,
+                });
+            }
+
+            string sortTypeStr = sortType switch
+            {
+                SortType.DateTime => "投稿日時",
+                SortType.Id => "ID",
+                SortType.Title => "タイトル",
+                SortType.Selected => "選択",
+                SortType.ViewCount => "再生回数",
+                _ => "並び替えなし"
+            };
+            string orderStr = orderBy switch
+            {
+                OrderBy.Ascending => "昇順",
+                OrderBy.Descending => "降順",
+                _ => "昇順",
+            };
+
+            WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
+            this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
+        }
+
+        #region private
+
         /// <summary>
         /// タスクキャンセラー
         /// </summary>
         private CancellationTokenSource? cts;
-
-        /// <summary>
-        /// プレイリストのタイトル
-        /// </summary>
-        public string PlaylistTitle { get => this.playlistTitleFIeld; set => this.SetProperty(ref this.playlistTitleFIeld, value); }
 
         private bool isFetching;
 
@@ -940,65 +997,98 @@ namespace Niconicome.ViewModels.Mainpage
         }
 
         /// <summary>
-        /// 並び替える
+        /// フォルダーパスを取得する
         /// </summary>
-        /// <param name="sortType"></param>
-        /// <param name="orderBy"></param>
-        public void SetOrder(SortType sortType, OrderBy orderBy)
-        {
-            var videos = new List<IVideoListInfo>(this.Videos);
-            this.Videos.Clear();
-            if (orderBy != OrderBy.Descending)
-            {
-                this.Videos.Addrange(sortType switch
-                {
-                    SortType.DateTime => videos.OrderBy(v => v.UploadedOn),
-                    SortType.Id => videos.OrderBy(v => v.NiconicoId),
-                    SortType.Title => videos.OrderBy(v => v.Title),
-                    SortType.Selected => videos.OrderBy(v => !v.IsSelected ? 1 : 0),
-                    SortType.ViewCount => videos.OrderBy(v => v.ViewCount),
-                    _ => videos,
-                });
-            }
-            else
-            {
-                this.Videos.Addrange(sortType switch
-                {
-                    SortType.DateTime => videos.OrderByDescending(v => v.UploadedOn),
-                    SortType.Id => videos.OrderByDescending(v => v.NiconicoId),
-                    SortType.Title => videos.OrderByDescending(v => v.Title),
-                    SortType.Selected => videos.OrderByDescending(v => !v.IsSelected ? 1 : 0),
-                    SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount),
-                    _ => videos,
-                });
-            }
-
-            string sortTypeStr = sortType switch
-            {
-                SortType.DateTime => "投稿日時",
-                SortType.Id => "ID",
-                SortType.Title => "タイトル",
-                SortType.Selected => "選択",
-                SortType.ViewCount => "再生回数",
-                _ => "並び替えなし"
-            };
-            string orderStr = orderBy switch
-            {
-                OrderBy.Ascending => "昇順",
-                OrderBy.Descending => "降順",
-                _ => "昇順",
-            };
-
-            WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
-            this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
-        }
-
+        /// <returns></returns>
         private string GetFolderPath()
         {
             if (this.Playlist is null) return string.Empty;
 
             return this.Playlist.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.Playlist.Folderpath;
         }
+        #endregion
+
+    }
+
+    class VideoListViewModelD
+    {
+        public VideoListViewModelD()
+        {
+            var v1 = new BindableVIdeoListInfo()
+            {
+                Title = "レッツゴー!陰陽師",
+                NiconicoId = "sm9",
+            };
+
+            this.Videos = new ObservableCollection<IVideoListInfo>() { v1 };
+
+        }
+
+        public MaterialDesign::PackIconKind FilterIcon { get; set; } = MaterialDesign::PackIconKind.Filter;
+
+        public MaterialDesign::PackIconKind RefreshCommandIcon { get; set; } = MaterialDesign::PackIconKind.Refresh;
+
+        public CommandBase<object> AddVideoCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<IVideoListInfo> RemoveVideoCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<IVideoListInfo> WatchOnNiconicoCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> AddVideoFromClipboardCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> EditPlaylistCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenNetworkSettingsCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<IVideoListInfo> UpdateVideoCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SyncWithNetowrkCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> ClearMessageCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> CopyMessageCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenLogWindowCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SelectAllVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> DisSelectAllVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SelectAllNotDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> DisSelectAllNotDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SelectAllDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> DisSelectAllDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenPlaylistFolder { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenInPlayerAcommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenInPlayerBcommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SendIdToappCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SendUrlToappCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> FilterCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SearchCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<string> CreatePlaylistCommand { get; init; } = new(_ => true, _ => { });
+
+        public ObservableCollection<IVideoListInfo> Videos { get; private set; }
+
+        public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
+
+        public string InputString { get; set; } = string.Empty;
+
+        public bool IsFilteringOnlyByTag { get; set; } = false;
+
+        public bool IsFilteringFromAllVideos { get; set; } = false;
+
+        public string PlaylistTitle { get; set; } = "空白のプレイリスト";
     }
 
     /// <summary>
