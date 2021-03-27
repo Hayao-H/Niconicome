@@ -135,5 +135,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string AllowDupeOnStage { get; private set; } = "allowdupeonstage";
         public static string ReplaceSingleByteToMultiByte { get; private set; } = "replacesinglebytetomultibyte";
         public static string OverideVideoFileDTToUploadedDT { get; private set; } = "overidevideofiledttouploadeddt";
+        public static string LimitCommentCount { get; private set; } = "limitcommentcount";
+        public static string MaxCommentCount { get; set; } = "maxcommentcount";
     }
 }

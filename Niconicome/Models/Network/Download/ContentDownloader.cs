@@ -46,6 +46,7 @@ namespace Niconicome.Models.Network.Download
         string FolderPath { get; }
         uint VerticalResolution { get; }
         int PlaylistID { get; }
+        int MaxCommentsCount { get; }
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
         Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset);
@@ -634,6 +635,8 @@ namespace Niconicome.Models.Network.Download
 
         public int PlaylistID { get; set; }
 
+        public int MaxCommentsCount { get; set; }
+
         public string NiconicoId { get; set; } = string.Empty;
 
         public string FolderPath { get; set; } = string.Empty;
@@ -679,25 +682,10 @@ namespace Niconicome.Models.Network.Download
                 IsDownloadingOwnerCommentEnable = this.DownloadOwner,
                 CommentOffset = commentOffset,
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
+                MaxcommentsCount = this.MaxCommentsCount,
             };
         }
 
-    }
-
-    /// <summary>
-    /// インデックス付きの動画情報
-    /// </summary>
-    public class VideoToDownload : IVideoToDownload
-    {
-        public VideoToDownload(IVideoListInfo video, int index)
-        {
-            this.Video = video;
-            this.Index = index;
-        }
-
-        public IVideoListInfo Video { get; set; }
-
-        public int Index { get; set; }
     }
 
     /// <summary>

@@ -118,6 +118,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                      UserId = c.UserId,
                      Mail = c.Mail,
                      Text = Utils::XmlUtils.RemoveSymbols(c.Content),
+                     Premium = (int)(c.Premium ?? 1),
                  }
             ).ToList(),
                 Thread = new Xml::PacketThread()
