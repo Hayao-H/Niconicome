@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using Niconicome.Extensions.System;
@@ -46,6 +47,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         string UserId { get; }
         string ChannelID { get; }
         string ChannelName { get; }
+        string Description { get; }
         int ViewCount { get; }
         int CommentCount { get; }
         int MylistCount { get; }
@@ -170,11 +172,12 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             }
 
             this.State = WatchInfoHandlerState.OK;
-            return new DomainVideoInfo() { 
-                Id = info.Id, 
-                Title = info.Title, 
-                Tags = info.Tags, 
-                DmcInfo = info, 
+            return new DomainVideoInfo()
+            {
+                Id = info.Id,
+                Title = info.Title,
+                Tags = info.Tags,
+                DmcInfo = info,
                 ViewCount = info.ViewCount,
                 ChannelID = info.ChannelID,
                 ChannelName = info.ChannelName,
@@ -289,6 +292,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             //チャンネル情報
             info.ChannelID = original?.Channel?.Id ?? string.Empty;
             info.ChannelName = original?.Channel?.Name ?? string.Empty;
+
+            //動画説明文
+            info.Description = original?.Video?.Description ?? string.Empty;
+            info.Description = Regex.Replace(info.Description, "</?.+?/?>", "");
 
             //Session情報
             if (!options.HasFlag(WatchInfoOptions.NoDmcData) && original?.Media?.Delivery is not null)
@@ -468,6 +475,9 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public string ChannelID { get; set; } = string.Empty;
 
         public string ChannelName { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+
 
         public int ViewCount { get; set; }
 
