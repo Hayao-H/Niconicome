@@ -15,6 +15,11 @@ namespace Niconicome.Models.Playlist
     {
         int Id { get; set; }
         int ViewCount { get; set; }
+        int CommentCount { get; set; }
+        int MylistCount { get; set; }
+        int LikeCount { get; set; }
+        int OwnerID { get; set; }
+        int Duration { get; set; }
         string NiconicoId { get; set; }
         string Title { get; set; }
         bool IsDeleted { get; set; }
@@ -58,6 +63,32 @@ namespace Niconicome.Models.Playlist
         /// 再生回数
         /// </summary>
         public int ViewCount { get; set; }
+
+        /// <summary>
+        /// コメント数
+        /// </summary>
+        public int CommentCount { get; set; }
+
+        /// <summary>
+        /// マイリス数
+        /// </summary>
+        public int MylistCount { get; set; }
+
+        /// <summary>
+        /// いいね数
+        /// </summary>
+        public int LikeCount { get; set; }
+
+        /// <summary>
+        /// 投稿者ID
+        /// </summary>
+        public int OwnerID { get; set; }
+
+        /// <summary>
+        /// 再生時間
+        /// </summary>
+        public int Duration { get; set; }
+
 
         /// <summary>
         /// ニコニコ動画におけるID
@@ -227,7 +258,7 @@ namespace Niconicome.Models.Playlist
             videoInfo.NiconicoId = dbVideo.NiconicoId;
             videoInfo.Title = dbVideo.Title;
             videoInfo.IsDeleted = dbVideo.IsDeleted;
-            videoInfo.OwnerName = dbVideo.Owner?.Nickname ?? string.Empty;
+            videoInfo.OwnerName = dbVideo.OwnerName;
             videoInfo.UploadedOn = dbVideo.UploadedOn;
             videoInfo.LargeThumbUrl = dbVideo.LargeThumbUrl;
             videoInfo.ThumbUrl = dbVideo.ThumbUrl;
@@ -236,6 +267,11 @@ namespace Niconicome.Models.Playlist
             videoInfo.IsSelected = dbVideo.IsSelected;
             videoInfo.Tags = dbVideo.Tags ?? new List<string>();
             videoInfo.ViewCount = dbVideo.ViewCount;
+            videoInfo.CommentCount = dbVideo.CommentCount;
+            videoInfo.MylistCount = dbVideo.MylistCount;
+            videoInfo.LikeCount = dbVideo.LikeCount;
+            videoInfo.OwnerID = dbVideo.OwnerID;
+            videoInfo.Duration = dbVideo.Duration;
         }
 
         /// <summary>
@@ -243,7 +279,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="newVideo"></param>
         /// <param name="oldVideo"></param>
-        protected static void SetData(IVideoListInfo newVideo, IVideoListInfo oldVideo)
+        public static void SetData(IVideoListInfo newVideo, IVideoListInfo oldVideo)
         {
             newVideo.Id = oldVideo.Id;
             newVideo.ViewCount = oldVideo.ViewCount;
@@ -260,6 +296,11 @@ namespace Niconicome.Models.Playlist
             newVideo.MessageGuid = oldVideo.MessageGuid;
             newVideo.Tags = oldVideo.Tags;
             newVideo.UploadedOn = oldVideo.UploadedOn;
+            newVideo.CommentCount = oldVideo.CommentCount;
+            newVideo.MylistCount = oldVideo.MylistCount;
+            newVideo.LikeCount = oldVideo.LikeCount;
+            newVideo.Duration = oldVideo.Duration;
+            newVideo.OwnerID = oldVideo.OwnerID;
         }
     }
 
