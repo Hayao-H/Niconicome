@@ -152,6 +152,7 @@ namespace Niconicome.Models.Local
                 Settings.VideoInfoInJson => STypes::SettingNames.IsDownloadingVideoInfoInJsonEnable,
                 Settings.MaxFetchCount => STypes::SettingNames.MaxParallelFetchCount,
                 Settings.FetchSleepInterval => STypes::SettingNames.FetchSleepInterval,
+                Settings.SkipSSLVerification => STypes::SettingNames.SkipSSLVerification,
                 _ => null
             };
         }
@@ -194,5 +195,6 @@ namespace Niconicome.Models.Local
         VideoInfoInJson,
         MaxFetchCount,
         FetchSleepInterval,
+        SkipSSLVerification,
     }
 }

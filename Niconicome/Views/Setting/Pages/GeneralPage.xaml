@@ -68,6 +68,16 @@
                 <ComboBox SelectedItem="{Binding FetchSleepInterval,UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding SelectablefetchSleepInterval}" DisplayMemberPath="DisplayValue" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="100"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="ShieldOff" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="SSL証明書の検証をスキップする(強く非推奨)" ToolTip="安全性が著しく低下します。ほかの回避手段がない場合にのみ有効にしてください。"/>
+                <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsSkippingSSLVerificationEnable}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
         
     </Grid>

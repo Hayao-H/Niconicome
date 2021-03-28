@@ -20,6 +20,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             var wv2 = new AutoLoginTypes(AutoLoginTypeString.Webview2, "Webview2とCookieを共有");
 
             this.SelectableAutoLoginTypes = new List<AutoLoginTypes>() { normal, wv2 };
+            this.isSkippingSSLVerificationEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.SkipSSLVerification);
 
             var type = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AutologinMode);
             this.selectedAutoLoginTypeField = type switch
@@ -63,6 +64,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         }
 
         private bool isAutologinEnableField;
+
+        private bool isSkippingSSLVerificationEnableField;
 
         private string empty = string.Empty;
 
@@ -117,6 +120,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// 待機間隔
         /// </summary>
         public ComboboxItem<int> FetchSleepInterval { get => this.fetchSleepIntervalFIeld; set => this.Savesetting(ref this.fetchSleepIntervalFIeld, value, Settings.FetchSleepInterval); }
+
+        /// <summary>
+        /// SSL証明書の検証をスキップする
+        /// </summary>
+        public bool IsSkippingSSLVerificationEnable { get => this.isSkippingSSLVerificationEnableField; set => this.Savesetting(ref this.isSkippingSSLVerificationEnableField, value, Settings.SkipSSLVerification); }
+
     }
 
     class GeneralSettingsPageViewModelD
@@ -139,6 +148,8 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public bool IsAutologinEnable { set; get; } = true;
 
+        public bool IsSkippingSSLVerificationEnable { get; set; } = false;
+
         public List<AutoLoginTypes> SelectableAutoLoginTypes { get; init; } = new();
 
         public AutoLoginTypes SelectedAutoLoginType { get; init; } = new AutoLoginTypes(AutoLoginTypeString.Normal, "パスワード");
@@ -147,7 +158,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public List<ComboboxItem<int>> SelectablefetchSleepInterval { get; init; }
 
-        public ComboboxItem<int> MaxFetchParallelCount { get; set; } 
+        public ComboboxItem<int> MaxFetchParallelCount { get; set; }
 
         public ComboboxItem<int> FetchSleepInterval { get; set; }
 
