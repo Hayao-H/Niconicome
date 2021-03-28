@@ -101,8 +101,6 @@ namespace Niconicome.ViewModels.Mainpage
                    var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
 
 
-                   WS::Mainpage.Messagehandler.AppendMessage($"動画のダウンロードを開始します。({videoCount}件)");
-                   this.SnackbarMessageQueue.Enqueue($"動画のダウンロードを開始します。({videoCount}件)");
                    WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting, allowDupe);
 
                    if (dlFromQueue)
