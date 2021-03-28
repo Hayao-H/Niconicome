@@ -148,6 +148,7 @@ namespace Niconicome.Models.Local
                 Settings.OverrideVideoFileDTToUploadedDT => STypes::SettingNames.OverideVideoFileDTToUploadedDT,
                 Settings.MaxCommentsCount => STypes::SettingNames.MaxCommentCount,
                 Settings.LimitCommentsCount => STypes::SettingNames.LimitCommentCount,
+                Settings.DLVideoInfo => STypes::SettingNames.IsDownloadingVideoInfoEnable,
                 _ => null
             };
         }
@@ -186,5 +187,6 @@ namespace Niconicome.Models.Local
         OverrideVideoFileDTToUploadedDT,
         LimitCommentsCount,
         MaxCommentsCount,
+        DLVideoInfo,
     }
 }
