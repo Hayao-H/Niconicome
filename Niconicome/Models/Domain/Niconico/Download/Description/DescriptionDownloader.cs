@@ -16,7 +16,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
 
     interface IDescriptionDownloader
     {
-        IDownloadResult DownloadVideoInfo(IDescriptionSetting setting, IWatchSession session);
+        IDownloadResult DownloadVideoInfo(IDescriptionSetting setting, IWatchSession session, Action<string> onMessage);
     }
 
     public class DescriptionSetting : IDescriptionSetting
@@ -32,15 +32,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
 
     class DescriptionDownloader : IDescriptionDownloader
     {
-        public DescriptionDownloader(INiconicoUtils niconicoUtils, ILogger logger)
+        public DescriptionDownloader(INiconicoUtils niconicoUtils, ILogger logger, IDownloadMessenger messenger)
         {
             this.utils = niconicoUtils;
             this.logger = logger;
+            this.messenger = messenger;
         }
 
         private readonly INiconicoUtils utils;
 
         private readonly ILogger logger;
+
+        private readonly IDownloadMessenger messenger;
 
         /// <summary>
         /// 動画情報ファイルを保存する
@@ -48,12 +51,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         /// <param name="setting"></param>
         /// <param name="dmcInfo"></param>
         /// <returns></returns>
-        public IDownloadResult DownloadVideoInfo(IDescriptionSetting setting, IWatchSession session)
+        public IDownloadResult DownloadVideoInfo(IDescriptionSetting setting, IWatchSession session, Action<string> onMessage)
         {
+            this.messenger.AddHandler(onMessage);
+
             if (session.Video is null)
             {
+                this.messenger.RemoveHandler(onMessage);
                 throw new InvalidOperationException("動画情報が未取得です。");
             }
+
+            this.messenger.SendMessage($"動画情報の保存を開始します。");
+            this.logger.Log($"{session.Video.Id}の動画情報保存を開始");
 
             var fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".txt", setting.IsReplaceRestrictedEnable);
             var filePath = Path.Combine(setting.FolderName, fileName);
@@ -61,6 +70,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
 
             if (folderpath is null)
             {
+                this.messenger.SendMessage($"動画情報ファイルの保存フォルダー取得に失敗しました。");
+                this.messenger.RemoveHandler(onMessage);
                 return new DownloadResult() { Message = "動画情報ファイルの保存フォルダー取得に失敗しました。" };
             }
 
@@ -73,10 +84,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             }
             catch (Exception e)
             {
+                this.messenger.SendMessage("動画情報ファイルの書き込みに失敗しました。");
                 this.logger.Error("動画情報ファイルの書き込みに失敗しました。", e);
+                this.messenger.RemoveHandler(onMessage);
                 return new DownloadResult() { Message = $"動画情報ファイルの書き込みに失敗しました。(詳細:{e.Message})" };
             }
 
+            this.messenger.SendMessage($"動画情報ファイルを保存しました。");
+            this.messenger.RemoveHandler(onMessage);
             return new DownloadResult() { Issucceeded = true };
         }
 

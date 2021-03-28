@@ -170,7 +170,7 @@ namespace Niconicome.Models.Network.Download
         /// <param name="niconicoid"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session)
+        private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
         {
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
 
@@ -179,7 +179,7 @@ namespace Niconicome.Models.Network.Download
             Download::IDownloadResult result;
             try
             {
-                result = descriptionDownloader.DownloadVideoInfo(dSettings, session);
+                result = descriptionDownloader.DownloadVideoInfo(dSettings, session, onMessage);
             }
             catch (Exception e)
             {
@@ -400,7 +400,7 @@ namespace Niconicome.Models.Network.Download
             {
                 if (!info?.VideoInfoExist ?? true)
                 {
-                    var iResult = this.TryDownloadDescriptionAsync(setting, session);
+                    var iResult = this.TryDownloadDescriptionAsync(setting, session, OnMessage);
 
                     if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
 
