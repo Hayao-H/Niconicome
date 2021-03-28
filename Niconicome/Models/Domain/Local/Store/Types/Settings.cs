@@ -141,5 +141,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string IsDownloadingVideoInfoInJsonEnable { get; private set; } = "isdownloadingvideoinfoinjsonenable";
         public static string MaxParallelFetchCount { get; private set; } = "maxparallelfetchcount";
         public static string FetchSleepInterval { get; private set; } = "fetchsleepinterval";
+        public static string SkipSSLVerification { get; private set; } = "skipsslverification";
     }
 }

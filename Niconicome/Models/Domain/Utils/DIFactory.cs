@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using System.Net.Security;
+using System.Runtime.ConstrainedExecution;
 using Microsoft.Extensions.DependencyInjection;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
@@ -42,10 +44,17 @@ namespace Niconicome.Models.Domain.Utils
             services.AddHttpClient<Niconico::INicoHttp, Niconico::NicoHttp>()
                 .ConfigureHttpMessageHandlerBuilder(builder =>
                 {
+                    var shandler = builder.Services.GetRequiredService<Local::ILocalSettingHandler>();
+                    var skip = shandler.GetBoolSetting(Local::Settings.SkipSSLVerification);
                     if (builder.PrimaryHandler is HttpClientHandler handler)
                     {
                         handler.CookieContainer = builder.Services.GetRequiredService<Niconico::ICookieManager>().CookieContainer;
                         handler.UseCookies = true;
+                        handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                        {
+                            if (skip) return true;
+                            return sslPolicyErrors == SslPolicyErrors.None;
+                        };
                     }
                 });
             services.AddSingleton<Niconico::ICookieManager, Niconico::CookieManager>();
