@@ -11,6 +11,7 @@ using State = Niconicome.Models.Local.State;
 using DWatch = Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Utils;
+using Niconicome.Models.Local;
 
 namespace Niconicome.Models.Network
 {
@@ -54,8 +55,10 @@ namespace Niconicome.Models.Network
 
         private readonly IVideoThumnailUtility videoThumnailUtility;
 
+        private readonly ILocalSettingHandler settingHandler;
 
-        public NetworkVideoHandler(IWatch watchPageHandler, IPlaylistVideoHandler playlistTreeHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility)
+
+        public NetworkVideoHandler(IWatch watchPageHandler, IPlaylistVideoHandler playlistTreeHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,ILocalSettingHandler settingHandler)
         {
             this.wacthPagehandler = watchPageHandler;
             this.playlistTreeHandler = playlistTreeHandler;
@@ -63,6 +66,7 @@ namespace Niconicome.Models.Network
             this.fileStorehandler = fileStorehandler;
             this.videoHandler = videoHandler;
             this.videoThumnailUtility = videoThumnailUtility;
+            this.settingHandler = settingHandler;
         }
 
 
@@ -216,7 +220,12 @@ namespace Niconicome.Models.Network
         {
             int videosCount = ids.Count();
             var videos = new List<IVideoListInfo>();
-            var handler = new ParallelTasksHandler<NetworkVideoParallelTask>(3, 5, 15);
+            var maxParallelCount = this.settingHandler.GetIntSetting(Settings.MaxFetchCount);
+            var waitInterval = this.settingHandler.GetIntSetting(Settings.FetchSleepInterval);
+            if (maxParallelCount < 1) maxParallelCount = 3;
+            if (waitInterval < 1) waitInterval = 5;
+
+            var handler = new ParallelTasksHandler<NetworkVideoParallelTask>(maxParallelCount, waitInterval, 15);
 
             foreach (var item in ids.Select((video, index) => new { video, index }))
             {
