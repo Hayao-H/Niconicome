@@ -19,6 +19,7 @@ using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using MS.WindowsAPICodePack.Internal;
+using System.Windows.Documents;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -53,7 +54,7 @@ namespace Niconicome.Models.Network.Download
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
         Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset);
-        DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat);
+        DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson);
     }
 
     public interface IDownloadResult
@@ -73,7 +74,7 @@ namespace Niconicome.Models.Network.Download
 
     public interface ILocalContentHandler
     {
-        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted);
+        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, bool downloadInJson);
         IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath);
     }
 
@@ -173,8 +174,9 @@ namespace Niconicome.Models.Network.Download
         private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
         {
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+            bool dlInJson = this.settingHandler.GetBoolSetting(Settings.VideoInfoInJson);
 
-            var dSettings = settings.ConvertToDescriptionDownloadSetting(fileNameFormat);
+            var dSettings = settings.ConvertToDescriptionDownloadSetting(fileNameFormat, dlInJson);
             var descriptionDownloader = DIFactory.Provider.GetRequiredService<DDL::IDescriptionDownloader>();
             Download::IDownloadResult result;
             try
@@ -282,8 +284,9 @@ namespace Niconicome.Models.Network.Download
             ILocalContentInfo? info = null;
             if (setting.Skip)
             {
+                bool dlInJson = this.settingHandler.GetBoolSetting(Settings.VideoInfoInJson);
                 string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable);
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, dlInJson);
             }
 
             if (!Directory.Exists(setting.FolderPath))
@@ -744,7 +747,7 @@ namespace Niconicome.Models.Network.Download
             };
         }
 
-        public DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat)
+        public DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson)
         {
             return new DDL::DescriptionSetting()
             {
@@ -752,6 +755,7 @@ namespace Niconicome.Models.Network.Download
                 FolderName = this.FolderPath,
                 IsReplaceRestrictedEnable = this.IsReplaceStrictedEnable,
                 Format = fileFormat,
+                IsSaveInJsonEnabled = dlInJson,
             };
         }
 
@@ -802,12 +806,12 @@ namespace Niconicome.Models.Network.Download
         /// <param name="format"></param>
         /// <param name="dmcInfo"></param>
         /// <returns></returns>
-        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted)
+        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, bool downloadInJson)
         {
             string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4", replaceStricted);
             string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml", replaceStricted);
             string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".jpg", replaceStricted);
-            string videoInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, ".txt", replaceStricted);
+            string videoInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, downloadInJson ? ".json" : ".txt", replaceStricted);
             bool videoExist = this.videoFileStorehandler.Exists(dmcInfo.Id);
             string? localPath = null;
 

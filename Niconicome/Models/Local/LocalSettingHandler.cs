@@ -149,6 +149,7 @@ namespace Niconicome.Models.Local
                 Settings.MaxCommentsCount => STypes::SettingNames.MaxCommentCount,
                 Settings.LimitCommentsCount => STypes::SettingNames.LimitCommentCount,
                 Settings.DLVideoInfo => STypes::SettingNames.IsDownloadingVideoInfoEnable,
+                Settings.VideoInfoInJson => STypes::SettingNames.IsDownloadingVideoInfoInJsonEnable,
                 _ => null
             };
         }
@@ -188,5 +189,6 @@ namespace Niconicome.Models.Local
         LimitCommentsCount,
         MaxCommentsCount,
         DLVideoInfo,
+        VideoInfoInJson,
     }
 }

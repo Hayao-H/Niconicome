@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
+using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 
@@ -12,11 +18,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         string Format { get; set; }
         bool IsOverwriteEnable { get; set; }
         bool IsReplaceRestrictedEnable { get; set; }
+        bool IsSaveInJsonEnabled { get; set; }
     }
 
     interface IDescriptionDownloader
     {
         IDownloadResult DownloadVideoInfo(IDescriptionSetting setting, IWatchSession session, Action<string> onMessage);
+    }
+    public interface IVideoInfoContentProducer
+    {
+        string GetContent(IDmcInfo info);
+        string GetJsonContent(IDmcInfo info);
     }
 
     public class DescriptionSetting : IDescriptionSetting
@@ -28,15 +40,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         public bool IsOverwriteEnable { get; set; }
 
         public bool IsReplaceRestrictedEnable { get; set; }
+
+        public bool IsSaveInJsonEnabled { get; set; }
     }
 
     class DescriptionDownloader : IDescriptionDownloader
     {
-        public DescriptionDownloader(INiconicoUtils niconicoUtils, ILogger logger, IDownloadMessenger messenger)
+        public DescriptionDownloader(INiconicoUtils niconicoUtils, ILogger logger, IDownloadMessenger messenger, IVideoInfoContentProducer producer)
         {
             this.utils = niconicoUtils;
             this.logger = logger;
             this.messenger = messenger;
+            this.producer = producer;
         }
 
         private readonly INiconicoUtils utils;
@@ -44,6 +59,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         private readonly ILogger logger;
 
         private readonly IDownloadMessenger messenger;
+
+        private readonly IVideoInfoContentProducer producer;
 
         /// <summary>
         /// 動画情報ファイルを保存する
@@ -64,7 +81,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             this.messenger.SendMessage($"動画情報の保存を開始します。");
             this.logger.Log($"{session.Video.Id}の動画情報保存を開始");
 
-            var fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".txt", setting.IsReplaceRestrictedEnable);
+            string fileName;
+
+            if (setting.IsSaveInJsonEnabled)
+            {
+                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".json", setting.IsReplaceRestrictedEnable);
+            }
+            else
+            {
+                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".txt", setting.IsReplaceRestrictedEnable);
+            }
+
             var filePath = Path.Combine(setting.FolderName, fileName);
             var folderpath = Path.GetDirectoryName(filePath);
 
@@ -75,7 +102,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
                 return new DownloadResult() { Message = "動画情報ファイルの保存フォルダー取得に失敗しました。" };
             }
 
-            var content = this.GetContent(session.Video.DmcInfo);
+            string content;
+
+            if (setting.IsSaveInJsonEnabled)
+            {
+                content = this.producer.GetJsonContent(session.Video.DmcInfo);
+            }
+            else
+            {
+                content = this.producer.GetContent(session.Video.DmcInfo);
+            }
 
             try
             {
@@ -96,45 +132,118 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         }
 
 
-        private string GetContent(IDmcInfo info)
+
+    }
+
+
+    public class VideoInfoContentProducer : IVideoInfoContentProducer
+    {
+        /// <summary>
+        /// 動画情報本文を取得する
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public string GetContent(IDmcInfo info)
         {
+            var ownerNameTitle = info.ChannelName.IsNullOrEmpty() ? "[owner_nickname]" : "[channel_name]";
+            var ownerIDTitle = info.ChannelName.IsNullOrEmpty() ? "[owner_id]" : "[channel_id]";
+            var ownerName = info.ChannelName.IsNullOrEmpty() ? info.Owner : info.ChannelName;
+            var ownerID = info.ChannelName.IsNullOrEmpty() ? info.OwnerID.ToString() : info.ChannelID;
+
             var list = new List<string>()
             {
                 "[name]",
-                info.Id,
-                Environment.NewLine,
+                info.Id+Environment.NewLine,
                 "[post]",
-                info.UploadedOn.ToString("yyyy/MM/dd HH:mm:ss"),
-                Environment.NewLine,
+                info.UploadedOn.ToString("yyyy/MM/dd HH:mm:ss")+Environment.NewLine,
                 "[title]",
-                info.Title,
-                Environment.NewLine,
+                info.Title+Environment.NewLine,
                 "[comment]",
-                info.Description,
-                Environment.NewLine,
+                info.Description+Environment.NewLine,
                 "[tags]",
-                String.Join(Environment.NewLine,info.Tags),
-                Environment.NewLine,
+                String.Join(Environment.NewLine,info.Tags)+Environment.NewLine,
                 "[view_counter]",
-                info.ViewCount.ToString(),
-                Environment.NewLine,
+                info.ViewCount.ToString()+Environment.NewLine,
                 "[comment_num]",
-                info.CommentCount.ToString(),
-                Environment.NewLine,
+                info.CommentCount.ToString()+Environment.NewLine,
                 "[mylist_counter]",
-                info.MylistCount.ToString(),
-                Environment.NewLine,
+                info.MylistCount.ToString()+Environment.NewLine,
                 "[length]",
-                $"{Math.Floor((double)(info.Duration/60))}分{info.Duration%60}秒",
-                Environment.NewLine,
-                "[owner_id]",
-                info.OwnerID.ToString(),
-                Environment.NewLine,
-                "[owner_nickname]",
-                info.Owner
+                $"{Math.Floor((double)(info.Duration/60))}分{info.Duration%60}秒"+Environment.NewLine,
+                ownerIDTitle,
+                ownerID+Environment.NewLine,
+                ownerNameTitle,
+                ownerName
             };
 
             return string.Join(Environment.NewLine, list);
+        }
+
+        /// <summary>
+        /// JSON文字列を取得する
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public string GetJsonContent(IDmcInfo info)
+        {
+            var data = new VideoInfoJson(info);
+            var options = new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNameCaseInsensitive = false,
+                IgnoreNullValues = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                WriteIndented = true
+            };
+
+            return JsonParser.Serialize(data, options);
+        }
+
+        class VideoInfoJson
+        {
+            public VideoInfoJson(IDmcInfo info)
+            {
+                this.Title = info.Title;
+                this.Post = info.UploadedOn.ToString("yyyy/MM/ddTHH:mm:ss");
+                this.ID = info.Id;
+                this.Description = info.Description;
+                this.Tags = new List<string>();
+                this.Tags.AddRange(info.Tags);
+                this.ViewCount = info.ViewCount;
+                this.MylistCount = info.MylistCount;
+                this.CommentCount = info.CommentCount;
+                this.LikeCount = info.LikeCount;
+                this.Owner = info.ChannelName.IsNullOrEmpty() ? info.Owner : null;
+                this.OwnerID = info.ChannelName.IsNullOrEmpty() ? info.OwnerID.ToString() : null;
+                this.ChannelName = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelName;
+                this.ChannelID = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelID;
+            }
+
+            public string Title { get; init; }
+
+            public string Post { get; init; }
+
+            public string ID { get; init; }
+
+            public string Description { get; init; }
+
+            public List<string> Tags { get; init; }
+
+            public int ViewCount { get; init; }
+
+            public int CommentCount { get; init; }
+
+            public int MylistCount { get; init; }
+
+            public int LikeCount { get; init; }
+
+            public string? Owner { get; init; }
+
+            public string? OwnerID { get; init; }
+
+            public string? ChannelName { get; init; }
+
+            public string? ChannelID { get; init; }
         }
     }
 }

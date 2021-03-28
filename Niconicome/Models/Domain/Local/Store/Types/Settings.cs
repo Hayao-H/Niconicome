@@ -138,5 +138,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string LimitCommentCount { get; private set; } = "limitcommentcount";
         public static string MaxCommentCount { get; private set; } = "maxcommentcount";
         public static string IsDownloadingVideoInfoEnable { get; private set; } = "isdownloadingvideoinfoenable";
+        public static string IsDownloadingVideoInfoInJsonEnable { get; private set; } = "isdownloadingvideoinfoinjsonenable";
     }
 }
