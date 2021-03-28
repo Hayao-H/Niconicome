@@ -5,6 +5,7 @@ using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
 using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
 using DlComment = Niconicome.Models.Domain.Niconico.Download.Comment;
+using DlDescription = Niconicome.Models.Domain.Niconico.Download.Description;
 using DlThumb = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using DlVideo = Niconicome.Models.Domain.Niconico.Download.Video;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
@@ -132,6 +133,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
             services.AddTransient<LocalFile::ILocalDirectoryHandler, LocalFile::LocalDirectoryHandler>();
             services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
+            services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();
 
             return services.BuildServiceProvider();
         }
