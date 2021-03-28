@@ -14,6 +14,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public GeneralSettingsPageViewModel()
         {
             this.isAutologinEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.AutologinEnable);
+            this.maxFetchParallelCountField = WS::SettingPage.SettingHandler.GetIntSetting(Settings.MaxFetchCount);
+            this.fetchSleepIntervalFIeld = WS::SettingPage.SettingHandler.GetIntSetting(Settings.FetchSleepInterval);
 
             var normal = new AutoLoginTypes(AutoLoginTypeString.Normal, "パスワードログイン");
             var wv2 = new AutoLoginTypes(AutoLoginTypeString.Webview2, "Webview2とCookieを共有");
@@ -32,6 +34,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         private bool isAutologinEnableField;
 
         private string empty = string.Empty;
+
+        private int maxFetchParallelCountField;
+
+        private int fetchSleepIntervalFIeld;
 
         private AutoLoginTypes selectedAutoLoginTypeField;
 
@@ -56,21 +62,29 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// 自動ログイン
         /// </summary>
         public bool IsAutologinEnable { get => this.isAutologinEnableField; set => this.Savesetting(ref this.isAutologinEnableField, value, Settings.AutologinEnable); }
+
+        /// <summary>
+        /// 動画情報最大並列取得数
+        /// </summary>
+        public int MaxFetchParallelCount { get => this.maxFetchParallelCountField; set => this.Savesetting(ref this.maxFetchParallelCountField, value, Settings.MaxFetchCount); }
+
+        /// <summary>
+        /// 待機間隔
+        /// </summary>
+        public int FetchSleepInterval { get => this.fetchSleepIntervalFIeld; set => this.Savesetting(ref this.fetchSleepIntervalFIeld, value, Settings.FetchSleepInterval); }
     }
 
     class GeneralSettingsPageViewModelD
     {
         public bool IsAutologinEnable { set; get; } = true;
 
-        /// <summary>
-        /// 選択可能な自動ログインの種別
-        /// </summary>
         public List<AutoLoginTypes> SelectableAutoLoginTypes { get; init; } = new();
 
-        /// <summary>
-        /// 自動ログインの種別
-        /// </summary>
         public AutoLoginTypes SelectedAutoLoginType { get; init; } = new AutoLoginTypes(AutoLoginTypeString.Normal, "パスワード");
+
+        public int MaxFetchParallelCount { get; set; } = 3;
+
+        public int FetchSleepInterval { get; set; } = 5;
 
     }
 

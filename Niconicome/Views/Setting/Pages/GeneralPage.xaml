@@ -48,6 +48,26 @@
                 <ComboBox HorizontalAlignment="Right" Width="300" ItemsSource="{Binding SelectableAutoLoginTypes}" SelectedItem="{Binding SelectedAutoLoginType}" DisplayMemberPath="DisplayValue"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="DownloadNetwork" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="動画情報取得時の並列取得数"/>
+                <TextBox Text="{Binding MaxFetchParallelCount,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Width="200"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="Sleep" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="動画情報取得時の待機間隔(動画数)"/>
+                <TextBox Text="{Binding FetchSleepInterval,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Width="200"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
         
     </Grid>

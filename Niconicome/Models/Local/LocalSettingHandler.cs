@@ -150,6 +150,8 @@ namespace Niconicome.Models.Local
                 Settings.LimitCommentsCount => STypes::SettingNames.LimitCommentCount,
                 Settings.DLVideoInfo => STypes::SettingNames.IsDownloadingVideoInfoEnable,
                 Settings.VideoInfoInJson => STypes::SettingNames.IsDownloadingVideoInfoInJsonEnable,
+                Settings.MaxFetchCount => STypes::SettingNames.MaxParallelFetchCount,
+                Settings.FetchSleepInterval => STypes::SettingNames.FetchSleepInterval,
                 _ => null
             };
         }
@@ -190,5 +192,7 @@ namespace Niconicome.Models.Local
         MaxCommentsCount,
         DLVideoInfo,
         VideoInfoInJson,
+        MaxFetchCount,
+        FetchSleepInterval,
     }
 }
