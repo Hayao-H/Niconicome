@@ -89,7 +89,7 @@
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>
-                <materialDesign:PackIcon Kind="SortCalendarDescending" Foreground="SkyBlue">
+                <materialDesign:PackIcon Kind="CodeJson" Foreground="SkyBlue">
                     <materialDesign:PackIcon.RenderTransform>
                         <TranslateTransform Y="7"/>
                     </materialDesign:PackIcon.RenderTransform>
