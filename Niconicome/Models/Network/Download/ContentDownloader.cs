@@ -587,6 +587,7 @@ namespace Niconicome.Models.Network.Download
             }
             catch (Exception e)
             {
+                this.logger.Error("ダウンロード中にエラーが発生しました", e);
                 onMessage($"ダウンロード中にエラーが発生しました。(詳細: {e.Message})");
                 onMessageShort($"ダウンロード中にエラーが発生しました。");
             }
