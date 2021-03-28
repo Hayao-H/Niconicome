@@ -38,16 +38,6 @@
                 <TextBox HorizontalAlignment="Right" Margin="10 0" Width="60" Text="{Binding CommentOffsetFIeld,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Right"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-             <DockPanel Visibility="Collapsed">
-                <materialDesign:PackIcon Kind="AutoFix" Foreground="SkyBlue">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <TranslateTransform Y="7"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
-                <Label Content="公式動画でコメントのオフセットを無効にする(推奨)"/>
-                <ToggleButton HorizontalAlignment="Right" Margin="10 0" IsChecked="{Binding IsAutoSwitchOffsetEnable}"/>
-            </DockPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>
                 <materialDesign:PackIcon Kind="DownloadMultiple" Foreground="SkyBlue">
                     <materialDesign:PackIcon.RenderTransform>
@@ -55,7 +45,7 @@
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
                 <Label Content="最大並列ダウンロード数" ToolTip="大きなすぎる場合、失敗する確率が高くなります"/>
-                <TextBox Text="{Binding MaxParallelDownloadCount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                <ComboBox SelectedItem="{Binding MaxParallelDownloadCount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" ItemsSource="{Binding SelectableMaxParallelDownloadCount}" DisplayMemberPath="DisplayValue"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>
@@ -65,7 +55,7 @@
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
                 <Label Content="HLSセグメントファイルの最大並列ダウンロード数（推奨値：1）" />
-                <TextBox Text="{Binding MaxParallelSegmentDownloadCount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                <ComboBox SelectedItem="{Binding MaxParallelSegmentDownloadCount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" ItemsSource="{Binding SelectableMaxParallelDownloadCount}" DisplayMemberPath="DisplayValue" />
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>

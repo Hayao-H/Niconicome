@@ -7,6 +7,7 @@ using WS = Niconicome.Workspaces;
 using Local = Niconicome.Models.Local;
 using System.ComponentModel;
 using Niconicome.Models.Local;
+using Niconicome.ViewModels.Mainpage.Utils;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
@@ -38,20 +39,42 @@ namespace Niconicome.ViewModels.Setting.Pages
             }
 
             this.isDownloadVideoInfoInJsonEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.VideoInfoInJson);
-            this.maxParallelDownloadCountFIeld = maxP;
-            this.maxParallelSegmentDownloadCountField = maxSP;
             this.isDownloadFromQueueEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
             this.isDupeOnStageAllowedField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
             this.isOverrideVideoFileDTToUploadedDTField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
+
+            var n1 = new ComboboxItem<int>(1, "1");
+            var n2 = new ComboboxItem<int>(2, "2");
+            var n3 = new ComboboxItem<int>(3, "3");
+            var n4 = new ComboboxItem<int>(4, "4");
+
+            this.SelectableMaxParallelDownloadCount = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
+            this.maxParallelDownloadCountFIeld = maxP switch
+            {
+                1 => n1,
+                2 => n2,
+                3 => n3,
+                4 => n4,
+                _ => n4,
+            };
+            this.maxParallelSegmentDownloadCountField = maxSP switch
+            {
+                1 => n1,
+                2 => n2,
+                3 => n3,
+                4 => n4,
+                _ => n4,
+            };
+
         }
 
         private int commentOffsetField;
 
         private bool isAutoSwitchOffsetEnableField;
 
-        private int maxParallelDownloadCountFIeld;
+        private ComboboxItem<int> maxParallelDownloadCountFIeld;
 
-        private int maxParallelSegmentDownloadCountField;
+        private ComboboxItem<int> maxParallelSegmentDownloadCountField;
 
         private bool isDownloadFromQueueEnableField;
 
@@ -60,6 +83,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         private bool isOverrideVideoFileDTToUploadedDTField;
 
         private bool isDownloadVideoInfoInJsonEnableField;
+
+        public List<ComboboxItem<int>> SelectableMaxParallelDownloadCount { get; init; }
 
         /// <summary>
         /// コメントのオフセット
@@ -82,23 +107,15 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// 最大並列DL数
         /// </summary>
-        public int MaxParallelDownloadCount { get => this.maxParallelDownloadCountFIeld; set => this.Savesetting(ref this.maxParallelDownloadCountFIeld, value, Settings.MaxParallelDL); }
+        public ComboboxItem<int> MaxParallelDownloadCount { get => this.maxParallelDownloadCountFIeld; set => this.Savesetting(ref this.maxParallelDownloadCountFIeld, value, Settings.MaxParallelDL); }
 
         /// <summary>
         /// 最大セグメント並列DL数
         /// </summary>
-        public int MaxParallelSegmentDownloadCount
+        public ComboboxItem<int> MaxParallelSegmentDownloadCount
         {
             get => this.maxParallelSegmentDownloadCountField;
-            set
-            {
-                if (value > 5)
-                {
-                    WS::SettingPage.SnackbarMessageQueue.Enqueue("セグメントの最大並列ダウンロード数は5です");
-                    return;
-                }
-                this.Savesetting(ref this.maxParallelSegmentDownloadCountField, value, Settings.MaxParallelSegDl);
-            }
+            set => this.Savesetting(ref this.maxParallelSegmentDownloadCountField, value, Settings.MaxParallelSegDl);
         }
 
         /// <summary>
@@ -127,13 +144,27 @@ namespace Niconicome.ViewModels.Setting.Pages
     [Obsolete("Desinger", true)]
     class DownloadSettingPageViewModelD
     {
+        public DownloadSettingPageViewModelD()
+        {
+            var n1 = new ComboboxItem<int>(1, "1");
+            var n2 = new ComboboxItem<int>(2, "2");
+            var n3 = new ComboboxItem<int>(3, "3");
+            var n4 = new ComboboxItem<int>(4, "4");
+
+            this.SelectableMaxParallelDownloadCount = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
+            this.MaxParallelDownloadCount = n3;
+            this.MaxParallelSegmentDownloadCount = n4;
+        }
+
         public int CommentOffsetFIeld { get; set; } = 40;
 
         public bool IsAutoSwitchOffsetEnable { get; set; } = true;
 
-        public int MaxParallelDownloadCount { get; set; } = 3;
+        public List<ComboboxItem<int>> SelectableMaxParallelDownloadCount { get; init; }
 
-        public int MaxParallelSegmentDownloadCount { get; set; } = 1;
+        public ComboboxItem<int> MaxParallelDownloadCount { get; set; }
+
+        public ComboboxItem<int> MaxParallelSegmentDownloadCount { get; set; }
 
         public bool IsDownloadFromQueueEnable { get; set; } = true;
 
