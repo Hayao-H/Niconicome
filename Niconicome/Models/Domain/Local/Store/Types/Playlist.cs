@@ -14,7 +14,18 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string TableName { get; } = "videos";
 
         public int Id { get; private set; }
+
         public int ViewCount { get; set; }
+
+        public int CommentCount { get; set; }
+
+        public int MylistCount { get; set; }
+
+        public int LikeCount { get; set; }
+
+        public int Duration { get; set; }
+
+        public int OwnerID { get; set; }
 
         public string NiconicoId { get; set; } = string.Empty;
 
@@ -30,17 +41,15 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public string ThumbPath { get; set; } = string.Empty;
 
+        public string OwnerName { get; set; } = string.Empty;
+
         public List<string>? Tags { get; set; }
 
         public bool IsDeleted { get; set; }
 
-        public bool IsDownloaded { get; set; }
-
         public bool IsSelected { get; set; }
 
         public List<int>? PlaylistIds { get; set; }
-
-        public User? Owner { get; set; }
 
         public DateTime UploadedOn { get; set; }
 
@@ -83,6 +92,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public int Sequence { get; set; }
 
         public string? PlaylistName { get; set; }
+
         public string? FolderPath { get; set; }
 
         public List<Video> Videos { get; set; } = new();

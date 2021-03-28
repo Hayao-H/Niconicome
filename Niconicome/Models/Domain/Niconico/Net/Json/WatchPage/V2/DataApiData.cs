@@ -223,6 +223,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2
 
         [JsonPropertyName("isAuthenticationRequired")]
         public bool IsAuthenticationRequired { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; } = string.Empty;
     }
     public class Owner
     {

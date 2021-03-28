@@ -20,6 +20,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         public DownloadSettingsViewModel()
         {
+            this.isDownloadingVideoIndoEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLVideoInfo);
             this.isLimittingCommentCountEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.LimitCommentsCount);
             this.maxCommentsCountField = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MaxCommentsCount);
             this.IsDownloadingVideoEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLVideo);
@@ -65,7 +66,7 @@ namespace Niconicome.ViewModels.Mainpage
                        return;
                    }
 
-                   if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable) return;
+                   if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable && !this.IsDownloadingVideoInfoEnable) return;
 
                    var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
                    if (!videos.Any()) return;
@@ -95,6 +96,7 @@ namespace Niconicome.ViewModels.Mainpage
                        IsReplaceStrictedEnable = replaceStricted,
                        OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                        MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
+                       DownloadVideoInfo = this.IsDownloadingVideoInfoEnable,
                    };
                    var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
 
@@ -131,7 +133,7 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable) return;
+                if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable && !this.IsDownloadingVideoInfoEnable) return;
 
                 var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
                 if (!videos.Any()) return;
@@ -160,6 +162,7 @@ namespace Niconicome.ViewModels.Mainpage
                     IsReplaceStrictedEnable = replaceStricted,
                     OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                     MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
+                    DownloadVideoInfo = this.IsDownloadingVideoInfoEnable,
                 }, allowDupe);
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
@@ -201,6 +204,8 @@ namespace Niconicome.ViewModels.Mainpage
         private bool isCopyFromAnotherFolderEnableFIeld;
 
         private bool isLimittingCommentCountEnableField;
+
+        private bool isDownloadingVideoIndoEnableField;
 
         private int maxCommentsCountField;
 
@@ -257,6 +262,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// サムネイルダウンロードフラグ
         /// </summary>
         public bool IsDownloadingThumbEnable { get => this.isDownloadingThumbEnableField; set => this.Savesetting(ref this.isDownloadingThumbEnableField, value, Settings.DLThumb); }
+
+        /// <summary>
+        /// 動画情報
+        /// </summary>
+        public bool IsDownloadingVideoInfoEnable { get => this.isDownloadingVideoIndoEnableField; set => this.Savesetting(ref this.isDownloadingVideoIndoEnableField, value, Settings.DLVideoInfo); }
+
 
         /// <summary>
         /// 上書き保存フラグ
@@ -360,6 +371,8 @@ namespace Niconicome.ViewModels.Mainpage
         public bool IsCopyFromAnotherFolderEnable { get; set; } = true;
 
         public bool IsLimittingCommentCountEnable { get; set; } = true;
+
+        public bool IsDownloadingVideoInfoEnable { get; set; } = true;
 
         public int MaxCommentsCount { get; set; } = 2000;
 

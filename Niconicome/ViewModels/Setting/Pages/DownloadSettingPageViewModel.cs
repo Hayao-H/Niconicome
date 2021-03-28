@@ -37,6 +37,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                 maxSP = 1;
             }
 
+            this.isDownloadVideoInfoInJsonEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.VideoInfoInJson);
             this.maxParallelDownloadCountFIeld = maxP;
             this.maxParallelSegmentDownloadCountField = maxSP;
             this.isDownloadFromQueueEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
@@ -57,6 +58,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         private bool isDupeOnStageAllowedField;
 
         private bool isOverrideVideoFileDTToUploadedDTField;
+
+        private bool isDownloadVideoInfoInJsonEnableField;
 
         /// <summary>
         /// コメントのオフセット
@@ -113,6 +116,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public bool IsOverrideVideoFileDTToUploadedDT { get => this.isOverrideVideoFileDTToUploadedDTField; set => this.Savesetting(ref this.isOverrideVideoFileDTToUploadedDTField, value, Settings.OverrideVideoFileDTToUploadedDT); }
 
+        /// <summary>
+        /// JSONでDLする
+        /// </summary>
+        public bool IsDownloadVideoInfoInJsonEnable { get => this.isDownloadVideoInfoInJsonEnableField; set => this.Savesetting(ref this.isDownloadVideoInfoInJsonEnableField, value, Settings.VideoInfoInJson); }
+
 
     }
 
@@ -132,5 +140,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public bool IsDupeOnStageAllowed { get; set; } = true;
 
         public bool IsOverrideVideoFileDTToUploadedDT { get; set; } = true;
+
+        public bool IsDownloadVideoInfoInJsonEnable { get; set; } = true;
     }
 }

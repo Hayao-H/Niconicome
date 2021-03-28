@@ -204,6 +204,12 @@ namespace Niconicome.Models.Domain.Local.Store
             dbVideo.FileName = videoData.FileName;
             dbVideo.Tags = videoData.Tags.ToList();
             dbVideo.ViewCount = videoData.ViewCount;
+            dbVideo.CommentCount = videoData.CommentCount;
+            dbVideo.MylistCount = videoData.MylistCount;
+            dbVideo.LikeCount = videoData.LikeCount;
+            dbVideo.Duration = videoData.Duration;
+            dbVideo.OwnerID = videoData.OwnerID;
+            dbVideo.OwnerName = videoData.OwnerName;
         }
 
         private void JustifyVideo(STypes::Video video)

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Niconico.Net.Json;
-using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 using Niconicome.Models.Domain.Utils;
 using DmcRequest = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request;
 using WatchJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
@@ -26,7 +26,13 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         string Id { get; set; }
         string ChannelID { get; set; }
         string ChannelName { get; set; }
+        string Owner { get; set; }
+        int OwnerID { get; set; }
         int ViewCount { get; }
+        int MylistCount { get; }
+        int CommentCount { get; }
+        int LikeCount { get; set; }
+        int Duration { get; set; }
         IEnumerable<string> Tags { get; set; }
         IDmcInfo DmcInfo { get; set; }
     }
@@ -36,11 +42,16 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         string Title { get; set; }
         string Id { get; set; }
         string Owner { get; set; }
+        int OwnerID { get; set; }
         string Userkey { get; }
         string UserId { get; }
         string ChannelID { get; }
         string ChannelName { get; }
+        string Description { get; }
         int ViewCount { get; }
+        int CommentCount { get; }
+        int MylistCount { get; }
+        int LikeCount { get; }
         int Duration { get; }
         IEnumerable<string> Tags { get; set; }
         bool IsDownloadsble { get; set; }
@@ -161,7 +172,22 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             }
 
             this.State = WatchInfoHandlerState.OK;
-            return new DomainVideoInfo() { Id = info.Id, Title = info.Title, Tags = info.Tags, DmcInfo = info, ViewCount = info.ViewCount,ChannelID = info.ChannelID,ChannelName = info.ChannelName };
+            return new DomainVideoInfo()
+            {
+                Id = info.Id,
+                Title = info.Title,
+                Tags = info.Tags,
+                DmcInfo = info,
+                ViewCount = info.ViewCount,
+                ChannelID = info.ChannelID,
+                ChannelName = info.ChannelName,
+                Owner = info.Owner,
+                OwnerID = info.OwnerID,
+                CommentCount = info.CommentCount,
+                MylistCount = info.MylistCount,
+                LikeCount = info.LikeCount,
+                Duration = info.Duration,
+            };
         }
     }
 
@@ -239,18 +265,21 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 
             //投稿者
             info.Owner = original?.Owner?.Nickname ?? string.Empty;
+            info.OwnerID = original?.Owner?.Id ?? 0;
 
             //タグ
             info.Tags = original?.Tag.Items?.Select(t => t.Name ?? string.Empty).Where(t => !t.IsNullOrEmpty()) ?? new List<string>();
 
-            //再生回数
+            //再生回数・コメント数・マイリス数・いいね数
             info.ViewCount = original?.Video?.Count?.View ?? 0;
+            info.CommentCount = original?.Video?.Count?.Comment ?? 0;
+            info.MylistCount = original?.Video?.Count?.Mylist ?? 0;
+            info.LikeCount = original?.Video?.Count?.Like ?? 0;
 
             //コメント情報
             info.CommentThreads = original?.Comment?.Threads ?? new List<WatchJson::Thread>();
 
             //ユーザー情報
-            //info.UserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId ?? string.Empty;
             info.UserId = NiconicoContext.User?.ID ?? string.Empty;
             info.Userkey = original?.Comment?.Keys?.UserKey ?? string.Empty;
 
@@ -263,6 +292,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             //チャンネル情報
             info.ChannelID = original?.Channel?.Id ?? string.Empty;
             info.ChannelName = original?.Channel?.Name ?? string.Empty;
+
+            //動画説明文
+            info.Description = original?.Video?.Description ?? string.Empty;
+            info.Description = Regex.Replace(info.Description, "</?.+?/?>", "");
 
             //Session情報
             if (!options.HasFlag(WatchInfoOptions.NoDmcData) && original?.Media?.Delivery is not null)
@@ -376,9 +409,40 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public string ChannelName { get; set; } = string.Empty;
 
         /// <summary>
+        /// 投稿者名
+        /// </summary>
+        public string Owner { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 投稿者ユーザーID
+        /// </summary>
+        public int OwnerID { get; set; }
+
+        /// <summary>
         /// 再生回数
         /// </summary>
         public int ViewCount { get; set; }
+
+        /// <summary>
+        /// マイリス数
+        /// </summary>
+        public int MylistCount { get; set; }
+
+        /// <summary>
+        /// コメント数
+        /// </summary>
+        public int CommentCount { get; set; }
+
+        /// <summary>
+        /// いいね数
+        /// </summary>
+        public int LikeCount { get; set; }
+
+        /// <summary>
+        /// 再生時間
+        /// </summary>
+        public int Duration { get; set; }
+
 
         /// <summary>
         /// タグ
@@ -412,9 +476,20 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 
         public string ChannelName { get; set; } = string.Empty;
 
+        public string Description { get; set; } = string.Empty;
+
+
         public int ViewCount { get; set; }
 
+        public int CommentCount { get; set; }
+
+        public int LikeCount { get; set; }
+
+        public int MylistCount { get; set; }
+
         public int Duration { get; set; }
+
+        public int OwnerID { get; set; }
 
         public IEnumerable<string> Tags { get; set; } = new List<string>();
 

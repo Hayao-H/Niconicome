@@ -17,6 +17,9 @@ using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using Download = Niconicome.Models.Domain.Niconico.Download;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
+using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
+using MS.WindowsAPICodePack.Internal;
+using System.Windows.Documents;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -40,6 +43,7 @@ namespace Niconicome.Models.Network.Download
         bool DownloadEasy { get; }
         bool DownloadLog { get; }
         bool DownloadOwner { get; }
+        bool DownloadVideoInfo { get; }
         bool IsReplaceStrictedEnable { get; }
         bool OverrideVideoFileDateToUploadedDT { get; }
         string NiconicoId { get; }
@@ -50,6 +54,7 @@ namespace Niconicome.Models.Network.Download
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
         Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset);
+        DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson);
     }
 
     public interface IDownloadResult
@@ -69,7 +74,7 @@ namespace Niconicome.Models.Network.Download
 
     public interface ILocalContentHandler
     {
-        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted);
+        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, bool downloadInJson);
         IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath);
     }
 
@@ -79,6 +84,7 @@ namespace Niconicome.Models.Network.Download
         bool ThumbExist { get; init; }
         bool VideoExist { get; init; }
         bool VIdeoExistInOnotherFolder { get; init; }
+        bool VideoInfoExist { get; init; }
         string? LocalPath { get; init; }
     }
 
@@ -154,6 +160,32 @@ namespace Niconicome.Models.Network.Download
             catch (Exception e)
             {
                 this.logger.Error("動画のダウンロードに失敗しました。", e);
+                return new DownloadResult() { IsSucceeded = false, Message = e.Message };
+            }
+            return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null, VideoFileName = result.VideoFileName, VideoVerticalResolution = result.VerticalResolution };
+        }
+
+        /// <summary>
+        /// 動画情報をダウンロードする
+        /// </summary>
+        /// <param name="niconicoid"></param>
+        /// <param name="onMessage"></param>
+        /// <returns></returns>
+        private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
+        {
+            string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+            bool dlInJson = this.settingHandler.GetBoolSetting(Settings.VideoInfoInJson);
+
+            var dSettings = settings.ConvertToDescriptionDownloadSetting(fileNameFormat, dlInJson);
+            var descriptionDownloader = DIFactory.Provider.GetRequiredService<DDL::IDescriptionDownloader>();
+            Download::IDownloadResult result;
+            try
+            {
+                result = descriptionDownloader.DownloadVideoInfo(dSettings, session, onMessage);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("動画情報のダウンロードに失敗しました。", e);
                 return new DownloadResult() { IsSucceeded = false, Message = e.Message };
             }
             return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null, VideoFileName = result.VideoFileName, VideoVerticalResolution = result.VerticalResolution };
@@ -252,8 +284,9 @@ namespace Niconicome.Models.Network.Download
             ILocalContentInfo? info = null;
             if (setting.Skip)
             {
+                bool dlInJson = this.settingHandler.GetBoolSetting(Settings.VideoInfoInJson);
                 string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable);
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, dlInJson);
             }
 
             if (!Directory.Exists(setting.FolderPath))
@@ -362,6 +395,31 @@ namespace Niconicome.Models.Network.Download
                     result.IsSucceeded = true;
                 }
             }
+
+            if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+            //動画情報
+            if (setting.DownloadVideoInfo)
+            {
+                if (!info?.VideoInfoExist ?? true)
+                {
+                    var iResult = this.TryDownloadDescriptionAsync(setting, session, OnMessage);
+
+                    if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+                    if (!iResult.IsSucceeded)
+                    {
+                        result.IsSucceeded = false;
+                        result.Message = iResult.Message ?? "None";
+                        return result;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = true;
+                    }
+                }
+            }
+
 
             if (session.IsSessionEnsured) session.Dispose();
 
@@ -532,6 +590,7 @@ namespace Niconicome.Models.Network.Download
             }
             catch (Exception e)
             {
+                this.logger.Error("ダウンロード中にエラーが発生しました", e);
                 onMessage($"ダウンロード中にエラーが発生しました。(詳細: {e.Message})");
                 onMessageShort($"ダウンロード中にエラーが発生しました。");
             }
@@ -627,6 +686,8 @@ namespace Niconicome.Models.Network.Download
 
         public bool DownloadOwner { get; set; }
 
+        public bool DownloadVideoInfo { get; set; }
+
         public bool IsReplaceStrictedEnable { get; set; }
 
         public bool OverrideVideoFileDateToUploadedDT { get; set; }
@@ -686,6 +747,19 @@ namespace Niconicome.Models.Network.Download
             };
         }
 
+        public DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson)
+        {
+            return new DDL::DescriptionSetting()
+            {
+                IsOverwriteEnable = this.Overwrite,
+                FolderName = this.FolderPath,
+                IsReplaceRestrictedEnable = this.IsReplaceStrictedEnable,
+                Format = fileFormat,
+                IsSaveInJsonEnabled = dlInJson,
+            };
+        }
+
+
     }
 
     /// <summary>
@@ -732,11 +806,12 @@ namespace Niconicome.Models.Network.Download
         /// <param name="format"></param>
         /// <param name="dmcInfo"></param>
         /// <returns></returns>
-        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted)
+        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, bool downloadInJson)
         {
             string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4", replaceStricted);
             string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml", replaceStricted);
             string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".jpg", replaceStricted);
+            string videoInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, downloadInJson ? ".json" : ".txt", replaceStricted);
             bool videoExist = this.videoFileStorehandler.Exists(dmcInfo.Id);
             string? localPath = null;
 
@@ -750,6 +825,7 @@ namespace Niconicome.Models.Network.Download
                 VideoExist = File.Exists(Path.Combine(folderPath, videoFIlename)),
                 CommentExist = File.Exists(Path.Combine(folderPath, commentFIlename)),
                 ThumbExist = File.Exists(Path.Combine(folderPath, thumbFIlename)),
+                VideoInfoExist = File.Exists(Path.Combine(folderPath, videoInfoFilename)),
                 VIdeoExistInOnotherFolder = videoExist,
                 LocalPath = localPath,
             };
@@ -820,6 +896,8 @@ namespace Niconicome.Models.Network.Download
         public bool CommentExist { get; init; }
 
         public bool ThumbExist { get; init; }
+
+        public bool VideoInfoExist { get; init; }
 
         public string? LocalPath { get; init; }
     }
