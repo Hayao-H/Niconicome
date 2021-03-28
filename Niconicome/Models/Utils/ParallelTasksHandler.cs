@@ -10,7 +10,7 @@ namespace Niconicome.Models.Utils
     public interface IParallelTask<T>
     {
         Guid TaskId { get; }
-        Func<T, Task> TaskFunction { get; }
+        Func<T, object, Task> TaskFunction { get; }
         Action<int> OnWait { get; }
     }
 
@@ -25,7 +25,7 @@ namespace Niconicome.Models.Utils
             this.createThread = createThread;
         }
 
-        public ParallelTasksHandler(int maxPallarelTasksCount, bool createThread = true) : this(maxPallarelTasksCount, -1, -1,createThread) { }
+        public ParallelTasksHandler(int maxPallarelTasksCount, bool createThread = true) : this(maxPallarelTasksCount, -1, -1, createThread) { }
 
         /// <summary>
         /// 最大動機実行数
@@ -45,7 +45,7 @@ namespace Niconicome.Models.Utils
         /// <summary>
         /// 実行フラグ
         /// </summary>
-        private bool IsProcessing;
+        public bool IsProcessing { get; private set; }
 
         /// <summary>
         /// ロックオブジェクト
@@ -118,7 +118,7 @@ namespace Niconicome.Models.Utils
         /// 実処理
         /// </summary>
         /// <returns></returns>
-        public async Task ProcessTasksAsync()
+        public async Task ProcessTasksAsync(Action? preAction = null)
         {
             //すでにタスクを実行中の場合はキャンセル
             if (this.IsProcessing) return;
@@ -127,10 +127,16 @@ namespace Niconicome.Models.Utils
             int index = 0;
             var mre = new ManualResetEventSlim(true);
             var tasks = new List<Task>();
+            var lockObj = new object();
 
             lock (this.lockobj)
             {
                 this.IsProcessing = true;
+            }
+
+            if (preAction is not null)
+            {
+                preAction();
             }
 
             //スレッドを作成して並列実行する
@@ -164,7 +170,7 @@ namespace Niconicome.Models.Utils
 
                     mre.Wait();
 
-                    await Task.Run(async () => await task.TaskFunction(task));
+                    await Task.Run(async () => await task.TaskFunction(task, lockobj));
 
                     semaphore.Release();
                 };
@@ -173,7 +179,8 @@ namespace Niconicome.Models.Utils
                 {
                     var t = Task.Run(func);
                     tasks.Add(t);
-                } else
+                }
+                else
                 {
                     var t = func();
                     tasks.Add(t);

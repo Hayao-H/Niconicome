@@ -21,6 +21,8 @@ using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
 using Niconicome.Models.Network;
+using Niconicome.ViewModels.Controls;
+using System.Threading.Tasks;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -30,11 +32,11 @@ namespace Niconicome.ViewModels.Mainpage
     /// </summary>
     class VideoListViewModel : BindableBase
     {
-        public VideoListViewModel() : this((message, title, button, image) => MessageBox.Show(message, title, button, image))
+        public VideoListViewModel() : this((message, button, image) => MaterialMessageBox.Show(message, button, image))
         {
 
         }
-        public VideoListViewModel(Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> showMessageBox)
+        public VideoListViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox)
         {
             //プレイリスト選択変更イベントを購読する
             WS::Mainpage.CurrentPlaylist.SelectedItemChanged += this.OnSelectedPlaylistChanged;
@@ -42,105 +44,122 @@ namespace Niconicome.ViewModels.Mainpage
             //プレイリスト内容更新のイベントを購読する
             WS::Mainpage.CurrentPlaylist.VideosChanged += (e, s) => this.ChangePlaylistTitle();
 
+
             this.showMessageBox = showMessageBox;
 
-            this.SnackbarMessageQueue = WS::Mainpage.SnackbarMessageQueue;
+            this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
             //メッセージハンドラーにイベントハンドラを追加する
             WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
 
-            //種々のコマンドを初期化する
-            this.AddVideoCommand = new CommandBase<object>(_ => this.Playlist is not null, async arg =>
-            {
-                if (this.Playlist is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
-                    return;
-                }
-                int playlistId = this.Playlist.Id;
+            #region コマンドの初期化
+            this.AddVideoCommand = new CommandBase<object>(_ => this.Playlist is not null && !WS::Mainpage.VideoIDHandler.IsProcessing, async arg =>
+              {
+                  if (this.Playlist is null)
+                  {
+                      this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
+                      return;
+                  }
+                  int playlistId = this.Playlist.Id;
 
-                string niconicoId;
-                if (arg is not null and string)
-                {
-                    niconicoId = (string)arg;
-                }
-                else if (this.InputString != string.Empty)
-                {
-                    niconicoId = this.InputString;
-                    this.InputString = string.Empty;
-                }
-                else
-                {
-                    return;
-                }
+                  string niconicoId;
+                  if (arg is not null and string)
+                  {
+                      niconicoId = (string)arg;
+                  }
+                  else if (this.InputString != string.Empty)
+                  {
+                      niconicoId = this.InputString;
+                      this.InputString = string.Empty;
+                  }
+                  else
+                  {
+                      return;
+                  }
 
-                await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(new List<string>() { niconicoId }, this.Playlist.Id, (result) =>
-                {
-                    var video = new BindableVIdeoListInfo()
-                    {
-                        Title = "取得失敗",
-                        ThumbUrl = "https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg",
-                        Message = result.Message
-                    };
-                    this.Videos.Add(video);
+                  var videos = new List<IVideoListInfo>();
+                  var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, this.Videos.Select(v => v.NiconicoId), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
-                }, video =>
-                {
-                    WS::Mainpage.PlaylistTree.Refresh();
-                    WS::Mainpage.CurrentPlaylist.Update(playlistId);
-                });
-            });
+                  if (result.IsFailed)
+                  {
+                      this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
+                      return;
+                  }
+                  else if (videos.Count == 0)
+                  {
 
-            this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true, arg =>
-            {
-                if (this.Playlist is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
-                    return;
-                }
+                      this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
+                      return;
+                  }
 
-                var targetVideos = new List<IVideoListInfo>();
+                  await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, this.Playlist.Id);
 
-                if (arg is not null && arg.AsNullable<IVideoListInfo>() is IVideoListInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
+                  WS::Mainpage.PlaylistTree.Refresh();
+                  WS::Mainpage.CurrentPlaylist.Update(playlistId);
 
-                targetVideos.AddRange(this.Videos.Where(v => v.IsSelected));
-                targetVideos = targetVideos.Distinct(v => v.Id).ToList();
+                  this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
 
-                string confirmMessage = targetVideos.Count == 1
-                ? $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」を削除しますか？"
-                : $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
+                  if (!videos.First().ChannelId.IsNullOrEmpty())
+                  {
+                      var video = videos.First();
+                      WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName}」です", "IDをコピー", () =>
+                      {
+                          Clipboard.SetText(video.ChannelId);
+                          WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
+                      });
+                  }
+              });
+
+            this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true, async arg =>
+             {
+                 if (this.Playlist is null)
+                 {
+                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
+                     return;
+                 }
+
+                 var targetVideos = new List<IVideoListInfo>();
+
+                 if (arg is not null && arg.AsNullable<IVideoListInfo>() is IVideoListInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
+
+                 targetVideos.AddRange(this.Videos.Where(v => v.IsSelected));
+                 targetVideos = targetVideos.Distinct(v => v.Id).ToList();
+
+                 string confirmMessage = targetVideos.Count == 1
+                 ? $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」を削除しますか？"
+                 : $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
 
 
-                var confirm = this.showMessageBox(confirmMessage, "削除の確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (confirm != MessageBoxResult.Yes) return;
+                 var confirm = await this.showMessageBox(confirmMessage, MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+                 if (confirm != MaterialMessageBoxResult.Yes) return;
 
-                foreach (var video in targetVideos)
-                {
-                    //取得失敗動画の場合
-                    if (video.Title == "取得失敗")
-                    {
-                        this.Videos.Remove(video);
-                    }
-                    else
-                    {
-                        WS::Mainpage.VideoHandler.RemoveVideo(video.Id, this.Playlist.Id);
-                    }
-                }
+                 foreach (var video in targetVideos)
+                 {
+                     //取得失敗動画の場合
+                     if (video.Title == "取得失敗")
+                     {
+                         this.Videos.Remove(video);
+                     }
+                     else
+                     {
+                         WS::Mainpage.VideoHandler.RemoveVideo(video.Id, this.Playlist.Id);
+                     }
+                 }
 
-                if (targetVideos.Count > 1)
-                {
+                 if (targetVideos.Count > 1)
+                 {
 
-                    WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                }
-                else
-                {
-                    WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}を削除しました。");
-                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}を削除しました。");
-                }
+                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                 }
+                 else
+                 {
+                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}を削除しました。");
+                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}を削除しました。");
+                 }
 
-                WS::Mainpage.CurrentPlaylist.Update(this.Playlist.Id);
-            });
+                 WS::Mainpage.CurrentPlaylist.Update(this.Playlist.Id);
+             });
 
             this.WatchOnNiconicoCommand = new CommandBase<IVideoListInfo>(_ => true, arg =>
             {
@@ -303,14 +322,8 @@ namespace Niconicome.ViewModels.Mainpage
 
                      int playlistId = this.Playlist.Id;
                      var videos = new List<IVideoListInfo>();
-                     INetworkResult result = this.Playlist.RemoteType switch
-                     {
-                         RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(this.Playlist.RemoteId, videos),
-                         RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(this.Playlist.RemoteId, videos),
-                         RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                         RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(this.Playlist.RemoteId, videos,this.Videos.Select(v=>v.NiconicoId), m => { }),
-                         _ => new NetworkResult(),
-                     };
+
+                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(this.Playlist.RemoteId, videos, this.Playlist.RemoteType, this.Videos.Select(v => v.NiconicoId), m => { });
 
                      if (!result.IsFailed)
                      {
@@ -646,6 +659,10 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストの作成に失敗しました。詳しくはログファイルを参照して下さい。");
                 }
             });
+            #endregion
+
+            //動画情報取得クラスの実行可能状態変更イベントを購読する
+            WS::Mainpage.VideoIDHandler.StateChange += (_, _) => this.AddVideoCommand.RaiseCanExecutechanged();
         }
 
         private MaterialDesign::PackIconKind refreshCommandIconField = MaterialDesign::PackIconKind.Refresh;
@@ -662,6 +679,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public MaterialDesign::PackIconKind RefreshCommandIcon { get => this.refreshCommandIconField; set => this.SetProperty(ref this.refreshCommandIconField, value); }
 
+        #region コマンド
         /// <summary>
         /// 動画を追加する
         /// </summary>
@@ -786,11 +804,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// プレイリスト作成コマンド
         /// </summary>
         public CommandBase<string> CreatePlaylistCommand { get; init; }
+        #endregion
 
         /// <summary>
         /// メッセージボックスを表示するコマンド
         /// </summary>
-        private readonly Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> showMessageBox;
+        private readonly Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox;
 
         /// <summary>
         /// 動画のリスト
@@ -817,6 +836,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public bool IsFilteringFromAllVideos { get => this.isFilteringFromAllVideosEnableField; set => this.SetProperty(ref this.isFilteringFromAllVideosEnableField, value); }
 
+        /// <summary>
+        /// プレイリストのタイトル
+        /// </summary>
+        public string PlaylistTitle { get => this.playlistTitleFIeld; set => this.SetProperty(ref this.playlistTitleFIeld, value); }
+
         private string inputStringFIeld = string.Empty;
 
         private string playlistTitleFIeld = string.Empty;
@@ -825,15 +849,67 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isFilteringFromAllVideosEnableField;
 
+
+        /// <summary>
+        /// 並び替える
+        /// </summary>
+        /// <param name="sortType"></param>
+        /// <param name="orderBy"></param>
+        public void SetOrder(SortType sortType, OrderBy orderBy)
+        {
+            var videos = new List<IVideoListInfo>(this.Videos);
+            this.Videos.Clear();
+            if (orderBy != OrderBy.Descending)
+            {
+                this.Videos.Addrange(sortType switch
+                {
+                    SortType.DateTime => videos.OrderBy(v => v.UploadedOn),
+                    SortType.Id => videos.OrderBy(v => v.NiconicoId),
+                    SortType.Title => videos.OrderBy(v => v.Title),
+                    SortType.Selected => videos.OrderBy(v => !v.IsSelected ? 1 : 0),
+                    SortType.ViewCount => videos.OrderBy(v => v.ViewCount),
+                    _ => videos,
+                });
+            }
+            else
+            {
+                this.Videos.Addrange(sortType switch
+                {
+                    SortType.DateTime => videos.OrderByDescending(v => v.UploadedOn),
+                    SortType.Id => videos.OrderByDescending(v => v.NiconicoId),
+                    SortType.Title => videos.OrderByDescending(v => v.Title),
+                    SortType.Selected => videos.OrderByDescending(v => !v.IsSelected ? 1 : 0),
+                    SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount),
+                    _ => videos,
+                });
+            }
+
+            string sortTypeStr = sortType switch
+            {
+                SortType.DateTime => "投稿日時",
+                SortType.Id => "ID",
+                SortType.Title => "タイトル",
+                SortType.Selected => "選択",
+                SortType.ViewCount => "再生回数",
+                _ => "並び替えなし"
+            };
+            string orderStr = orderBy switch
+            {
+                OrderBy.Ascending => "昇順",
+                OrderBy.Descending => "降順",
+                _ => "昇順",
+            };
+
+            WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
+            this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
+        }
+
+        #region private
+
         /// <summary>
         /// タスクキャンセラー
         /// </summary>
         private CancellationTokenSource? cts;
-
-        /// <summary>
-        /// プレイリストのタイトル
-        /// </summary>
-        public string PlaylistTitle { get => this.playlistTitleFIeld; set => this.SetProperty(ref this.playlistTitleFIeld, value); }
 
         private bool isFetching;
 
@@ -904,7 +980,7 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.Messagehandler.ClearMessage();
                 string name = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.Name;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
-                WS::Mainpage.SnackbarMessageQueue.Enqueue($"プレイリスト:{name}");
+                WS::Mainpage.SnaclbarHandler.Enqueue($"プレイリスト:{name}");
                 this.ChangePlaylistTitle();
             }
         }
@@ -921,65 +997,98 @@ namespace Niconicome.ViewModels.Mainpage
         }
 
         /// <summary>
-        /// 並び替える
+        /// フォルダーパスを取得する
         /// </summary>
-        /// <param name="sortType"></param>
-        /// <param name="orderBy"></param>
-        public void SetOrder(SortType sortType, OrderBy orderBy)
-        {
-            var videos = new List<IVideoListInfo>(this.Videos);
-            this.Videos.Clear();
-            if (orderBy != OrderBy.Descending)
-            {
-                this.Videos.Addrange(sortType switch
-                {
-                    SortType.DateTime => videos.OrderBy(v => v.UploadedOn),
-                    SortType.Id => videos.OrderBy(v => v.NiconicoId),
-                    SortType.Title => videos.OrderBy(v => v.Title),
-                    SortType.Selected => videos.OrderBy(v => !v.IsSelected ? 1 : 0),
-                    SortType.ViewCount => videos.OrderBy(v => v.ViewCount),
-                    _ => videos,
-                });
-            }
-            else
-            {
-                this.Videos.Addrange(sortType switch
-                {
-                    SortType.DateTime => videos.OrderByDescending(v => v.UploadedOn),
-                    SortType.Id => videos.OrderByDescending(v => v.NiconicoId),
-                    SortType.Title => videos.OrderByDescending(v => v.Title),
-                    SortType.Selected => videos.OrderByDescending(v => !v.IsSelected ? 1 : 0),
-                    SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount),
-                    _ => videos,
-                });
-            }
-
-            string sortTypeStr = sortType switch
-            {
-                SortType.DateTime => "投稿日時",
-                SortType.Id => "ID",
-                SortType.Title => "タイトル",
-                SortType.Selected => "選択",
-                SortType.ViewCount => "再生回数",
-                _ => "並び替えなし"
-            };
-            string orderStr = orderBy switch
-            {
-                OrderBy.Ascending => "昇順",
-                OrderBy.Descending => "降順",
-                _ => "昇順",
-            };
-
-            WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
-            this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
-        }
-
+        /// <returns></returns>
         private string GetFolderPath()
         {
             if (this.Playlist is null) return string.Empty;
 
             return this.Playlist.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.Playlist.Folderpath;
         }
+        #endregion
+
+    }
+
+    class VideoListViewModelD
+    {
+        public VideoListViewModelD()
+        {
+            var v1 = new BindableVIdeoListInfo()
+            {
+                Title = "レッツゴー!陰陽師",
+                NiconicoId = "sm9",
+            };
+
+            this.Videos = new ObservableCollection<IVideoListInfo>() { v1 };
+
+        }
+
+        public MaterialDesign::PackIconKind FilterIcon { get; set; } = MaterialDesign::PackIconKind.Filter;
+
+        public MaterialDesign::PackIconKind RefreshCommandIcon { get; set; } = MaterialDesign::PackIconKind.Refresh;
+
+        public CommandBase<object> AddVideoCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<IVideoListInfo> RemoveVideoCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<IVideoListInfo> WatchOnNiconicoCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> AddVideoFromClipboardCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> EditPlaylistCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenNetworkSettingsCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<IVideoListInfo> UpdateVideoCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SyncWithNetowrkCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> ClearMessageCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> CopyMessageCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenLogWindowCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SelectAllVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> DisSelectAllVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SelectAllNotDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> DisSelectAllNotDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SelectAllDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> DisSelectAllDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenPlaylistFolder { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenInPlayerAcommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> OpenInPlayerBcommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SendIdToappCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SendUrlToappCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> FilterCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<object> SearchCommand { get; init; } = new(_ => true, _ => { });
+
+        public CommandBase<string> CreatePlaylistCommand { get; init; } = new(_ => true, _ => { });
+
+        public ObservableCollection<IVideoListInfo> Videos { get; private set; }
+
+        public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
+
+        public string InputString { get; set; } = string.Empty;
+
+        public bool IsFilteringOnlyByTag { get; set; } = false;
+
+        public bool IsFilteringFromAllVideos { get; set; } = false;
+
+        public string PlaylistTitle { get; set; } = "空白のプレイリスト";
     }
 
     /// <summary>

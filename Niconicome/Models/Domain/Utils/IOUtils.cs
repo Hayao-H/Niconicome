@@ -37,5 +37,20 @@ namespace Niconicome.Models.Domain.Utils
                 return filepath;
             }
         }
+
+        /// <summary>
+        /// パスが存在しない場合作成する
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="fileName"></param>
+        public static void CreateDirectoryIfNotExist(string folderPath,string fileName)
+        {
+            var path = Path.Combine(folderPath, fileName);
+            var dirname = Path.GetDirectoryName(path);
+            if (dirname is not null&&!Directory.Exists(dirname))
+            {
+                Directory.CreateDirectory(dirname);
+            }
+        }
     }
 }

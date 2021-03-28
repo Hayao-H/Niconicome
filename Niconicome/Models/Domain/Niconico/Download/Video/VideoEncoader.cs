@@ -28,6 +28,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         string FileName { get; }
         string FolderName { get; }
         bool IsOverwriteEnable { get; }
+        bool IsOverrideDTEnable { get; }
+        DateTime UploadedOn { get; }
         IEnumerable<string> TsFilePaths { get; }
     }
 
@@ -63,10 +65,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             string mp4Foldername = this.GetFolderPath(settings.FolderName);
             string mp4Filename = this.GetFilePath(settings.FileName, mp4Foldername, settings.IsOverwriteEnable);
 
-            if (!Directory.Exists(mp4Foldername))
-            {
-                Directory.CreateDirectory(mp4Foldername);
-            }
+            IOUtils.CreateDirectoryIfNotExist(mp4Foldername, mp4Filename);
 
             this.Mp4FilePath = mp4Filename;
 
@@ -99,6 +98,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             messenger.SendMessage("ffmpegで変換を開始(.ts=>.mp4)");
             await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, token, LocalFile::EncodeOptions.Copy);
             messenger.SendMessage("ffmpegの変換が完了");
+
+            if (settings.IsOverrideDTEnable)
+            {
+                try
+                {
+                    File.SetLastWriteTime(mp4Filename, settings.UploadedOn);
+                }
+                catch (Exception ex)
+                {
+                    throw new IOException($"動画ファイルの更新日時書き換え中にエラーが発生しました。(詳細:{ex.Message})");
+                }
+            }
         }
 
         /// <summary>
@@ -166,6 +177,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public string FolderName { get; set; } = string.Empty;
 
         public bool IsOverwriteEnable { get; set; }
+
+        public bool IsOverrideDTEnable { get; set; }
+
+        public DateTime UploadedOn { get; set; }
 
         public IEnumerable<string> TsFilePaths { get; set; } = new List<string>();
     }

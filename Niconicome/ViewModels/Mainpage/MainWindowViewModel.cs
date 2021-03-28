@@ -1,17 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Microsoft.Xaml.Behaviors;
-using Niconicome.Views;
-using Niconicome.ViewModels;
-using Niconicome.Models.Domain.Niconico;
-using Niconicome.Models.Auth;
-using WS= Niconicome.Workspaces;
-using Niconicome.Views.Setting;
-using System.ComponentModel;
 using Niconicome.Extensions;
+using Niconicome.Models.Auth;
+using Niconicome.Models.Domain.Niconico;
+using Niconicome.Views;
+using Niconicome.Views.Setting;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -23,11 +22,20 @@ namespace Niconicome.ViewModels.Mainpage
 
         public MainWindowViewModel()
         {
+            if (WS::Mainpage.Session.IsLogin)
+            {
+                this.OnLogin(this, EventArgs.Empty);
+            } else
+            {
+                WS::Mainpage.StartUp.AutoLoginSucceeded += this.OnLogin;
+            }
+
 
             this.LoginCommand = new CommandBase<object>(
                     (object? arg) => true,
                     async (object? arg) =>
                     {
+
                         if (!this.IsLogin)
                         {
                             Window loginpage = new Loginxaml
@@ -36,17 +44,7 @@ namespace Niconicome.ViewModels.Mainpage
                                 ShowInTaskbar = true
                             };
 #pragma warning disable CS8602
-                            (loginpage.DataContext as Login.LoginWindowViewModel).LoginSucceeded += (s, e) =>
-#pragma warning restore CS8602
-                            {
-                                this.IsLogin = true;
-                                INiconicoContext context = NiconicoContext.Context;
-                                this.user = NiconicoContext.User;
-                                this.LoginBtnVal = "ログアウト";
-                                this.OnPropertyChanged(nameof(this.LoginBtnTooltip));
-                                this.OnPropertyChanged(nameof(this.Username));
-                                this.OnPropertyChanged(nameof(this.UserImage));
-                            };
+                            (loginpage.DataContext as Login.LoginWindowViewModel).LoginSucceeded += this.OnLogin;
                             loginpage.Show();
                         }
                         else
@@ -70,6 +68,12 @@ namespace Niconicome.ViewModels.Mainpage
                     Owner = Application.Current.MainWindow,
                 };
                 window.Show();
+            });
+
+            this.OpenDownloadTaskWindowsCommand = new CommandBase<object>(_ => true,_=>
+            {
+                var windows = new DownloadTasksWindows();
+                windows.Show();
             });
         }
 
@@ -132,6 +136,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<object> OpenSettingCommand { get; init; }
 
+        public CommandBase<object> OpenDownloadTaskWindowsCommand { get; init; }
+
         /// <summary>
         /// ログイン状態(フィールド)
         /// </summary>
@@ -171,6 +177,21 @@ namespace Niconicome.ViewModels.Mainpage
                 this.message.AppendLine(value);
                 this.OnPropertyChanged(nameof(this.message));
             }
+        }
+
+        /// <summary>
+        /// ログイン成功時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnLogin(object? sender,EventArgs e)
+        {
+            this.IsLogin = true;
+            this.user = NiconicoContext.User;
+            this.LoginBtnVal = "ログアウト";
+            this.OnPropertyChanged(nameof(this.LoginBtnTooltip));
+            this.OnPropertyChanged(nameof(this.Username));
+            this.OnPropertyChanged(nameof(this.UserImage));
         }
 
 
@@ -214,7 +235,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.AssociatedObject.Closing -= this.OnClosing;
         }
 
-        private void OnClosing(object? sender,CancelEventArgs e)
+        private void OnClosing(object? sender, CancelEventArgs e)
         {
             if (sender is null || sender.AsNullable<Window>() is not Window window) return;
             if (window != Application.Current.MainWindow) return;

@@ -11,6 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Download
     {
         string NiconicoId { get; }
         string Id { get; }
+        uint ActualVerticalResolution { get; set; }
 
         string GetLogContent();
     }
@@ -32,6 +33,12 @@ namespace Niconicome.Models.Domain.Niconico.Download
         /// ユニークなID
         /// </summary>
         public string Id { get; init; }
+
+        /// <summary>
+        /// 実際の垂直解像度
+        /// </summary>
+        public uint ActualVerticalResolution { get; set; }
+
 
         /// <summary>
         /// ログ出力可能な文字列を取得する

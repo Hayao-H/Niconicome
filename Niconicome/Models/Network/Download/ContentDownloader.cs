@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using MS.WindowsAPICodePack.Internal;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Download;
 using Niconicome.Models.Domain.Niconico.Watch;
@@ -19,12 +17,19 @@ using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using Download = Niconicome.Models.Domain.Niconico.Download;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
+using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
+using MS.WindowsAPICodePack.Internal;
+using System.Windows.Documents;
 
-namespace Niconicome.Models.Network
+namespace Niconicome.Models.Network.Download
 {
     public interface IContentDownloader
     {
-        Task<INetworkResult> DownloadVideos(IEnumerable<IVideoListInfo> videos, DownloadSettings setting, CancellationToken token);
+        Task<INetworkResult?> DownloadVideos();
+        Task<INetworkResult?> DownloadVideosFriendly(Action<string> onMessage, Action<string> onMessageShort);
+        bool CanDownload { get; }
+        void Cancel();
+        event EventHandler? CanDownloadChange;
     }
 
     public interface IDownloadSettings
@@ -38,12 +43,18 @@ namespace Niconicome.Models.Network
         bool DownloadEasy { get; }
         bool DownloadLog { get; }
         bool DownloadOwner { get; }
+        bool DownloadVideoInfo { get; }
+        bool IsReplaceStrictedEnable { get; }
+        bool OverrideVideoFileDateToUploadedDT { get; }
         string NiconicoId { get; }
         string FolderPath { get; }
         uint VerticalResolution { get; }
-        Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose);
+        int PlaylistID { get; }
+        int MaxCommentsCount { get; }
+        Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
         Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset);
+        DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson);
     }
 
     public interface IDownloadResult
@@ -63,7 +74,7 @@ namespace Niconicome.Models.Network
 
     public interface ILocalContentHandler
     {
-        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo);
+        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, bool downloadInJson);
         IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath);
     }
 
@@ -73,6 +84,7 @@ namespace Niconicome.Models.Network
         bool ThumbExist { get; init; }
         bool VideoExist { get; init; }
         bool VIdeoExistInOnotherFolder { get; init; }
+        bool VideoInfoExist { get; init; }
         string? LocalPath { get; init; }
     }
 
@@ -82,13 +94,23 @@ namespace Niconicome.Models.Network
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler, ICurrent current)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
             this.videoHandler = videoHandler;
             this.messageHandler = messageHandler;
             this.localContentHandler = localContentHandler;
+            this.downloadTasksHandler = downloadTasksHandler;
+            this.current = current;
+
+            int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelDL);
+            if (maxParallel <= 0)
+            {
+                maxParallel = 3;
+            }
+            this.parallelTasksHandler = new ParallelTasksHandler<DownloadTaskParallel>(maxParallel, 5, 15);
+            this.downloadTasksHandler.DownloadTaskPool.TaskPoolChange += this.DownloadTaskPoolChangedEventHandler;
         }
 
         private readonly ILogger logger;
@@ -101,6 +123,14 @@ namespace Niconicome.Models.Network
 
         private readonly ILocalContentHandler localContentHandler;
 
+        private readonly IDownloadTasksHandler downloadTasksHandler;
+
+        private readonly ICurrent current;
+
+        private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
+
+        public INetworkResult? CurrentResult { get; private set; }
+
         /// <summary>
         /// 非同期で動画をダウンロードする
         /// </summary>
@@ -110,7 +140,17 @@ namespace Niconicome.Models.Network
         private async Task<IDownloadResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
         {
             string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-            var vSettings = settings.ConvertToVideoDownloadSettings(fileNameFormat, false);
+            int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelSegDl);
+            if (maxParallel <= 0)
+            {
+                maxParallel = 1;
+            }
+            else if (maxParallel > 5)
+            {
+                maxParallel = 5;
+            }
+
+            var vSettings = settings.ConvertToVideoDownloadSettings(fileNameFormat, false, maxParallel);
             var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::IVideoDownloader>();
             Download::IDownloadResult result;
             try
@@ -120,6 +160,32 @@ namespace Niconicome.Models.Network
             catch (Exception e)
             {
                 this.logger.Error("動画のダウンロードに失敗しました。", e);
+                return new DownloadResult() { IsSucceeded = false, Message = e.Message };
+            }
+            return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null, VideoFileName = result.VideoFileName, VideoVerticalResolution = result.VerticalResolution };
+        }
+
+        /// <summary>
+        /// 動画情報をダウンロードする
+        /// </summary>
+        /// <param name="niconicoid"></param>
+        /// <param name="onMessage"></param>
+        /// <returns></returns>
+        private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
+        {
+            string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+            bool dlInJson = this.settingHandler.GetBoolSetting(Settings.VideoInfoInJson);
+
+            var dSettings = settings.ConvertToDescriptionDownloadSetting(fileNameFormat, dlInJson);
+            var descriptionDownloader = DIFactory.Provider.GetRequiredService<DDL::IDescriptionDownloader>();
+            Download::IDownloadResult result;
+            try
+            {
+                result = descriptionDownloader.DownloadVideoInfo(dSettings, session, onMessage);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("動画情報のダウンロードに失敗しました。", e);
                 return new DownloadResult() { IsSucceeded = false, Message = e.Message };
             }
             return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null, VideoFileName = result.VideoFileName, VideoVerticalResolution = result.VerticalResolution };
@@ -195,6 +261,11 @@ namespace Niconicome.Models.Network
 
             await session.GetVideoDataAsync(setting.NiconicoId, setting.Video);
 
+            if (session.Video?.DmcInfo.DownloadStartedOn is not null)
+            {
+                session.Video.DmcInfo.DownloadStartedOn = DateTime.Now;
+            }
+
             if (session.State != WatchSessionState.GotPage || session.Video is null)
             {
                 result.IsSucceeded = false;
@@ -213,10 +284,17 @@ namespace Niconicome.Models.Network
             ILocalContentInfo? info = null;
             if (setting.Skip)
             {
+                bool dlInJson = this.settingHandler.GetBoolSetting(Settings.VideoInfoInJson);
                 string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo);
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, dlInJson);
             }
 
+            if (!Directory.Exists(setting.FolderPath))
+            {
+                Directory.CreateDirectory(setting.FolderPath);
+            }
+
+            //動画
 
             if (setting.Video)
             {
@@ -318,6 +396,31 @@ namespace Niconicome.Models.Network
                 }
             }
 
+            if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+            //動画情報
+            if (setting.DownloadVideoInfo)
+            {
+                if (!info?.VideoInfoExist ?? true)
+                {
+                    var iResult = this.TryDownloadDescriptionAsync(setting, session, OnMessage);
+
+                    if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+                    if (!iResult.IsSucceeded)
+                    {
+                        result.IsSucceeded = false;
+                        result.Message = iResult.Message ?? "None";
+                        return result;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = true;
+                    }
+                }
+            }
+
+
             if (session.IsSessionEnsured) session.Dispose();
 
             return result;
@@ -334,86 +437,212 @@ namespace Niconicome.Models.Network
         }
 
         /// <summary>
+        /// イベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DownloadTaskPoolChangedEventHandler(object? sender, TaskPoolChangeEventargs e)
+        {
+            if (e.ChangeType != TaskPoolChangeType.Add)
+            {
+                return;
+            }
+
+            if (this.CurrentResult is null)
+            {
+                this.CurrentResult = new NetworkResult();
+            }
+
+            var t = new DownloadTaskParallel(async (parallelTask, lockObj) =>
+            {
+                if (!e.Task.IsCanceled && !e.Task.IsDone)
+                {
+
+                    var setting = e.Task.DownloadSettings;
+                    var task = e.Task;
+                    IVideoListInfo? video;
+                    if (this.videoHandler.Exist(task.VideoID))
+                    {
+                        video = this.videoHandler.GetVideo(task.VideoID);
+                    }
+                    else
+                    {
+                        video = null;
+                    }
+
+                    this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロード処理を開始しました。");
+
+                    string folderPath = setting.FolderPath;
+                    bool skippedFlag = false;
+                    e.Task.IsProcessing = true;
+
+                    var downloadResult = await this.TryDownloadContentAsync(setting with { NiconicoId = task.NiconicoID, Video = !skippedFlag && setting.Video }, msg => task.Message = msg, e.Task.CancellationToken);
+
+                    if (downloadResult.IsCanceled)
+                    {
+                        this.CurrentResult.FailedCount++;
+                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードがキャンセルされました。");
+                        task.Message = "ダウンロードをキャンセル";
+                    }
+                    else if (!downloadResult.IsSucceeded)
+                    {
+                        this.CurrentResult.FailedCount++;
+                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに失敗しました。");
+                        this.messageHandler.AppendMessage($"詳細: {downloadResult.Message}");
+                    }
+                    else
+                    {
+                        string rMessage = downloadResult.VideoVerticalResolution == 0 ? string.Empty : $"(vertical:{downloadResult.VideoVerticalResolution}px)";
+                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに成功しました。");
+
+                        task.Message = $"ダウンロード完了{rMessage}";
+                        if (!downloadResult.VideoFileName.IsNullOrEmpty() && video is not null)
+                        {
+                            video.FileName = downloadResult.VideoFileName;
+                            this.videoHandler.Update(video);
+                        }
+                        this.current.Uncheck(task.PlaylistID, task.VideoID);
+                        this.CurrentResult.SucceededCount++;
+                    }
+
+                    if (this.CurrentResult.FirstVideo is null)
+                    {
+                        this.CurrentResult.FirstVideo = video;
+                    }
+
+                    e.Task.IsProcessing = false;
+                    if (!e.Task.IsCanceled)
+                    {
+                        e.Task.IsDone = true;
+                    }
+                    //this.downloadTasksHandler.DownloadTaskPool.RemoveTask(e.Task);
+
+                }
+                else
+                {
+                    this.parallelTasksHandler.CancellAllTasks();
+                    //this.downloadTasksHandler.DownloadTaskPool.Clear();
+                }
+            }, _ =>
+            {
+                e.Task.Message = "待機中...(15s)";
+                this.messageHandler.AppendMessage($"待機中...(15s)");
+
+            });
+
+            this.parallelTasksHandler.AddTaskToQueue(t);
+
+            if (!this.parallelTasksHandler.IsProcessing)
+            {
+            }
+        }
+
+        /// <summary>
+        /// DL可能フラグ変更イベントを発火させる
+        /// </summary>
+        private void RaiseCanDownloadChange()
+        {
+            this.CanDownloadChange?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
         /// 動画をダウンロードする
         /// </summary>
         /// <param name="videos"></param>
         /// <param name="setting"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> DownloadVideos(IEnumerable<IVideoListInfo> videos, DownloadSettings setting, CancellationToken token)
+        public async Task<INetworkResult?> DownloadVideos()
         {
-            int totalVideos = videos.Count();
-            var handler = new ParallelTasksHandler<DownloadTaskParallel>(3, 5, 15);
-            var result = new NetworkResult();
 
-            var tasks = videos.Select(v => new DownloadTaskParallel(async task =>
+            if (this.parallelTasksHandler.IsProcessing)
             {
-                if (!token.IsCancellationRequested)
+                return new NetworkResult();
+            }
+
+            await this.parallelTasksHandler.ProcessTasksAsync(() => this.RaiseCanDownloadChange());
+
+            this.RaiseCanDownloadChange();
+
+            return this.CurrentResult;
+
+        }
+
+        /// <summary>
+        /// メッセージを表示しながらDL
+        /// </summary>
+        /// <param name="onMessage"></param>
+        /// <param name="onMessageShort"></param>
+        /// <returns></returns>
+        public async Task<INetworkResult?> DownloadVideosFriendly(Action<string> onMessage, Action<string> onMessageShort)
+        {
+            var videoCount = this.parallelTasksHandler.PallarelTasks.Count;
+
+            onMessage($"動画のダウンロードを開始します。({videoCount}件)");
+            onMessageShort($"動画のダウンロードを開始します。({videoCount}件)");
+
+            INetworkResult? result = null;
+
+            try
+            {
+                result = await this.DownloadVideos();
+
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("ダウンロード中にエラーが発生しました", e);
+                onMessage($"ダウンロード中にエラーが発生しました。(詳細: {e.Message})");
+                onMessageShort($"ダウンロード中にエラーが発生しました。");
+            }
+
+            if (result?.SucceededCount > 1)
+            {
+                if (result?.FirstVideo is not null)
                 {
-                    var video = task.Video;
+                    onMessage($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                    onMessageShort($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
 
-                    this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロード処理を開始しました。");
-
-                    string folderPath = setting.FolderPath;
-                    bool skippedFlag = false;
-
-
-                    var downloadResult = await this.TryDownloadContentAsync(setting with { NiconicoId = video.NiconicoId, Video = !skippedFlag && setting.Video }, msg => video.Message = msg, token);
-
-                    if (downloadResult.IsCanceled)
+                    if (!result.IsSucceededAll)
                     {
-                        result.FailedCount++;
-                        this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードがキャンセルされました。");
-                        video.Message = "ダウンロードをキャンセル";
+                        onMessage($"{result.FailedCount}件の動画のダウンロードに失敗しました。");
                     }
-                    else if (!downloadResult.IsSucceeded)
-                    {
-                        result.FailedCount++;
-                        this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードに失敗しました。");
-                        this.messageHandler.AppendMessage($"詳細: {downloadResult.Message}");
-                    }
-                    else
-                    {
-                        string rMessage = downloadResult.VideoVerticalResolution == 0 ? string.Empty : $"(vertical:{downloadResult.VideoVerticalResolution}px)";
-                        this.messageHandler.AppendMessage($"{video.NiconicoId}のダウンロードに成功しました。");
-                        video.IsSelected = false;
-                        video.Message = $"ダウンロード完了{rMessage}";
-                        if (!downloadResult.VideoFileName.IsNullOrEmpty())
-                        {
-                            video.FileName = downloadResult.VideoFileName;
-                            this.videoHandler.Update(video);
-                        }
-                        result.SucceededCount++;
-                    }
-
-                    if (result.FirstVideo is null)
-                    {
-                        result.FirstVideo = video;
-                    }
-
                 }
-                else
+            }
+            else if (result?.SucceededCount == 1)
+            {
+                if (result?.FirstVideo is not null)
                 {
-                    handler.CancellAllTasks();
+                    onMessage($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
+                    onMessageShort($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
                 }
-            }, _ =>
+            }
+            else
             {
-                v.Message = "待機中...(15s)";
-                this.messageHandler.AppendMessage($"待機中...(15s)");
-
-            }, v));
-
-            handler.AddTasksToQueue(tasks);
-
-            await handler.ProcessTasksAsync();
-
-            if (result.SucceededCount == totalVideos)
-            {
-                result.IsSucceededAll = true;
+                onMessage($"ダウンロード出来ませんでした。");
+                onMessageShort($"ダウンロード出来ませんでした。");
             }
 
             return result;
+        }
 
+
+        /// <summary>
+        /// DL可能フラグ
+        /// </summary>
+        public bool CanDownload { get => !this.parallelTasksHandler.IsProcessing; }
+
+        /// <summary>
+        /// DL可能フラグ変更イベント
+        /// </summary>
+        public event EventHandler? CanDownloadChange;
+
+        /// <summary>
+        /// ダウンロードをキャンセル
+        /// </summary>
+        public void Cancel()
+        {
+            this.parallelTasksHandler.CancellAllTasks();
+            this.downloadTasksHandler.DownloadTaskPool.Clear();
         }
 
     }
@@ -457,13 +686,23 @@ namespace Niconicome.Models.Network
 
         public bool DownloadOwner { get; set; }
 
+        public bool DownloadVideoInfo { get; set; }
+
+        public bool IsReplaceStrictedEnable { get; set; }
+
+        public bool OverrideVideoFileDateToUploadedDT { get; set; }
+
         public uint VerticalResolution { get; set; }
+
+        public int PlaylistID { get; set; }
+
+        public int MaxCommentsCount { get; set; }
 
         public string NiconicoId { get; set; } = string.Empty;
 
         public string FolderPath { get; set; } = string.Empty;
 
-        public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose)
+        public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount)
         {
             return new Vdl::VideoDownloadSettings()
             {
@@ -473,6 +712,9 @@ namespace Niconicome.Models.Network
                 IsAutoDisposingEnable = autodispose,
                 IsOverwriteEnable = this.Overwrite,
                 VerticalResolution = this.VerticalResolution,
+                MaxParallelDownloadCount = maxParallelDLCount,
+                IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
+                IsOvwrridingFileDTEnable = this.OverrideVideoFileDateToUploadedDT,
             };
         }
 
@@ -484,6 +726,7 @@ namespace Niconicome.Models.Network
                 FolderName = this.FolderPath,
                 FileNameFormat = fileFormat,
                 IsOverwriteEnable = this.Overwrite,
+                IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
             };
         }
 
@@ -498,7 +741,21 @@ namespace Niconicome.Models.Network
                 IsDownloadingEasyCommentEnable = this.DownloadEasy,
                 IsDownloadingLogEnable = this.DownloadLog,
                 IsDownloadingOwnerCommentEnable = this.DownloadOwner,
-                CommentOffset = commentOffset
+                CommentOffset = commentOffset,
+                IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
+                MaxcommentsCount = this.MaxCommentsCount,
+            };
+        }
+
+        public DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson)
+        {
+            return new DDL::DescriptionSetting()
+            {
+                IsOverwriteEnable = this.Overwrite,
+                FolderName = this.FolderPath,
+                IsReplaceRestrictedEnable = this.IsReplaceStrictedEnable,
+                Format = fileFormat,
+                IsSaveInJsonEnabled = dlInJson,
             };
         }
 
@@ -506,40 +763,21 @@ namespace Niconicome.Models.Network
     }
 
     /// <summary>
-    /// インデックス付きの動画情報
-    /// </summary>
-    public class VideoToDownload : IVideoToDownload
-    {
-        public VideoToDownload(IVideoListInfo video, int index)
-        {
-            this.Video = video;
-            this.Index = index;
-        }
-
-        public IVideoListInfo Video { get; set; }
-
-        public int Index { get; set; }
-    }
-
-    /// <summary>
     /// DL処理の単位
     /// </summary>
     public class DownloadTaskParallel : IParallelTask<DownloadTaskParallel>
     {
-        public DownloadTaskParallel(Func<DownloadTaskParallel, Task> taskFunction, Action<int> onwait, IVideoListInfo video)
+        public DownloadTaskParallel(Func<DownloadTaskParallel, object, Task> taskFunction, Action<int> onwait)
         {
             this.TaskFunction = taskFunction;
             this.OnWait = onwait;
-            this.Video = video;
         }
 
         public Guid TaskId { get; init; }
 
-        public Func<DownloadTaskParallel, Task> TaskFunction { get; init; }
+        public Func<DownloadTaskParallel, object, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
-
-        public IVideoListInfo Video { get; init; }
 
     }
 
@@ -568,11 +806,12 @@ namespace Niconicome.Models.Network
         /// <param name="format"></param>
         /// <param name="dmcInfo"></param>
         /// <returns></returns>
-        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo)
+        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, bool downloadInJson)
         {
-            string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4");
-            string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml");
-            string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".jpg");
+            string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4", replaceStricted);
+            string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml", replaceStricted);
+            string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".jpg", replaceStricted);
+            string videoInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, downloadInJson ? ".json" : ".txt", replaceStricted);
             bool videoExist = this.videoFileStorehandler.Exists(dmcInfo.Id);
             string? localPath = null;
 
@@ -586,6 +825,7 @@ namespace Niconicome.Models.Network
                 VideoExist = File.Exists(Path.Combine(folderPath, videoFIlename)),
                 CommentExist = File.Exists(Path.Combine(folderPath, commentFIlename)),
                 ThumbExist = File.Exists(Path.Combine(folderPath, thumbFIlename)),
+                VideoInfoExist = File.Exists(Path.Combine(folderPath, videoInfoFilename)),
                 VIdeoExistInOnotherFolder = videoExist,
                 LocalPath = localPath,
             };
@@ -656,6 +896,8 @@ namespace Niconicome.Models.Network
         public bool CommentExist { get; init; }
 
         public bool ThumbExist { get; init; }
+
+        public bool VideoInfoExist { get; init; }
 
         public string? LocalPath { get; init; }
     }

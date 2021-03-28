@@ -127,6 +127,20 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string IsCopyEnable { get; private set; } = "iscopyenable";
         public static string IsAutoSwitchOffsetEnable { get; set; } = "isautoswitchoffsetenable";
         public static string UseShellWhenLaunchingFFmpeg { get; set; } = "useshellwhenlaunchingffmpeg";
-
+        public static string IsAutologinEnable { get; private set; } = "isautologinenable";
+        public static string AutoLoginMode { get; private set; } = "autologinmode";
+        public static string MaxParallelDownloadCount { get; private set; } = "maxparalleldownloadcount";
+        public static string MaxParallelSegmentDownloadCount { get; private set; } = "maxparallelsegmentdownloadcount";
+        public static string DownloadAllWhenPushDLButton { get; private set; } = "downloadallwhenpushdlbutton";
+        public static string AllowDupeOnStage { get; private set; } = "allowdupeonstage";
+        public static string ReplaceSingleByteToMultiByte { get; private set; } = "replacesinglebytetomultibyte";
+        public static string OverideVideoFileDTToUploadedDT { get; private set; } = "overidevideofiledttouploadeddt";
+        public static string LimitCommentCount { get; private set; } = "limitcommentcount";
+        public static string MaxCommentCount { get; private set; } = "maxcommentcount";
+        public static string IsDownloadingVideoInfoEnable { get; private set; } = "isdownloadingvideoinfoenable";
+        public static string IsDownloadingVideoInfoInJsonEnable { get; private set; } = "isdownloadingvideoinfoinjsonenable";
+        public static string MaxParallelFetchCount { get; private set; } = "maxparallelfetchcount";
+        public static string FetchSleepInterval { get; private set; } = "fetchsleepinterval";
+        public static string SkipSSLVerification { get; private set; } = "skipsslverification";
     }
 }

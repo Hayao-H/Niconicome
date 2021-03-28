@@ -5,7 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>0.2.5.*</AssemblyVersion>
+    <AssemblyVersion>0.3.0.*</AssemblyVersion>
     <FileVersion>0.0.0.0</FileVersion>
     <StartupObject>Niconicome.App</StartupObject>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -15,7 +15,7 @@
     <PublishTrimmed>false</PublishTrimmed>
     <Deterministic>false</Deterministic>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <Version>0.2.5</Version>
+    <Version>0.3.0</Version>
     <PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
     <Copyright>c2021 Hayao-H</Copyright>
     <Authors>Hayao-H</Authors>
@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <None Remove="src\app.ico" />
+    <None Remove="Views\Setting\DownloadTasksWindows.xaml" />
     <None Include="src\icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -43,16 +44,17 @@
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.14.0" />
     <PackageReference Include="CredentialManagement" Version="1.0.2" />
-    <PackageReference Include="LiteDB" Version="5.0.9" />
-    <PackageReference Include="MaterialDesignColors" Version="1.2.7" />
-    <PackageReference Include="MaterialDesignThemes" Version="3.2.0" />
+    <PackageReference Include="LiteDB" Version="5.0.10" />
+    <PackageReference Include="MaterialDesignColors" Version="2.0.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.721-prerelease" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.774.44" />
     <PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
     <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
     <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
   </ItemGroup>
   

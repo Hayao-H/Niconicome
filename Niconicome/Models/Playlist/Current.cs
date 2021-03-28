@@ -16,6 +16,7 @@ namespace Niconicome.Models.Playlist
     {
         void Update(int playlistId);
         void Update(int playlistId, IVideoListInfo video);
+        void Uncheck(int playlistID, int videoID);
         ITreePlaylistInfo? CurrentSelectedPlaylist { get; set; }
         event EventHandler SelectedItemChanged;
         event EventHandler VideosChanged;
@@ -24,7 +25,7 @@ namespace Niconicome.Models.Playlist
 
     class Current : ICurrent
     {
-        public Current(ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,IPlaylistStoreHandler playlistStoreHandler)
+        public Current(ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility, IPlaylistStoreHandler playlistStoreHandler)
         {
             this.cacheHandler = cacheHandler;
             this.videoHandler = videoHandler;
@@ -50,6 +51,8 @@ namespace Niconicome.Models.Playlist
         private readonly ICacheHandler cacheHandler;
 
         private readonly IPlaylistStoreHandler playlistStoreHandler;
+
+        private readonly object lockObj = new();
 
         public ObservableCollection<IVideoListInfo> Videos { get; init; }
 
@@ -80,6 +83,37 @@ namespace Niconicome.Models.Playlist
                 this.RaiseSelectedItemChanged();
             }
         }
+
+        /// <summary>
+        /// チェックを外す
+        /// </summary>
+        /// <param name="playlistID"></param>
+        /// <param name="videoID"></param>
+       　public void Uncheck(int playlistID, int videoID)
+        {
+            if (this.CurrentSelectedPlaylist is null) return;
+
+            if (playlistID == this.CurrentSelectedPlaylist.Id)
+            {
+                var video = this.Videos.FirstOrDefault(v => v.Id == videoID);
+                if (video is not null)
+                {
+                    video.IsSelected = false;
+                }
+            }
+            else
+            {
+                var messageGuid = string.Empty;
+                if (LightVideoListinfoHandler.Contains(new LightVideoListInfo(messageGuid, playlistID, videoID, false)))
+                {
+                    messageGuid = LightVideoListinfoHandler.GetLightVideoListInfo(videoID, playlistID)!.MessageGuid;
+                }
+
+                var video = new LightVideoListInfo(messageGuid, playlistID, videoID, false);
+                LightVideoListinfoHandler.AddVideo(video);
+            }
+        }
+
 
         /// <summary>
         /// プレイリスト変更時に発火するイベント
@@ -156,8 +190,11 @@ namespace Niconicome.Models.Playlist
                         foreach (var oldVideo in videos)
                         {
                             if (!this.videoHandler.Exist(oldVideo.Id)) continue;
+                            if (playlistId != (this.CurrentSelectedPlaylist?.Id ?? -1)) return;
 
                             var video = this.videoHandler.GetVideo(oldVideo.Id);
+
+                            //保持されている動画情報があれば引き継ぐ
                             var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(oldVideo.Id, playlistId);
 
                             if (lightVideo is not null)
@@ -167,6 +204,7 @@ namespace Niconicome.Models.Playlist
                                 video.Message = VideoMessanger.GetMessage(lightVideo.MessageGuid);
                             }
 
+                            //サムネイル
                             bool isValid = this.videoThumnailUtility.IsValidThumbnail(video);
                             bool hasCache = this.videoThumnailUtility.HasThumbnailCache(video);
                             if (!isValid || !hasCache)
@@ -206,16 +244,20 @@ namespace Niconicome.Models.Playlist
         {
 
             if (this.Videos.Count == 0) return;
-            if (!this.Videos.Any(v => v.Id == video.Id))
+            
+            lock (this.lockObj)
             {
-                this.Videos.Add(video);
-            }
-            else
-            {
-                int index = this.Videos.FindIndex(v => v.Id == video.Id);
-                if (index == -1) return;
-                this.Videos.RemoveAt(index);
-                this.Videos.Insert(index, video);
+                if (!this.Videos.Any(v => (v?.Id ?? 0) == video.Id))
+                {
+                    this.Videos.Add(video);
+                }
+                else
+                {
+                    int index = this.Videos.FindIndex(v => v.Id == video.Id);
+                    if (index == -1) return;
+                    this.Videos.RemoveAt(index);
+                    this.Videos.Insert(index, video);
+                }
             }
 
 

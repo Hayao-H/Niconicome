@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Local;
+using Niconicome.ViewModels.Controls;
 using MD = MaterialDesignThemes.Wpf;
 using WS = Niconicome.Workspaces;
 
@@ -13,7 +15,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 {
     class RestorePageViewModel : BindableBase
     {
-        public RestorePageViewModel(Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> showMessage)
+        public RestorePageViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessage)
         {
             this.showMessage = showMessage;
             this.Backups = new ObservableCollection<IBackupData>();
@@ -39,10 +41,10 @@ namespace Niconicome.ViewModels.Setting.Pages
                 }
             });
 
-            this.ResetSettingsCommand = new CommandBase<object>(_ => true, _ =>
+            this.ResetSettingsCommand = new CommandBase<object>(_ => true, async _ =>
             {
-                var confirm = this.showMessage("本当に設定を削除しますか？この操作は元に戻すことができません。", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                if (confirm != MessageBoxResult.Yes) return;
+                var confirm = await this.showMessage("本当に設定を削除しますか？この操作は元に戻すことができません。", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+                if (confirm != MaterialMessageBoxResult.Yes) return;
                 WS::SettingPage.Restore.ResetSettings();
                 this.SnackbarMessageQueue.Enqueue("設定をリセットしました。");
             });
@@ -67,37 +69,37 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             });
 
-            this.ApplyBackupCommand = new CommandBase<IBackupData>(_ => true, arg =>
-            {
-
-                if (arg is null) return;
-                if (arg.AsNullable<IBackupData>() is not IBackupData backup || backup is null) return;
-
-                var confirm = this.showMessage("本当にこのバックアップを適用しますか？現在の設定は全て削除され、操作は元に戻すことができません。", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                if (confirm != MessageBoxResult.Yes) return;
-
-                bool result = WS::SettingPage.Restore.TryApplyBackup(backup.GUID);
-
-                if (result)
-                {
-                    this.SnackbarMessageQueue.Enqueue($"バックアップを適用しました。");
-                }
-                else
-                {
-                    this.SnackbarMessageQueue.Enqueue($"バックアップの適用に失敗しました。");
-                }
-            });
-
-            this.ResetDataCommand = new CommandBase<object>(_ => true, _ =>
+            this.ApplyBackupCommand = new CommandBase<IBackupData>(_ => true, async arg =>
              {
 
-                 var confirm = this.showMessage("本当に全ての動画・プレイリストを削除しますか？この操作は元に戻すことができません。", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-                 if (confirm != MessageBoxResult.Yes) return;
-                 WS::SettingPage.Restore.DeleteAllVideosAndPlaylists();
-                 this.SnackbarMessageQueue.Enqueue("データをリセットしました。");
-                 WS::SettingPage.PlaylistTreeHandler.Refresh();
-                 WS::SettingPage.PlaylistTreeHandler.Refresh();
+                 if (arg is null) return;
+                 if (arg.AsNullable<IBackupData>() is not IBackupData backup || backup is null) return;
+
+                 var confirm = await this.showMessage("本当にこのバックアップを適用しますか？現在の設定は全て削除され、操作は元に戻すことができません。", MessageBoxButtons.Yes | MessageBoxButtons.No | MessageBoxButtons.Cancel, MessageBoxIcons.Question);
+                 if (confirm != MaterialMessageBoxResult.Yes) return;
+
+                 bool result = WS::SettingPage.Restore.TryApplyBackup(backup.GUID);
+
+                 if (result)
+                 {
+                     this.SnackbarMessageQueue.Enqueue($"バックアップを適用しました。");
+                 }
+                 else
+                 {
+                     this.SnackbarMessageQueue.Enqueue($"バックアップの適用に失敗しました。");
+                 }
              });
+
+            this.ResetDataCommand = new CommandBase<object>(_ => true, async _ =>
+              {
+
+                  var confirm = await this.showMessage("本当に全ての動画・プレイリストを削除しますか？この操作は元に戻すことができません。", MessageBoxButtons.Yes | MessageBoxButtons.No | MessageBoxButtons.Cancel, MessageBoxIcons.Question);
+                  if (confirm != MaterialMessageBoxResult.OK) return;
+                  WS::SettingPage.Restore.DeleteAllVideosAndPlaylists();
+                  this.SnackbarMessageQueue.Enqueue("データをリセットしました。");
+                  WS::SettingPage.PlaylistTreeHandler.Refresh();
+                  WS::SettingPage.PlaylistTreeHandler.Refresh();
+              });
 
             this.LoadSavedFiles = new CommandBase<object>(_ => true, _ =>
             {
@@ -133,7 +135,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         }
 
 
-        public RestorePageViewModel() : this((message, title, button, image) => MessageBox.Show(message, title, button, image))
+        public RestorePageViewModel() : this((message, button, image) => MaterialMessageBox.Show(message, button, image))
         {
         }
 
@@ -209,6 +211,6 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// メッセージボックス
         /// </summary>
-        private readonly Func<string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult> showMessage;
+        private readonly Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessage;
     }
 }

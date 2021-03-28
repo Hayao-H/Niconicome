@@ -27,7 +27,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface IVideoDownloadHelper
     {
-        Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token);
+        Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, int maxParallelDownloadCount, CancellationToken token);
         IEnumerable<string> GetAllFileAbsPaths();
         string FolderName { get; }
     }
@@ -58,7 +58,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         string FileNameFormat { get; }
         bool IsOverwriteEnable { get; }
         bool IsAutoDisposingEnable { get; }
+        bool IsReplaceStrictedEnable { get; }
+        bool IsOvwrridingFileDTEnable { get; }
         uint VerticalResolution { get; }
+        int MaxParallelDownloadCount { get; }
     }
 
     /// <summary>
@@ -124,13 +127,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
 
 
-            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".mp4")
+            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".mp4", settings.IsReplaceStrictedEnable)
                 : $"[{session.Video!.Id}]{session.Video!.Title}.mp4"
                 ;
 
             if (token.IsCancellationRequested)
             {
-                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -140,9 +143,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             var targetStream = streams.GetStream(settings.VerticalResolution);
 
+            context.ActualVerticalResolution = targetStream.Resolution?.Vertical ?? 0;
+
             if (token.IsCancellationRequested)
             {
-                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -150,7 +155,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             try
             {
-                await this.videoDownloadHelper.DownloadAsync(targetStream, this.messenger, context, token);
+                await this.videoDownloadHelper.DownloadAsync(targetStream, this.messenger, context, settings.MaxParallelDownloadCount, token);
 
             }
             catch (Exception e)
@@ -167,7 +172,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             if (token.IsCancellationRequested)
             {
                 this.DeleteTmpFolder();
-                this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
@@ -179,7 +184,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 FileName = fileName,
                 FolderName = settings.FolderName,
                 TsFilePaths = this.videoDownloadHelper.GetAllFileAbsPaths(),
-                IsOverwriteEnable = settings.IsOverwriteEnable
+                IsOverwriteEnable = settings.IsOverwriteEnable,
+                IsOverrideDTEnable = settings.IsOvwrridingFileDTEnable,
+                UploadedOn = session.Video.DmcInfo.UploadedOn,
             };
 
             try
@@ -188,7 +195,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
             catch (TaskCanceledException)
             {
-                this.logger.Log("ユーザーの操作によって動画の変換処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+                this.logger.Log($"ユーザーの操作によって動画の変換処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("動画の変換中にキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 this.DeleteTmpFolder();
@@ -268,10 +275,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         public VideoDownloadHelper(INicoHttp http, ISegmentWriter writer, ILogger logger)
         {
-            //最大並列ダウンロード数(既定:5)
-            const int maxParallelDownloadCount = 5;
-
-            this.maxParallelDownloadCount = maxParallelDownloadCount;
             this.http = http;
             this.writer = writer;
             this.logger = logger;
@@ -289,21 +292,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         private readonly ILogger logger;
 
-        private readonly int maxParallelDownloadCount;
-
         /// <summary>
         /// 非同期でダウンロードする
         /// </summary>
         /// <param name="taskHandler"></param>
         /// <returns></returns>
-        public async Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
+        public async Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, int maxParallelDownloadCount, CancellationToken token)
         {
-            var taskHandler = new ParallelTasksHandler<IParallelDownloadTask>(2, false);
+            var taskHandler = new ParallelTasksHandler<IParallelDownloadTask>(maxParallelDownloadCount, false);
             var completed = 0;
             var all = stream.StreamUrls.Count;
+            var resolution = context.ActualVerticalResolution == 0 ? string.Empty : $"（{context.ActualVerticalResolution}px）";
             Exception? ex = null;
 
-            var tasks = stream.StreamUrls.Select(url => new ParallelDownloadTask(async self =>
+            var tasks = stream.StreamUrls.Select(url => new ParallelDownloadTask(async (self, _) =>
             {
                 if (token.IsCancellationRequested || ex is not null) return;
 
@@ -316,7 +318,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 catch (Exception e)
                 {
                     ex = e;
-                    this.logger.Error($"セグメント(idx:{self.SequenceZero})の取得に失敗しました。", e);
+                    this.logger.Error($"セグメント(idx:{self.SequenceZero})の取得に失敗しました。(context_id:{context.Id},content_id:{context.NiconicoId})", e);
                     return;
                 }
 
@@ -339,7 +341,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 }
 
                 completed++;
-                messenger.SendMessage($"完了: {completed}/{all}");
+                messenger.SendMessage($"完了: {completed}/{all}{resolution}");
 
                 await Task.Delay(1 * 1000);
 
@@ -415,7 +417,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     /// </summary>
     public class ParallelDownloadTask : IParallelDownloadTask
     {
-        public ParallelDownloadTask(Func<IParallelDownloadTask, Task> taskFunc, IDownloadContext context, string url, int sequenceZero, string filename)
+        public ParallelDownloadTask(Func<IParallelDownloadTask, object, Task> taskFunc, IDownloadContext context, string url, int sequenceZero, string filename)
         {
             this.TaskFunction = taskFunc;
             this.TaskId = Guid.NewGuid();
@@ -442,7 +444,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         public Guid TaskId { get; init; }
 
-        public Func<IParallelDownloadTask, Task> TaskFunction { get; init; }
+        public Func<IParallelDownloadTask, object, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
     }
@@ -462,6 +464,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         public bool IsAutoDisposingEnable { get; set; }
 
+        public bool IsReplaceStrictedEnable { get; set; }
+
+        public bool IsOvwrridingFileDTEnable { get; set; }
+
+
         public uint VerticalResolution { get; set; }
+
+        public int MaxParallelDownloadCount { get; set; }
+
     }
 }

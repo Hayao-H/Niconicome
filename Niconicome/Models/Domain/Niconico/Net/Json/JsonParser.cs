@@ -29,8 +29,8 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
                 PropertyNameCaseInsensitive = false,
                 IgnoreNullValues = true,
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-            //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-        };
+                //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            };
 
             T? instance = JsonSerializer.Deserialize<T>(source, options);
             //nullチェック
@@ -45,17 +45,20 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static string Serialize<T>(T source)
+        public static string Serialize<T>(T source, JsonSerializerOptions? options = null)
         {
 
-            var options = new JsonSerializerOptions()
+            if (options is null)
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                PropertyNameCaseInsensitive = false,
-                IgnoreNullValues = true,
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-            };
+                options = new JsonSerializerOptions()
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = false,
+                    IgnoreNullValues = true,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+                };
+            }
 
             string json = JsonSerializer.Serialize<T>(source, options);
 

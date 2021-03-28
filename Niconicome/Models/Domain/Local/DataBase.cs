@@ -106,8 +106,6 @@ namespace Niconicome.Models.Domain.Local
         {
             BsonMapper.Global.Entity<STypes::Playlist>()
                 .DbRef(playlist => playlist.Videos, STypes::Video.TableName);
-            BsonMapper.Global.Entity<STypes::Video>()
-                .DbRef(video => video.Owner, Niconico::User.TableName);
 
             if (!this.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot))
             {

@@ -17,7 +17,15 @@ namespace Niconicome.Models.Network
         string Title { get; set; }
         string Id { get; set; }
         string FileName { get; set; }
+        string ChannelID { get; set; }
+        string ChannelName { get; set; }
+        string OwnerName { get; set; }
         int ViewCount { get; set; }
+        int CommentCount { get; set; }
+        int MylistCount { get; set; }
+        int LikeCount { get; set; }
+        int OwnerID { get; set; }
+        int Duration { get; set; }
         IEnumerable<string> Tags { get; set; }
         DateTime UploadedOn { get; set; }
         Uri LargeThumbUri { get; set; }
@@ -113,6 +121,8 @@ namespace Niconicome.Models.Network
                 return result;
             }
 
+            var replaceStricted = this.settingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+
             //タイトル
             info.Title = retrieved.Title;
 
@@ -123,10 +133,24 @@ namespace Niconicome.Models.Network
             info.Tags = retrieved.Tags;
 
             //ファイル名
-            info.FileName = this.utils.GetFileName(filenameFormat, retrieved.DmcInfo, ".mp4");
+            info.FileName = this.utils.GetFileName(filenameFormat, retrieved.DmcInfo, ".mp4", replaceStricted);
 
             //再生回数
             info.ViewCount = retrieved.ViewCount;
+            info.CommentCount = retrieved.CommentCount;
+            info.MylistCount = retrieved.MylistCount;
+            info.LikeCount = retrieved.LikeCount;
+
+            //チャンネル情報
+            info.ChannelID = retrieved.ChannelID;
+            info.ChannelName = retrieved.ChannelName;
+
+            //投稿者情報
+            info.OwnerID = retrieved.OwnerID;
+            info.OwnerName = retrieved.Owner;
+
+            //再生時間
+            info.Duration = retrieved.Duration;
 
             //投稿日時
             if (retrieved.DmcInfo is not null)
@@ -169,8 +193,23 @@ namespace Niconicome.Models.Network
 
         public string FileName { get; set; } = string.Empty;
 
+        public string ChannelID { get; set; } = string.Empty;
+
+        public string ChannelName { get; set; } = string.Empty;
+
+        public string OwnerName { get; set; } = string.Empty;
 
         public int ViewCount { get; set; }
+
+        public int CommentCount { get; set; }
+
+        public int MylistCount { get; set; }
+
+        public int LikeCount { get; set; }
+
+        public int OwnerID { get; set; }
+
+        public int Duration { get; set; }
 
         public IEnumerable<string> Tags { get; set; } = new List<string>();
 
@@ -196,6 +235,14 @@ namespace Niconicome.Models.Network
                 Tags = this.Tags,
                 ViewCount = this.ViewCount,
                 FileName = this.FileName,
+                ChannelId = this.ChannelID,
+                ChannelName = this.ChannelName,
+                MylistCount = this.MylistCount,
+                CommentCount = this.CommentCount,
+                LikeCount = this.LikeCount,
+                OwnerID = this.OwnerID,
+                Duration = this.Duration,
+                OwnerName = this.OwnerName,
             };
         }
 

@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using Niconicome.Extensions.System;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Local;
-using Niconicome.Models.Network;
+using Niconicome.Models.Network.Download;
 using Niconicome.Models.Playlist;
+using Niconicome.Views;
+using MaterialDesign = MaterialDesignThemes.Wpf;
 using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 using WS = Niconicome.Workspaces;
-using MaterialDesign = MaterialDesignThemes.Wpf;
-using Niconicome.Extensions.System.List;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -21,6 +20,9 @@ namespace Niconicome.ViewModels.Mainpage
 
         public DownloadSettingsViewModel()
         {
+            this.isDownloadingVideoIndoEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLVideoInfo);
+            this.isLimittingCommentCountEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.LimitCommentsCount);
+            this.maxCommentsCountField = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MaxCommentsCount);
             this.IsDownloadingVideoEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLVideo);
             this.IsDownloadingCommentEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLComment);
             this.isDownloadingCommentLogEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLKako);
@@ -31,19 +33,20 @@ namespace Niconicome.ViewModels.Mainpage
             this.isSkippingEnablefield = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLSkip);
             this.isCopyFromAnotherFolderEnableFIeld = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLCopy);
 
+            WS::Mainpage.Videodownloader.CanDownloadChange += this.OnCanDownloadChange;
+
             var s1 = new ResolutionSetting("1920x1080");
             var s2 = new ResolutionSetting("1280x720");
             var s3 = new ResolutionSetting("854x480");
             var s4 = new ResolutionSetting("640x360");
             var s5 = new ResolutionSetting("426x240");
 
-            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5
-    };
+            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5 };
             this.selectedResolutionField = s1;
 
-            this.SnackbarMessageQueue = WS::Mainpage.SnackbarMessageQueue;
+            this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
-            this.DownloadCommand = new CommandBase<object>(_ => this.playlist is not null && !this.isDownloadingField, async _ =>
+            this.DownloadCommand = new CommandBase<object>(_ => this.playlist is not null && !this.IsDownloading, async _ =>
                {
                    if (this.playlist is null)
                    {
@@ -63,19 +66,20 @@ namespace Niconicome.ViewModels.Mainpage
                        return;
                    }
 
-                   if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable  && !this.IsDownloadingThumbEnable) return;
+                   if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable && !this.IsDownloadingVideoInfoEnable) return;
 
                    var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
                    if (!videos.Any()) return;
 
                    var cts = new CancellationTokenSource();
-                   this.downloacts = cts;
-                   this.StartDownload();
 
                    int videoCount = videos.Count();
                    var firstVideo = videos.First();
+                   var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
+                   var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+                   var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
                    string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
-                   var setting = new DownloadSettings()
+                   var setting = new DownloadSettings
                    {
                        Video = this.IsDownloadingVideoEnable,
                        Thumbnail = this.IsDownloadingThumbEnable,
@@ -88,63 +92,95 @@ namespace Niconicome.ViewModels.Mainpage
                        Skip = this.IsSkippingEnable,
                        FolderPath = folderPath,
                        VerticalResolution = this.SelectedResolution.Resolution.Vertical,
+                       PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
+                       IsReplaceStrictedEnable = replaceStricted,
+                       OverrideVideoFileDateToUploadedDT = overrideVideoDT,
+                       MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
+                       DownloadVideoInfo = this.IsDownloadingVideoInfoEnable,
                    };
+                   var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
 
 
-                   WS::Mainpage.Messagehandler.AppendMessage($"動画のダウンロードを開始します。({videoCount}件)");
-                   this.SnackbarMessageQueue.Enqueue($"動画のダウンロードを開始します。({videoCount}件)");
-                   INetworkResult? result = null;
+                   WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting, allowDupe);
 
-                   try
+                   if (dlFromQueue)
                    {
-                       result = await WS::Mainpage.Videodownloader.DownloadVideos(videos, setting, cts.Token);
-
-                   }
-                   catch (Exception e)
-                   {
-                       WS::Mainpage.Messagehandler.AppendMessage($"ダウンロード中にエラーが発生しました。(詳細: {e.Message})");
-                       this.SnackbarMessageQueue.Enqueue($"ダウンロード中にエラーが発生しました。");
-                   }
-
-                   if (result?.SucceededCount > 1)
-                   {
-                       if (result?.FirstVideo is not null)
-                       {
-                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
-                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
-
-                           if (!result.IsSucceededAll)
-                           {
-                               WS::Mainpage.Messagehandler.AppendMessage($"{result.FailedCount}件の動画のダウンロードに失敗しました。");
-                           }
-                       }
-                   }
-                   else if (result?.SucceededCount == 1)
-                   {
-                       if (result?.FirstVideo is not null)
-                       {
-                           WS::Mainpage.Messagehandler.AppendMessage($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
-                           this.SnackbarMessageQueue.Enqueue($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
-                       }
+                       WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
                    }
                    else
                    {
-                       WS::Mainpage.Messagehandler.AppendMessage($"ダウンロード出来ませんでした。");
-                       this.SnackbarMessageQueue.Enqueue($"ダウンロード出来ませんでした。");
+                       WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == this.playlist.Id);
                    }
 
-                   this.CompleteDownload();
+                   await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
+
 
                });
 
-            this.CancelCommand = new CommandBase<object>(_ => this.isDownloadingField, _ =>
+            this.StageVideosCommand = new CommandBase<object>(_ => true, _ =>
             {
-                this.downloacts?.Cancel();
-                this.downloacts = null;
-                this.CompleteDownload();
+                if (this.playlist is null)
+                {
+                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ステージできません");
+                    return;
+                }
+
+                if (!this.IsDownloadingCommentEnable && (this.IsDownloadingCommentLogEnable || this.IsDownloadingEasyComment || this.IsDownloadingOwnerComment))
+                {
+                    this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
+                    return;
+                }
+
+                if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable && !this.IsDownloadingVideoInfoEnable) return;
+
+                var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
+                if (!videos.Any()) return;
+
+                int videoCount = videos.Count();
+                var firstVideo = videos.First();
+                var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
+                var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+                var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
+                string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
+
+                WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, new DownloadSettings
+                {
+                    Video = this.IsDownloadingVideoEnable,
+                    Thumbnail = this.IsDownloadingThumbEnable,
+                    Overwrite = this.IsOverwriteEnable,
+                    Comment = this.IsDownloadingCommentEnable,
+                    DownloadLog = this.IsDownloadingCommentLogEnable,
+                    DownloadEasy = this.IsDownloadingEasyComment,
+                    DownloadOwner = this.IsDownloadingOwnerComment,
+                    FromAnotherFolder = this.IsCopyFromAnotherFolderEnable,
+                    Skip = this.IsSkippingEnable,
+                    FolderPath = folderPath,
+                    VerticalResolution = this.SelectedResolution.Resolution.Vertical,
+                    PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
+                    IsReplaceStrictedEnable = replaceStricted,
+                    OverrideVideoFileDateToUploadedDT = overrideVideoDT,
+                    MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
+                    DownloadVideoInfo = this.IsDownloadingVideoInfoEnable,
+                }, allowDupe);
+
+                this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
+                {
+                    var windows = new DownloadTasksWindows();
+                    windows.Show();
+                });
+            });
+
+            this.CancelCommand = new CommandBase<object>(_ => this.IsDownloading, _ =>
+            {
+                WS::Mainpage.Videodownloader.Cancel();
             });
 
             WS::Mainpage.CurrentPlaylist.SelectedItemChanged += this.OnSelectedChanged;
+        }
+
+        ~DownloadSettingsViewModel()
+        {
+            WS::Mainpage.Videodownloader.CanDownloadChange -= this.OnCanDownloadChange;
         }
 
         private bool isDownloadingVideoEnableField = true;
@@ -161,22 +197,24 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isOverwriteEnableField;
 
-        private bool isDownloadingField;
-
         private bool isSkippingEnablefield;
 
         private bool isCopyFromAnotherFolderEnableFIeld;
+
+        private bool isLimittingCommentCountEnableField;
+
+        private bool isDownloadingVideoIndoEnableField;
+
+        private int maxCommentsCountField;
 
         private ResolutionSetting selectedResolutionField;
 
         private ITreePlaylistInfo? playlist;
 
-        private CancellationTokenSource? downloacts;
-
         /// <summary>
         /// ダウンロードフラグ
         /// </summary>
-        public bool IsDownloading { get => this.isDownloadingField; set => this.SetProperty(ref this.isDownloadingField, value); }
+        public bool IsDownloading { get => !WS::Mainpage.Videodownloader.CanDownload; }
 
         /// <summary>
         /// 動画をダウンロードする
@@ -187,6 +225,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// ダウンロードをキャンセルする
         /// </summary>
         public CommandBase<object> CancelCommand { get; init; }
+
+        /// <summary>
+        /// ステージする
+        /// </summary>
+        public CommandBase<object> StageVideosCommand { get; init; }
 
         /// <summary>
         /// 動画ダウンロードフラグ
@@ -219,6 +262,12 @@ namespace Niconicome.ViewModels.Mainpage
         public bool IsDownloadingThumbEnable { get => this.isDownloadingThumbEnableField; set => this.Savesetting(ref this.isDownloadingThumbEnableField, value, Settings.DLThumb); }
 
         /// <summary>
+        /// 動画情報
+        /// </summary>
+        public bool IsDownloadingVideoInfoEnable { get => this.isDownloadingVideoIndoEnableField; set => this.Savesetting(ref this.isDownloadingVideoIndoEnableField, value, Settings.DLVideoInfo); }
+
+
+        /// <summary>
         /// 上書き保存フラグ
         /// </summary>
         public bool IsOverwriteEnable { get => this.isOverwriteEnableField; set => this.Savesetting(ref this.isOverwriteEnableField, value, Settings.DLOverwrite); }
@@ -233,6 +282,15 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public bool IsCopyFromAnotherFolderEnable { get => this.isCopyFromAnotherFolderEnableFIeld; set => this.Savesetting(ref this.isCopyFromAnotherFolderEnableFIeld, value, Settings.DLCopy); }
 
+        /// <summary>
+        /// コメント取得数を制限する
+        /// </summary>
+        public bool IsLimittingCommentCountEnable { get => this.isLimittingCommentCountEnableField; set => this.Savesetting(ref this.isLimittingCommentCountEnableField, value, Settings.LimitCommentsCount); }
+
+        /// <summary>
+        /// コメントの最大取得数
+        /// </summary>
+        public int MaxCommentsCount { get => this.maxCommentsCountField; set => this.Savesetting(ref this.maxCommentsCountField, value, Settings.MaxCommentsCount); }
 
         /// <summary>
         /// 選択中の解像度
@@ -264,17 +322,63 @@ namespace Niconicome.ViewModels.Mainpage
             }
         }
 
-        private void StartDownload()
+        private void OnCanDownloadChange(object? sender, EventArgs e)
         {
-            this.IsDownloading = true;
             this.RaiseCanExecuteChange();
+        }
+    }
+
+    class DownloadSettingsViewModelD
+    {
+        public DownloadSettingsViewModelD()
+        {
+            var s1 = new ResolutionSetting("1920x1080");
+            var s2 = new ResolutionSetting("1280x720");
+            var s3 = new ResolutionSetting("854x480");
+            var s4 = new ResolutionSetting("640x360");
+            var s5 = new ResolutionSetting("426x240");
+
+            this.Resolutions = new List<ResolutionSetting>() { s1, s2, s3, s4, s5 };
+            this.SelectedResolution = s1;
         }
 
-        private void CompleteDownload()
-        {
-            this.IsDownloading = false;
-            this.RaiseCanExecuteChange();
-        }
+        public bool IsDownloading { get => false; }
+
+        public CommandBase<object> DownloadCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public CommandBase<object> CancelCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public CommandBase<object> StageVideosCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public bool IsDownloadingVideoEnable { get; set; } = true;
+
+        public bool IsDownloadingCommentEnable { get; set; } = true;
+
+        public bool IsDownloadingCommentLogEnable { get; set; } = true;
+
+        public bool IsDownloadingOwnerComment { get; set; } = true;
+
+        public bool IsDownloadingEasyComment { get; set; } = true;
+
+        public bool IsDownloadingThumbEnable { get; set; } = true;
+
+        public bool IsOverwriteEnable { get; set; } = true;
+
+        public bool IsSkippingEnable { get; set; } = true;
+
+        public bool IsCopyFromAnotherFolderEnable { get; set; } = true;
+
+        public bool IsLimittingCommentCountEnable { get; set; } = true;
+
+        public bool IsDownloadingVideoInfoEnable { get; set; } = true;
+
+        public int MaxCommentsCount { get; set; } = 2000;
+
+        public ResolutionSetting SelectedResolution { get; set; }
+
+        public List<ResolutionSetting> Resolutions { get; init; }
+
+        public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
     }
 
     class ResolutionSetting

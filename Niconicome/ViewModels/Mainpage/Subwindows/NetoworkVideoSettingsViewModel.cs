@@ -73,15 +73,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     this.Message = "情報を取得中です...";
 
-                    INetworkResult result = this.CurrentSetting.NetworkMode switch
-                    {
-                        Playlist::RemoteType.Mylist => await WS::Mainpage.RemotePlaylistHandler.TryGetMylistVideosAsync(id, videos),
-                        Playlist::RemoteType.UserVideos => await WS::Mainpage.RemotePlaylistHandler.TryGetUserVideosAsync(id, videos),
-                        Playlist::RemoteType.WatchLater => await WS::Mainpage.RemotePlaylistHandler.TryGetWatchLaterAsync(videos),
-                        Playlist::RemoteType.Channel => await WS::Mainpage.RemotePlaylistHandler.TryGetChannelVideosAsync(id, videos, new List<string>(), m => this.Message = m),
-                        Playlist::RemoteType.None => new NetworkResult(),
-                        _ => new NetworkResult()
-                    };
+                    var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(id, videos,this.CurrentSetting.NetworkMode, new List<string>(), m => this.Message = m);
 
 
                     if (result.IsFailed)
@@ -116,18 +108,14 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                         WS::Mainpage.CurrentPlaylist.Update(playlistID);
                     }
 
-
-                    switch (this.CurrentSetting.NetworkMode)
+                    if (this.CurrentSetting.NetworkMode == Playlist::RemoteType.None)
                     {
-                        case Playlist::RemoteType.Mylist:
-                        case Playlist::RemoteType.UserVideos:
-                        case Playlist::RemoteType.WatchLater:
-                        case Playlist::RemoteType.Channel:
-                            WS::Mainpage.PlaylistTree.SetAsRemotePlaylist(playlistID, id, this.CurrentSetting.NetworkMode);
-                            break;
-                        case Playlist::RemoteType.None:
-                            WS::Mainpage.PlaylistTree.SetAsLocalPlaylist(playlistID);
-                            break;
+                        WS::Mainpage.PlaylistTree.SetAsLocalPlaylist(playlistID);
+
+                    }
+                    else
+                    {
+                        WS::Mainpage.PlaylistTree.SetAsRemotePlaylist(playlistID, id, this.CurrentSetting.NetworkMode);
                     }
 
                     if (result.IsSucceededAll)

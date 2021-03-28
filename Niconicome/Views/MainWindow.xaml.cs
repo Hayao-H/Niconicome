@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Niconicome.ViewModels.Mainpage;
 
 namespace Niconicome
 {
@@ -23,6 +24,8 @@ namespace Niconicome
         public MainWindow()
         {
             this.InitializeComponent();
+            this.downloadSettings.DataContext = new DownloadSettingsViewModel();
+            this.videoList.DataContext = new VideoListViewModel();
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)

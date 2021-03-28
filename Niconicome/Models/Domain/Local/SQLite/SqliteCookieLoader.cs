@@ -1,0 +1,106 @@
+﻿using System;
+
+namespace Niconicome.Models.Domain.Local.SQLite
+{
+    public interface IUserCookieRaw
+    {
+        bool IsUserSessionExpires { get; }
+        bool IsUserSessionSecureExpires { get; }
+        bool IsNnicosidExpires { get; }
+        byte[]? UserSession { get; }
+        byte[]? UserSessionSecure { get; }
+        byte[]? Nicosid { get; }
+    }
+
+    public interface ISqliteCookieLoader
+    {
+        string GetCookiePath(CookieType type);
+        IUserCookieRaw GetCookies(string path);
+    }
+
+    public class SqliteCookieLoader : ISqliteCookieLoader
+    {
+
+        public SqliteCookieLoader(ISQliteLoader loader)
+        {
+            this.loader = loader;
+        }
+
+        private readonly ISQliteLoader loader;
+
+        public string GetCookiePath(CookieType type)
+        {
+            return type switch
+            {
+                CookieType.Webview2 => @"Niconicome.exe.WebView2\EBWebView\Default\Cookies",
+                _ => throw new InvalidOperationException("そのような種別のCookieには対応していません。"),
+            };
+        }
+
+        public IUserCookieRaw GetCookies(string path)
+        {
+            using var loader = this.loader;
+
+            var command =
+                $"Select name,encrypted_value,expires_utc " +
+                $"From cookies " +
+                $"Where host_key = '.nicovideo.jp'";
+
+            var reader = loader.GetDataReader(path, command);
+
+            var data = new UserCookieRaw();
+
+            while (reader.Read())
+            {
+                var name = reader.GetString(0);
+                var stream = reader.GetStream(1);
+                var len = stream.Length;
+                var expires = reader.GetInt64(2);
+                var expiresDT = DateTimeOffset.FromUnixTimeSeconds(expires / 1000000 - 11644473600);
+
+                if (name == "user_session")
+                {
+                    data.UserSession = new byte[stream.Length];
+                    stream.Read(data.UserSession);
+                    data.IsUserSessionExpires = DateTime.Now > expiresDT.ToLocalTime();
+                }
+                else if (name == "user_session_secure")
+                {
+                    data.UserSessionSecure = new byte[stream.Length];
+                    stream.Read(data.UserSessionSecure);
+                    data.IsUserSessionSecureExpires = DateTime.Now > expiresDT.ToLocalTime();
+
+                }
+                else if (name == "nicosid")
+                {
+                    data.Nicosid = new byte[stream.Length];
+                    stream.Read(data.Nicosid);
+                    data.IsNnicosidExpires = DateTime.Now > expiresDT.ToLocalTime();
+                }
+            }
+
+            return data;
+        }
+    }
+
+    public class UserCookieRaw : IUserCookieRaw
+    {
+
+        public bool IsUserSessionExpires { get; set; }
+
+        public bool IsUserSessionSecureExpires { get; set; }
+
+        public bool IsNnicosidExpires { get; set; }
+
+        public byte[]? UserSession { get; set; }
+
+        public byte[]? UserSessionSecure { get; set; }
+
+        public byte[]? Nicosid { get; set; }
+    }
+
+    public enum CookieType
+    {
+        Webview2
+    }
+}

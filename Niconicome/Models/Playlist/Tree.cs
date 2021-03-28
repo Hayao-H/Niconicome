@@ -51,7 +51,6 @@ namespace Niconicome.Models.Playlist
         void Merge(ITreePlaylistInfo playlist);
         void MergeRange(IEnumerable<ITreePlaylistInfo> playlists);
         bool Contains(int id);
-        bool ContainsVideo(string niconicoId, int playlistId);
         bool IsLastChild(ITreePlaylistInfo child);
         bool IsLastChild(int id);
         ITreePlaylistInfo? GetParent(int id);
@@ -238,7 +237,7 @@ namespace Niconicome.Models.Playlist
         /// <returns></returns>
         public bool ContainsVideo(string niconicoId, int playlistId)
         {
-            return this.handler.ContainsVideo(niconicoId, playlistId);
+            return this.playlistStoreHandler.ContainsVideo(niconicoId, playlistId);
         }
 
         /// <summary>
@@ -370,19 +369,6 @@ namespace Niconicome.Models.Playlist
         public bool Contains(int id)
         {
             return this.TreePlaylistInfoes.Any(p => p.Id == id);
-        }
-
-        /// <summary>
-        /// 指定されたIDの動画を含むかどうかを返す
-        /// </summary>
-        /// <param name="videoId"></param>
-        /// <param name="playlistId"></param>
-        /// <returns></returns>
-        public bool ContainsVideo(string niconicoId, int playlistId)
-        {
-            var playlist = this.GetPlaylist(playlistId);
-            if (playlist is null) return false;
-            return playlist.Videos.Any(v => v.NiconicoId == niconicoId);
         }
 
         /// <summary>
@@ -833,6 +819,7 @@ namespace Niconicome.Models.Playlist
         Mylist,
         UserVideos,
         WatchLater,
-        Channel
+        Channel,
+        WatchPage
     }
 }
