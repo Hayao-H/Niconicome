@@ -130,7 +130,7 @@ namespace NiconicomeTest.Properties {
         ///&lt;html lang=&quot;ja&quot;&gt;
         ///  &lt;head&gt;
         ///    &lt;meta charset=&quot;UTF-8&quot;&gt;
-        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://ads.nicovideo.jp/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;http://nmsg.nicovideo.jp/api/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://ads.nicovideo.jp/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://public.api.nicovideo.jp/&quot;&gt;&lt; [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1.0&quot;&gt;      &lt;link rel=&quot;preconnect&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://ads.nicovideo.jp/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;http://nmsg.nicovideo.jp/api/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://ads.nicovideo.jp/&quot;&gt;&lt;link rel=&quot;preconnect&quot; href=&quot;https://public.api.nicovideo. [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string Niconico_Onmyoji {
             get {
