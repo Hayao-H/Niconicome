@@ -92,7 +92,7 @@ jobs:
       run: |
         dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x64 -p:PublishSingleFile=true --self-contained true  -o win-x64-sc
         dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x64 -p:PublishSingleFile=true --self-contained false  -o win-x64
-        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86-sc -p:PublishSingleFile=true --self-contained true  -o win-x86-sc
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86 -p:PublishSingleFile=true --self-contained true  -o win-x86-sc
         dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86 -p:PublishSingleFile=true --self-contained false  -o win-x86
         Copy-Item -Recurse ffmpeg/bin win-x64-sc
         Copy-Item -Recurse ffmpeg/bin win-x64
