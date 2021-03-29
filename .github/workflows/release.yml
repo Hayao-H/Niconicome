@@ -47,7 +47,7 @@ jobs:
     - name: Version
       id: get-version
       run: |
-        VERSION = $(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
+        $VERSION = $(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
         echo ::set-output name=version::$VERSION
 
   publish:
