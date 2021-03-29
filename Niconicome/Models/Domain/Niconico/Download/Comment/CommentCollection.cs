@@ -76,6 +76,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private readonly int defaultFork;
 
+        private bool isSorted;
+
         /// <summary>
         /// スレッド情報
         /// </summary>
@@ -116,8 +118,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else
                 {
-                    this.commentsfield.Sort((a, b) => (int)(a.Chat!.No - b.Chat!.No));
-                    return this.commentsfield.Distinct(c => c.Chat!.No).ToList();
+                    if (!this.isSorted)
+                    {
+                        this.Sort();
+                    }
+                    return this.commentsfield;
                 }
 
             }
@@ -195,6 +200,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 else if (comment.Chat is not null)
                 {
                     this.commentsfield.Add(comment);
+                    this.isSorted = false;
                 }
                 else
                 {
@@ -338,7 +344,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             }
             else
             {
-                return this.commentsfield.FirstOrDefault(c => includeOwnerComment || (c.Chat?.UserId != null || c.Chat?.Deleted != null))?.Chat;
+                return this.Comments.FirstOrDefault(c => includeOwnerComment || (c.Chat?.UserId != null || c.Chat?.Deleted == null))?.Chat;
             }
         }
 
@@ -347,7 +353,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// </summary>
         public void Sort()
         {
+            if (this.isRoot) return;
+
             this.commentsfield.Sort((a, b) => (int)(a.Chat!.No - b.Chat!.No));
+            var copy = this.commentsfield.Copy();
+            this.commentsfield.Clear();
+            this.commentsfield.AddRange(copy);
+            this.isSorted = true;
         }
 
         /// <summary>
