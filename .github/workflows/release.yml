@@ -97,7 +97,7 @@ jobs:
       with:
         upload_url: ${{ needs.release.outputs.upload_url }}
         asset_path: ./win-x64.zip
-        asset_name: niconicome-win-x64.zip
+        asset_name: niconicome-win-x64-{{ github.ref }}.zip
         asset_content_type: application/zip
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1.0.1
@@ -106,5 +106,5 @@ jobs:
       with:
         upload_url: ${{ needs.release.outputs.upload_url }}
         asset_path: ./win-x86.zip
-        asset_name: niconicome-win-x86.zip
+        asset_name: niconicome-win-x86-{{ github.ref }}.zip
         asset_content_type: application/zip

@@ -90,14 +90,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (dThread == -1 || dFork == -1) throw new InvalidOperationException("DefaultPostTargetが見つかりません。");
 
             var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork);
-            Response::Chat? first;
+            Response::Chat? first = null;
             int index = 0;
             long lastNo = 0;
 
             do
             {
                 if (index > 0) messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目)");
-                first = comments.GetFirstComment(false);
                 long? when = comments.Count == 0 ? 0 : first?.Date - 1;
                 List<Response::Comment> retlieved = await this.GetCommentsAsync(dmcInfo, settings, when);
 
