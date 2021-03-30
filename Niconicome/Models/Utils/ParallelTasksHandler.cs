@@ -124,7 +124,7 @@ namespace Niconicome.Models.Utils
             if (this.IsProcessing) return;
 
             var semaphore = new SemaphoreSlim(this.maxPallarelTasksCount, this.maxPallarelTasksCount);
-            int index = 0;
+            int index = -1;
             var mre = new ManualResetEventSlim(true);
             var tasks = new List<Task>();
             var lockObj = new object();
@@ -160,7 +160,7 @@ namespace Niconicome.Models.Utils
                     }
 
                     //待機処理
-                    if (this.waitInterval != -1 && index % this.waitInterval == 0)
+                    if (this.waitInterval != -1 && index > 0 && index % this.waitInterval == 0)
                     {
                         mre.Reset();
                         task.OnWait(index);

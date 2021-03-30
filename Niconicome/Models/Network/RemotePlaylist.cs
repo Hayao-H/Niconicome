@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Playlist;
 using Niconicome.Models.Domain.Niconico.Video.Channel;
 using Niconicome.Models.Local.State;
@@ -16,24 +18,20 @@ namespace Niconicome.Models.Network
     public interface IRemotePlaylistHandler
     {
         Task<INetworkResult> TryGetRemotePlaylistAsync(string id, List<Playlist::IVideoListInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage);
-        Task<INetworkResult> TryGetMylistVideosAsync(string id, List<Playlist::IVideoListInfo> videos);
-        Task<INetworkResult> TryGetUserVideosAsync(string id, List<Playlist::IVideoListInfo> videos);
-        Task<INetworkResult> TryGetWatchLaterAsync(List<Playlist::IVideoListInfo> videos);
-        Task<INetworkResult> TryGetChannelVideosAsync(string id, List<Playlist::IVideoListInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage);
         Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType, int page);
         string? ExceptionDetails { get; }
     }
 
     public class RemotePlaylistHandler : IRemotePlaylistHandler
     {
-        public RemotePlaylistHandler(Mylist::IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Search::ISearch search, Mylist::IWatchLaterHandler watchLaterHandler, IChannelVideoHandler channelVideoHandler, IMessageHandler messageHandler)
+        public RemotePlaylistHandler(Mylist::IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Search::ISearch search, Mylist::IWatchLaterHandler watchLaterHandler, IChannelVideoHandler channelVideoHandler, IMessageHandler messageHandler, INetworkVideoHandler networkVideoHandler)
         {
             this.mylistHandler = mylistHandler;
             this.userHandler = userHandler;
             this.searchClient = search;
             this.watchLaterHandler = watchLaterHandler;
             this.channelVideoHandler = channelVideoHandler;
-            this.messageHandler = messageHandler;
+            this.networkVideoHandler = networkVideoHandler;
         }
 
         /// <summary>
@@ -62,14 +60,14 @@ namespace Niconicome.Models.Network
         private readonly IChannelVideoHandler channelVideoHandler;
 
         /// <summary>
+        /// ネットワークハンドラ
+        /// </summary>
+        private readonly INetworkVideoHandler networkVideoHandler;
+
+        /// <summary>
         /// 例外の詳細情報
         /// </summary>
         public string? ExceptionDetails { get; private set; }
-
-        /// <summary>
-        /// 出力
-        /// </summary>
-        private readonly IMessageHandler messageHandler;
 
         /// <summary>
         /// 全てのタイプのリモートプレイリストをまとめて取得する
@@ -213,14 +211,13 @@ namespace Niconicome.Models.Network
         public async Task<INetworkResult> TryGetChannelVideosAsync(string id, List<Playlist::IVideoListInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
             var resultInfo = new NetworkResult();
-            IChannelResult result;
+            IEnumerable<string> ids;
             try
             {
-                result = await this.channelVideoHandler.GetVideosAsync(id, registeredVideo, m =>
-                 {
-                     onMessage(m);
-                     this.messageHandler.AppendMessage(m);
-                 });
+                ids = await this.channelVideoHandler.GetVideosAsync(id, registeredVideo, m =>
+                {
+                    onMessage(m);
+                });
 
             }
             catch
@@ -230,13 +227,41 @@ namespace Niconicome.Models.Network
                 return resultInfo;
             }
 
-            resultInfo.FailedCount = result.FailedCounts;
-            resultInfo.IsSucceededAll = result.IsSucceededAll;
-            resultInfo.SucceededCount = result.RetrievedVideos.Count;
+            var dupeCount = ids.Where(id => registeredVideo.Contains(id)).Count();
+            if (dupeCount > 0)
+            {
+                onMessage($"{dupeCount}件の動画が既に登録済みのためスキップされます。");
+            }
 
-            if (result.RetrievedVideos.Count == 0) return resultInfo;
+            ids = ids.Where(id => !registeredVideo.Contains(id));
+            var retlieved = await this.networkVideoHandler.GetVideoListInfosAsync(ids, (v, _, _, lockObj) =>
+            {
+                lock (lockObj)
+                {
+                    resultInfo.SucceededCount++;
+                }
+                onMessage($"{v.NiconicoId}の取得に成功しました。");
+            },
+            (result, v) =>
+            {
+                onMessage($"{v.NiconicoId}の取得に失敗しました。(詳細:{result.Message})");
+            },
+            (v, _) =>
+            {
+                onMessage($"{v.NiconicoId}の取得を開始します。");
+            },
+            _ =>
+            {
+                onMessage("-".Repeat(40));
+                onMessage("待機中...(15s)");
+                onMessage("-".Repeat(40));
+            }
+            );
 
-            videos.AddRange(result.RetrievedVideos);
+            videos.AddRange(retlieved);
+
+            resultInfo.FailedCount = ids.Count() - resultInfo.SucceededCount;
+
             return resultInfo;
         }
 

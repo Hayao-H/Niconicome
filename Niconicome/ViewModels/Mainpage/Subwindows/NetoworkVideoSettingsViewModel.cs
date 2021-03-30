@@ -73,7 +73,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     this.Message = "情報を取得中です...";
 
-                    var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(id, videos,this.CurrentSetting.NetworkMode, new List<string>(), m => this.Message = m);
+                    var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(id, videos, this.CurrentSetting.NetworkMode, new List<string>(), m =>
+                    {
+                        this.Message = m;
+                        WS::Mainpage.Messagehandler.AppendMessage(m);
+                    });
 
 
                     if (result.IsFailed)

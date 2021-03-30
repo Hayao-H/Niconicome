@@ -65,7 +65,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                      DataFilePath = this.xenoFilePath
                  };
 
-                 IXenoImportTaskResult result = await WS::SettingPage.XenoImportManager.InportFromXeno(setting, m => this.Message = m, this.importCTS.Token);
+                 IXenoImportTaskResult result = await WS::SettingPage.XenoImportManager.InportFromXeno(setting, m => this.Message = m, m => WS::SettingPage.MessageHandler.AppendMessage(m), this.importCTS.Token);
 
                  this.Message = $"インポートに成功したプレイリストの数; {result.SucceededPaylistCount}";
                  if (result.FailedPlaylistCount > 0)
