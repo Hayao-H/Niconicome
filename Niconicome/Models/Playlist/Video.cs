@@ -21,11 +21,10 @@ namespace Niconicome.Models.Playlist
     public class VideoHandler : IVideoHandler
     {
 
-        public VideoHandler(IVideoStoreHandler storeHandler,IPlaylistStoreHandler playlistStoreHandler,IPlaylistVideoHandler playlistVideoHandler)
+        public VideoHandler(IVideoStoreHandler storeHandler,IPlaylistStoreHandler playlistStoreHandler)
         {
             this.videoStoreHandler = storeHandler;
             this.playlistStoreHandler = playlistStoreHandler;
-            this.playlistVideoHandler = playlistVideoHandler;
         }
 
         /// <summary>
@@ -39,11 +38,6 @@ namespace Niconicome.Models.Playlist
         private readonly IPlaylistStoreHandler playlistStoreHandler;
 
         /// <summary>
-        /// プレイリストツリーにアクセスする
-        /// </summary>
-        private readonly IPlaylistVideoHandler playlistVideoHandler;
-
-        /// <summary>
         /// 動画を追加する
         /// </summary>
         /// <param name="video"></param>
@@ -52,7 +46,6 @@ namespace Niconicome.Models.Playlist
         public int AddVideo(IVideoListInfo video, int playlidtId)
         {
             int id = this.playlistStoreHandler.AddVideo(video, playlidtId);
-            this.playlistVideoHandler.AddVideo(video, playlidtId);
             return id;
         }
 
@@ -64,7 +57,6 @@ namespace Niconicome.Models.Playlist
         public void RemoveVideo(int videoID, int playlistID)
         {
             this.playlistStoreHandler.RemoveVideo(videoID, playlistID);
-            this.playlistVideoHandler.RemoveVideo(videoID, playlistID);
         }
 
         /// <summary>

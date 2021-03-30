@@ -67,8 +67,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<DataBase::IDataBase, DataBase::DataBase>();
             services.AddTransient<Store::IPlaylistStoreHandler, Store::PlaylistStoreHandler>();
             services.AddTransient<Store::IVideoStoreHandler, Store::VideoStoreHandler>();
-            services.AddSingleton<Playlist::IPlaylistVideoHandler, Playlist::PlaylistVideoHandler>();
-            services.AddTransient<Playlist::ITreePlaylistInfoHandler, Playlist::TreePlaylistInfoHandler>();
+            services.AddSingleton<Playlist::IPlaylistHandler, Playlist::PlaylistHandler>();
+            services.AddTransient<Playlist::IPlaylistTreeConstructor, Playlist::PlaylistTreeConstructor>();
             services.AddTransient<DomainWatch::IWatchPageHtmlParser, DomainWatch::WatchPageHtmlParser>();
             services.AddTransient<DomainWatch::IWatchInfohandler, DomainWatch::WatchInfohandler>();
             services.AddTransient<Net::IWatch, Net::Watch>();

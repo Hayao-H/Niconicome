@@ -18,7 +18,7 @@ namespace Niconicome.Models.Playlist
         void Update(int playlistId, IVideoListInfo video);
         void Uncheck(int playlistID, int videoID);
         ITreePlaylistInfo? CurrentSelectedPlaylist { get; set; }
-        event EventHandler SelectedItemChanged;
+        event EventHandler? SelectedItemChanged;
         event EventHandler VideosChanged;
         ObservableCollection<IVideoListInfo> Videos { get; }
     }
@@ -33,7 +33,6 @@ namespace Niconicome.Models.Playlist
             this.playlistStoreHandler = playlistStoreHandler;
             this.Videos = new ObservableCollection<IVideoListInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Videos, new object());
-            this.SelectedItemChanged += this.OnSelectedItemChanged;
             this.VideosChanged += this.OnVideoschanged;
 
         }
@@ -80,7 +79,7 @@ namespace Niconicome.Models.Playlist
                 this.SavePrevPlaylistVideos();
 
                 this.currentSelectedPlaylistField = value;
-                this.RaiseSelectedItemChanged();
+                this.Update(this.CurrentSelectedPlaylist?.Id ?? -1);
             }
         }
 
@@ -182,8 +181,7 @@ namespace Niconicome.Models.Playlist
 
                 if (this.CurrentSelectedPlaylist is not null)
                 {
-                    int id = this.CurrentSelectedPlaylist.Id;
-                    var videos = this.playlistStoreHandler.GetPlaylist(id)?.Videos.Copy();
+                    var videos = this.playlistStoreHandler.GetPlaylist(playlistId)?.Videos.Copy();
 
                     if (videos is not null)
                     {
@@ -223,7 +221,6 @@ namespace Niconicome.Models.Playlist
                             else
                             {
                                 this.Videos.Add(video);
-                                continue;
                             }
                         }
 
@@ -232,7 +229,7 @@ namespace Niconicome.Models.Playlist
 
                 }
             });
-
+            this.RaiseSelectedItemChanged();
         }
 
         /// <summary>
@@ -244,7 +241,7 @@ namespace Niconicome.Models.Playlist
         {
 
             if (this.Videos.Count == 0) return;
-            
+
             lock (this.lockObj)
             {
                 if (!this.Videos.Any(v => (v?.Id ?? 0) == video.Id))
@@ -253,17 +250,16 @@ namespace Niconicome.Models.Playlist
                 }
                 else
                 {
-                    int index = this.Videos.FindIndex(v => v.Id == video.Id);
-                    if (index == -1) return;
-                    this.Videos.RemoveAt(index);
-                    this.Videos.Insert(index, video);
+                    var currentVideo = this.Videos.FirstOrDefault(v => v.Id == video.Id);
+                    if (currentVideo is null) return;
+                    BindableVIdeoListInfo.SetData(currentVideo, video);
                 }
             }
 
 
         }
 
-        public event EventHandler SelectedItemChanged;
+        public event EventHandler? SelectedItemChanged;
 
         public event EventHandler VideosChanged;
     }

@@ -21,12 +21,9 @@ using State = Niconicome.Models.Local.State;
 
 namespace Niconicome.Models.Playlist
 {
-    public interface IPlaylistVideoHandler
+    public interface IPlaylistHandler
     {
         int AddPlaylist(int parentId);
-        void AddVideo(IVideoListInfo video, int playlistId);
-        void RemoveVideo(int videoId, int playlistId);
-        void UpdateVideo(IVideoListInfo video, int playlistId);
         void DeletePlaylist(int playlistID);
         void Update(ITreePlaylistInfo newpaylist);
         void Refresh();
@@ -42,7 +39,7 @@ namespace Niconicome.Models.Playlist
         ObservableCollection<ITreePlaylistInfo> Playlists { get; }
     }
 
-    public interface ITreePlaylistInfoHandler
+    public interface IPlaylistTreeConstructor
     {
         ITreePlaylistInfo? GetPlaylist(int id);
         void Remove(int id);
@@ -78,7 +75,7 @@ namespace Niconicome.Models.Playlist
         bool HasVideo(string niconicoId);
         bool IsRemotePlaylist { get; set; }
         RemoteType RemoteType { get; set; }
-        int GetLayer(ITreePlaylistInfoHandler handler);
+        int GetLayer(IPlaylistTreeConstructor handler);
         static ITreePlaylistInfo ConvertToTreePlaylistInfo(STypes::Playlist playlist)
         {
             playlist.Void();
@@ -99,9 +96,9 @@ namespace Niconicome.Models.Playlist
     /// これはあくまでメモリ上への動画データしか変更できないため、
     /// DBのデータを変更したい場合は別途VideoHandlerクラスのインスタンスを利用する必要がある
     /// </summary>
-    public class PlaylistVideoHandler : IPlaylistVideoHandler
+    public class PlaylistHandler : IPlaylistHandler
     {
-        public PlaylistVideoHandler(ITreePlaylistInfoHandler handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger)
+        public PlaylistHandler(IPlaylistTreeConstructor handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger)
         {
             this.Playlists = new ObservableCollection<ITreePlaylistInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Playlists, new object());
@@ -111,47 +108,13 @@ namespace Niconicome.Models.Playlist
             this.Refresh();
         }
 
-        private readonly ITreePlaylistInfoHandler handler;
+        private readonly IPlaylistTreeConstructor handler;
 
         private readonly IPlaylistStoreHandler playlistStoreHandler;
 
         private readonly State::IErrorMessanger errorMessanger;
 
         public ObservableCollection<ITreePlaylistInfo> Playlists { get; private set; }
-
-        /// <summary>
-        /// 動画をメモリ上のプレイリストに追加する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistId"></param>
-       　public void AddVideo(IVideoListInfo video, int playlistId)
-        {
-            var playlist = this.handler.GetPlaylist(playlistId);
-            playlist?.Videos.AddUnique(video, list => !list.Any(v => v.Id == video.Id));
-        }
-
-        /// <summary>
-        /// 動画をメモリ上のプレイリストから削除する
-        /// </summary>
-        /// <param name="videoId"></param>
-        /// <param name="playlistId"></param>
-        public void RemoveVideo(int videoId, int playlistId)
-        {
-            var playlist = this.handler.GetPlaylist(playlistId);
-            playlist?.Videos.RemoveAll(v => v.Id == videoId);
-        }
-
-        /// <summary>
-        /// 動画情報を更新する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistId"></param>
-        public void UpdateVideo(IVideoListInfo video, int playlistId)
-        {
-            this.RemoveVideo(video.Id, playlistId);
-            this.AddVideo(video, playlistId);
-        }
-
 
         /// <summary>
         /// プレイリストを追加
@@ -333,7 +296,7 @@ namespace Niconicome.Models.Playlist
     /// <summary>
     /// TreePlaylistInfoをよしなにしてくれる
     /// </summary>
-    public class TreePlaylistInfoHandler : ITreePlaylistInfoHandler
+    public class PlaylistTreeConstructor : IPlaylistTreeConstructor
     {
         private List<ITreePlaylistInfo> TreePlaylistInfoes { get; set; } = new();
 
@@ -444,7 +407,6 @@ namespace Niconicome.Models.Playlist
                     after.BeforeSeparatorVisibility = before.BeforeSeparatorVisibility;
                     after.AfterSeparatorVisibility = before.AfterSeparatorVisibility;
                     after.IsExpanded = before.IsExpanded;
-                    this.MergeVideo(before, after);
                     this.Remove(before.Id);
                 }
             }
@@ -453,23 +415,6 @@ namespace Niconicome.Models.Playlist
 
             //ツリーは未初期化
             this.IsTreeInitialized = false;
-        }
-
-        /// <summary>
-        /// メッセージを保持して動画を追加
-        /// </summary>
-        /// <param name="before"></param>
-        /// <param name="after"></param>
-        private void MergeVideo(ITreePlaylistInfo before, ITreePlaylistInfo after)
-        {
-            foreach (var afterVideo in after.Videos)
-            {
-                if (before.Videos.Any(v => v.Id == afterVideo.Id))
-                {
-                    var beforeVideo = before.Videos.First(v => v.Id == afterVideo.Id);
-                    afterVideo.Message = beforeVideo.Message;
-                }
-            }
         }
 
         /// <summary>
@@ -683,7 +628,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="handler"></param>
         /// <returns></returns>
-        public int GetLayer(ITreePlaylistInfoHandler handler)
+        public int GetLayer(IPlaylistTreeConstructor handler)
         {
 
             int layer = 1;

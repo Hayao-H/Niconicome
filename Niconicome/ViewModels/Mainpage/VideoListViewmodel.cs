@@ -286,7 +286,7 @@ namespace Niconicome.ViewModels.Mainpage
                 var result = await WS::Mainpage.NetworkVideoHandler.UpdateVideosAsync(this.Videos.Where(v => v.IsSelected), this.Playlist.Folderpath, video => WS::Mainpage.CurrentPlaylist.Update(playlistId, video), this.cts.Token);
 
                 WS::Mainpage.PlaylistTree.Refresh();
-                WS::Mainpage.CurrentPlaylist.Update(playlistId);
+                //WS::Mainpage.CurrentPlaylist.Update(playlistId);
 
                 this.FetchingCompleted();
                 this.RefreshCommandIcon = MaterialDesign::PackIconKind.Refresh;

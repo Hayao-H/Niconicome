@@ -43,7 +43,7 @@ namespace NiconicomeTest.Local.Playlist
     [TestFixture]
     class PlaylistInfoHandlerUnitTest
     {
-        private ITreePlaylistInfoHandler handler = new TreePlaylistInfoHandler();
+        private IPlaylistTreeConstructor handler = new PlaylistTreeConstructor();
 
         [SetUp]
         public void SetUp()
@@ -72,7 +72,7 @@ namespace NiconicomeTest.Local.Playlist
 
             //全て追加
             var playlists = new List<STypes::Playlist>() { first, second, third, fourth, fifth, sixth, seventh };
-            this.handler = new TreePlaylistInfoHandler();
+            this.handler = new PlaylistTreeConstructor();
             this.handler.AddRange(playlists.Select(p => NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, playlists.Where(pl => pl?.ParentPlaylist?.Id == p.Id))));
         }
 
