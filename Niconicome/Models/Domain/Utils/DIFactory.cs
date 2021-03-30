@@ -144,6 +144,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
             services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();
             services.AddTransient<DlDescription::IVideoInfoContentProducer, DlDescription::VideoInfoContentProducer>();
+            services.AddTransient<Local::ILocalVideoUtils, Local::LocalVideoUtils>();
 
             return services.BuildServiceProvider();
         }

@@ -9,6 +9,9 @@ using System.IO;
 using Niconicome.Models.Playlist;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage;
+using Playlist = Niconicome.Models.Playlist;
+using Microsoft.VisualBasic;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -16,6 +19,7 @@ namespace Niconicome.Models.Domain.Utils
     {
         List<string> GetNiconicoIdsFromText(string source);
         string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null);
+        string GetFileName(string format, Playlist::IVideoListInfo video, string extension, bool replaceStricted, string? suffix = null);
         string GetIdFromFIleName(string format, string filenameWithExt);
         string GetIdFromFIleName(string filenameWithExt);
         bool IsNiconicoID(string testString);
@@ -44,33 +48,41 @@ namespace Niconicome.Models.Domain.Utils
         /// <returns></returns>
         public string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null)
         {
-            string filename = format.Replace("<id>", dmcInfo.Id)
-                         .Replace("<title>", dmcInfo.Title)
-                         .Replace("<owner>", dmcInfo.Owner)
-                         + suffix
-                         + extension;
-
-            filename = this.GetDateReplacedString(filename, dmcInfo);
-
-            if (replaceStricted)
+            var info = new VideoInfoForPath()
             {
-                filename = filename
-                    .Replace("/", "／")
-                    .Replace(":", "：")
-                    .Replace("*", "＊")
-                    .Replace("?", "？")
-                    .Replace("<", "＜")
-                    .Replace("<", "＞")
-                    .Replace("|", "｜")
-                    .Replace("\"", "”");
-            } else
-            {
-                filename = Regex.Replace(filename, @"[/:\*\?\<\>\|""]", "");
-            }
+                Title = dmcInfo.Title,
+                OwnerName = dmcInfo.Owner,
+                NiconicoID = dmcInfo.Id,
+                UploadedOn = dmcInfo.UploadedOn,
+                DownloadStartedOn = dmcInfo.DownloadStartedOn,
+            };
 
-
-            return filename;
+            return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
         }
+
+        /// <summary>
+        /// 動画情報からファイル名を取得する
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="video"></param>
+        /// <param name="extension"></param>
+        /// <param name="replaceStricted"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
+        public string GetFileName(string format, Playlist::IVideoListInfo video, string extension, bool replaceStricted, string? suffix = null)
+        {
+            var info = new VideoInfoForPath()
+{
+                Title = video.Title,
+                OwnerName = video.OwnerName,
+                NiconicoID = video.NiconicoId,
+                UploadedOn = video.UploadedOn,
+                DownloadStartedOn = DateTime.Now,
+            };
+
+            return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
+        }
+
 
         /// <summary>
         /// 日付情報を取得する
@@ -78,7 +90,7 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="format"></param>
         /// <param name="dt"></param>
         /// <returns></returns>
-        private string GetDateReplacedString(string format,IDmcInfo info)
+        private string GetDateReplacedString(string format, VideoInfoForPath info)
         {
             if (Regex.IsMatch(format, "^.*<uploadedon:.+>.*$"))
             {
@@ -86,7 +98,8 @@ namespace Niconicome.Models.Domain.Utils
                 var customFormat = match.Value[12..^1];
                 return format.Replace(match.Value, info.UploadedOn.ToString(customFormat));
 
-            } else if (Regex.IsMatch(format, "^.*<downloadon:.+>.*$"))
+            }
+            else if (Regex.IsMatch(format, "^.*<downloadon:.+>.*$"))
             {
                 var match = Regex.Match(format, "<downloadon:.+>");
                 var customFormat = match.Value[12..^1];
@@ -96,7 +109,7 @@ namespace Niconicome.Models.Domain.Utils
             else
             {
                 return format.Replace("<uploadedon>", info.UploadedOn.ToString("yyyy-MM-dd HH-mm-ss"))
-                    .Replace("<downloadon>",info.DownloadStartedOn.ToString("yyyy-MM-dd HH-mm-ss"))
+                    .Replace("<downloadon>", info.DownloadStartedOn.ToString("yyyy-MM-dd HH-mm-ss"))
                     ;
             }
         }
@@ -217,6 +230,59 @@ namespace Niconicome.Models.Domain.Utils
             }
         }
 
+        /// <summary>
+        /// 内部メソッド
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="info"></param>
+        /// <param name="extension"></param>
+        /// <param name="replaceStricted"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
+        private string GetFilenameInternal(string format, VideoInfoForPath info, string extension, bool replaceStricted, string? suffix = null)
+        {
+            string filename = format.Replace("<id>", info.NiconicoID)
+             .Replace("<title>", info.Title)
+             .Replace("<owner>", info.OwnerName)
+             + suffix
+             + extension;
 
+            filename = this.GetDateReplacedString(filename, info);
+
+            if (replaceStricted)
+            {
+                filename = filename
+                    .Replace("/", "／")
+                    .Replace(":", "：")
+                    .Replace("*", "＊")
+                    .Replace("?", "？")
+                    .Replace("<", "＜")
+                    .Replace("<", "＞")
+                    .Replace("|", "｜")
+                    .Replace("\"", "”");
+            }
+            else
+            {
+                filename = Regex.Replace(filename, @"[/:\*\?\<\>\|""]", "");
+            }
+
+
+            return filename;
+        }
+
+
+    }
+
+    class VideoInfoForPath
+    {
+        public string Title { get; set; } = string.Empty;
+
+        public DateTime UploadedOn { get; set; }
+
+        public DateTime DownloadStartedOn { get; set; }
+
+        public string OwnerName { get; set; } = string.Empty;
+
+        public string NiconicoID { get; set; } = string.Empty;
     }
 }

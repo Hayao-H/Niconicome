@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Network;
+using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Local;
 using Niconicome.Models.Network;
 
 namespace Niconicome.Models.Playlist
@@ -25,12 +29,14 @@ namespace Niconicome.Models.Playlist
 
     class Current : ICurrent
     {
-        public Current(ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility, IPlaylistStoreHandler playlistStoreHandler)
+        public Current(ICacheHandler cacheHandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility, IPlaylistStoreHandler playlistStoreHandler, ILocalSettingHandler settingHandler, ILocalVideoUtils localVideoUtils)
         {
             this.cacheHandler = cacheHandler;
             this.videoHandler = videoHandler;
             this.videoThumnailUtility = videoThumnailUtility;
             this.playlistStoreHandler = playlistStoreHandler;
+            this.settingHandler = settingHandler;
+            this.localVideoUtils = localVideoUtils;
             this.Videos = new ObservableCollection<IVideoListInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Videos, new object());
             this.VideosChanged += this.OnVideoschanged;
@@ -50,6 +56,10 @@ namespace Niconicome.Models.Playlist
         private readonly ICacheHandler cacheHandler;
 
         private readonly IPlaylistStoreHandler playlistStoreHandler;
+
+        private readonly ILocalSettingHandler settingHandler;
+
+        private readonly ILocalVideoUtils localVideoUtils;
 
         private readonly object lockObj = new();
 
@@ -78,6 +88,11 @@ namespace Niconicome.Models.Playlist
                 this.prevSelectedPlaylist?.Videos.AddRange(this.Videos);
                 this.SavePrevPlaylistVideos();
 
+                if (value is not null && value.Folderpath.IsNullOrEmpty())
+                {
+                    value.Folderpath = this.settingHandler.GetStringSetting(Settings.DefaultFolder) ?? "download";
+                }
+
                 this.currentSelectedPlaylistField = value;
                 this.Update(this.CurrentSelectedPlaylist?.Id ?? -1);
             }
@@ -103,12 +118,15 @@ namespace Niconicome.Models.Playlist
             else
             {
                 var messageGuid = string.Empty;
-                if (LightVideoListinfoHandler.Contains(new LightVideoListInfo(messageGuid, playlistID, videoID, false)))
+                var fileName = string.Empty;
+                if (LightVideoListinfoHandler.Contains(videoID, playlistID))
                 {
-                    messageGuid = LightVideoListinfoHandler.GetLightVideoListInfo(videoID, playlistID)!.MessageGuid;
+                    var light = LightVideoListinfoHandler.GetLightVideoListInfo(videoID, playlistID);
+                    messageGuid = light!.MessageGuid;
+                    fileName = light!.FileName;
                 }
 
-                var video = new LightVideoListInfo(messageGuid, playlistID, videoID, false);
+                var video = new LightVideoListInfo(messageGuid, fileName, playlistID, videoID, false);
                 LightVideoListinfoHandler.AddVideo(video);
             }
         }
@@ -159,7 +177,7 @@ namespace Niconicome.Models.Playlist
 
             foreach (var video in this.prevSelectedPlaylist.Videos)
             {
-                var info = new LightVideoListInfo(video.MessageGuid, this.prevSelectedPlaylist.Id, video.Id, video.IsSelected);
+                var info = new LightVideoListInfo(video.MessageGuid, video.FileName, this.prevSelectedPlaylist.Id, video.Id, video.IsSelected);
                 LightVideoListinfoHandler.AddVideo(info);
             }
         }
@@ -182,6 +200,9 @@ namespace Niconicome.Models.Playlist
                 if (this.CurrentSelectedPlaylist is not null)
                 {
                     var videos = this.playlistStoreHandler.GetPlaylist(playlistId)?.Videos.Copy();
+                    var format = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+                    var replaceStricted = this.settingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+                    var folderPath = this.CurrentSelectedPlaylist.Folderpath;
 
                     if (videos is not null)
                     {
@@ -200,6 +221,12 @@ namespace Niconicome.Models.Playlist
                                 video.MessageGuid = lightVideo.MessageGuid;
                                 video.IsSelected = lightVideo.IsSelected;
                                 video.Message = VideoMessanger.GetMessage(lightVideo.MessageGuid);
+                                video.FileName = lightVideo.FileName;
+                            }
+
+                            if (video.FileName.IsNullOrEmpty())
+                            {
+                                video.FileName = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted);
                             }
 
                             //サムネイル
