@@ -136,8 +136,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             string source;
             Uri url = NiconicoContext.Context.GetPageUri(id);
 
-            var res = await this.http.GetAsync(url);
-
             try
             {
                 source = await this.http.GetStringAsync(url);
