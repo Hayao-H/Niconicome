@@ -141,7 +141,7 @@ namespace Niconicome.Models.Network
             int videoCount = videos.Count();
             int i = 0;
 
-            this.messageHandler.AppendMessage($"{videoCount}件の追加します。");
+            this.messageHandler.AppendMessage($"{videoCount}件の動画を追加します。");
 
             foreach (var video in videos)
             {
