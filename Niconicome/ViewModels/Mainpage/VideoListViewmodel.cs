@@ -323,7 +323,7 @@ namespace Niconicome.ViewModels.Mainpage
                      int playlistId = this.Playlist.Id;
                      var videos = new List<IVideoListInfo>();
 
-                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(this.Playlist.RemoteId, videos, this.Playlist.RemoteType, this.Videos.Select(v => v.NiconicoId), m => { });
+                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(this.Playlist.RemoteId, videos, this.Playlist.RemoteType, this.Videos.Select(v => v.NiconicoId), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
                      if (!result.IsFailed)
                      {

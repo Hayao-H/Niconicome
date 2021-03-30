@@ -18,5 +18,6 @@ namespace Niconicome.Workspaces
         public static ICurrent Current { get; private set; } = DIFactory.Provider.GetRequiredService<ICurrent>();
         public static IPlaylistVideoHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistVideoHandler>();
         public static IXenoImportGeneralManager XenoImportManager { get; private set; } = DIFactory.Provider.GetRequiredService<IXenoImportGeneralManager>();
+        public static IMessageHandler MessageHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IMessageHandler>();
     }
 }

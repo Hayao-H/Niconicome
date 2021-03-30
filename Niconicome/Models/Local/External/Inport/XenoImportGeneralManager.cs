@@ -58,7 +58,7 @@ namespace Niconicome.Models.Local.External.Import
 
     public interface IXenoImportGeneralManager
     {
-        Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage, CancellationToken token);
+        Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage, Action<string> onMessageVerbose, CancellationToken token);
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ namespace Niconicome.Models.Local.External.Import
         /// <param name="settings"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        public async Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage, CancellationToken token)
+        public async Task<IXenoImportTaskResult> InportFromXeno(IXenoImportSettings settings, Action<string> onMessage, Action<string> onMessageVerbose, CancellationToken token)
         {
             var taskResult = new XenoImportTaskResult();
             var result = this.importManager.TryImportData(settings.DataFilePath, out Xeno.IXenoImportResult? inportResult);
@@ -107,12 +107,12 @@ namespace Niconicome.Models.Local.External.Import
             {
                 foreach (var child in inportResult.PlaylistInfo.Children)
                 {
-                    await this.AddPlaylistAsync(child, settings.TargetPlaylistId, taskResult, onMessage, token);
+                    await this.AddPlaylistAsync(child, settings.TargetPlaylistId, taskResult, onMessage, onMessageVerbose, token);
                 }
             }
             else
             {
-                await this.AddPlaylistAsync(inportResult.PlaylistInfo, settings.TargetPlaylistId, taskResult, onMessage, token);
+                await this.AddPlaylistAsync(inportResult.PlaylistInfo, settings.TargetPlaylistId, taskResult, onMessage, onMessageVerbose, token);
 
             }
 
@@ -128,7 +128,7 @@ namespace Niconicome.Models.Local.External.Import
         /// <param name="onMessage"></param>
         /// <param name="recurse"></param>
         /// <returns></returns>
-        private async Task AddPlaylistAsync(ITreePlaylistInfo playlistInfo, int parentId, IXenoImportTaskResult result, Action<string> onMessage, CancellationToken token)
+        private async Task AddPlaylistAsync(ITreePlaylistInfo playlistInfo, int parentId, IXenoImportTaskResult result, Action<string> onMessage, Action<string> onMessageVerbose, CancellationToken token)
         {
             if (token.IsCancellationRequested)
             {
@@ -155,7 +155,7 @@ namespace Niconicome.Models.Local.External.Import
                 this.playlistVideoHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
 
                 var videos = new List<IVideoListInfo>();
-                var rResult = await this.remotePlaylistHandler.TryGetChannelVideosAsync(playlistInfo.RemoteId, videos, new List<string>(), m => { });
+                var rResult = await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(playlistInfo.RemoteId, videos, RemoteType.Channel, new List<string>(), m => onMessageVerbose(m));
 
                 if (!rResult.IsFailed)
                 {
@@ -195,7 +195,7 @@ namespace Niconicome.Models.Local.External.Import
 
             foreach (var child in playlistInfo.Children)
             {
-                await this.AddPlaylistAsync(child, id, result, onMessage, token);
+                await this.AddPlaylistAsync(child, id, result, onMessage, onMessageVerbose, token);
             }
 
         }

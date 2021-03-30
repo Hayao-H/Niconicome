@@ -23,7 +23,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
     public interface IChannelVideoHandler
     {
-        Task<IChannelResult> GetVideosAsync(string channelId,IEnumerable<string> registeredVideo, Action<string> onMessage);
+        Task<IEnumerable<string>> GetVideosAsync(string channelId,IEnumerable<string> registeredVideo, Action<string> onMessage);
         Exception? CurrentException { get; }
     }
 
@@ -50,7 +50,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public async Task<IChannelResult> GetVideosAsync(string channelId, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        public async Task<IEnumerable<string>> GetVideosAsync(string channelId, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
             var result = new ChannelResult();
 
@@ -77,31 +77,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
                 throw new InvalidOperationException();
             }
 
-            onMessage($"チャンネル内で{ids.Count}件の動画を発見しました。");
-            var dupe = ids.Where(i => registeredVideo.Contains(i));
-            onMessage($"{dupe.Count()}件の動画が既に登録済みのためスキップされます。");
-
-            ids.RemoveAll(id => registeredVideo.Contains(id));
-
-            IEnumerable<IVideoListInfo> videos;
-            try
-            {
-                videos = await this.ConvertToTreeVideoInfo(ids, onMessage, result);
-            }
-            catch (Exception e)
-            {
-                this.CurrentException = e;
-                throw new InvalidOperationException();
-            }
-
-            if (result.FailedCounts == 0)
-            {
-                result.IsSucceededAll = true;
-            }
-
-            result.RetrievedVideos.AddRange(videos);
-
-            return result;
+            return ids;
         }
 
 
@@ -140,40 +116,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         private IEnumerable<string> GetIdsFromHtml(string html)
         {
             return this.htmlParser.ParseAndGetIds(html);
-        }
-
-        /// <summary>
-        /// 動画情報に変換する
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<IVideoListInfo>> ConvertToTreeVideoInfo(IEnumerable<string> ids, Action<string> onMessage, ChannelResult cResult)
-        {
-            int allVideos = ids.Count();
-            var allResult = new List<IVideoListInfo>();
-
-            foreach (var item in ids.Select((id, index) => new { id, index }))
-            {
-                if ((item.index + 1) % 3 == 0)
-                {
-                    onMessage("待機中(10s)");
-                    await Task.Delay(10 * 1000);
-                }
-                onMessage($"{item.id}を取得中({item.index + 1}/{allVideos})");
-                var videoInfo = new VIdeoInfo();
-                var result = await this.watch.TryGetVideoInfoAsync(item.id, videoInfo, WatchInfo::WatchInfoOptions.NoDmcData);
-                if (!result.IsSucceeded)
-                {
-                    onMessage($"{item.id}の取得に失敗しました。(詳細:{result.Message})");
-                    cResult.FailedCounts++;
-                }
-                else
-                {
-                    allResult.Add(videoInfo.ConvertToTreeVideoInfo());
-                }
-            }
-
-            return allResult;
         }
     }
 
