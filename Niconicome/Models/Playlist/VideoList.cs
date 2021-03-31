@@ -62,7 +62,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// 再生回数
         /// </summary>
-        public int ViewCount { get; set; }
+        public virtual int ViewCount { get; set; }
 
         /// <summary>
         /// コメント数
@@ -98,7 +98,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// 動画タイトル
         /// </summary>
-        public string Title { get; set; } = string.Empty;
+        public virtual string Title { get; set; } = string.Empty;
 
         /// <summary>
         /// ファイル名
@@ -317,6 +317,14 @@ namespace Niconicome.Models.Playlist
         }
 
         private bool isSelectedField;
+
+        private int viewCountField;
+
+        private string titleField = string.Empty;
+
+        public override string Title { get => this.titleField; set => this.SetProperty(ref this.titleField, value); }
+
+        public override int ViewCount { get => this.viewCountField; set => this.SetProperty(ref this.viewCountField, value); }
 
         public override string Message
         {

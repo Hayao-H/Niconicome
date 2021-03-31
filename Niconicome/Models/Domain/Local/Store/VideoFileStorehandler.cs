@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Niconicome.Extensions.System.List;
 using IO = System.IO;
 
@@ -53,7 +54,14 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.dataBase.Exists<Types.VideoFile>(Types.VideoFile.TableName, v => v.NiconicoId == niconicoId))
             {
                 var data = this.GetFileData(niconicoId);
-                return data!.FilePaths.Any(p => IO::File.Exists(p));
+                return data!.FilePaths.Any(p =>
+                {
+                    if (!Path.IsPathRooted(p))
+                    {
+                        p = AppContext.BaseDirectory + p;
+                    }
+                    return File.Exists(@"\\?\" + p);
+                });
             }
             else
             {

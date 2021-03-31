@@ -298,23 +298,8 @@ namespace Niconicome.Models.Network.Download
 
             if (setting.Video)
             {
-                if (!info?.VideoExist ?? true)
-                {
-                    var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, session, context, token);
-                    if (!vResult.IsSucceeded)
-                    {
-                        result.IsSucceeded = false;
-                        result.Message = vResult.Message ?? "None";
-                        return result;
-                    }
-                    else
-                    {
-                        result.IsSucceeded = true;
-                        result.VideoFileName = vResult.VideoFileName ?? string.Empty;
-                        result.VideoVerticalResolution = vResult.VideoVerticalResolution;
-                    }
-                }
-                else if (info?.VideoExist ?? false)
+
+                if (info?.VideoExist ?? false)
                 {
                     OnMessage("動画を保存済みのためスキップしました。");
                     result.IsSucceeded = true;
@@ -333,6 +318,22 @@ namespace Niconicome.Models.Network.Download
                         result.IsSucceeded = true;
                         result.VideoFileName = vResult.VideoFileName ?? string.Empty;
                         OnMessage("別フォルダーに保存済みの動画をコピーしました。");
+                    }
+                }
+                else
+                {
+                    var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, session, context, token);
+                    if (!vResult.IsSucceeded)
+                    {
+                        result.IsSucceeded = false;
+                        result.Message = vResult.Message ?? "None";
+                        return result;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = true;
+                        result.VideoFileName = vResult.VideoFileName ?? string.Empty;
+                        result.VideoVerticalResolution = vResult.VideoVerticalResolution;
                     }
                 }
             }

@@ -14,7 +14,7 @@ namespace Niconicome.Workspaces
     static class Mainpage
     {
         public static ISession Session { get; private set; } = DIFactory.Provider.GetRequiredService<ISession>();
-        public static IPlaylistVideoHandler PlaylistTree { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistVideoHandler>();
+        public static IPlaylistHandler PlaylistTree { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
         public static IVideoHandler VideoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoHandler>();
         public static ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<ICurrent>();
         public static IWatch Watch { get; private set; } = DIFactory.Provider.GetRequiredService<IWatch>();

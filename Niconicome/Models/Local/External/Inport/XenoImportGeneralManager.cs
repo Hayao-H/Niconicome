@@ -67,7 +67,7 @@ namespace Niconicome.Models.Local.External.Import
     public class XenoImportGeneralManager : IXenoImportGeneralManager
     {
 
-        public XenoImportGeneralManager(Xeno::IXenoImportManager xenoImportManager, INetworkVideoHandler networkVideoHandler, IPlaylistVideoHandler playlistVideoHandler, IRemotePlaylistHandler remotePlaylistHandler)
+        public XenoImportGeneralManager(Xeno::IXenoImportManager xenoImportManager, INetworkVideoHandler networkVideoHandler, IPlaylistHandler playlistVideoHandler, IRemotePlaylistHandler remotePlaylistHandler)
         {
             this.importManager = xenoImportManager;
             this.networkVideoHandler = networkVideoHandler;
@@ -80,7 +80,7 @@ namespace Niconicome.Models.Local.External.Import
 
         private readonly INetworkVideoHandler networkVideoHandler;
 
-        private readonly IPlaylistVideoHandler playlistVideoHandler;
+        private readonly IPlaylistHandler playlistVideoHandler;
 
         private readonly IRemotePlaylistHandler remotePlaylistHandler;
 

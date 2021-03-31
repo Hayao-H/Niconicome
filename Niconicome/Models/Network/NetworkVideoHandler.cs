@@ -45,7 +45,7 @@ namespace Niconicome.Models.Network
 
         private readonly IWatch wacthPagehandler;
 
-        private readonly IPlaylistVideoHandler playlistTreeHandler;
+        private readonly IPlaylistHandler playlistTreeHandler;
 
         private readonly IVideoHandler videoHandler;
 
@@ -58,7 +58,7 @@ namespace Niconicome.Models.Network
         private readonly ILocalSettingHandler settingHandler;
 
 
-        public NetworkVideoHandler(IWatch watchPageHandler, IPlaylistVideoHandler playlistTreeHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,ILocalSettingHandler settingHandler)
+        public NetworkVideoHandler(IWatch watchPageHandler, IPlaylistHandler playlistTreeHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,ILocalSettingHandler settingHandler)
         {
             this.wacthPagehandler = watchPageHandler;
             this.playlistTreeHandler = playlistTreeHandler;
@@ -141,7 +141,7 @@ namespace Niconicome.Models.Network
             int videoCount = videos.Count();
             int i = 0;
 
-            this.messageHandler.AppendMessage($"{videoCount}件の追加します。");
+            this.messageHandler.AppendMessage($"{videoCount}件の動画を追加します。");
 
             foreach (var video in videos)
             {
