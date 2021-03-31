@@ -18,7 +18,7 @@ namespace Niconicome.Models.Playlist
 
     public interface ICurrent
     {
-        void Update(int playlistId);
+        void Update(int playlistId, bool savePrev = true);
         void Update(int playlistId, IVideoListInfo video);
         void Uncheck(int playlistID, int videoID);
         ITreePlaylistInfo? CurrentSelectedPlaylist { get; set; }
@@ -83,9 +83,6 @@ namespace Niconicome.Models.Playlist
             get { return this.currentSelectedPlaylistField; }
             set
             {
-                this.prevSelectedPlaylist = this.CurrentSelectedPlaylist;
-                this.prevSelectedPlaylist?.Videos.Clear();
-                this.prevSelectedPlaylist?.Videos.AddRange(this.Videos);
                 this.SavePrevPlaylistVideos();
 
                 if (value is not null && value.Folderpath.IsNullOrEmpty())
@@ -94,7 +91,7 @@ namespace Niconicome.Models.Playlist
                 }
 
                 this.currentSelectedPlaylistField = value;
-                this.Update(this.CurrentSelectedPlaylist?.Id ?? -1);
+                this.Update(this.CurrentSelectedPlaylist?.Id ?? -1, false);
             }
         }
 
@@ -173,11 +170,11 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         private void SavePrevPlaylistVideos()
         {
-            if (this.prevSelectedPlaylist is null) return;
+            if (this.CurrentSelectedPlaylist is null) return;
 
-            foreach (var video in this.prevSelectedPlaylist.Videos)
+            foreach (var video in this.Videos)
             {
-                var info = new LightVideoListInfo(video.MessageGuid, video.FileName, this.prevSelectedPlaylist.Id, video.Id, video.IsSelected);
+                var info = new LightVideoListInfo(video.MessageGuid, video.FileName, this.CurrentSelectedPlaylist.Id, video.Id, video.IsSelected);
                 LightVideoListinfoHandler.AddVideo(info);
             }
         }
@@ -185,9 +182,14 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// 動画リストを更新する
         /// </summary>
-        public void Update(int playlistId)
+        public void Update(int playlistId, bool savePrev = true)
         {
             if (playlistId != (this.CurrentSelectedPlaylist?.Id ?? -1)) return;
+
+            if (savePrev)
+            {
+                this.SavePrevPlaylistVideos();
+            }
 
             this.Videos.Clear();
             Task.Run(async () =>
