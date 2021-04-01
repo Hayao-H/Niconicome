@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Domain.Utils;
 using IO = System.IO;
 
 namespace Niconicome.Models.Domain.Local.Store
@@ -16,6 +17,7 @@ namespace Niconicome.Models.Domain.Local.Store
         bool Exists(string niconicoId);
         IEnumerable<string> GetFilePaths(string niconicoId);
         string? GetFilePath(string niconicoId);
+        string? GetFilePath(string niconicoID, string folderPath);
         void Add(string niconicoId, string filePath);
         void Delete(string niconicoId, string filePath);
         void Clean();
@@ -53,15 +55,7 @@ namespace Niconicome.Models.Domain.Local.Store
         {
             if (this.dataBase.Exists<Types.VideoFile>(Types.VideoFile.TableName, v => v.NiconicoId == niconicoId))
             {
-                var data = this.GetFileData(niconicoId);
-                return data!.FilePaths.Any(p =>
-                {
-                    if (!Path.IsPathRooted(p))
-                    {
-                        p = AppContext.BaseDirectory + p;
-                    }
-                    return File.Exists(@"\\?\" + p);
-                });
+                return this.GetFilePaths(niconicoId).Any();
             }
             else
             {
@@ -78,7 +72,25 @@ namespace Niconicome.Models.Domain.Local.Store
         {
             var data = this.GetFileData(niconicoId);
             if (data is null) return Enumerable.Empty<string>();
-            return data.FilePaths.Where(p => IO::File.Exists(p));
+            return data.FilePaths
+                .Select(p =>
+                IOUtils.GetRootedPath(p)
+                )
+                .Where(p => IO::File.Exists(IOUtils.GetPrefixedPath(p)));
+        }
+
+
+        /// <summary>
+        ///　指定したフォルダーに存在するファイルパスを取得する
+        /// </summary>
+        /// <param name="niconicoId"></param>
+        /// <param name="foldername"></param>
+        /// <returns></returns>
+        public string? GetFilePath(string niconicoId, string foldername)
+        {
+            var paths = this.GetFilePaths(niconicoId);
+            return paths.FirstOrDefault(p =>
+                (Path.GetDirectoryName(p) ?? string.Empty) == foldername);
         }
 
         /// <summary>
@@ -88,8 +100,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <returns></returns>
         public string? GetFilePath(string niconicoId)
         {
-            var data = this.GetFileData(niconicoId);
-            return data?.FilePaths.First(p => IO::File.Exists(p));
+            return this.GetFilePaths(niconicoId).FirstOrDefault();
         }
 
         /// <summary>
@@ -100,6 +111,7 @@ namespace Niconicome.Models.Domain.Local.Store
         public void Delete(string niconicoId, string filePath)
         {
             if (!this.Exists(niconicoId)) return;
+
             var data = this.GetFileData(niconicoId);
 
             if (data!.FilePaths.Contains(filePath))
@@ -119,17 +131,22 @@ namespace Niconicome.Models.Domain.Local.Store
 
             foreach (var data in allData)
             {
-                if (data.FilePaths.Any(p => !IO::File.Exists(p)))
+                var paths = data.FilePaths.Select(p => IOUtils.GetRootedPath(p)).Where(p =>
                 {
-                    data.FilePaths.RemoveAll(p => !IO::File.Exists(p));
-                    if (data.FilePaths.Count == 0)
-                    {
-                        this.dataBase.Delete(Types.VideoFile.TableName, data.Id);
-                    }
-                    else
-                    {
-                        this.dataBase.Update(data, Types.VideoFile.TableName);
-                    }
+                    var lp = IOUtils.GetPrefixedPath(p);
+                    return File.Exists(p);
+                }).Copy();
+
+                data.FilePaths.Clear();
+                data.FilePaths.AddRange(paths);
+
+                if (data.FilePaths.Count == 0)
+                {
+                    this.dataBase.Delete(Types.VideoFile.TableName, data.Id);
+                }
+                else
+                {
+                    this.dataBase.Update(data, Types.VideoFile.TableName);
                 }
             }
         }
@@ -141,6 +158,8 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="filePath"></param>
         public void Add(string niconicoId, string filePath)
         {
+            filePath = IOUtils.GetRootedPath(filePath);
+
             if (this.Exists(niconicoId))
             {
                 var data = this.GetFileData(niconicoId);
