@@ -225,6 +225,10 @@ namespace Niconicome.Models.Playlist
                                 video.Message = VideoMessanger.GetMessage(lightVideo.MessageGuid);
                                 video.FileName = lightVideo.FileName;
                             }
+                            else
+                            {
+                                video.FileName = string.Empty;
+                            }
 
                             if (video.FileName.IsNullOrEmpty())
                             {

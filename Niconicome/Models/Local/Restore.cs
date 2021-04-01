@@ -224,7 +224,9 @@ namespace Niconicome.Models.Local
         /// <returns></returns>
         public List<string> GetAllVideoDirectories()
         {
-            return this.videoDirectoryStoreHandler.GetVideoDirectories().Select(v => v.Path ?? string.Empty).Where(p => !p.IsNullOrEmpty()).ToList();
+            var list =this.videoDirectoryStoreHandler.GetVideoDirectories().Select(v => v.Path ?? string.Empty).Where(p => !p.IsNullOrEmpty()).ToList();
+            list.AddUnique(AppContext.BaseDirectory);
+            return list;
         }
 
 

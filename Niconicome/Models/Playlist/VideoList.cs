@@ -205,7 +205,12 @@ namespace Niconicome.Models.Playlist
             }
             else
             {
-                return File.Exists(Path.Combine(folderPath, this.FileName));
+                var p = Path.Combine(folderPath, this.FileName);
+                if (!p.StartsWith(@"\\?\"))
+                {
+                    p = @"\\?\" + p;
+                }
+                return File.Exists(p);
             }
         }
 

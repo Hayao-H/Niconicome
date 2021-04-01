@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Playlist;
+using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Network;
 using Playlist = Niconicome.Models.Playlist;
@@ -18,16 +20,19 @@ namespace Niconicome.Models.Local
 
     class PlaylistCreator : IPlaylistCreator
     {
-        public PlaylistCreator(IPlaylistFileFactory fileFactory, INetworkVideoHandler videoHandler, ILogger logger)
+        public PlaylistCreator(IPlaylistFileFactory fileFactory, INetworkVideoHandler videoHandler, ILogger logger, IVideoFileStorehandler videoFileStorehandler)
         {
             this.fileFactory = fileFactory;
             this.videoHandler = videoHandler;
             this.logger = logger;
+            this.videoFileStorehandler = videoFileStorehandler;
         }
 
         private readonly IPlaylistFileFactory fileFactory;
 
         private readonly INetworkVideoHandler videoHandler;
+
+        private readonly IVideoFileStorehandler videoFileStorehandler;
 
         private readonly ILogger logger;
 
@@ -38,7 +43,7 @@ namespace Niconicome.Models.Local
         /// <param name="directoryPath"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool TryCreatePlaylist(IEnumerable<Playlist::IVideoListInfo> videos,string playlistName, string directoryPath, PlaylistType type)
+        public bool TryCreatePlaylist(IEnumerable<Playlist::IVideoListInfo> videos, string playlistName, string directoryPath, PlaylistType type)
         {
             videos = videos.Where(v => v.CheckDownloaded(directoryPath));
             if (!videos.Any()) return false;
@@ -46,9 +51,7 @@ namespace Niconicome.Models.Local
             string data;
             try
             {
-                int i = directoryPath.LastIndexOf(@"\") + 1;
-                string dirName = directoryPath[i..];
-                data = this.fileFactory.GetPlaylist(videos.Select(v => this.videoHandler.GetFilePath(v.NiconicoId, directoryPath)),playlistName, type);
+                data = this.fileFactory.GetPlaylist(videos.Select(v => this.videoFileStorehandler.GetFilePath(v.NiconicoId, directoryPath) ?? string.Empty).Where(p => !p.IsNullOrEmpty()), playlistName, type);
             }
             catch (Exception e)
             {

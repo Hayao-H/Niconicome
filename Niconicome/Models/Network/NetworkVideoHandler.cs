@@ -19,7 +19,6 @@ namespace Niconicome.Models.Network
     {
         bool IsVideoDownloaded(string niconicoId);
         string GetFilePath(string niconicoId);
-        string GetFilePath(string niconicoId, string foldername);
         Task<INetworkResult> AddVideosAsync(IEnumerable<string> videosId, int playlistId, Action<IResult> onFailed, Action<IVideoListInfo> onSucceed);
         Task AddVideosAsync(IEnumerable<IVideoListInfo> videos, int playlistId);
         Task<INetworkResult> UpdateVideosAsync(IEnumerable<IVideoListInfo> videos, string folderPath, Action<IVideoListInfo> onSucceeded, CancellationToken ct);
