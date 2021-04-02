@@ -868,8 +868,9 @@ namespace Niconicome.ViewModels.Mainpage
                     SortType.Title => videos.OrderBy(v => v.Title),
                     SortType.Selected => videos.OrderBy(v => !v.IsSelected ? 1 : 0),
                     SortType.ViewCount => videos.OrderBy(v => v.ViewCount),
+                    SortType.Downloaded => videos.OrderBy(v => v.IsDownloaded ? 1 : 0),
                     _ => videos,
-                });
+                }); ;
             }
             else
             {
@@ -880,6 +881,7 @@ namespace Niconicome.ViewModels.Mainpage
                     SortType.Title => videos.OrderByDescending(v => v.Title),
                     SortType.Selected => videos.OrderByDescending(v => !v.IsSelected ? 1 : 0),
                     SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount),
+                    SortType.Downloaded => videos.OrderByDescending(v => v.IsDownloaded ? 1 : 0),
                     _ => videos,
                 });
             }
@@ -891,6 +893,7 @@ namespace Niconicome.ViewModels.Mainpage
                 SortType.Title => "タイトル",
                 SortType.Selected => "選択",
                 SortType.ViewCount => "再生回数",
+                SortType.Downloaded => "DL済み",
                 _ => "並び替えなし"
             };
             string orderStr = orderBy switch
@@ -1234,6 +1237,7 @@ namespace Niconicome.ViewModels.Mainpage
                 "タイトル" => SortType.Title,
                 "選択" => SortType.Selected,
                 "再生回数" => SortType.ViewCount,
+                "DL済み" => SortType.Downloaded,
                 _ => SortType.None
             };
         }
@@ -1283,6 +1287,7 @@ namespace Niconicome.ViewModels.Mainpage
         Title,
         Selected,
         ViewCount,
+        Downloaded,
     }
 
     enum OrderBy

@@ -312,6 +312,7 @@ namespace Niconicome.Models.Playlist
             newVideo.LikeCount = oldVideo.LikeCount;
             newVideo.Duration = oldVideo.Duration;
             newVideo.OwnerID = oldVideo.OwnerID;
+            newVideo.IsDownloaded = oldVideo.IsDownloaded;
         }
     }
 
