@@ -30,7 +30,7 @@ namespace Niconicome.Models.Network
         DateTime UploadedOn { get; set; }
         Uri LargeThumbUri { get; set; }
         Uri ThumbUri { get; set; }
-        IVideoListInfo ConvertToTreeVideoInfo();
+        IListVideoInfo ConvertToTreeVideoInfo();
     }
 
     public interface IWatch
@@ -223,9 +223,9 @@ namespace Niconicome.Models.Network
         /// Viewから参照可能な形式に変換する
         /// </summary>
         /// <returns></returns>
-        public IVideoListInfo ConvertToTreeVideoInfo()
+        public IListVideoInfo ConvertToTreeVideoInfo()
         {
-            return new BindableVIdeoListInfo()
+            return new BindableListVIdeoInfo()
             {
                 Title = this.Title,
                 NiconicoId = this.Id,

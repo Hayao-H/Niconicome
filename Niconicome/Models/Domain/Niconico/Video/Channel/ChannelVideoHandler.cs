@@ -15,7 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 {
     public interface IChannelResult
     {
-        List<IVideoListInfo> RetrievedVideos { get; }
+        List<IListVideoInfo> RetrievedVideos { get; }
 
         int FailedCounts { get; }
         bool IsSucceededAll { get; }
@@ -124,7 +124,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
     /// </summary>
     public class ChannelResult : IChannelResult
     {
-        public List<IVideoListInfo> RetrievedVideos { get; init; } = new();
+        public List<IListVideoInfo> RetrievedVideos { get; init; } = new();
 
         public int FailedCounts { get; set; }
 

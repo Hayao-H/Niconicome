@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
+        xmlns:cv="clr-namespace:Niconicome.Views.Converter"
         xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
@@ -24,6 +25,9 @@
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
+    <Window.Resources>
+        <cv:BooleanCircleConverter x:Key="BooleanCircleConverter"/>
+    </Window.Resources>
     <materialDesign:DialogHost Identifier="default">
         <DockPanel>
             <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
@@ -270,6 +274,7 @@
                                             </GridViewColumn>
                                             <GridViewColumn Header="投稿日" DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
                                             <GridViewColumn Header="再生回数" DisplayMemberBinding="{Binding ViewCount}"/>
+                                            <GridViewColumn Header="DL済み" DisplayMemberBinding="{Binding IsDownloaded,Converter={StaticResource BooleanCircleConverter}}"/>
                                             <GridViewColumn Header="状態" DisplayMemberBinding="{Binding Message}"/>
                                         </GridView>
                                     </ListView.View>

@@ -68,7 +68,7 @@ namespace Niconicome.Models.Network.Download
 
     public interface IVideoToDownload
     {
-        IVideoListInfo Video { get; }
+        IListVideoInfo Video { get; }
         int Index { get; }
     }
 
@@ -461,7 +461,7 @@ namespace Niconicome.Models.Network.Download
 
                     var setting = e.Task.DownloadSettings;
                     var task = e.Task;
-                    IVideoListInfo? video;
+                    IListVideoInfo? video;
                     if (this.videoHandler.Exist(task.VideoID))
                     {
                         video = this.videoHandler.GetVideo(task.VideoID);

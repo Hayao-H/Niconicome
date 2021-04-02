@@ -69,7 +69,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     this.messageField.Clear();
                     this.OnPropertyChanged(messagePropName);
 
-                    var videos = new List<Playlist::IVideoListInfo>();
+                    var videos = new List<Playlist::IListVideoInfo>();
 
                     this.Message = "情報を取得中です...";
 

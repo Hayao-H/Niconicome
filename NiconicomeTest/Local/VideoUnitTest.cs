@@ -46,7 +46,7 @@ namespace NiconicomeTest.Local.Video
         [Test]
         public void 動画を追加する()
         {
-            var videoInfo = new NonBindableVideoListInfo()
+            var videoInfo = new NonBindableListVideoInfo()
             {
                 NiconicoId = "sm9",
                 Title = "テスト動画"
@@ -62,7 +62,7 @@ namespace NiconicomeTest.Local.Video
         [Test]
         public void 複数プレイリストに単一動画を追加する()
         {
-            var videoInfo = new NonBindableVideoListInfo()
+            var videoInfo = new NonBindableListVideoInfo()
             {
                 NiconicoId = "sm9",
                 Title = "テスト動画"
@@ -84,7 +84,7 @@ namespace NiconicomeTest.Local.Video
         [Test]
         public void 動画を削除する()
         {
-            var videoInfo = new NonBindableVideoListInfo()
+            var videoInfo = new NonBindableListVideoInfo()
             {
                 NiconicoId = "sm9",
                 Title = "テスト動画"
@@ -101,7 +101,7 @@ namespace NiconicomeTest.Local.Video
         [Test]
         public void 複数プレイリストに追加した動画を削除する()
         {
-            var videoInfo = new NonBindableVideoListInfo()
+            var videoInfo = new NonBindableListVideoInfo()
             {
                 NiconicoId = "sm9",
                 Title = "テスト動画"
