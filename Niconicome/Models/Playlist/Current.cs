@@ -276,10 +276,16 @@ namespace Niconicome.Models.Playlist
 
             if (this.Videos.Count == 0) return;
 
+            if (this.CurrentSelectedPlaylist is null) return;
+
             lock (this.lockObj)
             {
                 if (!this.Videos.Any(v => (v?.Id ?? 0) == video.Id))
                 {
+                    var format = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+                    var replaceStricted = this.settingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+                    video.FileName = this.localVideoUtils.GetFilePath(video, this.CurrentSelectedPlaylist.Folderpath, format, replaceStricted);
+                    video.IsDownloaded = !video.FileName.IsNullOrEmpty();
                     this.Videos.Add(video);
                 }
                 else
