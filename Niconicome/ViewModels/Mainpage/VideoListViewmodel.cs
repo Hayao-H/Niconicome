@@ -77,7 +77,7 @@ namespace Niconicome.ViewModels.Mainpage
                       return;
                   }
 
-                  var videos = new List<IVideoListInfo>();
+                  var videos = new List<IListVideoInfo>();
                   var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, this.Videos.Select(v => v.NiconicoId), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
                   if (result.IsFailed)
@@ -110,7 +110,7 @@ namespace Niconicome.ViewModels.Mainpage
                   }
               });
 
-            this.RemoveVideoCommand = new CommandBase<IVideoListInfo>(_ => true, async arg =>
+            this.RemoveVideoCommand = new CommandBase<IListVideoInfo>(_ => true, async arg =>
              {
                  if (this.Playlist is null)
                  {
@@ -118,9 +118,9 @@ namespace Niconicome.ViewModels.Mainpage
                      return;
                  }
 
-                 var targetVideos = new List<IVideoListInfo>();
+                 var targetVideos = new List<IListVideoInfo>();
 
-                 if (arg is not null && arg.AsNullable<IVideoListInfo>() is IVideoListInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
+                 if (arg is not null && arg.AsNullable<IListVideoInfo>() is IListVideoInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
 
                  targetVideos.AddRange(this.Videos.Where(v => v.IsSelected));
                  targetVideos = targetVideos.Distinct(v => v.Id).ToList();
@@ -161,14 +161,14 @@ namespace Niconicome.ViewModels.Mainpage
                  WS::Mainpage.CurrentPlaylist.Update(this.Playlist.Id);
              });
 
-            this.WatchOnNiconicoCommand = new CommandBase<IVideoListInfo>(_ => true, arg =>
+            this.WatchOnNiconicoCommand = new CommandBase<IListVideoInfo>(_ => true, arg =>
             {
                 if (this.Playlist is null)
                 {
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を視聴できません");
                     return;
                 }
-                if (arg is null || arg.AsNullable<IVideoListInfo>() is not IVideoListInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
                 try
                 {
                     ProcessEx.StartWithShell($"https://nico.ms/{videoInfo.NiconicoId}");
@@ -212,7 +212,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 var result = await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(ids, this.Playlist.Id, (result) =>
                 {
-                    var video = new BindableVIdeoListInfo()
+                    var video = new BindableListVIdeoInfo()
                     {
                         Title = "取得失敗",
                         ThumbUrl = "https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg",
@@ -252,7 +252,7 @@ namespace Niconicome.ViewModels.Mainpage
                 window.Show();
             });
 
-            this.UpdateVideoCommand = new CommandBase<IVideoListInfo>(_ => this.Playlist is not null, async _ =>
+            this.UpdateVideoCommand = new CommandBase<IListVideoInfo>(_ => this.Playlist is not null, async _ =>
             {
                 if (this.isFetching)
                 {
@@ -321,7 +321,7 @@ namespace Niconicome.ViewModels.Mainpage
                      this.StartFetching();
 
                      int playlistId = this.Playlist.Id;
-                     var videos = new List<IVideoListInfo>();
+                     var videos = new List<IListVideoInfo>();
 
                      var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(this.Playlist.RemoteId, videos, this.Playlist.RemoteType, this.Videos.Select(v => v.NiconicoId), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
@@ -535,7 +535,7 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (arg is null || arg.AsNullable<IVideoListInfo>() is not IVideoListInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
                 string folderPath = this.GetFolderPath();
                 if (!videoInfo.CheckDownloaded(folderPath) || videoInfo.GetFilePath(folderPath).IsNullOrEmpty())
@@ -560,7 +560,7 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (arg is null || arg.AsNullable<IVideoListInfo>() is not IVideoListInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
                 string folderPath = this.GetFolderPath();
                 if (!videoInfo.CheckDownloaded(folderPath) || videoInfo.GetFilePath(folderPath).IsNullOrEmpty())
@@ -584,7 +584,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                if (arg is null || arg.AsNullable<IVideoListInfo>() is not IVideoListInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
                 string folderPath = this.GetFolderPath();
                 if (!videoInfo.CheckDownloaded(folderPath) || videoInfo.GetFilePath(folderPath).IsNullOrEmpty())
@@ -610,7 +610,7 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (arg is null || arg.AsNullable<IVideoListInfo>() is not IVideoListInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
                 string folderPath = this.GetFolderPath();
                 if (!videoInfo.CheckDownloaded(folderPath) || videoInfo.GetFilePath(folderPath).IsNullOrEmpty())
@@ -688,12 +688,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画を削除する
         /// </summary>
-        public CommandBase<IVideoListInfo> RemoveVideoCommand { get; init; }
+        public CommandBase<IListVideoInfo> RemoveVideoCommand { get; init; }
 
         /// <summary>
         /// ニコニコ動画で開く
         /// </summary>
-        public CommandBase<IVideoListInfo> WatchOnNiconicoCommand { get; init; }
+        public CommandBase<IListVideoInfo> WatchOnNiconicoCommand { get; init; }
 
         /// <summary>
         /// クリップボードから動画を追加する
@@ -713,7 +713,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画情報を更新する
         /// </summary>
-        public CommandBase<IVideoListInfo> UpdateVideoCommand { get; init; }
+        public CommandBase<IListVideoInfo> UpdateVideoCommand { get; init; }
 
         /// <summary>
         /// オンライン上のプレイリストと同期する
@@ -814,7 +814,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画のリスト
         /// </summary>
-        public ObservableCollection<IVideoListInfo> Videos { get; private set; } = WS::Mainpage.CurrentPlaylist.Videos;
+        public ObservableCollection<IListVideoInfo> Videos { get; private set; } = WS::Mainpage.CurrentPlaylist.Videos;
 
         /// <summary>
         /// スナックバー
@@ -857,7 +857,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="orderBy"></param>
         public void SetOrder(SortType sortType, OrderBy orderBy)
         {
-            var videos = new List<IVideoListInfo>(this.Videos);
+            var videos = new List<IListVideoInfo>(this.Videos);
             this.Videos.Clear();
             if (orderBy != OrderBy.Descending)
             {
@@ -1014,13 +1014,21 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public VideoListViewModelD()
         {
-            var v1 = new BindableVIdeoListInfo()
+            var v1 = new BindableListVIdeoInfo()
             {
                 Title = "レッツゴー!陰陽師",
                 NiconicoId = "sm9",
+                IsDownloaded = true,
             };
 
-            this.Videos = new ObservableCollection<IVideoListInfo>() { v1 };
+            var v2 = new BindableListVIdeoInfo()
+            {
+                Title = "Bad Apple!! feat. nomico",
+                NiconicoId = "sm8628149",
+                IsDownloaded = false,
+            };
+
+            this.Videos = new ObservableCollection<IListVideoInfo>() { v1, v2 };
 
         }
 
@@ -1030,9 +1038,9 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<object> AddVideoCommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<IVideoListInfo> RemoveVideoCommand { get; init; } = new(_ => true, _ => { });
+        public CommandBase<IListVideoInfo> RemoveVideoCommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<IVideoListInfo> WatchOnNiconicoCommand { get; init; } = new(_ => true, _ => { });
+        public CommandBase<IListVideoInfo> WatchOnNiconicoCommand { get; init; } = new(_ => true, _ => { });
 
         public CommandBase<object> AddVideoFromClipboardCommand { get; init; } = new(_ => true, _ => { });
 
@@ -1040,7 +1048,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<object> OpenNetworkSettingsCommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<IVideoListInfo> UpdateVideoCommand { get; init; } = new(_ => true, _ => { });
+        public CommandBase<IListVideoInfo> UpdateVideoCommand { get; init; } = new(_ => true, _ => { });
 
         public CommandBase<object> SyncWithNetowrkCommand { get; init; } = new(_ => true, _ => { });
 
@@ -1078,7 +1086,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<string> CreatePlaylistCommand { get; init; } = new(_ => true, _ => { });
 
-        public ObservableCollection<IVideoListInfo> Videos { get; private set; }
+        public ObservableCollection<IListVideoInfo> Videos { get; private set; }
 
         public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
 
