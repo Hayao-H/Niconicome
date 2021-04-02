@@ -65,7 +65,7 @@
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="17*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Column= "0" Background="#e7e7e7">
+                    <Grid Grid.Column= "0" Background="{DynamicResource  MaterialDesignSnackbarBackground}">
                         <Grid.DataContext>
                             <vm:PlaylistTreeViewModel/>
                         </Grid.DataContext>
@@ -78,7 +78,7 @@
                                 <materialDesign:PackIcon Kind="Refresh" />
                             </Button>
                         </DockPanel>
-                        <TreeView ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
+                        <TreeView Foreground="{DynamicResource MaterialDesignBody}" ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
                             <i:Interaction.Behaviors>
                                 <vm:PlaylistTreeBehavior/>
                             </i:Interaction.Behaviors>
@@ -90,7 +90,7 @@
                                                 <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
                                             </Grid.ToolTip>
                                             <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                            <TextBlock Text="{Binding Name}"/>
+                                            <TextBlock Foreground="{DynamicResource MaterialDesignSnackbarRipple}" Text="{Binding Name}"/>
                                             <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
                                         </Grid>
                                     </StackPanel>
@@ -137,7 +137,7 @@
                             <RowDefinition Height="19*"/>
                         </Grid.RowDefinitions>
                         <DockPanel >
-                            <ToggleButton Margin="10 0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignHamburgerToggleButton}" x:Name="MenuToggleButton"/>
+                            <ToggleButton Margin="10 0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignHamburgerToggleButton}" x:Name="MenuToggleButton" Foreground="{DynamicResource MaterialDesignBody}"/>
                             <DockPanel HorizontalAlignment="Right">
                                 <Button Margin="10,0" Grid.Column="0" Width="60" VerticalAlignment="Center" ToolTip="アプリケーション設定" Command="{Binding OpenSettingCommand}">
                                     <materialDesign:PackIcon Kind="cog">
@@ -249,7 +249,7 @@
                                             <GridViewColumn Header="選択">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                            <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                        <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
@@ -340,16 +340,36 @@
                                 </ListView>
                                 <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
                             </Grid>
-                            <TabControl Grid.Row="3" Margin="8">
+                            <TabControl Background="{DynamicResource MaterialDesignBackground}" Grid.Row="3" Margin="8">
+                                <TabControl.Resources>
+                                    <Style TargetType="TabItem">
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </Style>
+                                </TabControl.Resources>
                                 <TabItem Header="設定" d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingsViewModelD},IsDesignTimeCreatable=True}">
                                     <StackPanel Orientation="Vertical" x:Name="downloadSettings">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="{x:Type Label}">
+                                                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                                            </Style>
+                                            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource MaterialDesignComboBox}">
+                                                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                                            </Style>
+                                            <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+                                                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                                            </Style>
+                                        </StackPanel.Resources>
                                         <Grid Margin="0 5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="61*"/>
+                                                <ColumnDefinition Width="1277*"/>
+                                            </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="auto"/>
                                                 <RowDefinition Height="auto"/>
                                             </Grid.RowDefinitions>
-                                            <Label Content="ダウンロードする項目"/>
-                                            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                            <Label Content="ダウンロードする項目" Grid.ColumnSpan="2" Margin="0,0,0,30" Grid.RowSpan="2"/>
+                                            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2">
                                                 <CheckBox Margin="5 0" Content="動画" IsChecked="{Binding IsDownloadingVideoEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                 <CheckBox Margin="5 0" Content="コメント" IsChecked="{Binding IsDownloadingCommentEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                 <CheckBox Margin="5 0" Content="過去ログ" IsChecked="{Binding IsDownloadingCommentLogEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
@@ -405,7 +425,7 @@
                                             </Button>
                                         </StackPanel>
                                         <TextBox Grid.Row="1" Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="4" IsReadOnly="True"
-                                         BorderThickness="0 1 0 0" TextWrapping="Wrap"/>
+                                         BorderThickness="0 1 0 0" Foreground="{DynamicResource MaterialDesignBody}" TextWrapping="Wrap"/>
                                     </Grid>
                                 </TabItem>
                             </TabControl >
