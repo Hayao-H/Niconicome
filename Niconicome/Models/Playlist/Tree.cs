@@ -63,7 +63,7 @@ namespace Niconicome.Models.Playlist
         string Folderpath { get; set; }
         List<int> ChildrensIds { get; }
         List<ITreePlaylistInfo> Children { get; }
-        List<IVideoListInfo> Videos { get; set; }
+        List<IListVideoInfo> Videos { get; set; }
         int ParentId { get; set; }
         bool IsExpanded { get; set; }
         bool IsRoot { get; set; }
@@ -545,7 +545,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// 動画情報のリスト
         /// </summary>
-        public List<IVideoListInfo> Videos { get; set; } = new();
+        public List<IListVideoInfo> Videos { get; set; } = new();
 
         /// <summary>
         /// 親プレイリストのID

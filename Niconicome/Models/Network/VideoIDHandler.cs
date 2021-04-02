@@ -12,8 +12,8 @@ namespace Niconicome.Models.Network
 {
     interface IVideoIDHandler
     {
-        Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose);
-        Task<INetworkResult> TryGetVideoListInfosAsync(List<IVideoListInfo> videos, string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose);
+        Task<INetworkResult> TryGetVideoListInfosAsync(List<IListVideoInfo> videos, string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose);
         bool IsProcessing { get; }
         event EventHandler? StateChange;
     }
@@ -63,12 +63,12 @@ namespace Niconicome.Models.Network
         /// <param name="registeredVideos"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosAsync(string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose)
         {
             this.IsProcessing = true;
 
             inputText = inputText.Trim();
-            var videos = new List<IVideoListInfo>();
+            var videos = new List<IListVideoInfo>();
 
             if (Path.IsPathRooted(inputText))
             {
@@ -125,7 +125,7 @@ namespace Niconicome.Models.Network
         /// <param name="onMessage"></param>
         /// <param name="onMessageVerbose"></param>
         /// <returns></returns>
-        public async Task<INetworkResult> TryGetVideoListInfosAsync(List<IVideoListInfo> videos, string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose)
+        public async Task<INetworkResult> TryGetVideoListInfosAsync(List<IListVideoInfo> videos, string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose)
         {
             try
             {
@@ -165,7 +165,7 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromLocalPath(string localPath, Action<string> onMessage)
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromLocalPath(string localPath, Action<string> onMessage)
         {
             var ids = this.localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
             var videoCount = ids.Count();
@@ -198,7 +198,7 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromID(string id, Action<string> onMessage)
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromID(string id, Action<string> onMessage)
         {
             var videos = await this.networkVideoHandler.GetVideoListInfosAsync(new List<string>() { id }, (newVideo, video, i, _) =>
             {
@@ -226,10 +226,10 @@ namespace Niconicome.Models.Network
         /// <param name="registeredVideos"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromRemote(IEnumerable<string> registeredVideos, RemoteType type, string id, Action<string> onMessage)
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromRemote(IEnumerable<string> registeredVideos, RemoteType type, string id, Action<string> onMessage)
         {
 
-            var videos = new List<IVideoListInfo>();
+            var videos = new List<IListVideoInfo>();
 
             await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(id, videos, type, registeredVideos, onMessage);
 
@@ -246,9 +246,9 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IVideoListInfo>> GetVideoListInfosFromSearchResult(IEnumerable<string> registeredVideos, string keyword, Action<string> onMessage)
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromSearchResult(IEnumerable<string> registeredVideos, string keyword, Action<string> onMessage)
         {
-            IEnumerable<IVideoListInfo> videos = new List<IVideoListInfo>();
+            IEnumerable<IListVideoInfo> videos = new List<IListVideoInfo>();
 
             var searchResult = await this.remotePlaylistHandler.TrySearchVideosAsync(keyword, SearchType.Keyword, 1);
 

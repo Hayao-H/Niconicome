@@ -12,7 +12,7 @@ namespace Niconicome.Models.Local
 {
     interface ILocalVideoUtils
     {
-        string GetFilePath(IVideoListInfo video, string folderPath, string format, bool replaceStricted);
+        string GetFilePath(IListVideoInfo video, string folderPath, string format, bool replaceStricted);
     }
 
     class LocalVideoUtils : ILocalVideoUtils
@@ -34,7 +34,7 @@ namespace Niconicome.Models.Local
         /// <param name="video"></param>
         /// <param name="folderPath"></param>
         /// <returns></returns>
-        public string GetFilePath(IVideoListInfo video, string folderPath, string format, bool replaceStricted)
+        public string GetFilePath(IListVideoInfo video, string folderPath, string format, bool replaceStricted)
         {
             if (!Path.IsPathRooted(folderPath))
             {

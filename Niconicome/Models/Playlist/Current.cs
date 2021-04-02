@@ -19,12 +19,12 @@ namespace Niconicome.Models.Playlist
     public interface ICurrent
     {
         void Update(int playlistId, bool savePrev = true);
-        void Update(int playlistId, IVideoListInfo video);
+        void Update(int playlistId, IListVideoInfo video);
         void Uncheck(int playlistID, int videoID);
         ITreePlaylistInfo? CurrentSelectedPlaylist { get; set; }
         event EventHandler? SelectedItemChanged;
         event EventHandler VideosChanged;
-        ObservableCollection<IVideoListInfo> Videos { get; }
+        ObservableCollection<IListVideoInfo> Videos { get; }
     }
 
     class Current : ICurrent
@@ -37,7 +37,7 @@ namespace Niconicome.Models.Playlist
             this.playlistStoreHandler = playlistStoreHandler;
             this.settingHandler = settingHandler;
             this.localVideoUtils = localVideoUtils;
-            this.Videos = new ObservableCollection<IVideoListInfo>();
+            this.Videos = new ObservableCollection<IListVideoInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Videos, new object());
             this.VideosChanged += this.OnVideoschanged;
 
@@ -63,7 +63,7 @@ namespace Niconicome.Models.Playlist
 
         private readonly object lockObj = new();
 
-        public ObservableCollection<IVideoListInfo> Videos { get; init; }
+        public ObservableCollection<IListVideoInfo> Videos { get; init; }
 
         /// <summary>
         /// 選択中のプレイリスト
@@ -234,6 +234,7 @@ namespace Niconicome.Models.Playlist
                             {
                                 video.FileName = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted);
                             }
+                            video.IsDownloaded = !video.FileName.IsNullOrEmpty();
 
                             //サムネイル
                             bool isValid = this.videoThumnailUtility.IsValidThumbnail(video);
@@ -270,7 +271,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="playlistId"></param>
         /// <param name="video"></param>
-        public void Update(int playlistId, IVideoListInfo video)
+        public void Update(int playlistId, IListVideoInfo video)
         {
 
             if (this.Videos.Count == 0) return;
@@ -285,7 +286,7 @@ namespace Niconicome.Models.Playlist
                 {
                     var currentVideo = this.Videos.FirstOrDefault(v => v.Id == video.Id);
                     if (currentVideo is null) return;
-                    BindableVIdeoListInfo.SetData(currentVideo, video);
+                    BindableListVIdeoInfo.SetData(currentVideo, video);
                 }
             }
 
