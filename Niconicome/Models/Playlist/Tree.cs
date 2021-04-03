@@ -18,6 +18,7 @@ using Net = Niconicome.Models.Domain.Network;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Utils = Niconicome.Models.Domain.Utils;
 using State = Niconicome.Models.Local.State;
+using LiteDB;
 
 namespace Niconicome.Models.Playlist
 {
@@ -30,6 +31,7 @@ namespace Niconicome.Models.Playlist
         void Move(int id, int targetId);
         void SetAsRemotePlaylist(int playlistId, string Id, RemoteType type);
         void SetAsLocalPlaylist(int playlistId);
+        void SaveAllPlaylists();
         bool IsLastChild(int id);
         bool ContainsVideo(string niconicoId, int playlistId);
         ITreePlaylistInfo? GetPlaylist(int id);
@@ -53,6 +55,7 @@ namespace Niconicome.Models.Playlist
         ITreePlaylistInfo? GetParent(int id);
         ITreePlaylistInfo GetRoot();
         ITreePlaylistInfo GetTree();
+        IEnumerable<ITreePlaylistInfo> GetAllPlaylists();
     }
 
     public interface ITreePlaylistInfo : IClonable<ITreePlaylistInfo>
@@ -76,17 +79,6 @@ namespace Niconicome.Models.Playlist
         bool IsRemotePlaylist { get; set; }
         RemoteType RemoteType { get; set; }
         int GetLayer(IPlaylistTreeConstructor handler);
-        static ITreePlaylistInfo ConvertToTreePlaylistInfo(STypes::Playlist playlist)
-        {
-            playlist.Void();
-            return new NonBindableTreePlaylistInfo() { Id = playlist.Id };
-        }
-        static ITreePlaylistInfo ConvertToTreePlaylistInfo(STypes::Playlist playlist, IEnumerable<STypes::Playlist> childPlaylists)
-        {
-            playlist.Void();
-            childPlaylists.Void();
-            return new NonBindableTreePlaylistInfo();
-        }
 
     }
 
@@ -238,6 +230,18 @@ namespace Niconicome.Models.Playlist
         {
             this.playlistStoreHandler.Refresh();
             this.SetPlaylists();
+        }
+
+        /// <summary>
+        /// すべてのプレイリストを保存する
+        /// </summary>
+        public void SaveAllPlaylists()
+        {
+            var playlists = this.handler.GetAllPlaylists();
+            foreach (var p in playlists)
+            {
+                this.playlistStoreHandler.Update(p);
+            }
         }
 
         /// <summary>
@@ -479,6 +483,16 @@ namespace Niconicome.Models.Playlist
         }
 
         /// <summary>
+        /// すべてのプレイリストを取得する
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ITreePlaylistInfo> GetAllPlaylists()
+        {
+            return this.TreePlaylistInfoes;
+        }
+
+
+        /// <summary>
         /// 完全なプレイリストツリーを構築する
         /// </summary>
         /// <param name="Id"></param>
@@ -690,6 +704,7 @@ namespace Niconicome.Models.Playlist
             playlistInfo.RemoteType = dbPlaylist.IsMylist ? RemoteType.Mylist : dbPlaylist.IsUserVideos ? RemoteType.UserVideos : dbPlaylist.IsWatchLater ? RemoteType.WatchLater : dbPlaylist.IsChannel ? RemoteType.Channel : RemoteType.None;
             playlistInfo.RemoteId = dbPlaylist.RemoteId ?? string.Empty;
             playlistInfo.Folderpath = dbPlaylist.FolderPath ?? string.Empty;
+            playlistInfo.IsExpanded = dbPlaylist.IsExpanded;
         }
 
         /// <summary>
