@@ -238,14 +238,7 @@ namespace Niconicome.Models.Playlist
                             {
                                 _ = Task.Run(async () =>
                                 {
-                                    if (!isValid)
-                                    {
-                                        await this.videoThumnailUtility.GetAndSetThumbFilePathAsync(video, true);
-                                    }
-                                    else
-                                    {
-                                        await this.videoThumnailUtility.SetThumbPathAsync(video);
-                                    }
+                                    await this.videoThumnailUtility.SetThumbPathAsync(video);
                                     this.videoHandler.Update(video);
                                 });
                                 this.Videos.Add(video);
