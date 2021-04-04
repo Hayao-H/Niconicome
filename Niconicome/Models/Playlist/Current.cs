@@ -71,11 +71,6 @@ namespace Niconicome.Models.Playlist
         private ITreePlaylistInfo? currentSelectedPlaylistField;
 
         /// <summary>
-        /// ひとつまえに選択中だったプレイリスト
-        /// </summary>
-        private ITreePlaylistInfo? prevSelectedPlaylist;
-
-        /// <summary>
         /// 公開プロパティー
         /// </summary>
         public ITreePlaylistInfo? CurrentSelectedPlaylist
@@ -241,15 +236,18 @@ namespace Niconicome.Models.Playlist
                             bool hasCache = this.videoThumnailUtility.HasThumbnailCache(video);
                             if (!isValid || !hasCache)
                             {
-                                if (!isValid)
+                                _ = Task.Run(async () =>
                                 {
-                                    await this.videoThumnailUtility.GetAndSetThumbFilePathAsync(video, true);
-                                }
-                                else
-                                {
-                                    await this.videoThumnailUtility.SetThumbPathAsync(video);
-                                }
-                                this.videoHandler.Update(video);
+                                    if (!isValid)
+                                    {
+                                        await this.videoThumnailUtility.GetAndSetThumbFilePathAsync(video, true);
+                                    }
+                                    else
+                                    {
+                                        await this.videoThumnailUtility.SetThumbPathAsync(video);
+                                    }
+                                    this.videoHandler.Update(video);
+                                });
                                 this.Videos.Add(video);
                             }
                             else
