@@ -153,6 +153,8 @@ namespace Niconicome.Models.Local
                 Settings.MaxFetchCount => STypes::SettingNames.MaxParallelFetchCount,
                 Settings.FetchSleepInterval => STypes::SettingNames.FetchSleepInterval,
                 Settings.SkipSSLVerification => STypes::SettingNames.SkipSSLVerification,
+                Settings.ExpandAll => STypes::SettingNames.ExpandTreeOnStartUp,
+                Settings.InheritExpandedState => STypes::SettingNames.SaveTreePrevExpandedState,
                 _ => null
             };
         }
@@ -196,5 +198,7 @@ namespace Niconicome.Models.Local
         MaxFetchCount,
         FetchSleepInterval,
         SkipSSLVerification,
+        ExpandAll,
+        InheritExpandedState,
     }
 }

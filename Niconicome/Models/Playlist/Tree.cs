@@ -28,6 +28,7 @@ namespace Niconicome.Models.Playlist
         void DeletePlaylist(int playlistID);
         void Update(ITreePlaylistInfo newpaylist);
         void Refresh();
+        void Refresh(bool expandAll, bool inheritExpandedState);
         void Move(int id, int targetId);
         void SetAsRemotePlaylist(int playlistId, string Id, RemoteType type);
         void SetAsLocalPlaylist(int playlistId);
@@ -97,7 +98,6 @@ namespace Niconicome.Models.Playlist
             this.handler = handler;
             this.playlistStoreHandler = playlistStoreHandler;
             this.errorMessanger = errorMessanger;
-            this.Refresh();
         }
 
         private readonly IPlaylistTreeConstructor handler;
@@ -233,6 +233,18 @@ namespace Niconicome.Models.Playlist
         }
 
         /// <summary>
+        /// 展開状況を引き継いで更新する
+        /// </summary>
+        /// <param name="expandAll"></param>
+        /// <param name="inheritExpandedState"></param>
+        public void Refresh(bool expandAll, bool inheritExpandedState)
+        {
+            this.playlistStoreHandler.Refresh();
+            this.SetPlaylists(expandAll, inheritExpandedState);
+        }
+
+
+        /// <summary>
         /// すべてのプレイリストを保存する
         /// </summary>
         public void SaveAllPlaylists()
@@ -278,14 +290,25 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// プレイリストを初期化する
         /// </summary>
-        private void SetPlaylists()
+        private void SetPlaylists(bool expandAll = false, bool inheritExpandedState = false)
         {
 
             //プレイリストを取得する
             var playlists = this.playlistStoreHandler.GetAllPlaylists().Select(p =>
             {
+                var ex = false;
+                if (expandAll)
+                {
+                    ex = true;
+                }
+                else if (inheritExpandedState)
+                {
+                    ex = p.IsExpanded;
+                }
                 var childPlaylists = this.playlistStoreHandler.GetChildPlaylists(p.Id);
-                return BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
+                var playlist = BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
+                playlist.IsExpanded = ex;
+                return playlist;
             });
 
 
