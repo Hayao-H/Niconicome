@@ -52,6 +52,11 @@ namespace Niconicome.ViewModels.Mainpage
             //メッセージハンドラーにイベントハンドラを追加する
             WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
 
+            //展開状況を引き継ぐ
+            var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.InheritExpandedState);
+            var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ExpandAll);
+            WS::Mainpage.PlaylistTree.Refresh(expandAll, inheritExpandedState);
+
             #region コマンドの初期化
             this.AddVideoCommand = new CommandBase<object>(_ => this.Playlist is not null && !WS::Mainpage.VideoIDHandler.IsProcessing, async arg =>
               {

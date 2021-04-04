@@ -61,11 +61,18 @@ namespace Niconicome.ViewModels.Setting.Pages
                 5 => n5,
                 _ => n4,
             };
+
+            this.isExpandallPlaylistsEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.ExpandAll);
+            this.isSavePrevPlaylistExpandedStateEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.InheritExpandedState);
         }
 
         private bool isAutologinEnableField;
 
         private bool isSkippingSSLVerificationEnableField;
+
+        private bool isSavePrevPlaylistExpandedStateEnableField;
+
+        private bool isExpandallPlaylistsEnableField;
 
         private string empty = string.Empty;
 
@@ -126,6 +133,16 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public bool IsSkippingSSLVerificationEnable { get => this.isSkippingSSLVerificationEnableField; set => this.Savesetting(ref this.isSkippingSSLVerificationEnableField, value, Settings.SkipSSLVerification); }
 
+        /// <summary>
+        /// 展開状況を保存する
+        /// </summary>
+        public bool IsSavePrevPlaylistExpandedStateEnable { get => this.isSavePrevPlaylistExpandedStateEnableField; set => this.Savesetting(ref this.isSavePrevPlaylistExpandedStateEnableField, value, Settings.InheritExpandedState); }
+
+        /// <summary>
+        /// すべて展開する
+        /// </summary>
+        public bool IsExpandallPlaylistsEnable { get => this.isExpandallPlaylistsEnableField; set => this.Savesetting(ref this.isExpandallPlaylistsEnableField, value, Settings.ExpandAll); }
+
     }
 
     class GeneralSettingsPageViewModelD
@@ -149,6 +166,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         public bool IsAutologinEnable { set; get; } = true;
 
         public bool IsSkippingSSLVerificationEnable { get; set; } = false;
+
+        public bool IsSavePrevPlaylistExpandedStateEnable { get; set; } = true;
+
+        public bool IsExpandallPlaylistsEnable { get; set; } = true;
 
         public List<AutoLoginTypes> SelectableAutoLoginTypes { get; init; } = new();
 

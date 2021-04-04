@@ -309,9 +309,8 @@ namespace Niconicome.Models.Domain.Local.Store
         public void Update(ITreePlaylistInfo newPlaylist)
         {
             if (!this.Exists(newPlaylist.Id)) throw new InvalidOperationException($"指定したプレイリストが存在しません。(id:{newPlaylist.Id})");
-            var dbPlaylist = this.GetPlaylist(newPlaylist.Id);
-            dbPlaylist!.PlaylistName = newPlaylist.Name;
-            dbPlaylist.FolderPath = newPlaylist.Folderpath;
+            var dbPlaylist = this.GetPlaylist(newPlaylist.Id)!;
+            this.SetData(dbPlaylist, newPlaylist);
             this.Update(dbPlaylist);
         }
 
@@ -451,6 +450,18 @@ namespace Niconicome.Models.Domain.Local.Store
             {
                 this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
             }
+        }
+
+        /// <summary>
+        /// データをセットする
+        /// </summary>
+        /// <param name="dbPlaylist"></param>
+        /// <param name="playlistInfo"></param>
+        private void SetData(STypes::Playlist dbPlaylist,ITreePlaylistInfo playlistInfo)
+        {
+            dbPlaylist.PlaylistName = playlistInfo.Name;
+            dbPlaylist.FolderPath = playlistInfo.Folderpath;
+            dbPlaylist.IsExpanded = playlistInfo.IsExpanded;
         }
     }
 }
