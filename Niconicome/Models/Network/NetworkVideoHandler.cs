@@ -57,7 +57,7 @@ namespace Niconicome.Models.Network
         private readonly ILocalSettingHandler settingHandler;
 
 
-        public NetworkVideoHandler(IWatch watchPageHandler, IPlaylistHandler playlistTreeHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility,ILocalSettingHandler settingHandler)
+        public NetworkVideoHandler(IWatch watchPageHandler, IPlaylistHandler playlistTreeHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility, ILocalSettingHandler settingHandler)
         {
             this.wacthPagehandler = watchPageHandler;
             this.playlistTreeHandler = playlistTreeHandler;
@@ -231,17 +231,14 @@ namespace Niconicome.Models.Network
 
                 var task = new NetworkVideoParallelTask(async (_, lockObj) =>
                 {
-                    var videoInfo = new VIdeoInfo();
-
                     onStarted(item.video, item.index);
 
-                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, videoInfo, DWatch::WatchInfoOptions.NoDmcData);
+                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, item.video, DWatch::WatchInfoOptions.NoDmcData);
 
                     if (result.IsSucceeded)
                     {
-                        var newVideo = videoInfo.ConvertToTreeVideoInfo();
-                        onSucceeded(newVideo, item.video, item.index, lockObj);
-                        videos.Add(newVideo);
+                        onSucceeded(item.video, item.video, item.index, lockObj);
+                        videos.Add(item.video);
                     }
                     else
                     {

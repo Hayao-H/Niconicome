@@ -63,6 +63,7 @@ namespace Niconicome.Models.Network.Download
         bool IsCanceled { get; }
         string? Message { get; }
         string? VideoFileName { get; }
+        IListVideoInfo VideoInfo { get; }
         uint VideoVerticalResolution { get; }
     }
 
@@ -94,7 +95,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler, ICurrent current)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler, ICurrent current,IWatch watch)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -103,6 +104,7 @@ namespace Niconicome.Models.Network.Download
             this.localContentHandler = localContentHandler;
             this.downloadTasksHandler = downloadTasksHandler;
             this.current = current;
+            this.watch = watch;
 
             int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelDL);
             if (maxParallel <= 0)
@@ -126,6 +128,8 @@ namespace Niconicome.Models.Network.Download
         private readonly IDownloadTasksHandler downloadTasksHandler;
 
         private readonly ICurrent current;
+
+        private readonly IWatch watch;
 
         private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
 
@@ -261,6 +265,12 @@ namespace Niconicome.Models.Network.Download
 
             await session.GetVideoDataAsync(setting.NiconicoId, setting.Video);
 
+            if (session.Video is not null)
+            {
+                this.watch.ConvertDomainVideoInfoToListVideoInfo(result.VideoInfo, session.Video);
+            }
+
+
             if (session.Video?.DmcInfo.DownloadStartedOn is not null)
             {
                 session.Video.DmcInfo.DownloadStartedOn = DateTime.Now;
@@ -333,6 +343,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = true;
                         result.VideoFileName = vResult.VideoFileName ?? string.Empty;
+                        result.VideoInfo.FileName = vResult.VideoFileName ?? string.Empty;
                         result.VideoVerticalResolution = vResult.VideoVerticalResolution;
                     }
                 }
@@ -497,9 +508,13 @@ namespace Niconicome.Models.Network.Download
                         this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに成功しました。");
 
                         task.Message = $"ダウンロード完了{rMessage}";
-                        if (!downloadResult.VideoFileName.IsNullOrEmpty() && video is not null)
+                        if (video is not null&&downloadResult.VideoInfo is not null)
                         {
-                            video.FileName = downloadResult.VideoFileName;
+                            if (!downloadResult.VideoFileName.IsNullOrEmpty())
+                            {
+                                video.FileName = downloadResult.VideoFileName;
+                            }
+                            BindableListVIdeoInfo.SetData(video, downloadResult.VideoInfo);
                             this.videoHandler.Update(video);
                         }
                         this.current.Uncheck(task.PlaylistID, task.VideoID);
@@ -555,6 +570,7 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         public async Task<INetworkResult?> DownloadVideos()
         {
+            this.CurrentResult = new NetworkResult();
 
             if (this.parallelTasksHandler.IsProcessing)
             {
@@ -654,10 +670,14 @@ namespace Niconicome.Models.Network.Download
     class DownloadResult : IDownloadResult
     {
         public bool IsSucceeded { get; set; }
+
         public bool IsCanceled { get; set; }
 
         public string? Message { get; set; }
+
         public string? VideoFileName { get; set; }
+
+        public IListVideoInfo VideoInfo { get; set; } = new BindableListVIdeoInfo();
 
         public uint VideoVerticalResolution { get; set; }
 
