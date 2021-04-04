@@ -555,6 +555,7 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         public async Task<INetworkResult?> DownloadVideos()
         {
+            this.CurrentResult = new NetworkResult();
 
             if (this.parallelTasksHandler.IsProcessing)
             {
