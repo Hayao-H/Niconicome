@@ -106,13 +106,12 @@ namespace Niconicome.Models.Network
 
             if (fource || !this.IsValidThumbnailUrl(video))
             {
-                var info = new Network::VIdeoInfo();
+                var info = new NonBindableListVideoInfo();
                 var result = await this.watchInfohandler.TryGetVideoInfoAsync(video.NiconicoId, info);
                 if (result.IsSucceeded)
                 {
-                    var newVideo = info.ConvertToTreeVideoInfo();
-                    video.ThumbUrl = newVideo.ThumbUrl;
-                    video.LargeThumbUrl = newVideo.LargeThumbUrl;
+                    video.ThumbUrl =info.ThumbUrl;
+                    video.LargeThumbUrl = info.LargeThumbUrl;
                 }
                 else
                 {

@@ -104,12 +104,12 @@ namespace Niconicome.ViewModels.Mainpage
 
                   this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
 
-                  if (!videos.First().ChannelId.IsNullOrEmpty())
+                  if (!videos.First().ChannelID.IsNullOrEmpty())
                   {
                       var video = videos.First();
                       WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName}」です", "IDをコピー", () =>
                       {
-                          Clipboard.SetText(video.ChannelId);
+                          Clipboard.SetText(video.ChannelID);
                           WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
                       });
                   }

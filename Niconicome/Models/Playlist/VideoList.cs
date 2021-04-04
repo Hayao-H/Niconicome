@@ -33,7 +33,7 @@ namespace Niconicome.Models.Playlist
         string FileName { get; set; }
         string BindableThumbPath { get; }
         string MessageGuid { get; set; }
-        string ChannelId { get; set; }
+        string ChannelID { get; set; }
         string ChannelName { get; set; }
         IEnumerable<string> Tags { get; set; }
         DateTime UploadedOn { get; set; }
@@ -181,7 +181,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// チャンネルID
         /// </summary>
-        public string ChannelId { get; set; } = string.Empty;
+        public string ChannelID { get; set; } = string.Empty;
 
         /// <summary>
         /// チャンネル名
@@ -292,7 +292,6 @@ namespace Niconicome.Models.Playlist
         /// <param name="oldVideo"></param>
         public static void SetData(IListVideoInfo newVideo, IListVideoInfo oldVideo)
         {
-            newVideo.Id = oldVideo.Id;
             newVideo.ViewCount = oldVideo.ViewCount;
             newVideo.NiconicoId = oldVideo.NiconicoId;
             newVideo.Title = oldVideo.Title;
@@ -302,7 +301,7 @@ namespace Niconicome.Models.Playlist
             newVideo.LargeThumbUrl = oldVideo.LargeThumbUrl;
             newVideo.ThumbUrl = oldVideo.ThumbUrl;
             newVideo.Message = oldVideo.Message;
-            newVideo.ThumbPath = oldVideo.ThumbPath;
+            if (!oldVideo.ThumbPath.IsNullOrEmpty()) newVideo.ThumbPath = oldVideo.ThumbPath;
             newVideo.FileName = oldVideo.FileName;
             newVideo.MessageGuid = oldVideo.MessageGuid;
             newVideo.Tags = oldVideo.Tags;
