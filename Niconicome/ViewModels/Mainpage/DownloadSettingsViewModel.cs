@@ -76,28 +76,7 @@ namespace Niconicome.ViewModels.Mainpage
                    int videoCount = videos.Count();
                    var firstVideo = videos.First();
                    var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
-                   var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
-                   var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
-                   string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
-                   var setting = new DownloadSettings
-                   {
-                       Video = this.IsDownloadingVideoEnable,
-                       Thumbnail = this.IsDownloadingThumbEnable,
-                       Overwrite = this.IsOverwriteEnable,
-                       Comment = this.IsDownloadingCommentEnable,
-                       DownloadLog = this.IsDownloadingCommentLogEnable,
-                       DownloadEasy = this.IsDownloadingEasyComment,
-                       DownloadOwner = this.IsDownloadingOwnerComment,
-                       FromAnotherFolder = this.IsCopyFromAnotherFolderEnable,
-                       Skip = this.IsSkippingEnable,
-                       FolderPath = folderPath,
-                       VerticalResolution = this.SelectedResolution.Resolution.Vertical,
-                       PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
-                       IsReplaceStrictedEnable = replaceStricted,
-                       OverrideVideoFileDateToUploadedDT = overrideVideoDT,
-                       MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
-                       DownloadVideoInfo = this.IsDownloadingVideoInfoEnable,
-                   };
+                   var setting = this.CreateDownloadSettings();
                    var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
 
 
@@ -139,29 +118,8 @@ namespace Niconicome.ViewModels.Mainpage
                 int videoCount = videos.Count();
                 var firstVideo = videos.First();
                 var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
-                var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
-                var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
-                string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
 
-                WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, new DownloadSettings
-                {
-                    Video = this.IsDownloadingVideoEnable,
-                    Thumbnail = this.IsDownloadingThumbEnable,
-                    Overwrite = this.IsOverwriteEnable,
-                    Comment = this.IsDownloadingCommentEnable,
-                    DownloadLog = this.IsDownloadingCommentLogEnable,
-                    DownloadEasy = this.IsDownloadingEasyComment,
-                    DownloadOwner = this.IsDownloadingOwnerComment,
-                    FromAnotherFolder = this.IsCopyFromAnotherFolderEnable,
-                    Skip = this.IsSkippingEnable,
-                    FolderPath = folderPath,
-                    VerticalResolution = this.SelectedResolution.Resolution.Vertical,
-                    PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
-                    IsReplaceStrictedEnable = replaceStricted,
-                    OverrideVideoFileDateToUploadedDT = overrideVideoDT,
-                    MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
-                    DownloadVideoInfo = this.IsDownloadingVideoInfoEnable,
-                }, allowDupe);
+                WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, this.CreateDownloadSettings(), allowDupe);
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
                 {
@@ -325,6 +283,38 @@ namespace Niconicome.ViewModels.Mainpage
         private void OnCanDownloadChange(object? sender, EventArgs e)
         {
             this.RaiseCanExecuteChange();
+        }
+
+        /// <summary>
+        /// DL設定を取得する
+        /// </summary>
+        /// <returns></returns>
+        private DownloadSettings CreateDownloadSettings()
+        {
+
+            var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
+            var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
+            string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
+
+            return new DownloadSettings
+            {
+                Video = this.IsDownloadingVideoEnable,
+                Thumbnail = this.IsDownloadingThumbEnable,
+                Overwrite = this.IsOverwriteEnable,
+                Comment = this.IsDownloadingCommentEnable,
+                DownloadLog = this.IsDownloadingCommentLogEnable,
+                DownloadEasy = this.IsDownloadingEasyComment,
+                DownloadOwner = this.IsDownloadingOwnerComment,
+                FromAnotherFolder = this.IsCopyFromAnotherFolderEnable,
+                Skip = this.IsSkippingEnable,
+                FolderPath = folderPath,
+                VerticalResolution = this.SelectedResolution.Resolution.Vertical,
+                PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
+                IsReplaceStrictedEnable = replaceStricted,
+                OverrideVideoFileDateToUploadedDT = overrideVideoDT,
+                MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
+                DownloadVideoInfo = this.IsDownloadingVideoInfoEnable,
+            };
         }
     }
 
