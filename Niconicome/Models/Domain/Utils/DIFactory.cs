@@ -26,6 +26,7 @@ using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using Playlist = Niconicome.Models.Playlist;
+using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Search;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
@@ -147,6 +148,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::ILocalVideoUtils, Local::LocalVideoUtils>();
             services.AddTransient<IO::INicoDirectoryIO, IO::NicoDirectoryIO>();
             services.AddTransient<IO::INicoFileIO, IO::NicoFileIO>();
+            services.AddTransient<Resume::ISegmentsDirectoryHandler, Resume::SegmentsDirectoryHandler>();
+            services.AddTransient<Resume::IStreamResumer, Resume::StreamResumer>();
 
             return services.BuildServiceProvider();
         }
