@@ -12,8 +12,8 @@ namespace Niconicome.Models.Domain.Local.IO
         bool Exists(string path);
         void Create(string path);
         void Delete(string path, bool recurse = true);
-        IList<string> GetFiles(string path, string pattern = "*", bool recurse = false);
-        IList<string> GetDirectorys(string path, string pattern = "*", bool recurse = false);
+        List<string> GetFiles(string path, string pattern = "*", bool recurse = false);
+        List<string> GetDirectorys(string path, string pattern = "*", bool recurse = false);
 
     }
 
@@ -55,7 +55,7 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <param name="pattern"></param>
         /// <param name="recurse"></param>
         /// <returns></returns>
-        public IList<string> GetFiles(string path, string pattern = "*", bool recurse = false)
+        public List<string> GetFiles(string path, string pattern = "*", bool recurse = false)
         {
             var option = recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var files = Directory.GetFiles(path, pattern, option);
@@ -70,7 +70,7 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <param name="pattern"></param>
         /// <param name="recurse"></param>
         /// <returns></returns>
-        public IList<string> GetDirectorys(string path, string pattern = "*", bool recurse = false)
+        public List<string> GetDirectorys(string path, string pattern = "*", bool recurse = false)
         {
             var option = recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var files = Directory.GetDirectories(path, pattern, option);

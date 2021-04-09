@@ -11,7 +11,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
 {
     class NicoDirectoryIOMock : INicoDirectoryIO
     {
-        public NicoDirectoryIOMock(Func<string, bool> existsFunc, Func<string, string, bool, IList<string>> getfilesFunc, Func<string, string, bool, IList<string>> getdirFunc)
+        public NicoDirectoryIOMock(Func<string, bool> existsFunc, Func<string, string, bool, List<string>> getfilesFunc, Func<string, string, bool, List<string>> getdirFunc)
         {
             this.existsFunc = existsFunc;
             this.getfilesFunc = getfilesFunc;
@@ -20,9 +20,9 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
 
         private readonly Func<string, bool> existsFunc;
 
-        private readonly Func<string, string, bool, IList<string>> getfilesFunc;
+        private readonly Func<string, string, bool, List<string>> getfilesFunc;
 
-        private readonly Func<string, string, bool, IList<string>> getdirFunc;
+        private readonly Func<string, string, bool, List<string>> getdirFunc;
 
         public bool Exists(string path)
         {
@@ -37,12 +37,12 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
         {
         }
 
-        public IList<string> GetFiles(string path, string pattern = "*", bool recurse = false)
+        public List<string> GetFiles(string path, string pattern = "*", bool recurse = false)
         {
             return this.getfilesFunc(path, pattern, recurse);
         }
 
-        public IList<string> GetDirectorys(string path, string pattern = "*", bool recurse = false)
+        public List<string> GetDirectorys(string path, string pattern = "*", bool recurse = false)
         {
             return this.getdirFunc(path, pattern, recurse);
         }
