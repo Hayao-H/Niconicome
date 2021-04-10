@@ -37,6 +37,12 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
         {
         }
 
+        public void DeleteAll(Predicate<string> predicate, bool recurse = true)
+        {
+
+        }
+
+
         public List<string> GetFiles(string path, string pattern = "*", bool recurse = false)
         {
             return this.getfilesFunc(path, pattern, recurse);

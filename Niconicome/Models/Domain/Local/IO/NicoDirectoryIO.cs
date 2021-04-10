@@ -12,6 +12,7 @@ namespace Niconicome.Models.Domain.Local.IO
         bool Exists(string path);
         void Create(string path);
         void Delete(string path, bool recurse = true);
+        void DeleteAll(Predicate<string> predicate, bool recurse = true);
         List<string> GetFiles(string path, string pattern = "*", bool recurse = false);
         List<string> GetDirectorys(string path, string pattern = "*", bool recurse = false);
 
@@ -47,6 +48,22 @@ namespace Niconicome.Models.Domain.Local.IO
         {
             Directory.Delete(path, recurse);
         }
+
+        /// <summary>
+        /// 指定した条件でディレクトリを削除する
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <param name="recurse"></param>
+        public void DeleteAll(Predicate<string> predicate, bool recurse = true)
+        {
+            var dirs = this.GetDirectorys(@"/").Where(p => predicate(p));
+
+            foreach (var directory in dirs)
+            {
+                this.Delete(directory, recurse);
+            }
+        }
+
 
         /// <summary>
         /// ディレクトリ内のファイル一覧を取得する
