@@ -12,6 +12,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
         string NiconicoID { get; }
         string DirectoryName { get; }
         uint Resolution { get; }
+        DateTime StartedOn { get; set; }
     }
 
     public class SegmntsDirectoryInfo : ISegmentsDirectoryInfo
@@ -32,6 +33,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
 
 
         public uint Resolution { get; init; }
+
+        public DateTime StartedOn { get; set; }
 
     }
 }

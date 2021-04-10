@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -74,16 +75,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
 
             var splitedDirName = dirName.Split("-");
 
-            if (splitedDirName.Length < 3) throw new InvalidOperationException($"セグメントファイルディレクトリ名が不正です({dirName})");
+            if (splitedDirName.Length < 5) throw new InvalidOperationException($"セグメントファイルディレクトリ名が不正です({dirName})");
 
             var parseResult = uint.TryParse(splitedDirName[1], out uint resolution);
             if (!parseResult) throw new InvalidOperationException($"セグメントファイルディレクトリ名が不正です({dirName})");
+
+            var dt = DateTime.ParseExact(string.Join("-", splitedDirName[2..5]), "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
 
             var files = this.directoryIO.GetFiles(dirPath, "*.ts").Select(p => Path.GetFileName(p) ?? string.Empty).Where(p => !p.IsNullOrEmpty() && p != "combined.ts");
 
             var info = new SegmntsDirectoryInfo(splitedDirName[0], resolution, dirName);
             info.ExistsFileNames.AddRange(files);
+            info.StartedOn = dt;
 
             return info;
         }
