@@ -46,6 +46,7 @@ namespace Niconicome.Models.Network.Download
         bool DownloadVideoInfo { get; }
         bool IsReplaceStrictedEnable { get; }
         bool OverrideVideoFileDateToUploadedDT { get; }
+        bool ResumeEnable { get; }
         string NiconicoId { get; }
         string FolderPath { get; }
         uint VerticalResolution { get; }
@@ -713,6 +714,8 @@ namespace Niconicome.Models.Network.Download
 
         public bool OverrideVideoFileDateToUploadedDT { get; set; }
 
+        public bool ResumeEnable { get; set; }
+
         public uint VerticalResolution { get; set; }
 
         public int PlaylistID { get; set; }
@@ -736,6 +739,7 @@ namespace Niconicome.Models.Network.Download
                 MaxParallelDownloadCount = maxParallelDLCount,
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
                 IsOvwrridingFileDTEnable = this.OverrideVideoFileDateToUploadedDT,
+                IsResumeEnable = this.ResumeEnable,
             };
         }
 

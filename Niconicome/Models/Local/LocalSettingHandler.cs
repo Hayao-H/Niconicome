@@ -70,7 +70,7 @@ namespace Niconicome.Models.Local
         public int GetIntSetting(Settings setting)
         {
             var settingname = this.GetSettingName(setting);
-            if (settingname is null) return 0;
+            if (settingname is null) return -1;
 
             if (this.settingHandler.Exists(settingname, SettingType.intSetting))
             {
@@ -78,7 +78,7 @@ namespace Niconicome.Models.Local
             }
             else
             {
-                return 0;
+                return -1;
             }
         }
 
@@ -155,6 +155,8 @@ namespace Niconicome.Models.Local
                 Settings.SkipSSLVerification => STypes::SettingNames.SkipSSLVerification,
                 Settings.ExpandAll => STypes::SettingNames.ExpandTreeOnStartUp,
                 Settings.InheritExpandedState => STypes::SettingNames.SaveTreePrevExpandedState,
+                Settings.EnableResume => STypes::SettingNames.IsResumeEnable,
+                Settings.MaxTmpDirCount => STypes::SettingNames.MaxTmpSegmentsDirCount,
                 _ => null
             };
         }
@@ -200,5 +202,7 @@ namespace Niconicome.Models.Local
         SkipSSLVerification,
         ExpandAll,
         InheritExpandedState,
+        EnableResume,
+        MaxTmpDirCount,
     }
 }

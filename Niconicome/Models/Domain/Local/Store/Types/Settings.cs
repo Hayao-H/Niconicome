@@ -144,5 +144,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string SkipSSLVerification { get; private set; } = "skipsslverification";
         public static string SaveTreePrevExpandedState { get; private set; } = "savetreeprevexpandedstate";
         public static string ExpandTreeOnStartUp { get; private set; } = "expandtreeonstartup";
+        public static string IsResumeEnable { get; private set; } = "isresumeenable";
+        public static string MaxTmpSegmentsDirCount { get; private set; } = "maxtmpsegmentsdircount";
     }
 }

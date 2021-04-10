@@ -62,6 +62,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         bool IsAutoDisposingEnable { get; }
         bool IsReplaceStrictedEnable { get; }
         bool IsOvwrridingFileDTEnable { get; }
+        bool IsResumeEnable { get; }
         uint VerticalResolution { get; }
         int MaxParallelDownloadCount { get; }
     }
@@ -159,13 +160,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             ISegmentsDirectoryInfo? segmentsDirectoryInfo = null;
             var segmentFilePaths = targetStream.StreamUrls.Select(u => u.FileName).Copy();
-            try
+            if (settings.IsResumeEnable)
             {
-                segmentsDirectoryInfo = this.GetSegmentsDirectoryInfo(settings.NiconicoId, targetStream.Resolution?.Vertical ?? 0);
-            }
-            catch (Exception e)
-            {
-                this.logger.Error("セグメントディレクトリ情報の取得に失敗しました。", e);
+                try
+                {
+                    segmentsDirectoryInfo = this.GetSegmentsDirectoryInfo(settings.NiconicoId, targetStream.Resolution?.Vertical ?? 0);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error("セグメントディレクトリ情報の取得に失敗しました。", e);
+                }
             }
 
             if (segmentsDirectoryInfo is not null)
@@ -516,6 +520,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public bool IsReplaceStrictedEnable { get; set; }
 
         public bool IsOvwrridingFileDTEnable { get; set; }
+
+        public bool IsResumeEnable { get; set; }
 
 
         public uint VerticalResolution { get; set; }
