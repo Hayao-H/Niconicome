@@ -11,6 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
     public interface IStreamResumer
     {
         bool SegmentsDirectoryExists(string niconicoID);
+        void RemoveSegmentsdirectory(string niconicoID);
         ISegmentsDirectoryInfo GetSegmentsDirectoryInfo(string niconicoID);
     }
 
@@ -55,6 +56,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
         {
             return this.segmentsDirectoryHandler.GetSegmentsDirectoryInfo(niconicoID);
         }
+
+        /// <summary>
+        /// セグメントディレクトリを削除する
+        /// </summary>
+        /// <param name="niconicoID"></param>
+        public void RemoveSegmentsdirectory(string niconicoID)
+        {
+            this.directoryIO.DeleteAll(p => p.StartsWith(niconicoID));
+
+        }
+
 
     }
 }
