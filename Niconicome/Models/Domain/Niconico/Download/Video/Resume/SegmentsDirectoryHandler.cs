@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.IO;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
@@ -50,12 +51,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
         /// </summary>
         /// <param name="dirName"></param>
         /// <returns></returns>
-        private ISegmentsDirectoryInfo GetSegmentsDirectoryInfoInternal(string dirName)
+        private ISegmentsDirectoryInfo GetSegmentsDirectoryInfoInternal(string dirPath)
         {
-            if (!this.directoryIO.Exists(dirName)) throw new IOException($"指定したディレクトリは存在しません。({dirName})");
+            if (!this.directoryIO.Exists(dirPath)) throw new IOException($"指定したディレクトリは存在しません。({dirPath})");
 
 
-            dirName = Path.GetFileName(dirName);
+            var dirName = Path.GetFileName(dirPath);
 
             if (string.IsNullOrEmpty(dirName)) throw new IOException($"ディレクトリ名を取得できませんでした。({dirName})");
 
@@ -67,8 +68,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
             if (!parseResult) throw new InvalidOperationException($"セグメントファイルディレクトリ名が不正です({dirName})");
 
 
-            var files = this.directoryIO.GetFiles(dirName, "*.ts");
-            files.Remove("combined.ts");
+            var files = this.directoryIO.GetFiles(dirPath, "*.ts").Select(p => Path.GetFileName(p) ?? string.Empty).Where(p => !p.IsNullOrEmpty() && p != "combined.ts");
 
             var info = new SegmntsDirectoryInfo(splitedDirName[0], resolution, dirName);
             info.ExistsFileNames.AddRange(files);
