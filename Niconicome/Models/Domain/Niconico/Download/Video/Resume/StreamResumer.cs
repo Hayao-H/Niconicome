@@ -40,7 +40,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
         /// <returns></returns>
         public bool SegmentsDirectoryExists(string niconicoID)
         {
-            var dirs = this.directoryIO.GetDirectorys(@"\tmp", $"{niconicoID}-*");
+            var dirs = this.directoryIO.GetDirectorys(@"tmp", $"{niconicoID}-*");
 
             dirs.RemoveAll(d => !Regex.IsMatch(d, @"^.+-\d+-\d{4}-\d{2}-\d{2}$"));
 

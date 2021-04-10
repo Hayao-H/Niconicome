@@ -19,7 +19,7 @@ namespace NiconicomeTest.NetWork.Download.Video.Resume
         [Test]
         public void 存在しないディレクトリを渡す()
         {
-            this.nicoDirectoryIO = new NicoDirectoryIOMock(_ => false, (_, _, _) => new List<string>(), (_, _, _) => new List<string>());
+            this.nicoDirectoryIO = new NicoDirectoryIOMock(_ => true, (_, _, _) => new List<string>(), (_, _, _) => new List<string>());
             this.segmentsDirectoryHandler = new SegmentsDirectoryHandler(this.nicoDirectoryIO);
 
             Assert.That(() => this.segmentsDirectoryHandler.GetSegmentsDirectoryInfo("sm9"), Throws.InstanceOf<IOException>());
@@ -28,7 +28,7 @@ namespace NiconicomeTest.NetWork.Download.Video.Resume
         [Test]
         public void 不正なパスを渡す()
         {
-            this.nicoDirectoryIO = new NicoDirectoryIOMock(_ => false, (_, _, _) => new List<string>(), (_, _, _) => new List<string>() { "sm9-hoge-2021-04-09" });
+            this.nicoDirectoryIO = new NicoDirectoryIOMock(_ => true, (_, _, _) => new List<string>(), (_, _, _) => new List<string>() { @"tmp\sm9-hoge-2021-04-09" });
             this.segmentsDirectoryHandler = new SegmentsDirectoryHandler(this.nicoDirectoryIO);
 
             Assert.That(() => this.segmentsDirectoryHandler.GetSegmentsDirectoryInfo("sm9"), Throws.InstanceOf<InvalidOperationException>());
@@ -37,7 +37,7 @@ namespace NiconicomeTest.NetWork.Download.Video.Resume
         [Test]
         public void セグメント0個()
         {
-            this.nicoDirectoryIO = new NicoDirectoryIOMock(_ => false, (_, _, _) => new List<string>(), (_, _, _) => new List<string>() { "sm9-1080-2021-04-09" });
+            this.nicoDirectoryIO = new NicoDirectoryIOMock(_ => true, (_, _, _) => new List<string>(), (_, _, _) => new List<string>() { @"tmp\sm9-1080-2021-04-09" });
             this.segmentsDirectoryHandler = new SegmentsDirectoryHandler(this.nicoDirectoryIO);
             var result = this.segmentsDirectoryHandler.GetSegmentsDirectoryInfo("sm9");
 
@@ -51,7 +51,7 @@ namespace NiconicomeTest.NetWork.Download.Video.Resume
         [Test]
         public void セグメント3個()
         {
-            this.nicoDirectoryIO = new NicoDirectoryIOMock(_ => false, (_, _, _) => new List<string>() { "1.ts", "2.ts", "3.ts", "combined.ts" }, (_, _, _) => new List<string>() { "sm9-1080-2021-04-09" });
+            this.nicoDirectoryIO = new NicoDirectoryIOMock(_ => true, (_, _, _) => new List<string>() { "1.ts", "2.ts", "3.ts", "combined.ts" }, (_, _, _) => new List<string>() { @"tmp\sm9-1080-2021-04-09" });
             this.segmentsDirectoryHandler = new SegmentsDirectoryHandler(this.nicoDirectoryIO);
             var result = this.segmentsDirectoryHandler.GetSegmentsDirectoryInfo("sm9");
 

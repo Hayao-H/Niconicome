@@ -33,12 +33,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
         /// <returns></returns>
         public ISegmentsDirectoryInfo GetSegmentsDirectoryInfo(string niconicoID)
         {
-            var dirs = this.directoryIO.GetDirectorys(@"\tmp\", $"{niconicoID}-*");
+            var dirs = this.directoryIO.GetDirectorys(@"tmp\", $"{niconicoID}-*");
 
             if (dirs.Count == 0) throw new IOException($"{niconicoID}のセグメントファイルは保存されていません。");
 
             var dir = dirs.First();
-            var info = this.GetSegmentsDirectoryInfoInternal(dir);
+            var dirName = Path.GetFileName(dir);
+
+            if (string.IsNullOrEmpty(dirName)) throw new IOException($"ディレクトリ名を取得できませんでした。({dir})");
+
+            var info = this.GetSegmentsDirectoryInfoInternal(dirName);
             return info;
         }
 
