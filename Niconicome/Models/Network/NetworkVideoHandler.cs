@@ -229,7 +229,7 @@ namespace Niconicome.Models.Network
             foreach (var item in ids.Select((video, index) => new { video, index }))
             {
 
-                var task = new NetworkVideoParallelTask(async (_, lockObj) =>
+                var task = new NetworkVideoParallelTask(async (_, lockObj, _) =>
                 {
                     onStarted(item.video, item.index);
 
@@ -343,7 +343,7 @@ namespace Niconicome.Models.Network
 
     public class NetworkVideoParallelTask : IParallelTask<NetworkVideoParallelTask>
     {
-        public NetworkVideoParallelTask(Func<NetworkVideoParallelTask, object, Task> taskFunction, Action<int> onwait)
+        public NetworkVideoParallelTask(Func<NetworkVideoParallelTask, object, IParallelTaskToken, Task> taskFunction, Action<int> onwait)
         {
             this.TaskFunction = taskFunction;
             this.OnWait = onwait;
@@ -351,7 +351,7 @@ namespace Niconicome.Models.Network
 
         public Guid TaskId { get; init; } = Guid.NewGuid();
 
-        public Func<NetworkVideoParallelTask, object, Task> TaskFunction { get; init; }
+        public Func<NetworkVideoParallelTask, object, IParallelTaskToken, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
     }

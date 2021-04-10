@@ -466,7 +466,7 @@ namespace Niconicome.Models.Network.Download
                 this.CurrentResult = new NetworkResult();
             }
 
-            var t = new DownloadTaskParallel(async (parallelTask, lockObj) =>
+            var t = new DownloadTaskParallel(async (parallelTask, lockObj, pToken) =>
             {
                 if (!e.Task.IsCanceled && !e.Task.IsDone)
                 {
@@ -792,7 +792,7 @@ namespace Niconicome.Models.Network.Download
     /// </summary>
     public class DownloadTaskParallel : IParallelTask<DownloadTaskParallel>
     {
-        public DownloadTaskParallel(Func<DownloadTaskParallel, object, Task> taskFunction, Action<int> onwait)
+        public DownloadTaskParallel(Func<DownloadTaskParallel, object, IParallelTaskToken, Task> taskFunction, Action<int> onwait)
         {
             this.TaskFunction = taskFunction;
             this.OnWait = onwait;
@@ -800,7 +800,7 @@ namespace Niconicome.Models.Network.Download
 
         public Guid TaskId { get; init; }
 
-        public Func<DownloadTaskParallel, object, Task> TaskFunction { get; init; }
+        public Func<DownloadTaskParallel, object, IParallelTaskToken, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
 
