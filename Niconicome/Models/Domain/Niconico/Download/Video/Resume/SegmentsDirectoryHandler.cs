@@ -38,22 +38,38 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
             if (dirs.Count == 0) throw new IOException($"{niconicoID}のセグメントファイルは保存されていません。");
 
             var dir = dirs.First();
-            var splitedDirName = dir.Split("-");
+            var info = this.GetSegmentsDirectoryInfoInternal(dir);
+            return info;
+        }
 
-            if (splitedDirName.Length < 3) throw new InvalidOperationException($"セグメントファイルディレクトリ名が不正です({dir})");
+        #region private
+
+        /// <summary>
+        /// セグメントディレクトリの情報を取得する
+        /// </summary>
+        /// <param name="dirName"></param>
+        /// <returns></returns>
+        private ISegmentsDirectoryInfo GetSegmentsDirectoryInfoInternal(string dirName)
+        {
+            if (!this.directoryIO.Exists(dirName)) throw new IOException($"指定したディレクトリは存在しません。({dirName})");
+
+            var splitedDirName = dirName.Split("-");
+
+            if (splitedDirName.Length < 3) throw new InvalidOperationException($"セグメントファイルディレクトリ名が不正です({dirName})");
 
             var parseResult = uint.TryParse(splitedDirName[1], out uint resolution);
-            if (!parseResult) throw new InvalidOperationException($"セグメントファイルディレクトリ名が不正です({dir})");
+            if (!parseResult) throw new InvalidOperationException($"セグメントファイルディレクトリ名が不正です({dirName})");
 
 
-            var files = this.directoryIO.GetFiles(dir, "*.ts");
+            var files = this.directoryIO.GetFiles(dirName, "*.ts");
             files.Remove("combined.ts");
 
-            var info = new SegmntsDirectoryInfo(niconicoID, resolution, dir);
+            var info = new SegmntsDirectoryInfo(splitedDirName[0], resolution, dirName);
             info.ExistsFileNames.AddRange(files);
 
             return info;
         }
+        #endregion
 
     }
 }
