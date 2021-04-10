@@ -61,5 +61,19 @@ namespace NiconicomeTest.NetWork.Download.Video.Resume
             Assert.That(result.NiconicoID, Is.EqualTo("sm9"));
 
         }
+
+        [Test]
+        public void ディレクトリのパスで取得()
+        {
+            this.nicoDirectoryIO = new NicoDirectoryIOMock(p => p== @"tmp\sm9-1080-2021-04-09", (_, _, _) => new List<string>(), (_, _, _) => new List<string>() { @"tmp\sm9-1080-2021-04-09" });
+            this.segmentsDirectoryHandler = new SegmentsDirectoryHandler(this.nicoDirectoryIO);
+            var result = this.segmentsDirectoryHandler.GetSegmentsDirectoryInfoWithDirectoryPath(@"tmp\sm9-1080-2021-04-09");
+
+            Assert.That(result.DirectoryName, Is.EqualTo("sm9-1080-2021-04-09"));
+            Assert.That(result.ExistsFileNames.Count, Is.EqualTo(0));
+            Assert.That(result.Resolution, Is.EqualTo((uint)1080));
+            Assert.That(result.NiconicoID, Is.EqualTo("sm9"));
+
+        }
     }
 }

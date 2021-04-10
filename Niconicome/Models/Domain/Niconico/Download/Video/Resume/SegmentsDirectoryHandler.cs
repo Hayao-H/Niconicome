@@ -13,6 +13,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
     public interface ISegmentsDirectoryHandler
     {
         ISegmentsDirectoryInfo GetSegmentsDirectoryInfo(string niconicoID);
+        ISegmentsDirectoryInfo GetSegmentsDirectoryInfoWithDirectoryPath(string path);
     }
 
     public class SegmentsDirectoryHandler : ISegmentsDirectoryHandler
@@ -43,6 +44,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
             var info = this.GetSegmentsDirectoryInfoInternal(dir);
             return info;
         }
+
+        /// <summary>
+        /// ディレクトリのパスから取得する
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public ISegmentsDirectoryInfo GetSegmentsDirectoryInfoWithDirectoryPath(string path)
+        {
+            return this.GetSegmentsDirectoryInfoInternal(path);
+        }
+
 
         #region private
 

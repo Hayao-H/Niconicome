@@ -12,6 +12,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
     {
         bool SegmentsDirectoryExists(string niconicoID);
         void RemoveSegmentsdirectory(string niconicoID);
+        //   IEnumerable<ISegmentsDirectoryInfo> GetAllSegmentsDirectoryInfo();
         ISegmentsDirectoryInfo GetSegmentsDirectoryInfo(string niconicoID);
     }
 
@@ -66,6 +67,21 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
             this.directoryIO.DeleteAll(p => p.StartsWith(niconicoID));
 
         }
+
+        /// <summary>
+        /// すべてのセグメントディレクトリ情報を取得する
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ISegmentsDirectoryInfo> GetAllSegmentsDirectoryInfo()
+        {
+            var dirs = this.directoryIO.GetDirectorys(@"tmp");
+            dirs.RemoveAll(d => !Regex.IsMatch(d, @"^.+-\d+-\d{4}-\d{2}-\d{2}$"));
+
+            var infos = dirs.Select(d => this.segmentsDirectoryHandler.GetSegmentsDirectoryInfoWithDirectoryPath(d));
+
+            return infos;
+        }
+
 
 
     }
