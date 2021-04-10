@@ -45,6 +45,10 @@ namespace NiconicomeTest.NetWork.Download.Video.Resume
             Assert.That(result.ExistsFileNames.Count, Is.EqualTo(0));
             Assert.That(result.Resolution, Is.EqualTo((uint)1080));
             Assert.That(result.NiconicoID, Is.EqualTo("sm9"));
+            Assert.That(result.StartedOn.Year, Is.EqualTo(2021));
+            Assert.That(result.StartedOn.Month, Is.EqualTo(4));
+            Assert.That(result.StartedOn.Day, Is.EqualTo(9));
+
 
         }
 
@@ -59,6 +63,10 @@ namespace NiconicomeTest.NetWork.Download.Video.Resume
             Assert.That(result.ExistsFileNames.Count, Is.EqualTo(3));
             Assert.That(result.Resolution, Is.EqualTo((uint)1080));
             Assert.That(result.NiconicoID, Is.EqualTo("sm9"));
+            Assert.That(result.StartedOn.Year, Is.EqualTo(2021));
+            Assert.That(result.StartedOn.Month, Is.EqualTo(4));
+            Assert.That(result.StartedOn.Day, Is.EqualTo(9));
+
 
         }
 
@@ -73,6 +81,9 @@ namespace NiconicomeTest.NetWork.Download.Video.Resume
             Assert.That(result.ExistsFileNames.Count, Is.EqualTo(0));
             Assert.That(result.Resolution, Is.EqualTo((uint)1080));
             Assert.That(result.NiconicoID, Is.EqualTo("sm9"));
+            Assert.That(result.StartedOn.Year, Is.EqualTo(2021));
+            Assert.That(result.StartedOn.Month, Is.EqualTo(4));
+            Assert.That(result.StartedOn.Day, Is.EqualTo(9));
 
         }
     }

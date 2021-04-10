@@ -12,7 +12,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
     {
         bool SegmentsDirectoryExists(string niconicoID);
         void RemoveSegmentsdirectory(string niconicoID);
-        //   IEnumerable<ISegmentsDirectoryInfo> GetAllSegmentsDirectoryInfo();
+        IEnumerable<ISegmentsDirectoryInfo> GetAllSegmentsDirectoryInfo();
         ISegmentsDirectoryInfo GetSegmentsDirectoryInfo(string niconicoID);
     }
 

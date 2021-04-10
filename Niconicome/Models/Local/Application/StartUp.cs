@@ -7,6 +7,8 @@ using Niconicome.Models.Auth;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Domain.Utils;
 using Store = Niconicome.Models.Domain.Local.Store;
+using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
+using NicoIO = Niconicome.Models.Domain.Local.IO;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -20,7 +22,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger)
+        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer,NicoIO::INicoDirectoryIO nicoDirectoryIO)
         {
 
             this.videoStoreHandler = videoStoreHandler;
@@ -30,6 +32,9 @@ namespace Niconicome.Models.Local.Application
             this.autoLogin = autoLogin;
             this.snackbarHandler = snackbarHandler;
             this.logger = logger;
+            this.settingHandler = settingHandler;
+            this.streamResumer = streamResumer;
+            this.nicoDirectoryIO = nicoDirectoryIO;
             this.DeleteInvalidbackup();
         }
 
@@ -46,6 +51,12 @@ namespace Niconicome.Models.Local.Application
         private readonly ISnackbarHandler snackbarHandler;
 
         private readonly ILogger logger;
+
+        private readonly ILocalSettingHandler settingHandler;
+
+        private readonly Resume::IStreamResumer streamResumer;
+
+        private readonly NicoIO::INicoDirectoryIO nicoDirectoryIO;
 
         /// <summary>
         /// 自動ログイン成功時
@@ -71,13 +82,18 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         private void RemoveTmpFolder()
         {
-            if (Directory.Exists("tmp"))
+            if (this.nicoDirectoryIO.Exists("tmp"))
             {
-                try
+                var maxTmp = this.settingHandler.GetIntSetting(Settings.MaxTmpDirCount);
+                if (maxTmp < 0) maxTmp = 20;
+                var infos = this.streamResumer.GetAllSegmentsDirectoryInfo().ToList();
+                if (infos.Count <= maxTmp) return;
+                infos = infos.OrderBy(i => i.StartedOn).ToList();
+                foreach (var i in Enumerable.Range(0, infos.Count - maxTmp))
                 {
-                    Directory.Delete("tmp", true);
+                    this.nicoDirectoryIO.Delete(Path.Combine(AppContext.BaseDirectory, "tmp", infos[i].DirectoryName));
                 }
-                catch { }
+
             }
         }
 
@@ -136,7 +152,8 @@ namespace Niconicome.Models.Local.Application
             {
                 this.snackbarHandler.Enqueue("自動ログインに失敗しました。");
                 return;
-            }else
+            }
+            else
             {
                 this.snackbarHandler.Enqueue("自動ログインに成功しました。");
                 this.RaiseLoginSucceeded();
