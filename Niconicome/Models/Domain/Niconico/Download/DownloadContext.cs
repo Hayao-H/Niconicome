@@ -11,7 +11,9 @@ namespace Niconicome.Models.Domain.Niconico.Download
     {
         string NiconicoId { get; }
         string Id { get; }
+        string SegmentsDirectoryName { get; set; }
         uint ActualVerticalResolution { get; set; }
+        int OriginalSegmentsCount { get; set; }
 
         string GetLogContent();
     }
@@ -38,6 +40,17 @@ namespace Niconicome.Models.Domain.Niconico.Download
         /// 実際の垂直解像度
         /// </summary>
         public uint ActualVerticalResolution { get; set; }
+
+        /// <summary>
+        /// セグメントディレクトリ名
+        /// </summary>
+        public string SegmentsDirectoryName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// セグメントファイル数
+        /// </summary>
+        public int OriginalSegmentsCount { get; set; }
+
 
 
         /// <summary>

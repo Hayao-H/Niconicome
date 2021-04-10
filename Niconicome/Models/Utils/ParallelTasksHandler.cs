@@ -10,8 +10,13 @@ namespace Niconicome.Models.Utils
     public interface IParallelTask<T>
     {
         Guid TaskId { get; }
-        Func<T, object, Task> TaskFunction { get; }
+        Func<T, object, IParallelTaskToken, Task> TaskFunction { get; }
         Action<int> OnWait { get; }
+    }
+
+    public interface IParallelTaskToken
+    {
+        bool IsSkipped { get; set; }
     }
 
     class ParallelTasksHandler<T> where T : IParallelTask<T>
@@ -124,7 +129,7 @@ namespace Niconicome.Models.Utils
             if (this.IsProcessing) return;
 
             var semaphore = new SemaphoreSlim(this.maxPallarelTasksCount, this.maxPallarelTasksCount);
-            int index = -1;
+            int index = 0;
             var mre = new ManualResetEventSlim(true);
             var tasks = new List<Task>();
             var lockObj = new object();
@@ -154,11 +159,6 @@ namespace Niconicome.Models.Utils
 
                     await semaphore.WaitAsync();
 
-                    lock (this.lockobj)
-                    {
-                        index++;
-                    }
-
                     //待機処理
                     if (this.waitInterval != -1 && index > 0 && index % this.waitInterval == 0)
                     {
@@ -170,7 +170,14 @@ namespace Niconicome.Models.Utils
 
                     mre.Wait();
 
-                    await Task.Run(async () => await task.TaskFunction(task, lockobj));
+                    var token = new ParallelTaskToken();
+
+                    await Task.Run(async () => await task.TaskFunction(task, lockobj, token));
+
+                    lock (this.lockobj)
+                    {
+                        index++;
+                    }
 
                     semaphore.Release();
                 };
@@ -196,5 +203,10 @@ namespace Niconicome.Models.Utils
             }
         }
 
+    }
+
+    public struct ParallelTaskToken : IParallelTaskToken
+    {
+        public bool IsSkipped { get; set; }
     }
 }

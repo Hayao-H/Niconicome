@@ -66,6 +66,10 @@ namespace Niconicome.ViewModels.Setting.Pages
                 _ => n4,
             };
 
+            this.isDownloadResumingEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.EnableResume);
+            var maxTmp = WS::SettingPage.SettingHandler.GetIntSetting(Settings.MaxTmpDirCount);
+            this.maxTmpDirCountField = maxTmp < 0 ? 20 : maxTmp;
+
         }
 
         private int commentOffsetField;
@@ -83,6 +87,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         private bool isOverrideVideoFileDTToUploadedDTField;
 
         private bool isDownloadVideoInfoInJsonEnableField;
+
+        private bool isDownloadResumingEnableField;
+
+        private int maxTmpDirCountField;
 
         public List<ComboboxItem<int>> SelectableMaxParallelDownloadCount { get; init; }
 
@@ -138,6 +146,16 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public bool IsDownloadVideoInfoInJsonEnable { get => this.isDownloadVideoInfoInJsonEnableField; set => this.Savesetting(ref this.isDownloadVideoInfoInJsonEnableField, value, Settings.VideoInfoInJson); }
 
+        /// <summary>
+        /// レジュームを有効にする
+        /// </summary>
+        public bool IsDownloadResumingEnable { get => this.isDownloadResumingEnableField; set => this.Savesetting(ref this.isDownloadResumingEnableField, value, Settings.EnableResume); }
+
+        /// <summary>
+        /// 一時フォルダーの最大保持数
+        /// </summary>
+        public int MaxTmpDirCount { get => this.maxTmpDirCountField; set => this.Savesetting(ref this.maxTmpDirCountField, value, Settings.MaxTmpDirCount); }
+
 
     }
 
@@ -173,5 +191,9 @@ namespace Niconicome.ViewModels.Setting.Pages
         public bool IsOverrideVideoFileDTToUploadedDT { get; set; } = true;
 
         public bool IsDownloadVideoInfoInJsonEnable { get; set; } = true;
+
+        public bool IsDownloadResumingEnable { get; set; } = true;
+
+        public int MaxTmpDirCount { get; set; } = 20;
     }
 }

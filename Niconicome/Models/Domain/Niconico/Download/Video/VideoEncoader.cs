@@ -149,7 +149,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public void Merge(IEnumerable<string> sourceFiles, string targetFilePath)
         {
             using var fsTarget = new FileStream(targetFilePath, FileMode.OpenOrCreate);
-            foreach (var file in sourceFiles)
+            foreach (var file in sourceFiles.OrderBy(p =>
+            {
+                p = Path.GetFileName(p) ?? string.Empty;
+                return int.Parse(p.Contains(".") ? p[0..p.LastIndexOf(".")] : p);
+            }))
             {
                 using var fsSource = new FileStream(file, FileMode.Open);
 

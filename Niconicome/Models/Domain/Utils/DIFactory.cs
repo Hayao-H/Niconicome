@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
-using System.Runtime.ConstrainedExecution;
 using Microsoft.Extensions.DependencyInjection;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
@@ -19,6 +18,7 @@ using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Import = Niconicome.Models.Local.External.Import;
+using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 using MyApplication = Niconicome.Models.Local.Application;
@@ -26,6 +26,7 @@ using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using Playlist = Niconicome.Models.Playlist;
+using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Search;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
@@ -145,6 +146,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();
             services.AddTransient<DlDescription::IVideoInfoContentProducer, DlDescription::VideoInfoContentProducer>();
             services.AddTransient<Local::ILocalVideoUtils, Local::LocalVideoUtils>();
+            services.AddTransient<IO::INicoDirectoryIO, IO::NicoDirectoryIO>();
+            services.AddTransient<IO::INicoFileIO, IO::NicoFileIO>();
+            services.AddTransient<Resume::ISegmentsDirectoryHandler, Resume::SegmentsDirectoryHandler>();
+            services.AddTransient<Resume::IStreamResumer, Resume::StreamResumer>();
 
             return services.BuildServiceProvider();
         }

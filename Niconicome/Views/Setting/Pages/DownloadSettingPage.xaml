@@ -97,6 +97,26 @@
                 <Label Content="動画情報ファイルの保存形式をJSONにする" />
                 <ToggleButton IsChecked="{Binding IsDownloadVideoInfoInJsonEnable}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
             </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="SkipNextCircleOutline" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="可能な場合は動画ファイルのDLをレジュームする" />
+                <ToggleButton IsChecked="{Binding IsDownloadResumingEnable}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="SkipNextCircleOutline" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="一時フォルダーの最大保持数" ToolTip="DLをレジュームできる動画の最大数です。" />
+                <TextBox Text="{Binding MaxTmpDirCount}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+            </DockPanel>
         </StackPanel>
 
 
