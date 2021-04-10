@@ -6,8 +6,10 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Dmc;
+using Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Utils;
@@ -69,7 +71,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     /// </summary>
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(IWatchSession session, ILogger logger, IVideoDownloadHelper videoDownloadHelper, IDownloadMessenger messenger, IVideoEncoader encorder, INiconicoUtils utils, IVideoFileStorehandler fileStorehandler)
+        public VideoDownloader(IWatchSession session, ILogger logger, IVideoDownloadHelper videoDownloadHelper, IDownloadMessenger messenger, IVideoEncoader encorder, INiconicoUtils utils, IVideoFileStorehandler fileStorehandler, IStreamResumer streamResumer)
         {
             this.session = session;
             this.logger = logger;
@@ -78,6 +80,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             this.encorder = encorder;
             this.utils = utils;
             this.fileStorehandler = fileStorehandler;
+            this.streamResumer = streamResumer;
         }
 
         ~VideoDownloader()
@@ -144,6 +147,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             var targetStream = streams.GetStream(settings.VerticalResolution);
 
             context.ActualVerticalResolution = targetStream.Resolution?.Vertical ?? 0;
+            context.OriginalSegmentsCount = targetStream.StreamUrls.Count;
 
             if (token.IsCancellationRequested)
             {
@@ -151,6 +155,29 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
+            }
+
+            ISegmentsDirectoryInfo? segmentsDirectoryInfo = null;
+            try
+            {
+                segmentsDirectoryInfo = this.GetSegmentsDirectoryInfo(settings.NiconicoId, targetStream.Resolution?.Vertical ?? 0);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("セグメントディレクトリ情報の取得に失敗しました。", e);
+            }
+
+            if (segmentsDirectoryInfo is not null)
+            {
+                var urls = targetStream.StreamUrls.Where(u => !segmentsDirectoryInfo.ExistsFileNames.Contains(u.FileName)).Copy();
+                targetStream.StreamUrls.Clear();
+                targetStream.StreamUrls.AddRange(urls);
+                context.SegmentsDirectoryName = segmentsDirectoryInfo.DirectoryName;
+                this.messenger.SendMessage("DLをレジューム");
+            }
+            else
+            {
+                context.SegmentsDirectoryName = $"{settings.NiconicoId}-{targetStream.Resolution?.Vertical ?? 0}-{DateTime.Now.ToString("yyyy-MM-dd")}";
             }
 
             try
@@ -163,7 +190,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 this.logger.Error("動画のダウンロード中にエラーが発生しました。", e);
                 this.messenger.SendMessage("動画のダウンロードに失敗");
                 this.messenger.RemoveHandler(onMessage);
-                this.DeleteTmpFolder();
                 return new DownloadResult() { Issucceeded = false, Message = $"動画のダウンロード中にエラーが発生しました。(詳細: {e.Message})" };
             }
 
@@ -171,7 +197,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             if (token.IsCancellationRequested)
             {
-                this.DeleteTmpFolder();
                 this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("ダウンロードをキャンセル");
                 this.messenger.RemoveHandler(onMessage);
@@ -198,7 +223,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 this.logger.Log($"ユーザーの操作によって動画の変換処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
                 this.messenger.SendMessage("動画の変換中にキャンセル");
                 this.messenger.RemoveHandler(onMessage);
-                this.DeleteTmpFolder();
                 return new DownloadResult() { Issucceeded = false, Message = $"動画の変換中にキャンセルされました。" };
             }
             catch (Exception e)
@@ -206,7 +230,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 this.logger.Error("ファイルの変換中にエラーが発生しました。", e);
                 this.messenger.SendMessage("動画の変換中にエラー発生");
                 this.messenger.RemoveHandler(onMessage);
-                this.DeleteTmpFolder();
                 return new DownloadResult() { Issucceeded = false, Message = $"ファイルの変換中にエラーが発生しました。(詳細: {e.Message})" };
             }
             this.messenger.SendMessage("動画の変換が完了");
@@ -222,6 +245,27 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public async Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
             return await this.DownloadVideoAsync(settings, onMessage, this.session, context, token);
+        }
+
+        /// <summary>
+        /// セグメントディレクトリ情報を取得する
+        /// </summary>
+        /// <param name="niconicoID"></param>
+        /// <param name="verticalResolution"></param>
+        /// <returns></returns>
+        private ISegmentsDirectoryInfo? GetSegmentsDirectoryInfo(string niconicoID, uint verticalResolution)
+        {
+            if (!this.streamResumer.SegmentsDirectoryExists(niconicoID)) return null;
+
+            var info = this.streamResumer.GetSegmentsDirectoryInfo(niconicoID);
+
+            if (info.Resolution != verticalResolution)
+            {
+                this.streamResumer.RemoveSegmentsdirectory(niconicoID);
+                return null;
+            }
+
+            return info;
         }
 
         /// <summary>
@@ -256,6 +300,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         private readonly INiconicoUtils utils;
 
         private readonly IVideoFileStorehandler fileStorehandler;
+
+        private readonly IStreamResumer streamResumer;
 
         /// <summary>
         /// キャンセル時のメッセージを取得する
@@ -300,8 +346,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public async Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, int maxParallelDownloadCount, CancellationToken token)
         {
             var taskHandler = new ParallelTasksHandler<IParallelDownloadTask>(maxParallelDownloadCount, false);
-            var completed = 0;
-            var all = stream.StreamUrls.Count;
+            var completed = context.OriginalSegmentsCount - stream.StreamUrls.Count;
+            var all = context.OriginalSegmentsCount;
             var resolution = context.ActualVerticalResolution == 0 ? string.Empty : $"（{context.ActualVerticalResolution}px）";
             Exception? ex = null;
 
