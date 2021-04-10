@@ -158,6 +158,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
 
             ISegmentsDirectoryInfo? segmentsDirectoryInfo = null;
+            var segmentFilePaths = targetStream.StreamUrls.Select(u => u.FileName).Copy();
             try
             {
                 segmentsDirectoryInfo = this.GetSegmentsDirectoryInfo(settings.NiconicoId, targetStream.Resolution?.Vertical ?? 0);
@@ -179,6 +180,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             {
                 context.SegmentsDirectoryName = $"{settings.NiconicoId}-{targetStream.Resolution?.Vertical ?? 0}-{DateTime.Now.ToString("yyyy-MM-dd")}";
             }
+
+            segmentFilePaths = segmentFilePaths.Select(p => Path.Combine(AppContext.BaseDirectory, "tmp", context.SegmentsDirectoryName, p));
 
             try
             {
@@ -208,7 +211,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             {
                 FileName = fileName,
                 FolderName = settings.FolderName,
-                TsFilePaths = this.videoDownloadHelper.GetAllFileAbsPaths(),
+                TsFilePaths = segmentFilePaths,
                 IsOverwriteEnable = settings.IsOverwriteEnable,
                 IsOverrideDTEnable = settings.IsOvwrridingFileDTEnable,
                 UploadedOn = session.Video.DmcInfo.UploadedOn,
@@ -234,7 +237,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
             this.messenger.SendMessage("動画の変換が完了");
 
-            this.DeleteTmpFolder();
+            this.DeleteTmpFolder(context);
 
             this.fileStorehandler.Add(settings.NiconicoId, Path.Combine(settings.FolderName, fileName));
 
@@ -271,9 +274,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <summary>
         /// 一時フォルダーを削除
         /// </summary>
-        private void DeleteTmpFolder()
+        private void DeleteTmpFolder(IDownloadContext context)
         {
-            string folderPath = this.videoDownloadHelper.FolderName;
+            string folderPath = Path.Combine(AppContext.BaseDirectory, "tmp", context.SegmentsDirectoryName);
             if (!Directory.Exists(folderPath)) return;
             try
             {
