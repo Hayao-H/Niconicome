@@ -38,11 +38,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
             if (dirs.Count == 0) throw new IOException($"{niconicoID}のセグメントファイルは保存されていません。");
 
             var dir = dirs.First();
-            var dirName = Path.GetFileName(dir);
 
-            if (string.IsNullOrEmpty(dirName)) throw new IOException($"ディレクトリ名を取得できませんでした。({dir})");
-
-            var info = this.GetSegmentsDirectoryInfoInternal(dirName);
+            var info = this.GetSegmentsDirectoryInfoInternal(dir);
             return info;
         }
 
@@ -56,6 +53,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.Resume
         private ISegmentsDirectoryInfo GetSegmentsDirectoryInfoInternal(string dirName)
         {
             if (!this.directoryIO.Exists(dirName)) throw new IOException($"指定したディレクトリは存在しません。({dirName})");
+
+
+            dirName = Path.GetFileName(dirName);
+
+            if (string.IsNullOrEmpty(dirName)) throw new IOException($"ディレクトリ名を取得できませんでした。({dirName})");
 
             var splitedDirName = dirName.Split("-");
 
