@@ -64,6 +64,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             this.isExpandallPlaylistsEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.ExpandAll);
             this.isSavePrevPlaylistExpandedStateEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.InheritExpandedState);
+            this.isStoreOnlyNiconicoIDEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
         }
 
         private bool isAutologinEnableField;
@@ -73,6 +74,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         private bool isSavePrevPlaylistExpandedStateEnableField;
 
         private bool isExpandallPlaylistsEnableField;
+
+        private bool isStoreOnlyNiconicoIDEnableField;
 
         private string empty = string.Empty;
 
@@ -143,6 +146,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public bool IsExpandallPlaylistsEnable { get => this.isExpandallPlaylistsEnableField; set => this.Savesetting(ref this.isExpandallPlaylistsEnableField, value, Settings.ExpandAll); }
 
+        /// <summary>
+        /// ニコニコ動画のIDのみを保存する
+        /// </summary>
+        public bool IsStoreOnlyNiconicoIDEnable { get => this.isStoreOnlyNiconicoIDEnableField; set => this.Savesetting(ref this.isStoreOnlyNiconicoIDEnableField, value, Settings.StoreOnlyNiconicoID); }
+
+
     }
 
     class GeneralSettingsPageViewModelD
@@ -170,6 +179,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public bool IsSavePrevPlaylistExpandedStateEnable { get; set; } = true;
 
         public bool IsExpandallPlaylistsEnable { get; set; } = true;
+
+        public bool IsStoreOnlyNiconicoIDEnable { get; set; } = true;
 
         public List<AutoLoginTypes> SelectableAutoLoginTypes { get; init; } = new();
 

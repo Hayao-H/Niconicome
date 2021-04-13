@@ -102,6 +102,16 @@
                 <ToggleButton HorizontalAlignment="Right" IsEnabled="{Binding ElementName=expandAllPlaylists,Path=IsChecked,Converter={StaticResource booleanInverseconverter }}" IsChecked="{Binding IsSavePrevPlaylistExpandedStateEnable}"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="MovieOpenPlus" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="動画追加時にIDのみを登録する" ToolTip="動画情報は更新時、またはDL時に改めて登録されます。" />
+                <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsStoreOnlyNiconicoIDEnable}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
         
     </Grid>
