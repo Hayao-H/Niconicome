@@ -258,15 +258,22 @@ namespace Niconicome.Models.Network
         /// <summary>
         /// 動画情報を取得して処理する（実装）
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="emptyVideos"></param>
         /// <param name="onSucceeded"></param>
         /// <param name="onFailed"></param>
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> ids, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting)
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting)
         {
-            int videosCount = ids.Count();
+
+            var registerOnlyID = this.settingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
+            if (registerOnlyID)
+            {
+                return emptyVideos;
+            }
+
+            int videosCount = emptyVideos.Count();
             var videos = new List<IListVideoInfo>();
             var maxParallelCount = this.settingHandler.GetIntSetting(Settings.MaxFetchCount);
             var waitInterval = this.settingHandler.GetIntSetting(Settings.FetchSleepInterval);
@@ -275,7 +282,7 @@ namespace Niconicome.Models.Network
 
             var handler = new ParallelTasksHandler<NetworkVideoParallelTask>(maxParallelCount, waitInterval, 15);
 
-            foreach (var item in ids.Select((video, index) => new { video, index }))
+            foreach (var item in emptyVideos.Select((video, index) => new { video, index }))
             {
 
                 var task = new NetworkVideoParallelTask(async (_, lockObj, _) =>

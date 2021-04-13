@@ -67,12 +67,13 @@ namespace Niconicome.Models.Local.External.Import
     public class XenoImportGeneralManager : IXenoImportGeneralManager
     {
 
-        public XenoImportGeneralManager(Xeno::IXenoImportManager xenoImportManager, INetworkVideoHandler networkVideoHandler, IPlaylistHandler playlistVideoHandler, IRemotePlaylistHandler remotePlaylistHandler)
+        public XenoImportGeneralManager(Xeno::IXenoImportManager xenoImportManager, INetworkVideoHandler networkVideoHandler, IPlaylistHandler playlistVideoHandler, IRemotePlaylistHandler remotePlaylistHandler, ILocalSettingHandler settingHandler)
         {
             this.importManager = xenoImportManager;
             this.networkVideoHandler = networkVideoHandler;
             this.playlistVideoHandler = playlistVideoHandler;
             this.remotePlaylistHandler = remotePlaylistHandler;
+            this.settingHandler = settingHandler;
 
         }
 
@@ -83,6 +84,8 @@ namespace Niconicome.Models.Local.External.Import
         private readonly IPlaylistHandler playlistVideoHandler;
 
         private readonly IRemotePlaylistHandler remotePlaylistHandler;
+
+        private readonly ILocalSettingHandler settingHandler;
 
         /// <summary>
         /// Xenoからインポートする
@@ -146,8 +149,12 @@ namespace Niconicome.Models.Local.External.Import
             playlist.Name = playlistInfo.Name;
             if (playlistInfo.IsRemotePlaylist)
             {
-                onMessage("待機中(10s)");
-                await Task.Delay(10 * 1000, token);
+                var registerOnlyID = this.settingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
+                if (!registerOnlyID)
+                {
+                    onMessage("待機中(10s)");
+                    await Task.Delay(10 * 1000, token);
+                }
 
                 playlist.IsRemotePlaylist = true;
                 playlist.RemoteType = RemoteType.Channel;
@@ -161,7 +168,11 @@ namespace Niconicome.Models.Local.External.Import
                 {
                     await this.networkVideoHandler.AddVideosAsync(videos, id);
                     result.SucceededVideoCount += rResult.SucceededCount;
-                    if (!rResult.IsSucceededAll)
+                    if (registerOnlyID)
+                    {
+                        result.SucceededVideoCount += rResult.FailedCount;
+                    }
+                    else if (!rResult.IsSucceededAll)
                     {
                         onMessage($"{rResult.FailedCount}件の動画の取得に失敗しました。");
                         result.FailedVideoCount += rResult.FailedCount;
@@ -178,9 +189,9 @@ namespace Niconicome.Models.Local.External.Import
                 {
                     result.FailedVideoCount++;
                 }, v =>
-                {
-                    result.SucceededVideoCount++;
-                });
+                                    {
+                                        result.SucceededVideoCount++;
+                                    });
             }
 
             this.playlistVideoHandler.Update(playlist);
