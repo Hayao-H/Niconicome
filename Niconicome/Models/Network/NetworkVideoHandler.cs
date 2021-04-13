@@ -22,7 +22,6 @@ namespace Niconicome.Models.Network
         Task<INetworkResult> AddVideosAsync(IEnumerable<string> videosId, int playlistId, Action<IResult> onFailed, Action<IListVideoInfo> onSucceed);
         Task AddVideosAsync(IEnumerable<IListVideoInfo> videos, int playlistId);
         Task<INetworkResult> UpdateVideosAsync(IEnumerable<IListVideoInfo> videos, string folderPath, Action<IListVideoInfo> onSucceeded, CancellationToken ct);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> ids, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting);
         Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting);
     }
 
@@ -207,56 +206,6 @@ namespace Niconicome.Models.Network
         }
 
         /// <summary>
-        /// 動画情報を取得して処理する
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <param name="onSucceeded"></param>
-        /// <param name="onFailed"></param>
-        /// <param name="onStarted"></param>
-        /// <param name="onWaiting"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> ids, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting)
-        {
-            int videosCount = ids.Count();
-            var videos = new List<IListVideoInfo>();
-            var maxParallelCount = this.settingHandler.GetIntSetting(Settings.MaxFetchCount);
-            var waitInterval = this.settingHandler.GetIntSetting(Settings.FetchSleepInterval);
-            if (maxParallelCount < 1) maxParallelCount = 3;
-            if (waitInterval < 1) waitInterval = 5;
-
-            var handler = new ParallelTasksHandler<NetworkVideoParallelTask>(maxParallelCount, waitInterval, 15);
-
-            foreach (var item in ids.Select((video, index) => new { video, index }))
-            {
-
-                var task = new NetworkVideoParallelTask(async (_, lockObj, _) =>
-                {
-                    onStarted(item.video, item.index);
-
-                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, item.video, DWatch::WatchInfoOptions.NoDmcData);
-
-                    if (result.IsSucceeded)
-                    {
-                        onSucceeded(item.video, item.video, item.index, lockObj);
-                        videos.Add(item.video);
-                    }
-                    else
-                    {
-                        onFailed(result, item.video);
-                    }
-                }, index => { onWaiting(item.video); });
-
-                handler.AddTaskToQueue(task);
-
-            }
-
-            await handler.ProcessTasksAsync();
-
-
-            return videos;
-        }
-
-        /// <summary>
         /// IDから動画情報を取得する
         /// </summary>
         /// <param name="ids"></param>
@@ -303,6 +252,60 @@ namespace Niconicome.Models.Network
             return paths.First(p =>
                 (Path.GetDirectoryName(p) ?? string.Empty) == foldername);
         }
+
+        #region
+
+        /// <summary>
+        /// 動画情報を取得して処理する（実装）
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="onSucceeded"></param>
+        /// <param name="onFailed"></param>
+        /// <param name="onStarted"></param>
+        /// <param name="onWaiting"></param>
+        /// <returns></returns>
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> ids, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting)
+        {
+            int videosCount = ids.Count();
+            var videos = new List<IListVideoInfo>();
+            var maxParallelCount = this.settingHandler.GetIntSetting(Settings.MaxFetchCount);
+            var waitInterval = this.settingHandler.GetIntSetting(Settings.FetchSleepInterval);
+            if (maxParallelCount < 1) maxParallelCount = 3;
+            if (waitInterval < 1) waitInterval = 5;
+
+            var handler = new ParallelTasksHandler<NetworkVideoParallelTask>(maxParallelCount, waitInterval, 15);
+
+            foreach (var item in ids.Select((video, index) => new { video, index }))
+            {
+
+                var task = new NetworkVideoParallelTask(async (_, lockObj, _) =>
+                {
+                    onStarted(item.video, item.index);
+
+                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, item.video, DWatch::WatchInfoOptions.NoDmcData);
+
+                    if (result.IsSucceeded)
+                    {
+                        onSucceeded(item.video, item.video, item.index, lockObj);
+                        videos.Add(item.video);
+                    }
+                    else
+                    {
+                        onFailed(result, item.video);
+                    }
+                }, index => { onWaiting(item.video); });
+
+                handler.AddTaskToQueue(task);
+
+            }
+
+            await handler.ProcessTasksAsync();
+
+
+            return videos;
+        }
+
+        #endregion
     }
 
     public class NetworkResult : INetworkResult
