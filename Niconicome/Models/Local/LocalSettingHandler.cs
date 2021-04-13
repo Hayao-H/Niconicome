@@ -157,6 +157,7 @@ namespace Niconicome.Models.Local
                 Settings.InheritExpandedState => STypes::SettingNames.SaveTreePrevExpandedState,
                 Settings.EnableResume => STypes::SettingNames.IsResumeEnable,
                 Settings.MaxTmpDirCount => STypes::SettingNames.MaxTmpSegmentsDirCount,
+                Settings.StoreOnlyNiconicoID => STypes::SettingNames.StoreOnlyNiconicoIDOnRegister,
                 _ => null
             };
         }
@@ -204,5 +205,6 @@ namespace Niconicome.Models.Local
         InheritExpandedState,
         EnableResume,
         MaxTmpDirCount,
+        StoreOnlyNiconicoID,
     }
 }
