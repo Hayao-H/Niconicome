@@ -107,7 +107,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     if (videos.Count > 0)
                     {
-                        await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, playlistID);
+                        WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, playlistID);
                         WS::Mainpage.PlaylistTree.Refresh();
                         WS::Mainpage.CurrentPlaylist.Update(playlistID);
                     }
