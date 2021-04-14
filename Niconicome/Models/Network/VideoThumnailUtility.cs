@@ -1,63 +1,44 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Network;
 using Niconicome.Models.Playlist;
-using Network = Niconicome.Models.Network;
 
 namespace Niconicome.Models.Network
 {
     public interface IVideoThumnailUtility
     {
-        Task GetAndSetThumbFilePathAsync(IListVideoInfo video, bool fource = false);
-        Task SetThumbPathAsync(IListVideoInfo video, bool overwrite = false);
-        Task<string> GetThumbPathAsync(string niconicoId, string url, bool overwrite = false);
+        void GetThumbAsync(IListVideoInfo video, bool overwrite = false);
         string GetThumbFilePath(string niconicoId);
         bool IsValidThumbnail(IListVideoInfo video);
         bool HasThumbnailCache(IListVideoInfo video);
     }
 
-    public class VideoThumnailUtility:IVideoThumnailUtility
+    public class VideoThumnailUtility : IVideoThumnailUtility
     {
-        public VideoThumnailUtility(ICacheHandler cacheHandler,IWatch watchInfohandler)
+        public VideoThumnailUtility(ICacheHandler cacheHandler)
         {
             this.cacheHandler = cacheHandler;
-            this.watchInfohandler = watchInfohandler;
+            this.thumbConfigs = new Queue<ThumbConfig>();
+            this.lockObj = new object();
         }
 
         //キャッシュハンドラ
         private readonly ICacheHandler cacheHandler;
 
         /// <summary>
-        /// 動画情報取得
+        /// キャッシュのキュー
         /// </summary>
-        private readonly IWatch watchInfohandler;
-
+        private readonly Queue<ThumbConfig> thumbConfigs;
 
         /// <summary>
-        /// 非同期でサムネイルのパスを取得する
+        /// 非同期ロックオブジェクト
         /// </summary>
-        /// <param name="niconicoId"></param>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public async Task<string> GetThumbPathAsync(string niconicoId, string url, bool overwrite = false)
-        {
-            string path = await this.cacheHandler.GetOrCreateCacheAsync(niconicoId, CacheType.Thumbnail, url, overwrite);
-            return path;
-        }
+        private readonly object lockObj;
 
-        /// <summary>
-        /// サムネイルのパスを設定する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <returns></returns>
-        public async Task SetThumbPathAsync(IListVideoInfo video, bool overwrite = false)
-        {
-            if (video.ThumbUrl == string.Empty || video.NiconicoId == string.Empty) return;
+        private bool isFetching;
 
-            string path = await this.GetThumbPathAsync(video.NiconicoId, video.ThumbUrl, overwrite);
-            video.ThumbPath = path;
-
-        }
 
         /// <summary>
         /// サムネイルの相対パスを取得する
@@ -99,27 +80,55 @@ namespace Niconicome.Models.Network
         /// <param name="video"></param>
         /// <param name="fource"></param>
         /// <returns></returns>
-        public async Task GetAndSetThumbFilePathAsync(IListVideoInfo video, bool fource = false)
+        public void GetThumbAsync(IListVideoInfo video, bool overwrite = false)
         {
-            if (this.IsValidThumbnail(video) && !fource) return;
+            if (this.IsValidThumbnail(video)) return;
 
-
-            if (fource || !this.IsValidThumbnailUrl(video))
+            lock (this.lockObj)
             {
-                var info = new NonBindableListVideoInfo();
-                var result = await this.watchInfohandler.TryGetVideoInfoAsync(video.NiconicoId, info);
-                if (result.IsSucceeded)
+                if (!this.thumbConfigs.Any(c => c.NiconicoID == video.NiconicoId))
                 {
-                    video.ThumbUrl =info.ThumbUrl;
-                    video.LargeThumbUrl = info.LargeThumbUrl;
-                }
-                else
-                {
-                    return;
+                    this.thumbConfigs.Enqueue(new ThumbConfig() { NiconicoID = video.NiconicoId, Url = video.ThumbPath, Overwrite = overwrite });
                 }
             }
 
-            await this.SetThumbPathAsync(video, true);
+            if (!this.isFetching)
+            {
+                _ = this.GetThumbAsync();
+            }
+        }
+
+
+        /// <summary>
+        /// 非同期でサムネイルのパスを取得する
+        /// </summary>
+        /// <param name="niconicoId"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public async Task GetThumbAsync()
+        {
+
+            if (this.isFetching) return;
+            if (this.thumbConfigs.Count < 1) return;
+
+            this.isFetching = true;
+            ThumbConfig config;
+
+            lock (this.lockObj)
+            {
+                config = this.thumbConfigs.Dequeue();
+            }
+            await this.cacheHandler.GetOrCreateCacheAsync(config.NiconicoID, CacheType.Thumbnail, config.Url, config.Overwrite);
+
+            if (this.thumbConfigs.Count > 0)
+            {
+                await Task.Delay(1000 * 3);
+                _ = this.GetThumbAsync();
+            }
+            else
+            {
+                this.isFetching = false;
+            }
         }
 
         /// <summary>
@@ -130,6 +139,15 @@ namespace Niconicome.Models.Network
         public bool HasThumbnailCache(IListVideoInfo video)
         {
             return this.cacheHandler.HasCache(video.NiconicoId, CacheType.Thumbnail);
+        }
+
+        private class ThumbConfig
+        {
+            public bool Overwrite { get; set; }
+
+            public string Url { get; set; } = string.Empty;
+
+            public string NiconicoID { get; set; } = string.Empty;
         }
 
     }

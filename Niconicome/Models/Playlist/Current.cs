@@ -232,15 +232,19 @@ namespace Niconicome.Models.Playlist
                             video.IsDownloaded = !video.FileName.IsNullOrEmpty();
 
                             //サムネイル
-                            bool isValid = this.videoThumnailUtility.IsValidThumbnail(video);
                             bool hasCache = this.videoThumnailUtility.HasThumbnailCache(video);
-                            if (!isValid || !hasCache)
+                            bool isValid = this.videoThumnailUtility.IsValidThumbnail(video);
+
+                            if (isValid && !hasCache)
                             {
-                                _ = Task.Run(async () =>
-                                {
-                                    await this.videoThumnailUtility.SetThumbPathAsync(video);
-                                    this.videoHandler.Update(video);
-                                });
+                                this.videoThumnailUtility.GetThumbAsync(video);
+                                video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
+                                this.videoHandler.Update(video);
+                                this.Videos.Add(video);
+                            }
+                            else if (!hasCache)
+                            {
+                                video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath("0");
                                 this.Videos.Add(video);
                             }
                             else

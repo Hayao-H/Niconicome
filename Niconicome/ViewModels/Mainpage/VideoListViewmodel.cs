@@ -97,7 +97,7 @@ namespace Niconicome.ViewModels.Mainpage
                       return;
                   }
 
-                  await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, this.Playlist.Id);
+                  WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, this.Playlist.Id);
 
                   WS::Mainpage.PlaylistTree.Refresh();
                   WS::Mainpage.CurrentPlaylist.Update(playlistId);
@@ -347,7 +347,7 @@ namespace Niconicome.ViewModels.Mainpage
                              return;
                          }
 
-                         await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, playlistId);
+                         WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, playlistId);
 
                          if (videos.Count > 1)
                          {

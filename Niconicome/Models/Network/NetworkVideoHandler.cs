@@ -20,7 +20,7 @@ namespace Niconicome.Models.Network
         bool IsVideoDownloaded(string niconicoId);
         string GetFilePath(string niconicoId);
         Task<INetworkResult> AddVideosAsync(IEnumerable<string> videosId, int playlistId, Action<IResult> onFailed, Action<IListVideoInfo> onSucceed);
-        Task AddVideosAsync(IEnumerable<IListVideoInfo> videos, int playlistId);
+        void AddVideosAsync(IEnumerable<IListVideoInfo> videos, int playlistId);
         Task<INetworkResult> UpdateVideosAsync(IEnumerable<IListVideoInfo> videos, string folderPath, Action<IListVideoInfo> onSucceeded, CancellationToken ct);
         Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting);
     }
@@ -90,13 +90,14 @@ namespace Niconicome.Models.Network
 
             this.messageHandler.AppendMessage($"{videosCount}件の動画を追加します。");
 
-            await this.GetVideoListInfosAsync(videoIds.Copy(), async (newVideo, video, i, lockObj) =>
+            await this.GetVideoListInfosAsync(videoIds.Copy(), (newVideo, video, i, lockObj) =>
             {
                 lock (lockObj)
                 {
                     netResult.SucceededCount++;
                 }
-                await this.videoThumnailUtility.SetThumbPathAsync(newVideo);
+                this.videoThumnailUtility.GetThumbAsync(newVideo);
+                newVideo.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(newVideo.NiconicoId);
                 int id = this.videoHandler.AddVideo(newVideo, playlist.Id);
                 newVideo.Id = id;
                 this.messageHandler.AppendMessage($"{video.NiconicoId}を追加しました。({i + 1}/{videosCount})");
@@ -129,7 +130,7 @@ namespace Niconicome.Models.Network
         /// <param name="videos"></param>
         /// <param name="playlistId"></param>
         /// <returns></returns>
-        public async Task AddVideosAsync(IEnumerable<IListVideoInfo> videos, int playlistId)
+        public void AddVideosAsync(IEnumerable<IListVideoInfo> videos, int playlistId)
         {
             var playlist = this.playlistTreeHandler.GetPlaylist(playlistId);
 
@@ -143,7 +144,8 @@ namespace Niconicome.Models.Network
 
             foreach (var video in videos)
             {
-                await this.videoThumnailUtility.SetThumbPathAsync(video);
+                this.videoThumnailUtility.GetThumbAsync(video);
+                video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
                 this.videoHandler.AddVideo(video, playlistId);
                 this.messageHandler.AppendMessage($"{video.NiconicoId}を追加しました。({i + 1}/{videoCount})");
                 i++;
@@ -168,7 +170,7 @@ namespace Niconicome.Models.Network
 
             this.messageHandler.AppendMessage($"{videosCount}件の動画情報を更新します。");
 
-            await this.GetVideoListInfosAsync(videos.Copy(), async (newVideo, video, i, lockObj) =>
+            await this.GetVideoListInfosAsync(videos.Copy(), (newVideo, video, i, lockObj) =>
             {
                 lock (lockObj)
                 {
@@ -178,7 +180,10 @@ namespace Niconicome.Models.Network
                 video.Message = "情報を更新しました。";
                 newVideo.Id = video.Id;
                 newVideo.Message = video.Message;
-                await this.videoThumnailUtility.SetThumbPathAsync(newVideo);
+
+                this.videoThumnailUtility.GetThumbAsync(video, true);
+                video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
+
                 this.videoHandler.Update(newVideo);
                 this.messageHandler.AppendMessage($"{video.NiconicoId}の情報を更新しました。({i + 1}/{videosCount})");
                 onSucceeded(newVideo);

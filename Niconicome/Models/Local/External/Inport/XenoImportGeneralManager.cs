@@ -166,7 +166,7 @@ namespace Niconicome.Models.Local.External.Import
 
                 if (!rResult.IsFailed)
                 {
-                    await this.networkVideoHandler.AddVideosAsync(videos, id);
+                    this.networkVideoHandler.AddVideosAsync(videos, id);
                     result.SucceededVideoCount += rResult.SucceededCount;
                     if (registerOnlyID)
                     {
