@@ -10,7 +10,7 @@ using Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Local
 {
-    interface ILocalVideoUtils
+    public interface ILocalVideoUtils
     {
         string GetFilePath(IListVideoInfo video, string folderPath, string format, bool replaceStricted);
     }
