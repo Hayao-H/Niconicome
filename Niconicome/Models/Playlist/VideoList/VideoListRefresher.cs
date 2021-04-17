@@ -126,14 +126,17 @@ namespace Niconicome.Models.Playlist.VideoList
                 if (isValid && !hasCache)
                 {
                     this.videoThumnailUtility.GetThumbAsync(video);
-                    video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
-                    this.videoHandler.Update(video);
+                    video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath("0");
                     videos.Add(video);
                 }
                 else if (!hasCache)
                 {
                     video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath("0");
                     videos.Add(video);
+                } else if (!isValid && hasCache)
+                {
+                    video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
+                    this.videoHandler.Update(video);
                 }
                 else
                 {

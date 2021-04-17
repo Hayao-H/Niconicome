@@ -21,6 +21,7 @@ namespace Niconicome.Models.Network
         {
             this.cacheHandler = cacheHandler;
             this.thumbConfigs = new Queue<ThumbConfig>();
+            this.niconicoIDs = new List<string>();
             this.lockObj = new object();
         }
 
@@ -31,6 +32,11 @@ namespace Niconicome.Models.Network
         /// キャッシュのキュー
         /// </summary>
         private readonly Queue<ThumbConfig> thumbConfigs;
+
+        /// <summary>
+        /// IDのリスト
+        /// </summary>
+        private readonly List<string> niconicoIDs;
 
         /// <summary>
         /// 非同期ロックオブジェクト
@@ -82,19 +88,20 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public void GetThumbAsync(IListVideoInfo video, bool overwrite = false)
         {
-            if (this.IsValidThumbnail(video)) return;
+            if (!this.IsValidThumbnail(video)) return;
 
             lock (this.lockObj)
             {
-                if (!this.thumbConfigs.Any(c => c.NiconicoID == video.NiconicoId))
+                if (!this.niconicoIDs.Any(id => id == video.NiconicoId))
                 {
-                    this.thumbConfigs.Enqueue(new ThumbConfig() { NiconicoID = video.NiconicoId, Url = video.ThumbPath, Overwrite = overwrite });
+                    this.thumbConfigs.Enqueue(new ThumbConfig() { NiconicoID = video.NiconicoId, Url = video.ThumbUrl, Overwrite = overwrite });
+                    this.niconicoIDs.Add(video.NiconicoId);
                 }
             }
 
             if (!this.isFetching)
             {
-                _ = this.GetThumbAsync();
+                Task.Run(() => this.GetThumbAsync());
             }
         }
 
@@ -117,12 +124,14 @@ namespace Niconicome.Models.Network
             lock (this.lockObj)
             {
                 config = this.thumbConfigs.Dequeue();
+                this.niconicoIDs.Remove(config.NiconicoID);
             }
             await this.cacheHandler.GetOrCreateCacheAsync(config.NiconicoID, CacheType.Thumbnail, config.Url, config.Overwrite);
 
             if (this.thumbConfigs.Count > 0)
             {
-                await Task.Delay(1000 * 3);
+                await Task.Delay(1000 * 1);
+                this.isFetching = false;
                 _ = this.GetThumbAsync();
             }
             else
