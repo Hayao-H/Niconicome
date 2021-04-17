@@ -12,6 +12,7 @@ using DWatch = Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Utils;
 using Niconicome.Models.Local;
+using Niconicome.Models.Playlist.VideoList;
 
 namespace Niconicome.Models.Network
 {
@@ -19,8 +20,8 @@ namespace Niconicome.Models.Network
     {
         bool IsVideoDownloaded(string niconicoId);
         string GetFilePath(string niconicoId);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, CancellationToken? ct = null);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> videos, CancellationToken? ct = null);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> videos, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null);
     }
 
     public interface INetworkResult
@@ -47,13 +48,16 @@ namespace Niconicome.Models.Network
 
         private readonly ILocalSettingHandler settingHandler;
 
+        private readonly IVideoListContainer videoListContainer;
 
-        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler)
+
+        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoListContainer videoListContainer)
         {
             this.wacthPagehandler = watchPageHandler;
             this.messageHandler = messageHandler;
             this.fileStorehandler = fileStorehandler;
             this.settingHandler = settingHandler;
+            this.videoListContainer = videoListContainer;
         }
 
 
@@ -66,9 +70,9 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, CancellationToken? ct = null)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null)
         {
-            return await this.GetVideoListInfosAsync(ids.Select(i => new BindableListVIdeoInfo() { NiconicoId = i }), ct);
+            return await this.GetVideoListInfosAsync(ids.Select(i => new BindableListVIdeoInfo() { NiconicoId = i }), uncheck, playlistID, ct);
         }
 
         /// <summary>
@@ -116,7 +120,7 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, CancellationToken? ct = null)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null)
         {
 
             var registerOnlyID = this.settingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
@@ -147,6 +151,10 @@ namespace Niconicome.Models.Network
                     {
                         this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得に成功しました。");
                         videos.Add(item.video);
+                        if (uncheck)
+                        {
+                            this.videoListContainer.Uncheck(item.video.Id, playlistID ?? -1);
+                        }
                     }
                     else
                     {
@@ -158,7 +166,7 @@ namespace Niconicome.Models.Network
 
             }
 
-            await handler.ProcessTasksAsync(() => { }, ct);
+            await handler.ProcessTasksAsync(() => { }, () => this.messageHandler.AppendMessage("動画情報の取得処理が中断されました。"), ct);
 
 
             return videos;

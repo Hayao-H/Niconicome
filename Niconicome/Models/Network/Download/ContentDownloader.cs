@@ -20,6 +20,7 @@ using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using MS.WindowsAPICodePack.Internal;
 using System.Windows.Documents;
+using Niconicome.Models.Playlist.VideoList;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -96,7 +97,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler, ICurrent current,IWatch watch)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler,IWatch watch,IVideoListContainer videoListContainer)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -104,7 +105,7 @@ namespace Niconicome.Models.Network.Download
             this.messageHandler = messageHandler;
             this.localContentHandler = localContentHandler;
             this.downloadTasksHandler = downloadTasksHandler;
-            this.current = current;
+            this.videoListContainer = videoListContainer;
             this.watch = watch;
 
             int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelDL);
@@ -128,7 +129,7 @@ namespace Niconicome.Models.Network.Download
 
         private readonly IDownloadTasksHandler downloadTasksHandler;
 
-        private readonly ICurrent current;
+        private readonly IVideoListContainer videoListContainer;
 
         private readonly IWatch watch;
 
@@ -518,7 +519,7 @@ namespace Niconicome.Models.Network.Download
                             BindableListVIdeoInfo.SetData(video, downloadResult.VideoInfo);
                             this.videoHandler.Update(video);
                         }
-                        this.current.Uncheck(task.PlaylistID, task.VideoID);
+                        this.videoListContainer.Uncheck(task.PlaylistID, task.VideoID);
                         this.CurrentResult.SucceededCount++;
                     }
 

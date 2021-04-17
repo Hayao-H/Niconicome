@@ -75,7 +75,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainWatch::IWatchInfohandler, DomainWatch::WatchInfohandler>();
             services.AddTransient<Net::IWatch, Net::Watch>();
             services.AddTransient<Net::IVideoThumnailUtility, Net::VideoThumnailUtility>();
-            services.AddSingleton<Playlist::ICurrent, Playlist::Current>();
             services.AddTransient<Mylist::IMylistHandler, Mylist::MylistHandler>();
             services.AddTransient<Mylist::IWatchLaterHandler, Mylist::WatchLaterHandler>();
             services.AddTransient<UVideo::IUserVideoHandler, UVideo::UserVideoHandler>();

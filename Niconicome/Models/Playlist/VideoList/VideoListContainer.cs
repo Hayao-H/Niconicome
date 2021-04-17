@@ -21,6 +21,7 @@ namespace Niconicome.Models.Playlist.VideoList
         IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, bool commit = true);
         IAttemptResult Refresh();
         IAttemptResult Clear();
+        IAttemptResult Uncheck(int videoID, int playlistID);
         int Count { get; }
         event EventHandler<ListChangedEventArgs<IListVideoInfo>>? ListChanged;
     }
@@ -362,6 +363,40 @@ namespace Niconicome.Models.Playlist.VideoList
                 IsSucceeded = true,
             };
         }
+
+        /// <summary>
+        /// チャックを外す
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="playlistID"></param>
+        /// <returns></returns>
+        public IAttemptResult Uncheck(int videoID, int playlistID)
+        {
+            if (this.videos.Any(v => v.Id == videoID))
+            {
+                var target = this.videos.First(v => v.Id == videoID);
+                target.IsSelected = false;
+            }
+            else if (LightVideoListinfoHandler.Contains(videoID, playlistID))
+            {
+                var target = LightVideoListinfoHandler.GetLightVideoListInfo(videoID, playlistID)!;
+                var light = new LightVideoListInfo(target.MessageGuid, target.FileName, target.PlaylistId, target.VideoId, false);
+                LightVideoListinfoHandler.AddVideo(light);
+            }
+            else
+            {
+                return new AttemptResult()
+                {
+                    Message = $"指定された動画は存在しません。(videoID:{videoID}, playlistID:{playlistID})",
+                };
+            }
+
+            return new AttemptResult()
+            {
+                IsSucceeded = true,
+            };
+        }
+
 
         /// <summary>
         /// 動画リストを再読み込みする
