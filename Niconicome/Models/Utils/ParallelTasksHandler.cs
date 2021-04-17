@@ -123,7 +123,7 @@ namespace Niconicome.Models.Utils
         /// 実処理
         /// </summary>
         /// <returns></returns>
-        public async Task ProcessTasksAsync(Action? preAction = null)
+        public async Task ProcessTasksAsync(Action? preAction = null, CancellationToken? ct = null)
         {
             //すでにタスクを実行中の場合はキャンセル
             if (this.IsProcessing) return;
@@ -156,7 +156,7 @@ namespace Niconicome.Models.Utils
 
                 Func<Task> func = async () =>
                 {
-
+                    if (ct?.IsCancellationRequested ?? false) return;
                     await semaphore.WaitAsync();
 
                     //待機処理
