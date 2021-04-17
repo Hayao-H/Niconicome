@@ -41,27 +41,18 @@ namespace Niconicome.Models.Network
 
         private readonly IWatch wacthPagehandler;
 
-        private readonly IPlaylistHandler playlistTreeHandler;
-
-        private readonly IVideoHandler videoHandler;
-
         private readonly State::IMessageHandler messageHandler;
 
         private readonly IVideoFileStorehandler fileStorehandler;
 
-        private readonly IVideoThumnailUtility videoThumnailUtility;
-
         private readonly ILocalSettingHandler settingHandler;
 
 
-        public NetworkVideoHandler(IWatch watchPageHandler, IPlaylistHandler playlistTreeHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, IVideoHandler videoHandler, IVideoThumnailUtility videoThumnailUtility, ILocalSettingHandler settingHandler)
+        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler)
         {
             this.wacthPagehandler = watchPageHandler;
-            this.playlistTreeHandler = playlistTreeHandler;
             this.messageHandler = messageHandler;
             this.fileStorehandler = fileStorehandler;
-            this.videoHandler = videoHandler;
-            this.videoThumnailUtility = videoThumnailUtility;
             this.settingHandler = settingHandler;
         }
 
