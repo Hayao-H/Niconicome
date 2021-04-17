@@ -20,7 +20,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public class VideoListRefresher : IVideoListRefresher
     {
-        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler,IVideoHandler videoHandler,ILocalSettingHandler localSettingHandler,ILocalVideoUtils localVideoUtils,IVideoThumnailUtility videoThumnailUtility,ICurrent current)
+        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current)
         {
             this.playlistStoreHandler = playlistStoreHandler;
             this.videoHandler = videoHandler;
@@ -53,7 +53,15 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <returns></returns>
         public IAttemptResult Refresh(List<IListVideoInfo> videos)
         {
-            var playlistID = this.current.SelectedPlaylistID;
+            var playlistID = this.current.SelectedPlaylist?.Id ?? -1;
+
+            if (playlistID == -1)
+            {
+                return new AttemptResult()
+                {
+                    Message = $"プレイストが選択されていません。",
+                };
+            }
             var playlist = this.playlistStoreHandler.GetPlaylist(playlistID);
             var originVideos = playlist?.Videos;
 
@@ -80,7 +88,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             foreach (var originVideo in originVideos)
             {
-                if (playlistID != this.current.SelectedPlaylistID)
+                if (playlistID != (this.current.SelectedPlaylist?.Id ?? -1))
                 {
                     return new AttemptResult()
                     {

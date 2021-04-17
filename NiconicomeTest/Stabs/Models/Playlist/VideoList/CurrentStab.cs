@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Playlist.VideoList;
+using VList = Niconicome.Models.Playlist.VideoList;
+using Niconicome.Models.Playlist;
 
 namespace NiconicomeTest.Stabs.Models.Playlist.VideoList
 {
-    class CurrentStab : ICurrent
+    class CurrentStab : VList::ICurrent
     {
-       public int SelectedPlaylistID { get; set; }
+        public ITreePlaylistInfo? SelectedPlaylist { get; set; }
 
-       public event EventHandler? SelectedPlaylistChanged;
+        public event EventHandler? SelectedPlaylistChanged;
     }
 }

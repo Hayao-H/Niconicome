@@ -45,8 +45,9 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     this.StartFetching();
 
-                    int playlistId = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? -1;
-                    var videos = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Videos.Select(v => v.NiconicoId) ?? new List<string>();
+                    int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist?.Id ?? -1;
+                    var sourceVideos = WS::Mainpage.VideoListContainer.GetVideos().Select(v => v.NiconicoId) ?? new List<string>();
+                    var sourceVideosCount = sourceVideos.Count();
 
                     if (playlistId == -1) return;
 
@@ -61,12 +62,18 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     this.Message = $"{result.Videos.Count()}件の動画が見つかりました。";
 
-                    var dupe = result.Videos.Select(v => v.Id).Where(v => videos.Contains(v));
+                    var dupe = result.Videos.Select(v => v.Id).Where(v => sourceVideos.Contains(v));
                     this.Message = $"{dupe.Count()}件の動画が既に登録されているのでスキップします。";
 
-                    await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(result.Videos.Select(v => v.Id).Where(v => !dupe.Contains(v)), playlistId, result => { }, video => WS::Mainpage.CurrentPlaylist.Update(playlistId, video));
-                    WS::Mainpage.PlaylistTree.Refresh();
-                    WS::Mainpage.CurrentPlaylist.Update(playlistId);
+                    var videos = await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(result.Videos.Select(v => v.Id).Where(v => !dupe.Contains(v)));
+                    WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
+
+                    if (sourceVideosCount > videos.Count())
+                    {
+                        this.Message = $"{sourceVideosCount-videos.Count()}件の動画の登録に失敗しました。";
+                    }
+
+                    WS::Mainpage.VideoListContainer.Refresh();
 
                     this.CompleteFetching();
                 }

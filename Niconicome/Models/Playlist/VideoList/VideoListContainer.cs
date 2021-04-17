@@ -12,14 +12,15 @@ namespace Niconicome.Models.Playlist.VideoList
     public interface IVideoListContainer
     {
         IEnumerable<IListVideoInfo> GetVideos();
-        IAttemptResult Remove(IListVideoInfo video, bool commit = true);
-        IAttemptResult RemoveRange(IEnumerable<IListVideoInfo> videos, bool commit = true);
-        IAttemptResult Add(IListVideoInfo video, bool commit = true);
-        IAttemptResult AddRange(IEnumerable<IListVideoInfo> videos, bool commit = true);
+        IAttemptResult Remove(IListVideoInfo video, int? playlistID = null, bool commit = true);
+        IAttemptResult RemoveRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true);
+        IAttemptResult Add(IListVideoInfo video, int? playlistID = null, bool commit = true);
+        IAttemptResult AddRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true);
         IAttemptResult Update(IListVideoInfo video, bool commit = true);
         IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, bool commit = true);
         IAttemptResult Refresh();
         IAttemptResult Clear();
+        int Count { get; }
         event EventHandler<ListChangedEventArgs<IListVideoInfo>>? ListChanged;
     }
 
@@ -59,10 +60,11 @@ namespace Niconicome.Models.Playlist.VideoList
         /// </summary>
         private void SavePrevPlaylistVideos()
         {
+            if (this.current.SelectedPlaylist is null) return;
 
             foreach (var video in this.videos)
             {
-                var info = new LightVideoListInfo(video.MessageGuid, video.FileName, this.current.SelectedPlaylistID, video.Id, video.IsSelected);
+                var info = new LightVideoListInfo(video.MessageGuid, video.FileName, this.current.SelectedPlaylist.Id, video.Id, video.IsSelected);
                 LightVideoListinfoHandler.AddVideo(info);
             }
         }
@@ -80,6 +82,11 @@ namespace Niconicome.Models.Playlist.VideoList
         #endregion
 
         /// <summary>
+        /// 動画数
+        /// </summary>
+        public int Count { get => this.videos.Count; }
+
+        /// <summary>
         /// 動画を取得する
         /// </summary>
         /// <returns></returns>
@@ -94,8 +101,10 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <param name="video"></param>
         /// <param name="commit"></param>
         /// <returns></returns>
-        public IAttemptResult Remove(IListVideoInfo video, bool commit = true)
+        public IAttemptResult Remove(IListVideoInfo video, int? playlistID = null, bool commit = true)
         {
+            var id = playlistID ?? this.current.SelectedPlaylist?.Id ?? -1;
+
             if (!this.videos.Any(v => v.NiconicoId == video.NiconicoId))
             {
                 return new AttemptResult()
@@ -120,16 +129,25 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (!commit)
             {
-                this.RaiseListChanged(video, ChangeType.Remove);
+                if (id == (this.current.SelectedPlaylist?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Remove);
                 return new AttemptResult()
                 {
                     IsSucceeded = true,
                 };
             }
 
+
+            if (id == -1)
+            {
+                return new AttemptResult()
+                {
+                    Message = $"プレイストが選択されていません。",
+                };
+            }
+
             try
             {
-                this.playlistStoreHandler.RemoveVideo(video.Id, this.current.SelectedPlaylistID);
+                this.playlistStoreHandler.RemoveVideo(video.Id, id);
             }
             catch (Exception e)
             {
@@ -140,7 +158,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 };
             }
 
-            this.RaiseListChanged(video, ChangeType.Remove);
+            if (id == (this.current.SelectedPlaylist?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Remove);
             return new AttemptResult()
             {
                 IsSucceeded = true,
@@ -152,11 +170,11 @@ namespace Niconicome.Models.Playlist.VideoList
         /// </summary>
         /// <param name="videos"></param>
         /// <param name="commit"></param>
-        public IAttemptResult RemoveRange(IEnumerable<IListVideoInfo> videos, bool commit = true)
+        public IAttemptResult RemoveRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true)
         {
             foreach (var video in videos.Copy())
             {
-                var result = this.Remove(video, commit);
+                var result = this.Remove(video, playlistID, commit);
                 if (!result.IsSucceeded)
                 {
                     return result;
@@ -175,8 +193,11 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <param name="video"></param>
         /// <param name="commit"></param>
         /// <returns></returns>
-        public IAttemptResult Add(IListVideoInfo video, bool commit = true)
+        public IAttemptResult Add(IListVideoInfo video, int? playlistID = null, bool commit = true)
         {
+
+            var id = playlistID ?? this.current.SelectedPlaylist?.Id ?? -1;
+
             if (this.videos.Any(v => v.NiconicoId == video.NiconicoId))
             {
                 return new AttemptResult()
@@ -201,16 +222,25 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (!commit)
             {
-                this.RaiseListChanged(video, ChangeType.Add);
+                if (id == (this.current.SelectedPlaylist?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Add);
                 return new AttemptResult()
                 {
                     IsSucceeded = true,
                 };
             }
 
+
+            if (id == -1)
+            {
+                return new AttemptResult()
+                {
+                    Message = $"プレイストが選択されていません。",
+                };
+            }
+
             try
             {
-                this.playlistStoreHandler.AddVideo(video, this.current.SelectedPlaylistID);
+                this.playlistStoreHandler.AddVideo(video, id);
             }
             catch (Exception e)
             {
@@ -221,7 +251,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 };
             }
 
-            this.RaiseListChanged(video, ChangeType.Add);
+            if (id == (this.current.SelectedPlaylist?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Add);
             return new AttemptResult()
             {
                 IsSucceeded = true,
@@ -234,11 +264,11 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <param name="videos"></param>
         /// <param name="commit"></param>
         /// <returns></returns>
-        public IAttemptResult AddRange(IEnumerable<IListVideoInfo> videos, bool commit = true)
+        public IAttemptResult AddRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true)
         {
             foreach (var video in videos.Copy())
             {
-                var result = this.Add(video, commit);
+                var result = this.Add(video, playlistID, commit);
                 if (!result.IsSucceeded)
                 {
                     return result;
@@ -339,7 +369,15 @@ namespace Niconicome.Models.Playlist.VideoList
         public IAttemptResult Refresh()
         {
             this.SavePrevPlaylistVideos();
-            return this.refresher.Refresh(this.videos);
+            this.Clear();
+            var result = this.refresher.Refresh(this.videos);
+
+            if (result.IsSucceeded)
+            {
+                this.RaiseListChanged(null, ChangeType.Overall);
+            }
+
+            return result;
         }
 
         /// <summary>

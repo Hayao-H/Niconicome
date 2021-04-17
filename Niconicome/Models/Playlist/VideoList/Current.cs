@@ -8,7 +8,7 @@ namespace Niconicome.Models.Playlist.VideoList
 {
     public interface ICurrent
     {
-        int SelectedPlaylistID { get; set; }
+        ITreePlaylistInfo? SelectedPlaylist { get; set; }
         event EventHandler? SelectedPlaylistChanged;
     }
 
@@ -18,12 +18,12 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <summary>
         /// 現在選択されているプレイリストのID
         /// </summary>
-        public int SelectedPlaylistID
+        public ITreePlaylistInfo? SelectedPlaylist
         {
-            get => this.selectedPlaylistIDfield;
+            get => this.selectedPlaylistfield;
             set
             {
-                this.selectedPlaylistIDfield = value;
+                this.selectedPlaylistfield = value;
                 this.RaiseSelectedPlaylistChanged();
             }
         }
@@ -33,7 +33,7 @@ namespace Niconicome.Models.Playlist.VideoList
         /// </summary>
         public event EventHandler? SelectedPlaylistChanged;
 
-        private int selectedPlaylistIDfield;
+        private ITreePlaylistInfo? selectedPlaylistfield;
 
         private void RaiseSelectedPlaylistChanged()
         {

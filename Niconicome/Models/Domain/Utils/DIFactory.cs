@@ -33,6 +33,7 @@ using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
+using VList = Niconicome.Models.Playlist.VideoList;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -150,6 +151,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<IO::INicoFileIO, IO::NicoFileIO>();
             services.AddTransient<Resume::ISegmentsDirectoryHandler, Resume::SegmentsDirectoryHandler>();
             services.AddTransient<Resume::IStreamResumer, Resume::StreamResumer>();
+            services.AddSingleton<VList::ICurrent, VList::Current>();
+            services.AddSingleton<VList::IVideoListContainer, VList::VideoListContainer>();
+            services.AddTransient<VList::IVideoListRefresher, VList::VideoListRefresher>();
 
             return services.BuildServiceProvider();
         }

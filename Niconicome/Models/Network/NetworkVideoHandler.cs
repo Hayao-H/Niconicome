@@ -19,10 +19,8 @@ namespace Niconicome.Models.Network
     {
         bool IsVideoDownloaded(string niconicoId);
         string GetFilePath(string niconicoId);
-        Task<INetworkResult> AddVideosAsync(IEnumerable<string> videosId, int playlistId, Action<IResult> onFailed, Action<IListVideoInfo> onSucceed);
-        void AddVideosAsync(IEnumerable<IListVideoInfo> videos, int playlistId);
-        Task<INetworkResult> UpdateVideosAsync(IEnumerable<IListVideoInfo> videos, string folderPath, Action<IListVideoInfo> onSucceeded, CancellationToken ct);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> ids);
     }
 
     public interface INetworkResult
@@ -69,148 +67,6 @@ namespace Niconicome.Models.Network
 
 
         /// <summary>
-        /// 動画を追加する
-        /// </summary>
-        /// <param name="videoIds"></param>
-        /// <param name="playlistId"></param>
-        /// <param name="onfailed"></param>
-        /// <param name="onSucceed"></param>
-        /// <returns></returns>
-        public async Task<INetworkResult> AddVideosAsync(IEnumerable<string> videoIds, int playlistId, Action<IResult> onfailed, Action<IListVideoInfo> onSucceed)
-        {
-            var playlist = this.playlistTreeHandler.GetPlaylist(playlistId);
-
-            var netResult = new NetworkResult();
-
-            if (playlist is null) return netResult;
-
-            int videosCount = videoIds.Count();
-
-            if (videosCount == 0) return netResult;
-
-            this.messageHandler.AppendMessage($"{videosCount}件の動画を追加します。");
-
-            await this.GetVideoListInfosAsync(videoIds.Copy(), (newVideo, video, i, lockObj) =>
-            {
-                lock (lockObj)
-                {
-                    netResult.SucceededCount++;
-                }
-                this.videoThumnailUtility.GetThumbAsync(newVideo);
-                newVideo.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(newVideo.NiconicoId);
-                int id = this.videoHandler.AddVideo(newVideo, playlist.Id);
-                newVideo.Id = id;
-                this.messageHandler.AppendMessage($"{video.NiconicoId}を追加しました。({i + 1}/{videosCount})");
-                onSucceed(newVideo);
-            }, (result, video) =>
-            {
-                netResult.FailedCount++;
-                onfailed(result);
-                this.messageHandler.AppendMessage($"動画の取得に失敗しました。(詳細: {result.Message})");
-            }, (video, index) =>
-            {
-                this.messageHandler.AppendMessage($"{video.NiconicoId}の動画情報を取得中です...({index + 1}/{videosCount})");
-            }, video =>
-            {
-                video.Message = "待機中...(15s)";
-                this.messageHandler.AppendMessage("待機中...(15s)");
-            });
-
-            if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
-
-            this.messageHandler.AppendMessage($"動画の追加処理が完了しました。({netResult.SucceededCount}件)");
-            this.messageHandler.AppendMessage("-".Repeat(50));
-
-            return netResult;
-        }
-
-        /// <summary>
-        /// 情報を取得済の動画を追加する
-        /// </summary>
-        /// <param name="videos"></param>
-        /// <param name="playlistId"></param>
-        /// <returns></returns>
-        public void AddVideosAsync(IEnumerable<IListVideoInfo> videos, int playlistId)
-        {
-            var playlist = this.playlistTreeHandler.GetPlaylist(playlistId);
-
-            if (playlist is null) return;
-
-            videos = videos.Where(v => !playlist.HasVideo(v.NiconicoId)).Copy();
-            int videoCount = videos.Count();
-            int i = 0;
-
-            this.messageHandler.AppendMessage($"{videoCount}件の動画を追加します。");
-
-            foreach (var video in videos)
-            {
-                this.videoThumnailUtility.GetThumbAsync(video);
-                video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
-                this.videoHandler.AddVideo(video, playlistId);
-                this.messageHandler.AppendMessage($"{video.NiconicoId}を追加しました。({i + 1}/{videoCount})");
-                i++;
-            }
-
-            this.messageHandler.AppendMessage($"動画の追加処理が完了しました。({videoCount}件)");
-        }
-
-        /// <summary>
-        /// 動画情報を更新する
-        /// </summary>
-        /// <param name="videos"></param>
-        /// <param name="folderPath"></param>
-        /// <param name="onSucceeded"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        public async Task<INetworkResult> UpdateVideosAsync(IEnumerable<IListVideoInfo> videos, string folderPath, Action<IListVideoInfo> onSucceeded, CancellationToken ct)
-        {
-            videos = videos.Copy();
-            var netResult = new NetworkResult();
-            int videosCount = videos.Count();
-
-            this.messageHandler.AppendMessage($"{videosCount}件の動画情報を更新します。");
-
-            await this.GetVideoListInfosAsync(videos.Copy(), (newVideo, video, i, lockObj) =>
-            {
-                lock (lockObj)
-                {
-                    netResult.SucceededCount++;
-                }
-                video.IsSelected = false;
-                video.Message = "情報を更新しました。";
-                newVideo.Id = video.Id;
-                newVideo.Message = video.Message;
-
-                this.videoThumnailUtility.GetThumbAsync(video, true);
-                video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
-
-                this.videoHandler.Update(newVideo);
-                this.messageHandler.AppendMessage($"{video.NiconicoId}の情報を更新しました。({i + 1}/{videosCount})");
-                onSucceeded(newVideo);
-            }, (result, video) =>
-            {
-                netResult.FailedCount++;
-                video.Message = "情報の更新に失敗しました。";
-                this.messageHandler.AppendMessage($"{video.NiconicoId}の情報を更新に失敗しました。(詳細: {result.Message ?? "None"})");
-            }, (video, i) =>
-            {
-                video.Message = "情報を取得中...";
-                this.messageHandler.AppendMessage($"情報を取得中...({i + 1}/{videosCount})");
-            },
-            video =>
-            {
-                video.Message = "待機中...(15s)";
-                this.messageHandler.AppendMessage("待機中...(15s)");
-            });
-
-            if (netResult.SucceededCount == videosCount) netResult.IsSucceededAll = true;
-
-            this.messageHandler.AppendMessage("-".Repeat(50));
-
-            return netResult;
-        }
-
-        /// <summary>
         /// IDから動画情報を取得する
         /// </summary>
         /// <param name="ids"></param>
@@ -219,9 +75,9 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids)
         {
-            return await this.GetVideoListInfosAsync(ids.Select(i => new BindableListVIdeoInfo() { NiconicoId = i }), onSucceeded, onFailed, onStarted, onWaiting);
+            return await this.GetVideoListInfosAsync(ids.Select(i => new BindableListVIdeoInfo() { NiconicoId = i }));
         }
 
         /// <summary>
@@ -269,7 +125,7 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, Action<IListVideoInfo, IListVideoInfo, int, object> onSucceeded, Action<IResult, IListVideoInfo> onFailed, Action<IListVideoInfo, int> onStarted, Action<IListVideoInfo> onWaiting)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos)
         {
 
             var registerOnlyID = this.settingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
@@ -292,20 +148,20 @@ namespace Niconicome.Models.Network
 
                 var task = new NetworkVideoParallelTask(async (_, lockObj, _) =>
                 {
-                    onStarted(item.video, item.index);
+                    this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得を開始します。");
 
                     IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, item.video, DWatch::WatchInfoOptions.NoDmcData);
 
                     if (result.IsSucceeded)
                     {
-                        onSucceeded(item.video, item.video, item.index, lockObj);
+                        this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得に成功しました。");
                         videos.Add(item.video);
                     }
                     else
                     {
-                        onFailed(result, item.video);
+                        this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得に失敗しました。(詳細:{result.Message})");
                     }
-                }, index => { onWaiting(item.video); });
+                }, index => this.messageHandler.AppendMessage("待機中...(15s)"));
 
                 handler.AddTaskToQueue(task);
 

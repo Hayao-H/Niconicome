@@ -24,7 +24,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         public void SetUp()
         {
             this.playlistStoreHandler = new PlaylistStoreHandlerStab();
-            this.videoListContainer = new VideoListContainer(this.playlistStoreHandler, new VideoHandlerStab(), new VideoListRefresherStab(), new CurrentStab());
+            this.videoListContainer = new VideoListContainer(this.playlistStoreHandler, new VideoHandlerStab(), new VideoListRefresherStab(), new CurrentStab() { SelectedPlaylist = new NonBindableTreePlaylistInfo() { Id = 1 } });
             this.lastVIdeoNicoID = null;
             this.videoListContainer.ListChanged += (_, e) =>
             {
@@ -37,7 +37,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         public void 動画を追加する()
         {
             var video = new NonBindableListVideoInfo() { NiconicoId = "sm9" };
-            var result = this.videoListContainer!.Add(video);
+            var result = this.videoListContainer!.Add(video, 1);
 
             Assert.That(this.lastChangeType, Is.EqualTo(ChangeType.Add));
             Assert.That(this.lastVIdeoNicoID, Is.EqualTo("sm9"));
@@ -51,8 +51,8 @@ namespace NiconicomeTest.Local.Playlist.Videos
         {
             var video = new NonBindableListVideoInfo() { NiconicoId = "sm9" };
             var video2 = new NonBindableListVideoInfo() { NiconicoId = "sm9" };
-            var result = this.videoListContainer!.Add(video);
-            var result2 = this.videoListContainer!.Add(video2);
+            var result = this.videoListContainer!.Add(video, 1);
+            var result2 = this.videoListContainer!.Add(video2, 1);
 
             Assert.That(this.lastChangeType, Is.EqualTo(ChangeType.Add));
             Assert.That(this.lastVIdeoNicoID, Is.EqualTo("sm9"));
@@ -66,7 +66,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         {
             var video = new NonBindableListVideoInfo() { NiconicoId = "sm9" };
             this.videoListContainer!.Add(video);
-            var result = this.videoListContainer!.Remove(video);
+            var result = this.videoListContainer!.Remove(video, 1);
 
             Assert.That(this.lastChangeType, Is.EqualTo(ChangeType.Remove));
             Assert.That(this.lastVIdeoNicoID, Is.EqualTo("sm9"));

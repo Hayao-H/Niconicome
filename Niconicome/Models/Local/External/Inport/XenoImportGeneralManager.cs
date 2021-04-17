@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Network;
 using Niconicome.Models.Playlist;
 using Xeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
@@ -67,12 +68,13 @@ namespace Niconicome.Models.Local.External.Import
     public class XenoImportGeneralManager : IXenoImportGeneralManager
     {
 
-        public XenoImportGeneralManager(Xeno::IXenoImportManager xenoImportManager, INetworkVideoHandler networkVideoHandler, IPlaylistHandler playlistVideoHandler, IRemotePlaylistHandler remotePlaylistHandler, ILocalSettingHandler settingHandler)
+        public XenoImportGeneralManager(Xeno::IXenoImportManager xenoImportManager, INetworkVideoHandler networkVideoHandler, IPlaylistHandler playlistVideoHandler, IRemotePlaylistHandler remotePlaylistHandler, ILocalSettingHandler settingHandler, IVideoHandler videoHandler)
         {
             this.importManager = xenoImportManager;
             this.networkVideoHandler = networkVideoHandler;
-            this.playlistVideoHandler = playlistVideoHandler;
+            this.playlistHandler = playlistVideoHandler;
             this.remotePlaylistHandler = remotePlaylistHandler;
+            this.videoHandler = videoHandler;
             this.settingHandler = settingHandler;
 
         }
@@ -81,7 +83,9 @@ namespace Niconicome.Models.Local.External.Import
 
         private readonly INetworkVideoHandler networkVideoHandler;
 
-        private readonly IPlaylistHandler playlistVideoHandler;
+        private readonly IPlaylistHandler playlistHandler;
+
+        private readonly IVideoHandler videoHandler;
 
         private readonly IRemotePlaylistHandler remotePlaylistHandler;
 
@@ -139,8 +143,8 @@ namespace Niconicome.Models.Local.External.Import
                 return;
             }
 
-            var id = this.playlistVideoHandler.AddPlaylist(parentId);
-            var playlist = this.playlistVideoHandler.GetPlaylist(id);
+            var id = this.playlistHandler.AddPlaylist(parentId);
+            var playlist = this.playlistHandler.GetPlaylist(id);
             if (playlist is null) return;
 
             onMessage("-".Repeat(50));
@@ -159,14 +163,17 @@ namespace Niconicome.Models.Local.External.Import
                 playlist.IsRemotePlaylist = true;
                 playlist.RemoteType = RemoteType.Channel;
                 playlist.RemoteId = playlistInfo.RemoteId;
-                this.playlistVideoHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
+                this.playlistHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
 
                 var videos = new List<IListVideoInfo>();
                 var rResult = await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(playlistInfo.RemoteId, videos, RemoteType.Channel, new List<string>(), m => onMessageVerbose(m));
 
                 if (!rResult.IsFailed)
                 {
-                    this.networkVideoHandler.AddVideosAsync(videos, id);
+                    foreach (var video in videos)
+                    {
+                        this.videoHandler.AddVideo(video, id);
+                    }
                     result.SucceededVideoCount += rResult.SucceededCount;
                     if (registerOnlyID)
                     {
@@ -185,16 +192,15 @@ namespace Niconicome.Models.Local.External.Import
             }
             else
             {
-                await this.networkVideoHandler.AddVideosAsync(playlistInfo.Videos.Select(v => v.NiconicoId), id, r =>
+                var videos = (await this.networkVideoHandler.GetVideoListInfosAsync(playlistInfo.Videos.Select(v => v.NiconicoId))).ToList();
+                if (playlistInfo.Videos.Count > videos.Count)
                 {
-                    result.FailedVideoCount++;
-                }, v =>
-                                    {
-                                        result.SucceededVideoCount++;
-                                    });
+                    result.FailedVideoCount += playlistInfo.Videos.Count - videos.Count;
+                }
+                result.SucceededVideoCount += videos.Count;
             }
 
-            this.playlistVideoHandler.Update(playlist);
+            this.playlistHandler.Update(playlist);
 
             onMessage($"プレイリスト「{playlistInfo.Name}」を追加しました。");
 

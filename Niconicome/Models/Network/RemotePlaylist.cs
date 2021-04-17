@@ -234,32 +234,11 @@ namespace Niconicome.Models.Network
             }
 
             ids = ids.Where(id => !registeredVideo.Contains(id));
-            var retlieved = await this.networkVideoHandler.GetVideoListInfosAsync(ids, (v, _, _, lockObj) =>
-            {
-                lock (lockObj)
-                {
-                    resultInfo.SucceededCount++;
-                }
-                onMessage($"{v.NiconicoId}の取得に成功しました。");
-            },
-            (result, v) =>
-            {
-                onMessage($"{v.NiconicoId}の取得に失敗しました。(詳細:{result.Message})");
-            },
-            (v, _) =>
-            {
-                onMessage($"{v.NiconicoId}の取得を開始します。");
-            },
-            _ =>
-            {
-                onMessage("-".Repeat(40));
-                onMessage("待機中...(15s)");
-                onMessage("-".Repeat(40));
-            }
-            );
+            var retlieved = await this.networkVideoHandler.GetVideoListInfosAsync(ids);
 
             videos.AddRange(retlieved);
 
+            resultInfo.SucceededCount = videos.Count();
             resultInfo.FailedCount = ids.Count() - resultInfo.SucceededCount;
 
             return resultInfo;
