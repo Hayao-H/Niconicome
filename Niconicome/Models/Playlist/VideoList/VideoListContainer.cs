@@ -66,7 +66,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             foreach (var video in this.videos)
             {
-                var info = new LightVideoListInfo(video.MessageGuid, video.FileName, this.current.SelectedPlaylist.Id, video.Id, video.IsSelected);
+                var info = new LightVideoListInfo(video.MessageGuid, video.FileName, this.current.PrevSelectedPlaylistID, video.Id, video.IsSelected);
                 LightVideoListinfoHandler.AddVideo(info);
             }
         }
