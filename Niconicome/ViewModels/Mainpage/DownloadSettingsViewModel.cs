@@ -68,7 +68,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                    if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable && !this.IsDownloadingVideoInfoEnable) return;
 
-                   var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
+                   var videos = WS::Mainpage.VideoListContainer.GetVideos().Where(v => v.IsSelected).Copy();
                    if (!videos.Any()) return;
 
                    var cts = new CancellationTokenSource();
@@ -112,7 +112,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable && !this.IsDownloadingVideoInfoEnable) return;
 
-                var videos = WS::Mainpage.CurrentPlaylist.Videos.Where(v => v.IsSelected).Copy();
+                var videos = WS::Mainpage.VideoListContainer.GetVideos().Where(v => v.IsSelected).Copy();
                 if (!videos.Any()) return;
 
                 int videoCount = videos.Count();
@@ -133,7 +133,7 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.Videodownloader.Cancel();
             });
 
-            WS::Mainpage.CurrentPlaylist.SelectedItemChanged += this.OnSelectedChanged;
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylistChanged += this.OnSelectedChanged;
         }
 
         ~DownloadSettingsViewModel()
@@ -273,9 +273,9 @@ namespace Niconicome.ViewModels.Mainpage
 
         private void OnSelectedChanged(object? sender, EventArgs e)
         {
-            if (WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist is not null)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null)
             {
-                this.playlist = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist;
+                this.playlist = WS::Mainpage.CurrentPlaylist.SelectedPlaylist;
                 this.RaiseCanExecuteChange();
             }
         }
@@ -310,7 +310,7 @@ namespace Niconicome.ViewModels.Mainpage
                 Skip = this.IsSkippingEnable,
                 FolderPath = folderPath,
                 VerticalResolution = this.SelectedResolution.Resolution.Vertical,
-                PlaylistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? 0,
+                PlaylistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist?.Id ?? 0,
                 IsReplaceStrictedEnable = replaceStricted,
                 OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                 MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,

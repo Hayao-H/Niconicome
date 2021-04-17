@@ -26,11 +26,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             };
 
 
-            if (WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist is not null && WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.IsRemotePlaylist)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.IsRemotePlaylist)
             {
-                this.idField = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.RemoteId;
+                this.idField = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId;
 
-                this.currentSettingField = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.RemoteType switch
+                this.currentSettingField = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType switch
                 {
                     Playlist::RemoteType.Mylist => mylist,
                     Playlist::RemoteType.UserVideos => userVideo,
@@ -52,7 +52,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                 if (arg is null) return;
 
-                if (WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist is null) return;
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null) return;
 
 
                 if (arg is Window window)
@@ -102,14 +102,13 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                         this.Message = $"{result.FailedCount}件の取得に失敗しました。";
                     }
 
-                    int playlistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.Id;
+                    int playlistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
 
 
                     if (videos.Count > 0)
                     {
-                        WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, playlistID);
-                        WS::Mainpage.PlaylistTree.Refresh();
-                        WS::Mainpage.CurrentPlaylist.Update(playlistID);
+                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistID);
+                        WS::Mainpage.VideoListContainer.Refresh();
                     }
 
                     if (this.CurrentSetting.NetworkMode == Playlist::RemoteType.None)

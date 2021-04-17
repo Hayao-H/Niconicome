@@ -123,7 +123,7 @@ namespace Niconicome.Models.Utils
         /// 実処理
         /// </summary>
         /// <returns></returns>
-        public async Task ProcessTasksAsync(Action? preAction = null)
+        public async Task ProcessTasksAsync(Action? preAction = null, Action? onCancelled = null, CancellationToken? ct = null)
         {
             //すでにタスクを実行中の場合はキャンセル
             if (this.IsProcessing) return;
@@ -156,8 +156,12 @@ namespace Niconicome.Models.Utils
 
                 Func<Task> func = async () =>
                 {
-
                     await semaphore.WaitAsync();
+                    if (ct?.IsCancellationRequested ?? false)
+                    {
+                        onCancelled?.Invoke();
+                        return;
+                    }
 
                     //待機処理
                     if (this.waitInterval != -1 && index > 0 && index % this.waitInterval == 0)
@@ -166,9 +170,19 @@ namespace Niconicome.Models.Utils
                         task.OnWait(index);
                         await Task.Delay(this.waitSeconds * 1000);
                         mre.Set();
+                        if (ct?.IsCancellationRequested ?? false)
+                        {
+                            onCancelled?.Invoke();
+                            return;
+                        }
                     }
 
                     mre.Wait();
+                    if (ct?.IsCancellationRequested ?? false)
+                    {
+                        onCancelled?.Invoke();
+                        return;
+                    }
 
                     var token = new ParallelTaskToken();
 
