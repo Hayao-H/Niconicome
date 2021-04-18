@@ -37,12 +37,6 @@ namespace Niconicome.Models.Domain.Niconico.Search
         Task<Api::Response> GetResponseAsync(string url);
     }
 
-    public enum SearchType
-    {
-        Tag,
-        Keyword,
-    }
-
     /// <summary>
     /// 検索API
     /// </summary>
