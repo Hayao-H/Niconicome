@@ -97,7 +97,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler,IWatch watch,IVideoListContainer videoListContainer)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler, IWatch watch, IVideoListContainer videoListContainer)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -510,7 +510,7 @@ namespace Niconicome.Models.Network.Download
                         this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに成功しました。");
 
                         task.Message = $"ダウンロード完了{rMessage}";
-                        if (video is not null&&downloadResult.VideoInfo is not null)
+                        if (video is not null && downloadResult.VideoInfo is not null)
                         {
                             if (!downloadResult.VideoFileName.IsNullOrEmpty())
                             {
@@ -519,7 +519,7 @@ namespace Niconicome.Models.Network.Download
                             BindableListVIdeoInfo.SetData(video, downloadResult.VideoInfo);
                             this.videoHandler.Update(video);
                         }
-                        this.videoListContainer.Uncheck(task.PlaylistID, task.VideoID);
+                        this.videoListContainer.Uncheck(task.VideoID, task.PlaylistID);
                         this.CurrentResult.SucceededCount++;
                     }
 
