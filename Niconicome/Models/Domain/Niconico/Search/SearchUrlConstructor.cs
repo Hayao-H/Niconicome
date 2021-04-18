@@ -22,10 +22,11 @@ namespace Niconicome.Models.Domain.Niconico.Search
     {
         public string GetUrl(ISearchQuery query)
         {
-            var list = new List<string>();
-
-            //クエリ―
-            list.Add($"q={query.Query}");
+            var list = new List<string>
+            {
+                //クエリ―
+                $"q={query.Query}"
+            };
 
             //検索タイプ
             var sType = query.SearchType switch
