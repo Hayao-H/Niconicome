@@ -37,7 +37,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
             list.Add($"targets={sType}");
 
             //並び替え
-            var sort = query.Sort switch
+            var sort = query.SortOption.Sort switch
             {
                 Sort.ViewCount => "viewCounter",
                 Sort.MylistCount => "mylistCounter",
@@ -47,7 +47,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
                 Sort.LastCommentTime => "lastCommentTime",
                 _ => "viewCounter",
             };
-            if (!query.IsAscending)
+            if (!query.SortOption.IsAscending)
             {
                 sort = "-" + sort;
             }

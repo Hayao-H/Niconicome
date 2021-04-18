@@ -10,12 +10,17 @@ namespace Niconicome.Models.Domain.Niconico.Search
     {
         SearchType SearchType { get; }
         Genre Genre { get; }
-        Sort Sort { get; }
         string Query { get; }
-        bool IsAscending { get; }
+        ISortOption SortOption { get; }
         DateTimeOffset? UploadedDateTimeStart { get; }
         DateTimeOffset? UploadedDateTimeEnd { get; }
         int Page { get; }
+    }
+
+    public interface ISortOption
+    {
+        bool IsAscending { get; set; }
+        Sort Sort { get; set; }
     }
 
     public enum SearchType
@@ -44,17 +49,23 @@ namespace Niconicome.Models.Domain.Niconico.Search
         LastCommentTime,
     }
 
+    public class SortOption : ISortOption
+    {
+        public Sort Sort { get; set; }
+
+        public bool IsAscending { get; set; }
+    }
+
     public class SearchQuery : ISearchQuery
     {
         public SearchType SearchType { get; set; }
 
         public Genre Genre { get; set; }
 
-        public Sort Sort { get; set; }
+        public ISortOption SortOption { get; set; } = new SortOption();
+
 
         public string Query { get; set; } = string.Empty;
-
-        public bool IsAscending { get; set; }
 
         public DateTimeOffset? UploadedDateTimeStart { get; set; }
 
