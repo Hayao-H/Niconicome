@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Download;
 using Niconicome.Models.Domain.Niconico.Watch;
@@ -12,15 +11,13 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
+using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Download = Niconicome.Models.Domain.Niconico.Download;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
-using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
-using MS.WindowsAPICodePack.Internal;
-using System.Windows.Documents;
-using Niconicome.Models.Playlist.VideoList;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -97,7 +94,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler,IWatch watch,IVideoListContainer videoListContainer)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler, IWatch watch, IVideoListContainer videoListContainer)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -510,7 +507,7 @@ namespace Niconicome.Models.Network.Download
                         this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに成功しました。");
 
                         task.Message = $"ダウンロード完了{rMessage}";
-                        if (video is not null&&downloadResult.VideoInfo is not null)
+                        if (video is not null && downloadResult.VideoInfo is not null)
                         {
                             if (!downloadResult.VideoFileName.IsNullOrEmpty())
                             {
@@ -519,7 +516,7 @@ namespace Niconicome.Models.Network.Download
                             BindableListVIdeoInfo.SetData(video, downloadResult.VideoInfo);
                             this.videoHandler.Update(video);
                         }
-                        this.videoListContainer.Uncheck(task.PlaylistID, task.VideoID);
+                        this.videoListContainer.Uncheck(task.VideoID, task.PlaylistID);
                         this.CurrentResult.SucceededCount++;
                     }
 

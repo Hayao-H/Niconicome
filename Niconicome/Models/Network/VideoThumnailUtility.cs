@@ -11,7 +11,8 @@ namespace Niconicome.Models.Network
     {
         void GetThumbAsync(IListVideoInfo video, bool overwrite = false);
         string GetThumbFilePath(string niconicoId);
-        bool IsValidThumbnail(IListVideoInfo video);
+        bool IsValidThumbnailUrl(IListVideoInfo video);
+        bool IsValidThumbnailPath(IListVideoInfo video);
         bool HasThumbnailCache(IListVideoInfo video);
     }
 
@@ -57,16 +58,16 @@ namespace Niconicome.Models.Network
         }
 
         /// <summary>
-        /// サムネイルの形式が正しいかどうかを確認する
+        /// サムネイルのパスが正しいかどうかを確認する
         /// </summary>
         /// <param name="video"></param>
         /// <returns></returns>
-        public bool IsValidThumbnail(IListVideoInfo video)
+        public bool IsValidThumbnailPath(IListVideoInfo video)
         {
 
             string deletedVideoPath = this.GetThumbFilePath("0");
 
-            return (!video.ThumbPath.IsNullOrEmpty() && video.ThumbPath != deletedVideoPath && this.IsValidThumbnailUrl(video));
+            return (!video.ThumbPath.IsNullOrEmpty() && video.ThumbPath != deletedVideoPath);
         }
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace Niconicome.Models.Network
         /// </summary>
         /// <param name="video"></param>
         /// <returns></returns>
-        private bool IsValidThumbnailUrl(IListVideoInfo video)
+        public bool IsValidThumbnailUrl(IListVideoInfo video)
         {
             string deletedVideoUrl = VIdeoInfo.DeletedVideoThumb;
             return !(video.ThumbUrl.IsNullOrEmpty() || video.ThumbUrl == deletedVideoUrl);
@@ -88,7 +89,7 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public void GetThumbAsync(IListVideoInfo video, bool overwrite = false)
         {
-            if (!this.IsValidThumbnail(video)) return;
+            if (!this.IsValidThumbnailUrl(video)) return;
 
             lock (this.lockObj)
             {
