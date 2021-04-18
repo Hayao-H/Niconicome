@@ -7,6 +7,7 @@ using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist;
+using Search = Niconicome.Models.Domain.Niconico.Search;
 
 namespace Niconicome.Models.Network
 {
@@ -222,7 +223,14 @@ namespace Niconicome.Models.Network
         {
             IEnumerable<IListVideoInfo> videos = new List<IListVideoInfo>();
 
-            var searchResult = await this.remotePlaylistHandler.TrySearchVideosAsync(keyword, SearchType.Keyword, 1);
+            var query = new Search::SearchQuery()
+            {
+                Query = keyword,
+                SearchType = SearchType.Keyword,
+                Page = 1,
+            };
+
+            var searchResult = await this.remotePlaylistHandler.TrySearchVideosAsync(query);
 
             if (!searchResult.IsSucceeded || searchResult.Videos is null)
             {

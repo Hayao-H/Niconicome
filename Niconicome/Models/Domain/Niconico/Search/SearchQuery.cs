@@ -62,8 +62,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
 
         public Genre Genre { get; set; }
 
-        public ISortOption SortOption { get; set; } = new SortOption();
-
+        public ISortOption SortOption { get; set; } = new SortOption() { Sort = Sort.ViewCount};
 
         public string Query { get; set; } = string.Empty;
 
