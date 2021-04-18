@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Api = Niconicome.Models.Domain.Niconico.Net.Json.API.Search;
 using System.DirectoryServices;
+using Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Domain.Niconico.Search
 {
@@ -29,7 +30,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
 
     public interface ISearch
     {
-        Task<ISearchResult> SearchAsync(string query, SearchType searchType, int page);
+        Task<ISearchResult> SearchAsync(ISearchQuery query);
     }
 
     public interface ISearchClient
@@ -42,11 +43,21 @@ namespace Niconicome.Models.Domain.Niconico.Search
     /// </summary>
     class Search : ISearch
     {
-        public Search(ISearchClient searchClient, ILogger logger)
+        public Search(ISearchClient searchClient, ILogger logger,ISearchUrlConstructor urlConstructor)
         {
             this.client = searchClient;
             this.logger = logger;
+            this.urlConstructor = urlConstructor;
         }
+
+        #region DIされるクラス
+
+        private readonly ISearchClient client;
+
+        private readonly ILogger logger;
+
+        private readonly ISearchUrlConstructor urlConstructor;
+        #endregion
 
         /// <summary>
         /// 検索する
@@ -54,10 +65,10 @@ namespace Niconicome.Models.Domain.Niconico.Search
         /// <param name="query"></param>
         /// <param name="searchType"></param>
         /// <returns></returns>
-        public async Task<ISearchResult> SearchAsync(string query, SearchType searchType, int page)
+        public async Task<ISearchResult> SearchAsync(ISearchQuery query)
         {
 
-            string url = this.GetUrl(query, searchType, page);
+            string url = this.urlConstructor.GetUrl(query);
 
             Api::Response data;
             try
@@ -75,34 +86,6 @@ namespace Niconicome.Models.Domain.Niconico.Search
             return new SearchResult() { IsSucceeded = true, Videos = videos };
         }
 
-        /// <summary>
-        /// urlを取得する
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="searchType"></param>
-        /// <returns></returns>
-        private string GetUrl(string query, SearchType searchType, int page)
-        {
-            string sType = searchType switch
-            {
-                SearchType.Tag => "tags",
-                _ => "title,description,tags"
-            };
-
-            const int limit = 50;
-            int offset = limit * (page - 1);
-
-            query = HttpUtility.UrlEncode(query);
-
-            string url = $"https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q={query}&targets={sType}&fields=contentId,title&_limit={limit}&_offset={offset}&_context=niconicome&_sort=-viewCounter";
-
-            return url;
-        }
-
-
-        private readonly ISearchClient client;
-
-        private readonly ILogger logger;
     }
 
     /// <summary>
@@ -116,7 +99,11 @@ namespace Niconicome.Models.Domain.Niconico.Search
             this.logger = logger;
         }
 
+        #region DIされるクラス
         private readonly ILogger logger;
+
+        private readonly INicoHttp http;
+        #endregion
 
         /// <summary>
         /// APIから検索結果を取得する
@@ -156,7 +143,6 @@ namespace Niconicome.Models.Domain.Niconico.Search
             return data;
         }
 
-        private readonly INicoHttp http;
     }
 
     /// <summary>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Playlist;
+using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Niconico.Video.Channel;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
@@ -18,7 +19,7 @@ namespace Niconicome.Models.Network
     public interface IRemotePlaylistHandler
     {
         Task<INetworkResult> TryGetRemotePlaylistAsync(string id, List<Playlist::IListVideoInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage);
-        Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType, int page);
+        Task<Search::ISearchResult> TrySearchVideosAsync(ISearchQuery query);
         string? ExceptionDetails { get; }
     }
 
@@ -158,12 +159,12 @@ namespace Niconicome.Models.Network
         /// <param name="keyword"></param>
         /// <param name="searchType"></param>
         /// <returns></returns>
-        public async Task<Search::ISearchResult> TrySearchVideosAsync(string keyword, Search::SearchType searchType, int page)
+        public async Task<Search::ISearchResult> TrySearchVideosAsync(ISearchQuery query)
         {
             Search::ISearchResult result;
             try
             {
-                result = await this.searchClient.SearchAsync(keyword, searchType, page);
+                result = await this.searchClient.SearchAsync(query);
             }
             catch
             {
