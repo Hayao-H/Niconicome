@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Download;
 using Niconicome.Models.Domain.Niconico.Watch;
@@ -12,15 +11,13 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
+using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Download = Niconicome.Models.Domain.Niconico.Download;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
-using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
-using MS.WindowsAPICodePack.Internal;
-using System.Windows.Documents;
-using Niconicome.Models.Playlist.VideoList;
 
 namespace Niconicome.Models.Network.Download
 {
