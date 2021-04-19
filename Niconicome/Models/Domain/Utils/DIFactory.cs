@@ -103,6 +103,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Playlist::IVideoFilter, Playlist::VideoFilter>();
             services.AddTransient<Search::ISearch, Search::Search>();
             services.AddTransient<Search::ISearchClient, Search::SearchClient>();
+            services.AddTransient<Search::ISearchUrlConstructor, Search::SearchUrlConstructor>();
             services.AddSingleton<State::IErrorMessanger, State::ErrorMessenger>();
             services.AddSingleton<MyApplication::IStartUp, MyApplication::StartUp>();
             services.AddTransient<Store::ISettingHandler, Store::SettingHandler>();

@@ -17,7 +17,7 @@
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource Window_Style}"
         d:DataContext="{d:DesignInstance {x:Type vm:SearchViewModelD},IsDesignTimeCreatable=True}"
-        Title="動画を検索する" Height="600" Width="400">
+        Title="動画を検索する" Height="600" Width="700">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="8*"/>
@@ -107,10 +107,63 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="結果">
-                
+                <ListView ItemsSource="{Binding SearchResult}">
+                    <ListView.View>
+                        <GridView>
+                            <GridView.Columns>
+                                <GridViewColumn>
+                                    <GridViewColumn.Header>
+                                        <CheckBox IsChecked="{Binding IsAllSelected}"/>
+                                    </GridViewColumn.Header>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsSelected}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn 
+                                    Header="ID" 
+                                    DisplayMemberBinding="{Binding NiconicoId}"/>
+                                <GridViewColumn
+                                    Header="タイトル">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock 
+                                                Text="{Binding Title}"
+                                                ToolTip="{Binding Title}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn 
+                                    Header="投稿日時"
+                                    DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
+                            </GridView.Columns>
+                        </GridView>
+                    </ListView.View>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
             </TabItem>
         </TabControl>
-        <Button Grid.Row="2" Margin="80 0" Content="検索" Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=window}"/>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <Button 
+                Grid.Column="0" 
+                Margin="8 0" 
+                Content="検索" 
+                Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=window}"/>
+            <Button 
+                Grid.Column="1" 
+                Margin="8 0" 
+                Content="結果をプレイリストに登録" 
+                Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=window}"/>
+        </Grid>
         <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"/>
     </Grid>
 </Window>

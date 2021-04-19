@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Niconicome.ViewModels.Mainpage.Subwindows;
 
 namespace Niconicome.Views.Mainpage
 {
@@ -22,6 +23,7 @@ namespace Niconicome.Views.Mainpage
         public SearchPage()
         {
             this.InitializeComponent();
+            this.DataContext = new SearchViewModel();
         }
     }
 }
