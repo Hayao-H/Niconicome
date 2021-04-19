@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Niconicome.Views
+namespace Niconicome.Views.Mainpage
 {
     /// <summary>
     /// SearchPage.xaml の相互作用ロジック
