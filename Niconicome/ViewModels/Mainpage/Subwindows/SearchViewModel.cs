@@ -27,7 +27,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             var genre = new ComboboxItem<Search::Genre>(Search::Genre.Other, "その他");
 
             this.genreField = all;
-            this.SelectableGenre = new List<ComboboxItem<Search.Genre>>() { all, game, music, entertainment, genre };
+            this.SelectableGenre = new List<ComboboxItem<Search.Genre>>() { all, game, music, entertainment, dance, genre };
 
             //日付
             var dtNone = new ComboboxItem<DateTimeOffset>(default, "指定しない");
