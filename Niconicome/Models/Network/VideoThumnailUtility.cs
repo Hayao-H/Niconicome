@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Network;
+using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Network

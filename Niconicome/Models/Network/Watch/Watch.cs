@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using WatchInfo = Niconicome.Models.Domain.Niconico.Watch;
-using Niconicome.Models.Playlist;
-using Niconicome.Models.Local;
-using STypes = Niconicome.Models.Domain.Local.Store.Types;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Playlist;
 
-namespace Niconicome.Models.Network
+namespace Niconicome.Models.Network.Watch
 {
     public interface IVideoInfo
     {
@@ -36,7 +31,7 @@ namespace Niconicome.Models.Network
 
     public interface IWatch
     {
-        Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo outInfo, WatchInfo::WatchInfoOptions options = WatchInfo::WatchInfoOptions.Default);
+        Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo outInfo, WatchInfoOptions options = WatchInfoOptions.Default);
         void ConvertDomainVideoInfoToListVideoInfo(IListVideoInfo videoInfo, IDomainVideoInfo domwinVideoInfo);
     }
 
@@ -48,13 +43,13 @@ namespace Niconicome.Models.Network
 
     public class Watch : IWatch
     {
-        public Watch(WatchInfo::IWatchInfohandler handler, ILogger logger)
+        public Watch(IWatchInfohandler handler, ILogger logger)
         {
             this.handler = handler;
             this.logger = logger;
         }
 
-        private readonly WatchInfo::IWatchInfohandler handler;
+        private readonly IWatchInfohandler handler;
 
 
         private readonly ILogger logger;
@@ -65,7 +60,7 @@ namespace Niconicome.Models.Network
         /// <param name="nicoId"></param>
         /// <param name="info"></param>
         /// <returns></returns>
-        public async Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfo::WatchInfoOptions options = WatchInfo::WatchInfoOptions.Default)
+        public async Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfoOptions options = WatchInfoOptions.Default)
         {
             IResult result;
 
@@ -93,9 +88,9 @@ namespace Niconicome.Models.Network
         /// <param name="info"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<IResult> GetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfo::WatchInfoOptions options = WatchInfo::WatchInfoOptions.Default)
+        private async Task<IResult> GetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfoOptions options = WatchInfoOptions.Default)
         {
-            WatchInfo::IDomainVideoInfo retrieved;
+            IDomainVideoInfo retrieved;
             var result = new Result();
 
             try
@@ -107,10 +102,10 @@ namespace Niconicome.Models.Network
                 result.IsSucceeded = false;
                 result.Message = this.handler.State switch
                 {
-                    WatchInfo::WatchInfoHandlerState.HttpRequestFailure => "httpリクエストに失敗しました。(サーバーエラー・IDの指定間違い)",
-                    WatchInfo::WatchInfoHandlerState.JsonParsingFailure => "視聴ページの解析に失敗しました。(サーバーエラー)",
-                    WatchInfo::WatchInfoHandlerState.NoJsDataElement => "視聴ページの解析に失敗しました。(サーバーエラー・権利のない有料動画など)",
-                    WatchInfo::WatchInfoHandlerState.OK => "取得完了",
+                    WatchInfoHandlerState.HttpRequestFailure => "httpリクエストに失敗しました。(サーバーエラー・IDの指定間違い)",
+                    WatchInfoHandlerState.JsonParsingFailure => "視聴ページの解析に失敗しました。(サーバーエラー)",
+                    WatchInfoHandlerState.NoJsDataElement => "視聴ページの解析に失敗しました。(サーバーエラー・権利のない有料動画など)",
+                    WatchInfoHandlerState.OK => "取得完了",
                     _ => "不明なエラー"
                 };
 
@@ -219,9 +214,9 @@ namespace Niconicome.Models.Network
 
         public DateTime UploadedOn { get; set; }
 
-        public Uri LargeThumbUri { get; set; } = new Uri(VIdeoInfo.DeletedVideoThumb);
+        public Uri LargeThumbUri { get; set; } = new Uri(DeletedVideoThumb);
 
-        public Uri ThumbUri { get; set; } = new Uri(VIdeoInfo.DeletedVideoThumb);
+        public Uri ThumbUri { get; set; } = new Uri(DeletedVideoThumb);
 
         /// <summary>
         /// Viewから参照可能な形式に変換する
