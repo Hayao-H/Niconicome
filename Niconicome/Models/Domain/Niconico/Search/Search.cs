@@ -82,7 +82,8 @@ namespace Niconicome.Models.Domain.Niconico.Search
             {
                 var dmc = new DmcInfo();
                 dmc.ThumbInfo.Normal = v.ThumbnailUrl;
-                return new DomainVideoInfo() { Title = v.Title, Id = v.ContentId, ViewCount = v.ViewCounter, CommentCount = v.CommentCounter, MylistCount = v.MylistCounter, DmcInfo = dmc,Tags = v.Tags.Split(" ") };
+                dmc.UploadedOn = v.StartTime.DateTime;
+                return new DomainVideoInfo() { Title = v.Title, Id = v.ContentId, ViewCount = v.ViewCounter, CommentCount = v.CommentCounter, MylistCount = v.MylistCounter, DmcInfo = dmc,Tags = v.Tags.Split(" ")};
             });
 
             return new SearchResult() { IsSucceeded = true, Videos = videos };
