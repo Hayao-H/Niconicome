@@ -34,6 +34,7 @@ using Store = Niconicome.Models.Domain.Local.Store;
 using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
+using Watch = Niconicome.Models.Network.Watch;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -73,7 +74,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Playlist::IPlaylistTreeConstructor, Playlist::PlaylistTreeConstructor>();
             services.AddTransient<DomainWatch::IWatchPageHtmlParser, DomainWatch::WatchPageHtmlParser>();
             services.AddTransient<DomainWatch::IWatchInfohandler, DomainWatch::WatchInfohandler>();
-            services.AddTransient<Net::IWatch, Net::Watch>();
+            services.AddTransient<Watch::IWatch, Watch::Watch>();
+            services.AddTransient<Watch::IDomainModelConverter, Watch::DomainModelConverter>();
             services.AddTransient<Net::IVideoThumnailUtility, Net::VideoThumnailUtility>();
             services.AddTransient<Mylist::IMylistHandler, Mylist::MylistHandler>();
             services.AddTransient<Mylist::IWatchLaterHandler, Mylist::WatchLaterHandler>();

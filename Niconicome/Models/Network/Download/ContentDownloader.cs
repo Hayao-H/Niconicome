@@ -95,7 +95,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler, IWatch watch, IVideoListContainer videoListContainer)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, ILocalContentHandler localContentHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer,IDomainModelConverter converter)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -104,7 +104,7 @@ namespace Niconicome.Models.Network.Download
             this.localContentHandler = localContentHandler;
             this.downloadTasksHandler = downloadTasksHandler;
             this.videoListContainer = videoListContainer;
-            this.watch = watch;
+            this.converter = converter;
 
             int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelDL);
             if (maxParallel <= 0)
@@ -129,7 +129,7 @@ namespace Niconicome.Models.Network.Download
 
         private readonly IVideoListContainer videoListContainer;
 
-        private readonly IWatch watch;
+        private readonly IDomainModelConverter converter;
 
         private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
 
@@ -267,7 +267,7 @@ namespace Niconicome.Models.Network.Download
 
             if (session.Video is not null)
             {
-                this.watch.ConvertDomainVideoInfoToListVideoInfo(result.VideoInfo, session.Video);
+                this.converter.ConvertDomainVideoInfoToListVideoInfo(result.VideoInfo, session.Video);
             }
 
 

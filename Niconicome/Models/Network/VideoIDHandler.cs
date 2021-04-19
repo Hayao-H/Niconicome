@@ -169,7 +169,6 @@ namespace Niconicome.Models.Network
         private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromLocalPath(string localPath, Action<string> onMessage)
         {
             var ids = this.localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
-            var videoCount = ids.Count();
 
             var videos = await this.networkVideoHandler.GetVideoListInfosAsync(ids);
 
@@ -232,15 +231,15 @@ namespace Niconicome.Models.Network
 
             var searchResult = await this.remotePlaylistHandler.TrySearchVideosAsync(query);
 
-            if (!searchResult.IsSucceeded || searchResult.Videos is null)
+            if (!searchResult.IsSucceeded || searchResult.Data is null)
             {
                 onMessage($"検索に失敗しました(詳細: {searchResult.Message ?? "none"})");
                 return videos;
             }
 
-            int videoCount = searchResult.Videos.Count();
+            int videoCount = searchResult.Data.Count();
 
-            videos = await this.networkVideoHandler.GetVideoListInfosAsync(searchResult.Videos.Select(v => v.Id).Where(v => !registeredVideos.Contains(v)));
+            videos = await this.networkVideoHandler.GetVideoListInfosAsync(searchResult.Data.Select(v => v.NiconicoId).Where(v => !registeredVideos.Contains(v)));
 
             return videos;
 

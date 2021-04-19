@@ -54,19 +54,19 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     var result = await WS::Mainpage.RemotePlaylistHandler.TrySearchVideosAsync(new Search::SearchQuery());
 
-                    if (!result.IsSucceeded || result.Videos is null)
+                    if (!result.IsSucceeded || result.Data is null)
                     {
                         this.Message = $"検索に失敗しました。(詳細: {result.Message ?? "None"})";
                         this.CompleteFetching();
                         return;
                     }
 
-                    this.Message = $"{result.Videos.Count()}件の動画が見つかりました。";
+                    this.Message = $"{result.Data.Count()}件の動画が見つかりました。";
 
-                    var dupe = result.Videos.Select(v => v.Id).Where(v => sourceVideos.Contains(v));
+                    var dupe = result.Data.Select(v => v.NiconicoId).Where(v => sourceVideos.Contains(v));
                     this.Message = $"{dupe.Count()}件の動画が既に登録されているのでスキップします。";
 
-                    var videos = await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(result.Videos.Select(v => v.Id).Where(v => !dupe.Contains(v)));
+                    var videos = await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(result.Data.Select(v => v.NiconicoId).Where(v => !dupe.Contains(v)));
                     WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
 
                     if (sourceVideosCount > videos.Count())

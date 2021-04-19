@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using AngleSharp.Attributes;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Network;
+using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using WatchInfo = Niconicome.Models.Domain.Niconico.Watch;
 
@@ -29,12 +29,11 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
     class ChannelVideoHandler : IChannelVideoHandler
     {
-        public ChannelVideoHandler(INicoHttp http, ILogger logger, IChannelPageHtmlParser htmlParser, IWatch watch)
+        public ChannelVideoHandler(INicoHttp http, ILogger logger, IChannelPageHtmlParser htmlParser)
         {
             this.http = http;
             this.htmlParser = htmlParser;
             this.logger = logger;
-            this.watch = watch;
         }
 
         private readonly INicoHttp http;
@@ -42,8 +41,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         private readonly ILogger logger;
 
         private readonly IChannelPageHtmlParser htmlParser;
-
-        private readonly IWatch watch;
 
         /// <summary>
         /// チャンネル動画を取得する

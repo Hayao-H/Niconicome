@@ -6,7 +6,9 @@ using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Playlist;
 using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Niconico.Video.Channel;
+using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Playlist = Niconicome.Models.Playlist;
@@ -19,13 +21,13 @@ namespace Niconicome.Models.Network
     public interface IRemotePlaylistHandler
     {
         Task<INetworkResult> TryGetRemotePlaylistAsync(string id, List<Playlist::IListVideoInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage);
-        Task<Search::ISearchResult> TrySearchVideosAsync(ISearchQuery query);
+        Task<IAttemptResult<IEnumerable<IListVideoInfo>>> TrySearchVideosAsync(ISearchQuery query);
         string? ExceptionDetails { get; }
     }
 
     public class RemotePlaylistHandler : IRemotePlaylistHandler
     {
-        public RemotePlaylistHandler(Mylist::IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Search::ISearch search, Mylist::IWatchLaterHandler watchLaterHandler, IChannelVideoHandler channelVideoHandler, IMessageHandler messageHandler, INetworkVideoHandler networkVideoHandler)
+        public RemotePlaylistHandler(Mylist::IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Search::ISearch search, Mylist::IWatchLaterHandler watchLaterHandler, IChannelVideoHandler channelVideoHandler, INetworkVideoHandler networkVideoHandler, IDomainModelConverter converter)
         {
             this.mylistHandler = mylistHandler;
             this.userHandler = userHandler;
@@ -33,8 +35,10 @@ namespace Niconicome.Models.Network
             this.watchLaterHandler = watchLaterHandler;
             this.channelVideoHandler = channelVideoHandler;
             this.networkVideoHandler = networkVideoHandler;
+            this.converter = converter;
         }
 
+        #region DIされるコード
         /// <summary>
         /// マイリストのハンドラ
         /// </summary>
@@ -64,6 +68,12 @@ namespace Niconicome.Models.Network
         /// ネットワークハンドラ
         /// </summary>
         private readonly INetworkVideoHandler networkVideoHandler;
+
+        /// <summary>
+        /// 動画情報のコンバーター
+        /// </summary>
+        private readonly IDomainModelConverter converter;
+        #endregion
 
         /// <summary>
         /// 例外の詳細情報
@@ -159,19 +169,35 @@ namespace Niconicome.Models.Network
         /// <param name="keyword"></param>
         /// <param name="searchType"></param>
         /// <returns></returns>
-        public async Task<Search::ISearchResult> TrySearchVideosAsync(ISearchQuery query)
+        public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> TrySearchVideosAsync(ISearchQuery query)
         {
-            Search::ISearchResult result;
+            Search::ISearchResult searchResult;
             try
             {
-                result = await this.searchClient.SearchAsync(query);
+                searchResult = await this.searchClient.SearchAsync(query);
             }
-            catch
+            catch (Exception e)
             {
-                return new Search::SearchResult { Message = "不明なエラーが発生しました。" };
+                return new AttemptResult<IEnumerable<IListVideoInfo>> { Message = $"補足されないエラーが発生しました。(詳細:{e.Message})", Exception = e };
             }
 
-            return result;
+            if (!searchResult.IsSucceeded)
+            {
+                return new AttemptResult<IEnumerable<IListVideoInfo>> { 
+                    Message = searchResult.Message,
+                };
+            }
+
+            return new AttemptResult<IEnumerable<IListVideoInfo>>()
+            {
+                IsSucceeded = true,
+                Data = searchResult.Videos?.Select(v =>
+                {
+                    var lVIdeo = new BindableListVIdeoInfo();
+                    this.converter.ConvertDomainVideoInfoToListVideoInfo(lVIdeo, v);
+                    return lVIdeo;
+                }),
+            };
         }
 
         /// <summary>

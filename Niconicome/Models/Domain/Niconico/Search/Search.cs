@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Web;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Utils;
 using Api = Niconicome.Models.Domain.Niconico.Net.Json.API.Search;
-using System.DirectoryServices;
-using Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Domain.Niconico.Search
 {
@@ -25,7 +22,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
     {
         bool IsSucceeded { get; }
         string? Message { get; }
-        IEnumerable<ISearchVideo>? Videos { get; }
+        IEnumerable<IDomainVideoInfo>? Videos { get; }
     }
 
     public interface ISearch
@@ -43,7 +40,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
     /// </summary>
     class Search : ISearch
     {
-        public Search(ISearchClient searchClient, ILogger logger,ISearchUrlConstructor urlConstructor)
+        public Search(ISearchClient searchClient, ILogger logger, ISearchUrlConstructor urlConstructor)
         {
             this.client = searchClient;
             this.logger = logger;
@@ -81,7 +78,12 @@ namespace Niconicome.Models.Domain.Niconico.Search
                 return new SearchResult() { Message = $"APIへのアクセスに失敗しました。(詳細: {e.Message})" };
             }
 
-            IEnumerable<ISearchVideo> videos = data.Data.Select(v => new SearchVideo() { Id = v.ContentId, Title = v.Title });
+            var videos = data.Data.Select(v =>
+            {
+                var dmc = new DmcInfo();
+                dmc.ThumbInfo.Normal = v.ThumbnailUrl;
+                return new DomainVideoInfo() { Title = v.Title, Id = v.ContentId, ViewCount = v.ViewCounter, CommentCount = v.CommentCounter, MylistCount = v.MylistCounter, DmcInfo = dmc,Tags = v.Tags.Split(" ") };
+            });
 
             return new SearchResult() { IsSucceeded = true, Videos = videos };
         }
@@ -93,7 +95,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
     /// </summary>
     public class SearchClient : ISearchClient
     {
-        public SearchClient(INicoHttp http,ILogger logger)
+        public SearchClient(INicoHttp http, ILogger logger)
         {
             this.http = http;
             this.logger = logger;
@@ -154,7 +156,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
 
         public string? Message { get; set; }
 
-        public IEnumerable<ISearchVideo>? Videos { get; set; } = new List<ISearchVideo>();
+        public IEnumerable<IDomainVideoInfo>? Videos { get; set; } = new List<IDomainVideoInfo>();
     }
 
     /// <summary>
