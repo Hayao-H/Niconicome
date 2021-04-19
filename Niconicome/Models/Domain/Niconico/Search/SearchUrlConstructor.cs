@@ -66,11 +66,12 @@ namespace Niconicome.Models.Domain.Niconico.Search
                 {
                     var genre = query.Genre switch
                     {
-                        Genre.Game => "game",
-                        Genre.MusicSound => "music_sound",
-                        Genre.Anime => "anime",
-                        Genre.Entertainment => "entertainment",
-                        Genre.Other => "other",
+                        Genre.Game => "ゲーム",
+                        Genre.MusicSound => "音楽・サウンド",
+                        Genre.Anime => "アニメ",
+                        Genre.Entertainment => "エンターテイメント",
+                        Genre.Dance => "ダンス",
+                        Genre.Other => "その他",
                         _ => "other"
                     };
                     var filter = new JsonFilter()

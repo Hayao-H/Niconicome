@@ -23,6 +23,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             var game = new ComboboxItem<Search::Genre>(Search::Genre.Game, "ゲーム");
             var music = new ComboboxItem<Search::Genre>(Search::Genre.MusicSound, "音楽・サウンド");
             var entertainment = new ComboboxItem<Search::Genre>(Search::Genre.Entertainment, "エンターテイメント");
+            var dance = new ComboboxItem<Search::Genre>(Search::Genre.Dance, "ダンス");
             var genre = new ComboboxItem<Search::Genre>(Search::Genre.Other, "その他");
 
             this.genreField = all;

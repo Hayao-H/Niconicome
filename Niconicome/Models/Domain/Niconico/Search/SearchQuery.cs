@@ -36,6 +36,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
         MusicSound,
         Anime,
         Entertainment,
+        Dance,
         Other,
     }
 

@@ -17,7 +17,7 @@
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource Window_Style}"
         d:DataContext="{d:DesignInstance {x:Type vm:SearchViewModelD},IsDesignTimeCreatable=True}"
-        Title="動画を検索する" Height="600" Width="700">
+        Title="動画を検索する" Height="600" Width="850">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="8*"/>
