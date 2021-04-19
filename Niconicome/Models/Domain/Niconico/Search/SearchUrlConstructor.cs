@@ -43,7 +43,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
                 Sort.MylistCount => "mylistCounter",
                 Sort.CommentCount => "commentCounter",
                 Sort.UploadedTime => "startTime",
-                Sort.Length => "lengthSeconds ",
+                Sort.Length => "lengthSeconds",
                 Sort.LastCommentTime => "lastCommentTime",
                 _ => "viewCounter",
             };
@@ -52,6 +52,9 @@ namespace Niconicome.Models.Domain.Niconico.Search
                 sort = "-" + sort;
             }
             list.Add($"_sort={sort}");
+
+            //フィールド
+            list.Add("fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter");
 
             //jsonフィルター
             if (query.Genre != Genre.All || query.UploadedDateTimeStart is not null)
