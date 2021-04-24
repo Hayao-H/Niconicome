@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using WatchInfo = Niconicome.Models.Domain.Niconico.Watch;
-using Niconicome.Models.Playlist;
-using Niconicome.Models.Local;
-using STypes = Niconicome.Models.Domain.Local.Store.Types;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Playlist;
 
-namespace Niconicome.Models.Network
+namespace Niconicome.Models.Network.Watch
 {
     public interface IVideoInfo
     {
@@ -36,8 +31,7 @@ namespace Niconicome.Models.Network
 
     public interface IWatch
     {
-        Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo outInfo, WatchInfo::WatchInfoOptions options = WatchInfo::WatchInfoOptions.Default);
-        void ConvertDomainVideoInfoToListVideoInfo(IListVideoInfo videoInfo, IDomainVideoInfo domwinVideoInfo);
+        Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo outInfo, WatchInfoOptions options = WatchInfoOptions.Default);
     }
 
     public interface IResult
@@ -48,16 +42,20 @@ namespace Niconicome.Models.Network
 
     public class Watch : IWatch
     {
-        public Watch(WatchInfo::IWatchInfohandler handler, ILogger logger)
+        public Watch(IWatchInfohandler handler, ILogger logger,IDomainModelConverter converter)
         {
             this.handler = handler;
             this.logger = logger;
+            this.converter = converter;
         }
 
-        private readonly WatchInfo::IWatchInfohandler handler;
-
+        #region DIされるクラス
+        private readonly IWatchInfohandler handler;
 
         private readonly ILogger logger;
+
+        private readonly IDomainModelConverter converter;
+        #endregion
 
         /// <summary>
         /// 動画情報を取得する
@@ -65,7 +63,7 @@ namespace Niconicome.Models.Network
         /// <param name="nicoId"></param>
         /// <param name="info"></param>
         /// <returns></returns>
-        public async Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfo::WatchInfoOptions options = WatchInfo::WatchInfoOptions.Default)
+        public async Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfoOptions options = WatchInfoOptions.Default)
         {
             IResult result;
 
@@ -93,9 +91,9 @@ namespace Niconicome.Models.Network
         /// <param name="info"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<IResult> GetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfo::WatchInfoOptions options = WatchInfo::WatchInfoOptions.Default)
+        private async Task<IResult> GetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfoOptions options = WatchInfoOptions.Default)
         {
-            WatchInfo::IDomainVideoInfo retrieved;
+            IDomainVideoInfo retrieved;
             var result = new Result();
 
             try
@@ -107,79 +105,23 @@ namespace Niconicome.Models.Network
                 result.IsSucceeded = false;
                 result.Message = this.handler.State switch
                 {
-                    WatchInfo::WatchInfoHandlerState.HttpRequestFailure => "httpリクエストに失敗しました。(サーバーエラー・IDの指定間違い)",
-                    WatchInfo::WatchInfoHandlerState.JsonParsingFailure => "視聴ページの解析に失敗しました。(サーバーエラー)",
-                    WatchInfo::WatchInfoHandlerState.NoJsDataElement => "視聴ページの解析に失敗しました。(サーバーエラー・権利のない有料動画など)",
-                    WatchInfo::WatchInfoHandlerState.OK => "取得完了",
+                    WatchInfoHandlerState.HttpRequestFailure => "httpリクエストに失敗しました。(サーバーエラー・IDの指定間違い)",
+                    WatchInfoHandlerState.JsonParsingFailure => "視聴ページの解析に失敗しました。(サーバーエラー)",
+                    WatchInfoHandlerState.NoJsDataElement => "視聴ページの解析に失敗しました。(サーバーエラー・権利のない有料動画など)",
+                    WatchInfoHandlerState.OK => "取得完了",
                     _ => "不明なエラー"
                 };
 
                 return result;
             }
 
-            this.ConvertDomainVideoInfoToListVideoInfo(info, retrieved);
+            this.converter.ConvertDomainVideoInfoToListVideoInfo(info, retrieved);
 
             result.IsSucceeded = true;
             result.Message = "取得成功";
 
 
             return result;
-        }
-
-        /// <summary>
-        /// Domainの動画情報を変換する
-        /// </summary>
-        /// <param name="videoInfo"></param>
-        /// <returns></returns>
-        public void ConvertDomainVideoInfoToListVideoInfo(IListVideoInfo info, IDomainVideoInfo domainVideoInfo)
-        {
-
-            //タイトル
-            info.Title = domainVideoInfo.Title;
-
-            //ID
-            info.NiconicoId = domainVideoInfo.Id;
-
-            //タグ
-            info.Tags = domainVideoInfo.Tags;
-
-            //再生回数
-            info.ViewCount = domainVideoInfo.ViewCount;
-            info.CommentCount = domainVideoInfo.CommentCount;
-            info.MylistCount = domainVideoInfo.MylistCount;
-            info.LikeCount = domainVideoInfo.LikeCount;
-
-            //チャンネル情報
-            info.ChannelID = domainVideoInfo.ChannelID;
-            info.ChannelName = domainVideoInfo.ChannelName;
-
-            //投稿者情報
-            info.OwnerID = domainVideoInfo.OwnerID;
-            info.OwnerName = domainVideoInfo.Owner;
-
-            //再生時間
-            info.Duration = domainVideoInfo.Duration;
-
-            //投稿日時
-            if (domainVideoInfo.DmcInfo is not null)
-            {
-                info.UploadedOn = domainVideoInfo.DmcInfo.UploadedOn;
-            }
-
-            //サムネイル
-            if (domainVideoInfo.DmcInfo is not null && domainVideoInfo.DmcInfo.ThumbInfo is not null)
-            {
-                if (!domainVideoInfo.DmcInfo.ThumbInfo.Large.IsNullOrEmpty())
-                {
-                    info.ThumbUrl = domainVideoInfo.DmcInfo.ThumbInfo.Large;
-                }
-
-                if (!domainVideoInfo.DmcInfo.ThumbInfo.Normal.IsNullOrEmpty())
-                {
-                    info.ThumbUrl = domainVideoInfo.DmcInfo.ThumbInfo.Normal;
-                }
-            }
-
         }
 
     }
@@ -219,9 +161,9 @@ namespace Niconicome.Models.Network
 
         public DateTime UploadedOn { get; set; }
 
-        public Uri LargeThumbUri { get; set; } = new Uri(VIdeoInfo.DeletedVideoThumb);
+        public Uri LargeThumbUri { get; set; } = new Uri(DeletedVideoThumb);
 
-        public Uri ThumbUri { get; set; } = new Uri(VIdeoInfo.DeletedVideoThumb);
+        public Uri ThumbUri { get; set; } = new Uri(DeletedVideoThumb);
 
         /// <summary>
         /// Viewから参照可能な形式に変換する

@@ -9,6 +9,7 @@ using Niconicome.Models.Local.Application;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Download;
 using VideoList = Niconicome.Models.Playlist.VideoList;
+using Niconicome.Models.Network.Watch;
 
 namespace Niconicome.Workspaces
 {

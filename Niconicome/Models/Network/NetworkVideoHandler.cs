@@ -13,6 +13,7 @@ using Niconicome.Extensions.System;
 using Niconicome.Models.Utils;
 using Niconicome.Models.Local;
 using Niconicome.Models.Playlist.VideoList;
+using Niconicome.Models.Network.Watch;
 
 namespace Niconicome.Models.Network
 {

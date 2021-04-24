@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Helper.Event.Generic;
 using System.Linq.Expressions;
 using Niconicome.Models.Const;
+using Niconicome.Views.Mainpage;
 
 namespace Niconicome.ViewModels.Mainpage
 {

@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Web;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Utils;
 using Api = Niconicome.Models.Domain.Niconico.Net.Json.API.Search;
-using System.DirectoryServices;
 
 namespace Niconicome.Models.Domain.Niconico.Search
 {
@@ -24,12 +22,12 @@ namespace Niconicome.Models.Domain.Niconico.Search
     {
         bool IsSucceeded { get; }
         string? Message { get; }
-        IEnumerable<ISearchVideo>? Videos { get; }
+        IEnumerable<IDomainVideoInfo>? Videos { get; }
     }
 
     public interface ISearch
     {
-        Task<ISearchResult> SearchAsync(string query, SearchType searchType, int page);
+        Task<ISearchResult> SearchAsync(ISearchQuery query);
     }
 
     public interface ISearchClient
@@ -37,22 +35,26 @@ namespace Niconicome.Models.Domain.Niconico.Search
         Task<Api::Response> GetResponseAsync(string url);
     }
 
-    public enum SearchType
-    {
-        Tag,
-        Keyword,
-    }
-
     /// <summary>
     /// 検索API
     /// </summary>
     class Search : ISearch
     {
-        public Search(ISearchClient searchClient, ILogger logger)
+        public Search(ISearchClient searchClient, ILogger logger, ISearchUrlConstructor urlConstructor)
         {
             this.client = searchClient;
             this.logger = logger;
+            this.urlConstructor = urlConstructor;
         }
+
+        #region DIされるクラス
+
+        private readonly ISearchClient client;
+
+        private readonly ILogger logger;
+
+        private readonly ISearchUrlConstructor urlConstructor;
+        #endregion
 
         /// <summary>
         /// 検索する
@@ -60,10 +62,10 @@ namespace Niconicome.Models.Domain.Niconico.Search
         /// <param name="query"></param>
         /// <param name="searchType"></param>
         /// <returns></returns>
-        public async Task<ISearchResult> SearchAsync(string query, SearchType searchType, int page)
+        public async Task<ISearchResult> SearchAsync(ISearchQuery query)
         {
 
-            string url = this.GetUrl(query, searchType, page);
+            string url = this.urlConstructor.GetUrl(query);
 
             Api::Response data;
             try
@@ -76,39 +78,17 @@ namespace Niconicome.Models.Domain.Niconico.Search
                 return new SearchResult() { Message = $"APIへのアクセスに失敗しました。(詳細: {e.Message})" };
             }
 
-            IEnumerable<ISearchVideo> videos = data.Data.Select(v => new SearchVideo() { Id = v.ContentId, Title = v.Title });
+            var videos = data.Data.Select(v =>
+            {
+                var dmc = new DmcInfo();
+                dmc.ThumbInfo.Normal = v.ThumbnailUrl;
+                dmc.UploadedOn = v.StartTime.DateTime;
+                return new DomainVideoInfo() { Title = v.Title, Id = v.ContentId, ViewCount = v.ViewCounter, CommentCount = v.CommentCounter, MylistCount = v.MylistCounter, DmcInfo = dmc,Tags = v.Tags.Split(" ")};
+            });
 
             return new SearchResult() { IsSucceeded = true, Videos = videos };
         }
 
-        /// <summary>
-        /// urlを取得する
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="searchType"></param>
-        /// <returns></returns>
-        private string GetUrl(string query, SearchType searchType, int page)
-        {
-            string sType = searchType switch
-            {
-                SearchType.Tag => "tags",
-                _ => "title,description,tags"
-            };
-
-            const int limit = 50;
-            int offset = limit * (page - 1);
-
-            query = HttpUtility.UrlEncode(query);
-
-            string url = $"https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search?q={query}&targets={sType}&fields=contentId,title&_limit={limit}&_offset={offset}&_context=niconicome&_sort=-viewCounter";
-
-            return url;
-        }
-
-
-        private readonly ISearchClient client;
-
-        private readonly ILogger logger;
     }
 
     /// <summary>
@@ -116,13 +96,17 @@ namespace Niconicome.Models.Domain.Niconico.Search
     /// </summary>
     public class SearchClient : ISearchClient
     {
-        public SearchClient(INicoHttp http,ILogger logger)
+        public SearchClient(INicoHttp http, ILogger logger)
         {
             this.http = http;
             this.logger = logger;
         }
 
+        #region DIされるクラス
         private readonly ILogger logger;
+
+        private readonly INicoHttp http;
+        #endregion
 
         /// <summary>
         /// APIから検索結果を取得する
@@ -162,7 +146,6 @@ namespace Niconicome.Models.Domain.Niconico.Search
             return data;
         }
 
-        private readonly INicoHttp http;
     }
 
     /// <summary>
@@ -174,7 +157,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
 
         public string? Message { get; set; }
 
-        public IEnumerable<ISearchVideo>? Videos { get; set; } = new List<ISearchVideo>();
+        public IEnumerable<IDomainVideoInfo>? Videos { get; set; } = new List<IDomainVideoInfo>();
     }
 
     /// <summary>

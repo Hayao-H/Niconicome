@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using Watch = Niconicome.Models.Domain.Niconico.Watch;
 using System.IO;
-using Niconicome.Models.Playlist;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Niconico.Watch;
-using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage;
+using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Playlist;
 using Playlist = Niconicome.Models.Playlist;
-using Microsoft.VisualBasic;
+using Watch = Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -24,6 +21,8 @@ namespace Niconicome.Models.Domain.Utils
         string GetIdFromFIleName(string filenameWithExt);
         bool IsNiconicoID(string testString);
         RemoteType GetRemoteType(string url);
+        bool IsSearchUrl(string url);
+        ISearchQuery GetQueryFromUrl(string url);
         string GetID(string url, RemoteType type);
     }
 
@@ -72,7 +71,7 @@ namespace Niconicome.Models.Domain.Utils
         public string GetFileName(string format, Playlist::IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null)
         {
             var info = new VideoInfoForPath()
-{
+            {
                 Title = video.Title,
                 OwnerName = video.OwnerName,
                 NiconicoID = video.NiconicoId,
@@ -229,6 +228,80 @@ namespace Niconicome.Models.Domain.Utils
                 throw new InvalidOperationException($"RemoteType:{type}は不正です。");
             }
         }
+
+        public ISearchQuery GetQueryFromUrl(string url)
+        {
+            //不正なURL
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            {
+                throw new ArgumentException($"URLが不正です。(url:{url})");
+            }
+
+            //クエリを含まないURL
+            if (!url.Contains("?"))
+            {
+                throw new ArgumentException($"URLが不正です。(url:{url})");
+            }
+
+            var result = new SearchQuery();
+            var splitted = url.Split("/");
+
+            //検索タイプ
+            var typeString = splitted[^1].IsNullOrEmpty() ? splitted[^3] : splitted[^2];
+            result.SearchType = typeString switch
+            {
+                "tag" => SearchType.Tag,
+                _ => SearchType.Keyword,
+            };
+
+            //検索文字列
+            var rawKweyword = splitted[^1].IsNullOrEmpty() ? splitted[^2] : splitted[^1];
+            rawKweyword = rawKweyword[0..rawKweyword.IndexOf("?")];
+            rawKweyword = HttpUtility.UrlDecode(rawKweyword);
+            result.Query = rawKweyword;
+
+            //クエリ解析
+            var rawQuery = url[(url.LastIndexOf("?") + 1)..];
+            var query = HttpUtility.ParseQueryString(rawQuery);
+
+            //並び替え
+            var isAscending = query["order"] == "a";
+            var rawSort = query["sort"];
+            var sortType = rawSort switch
+            {
+                "v" => Sort.ViewCount,
+                "m" => Sort.MylistCount,
+                "n" => Sort.LastCommentTime,
+                "r" => Sort.CommentCount,
+                "f" => Sort.UploadedTime,
+                "l" => Sort.Length,
+                _ => throw new ArgumentException($"対応していないソート形式です。(sort:{rawSort})")
+            };
+            result.SortOption = new SortOption() { Sort = sortType, IsAscending = isAscending };
+
+            return result;
+
+
+
+        }
+
+        /// <summary>
+        /// 検索URLをテストする
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public bool IsSearchUrl(string url)
+        {
+            //そもそもURLじゃない
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            {
+                return false;
+            }
+
+            return Regex.IsMatch(url, @"https?://(www\.)?nicovideo\.jp/(search|tag)/.*");
+        }
+
+
 
         /// <summary>
         /// 内部メソッド

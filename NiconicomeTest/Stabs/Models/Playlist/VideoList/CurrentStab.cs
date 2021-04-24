@@ -12,6 +12,9 @@ namespace NiconicomeTest.Stabs.Models.Playlist.VideoList
     {
         public ITreePlaylistInfo? SelectedPlaylist { get; set; }
 
+        public int PrevSelectedPlaylistID { get; set; }
+
+
         public event EventHandler? SelectedPlaylistChanged;
     }
 }
