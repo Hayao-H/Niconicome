@@ -31,7 +31,7 @@ namespace NiconicomeTest.NetWork.Niconico.Search
         {
             var query = new SearchQuery() { SearchType = SearchType.Tag, Query = "東方", Page = 1, SortOption = new SortOption() { Sort = Sort.ViewCount, IsAscending = true } };
             var result = this.searchUrlConstructor!.GetUrl(query);
-            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tags&_sort=viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&_limit=50&_offset=0";
+            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tags&_sort=%2bviewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&_limit=50&_offset=0";
 
             Assert.That(result, Is.EqualTo(expected));
         }

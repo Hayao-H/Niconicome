@@ -51,6 +51,9 @@ namespace Niconicome.Models.Domain.Niconico.Search
             if (!query.SortOption.IsAscending)
             {
                 sort = "-" + sort;
+            } else
+            {
+                sort = HttpUtility.UrlEncode("+") + sort;
             }
             list.Add($"_sort={sort}");
 
@@ -92,7 +95,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
                         Type = "range",
                         Field = "startTime",
                         From = HttpUtility.UrlEncode(query.UploadedDateTimeStart?.ToString(Format.ISO8601)),
-                        To = HttpUtility.UrlEncode(query.UploadedDateTimeEnd?.ToString(Format.ISO8601)),
+                        To = HttpUtility.UrlEncode((query.UploadedDateTimeEnd ?? DateTimeOffset.Now).ToString(Format.ISO8601)),
                         IncludeLower = true,
                         IncludeUpper = true,
                     };
