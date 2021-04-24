@@ -17,7 +17,7 @@
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource Window_Style}"
         d:DataContext="{d:DesignInstance {x:Type vm:SearchViewModelD},IsDesignTimeCreatable=True}"
-        Title="動画を検索する" Height="600" Width="850">
+        Title="動画を検索する" Height="650" Width="850">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="8*"/>
@@ -161,8 +161,8 @@
             <Button 
                 Grid.Column="1" 
                 Margin="8 0" 
-                Content="結果をプレイリストに登録" 
-                Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=window}"/>
+                Content="選択した動画をプレイリストに登録" 
+                Command="{Binding RegisterResultCommand}" CommandParameter="{Binding ElementName=window}"/>
         </Grid>
         <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"/>
     </Grid>

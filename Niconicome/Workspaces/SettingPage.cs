@@ -4,6 +4,7 @@ using Niconicome.Models.Local;
 using Niconicome.Models.Local.External.Import;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.VideoList;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 
 namespace Niconicome.Workspaces
@@ -18,5 +19,6 @@ namespace Niconicome.Workspaces
         public static IPlaylistHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
         public static IXenoImportGeneralManager XenoImportManager { get; private set; } = DIFactory.Provider.GetRequiredService<IXenoImportGeneralManager>();
         public static IMessageHandler MessageHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IMessageHandler>();
+        public static IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoListContainer>();
     }
 }

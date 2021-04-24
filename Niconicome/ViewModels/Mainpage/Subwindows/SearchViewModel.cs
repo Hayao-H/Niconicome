@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Playlist;
@@ -63,6 +64,9 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
             this.IsTag = true;
             this.Page = 1;
+
+            this.uploadDTStartField = DateTime.Now;
+            this.uploadDTEndFIeld = DateTime.Now;
             #endregion
 
 
@@ -100,8 +104,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     SearchType = this.IsTag ? Search::SearchType.Tag : Search::SearchType.Keyword,
                     Genre = this.Genre.Value,
                     SortOption = this.Sort.Value,
-                    UploadedDateTimeStart = this.ConfigureDateTimeManualy ? this.UploadedDT.Value == default ? null : this.UploadedDT.Value : this.UploadedDT.Value == default ? null : this.UploadedDT.Value,
-                    UploadedDateTimeEnd = this.ConfigureDateTimeManualy ? null : null,
+                    UploadedDateTimeStart = this.ConfigureDateTimeManualy ? new DateTimeOffset(this.UploadDTStart, TimeSpan.FromHours(9)) : this.UploadedDT.Value == default ? null : this.UploadedDT.Value,
+                    UploadedDateTimeEnd = this.ConfigureDateTimeManualy ? new DateTimeOffset(this.UploadDTEnd, TimeSpan.FromHours(9)) : null,
                     Page = this.Page,
                 };
 
@@ -119,6 +123,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                 this.MessageQueue.Enqueue($"{result.Data.Count()}件の動画が見つかりました");
 
                 this.SearchResult.Addrange(result.Data);
+                this.IsAllSelected = true;
 
                 this.CompleteFetching();
 
@@ -136,6 +141,48 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                 --this.Page;
                 this.RaiseCanExecuteChanged();
             });
+
+            this.RegisterResultCommand = new CommandBase<object>(_ => true, _ =>
+             {
+                 if (this.SearchResult.Count <= 0)
+                 {
+                     this.MessageQueue.Enqueue("検索結果が空です");
+                     this.Message = "検索結果が空のためプレイリストに動画を追加できません。";
+                     return;
+                 }
+
+                 var videos = this.SearchResult.Where(v => v.IsSelected).Select(v=> {
+                     v.IsSelected = false;
+                     return v;
+                 }).Copy();
+
+                 if (videos.Count() <= 0)
+                 {
+
+                     this.MessageQueue.Enqueue("動画が選択されていません");
+                     this.Message = "動画が選択されていないためプレイリストに動画を追加できません。";
+                     return;
+                 }
+
+                 var result = WS::SettingPage.VideoListContainer.AddRange(videos);
+
+                 if (!result.IsSucceeded)
+                 {
+                     this.Message = $"登録に失敗しました。(詳細:{result.Message})";
+                     this.MessageQueue.Enqueue("登録に失敗しました");
+                 }
+                 else
+                 {
+
+                     this.Message = $"{videos.Count()}件の動画を登録しました。(詳細:{result.Message})";
+                     this.MessageQueue.Enqueue("登録しました");
+                     this.SearchResult.Clear();
+                 }
+
+
+
+             });
+
 
         }
 
@@ -177,6 +224,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         private bool isAllSelectedField;
 
         private int pageField;
+
+        private DateTime uploadDTStartField;
+
+        private DateTime uploadDTEndFIeld;
 
         private ComboboxItem<Search::ISortOption> sortField;
 
@@ -220,7 +271,19 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// 全選択フラグ
         /// </summary>
-        public bool IsAllSelected { get => this.isAllSelectedField; set => this.SetProperty(ref this.isAllSelectedField, value); }
+        public bool IsAllSelected
+        {
+            get => this.isAllSelectedField;
+            set
+            {
+                foreach (var video in this.SearchResult)
+                {
+                    video.IsSelected = value;
+                }
+
+                this.SetProperty(ref this.isAllSelectedField, value);
+            }
+        }
 
         /// <summary>
         /// ページ
@@ -233,6 +296,16 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                 this.SetProperty(ref this.pageField, value);
             }
         }
+
+        /// <summary>
+        /// アップロード日時起点
+        /// </summary>
+        public DateTime UploadDTStart { get => this.uploadDTStartField; set => this.SetProperty(ref this.uploadDTStartField, value); }
+
+        /// <summary>
+        /// アップロード日時終点
+        /// </summary>
+        public DateTime UploadDTEnd { get => this.uploadDTEndFIeld; set => this.SetProperty(ref this.uploadDTEndFIeld, value); }
 
         /// <summary>
         /// ソート設定
@@ -277,17 +350,23 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// 次のページを取得
         /// </summary>
-        public CommandBase<object> IncrementPageCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+        public CommandBase<object> IncrementPageCommand { get; init; }
 
         /// <summary>
         /// 前のページを取得
         /// </summary>
-        public CommandBase<object> DecrementPageCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+        public CommandBase<object> DecrementPageCommand { get; init; }
 
         /// <summary>
         /// 検索コマンド
         /// </summary>
-        public CommandBase<object> SearchCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+        public CommandBase<object> SearchCommand { get; init; }
+
+        /// <summary>
+        /// 検索結果登録コマンド
+        /// </summary>
+        public CommandBase<object> RegisterResultCommand { get; init; }
+
 
     }
 
@@ -350,6 +429,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         public int Page { get; set; } = 1;
 
+        public DateTime UploadDTStart { get; set; } = DateTime.Now;
+
+        public DateTime UploadDTEnd { get; set; } = DateTime.Now;
+
         public ComboboxItem<Search::ISortOption> Sort { get; set; }
 
         public ComboboxItem<Search::Genre> Genre { get; set; }
@@ -371,6 +454,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public CommandBase<object> DecrementPageCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
 
         public CommandBase<object> SearchCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public CommandBase<object> RegisterResultCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
 
     }
 
