@@ -63,7 +63,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
 
         public Genre Genre { get; set; }
 
-        public ISortOption SortOption { get; set; } = new SortOption() { Sort = Sort.ViewCount};
+        public ISortOption SortOption { get; set; } = new SortOption() { Sort = Sort.ViewCount };
 
         public string Query { get; set; } = string.Empty;
 
@@ -71,6 +71,6 @@ namespace Niconicome.Models.Domain.Niconico.Search
 
         public DateTimeOffset? UploadedDateTimeEnd { get; set; }
 
-        public int Page { get; set; }
+        public int Page { get; set; } = 1;
     }
 }
