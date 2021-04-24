@@ -3,6 +3,7 @@ using System;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Niconico.Search;
 
 namespace NiconicomeTest.Utils
 {
@@ -101,7 +102,7 @@ namespace NiconicomeTest.Utils
             var result = this.utils!.GetID(url, type);
 
             Assert.That(result, Is.EqualTo(id));
-        } 
+        }
 
         [TestCase("[<id>]<title>", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師")]
         [TestCase("[<id>]<title>（<owner>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（中の）")]
@@ -125,6 +126,35 @@ namespace NiconicomeTest.Utils
             var result = this.utils!.GetFileName(format, dmc, string.Empty, true);
 
             Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=v&order=d", "東方", SearchType.Tag, Sort.ViewCount, false)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=f&order=d", "東方", SearchType.Tag, Sort.UploadedTime, false)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=m&order=d", "東方", SearchType.Tag, Sort.MylistCount, false)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=n&order=d", "東方", SearchType.Tag, Sort.LastCommentTime, false)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=r&order=d", "東方", SearchType.Tag, Sort.CommentCount, false)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=l&order=d", "東方", SearchType.Tag, Sort.Length, false)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=v&order=a", "東方", SearchType.Tag, Sort.ViewCount, true)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=f&order=a", "東方", SearchType.Tag, Sort.UploadedTime, true)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=m&order=a", "東方", SearchType.Tag, Sort.MylistCount, true)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=n&order=a", "東方", SearchType.Tag, Sort.LastCommentTime, true)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=r&order=a", "東方", SearchType.Tag, Sort.CommentCount, true)]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=l&order=a", "東方", SearchType.Tag, Sort.Length, true)]
+        public void 検索URLからクエリを取得する(string url, string kw, SearchType searchType, Sort sort, bool isAscending)
+        {
+            var result = this.utils!.GetQueryFromUrl(url);
+
+            Assert.That(result.Query, Is.EqualTo(kw));
+            Assert.That(result.SearchType, Is.EqualTo(searchType));
+            Assert.That(result.SortOption.Sort, Is.EqualTo(sort));
+            Assert.That(result.SortOption.IsAscending, Is.EqualTo(isAscending));
+        }
+
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=h&order=d")]
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=h&order=a")]
+        public void 対応していない検索URLからクエリを取得する(string url)
+        {
+            Assert.Throws<ArgumentException>(() => this.utils!.GetQueryFromUrl(url));
         }
     }
 }
