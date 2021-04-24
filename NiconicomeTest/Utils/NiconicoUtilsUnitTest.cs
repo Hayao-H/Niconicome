@@ -169,5 +169,15 @@ namespace NiconicomeTest.Utils
             Assert.Throws<ArgumentException>(() => this.utils!.GetQueryFromUrl(url));
         }
 
+        [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=v&order=d", true)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=l&order=a", true)]
+        [TestCase(@"hoge", false)]
+        [TestCase(@"https://www.google.com", false)]
+        public void 検索URLをテストする(string url, bool expected)
+        {
+            var result = this.utils!.IsSearchUrl(url);
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
     }
 }

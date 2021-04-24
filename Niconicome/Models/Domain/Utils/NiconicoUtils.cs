@@ -21,6 +21,7 @@ namespace Niconicome.Models.Domain.Utils
         string GetIdFromFIleName(string filenameWithExt);
         bool IsNiconicoID(string testString);
         RemoteType GetRemoteType(string url);
+        bool IsSearchUrl(string url);
         ISearchQuery GetQueryFromUrl(string url);
         string GetID(string url, RemoteType type);
     }
@@ -283,6 +284,23 @@ namespace Niconicome.Models.Domain.Utils
 
 
         }
+
+        /// <summary>
+        /// 検索URLをテストする
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public bool IsSearchUrl(string url)
+        {
+            //そもそもURLじゃない
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            {
+                return false;
+            }
+
+            return Regex.IsMatch(url, @"https?://(www\.)?nicovideo\.jp/(search|tag)/.*");
+        }
+
 
 
         /// <summary>
