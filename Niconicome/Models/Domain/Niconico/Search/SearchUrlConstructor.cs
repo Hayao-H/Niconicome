@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Const;
+using System.Web;
 
 namespace Niconicome.Models.Domain.Niconico.Search
 {
@@ -90,8 +91,8 @@ namespace Niconicome.Models.Domain.Niconico.Search
                     {
                         Type = "range",
                         Field = "startTime",
-                        From = query.UploadedDateTimeStart,
-                        To = query.UploadedDateTimeEnd ?? DateTimeOffset.Now,
+                        From = HttpUtility.UrlEncode(query.UploadedDateTimeStart?.ToString(Format.ISO8601)),
+                        To = HttpUtility.UrlEncode(query.UploadedDateTimeEnd?.ToString(Format.ISO8601)),
                         IncludeLower = true,
                         IncludeUpper = true,
                     };
@@ -135,10 +136,10 @@ namespace Niconicome.Models.Domain.Niconico.Search
         public string? Value { get; set; }
 
         [JsonPropertyName("from")]
-        public DateTimeOffset? From { get; set; }
+        public string? From { get; set; }
 
         [JsonPropertyName("to")]
-        public DateTimeOffset? To { get; set; }
+        public string? To { get; set; }
 
         [JsonPropertyName("include_lower")]
         public bool? IncludeLower { get; set; }
