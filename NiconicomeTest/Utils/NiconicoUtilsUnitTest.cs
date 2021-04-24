@@ -140,6 +140,18 @@ namespace NiconicomeTest.Utils
         [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=n&order=a", "東方", SearchType.Tag, Sort.LastCommentTime, true)]
         [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=r&order=a", "東方", SearchType.Tag, Sort.CommentCount, true)]
         [TestCase(@"https://www.nicovideo.jp/tag/%E6%9D%B1%E6%96%B9?sort=l&order=a", "東方", SearchType.Tag, Sort.Length, true)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=v&order=d", "東方", SearchType.Keyword, Sort.ViewCount, false)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=f&order=d", "東方", SearchType.Keyword, Sort.UploadedTime, false)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=m&order=d", "東方", SearchType.Keyword, Sort.MylistCount, false)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=n&order=d", "東方", SearchType.Keyword, Sort.LastCommentTime, false)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=r&order=d", "東方", SearchType.Keyword, Sort.CommentCount, false)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=l&order=d", "東方", SearchType.Keyword, Sort.Length, false)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=v&order=a", "東方", SearchType.Keyword, Sort.ViewCount, true)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=f&order=a", "東方", SearchType.Keyword, Sort.UploadedTime, true)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=m&order=a", "東方", SearchType.Keyword, Sort.MylistCount, true)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=n&order=a", "東方", SearchType.Keyword, Sort.LastCommentTime, true)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=r&order=a", "東方", SearchType.Keyword, Sort.CommentCount, true)]
+        [TestCase(@"https://www.nicovideo.jp/search/%E6%9D%B1%E6%96%B9?sort=l&order=a", "東方", SearchType.Keyword, Sort.Length, true)]
         public void 検索URLからクエリを取得する(string url, string kw, SearchType searchType, Sort sort, bool isAscending)
         {
             var result = this.utils!.GetQueryFromUrl(url);
@@ -156,5 +168,6 @@ namespace NiconicomeTest.Utils
         {
             Assert.Throws<ArgumentException>(() => this.utils!.GetQueryFromUrl(url));
         }
+
     }
 }
