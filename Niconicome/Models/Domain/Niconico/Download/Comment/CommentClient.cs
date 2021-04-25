@@ -145,6 +145,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             if (token.IsCancellationRequested) throw new TaskCanceledException("コメントのダウンロードがキャンセルされました。");
 
+            messenger.SendMessage($"コメントの正規化処理を開始します。");
+            comments.Distinct();
+            messenger.SendMessage($"コメントの正規化処理が完了しました。");
+
             this.logger.Log($"コメントのダウンロードが完了しました。({comments.Count}コメント, {context.GetLogContent()})");
 
             return comments;

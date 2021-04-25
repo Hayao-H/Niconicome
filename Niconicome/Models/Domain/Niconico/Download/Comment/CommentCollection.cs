@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment
@@ -67,7 +68,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private readonly List<ICommentCollection> childCollections = new();
 
-        private readonly List<long> CommentNumbers = new();
+        private readonly LinkedList<long> CommentNumbers = new();
 
         public const int NumberToThrough = 40;
 
@@ -151,7 +152,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                         count += child.Count;
                     }
                     return count;
-                } else
+                }
+                else
                 {
                     return this.commentsfield.Count;
                 }
@@ -227,7 +229,15 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                     if (!this.unsafeHandle)
                     {
                         if (this.CommentNumbers.Contains(comment.Chat.No)) return;
-                        this.CommentNumbers.Add(comment.Chat.No);
+                        this.CommentNumbers.AddLast(comment.Chat.No);
+
+                        if (this.CommentNumbers.Count > 5000)
+                        {
+                            foreach (var _ in Enumerable.Range(0, 2000))
+                            {
+                                this.CommentNumbers.RemoveFirst();
+                            }
+                        }
                     }
                     this.commentsfield.AddFirst(comment);
                     this.isSorted = false;
@@ -247,34 +257,50 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         public void Add(List<Response::Comment> comments, bool addSafe = true)
         {
             bool nicoruEnded = false;
-            int skipped = 0;
-            int cCounts = comments.Where(c => c.Chat is not null).Count();
-            var first = this.GetFirstComment();
-            bool isFirstIsOldEnough = first is null ? false : first.No < this.comThroughSetting + 10;
 
+            var chats = new LinkedList<Response::Comment>();
+
+            //チャットを抽出する
+            //LinkedListはAddFirstなので逆転させて処理する
             foreach (var item in comments)
             {
-                if (item.Chat is not null)
+                if (item.Chat is null) continue;
+
+                if (!nicoruEnded && item.Chat!.Nicoru is not null)
                 {
-                    if (!nicoruEnded && item.Chat.Nicoru is not null)
-                    {
-                        continue;
-                    }
-                    else if (!nicoruEnded && item.Chat.Nicoru is null)
-                    {
-                        nicoruEnded = true;
-                    }
+                    continue;
+                }
+                else if (!nicoruEnded && item.Chat!.Nicoru is null)
+                {
+                    nicoruEnded = true;
                 }
 
-                if (addSafe && !isFirstIsOldEnough && this.comThroughSetting > 0 && cCounts > this.comThroughSetting + 20 && item.Chat is not null)
+                //ここで逆転させる
+                chats.AddFirst(item);
+            }
+
+            //最初の方にある古いコメントを除去する
+            //この時点では降順
+            if (addSafe && chats.Count > this.comThroughSetting + 20)
+            {
+                var first = this.GetFirstComment();
+                bool isFirstIsOldEnough = first is null ? false : first.No < this.comThroughSetting + 10;
+
+                foreach (var _ in Enumerable.Range(0, this.comThroughSetting))
                 {
-                    if (skipped < this.comThroughSetting)
-                    {
-                        ++skipped;
-                        continue;
-                    }
+                    chats.RemoveLast();
                 }
+            }
+
+            foreach (var item in chats)
+            {
                 this.Add(item, false);
+            }
+
+            var thread = comments.FirstOrDefault(c => c.Thread is not null);
+            if (thread is not null)
+            {
+                this.Add(thread, false);
             }
         }
 
@@ -301,9 +327,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// </summary>
         public void Distinct()
         {
-            var copy = this.Clone();
-            this.commentsfield.Clear();
-            this.AddRange(copy.Comments.Distinct(c => c.Chat!.No));
+            if (this.isRoot)
+            {
+                foreach (var child in this.childCollections)
+                {
+                    child.Distinct();
+                }
+            } else
+            {
+                var copy = this.Clone();
+                this.commentsfield.Clear();
+                this.AddRange(copy.Comments.Distinct(c => c.Chat!.No));
+            }
         }
 
         /// <summary>
@@ -386,7 +421,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (this.isRoot) return;
 
             var copy = this.commentsfield.ToList();
-            copy.Sort((a, b) => (int)(a.Chat!.No - b.Chat!.No));
+            copy.Sort((a, b) => (int)(b.Chat!.No - a.Chat!.No));
             this.commentsfield.Clear();
             this.AddRange(copy);
             this.isSorted = true;
