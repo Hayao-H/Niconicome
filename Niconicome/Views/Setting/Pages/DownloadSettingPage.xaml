@@ -17,7 +17,7 @@
         Background="{DynamicResource MaterialDesignBackground}"
         d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingPageViewModelD},IsDesignTimeCreatable=True}"
         FontFamily="Yu Gothic"
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="800"
       Title="ダウンロード設定">
     <Grid>
         <Grid.RowDefinitions>
@@ -117,6 +117,17 @@
                 <Label Content="一時フォルダーの最大保持数" ToolTip="DLをレジュームできる動画の最大数です。" />
                 <TextBox Text="{Binding MaxTmpDirCount}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
             </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="ClockFast" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label ToolTip="コメントのDL速度は大きくなりますが、コメント数指定が効かなくなる可能性があります。" Content="安全なコメントのダウンロードを無効にする" />
+                <ToggleButton IsChecked="{Binding IsUnsafeCommentHandleEnable}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
 
 

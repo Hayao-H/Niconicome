@@ -42,6 +42,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.isDownloadFromQueueEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
             this.isDupeOnStageAllowedField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
             this.isOverrideVideoFileDTToUploadedDTField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
+            this.isUnsafeCommentHandleEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.UnsafeCommentHandle);
 
             var n1 = new ComboboxItem<int>(1, "1");
             var n2 = new ComboboxItem<int>(2, "2");
@@ -72,6 +73,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         }
 
+        #region 設定値のフィールド
         private int commentOffsetField;
 
         private bool isAutoSwitchOffsetEnableField;
@@ -90,7 +92,10 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         private bool isDownloadResumingEnableField;
 
+        private bool isUnsafeCommentHandleEnableField;
+
         private int maxTmpDirCountField;
+        #endregion
 
         public List<ComboboxItem<int>> SelectableMaxParallelDownloadCount { get; init; }
 
@@ -152,6 +157,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         public bool IsDownloadResumingEnable { get => this.isDownloadResumingEnableField; set => this.Savesetting(ref this.isDownloadResumingEnableField, value, Settings.EnableResume); }
 
         /// <summary>
+        /// 安全でないコメントハンドルを有効にする
+        /// </summary>
+        public bool IsUnsafeCommentHandleEnable { get => this.isUnsafeCommentHandleEnableField; set => this.Savesetting(ref this.isUnsafeCommentHandleEnableField, value, Settings.UnsafeCommentHandle); }
+
+
+        /// <summary>
         /// 一時フォルダーの最大保持数
         /// </summary>
         public int MaxTmpDirCount { get => this.maxTmpDirCountField; set => this.Savesetting(ref this.maxTmpDirCountField, value, Settings.MaxTmpDirCount); }
@@ -193,6 +204,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public bool IsDownloadVideoInfoInJsonEnable { get; set; } = true;
 
         public bool IsDownloadResumingEnable { get; set; } = true;
+
+        public bool IsUnsafeCommentHandleEnable { get; set; } = false;
 
         public int MaxTmpDirCount { get; set; } = 20;
     }
