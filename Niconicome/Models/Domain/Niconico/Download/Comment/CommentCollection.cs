@@ -41,36 +41,41 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             this.ThreadInfo = original.ThreadInfo;
         }
 
-        public CommentCollection(int cOffset, long defaultThread, int defaultFork)
+        public CommentCollection(int cOffset, long defaultThread, int defaultFork, bool unsafeHandle)
         {
             this.comThroughSetting = cOffset;
             this.isRoot = true;
             this.defaultTread = defaultThread;
             this.defaultFork = defaultFork;
+            this.unsafeHandle = unsafeHandle;
         }
 
-        public CommentCollection(long thread, int fork, bool isDefault)
+        public CommentCollection(long thread, int fork, bool isDefault, bool unsafeHandle)
         {
             this.Thread = thread;
             this.Fork = fork;
             this.IsDefaultPostTarget = isDefault;
-
+            this.unsafeHandle = unsafeHandle;
         }
 
-        public static ICommentCollection GetInstance(int cOffset, long defaultThread, int defaultFork)
+        public static ICommentCollection GetInstance(int cOffset, long defaultThread, int defaultFork, bool unsafeHandle)
         {
-            return new CommentCollection(cOffset, defaultThread, defaultFork);
+            return new CommentCollection(cOffset, defaultThread, defaultFork, unsafeHandle);
         }
 
         private readonly LinkedList<Response::Comment> commentsfield = new();
 
         private readonly List<ICommentCollection> childCollections = new();
 
+        private readonly List<long> CommentNumbers = new();
+
         public const int NumberToThrough = 40;
 
         private readonly int comThroughSetting;
 
         private readonly bool isRoot;
+
+        private readonly bool unsafeHandle;
 
         private readonly long defaultTread;
 
@@ -121,7 +126,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else
                 {
-                    if (!this.isSorted)
+                    if (!this.unsafeHandle && !this.isSorted)
                     {
                         this.Sort();
                     }
@@ -134,7 +139,24 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <summary>
         /// 要素数
         /// </summary>
-        public int Count { get => this.Comments.Count; }
+        public int Count
+        {
+            get
+            {
+                if (this.isRoot)
+                {
+                    var count = 0;
+                    foreach (var child in this.childCollections)
+                    {
+                        count += child.Count;
+                    }
+                    return count;
+                } else
+                {
+                    return this.commentsfield.Count;
+                }
+            }
+        }
 
         /// <summary>
         /// スレッド
@@ -155,6 +177,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             private set => this.threadInfoField = value;
         }
 
+        #region 操作系メソッド
         /// <summary>
         /// コメントを追加
         /// </summary>
@@ -201,6 +224,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else if (comment.Chat is not null)
                 {
+                    if (!this.unsafeHandle)
+                    {
+                        if (this.CommentNumbers.Contains(comment.Chat.No)) return;
+                        this.CommentNumbers.Add(comment.Chat.No);
+                    }
                     this.commentsfield.AddFirst(comment);
                     this.isSorted = false;
                 }
@@ -392,6 +420,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             }
         }
 
+        #endregion
+
         #region private
 
         /// <summary>
@@ -416,7 +446,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             var isDefault = thread == this.defaultTread && fork == this.defaultFork;
 
-            this.childCollections.Add(new CommentCollection(thread, fork, isDefault));
+            this.childCollections.Add(new CommentCollection(thread, fork, isDefault, this.unsafeHandle));
         }
 
         /// <summary>
