@@ -54,6 +54,22 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
+            //幅
+            var scWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWSelectColumnWid);
+            var idWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWIDColumnWid);
+            var titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWTitleColumnWid);
+            var uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWUploadColumnWid);
+            var vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWViewCountColumnWid);
+            var dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWDownloadedFlagColumnWid);
+            var stWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWStateColumnWid);
+            this.SelectColumnWidth = scWidth <= 0 ? 150 : scWidth;
+            this.IDColumnWidth = idWidth <= 0 ? 150 : idWidth;
+            this.TitleColumnWidth = titleWIdth <= 0 ? 150 : titleWIdth;
+            this.UploadColumnWidth = uploadWidth <= 0 ? 150 : uploadWidth;
+            this.ViewCountColumnWidth = vctWidth <= 0 ? 150 : vctWidth;
+            this.DownloadedFlagColumnWidth = dlfWidth <= 0 ? 150 : dlfWidth;
+            this.StateColumnWidth = stWidth <= 0 ? 150 : stWidth;
+
             //メッセージハンドラーにイベントハンドラを追加する
             WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
 
@@ -842,6 +858,57 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public string PlaylistTitle { get => this.playlistTitleFIeld; set => this.SetProperty(ref this.playlistTitleFIeld, value); }
 
+        #region Width
+        public int selectColumnWidthField;
+
+        public int iDColumnWidthField;
+
+        public int titleColumnWidthField;
+
+        public int uploadColumnWidthField;
+
+        public int viewCountColumnWidthField;
+
+        public int downloadedFlagColumnWidthField;
+
+        public int stateColumnWidthField;
+
+        /// <summary>
+        /// 選択
+        /// </summary>
+        public int SelectColumnWidth { get => this.selectColumnWidthField; set => this.SetProperty(ref this.selectColumnWidthField, value); }
+
+        /// <summary>
+        /// ID
+        /// </summary>
+        public int IDColumnWidth { get => this.iDColumnWidthField; set => this.SetProperty(ref this.iDColumnWidthField, value); }
+
+        /// <summary>
+        /// タイトル
+        /// </summary>
+        public int TitleColumnWidth { get => this.titleColumnWidthField; set => this.SetProperty(ref this.titleColumnWidthField, value); }
+
+        /// <summary>
+        /// 投稿日時
+        /// </summary>
+        public int UploadColumnWidth { get => this.uploadColumnWidthField; set => this.SetProperty(ref this.uploadColumnWidthField, value); }
+
+        /// <summary>
+        /// 再生回数
+        /// </summary>
+        public int ViewCountColumnWidth { get => this.viewCountColumnWidthField; set => this.SetProperty(ref this.viewCountColumnWidthField, value); }
+
+        /// <summary>
+        /// DL済み
+        /// </summary>
+        public int DownloadedFlagColumnWidth { get => this.downloadedFlagColumnWidthField; set => this.SetProperty(ref this.downloadedFlagColumnWidthField, value); }
+
+        /// <summary>
+        /// 状態
+        /// </summary>
+        public int StateColumnWidth { get => this.stateColumnWidthField; set => this.SetProperty(ref this.stateColumnWidthField, value); }
+        #endregion
+
         private string inputStringFIeld = string.Empty;
 
         private string playlistTitleFIeld = string.Empty;
@@ -906,6 +973,20 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
             this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
+        }
+
+        /// <summary>
+        /// 幅を保持する
+        /// </summary>
+        public void SaveColumnWidth()
+        {
+            WS::Mainpage.SettingHandler.SaveSetting(this.SelectColumnWidth, Settings.MWSelectColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.IDColumnWidth, Settings.MWIDColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.TitleColumnWidth, Settings.MWTitleColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.UploadColumnWidth, Settings.MWUploadColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.ViewCountColumnWidth, Settings.MWViewCountColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.DownloadedFlagColumnWidth, Settings.MWDownloadedFlagColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.StateColumnWidth, Settings.MWStateColumnWid);
         }
 
         #region private
@@ -1128,6 +1209,20 @@ namespace Niconicome.ViewModels.Mainpage
         public bool IsFilteringFromAllVideos { get; set; } = false;
 
         public string PlaylistTitle { get; set; } = "空白のプレイリスト";
+
+        public int SelectColumnWidth { get; set; }
+
+        public int IDColumnWidth { get; set; }
+
+        public int TitleColumnWidth { get; set; }
+
+        public int UploadColumnWidth { get; set; }
+
+        public int ViewCountColumnWidth { get; set; }
+
+        public int DownloadedFlagColumnWidth { get; set; }
+
+        public int StateColumnWidth { get; set; }
     }
 
     /// <summary>
