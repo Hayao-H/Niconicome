@@ -46,6 +46,7 @@ namespace Niconicome.Models.Network.Download
         bool IsReplaceStrictedEnable { get; }
         bool OverrideVideoFileDateToUploadedDT { get; }
         bool ResumeEnable { get; }
+        bool EnableUnsafeCommentHandle { get; }
         string NiconicoId { get; }
         string FolderPath { get; }
         uint VerticalResolution { get; }
@@ -715,6 +716,8 @@ namespace Niconicome.Models.Network.Download
 
         public bool ResumeEnable { get; set; }
 
+        public bool EnableUnsafeCommentHandle { get; set; }
+
         public uint VerticalResolution { get; set; }
 
         public int PlaylistID { get; set; }
@@ -768,6 +771,7 @@ namespace Niconicome.Models.Network.Download
                 CommentOffset = commentOffset,
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
                 MaxcommentsCount = this.MaxCommentsCount,
+                IsUnsafeHandleEnable = this.EnableUnsafeCommentHandle,
             };
         }
 

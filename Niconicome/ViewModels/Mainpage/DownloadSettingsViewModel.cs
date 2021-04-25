@@ -295,6 +295,7 @@ namespace Niconicome.ViewModels.Mainpage
             var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
             var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
             var resumeEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.EnableResume);
+            var unsafeHandle = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.UnsafeCommentHandle);
             string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
 
             return new DownloadSettings
@@ -316,6 +317,8 @@ namespace Niconicome.ViewModels.Mainpage
                 MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,
                 DownloadVideoInfo = this.IsDownloadingVideoInfoEnable,
                 ResumeEnable = resumeEnable,
+                EnableUnsafeCommentHandle = unsafeHandle,
+
             };
         }
     }

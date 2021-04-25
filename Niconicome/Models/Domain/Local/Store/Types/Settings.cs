@@ -147,5 +147,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string IsResumeEnable { get; private set; } = "isresumeenable";
         public static string MaxTmpSegmentsDirCount { get; private set; } = "maxtmpsegmentsdircount";
         public static string StoreOnlyNiconicoIDOnRegister { get; private set; } = "storeonlyniconicoidonregister";
+        public static string EnableUnsafeCommentHandle { get; private set; } = "enableunsafecommenthandle";
     }
 }

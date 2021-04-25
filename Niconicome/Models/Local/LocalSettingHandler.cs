@@ -158,6 +158,7 @@ namespace Niconicome.Models.Local
                 Settings.EnableResume => STypes::SettingNames.IsResumeEnable,
                 Settings.MaxTmpDirCount => STypes::SettingNames.MaxTmpSegmentsDirCount,
                 Settings.StoreOnlyNiconicoID => STypes::SettingNames.StoreOnlyNiconicoIDOnRegister,
+                Settings.UnsafeCommentHandle => STypes::SettingNames.EnableUnsafeCommentHandle,
                 _ => null
             };
         }
@@ -206,5 +207,6 @@ namespace Niconicome.Models.Local
         EnableResume,
         MaxTmpDirCount,
         StoreOnlyNiconicoID,
+        UnsafeCommentHandle,
     }
 }

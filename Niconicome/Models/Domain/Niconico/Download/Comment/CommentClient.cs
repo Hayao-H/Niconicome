@@ -22,6 +22,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         bool IsDownloadingOwnerCommentEnable { get; }
         bool IsDownloadingEasyCommentEnable { get; }
         bool IsReplaceStrictedEnable { get; }
+        bool IsUnsafeHandleEnable { get; }
         int CommentOffset { get; }
         int MaxcommentsCount { get; }
     }
@@ -50,6 +51,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         public bool IsDownloadingEasyCommentEnable { get; set; }
 
         public bool IsReplaceStrictedEnable { get; set; }
+
+        public bool IsUnsafeHandleEnable { get; set; }
 
         public int CommentOffset { get; set; }
 
@@ -89,7 +92,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             if (dThread == -1 || dFork == -1) throw new InvalidOperationException("DefaultPostTargetが見つかりません。");
 
-            var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork);
+            var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork,settings.IsUnsafeHandleEnable);
             Response::Chat? first = null;
             int index = 0;
             long lastNo = 0;
@@ -141,6 +144,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             } while (first?.No > 1 && !token.IsCancellationRequested);
 
             if (token.IsCancellationRequested) throw new TaskCanceledException("コメントのダウンロードがキャンセルされました。");
+
+            messenger.SendMessage($"コメントの正規化処理を開始します。");
+            comments.Distinct();
+            messenger.SendMessage($"コメントの正規化処理が完了しました。");
 
             this.logger.Log($"コメントのダウンロードが完了しました。({comments.Count}コメント, {context.GetLogContent()})");
 
