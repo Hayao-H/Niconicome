@@ -250,32 +250,32 @@
                                     </i:Interaction.Behaviors>
                                     <ListView.View>
                                         <GridView>
-                                            <GridViewColumn Header="選択">
+                                            <GridViewColumn Header="選択" Width="{Binding SelectColumnWidth,Mode=TwoWay}">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-                                            <GridViewColumn >
+                                            <GridViewColumn Width="{Binding ThumbColumnWidth}">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <Image Source="{Binding BindableThumbPath,UpdateSourceTrigger=PropertyChanged}" Height="80"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-                                            <GridViewColumn Width="150" Header="ID" DisplayMemberBinding="{Binding NiconicoId}"/>
-                                            <GridViewColumn Header="タイトル">
+                                            <GridViewColumn Width="{Binding IDColumnWidth,Mode=TwoWay}" Header="ID" DisplayMemberBinding="{Binding NiconicoId}"/>
+                                            <GridViewColumn Width="{Binding TitleColumnWidth,Mode=TwoWay}" Header="タイトル">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <TextBlock Text="{Binding Title}" ToolTip="{Binding Title}"/>
+                                                        <TextBlock Text="{Binding Title,Mode=TwoWay}" ToolTip="{Binding Title}"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-                                            <GridViewColumn Header="投稿日" DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
-                                            <GridViewColumn Header="再生回数" DisplayMemberBinding="{Binding ViewCount}"/>
-                                            <GridViewColumn Header="DL済み" DisplayMemberBinding="{Binding IsDownloaded,Converter={StaticResource BooleanCircleConverter}}"/>
-                                            <GridViewColumn Header="状態" DisplayMemberBinding="{Binding Message}"/>
+                                            <GridViewColumn Width="{Binding UploadColumnWidth,Mode=TwoWay}" Header="投稿日" DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
+                                            <GridViewColumn Width="{Binding ViewCountColumnWidth,Mode=TwoWay}" Header="再生回数" DisplayMemberBinding="{Binding ViewCount}"/>
+                                            <GridViewColumn Width="{Binding DownloadedFlagColumnWidth,Mode=TwoWay}" Header="DL済み" DisplayMemberBinding="{Binding IsDownloaded,Converter={StaticResource BooleanCircleConverter}}"/>
+                                            <GridViewColumn Width="{Binding StateColumnWidth,Mode=TwoWay}" Header="状態" DisplayMemberBinding="{Binding Message}"/>
                                         </GridView>
                                     </ListView.View>
                                     <ListView.ItemContainerStyle>

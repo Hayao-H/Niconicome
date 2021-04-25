@@ -148,5 +148,15 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string MaxTmpSegmentsDirCount { get; private set; } = "maxtmpsegmentsdircount";
         public static string StoreOnlyNiconicoIDOnRegister { get; private set; } = "storeonlyniconicoidonregister";
         public static string EnableUnsafeCommentHandle { get; private set; } = "enableunsafecommenthandle";
+        public static string MainWindowSelectColumnWidth { get; private set; } = "mainwindowselectcolumnwidth";
+        public static string MainWindowIDColumnWidth { get; private set; } = "mainwindowidcolumnwidth";
+        public static string MainWindowTitleColumnWidth { get; private set; } = "mainwindowtitlecolumnwidth";
+        public static string MainWindowUploadColumnWidth { get; private set; } = "mainwindowuploadcolumnwidth";
+        public static string MainWindowViewCountColumnWidth { get; private set; } = "mainwindowviewcountcolumnwidth";
+        public static string MainWindowDownloadedFlagColumnWidth { get; private set; } = "mainwindowdownloadedflagcolumnwidth";
+        public static string MainWindowStateColumnWidth { get; private set; } = "mainwindowstatecolumnwidth";
+        public static string MainWindowThumbnailColumnWidth { get; private set; } = "mainwindowthumbnailcolumnwidth";
+
+
     }
 }

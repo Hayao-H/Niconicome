@@ -239,7 +239,10 @@ namespace Niconicome.ViewModels.Mainpage
         {
             if (sender is null || sender.AsNullable<Window>() is not Window window) return;
             if (window != Application.Current.MainWindow) return;
+            if (window is not MainWindow mw) return;
+            if (mw.videolist.DataContext is not VideoListViewModel listVM) return;
 
+            listVM.SaveColumnWidth();
             WS::Mainpage.Shutdown.ShutdownApp();
         }
     }

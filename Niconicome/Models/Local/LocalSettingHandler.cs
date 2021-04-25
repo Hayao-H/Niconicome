@@ -159,6 +159,14 @@ namespace Niconicome.Models.Local
                 Settings.MaxTmpDirCount => STypes::SettingNames.MaxTmpSegmentsDirCount,
                 Settings.StoreOnlyNiconicoID => STypes::SettingNames.StoreOnlyNiconicoIDOnRegister,
                 Settings.UnsafeCommentHandle => STypes::SettingNames.EnableUnsafeCommentHandle,
+                Settings.MWSelectColumnWid => STypes::SettingNames.MainWindowSelectColumnWidth,
+                Settings.MWIDColumnWid => STypes::SettingNames.MainWindowIDColumnWidth,
+                Settings.MWTitleColumnWid => STypes::SettingNames.MainWindowTitleColumnWidth,
+                Settings.MWUploadColumnWid => STypes::SettingNames.MainWindowUploadColumnWidth,
+                Settings.MWViewCountColumnWid => STypes::SettingNames.MainWindowViewCountColumnWidth,
+                Settings.MWDownloadedFlagColumnWid => STypes::SettingNames.MainWindowDownloadedFlagColumnWidth,
+                Settings.MWStateColumnWid => STypes::SettingNames.MainWindowStateColumnWidth,
+                Settings.MWThumbColumnWid=>STypes::SettingNames.MainWindowThumbnailColumnWidth,
                 _ => null
             };
         }
@@ -208,5 +216,13 @@ namespace Niconicome.Models.Local
         MaxTmpDirCount,
         StoreOnlyNiconicoID,
         UnsafeCommentHandle,
+        MWSelectColumnWid,
+        MWIDColumnWid,
+        MWTitleColumnWid,
+        MWUploadColumnWid,
+        MWViewCountColumnWid,
+        MWDownloadedFlagColumnWid,
+        MWStateColumnWid,
+        MWThumbColumnWid,
     }
 }
