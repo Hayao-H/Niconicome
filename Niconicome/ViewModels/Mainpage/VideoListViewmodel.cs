@@ -997,6 +997,7 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.SettingHandler.SaveSetting(this.ViewCountColumnWidth, Settings.MWViewCountColumnWid);
             WS::Mainpage.SettingHandler.SaveSetting(this.DownloadedFlagColumnWidth, Settings.MWDownloadedFlagColumnWid);
             WS::Mainpage.SettingHandler.SaveSetting(this.StateColumnWidth, Settings.MWStateColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.ThumbColumnWidth, Settings.MWThumbColumnWid);
         }
 
         #region private
