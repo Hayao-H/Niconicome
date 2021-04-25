@@ -62,13 +62,15 @@ namespace Niconicome.ViewModels.Mainpage
             var vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWViewCountColumnWid);
             var dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWDownloadedFlagColumnWid);
             var stWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWStateColumnWid);
-            this.SelectColumnWidth = scWidth <= 0 ? 150 : scWidth;
-            this.IDColumnWidth = idWidth <= 0 ? 150 : idWidth;
-            this.TitleColumnWidth = titleWIdth <= 0 ? 150 : titleWIdth;
-            this.UploadColumnWidth = uploadWidth <= 0 ? 150 : uploadWidth;
-            this.ViewCountColumnWidth = vctWidth <= 0 ? 150 : vctWidth;
-            this.DownloadedFlagColumnWidth = dlfWidth <= 0 ? 150 : dlfWidth;
-            this.StateColumnWidth = stWidth <= 0 ? 150 : stWidth;
+            var tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWThumbColumnWid);
+            this.selectColumnWidthField = scWidth <= 0 ? 150 : scWidth;
+            this.iDColumnWidthField = idWidth <= 0 ? 150 : idWidth;
+            this.titleColumnWidthField = titleWIdth <= 0 ? 150 : titleWIdth;
+            this.uploadColumnWidthField = uploadWidth <= 0 ? 150 : uploadWidth;
+            this.viewCountColumnWidthField = vctWidth <= 0 ? 150 : vctWidth;
+            this.downloadedFlagColumnWidthField = dlfWidth <= 0 ? 150 : dlfWidth;
+            this.stateColumnWidthField = stWidth <= 0 ? 150 : stWidth;
+            this.thumbColumnWidthField = tnWidth <= 0 ? 150 : tnWidth;
 
             //メッセージハンドラーにイベントハンドラを追加する
             WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
@@ -873,6 +875,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public int stateColumnWidthField;
 
+        public int thumbColumnWidthField;
+
         /// <summary>
         /// 選択
         /// </summary>
@@ -907,6 +911,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// 状態
         /// </summary>
         public int StateColumnWidth { get => this.stateColumnWidthField; set => this.SetProperty(ref this.stateColumnWidthField, value); }
+
+        /// <summary>
+        /// サムネイル
+        /// </summary>
+        public int ThumbColumnWidth { get => this.thumbColumnWidthField; set => this.SetProperty(ref this.thumbColumnWidthField, value); }
+
         #endregion
 
         private string inputStringFIeld = string.Empty;
@@ -1223,6 +1233,9 @@ namespace Niconicome.ViewModels.Mainpage
         public int DownloadedFlagColumnWidth { get; set; }
 
         public int StateColumnWidth { get; set; }
+
+        public int ThumbColumnWidth { get; set; }
+
     }
 
     /// <summary>

@@ -257,7 +257,7 @@
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-                                            <GridViewColumn>
+                                            <GridViewColumn Width="{Binding ThumbColumnWidth}">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <Image Source="{Binding BindableThumbPath,UpdateSourceTrigger=PropertyChanged}" Height="80"/>

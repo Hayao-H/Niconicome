@@ -166,6 +166,7 @@ namespace Niconicome.Models.Local
                 Settings.MWViewCountColumnWid => STypes::SettingNames.MainWindowViewCountColumnWidth,
                 Settings.MWDownloadedFlagColumnWid => STypes::SettingNames.MainWindowDownloadedFlagColumnWidth,
                 Settings.MWStateColumnWid => STypes::SettingNames.MainWindowStateColumnWidth,
+                Settings.MWThumbColumnWid=>STypes::SettingNames.MainWindowThumbnailColumnWidth,
                 _ => null
             };
         }
@@ -222,5 +223,6 @@ namespace Niconicome.Models.Local
         MWViewCountColumnWid,
         MWDownloadedFlagColumnWid,
         MWStateColumnWid,
+        MWThumbColumnWid,
     }
 }
