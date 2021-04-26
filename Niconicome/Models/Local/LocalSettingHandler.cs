@@ -167,6 +167,7 @@ namespace Niconicome.Models.Local
                 Settings.MWDownloadedFlagColumnWid => STypes::SettingNames.MainWindowDownloadedFlagColumnWidth,
                 Settings.MWStateColumnWid => STypes::SettingNames.MainWindowStateColumnWidth,
                 Settings.MWThumbColumnWid=>STypes::SettingNames.MainWindowThumbnailColumnWidth,
+                Settings.ReAllocateCommands => STypes::SettingNames.ReAllocateIfVideoisNotSaved,
                 _ => null
             };
         }
@@ -224,5 +225,6 @@ namespace Niconicome.Models.Local
         MWDownloadedFlagColumnWid,
         MWStateColumnWid,
         MWThumbColumnWid,
+        ReAllocateCommands,
     }
 }

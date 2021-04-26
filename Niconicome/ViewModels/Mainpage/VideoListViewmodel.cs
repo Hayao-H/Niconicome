@@ -544,6 +544,45 @@ namespace Niconicome.ViewModels.Mainpage
                  window.Show();
              });
 
+            this.SendToappACommand = new CommandBase<object>(_ => true, arg =>
+            {
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                {
+                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    return;
+                }
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+
+                var result = WS::Mainpage.ExternalAppUtils.SendToAppA(videoInfo);
+
+                if (!result.IsSucceeded)
+                {
+                    this.SnackbarMessageQueue.Enqueue("コマンドの実行に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "コマンドの実行に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
+                }
+            });
+
+            this.SendToappBCommand = new CommandBase<object>(_ => true, arg =>
+            {
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                {
+                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    return;
+                }
+
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+
+                var result = WS::Mainpage.ExternalAppUtils.SendToAppB(videoInfo);
+
+                if (!result.IsSucceeded)
+                {
+                    this.SnackbarMessageQueue.Enqueue("コマンドの実行に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "コマンドの実行に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
+                }
+            });
+
             this.OpenInPlayerAcommand = new CommandBase<object>(_ => true, arg =>
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
@@ -553,6 +592,13 @@ namespace Niconicome.ViewModels.Mainpage
                 }
 
                 if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+
+                if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty())
+                {
+                    var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReAllocateCommands);
+                    if (reAll) this.SendToappACommand.Execute(arg);
+                    return;
+                }
 
                 var result = WS::Mainpage.ExternalAppUtils.OpenInPlayerA(videoInfo);
 
@@ -574,51 +620,19 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
+                if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty())
+                {
+                    var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReAllocateCommands);
+                    if (reAll) this.SendToappBCommand.Execute(arg);
+                    return;
+                }
+
                 var result = WS::Mainpage.ExternalAppUtils.OpenInPlayerB(videoInfo);
 
                 if (!result.IsSucceeded)
                 {
                     this.SnackbarMessageQueue.Enqueue("動画の再生に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "動画の再生に失敗しました。");
-                    WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
-                }
-            });
-
-            this.SendToappACommand = new CommandBase<object>(_ => true, arg =>
-            {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
-                    return;
-                }
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
-
-                var result = WS::Mainpage.ExternalAppUtils.SendToAppA(videoInfo);
-
-                if (!result.IsSucceeded)
-                {
-                    this.SnackbarMessageQueue.Enqueue("コマンドの実行に失敗しました。");
-                    WS::Mainpage.Messagehandler.AppendMessage(result.Message??"コマンドの実行に失敗しました。");
-                    WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
-                }
-            });
-
-            this.SendToappBCommand = new CommandBase<object>(_ => true, arg =>
-            {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
-                    return;
-                }
-
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
-
-                var result = WS::Mainpage.ExternalAppUtils.SendToAppB(videoInfo);
-
-                if (!result.IsSucceeded)
-                {
-                    this.SnackbarMessageQueue.Enqueue("コマンドの実行に失敗しました。");
-                    WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "コマンドの実行に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
                 }
             });

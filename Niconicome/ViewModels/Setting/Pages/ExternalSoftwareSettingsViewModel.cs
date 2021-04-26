@@ -8,19 +8,20 @@ using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
-    class ExternalSoftwareSettingsViewModel:SettingaBase
+    class ExternalSoftwareSettingsViewModel : SettingaBase
     {
 
         public ExternalSoftwareSettingsViewModel()
         {
-            this.playerAPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerAPath)??string.Empty;
-            this.playerBPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerBPath)??string.Empty;
-            this.appAPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppAPath)??string.Empty;
-            this.appBPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppBPath)??string.Empty;
-            this.appAParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppAParam)??string.Empty;
-            this.appBParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppBParam)??string.Empty;
+            this.playerAPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerAPath) ?? string.Empty;
+            this.playerBPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerBPath) ?? string.Empty;
+            this.appAPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppAPath) ?? string.Empty;
+            this.appBPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppBPath) ?? string.Empty;
+            this.appAParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppAParam) ?? string.Empty;
+            this.appBParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppBParam) ?? string.Empty;
             this.ffmpegPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.FfmpegPath) ?? string.Empty;
             this.useShellWhenLaunchingFFmpegFIeld = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.FFmpegShell);
+            this.reAllocateCommandsField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.ReAllocateCommands);
         }
 
         private string playerAPathField;
@@ -38,6 +39,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         private string ffmpegPathField;
 
         private bool useShellWhenLaunchingFFmpegFIeld;
+
+        private bool reAllocateCommandsField;
 
         /// <summary>
         /// プレイヤーAのパス
@@ -77,7 +80,13 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// シェルを利用する
         /// </summary>
-        public bool UseShellWhenLaunchingFFmpeg { get => this.useShellWhenLaunchingFFmpegFIeld; set => this.Savesetting(ref this.useShellWhenLaunchingFFmpegFIeld, value,Settings.FFmpegShell); }
+        public bool UseShellWhenLaunchingFFmpeg { get => this.useShellWhenLaunchingFFmpegFIeld; set => this.Savesetting(ref this.useShellWhenLaunchingFFmpegFIeld, value, Settings.FFmpegShell); }
+
+        /// <summary>
+        /// 保存されていない動画の場合再割り当てを行う
+        /// </summary>
+        public bool ReAllocateCommands { get => this.reAllocateCommandsField; set => this.Savesetting(ref this.reAllocateCommandsField, value, Settings.ReAllocateCommands); }
+
     }
 
     class ExternalSoftwareSettingsViewModelD
@@ -118,5 +127,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public string FfmpegPath { get; set; } = "設定値";
 
         public bool UseShellWhenLaunchingFFmpeg { get; set; } = true;
+
+        public bool ReAllocateCommands { get; set; } = true;
     }
 }
