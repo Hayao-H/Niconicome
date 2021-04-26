@@ -116,8 +116,10 @@ namespace Niconicome.Models.Local.External
             if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty()) return new AttemptResult() { Message = $"{videoInfo.NiconicoId}はダウンロードされていません。", };
             if (folderPath is null) return new AttemptResult() { Message = "フォルダーパスが設定されていません。" };
 
-            var path = Path.Combine(folderPath, videoInfo.FileName);
-            return this.commandExecuter.Execute(appPath, folderPath);
+            var path = Path.Combine(folderPath, videoInfo.FileName)
+                .Replace(@"\\?\", string.Empty)
+                ;
+            return this.commandExecuter.Execute(appPath, $"\"{path}\"");
         }
 
         /// <summary>
