@@ -35,6 +35,8 @@ using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
+using DomainExt = Niconicome.Models.Domain.Local.External;
+using Ext = Niconicome.Models.Local.External;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -156,6 +158,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<VList::ICurrent, VList::Current>();
             services.AddSingleton<VList::IVideoListContainer, VList::VideoListContainer>();
             services.AddTransient<VList::IVideoListRefresher, VList::VideoListRefresher>();
+            services.AddTransient<Ext::IExternalAppUtils, Ext::ExternalAppUtils>();
+            services.AddTransient<DomainExt::ICommandExecuter,DomainExt::CommandExecuter>();
 
             return services.BuildServiceProvider();
         }

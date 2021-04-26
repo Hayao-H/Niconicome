@@ -15,10 +15,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         {
             this.playerAPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerAPath)??string.Empty;
             this.playerBPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerBPath)??string.Empty;
-            this.appIdPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppIdPath)??string.Empty;
-            this.appUrlPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppUrlPath)??string.Empty;
-            this.appIdParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppIdParam)??string.Empty;
-            this.appUrlParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppUrlParam)??string.Empty;
+            this.appIdPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppBPath)??string.Empty;
+            this.appUrlPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppAPath)??string.Empty;
+            this.appIdParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppBParam)??string.Empty;
+            this.appUrlParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppAParam)??string.Empty;
             this.ffmpegPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.FfmpegPath) ?? string.Empty;
             this.useShellWhenLaunchingFFmpegFIeld = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.FFmpegShell);
         }
@@ -52,22 +52,22 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// Id
         /// </summary>
-        public string AppIdPath { get => this.appIdPathField; set => this.Savesetting(ref this.appIdPathField, value, Settings.AppIdPath); }
+        public string AppIdPath { get => this.appIdPathField; set => this.Savesetting(ref this.appIdPathField, value, Settings.AppBPath); }
 
         /// <summary>
         /// Url
         /// </summary>
-        public string AppUrlPath { get => this.appUrlPathField; set => this.Savesetting(ref this.appUrlPathField, value, Settings.AppUrlPath); }
+        public string AppUrlPath { get => this.appUrlPathField; set => this.Savesetting(ref this.appUrlPathField, value, Settings.AppAPath); }
 
         /// <summary>
         /// Id
         /// </summary>
-        public string AppIdParam { get => this.appIdParamField; set => this.Savesetting(ref this.appIdParamField, value, Settings.AppIdParam); }
+        public string AppIdParam { get => this.appIdParamField; set => this.Savesetting(ref this.appIdParamField, value, Settings.AppBParam); }
 
         /// <summary>
         /// Url
         /// </summary>
-        public string AppUrlParam { get => this.appUrlParamField; set => this.Savesetting(ref this.appUrlParamField, value, Settings.AppUrlParam); }
+        public string AppUrlParam { get => this.appUrlParamField; set => this.Savesetting(ref this.appUrlParamField, value, Settings.AppAParam); }
 
         /// <summary>
         /// ffmpegのパス
