@@ -8,36 +8,39 @@ using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
-    class ExternalSoftwareSettingsViewModel:SettingaBase
+    class ExternalSoftwareSettingsViewModel : SettingaBase
     {
 
         public ExternalSoftwareSettingsViewModel()
         {
-            this.playerAPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerAPath)??string.Empty;
-            this.playerBPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerBPath)??string.Empty;
-            this.appIdPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppIdPath)??string.Empty;
-            this.appUrlPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppUrlPath)??string.Empty;
-            this.appIdParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppIdParam)??string.Empty;
-            this.appUrlParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppUrlParam)??string.Empty;
+            this.playerAPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerAPath) ?? string.Empty;
+            this.playerBPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.PlayerBPath) ?? string.Empty;
+            this.appAPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppAPath) ?? string.Empty;
+            this.appBPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppBPath) ?? string.Empty;
+            this.appAParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppAParam) ?? string.Empty;
+            this.appBParamField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AppBParam) ?? string.Empty;
             this.ffmpegPathField = WS::SettingPage.SettingHandler.GetStringSetting(Settings.FfmpegPath) ?? string.Empty;
             this.useShellWhenLaunchingFFmpegFIeld = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.FFmpegShell);
+            this.reAllocateCommandsField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.ReAllocateCommands);
         }
 
         private string playerAPathField;
 
         private string playerBPathField;
 
-        private string appIdPathField;
+        private string appAPathField;
 
-        private string appUrlPathField;
+        private string appBPathField;
 
-        private string appIdParamField;
+        private string appAParamField;
 
-        private string appUrlParamField;
+        private string appBParamField;
 
         private string ffmpegPathField;
 
         private bool useShellWhenLaunchingFFmpegFIeld;
+
+        private bool reAllocateCommandsField;
 
         /// <summary>
         /// プレイヤーAのパス
@@ -50,24 +53,24 @@ namespace Niconicome.ViewModels.Setting.Pages
         public string PlayerBPath { get => this.playerBPathField; set => this.Savesetting(ref this.playerBPathField, value, Settings.PlayerBPath); }
 
         /// <summary>
-        /// Id
+        /// A
         /// </summary>
-        public string AppIdPath { get => this.appIdPathField; set => this.Savesetting(ref this.appIdPathField, value, Settings.AppIdPath); }
+        public string AppAPath { get => this.appAPathField; set => this.Savesetting(ref this.appAPathField, value, Settings.AppAPath); }
 
         /// <summary>
-        /// Url
+        /// B
         /// </summary>
-        public string AppUrlPath { get => this.appUrlPathField; set => this.Savesetting(ref this.appUrlPathField, value, Settings.AppUrlPath); }
+        public string AppBPath { get => this.appBPathField; set => this.Savesetting(ref this.appBPathField, value, Settings.AppBPath); }
 
         /// <summary>
-        /// Id
+        /// A
         /// </summary>
-        public string AppIdParam { get => this.appIdParamField; set => this.Savesetting(ref this.appIdParamField, value, Settings.AppIdParam); }
+        public string AppAParam { get => this.appAParamField; set => this.Savesetting(ref this.appAParamField, value, Settings.AppAParam); }
 
         /// <summary>
-        /// Url
+        /// B
         /// </summary>
-        public string AppUrlParam { get => this.appUrlParamField; set => this.Savesetting(ref this.appUrlParamField, value, Settings.AppUrlParam); }
+        public string AppBParam { get => this.appBParamField; set => this.Savesetting(ref this.appBParamField, value, Settings.AppBParam); }
 
         /// <summary>
         /// ffmpegのパス
@@ -77,7 +80,13 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// シェルを利用する
         /// </summary>
-        public bool UseShellWhenLaunchingFFmpeg { get => this.useShellWhenLaunchingFFmpegFIeld; set => this.Savesetting(ref this.useShellWhenLaunchingFFmpegFIeld, value,Settings.FFmpegShell); }
+        public bool UseShellWhenLaunchingFFmpeg { get => this.useShellWhenLaunchingFFmpegFIeld; set => this.Savesetting(ref this.useShellWhenLaunchingFFmpegFIeld, value, Settings.FFmpegShell); }
+
+        /// <summary>
+        /// 保存されていない動画の場合再割り当てを行う
+        /// </summary>
+        public bool ReAllocateCommands { get => this.reAllocateCommandsField; set => this.Savesetting(ref this.reAllocateCommandsField, value, Settings.ReAllocateCommands); }
+
     }
 
     class ExternalSoftwareSettingsViewModelD
@@ -93,24 +102,24 @@ namespace Niconicome.ViewModels.Setting.Pages
         public string PlayerBPath { get; set; } = "設定値";
 
         /// <summary>
-        /// Id
+        /// A
         /// </summary>
-        public string AppIdPath { get; set; } = "設定値";
+        public string AppAPath { get; set; } = "設定値";
 
         /// <summary>
-        /// Url
+        /// B
         /// </summary>
-        public string AppUrlPath { get; set; } = "設定値";
+        public string AppBPath { get; set; } = "設定値";
 
         /// <summary>
-        /// Id
+        /// A
         /// </summary>
-        public string AppIdParam { get; set; } = "設定値";
+        public string AppAParam { get; set; } = "設定値";
 
         /// <summary>
-        /// Url
+        /// B
         /// </summary>
-        public string AppUrlParam { get; set; } = "設定値";
+        public string AppBParam { get; set; } = "設定値";
 
         /// <summary>
         /// ffmpegのパス
@@ -118,5 +127,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public string FfmpegPath { get; set; } = "設定値";
 
         public bool UseShellWhenLaunchingFFmpeg { get; set; } = true;
+
+        public bool ReAllocateCommands { get; set; } = true;
     }
 }

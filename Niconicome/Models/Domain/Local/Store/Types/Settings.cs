@@ -157,6 +157,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string MainWindowStateColumnWidth { get; private set; } = "mainwindowstatecolumnwidth";
         public static string MainWindowThumbnailColumnWidth { get; private set; } = "mainwindowthumbnailcolumnwidth";
 
-
+        public static string ReAllocateIfVideoisNotSaved { get; private set; } = "reallocateifvideoisnotsaved";
     }
 }

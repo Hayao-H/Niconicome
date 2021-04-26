@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Xaml.Behaviors;
@@ -13,20 +14,17 @@ using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
+using Niconicome.Models.Const;
+using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local;
 using Niconicome.Models.Playlist;
+using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
+using Niconicome.Views.Mainpage;
 using MaterialDesign = MaterialDesignThemes.Wpf;
+using Playlist = Niconicome.Models.Domain.Local.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
-using Playlist = Niconicome.Models.Domain.Local.Playlist;
-using Niconicome.Models.Network;
-using Niconicome.ViewModels.Controls;
-using System.Threading.Tasks;
-using Niconicome.Models.Helper.Event.Generic;
-using System.Linq.Expressions;
-using Niconicome.Models.Const;
-using Niconicome.Views.Mainpage;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -546,6 +544,45 @@ namespace Niconicome.ViewModels.Mainpage
                  window.Show();
              });
 
+            this.SendToappACommand = new CommandBase<object>(_ => true, arg =>
+            {
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                {
+                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    return;
+                }
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+
+                var result = WS::Mainpage.ExternalAppUtils.SendToAppA(videoInfo);
+
+                if (!result.IsSucceeded)
+                {
+                    this.SnackbarMessageQueue.Enqueue("コマンドの実行に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "コマンドの実行に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
+                }
+            });
+
+            this.SendToappBCommand = new CommandBase<object>(_ => true, arg =>
+            {
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                {
+                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    return;
+                }
+
+                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+
+                var result = WS::Mainpage.ExternalAppUtils.SendToAppB(videoInfo);
+
+                if (!result.IsSucceeded)
+                {
+                    this.SnackbarMessageQueue.Enqueue("コマンドの実行に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "コマンドの実行に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
+                }
+            });
+
             this.OpenInPlayerAcommand = new CommandBase<object>(_ => true, arg =>
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
@@ -556,18 +593,20 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
-                string folderPath = this.GetFolderPath();
-                if (!videoInfo.CheckDownloaded(folderPath) || videoInfo.GetFilePath(folderPath).IsNullOrEmpty())
+                if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty())
                 {
-                    this.SnackbarMessageQueue.Enqueue("動画が保存されていません。");
+                    var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReAllocateCommands);
+                    if (reAll) this.SendToappACommand.Execute(arg);
                     return;
                 }
 
-                string? appPath = WS::Mainpage.SettingHandler.GetStringSetting(Settings.PlayerAPath);
+                var result = WS::Mainpage.ExternalAppUtils.OpenInPlayerA(videoInfo);
 
-                if (appPath is not null)
+                if (!result.IsSucceeded)
                 {
-                    ProcessEx.StartWithShell(appPath, $"\"{videoInfo.GetFilePath(folderPath)}\"");
+                    this.SnackbarMessageQueue.Enqueue("動画の再生に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "動画の再生に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
                 }
             });
 
@@ -581,69 +620,20 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
-                string folderPath = this.GetFolderPath();
-                if (!videoInfo.CheckDownloaded(folderPath) || videoInfo.GetFilePath(folderPath).IsNullOrEmpty())
+                if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty())
                 {
-                    this.SnackbarMessageQueue.Enqueue("動画が保存されていません。");
+                    var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReAllocateCommands);
+                    if (reAll) this.SendToappBCommand.Execute(arg);
                     return;
                 }
 
-                string? appPath = WS::Mainpage.SettingHandler.GetStringSetting(Settings.PlayerBPath);
+                var result = WS::Mainpage.ExternalAppUtils.OpenInPlayerB(videoInfo);
 
-                if (appPath is not null)
+                if (!result.IsSucceeded)
                 {
-                    ProcessEx.StartWithShell(appPath, $"\"{videoInfo.GetFilePath(folderPath)}\"");
-                }
-            });
-
-            this.SendIdToappCommand = new CommandBase<object>(_ => true, arg =>
-            {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
-                    return;
-                }
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
-
-                string folderPath = this.GetFolderPath();
-                if (!videoInfo.CheckDownloaded(folderPath) || videoInfo.GetFilePath(folderPath).IsNullOrEmpty())
-                {
-                    this.SnackbarMessageQueue.Enqueue("動画が保存されていません。");
-                    return;
-                }
-
-                string? appPath = WS::Mainpage.SettingHandler.GetStringSetting(Settings.AppIdPath);
-                string param = WS::Mainpage.SettingHandler.GetStringSetting(Settings.AppIdParam) ?? string.Empty;
-
-                if (appPath is not null)
-                {
-                    ProcessEx.StartWithShell(appPath, $"{param} {videoInfo.NiconicoId}");
-                }
-            });
-
-            this.SendUrlToappCommand = new CommandBase<object>(_ => true, arg =>
-            {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
-                    return;
-                }
-
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
-
-                string folderPath = this.GetFolderPath();
-                if (!videoInfo.CheckDownloaded(folderPath) || videoInfo.GetFilePath(folderPath).IsNullOrEmpty())
-                {
-                    this.SnackbarMessageQueue.Enqueue("動画が保存されていません。");
-                    return;
-                }
-
-                string? appPath = WS::Mainpage.SettingHandler.GetStringSetting(Settings.AppIdPath);
-                string param = WS::Mainpage.SettingHandler.GetStringSetting(Settings.AppIdParam) ?? string.Empty;
-
-                if (appPath is not null)
-                {
-                    ProcessEx.StartWithShell(appPath, $"{param} {videoInfo.NiconicoId}");
+                    this.SnackbarMessageQueue.Enqueue("動画の再生に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "動画の再生に失敗しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
                 }
             });
 
@@ -802,12 +792,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// アプリにIdを送る
         /// </summary>
-        public CommandBase<object> SendIdToappCommand { get; init; }
+        public CommandBase<object> SendToappACommand { get; init; }
 
         /// <summary>
         /// アプリにIdを送る
         /// </summary>
-        public CommandBase<object> SendUrlToappCommand { get; init; }
+        public CommandBase<object> SendToappBCommand { get; init; }
 
         /// <summary>
         /// フィルターコマンド
@@ -1199,9 +1189,9 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<object> OpenInPlayerBcommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<object> SendIdToappCommand { get; init; } = new(_ => true, _ => { });
+        public CommandBase<object> SendToappACommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<object> SendUrlToappCommand { get; init; } = new(_ => true, _ => { });
+        public CommandBase<object> SendToappBCommand { get; init; } = new(_ => true, _ => { });
 
         public CommandBase<object> FilterCommand { get; init; } = new(_ => true, _ => { });
 

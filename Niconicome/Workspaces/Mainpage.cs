@@ -10,6 +10,7 @@ using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Download;
 using VideoList = Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Network.Watch;
+using Ext = Niconicome.Models.Local.External;
 
 namespace Niconicome.Workspaces
 {
@@ -34,6 +35,7 @@ namespace Niconicome.Workspaces
         public static IDownloadTasksHandler DownloadTasksHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IDownloadTasksHandler>();
         public static VideoList::ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::ICurrent>();
         public static VideoList::IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::IVideoListContainer>();
+        public static Ext::IExternalAppUtils ExternalAppUtils { get; private set; } = DIFactory.Provider.GetRequiredService<Ext::IExternalAppUtils>();
 
     }
 }

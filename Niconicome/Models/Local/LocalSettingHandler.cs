@@ -120,10 +120,10 @@ namespace Niconicome.Models.Local
                 Settings.FileNameFormat => STypes::SettingNames.FileNameFormat,
                 Settings.PlayerAPath => STypes::SettingNames.PlayerAPath,
                 Settings.PlayerBPath => STypes::SettingNames.PlayerBPath,
-                Settings.AppUrlPath => STypes::SettingNames.AppUrlPath,
-                Settings.AppUrlParam => STypes::SettingNames.AppUrlParam,
-                Settings.AppIdPath => STypes::SettingNames.AppIdPath,
-                Settings.AppIdParam => STypes::SettingNames.AppIdParam,
+                Settings.AppAPath => STypes::SettingNames.AppUrlPath,
+                Settings.AppAParam => STypes::SettingNames.AppUrlParam,
+                Settings.AppBPath => STypes::SettingNames.AppIdPath,
+                Settings.AppBParam => STypes::SettingNames.AppIdParam,
                 Settings.FfmpegPath => STypes::SettingNames.FFmpegPath,
                 Settings.DefaultFolder => STypes::SettingNames.DefaultFolder,
                 Settings.CommentOffset => STypes::SettingNames.CommentOffset,
@@ -167,6 +167,7 @@ namespace Niconicome.Models.Local
                 Settings.MWDownloadedFlagColumnWid => STypes::SettingNames.MainWindowDownloadedFlagColumnWidth,
                 Settings.MWStateColumnWid => STypes::SettingNames.MainWindowStateColumnWidth,
                 Settings.MWThumbColumnWid=>STypes::SettingNames.MainWindowThumbnailColumnWidth,
+                Settings.ReAllocateCommands => STypes::SettingNames.ReAllocateIfVideoisNotSaved,
                 _ => null
             };
         }
@@ -177,10 +178,10 @@ namespace Niconicome.Models.Local
         FileNameFormat,
         PlayerAPath,
         PlayerBPath,
-        AppUrlPath,
-        AppIdPath,
-        AppUrlParam,
-        AppIdParam,
+        AppAPath,
+        AppBPath,
+        AppAParam,
+        AppBParam,
         FfmpegPath,
         DefaultFolder,
         CommentOffset,
@@ -224,5 +225,6 @@ namespace Niconicome.Models.Local
         MWDownloadedFlagColumnWid,
         MWStateColumnWid,
         MWThumbColumnWid,
+        ReAllocateCommands,
     }
 }
