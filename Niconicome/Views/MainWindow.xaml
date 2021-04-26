@@ -320,9 +320,9 @@
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         </MenuItem>
                                                         <MenuItem Header="送る">
-                                                            <MenuItem Header="アプリにURLを送る" Command="{Binding SendUrlToappCommand}"
+                                                            <MenuItem Header="アプリに送る(A)" Command="{Binding SendToappACommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                            <MenuItem Header="アプリにIDを送る" Command="{Binding SendIdToappCommand}"
+                                                            <MenuItem Header="アプリに送る(B)" Command="{Binding SendToappBCommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         </MenuItem>
                                                         <MenuItem Header="プレイリストを作成">
