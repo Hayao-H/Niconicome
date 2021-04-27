@@ -187,7 +187,7 @@ namespace Niconicome.Models.Local
             foreach (var file in filePaths)
             {
                 string id;
-                string format = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? string.Empty;
+                string format = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? string.Empty;
                 try
                 {
                     id = this.niconicoUtils.GetIdFromFIleName(format, file);

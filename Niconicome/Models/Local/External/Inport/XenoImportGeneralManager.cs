@@ -153,7 +153,7 @@ namespace Niconicome.Models.Local.External.Import
             playlist.Name = playlistInfo.Name;
             if (playlistInfo.IsRemotePlaylist)
             {
-                var registerOnlyID = this.settingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
+                var registerOnlyID = this.settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
                 if (!registerOnlyID)
                 {
                     onMessage("待機中(10s)");

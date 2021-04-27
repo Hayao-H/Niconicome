@@ -53,14 +53,14 @@ namespace Niconicome.ViewModels.Mainpage
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
             //幅
-            var scWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWSelectColumnWid);
-            var idWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWIDColumnWid);
-            var titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWTitleColumnWid);
-            var uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWUploadColumnWid);
-            var vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWViewCountColumnWid);
-            var dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWDownloadedFlagColumnWid);
-            var stWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWStateColumnWid);
-            var tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MWThumbColumnWid);
+            var scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
+            var idWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWIDColumnWid);
+            var titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWTitleColumnWid);
+            var uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWUploadColumnWid);
+            var vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWViewCountColumnWid);
+            var dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWDownloadedFlagColumnWid);
+            var stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
+            var tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
             this.selectColumnWidthField = scWidth <= 0 ? 150 : scWidth;
             this.iDColumnWidthField = idWidth <= 0 ? 150 : idWidth;
             this.titleColumnWidthField = titleWIdth <= 0 ? 150 : titleWIdth;
@@ -74,8 +74,8 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
 
             //展開状況を引き継ぐ
-            var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.InheritExpandedState);
-            var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ExpandAll);
+            var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
+            var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
             WS::Mainpage.PlaylistTree.Refresh(expandAll, inheritExpandedState);
 
             #region コマンドの初期化
@@ -595,7 +595,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty())
                 {
-                    var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReAllocateCommands);
+                    var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
                     if (reAll) this.SendToappACommand.Execute(arg);
                     return;
                 }
@@ -622,7 +622,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty())
                 {
-                    var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReAllocateCommands);
+                    var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
                     if (reAll) this.SendToappBCommand.Execute(arg);
                     return;
                 }
@@ -980,14 +980,14 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public void SaveColumnWidth()
         {
-            WS::Mainpage.SettingHandler.SaveSetting(this.SelectColumnWidth, Settings.MWSelectColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.IDColumnWidth, Settings.MWIDColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.TitleColumnWidth, Settings.MWTitleColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.UploadColumnWidth, Settings.MWUploadColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.ViewCountColumnWidth, Settings.MWViewCountColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.DownloadedFlagColumnWidth, Settings.MWDownloadedFlagColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.StateColumnWidth, Settings.MWStateColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.ThumbColumnWidth, Settings.MWThumbColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.SelectColumnWidth, SettingsEnum.MWSelectColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.IDColumnWidth, SettingsEnum.MWIDColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.TitleColumnWidth, SettingsEnum.MWTitleColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.UploadColumnWidth, SettingsEnum.MWUploadColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.ViewCountColumnWidth, SettingsEnum.MWViewCountColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.DownloadedFlagColumnWidth, SettingsEnum.MWDownloadedFlagColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.StateColumnWidth, SettingsEnum.MWStateColumnWid);
+            WS::Mainpage.SettingHandler.SaveSetting(this.ThumbColumnWidth, SettingsEnum.MWThumbColumnWid);
         }
 
         #region private
@@ -1117,7 +1117,7 @@ namespace Niconicome.ViewModels.Mainpage
         {
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null) return string.Empty;
 
-            return WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? FileFolder.DefaultDownloadDir : WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Folderpath;
+            return WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir : WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Folderpath;
         }
         #endregion
 

@@ -107,7 +107,7 @@ namespace Niconicome.Models.Network.Download
             this.videoListContainer = videoListContainer;
             this.converter = converter;
 
-            int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelDL);
+            int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelDL);
             if (maxParallel <= 0)
             {
                 maxParallel = 3;
@@ -144,8 +144,8 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         private async Task<IDownloadResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
         {
-            string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-            int maxParallel = this.settingHandler.GetIntSetting(Settings.MaxParallelSegDl);
+            string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
+            int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelSegDl);
             if (maxParallel <= 0)
             {
                 maxParallel = 1;
@@ -178,8 +178,8 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
         {
-            string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-            bool dlInJson = this.settingHandler.GetBoolSetting(Settings.VideoInfoInJson);
+            string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
+            bool dlInJson = this.settingHandler.GetBoolSetting(SettingsEnum.VideoInfoInJson);
 
             var dSettings = settings.ConvertToDescriptionDownloadSetting(fileNameFormat, dlInJson);
             var descriptionDownloader = DIFactory.Provider.GetRequiredService<DDL::IDescriptionDownloader>();
@@ -204,7 +204,7 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         private async Task<IDownloadResult> TryDownloadThumbAsync(IDownloadSettings setting, IWatchSession session)
         {
-            string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+            string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
             var tSettings = setting.ConvertToThumbDownloadSetting(fileNameFormat);
             var thumbDownloader = DIFactory.Provider.GetRequiredService<Tdl::IThumbDownloader>();
             Download::IDownloadResult result;
@@ -230,13 +230,13 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         private async Task<IDownloadResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
-            var cOffset = this.settingHandler.GetIntSetting(Settings.CommentOffset);
-            var autoSwicth = this.settingHandler.GetBoolSetting(Settings.SwitchOffset);
+            var cOffset = this.settingHandler.GetIntSetting(SettingsEnum.CommentOffset);
+            var autoSwicth = this.settingHandler.GetBoolSetting(SettingsEnum.SwitchOffset);
 
             if (cOffset < 0) cOffset = Cdl::CommentCollection.NumberToThrough;
             if (autoSwicth && session.Video!.DmcInfo.IsOfficial) cOffset = 0;
 
-            string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+            string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
             var cSettings = settings.ConvertToCommentDownloadSetting(fileNameFormat, cOffset);
             var commentDownloader = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
             Download::IDownloadResult result;
@@ -295,8 +295,8 @@ namespace Niconicome.Models.Network.Download
             ILocalContentInfo? info = null;
             if (setting.Skip)
             {
-                bool dlInJson = this.settingHandler.GetBoolSetting(Settings.VideoInfoInJson);
-                string fileNameFormat = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
+                bool dlInJson = this.settingHandler.GetBoolSetting(SettingsEnum.VideoInfoInJson);
+                string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
                 info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, dlInJson);
             }
 

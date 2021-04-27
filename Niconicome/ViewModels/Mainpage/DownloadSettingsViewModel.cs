@@ -20,18 +20,18 @@ namespace Niconicome.ViewModels.Mainpage
 
         public DownloadSettingsViewModel()
         {
-            this.isDownloadingVideoIndoEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLVideoInfo);
-            this.isLimittingCommentCountEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.LimitCommentsCount);
-            this.maxCommentsCountField = WS::Mainpage.SettingHandler.GetIntSetting(Settings.MaxCommentsCount);
-            this.IsDownloadingVideoEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLVideo);
-            this.IsDownloadingCommentEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLComment);
-            this.isDownloadingCommentLogEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLKako);
-            this.IsDownloadingEasyComment = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLEasy);
-            this.IsDownloadingThumbEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLThumb);
-            this.isDownloadingOwnerCommentField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLOwner);
-            this.isOverwriteEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLOverwrite);
-            this.isSkippingEnablefield = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLSkip);
-            this.isCopyFromAnotherFolderEnableFIeld = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLCopy);
+            this.isDownloadingVideoIndoEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLVideoInfo);
+            this.isLimittingCommentCountEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount);
+            this.maxCommentsCountField = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MaxCommentsCount);
+            this.IsDownloadingVideoEnable = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLVideo);
+            this.IsDownloadingCommentEnable = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLComment);
+            this.isDownloadingCommentLogEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLKako);
+            this.IsDownloadingEasyComment = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLEasy);
+            this.IsDownloadingThumbEnable = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLThumb);
+            this.isDownloadingOwnerCommentField = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLOwner);
+            this.isOverwriteEnableField = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLOverwrite);
+            this.isSkippingEnablefield = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLSkip);
+            this.isCopyFromAnotherFolderEnableFIeld = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLCopy);
 
             WS::Mainpage.Videodownloader.CanDownloadChange += this.OnCanDownloadChange;
 
@@ -75,9 +75,9 @@ namespace Niconicome.ViewModels.Mainpage
 
                    int videoCount = videos.Count();
                    var firstVideo = videos.First();
-                   var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
+                   var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.AllowDupeOnStage);
                    var setting = this.CreateDownloadSettings();
-                   var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.DLAllFromQueue);
+                   var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLAllFromQueue);
 
 
                    WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting, allowDupe);
@@ -117,7 +117,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 int videoCount = videos.Count();
                 var firstVideo = videos.First();
-                var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.AllowDupeOnStage);
+                var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.AllowDupeOnStage);
 
                 WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, this.CreateDownloadSettings(), allowDupe);
 
@@ -192,63 +192,63 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画ダウンロードフラグ
         /// </summary>
-        public bool IsDownloadingVideoEnable { get => this.isDownloadingVideoEnableField; set => this.Savesetting(ref this.isDownloadingVideoEnableField, value, Settings.DLVideo); }
+        public bool IsDownloadingVideoEnable { get => this.isDownloadingVideoEnableField; set => this.Savesetting(ref this.isDownloadingVideoEnableField, value, SettingsEnum.DLVideo); }
 
         /// <summary>
         /// コメントダウンロードフラグ
         /// </summary>
-        public bool IsDownloadingCommentEnable { get => this.isDownloadingCommentEnableField; set => this.Savesetting(ref this.isDownloadingCommentEnableField, value, Settings.DLComment); }
+        public bool IsDownloadingCommentEnable { get => this.isDownloadingCommentEnableField; set => this.Savesetting(ref this.isDownloadingCommentEnableField, value, SettingsEnum.DLComment); }
 
         /// <summary>
         /// 過去ログダウンロードフラグ
         /// </summary>
-        public bool IsDownloadingCommentLogEnable { get => this.isDownloadingCommentLogEnableField; set => this.Savesetting(ref this.isDownloadingCommentLogEnableField, value, Settings.DLKako); }
+        public bool IsDownloadingCommentLogEnable { get => this.isDownloadingCommentLogEnableField; set => this.Savesetting(ref this.isDownloadingCommentLogEnableField, value, SettingsEnum.DLKako); }
 
         /// <summary>
         /// 投稿者コメント
         /// </summary>
-        public bool IsDownloadingOwnerComment { get => this.isDownloadingOwnerCommentField; set => this.Savesetting(ref this.isDownloadingOwnerCommentField, value, Settings.DLOwner); }
+        public bool IsDownloadingOwnerComment { get => this.isDownloadingOwnerCommentField; set => this.Savesetting(ref this.isDownloadingOwnerCommentField, value, SettingsEnum.DLOwner); }
 
         /// <summary>
         /// かんたんコメント
         /// </summary>
-        public bool IsDownloadingEasyComment { get => this.isDownloadingEasyCommentFIeld; set => this.Savesetting(ref this.isDownloadingEasyCommentFIeld, value, Settings.DLEasy); }
+        public bool IsDownloadingEasyComment { get => this.isDownloadingEasyCommentFIeld; set => this.Savesetting(ref this.isDownloadingEasyCommentFIeld, value, SettingsEnum.DLEasy); }
 
         /// <summary>
         /// サムネイルダウンロードフラグ
         /// </summary>
-        public bool IsDownloadingThumbEnable { get => this.isDownloadingThumbEnableField; set => this.Savesetting(ref this.isDownloadingThumbEnableField, value, Settings.DLThumb); }
+        public bool IsDownloadingThumbEnable { get => this.isDownloadingThumbEnableField; set => this.Savesetting(ref this.isDownloadingThumbEnableField, value, SettingsEnum.DLThumb); }
 
         /// <summary>
         /// 動画情報
         /// </summary>
-        public bool IsDownloadingVideoInfoEnable { get => this.isDownloadingVideoIndoEnableField; set => this.Savesetting(ref this.isDownloadingVideoIndoEnableField, value, Settings.DLVideoInfo); }
+        public bool IsDownloadingVideoInfoEnable { get => this.isDownloadingVideoIndoEnableField; set => this.Savesetting(ref this.isDownloadingVideoIndoEnableField, value, SettingsEnum.DLVideoInfo); }
 
 
         /// <summary>
         /// 上書き保存フラグ
         /// </summary>
-        public bool IsOverwriteEnable { get => this.isOverwriteEnableField; set => this.Savesetting(ref this.isOverwriteEnableField, value, Settings.DLOverwrite); }
+        public bool IsOverwriteEnable { get => this.isOverwriteEnableField; set => this.Savesetting(ref this.isOverwriteEnableField, value, SettingsEnum.DLOverwrite); }
 
         /// <summary>
         /// ダウンロード済をスキップ
         /// </summary>
-        public bool IsSkippingEnable { get => this.isSkippingEnablefield; set => this.Savesetting(ref this.isSkippingEnablefield, value, Settings.DLSkip); }
+        public bool IsSkippingEnable { get => this.isSkippingEnablefield; set => this.Savesetting(ref this.isSkippingEnablefield, value, SettingsEnum.DLSkip); }
 
         /// <summary>
         /// 別フォルダーからコピー
         /// </summary>
-        public bool IsCopyFromAnotherFolderEnable { get => this.isCopyFromAnotherFolderEnableFIeld; set => this.Savesetting(ref this.isCopyFromAnotherFolderEnableFIeld, value, Settings.DLCopy); }
+        public bool IsCopyFromAnotherFolderEnable { get => this.isCopyFromAnotherFolderEnableFIeld; set => this.Savesetting(ref this.isCopyFromAnotherFolderEnableFIeld, value, SettingsEnum.DLCopy); }
 
         /// <summary>
         /// コメント取得数を制限する
         /// </summary>
-        public bool IsLimittingCommentCountEnable { get => this.isLimittingCommentCountEnableField; set => this.Savesetting(ref this.isLimittingCommentCountEnableField, value, Settings.LimitCommentsCount); }
+        public bool IsLimittingCommentCountEnable { get => this.isLimittingCommentCountEnableField; set => this.Savesetting(ref this.isLimittingCommentCountEnableField, value, SettingsEnum.LimitCommentsCount); }
 
         /// <summary>
         /// コメントの最大取得数
         /// </summary>
-        public int MaxCommentsCount { get => this.maxCommentsCountField; set => this.Savesetting(ref this.maxCommentsCountField, value, Settings.MaxCommentsCount); }
+        public int MaxCommentsCount { get => this.maxCommentsCountField; set => this.Savesetting(ref this.maxCommentsCountField, value, SettingsEnum.MaxCommentsCount); }
 
         /// <summary>
         /// 選択中の解像度
@@ -292,11 +292,11 @@ namespace Niconicome.ViewModels.Mainpage
         private DownloadSettings CreateDownloadSettings()
         {
 
-            var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
-            var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.OverrideVideoFileDTToUploadedDT);
-            var resumeEnable = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.EnableResume);
-            var unsafeHandle = WS::Mainpage.SettingHandler.GetBoolSetting(Settings.UnsafeCommentHandle);
-            string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(Settings.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
+            var replaceStricted = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
+            var overrideVideoDT = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT);
+            var resumeEnable = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.EnableResume);
+            var unsafeHandle = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
+            string folderPath = this.playlist!.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? "downloaded" : this.playlist.Folderpath;
 
             return new DownloadSettings
             {

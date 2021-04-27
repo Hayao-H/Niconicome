@@ -84,7 +84,7 @@ namespace Niconicome.Models.Local.Application
         {
             if (this.nicoDirectoryIO.Exists("tmp"))
             {
-                var maxTmp = this.settingHandler.GetIntSetting(Settings.MaxTmpDirCount);
+                var maxTmp = this.settingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
                 if (maxTmp < 0) maxTmp = 20;
                 var infos = this.streamResumer.GetAllSegmentsDirectoryInfo().ToList();
                 if (infos.Count <= maxTmp) return;

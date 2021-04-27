@@ -124,7 +124,7 @@ namespace Niconicome.Models.Network
         public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null)
         {
 
-            var registerOnlyID = this.settingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
+            var registerOnlyID = this.settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
             if (registerOnlyID)
             {
                 return emptyVideos;
@@ -132,8 +132,8 @@ namespace Niconicome.Models.Network
 
             int videosCount = emptyVideos.Count();
             var videos = new List<IListVideoInfo>();
-            var maxParallelCount = this.settingHandler.GetIntSetting(Settings.MaxFetchCount);
-            var waitInterval = this.settingHandler.GetIntSetting(Settings.FetchSleepInterval);
+            var maxParallelCount = this.settingHandler.GetIntSetting(SettingsEnum.MaxFetchCount);
+            var waitInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
             if (maxParallelCount < 1) maxParallelCount = 3;
             if (waitInterval < 1) waitInterval = 5;
 

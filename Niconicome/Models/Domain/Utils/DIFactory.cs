@@ -50,7 +50,7 @@ namespace Niconicome.Models.Domain.Utils
                 .ConfigureHttpMessageHandlerBuilder(builder =>
                 {
                     var shandler = builder.Services.GetRequiredService<Local::ILocalSettingHandler>();
-                    var skip = shandler.GetBoolSetting(Local::Settings.SkipSSLVerification);
+                    var skip = shandler.GetBoolSetting(Local::SettingsEnum.SkipSSLVerification);
                     if (builder.PrimaryHandler is HttpClientHandler handler)
                     {
                         handler.CookieContainer = builder.Services.GetRequiredService<Niconico::ICookieManager>().CookieContainer;

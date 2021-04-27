@@ -14,15 +14,15 @@ namespace Niconicome.ViewModels.Setting.Pages
     {
         public GeneralSettingsPageViewModel()
         {
-            this.isAutologinEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.AutologinEnable);
+            this.isAutologinEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.AutologinEnable);
 
             var normal = new AutoLoginTypes(AutoLoginTypeString.Normal, "パスワードログイン");
             var wv2 = new AutoLoginTypes(AutoLoginTypeString.Webview2, "Webview2とCookieを共有");
 
             this.SelectableAutoLoginTypes = new List<AutoLoginTypes>() { normal, wv2 };
-            this.isSkippingSSLVerificationEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.SkipSSLVerification);
+            this.isSkippingSSLVerificationEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.SkipSSLVerification);
 
-            var type = WS::SettingPage.SettingHandler.GetStringSetting(Settings.AutologinMode);
+            var type = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.AutologinMode);
             this.selectedAutoLoginTypeField = type switch
             {
                 AutoLoginTypeString.Normal => normal,
@@ -40,8 +40,8 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.SelectableMaxParallelFetch = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
 
 
-            var maxFetchParallelCount = WS::SettingPage.SettingHandler.GetIntSetting(Settings.MaxFetchCount);
-            var fetchSleepInterval = WS::SettingPage.SettingHandler.GetIntSetting(Settings.FetchSleepInterval);
+            var maxFetchParallelCount = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.MaxFetchCount);
+            var fetchSleepInterval = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
 
             this.maxFetchParallelCountField = maxFetchParallelCount switch
             {
@@ -62,9 +62,9 @@ namespace Niconicome.ViewModels.Setting.Pages
                 _ => n4,
             };
 
-            this.isExpandallPlaylistsEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.ExpandAll);
-            this.isSavePrevPlaylistExpandedStateEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.InheritExpandedState);
-            this.isStoreOnlyNiconicoIDEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
+            this.isExpandallPlaylistsEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
+            this.isSavePrevPlaylistExpandedStateEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
+            this.isStoreOnlyNiconicoIDEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
         }
 
         private bool isAutologinEnableField;
@@ -97,7 +97,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         {
             get => this.selectedAutoLoginTypeField; set
             {
-                this.Savesetting(ref this.empty, value.Value, Settings.AutologinMode);
+                this.Savesetting(ref this.empty, value.Value, SettingsEnum.AutologinMode);
                 this.SetProperty(ref this.selectedAutoLoginTypeField, value);
             }
         }
@@ -115,7 +115,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// 自動ログイン
         /// </summary>
-        public bool IsAutologinEnable { get => this.isAutologinEnableField; set => this.Savesetting(ref this.isAutologinEnableField, value, Settings.AutologinEnable); }
+        public bool IsAutologinEnable { get => this.isAutologinEnableField; set => this.Savesetting(ref this.isAutologinEnableField, value, SettingsEnum.AutologinEnable); }
 
         /// <summary>
         /// 動画情報最大並列取得数
@@ -123,33 +123,33 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ComboboxItem<int> MaxFetchParallelCount
         {
             get => this.maxFetchParallelCountField;
-            set => this.Savesetting(ref this.maxFetchParallelCountField, value, Settings.MaxFetchCount);
+            set => this.Savesetting(ref this.maxFetchParallelCountField, value, SettingsEnum.MaxFetchCount);
         }
 
         /// <summary>
         /// 待機間隔
         /// </summary>
-        public ComboboxItem<int> FetchSleepInterval { get => this.fetchSleepIntervalFIeld; set => this.Savesetting(ref this.fetchSleepIntervalFIeld, value, Settings.FetchSleepInterval); }
+        public ComboboxItem<int> FetchSleepInterval { get => this.fetchSleepIntervalFIeld; set => this.Savesetting(ref this.fetchSleepIntervalFIeld, value, SettingsEnum.FetchSleepInterval); }
 
         /// <summary>
         /// SSL証明書の検証をスキップする
         /// </summary>
-        public bool IsSkippingSSLVerificationEnable { get => this.isSkippingSSLVerificationEnableField; set => this.Savesetting(ref this.isSkippingSSLVerificationEnableField, value, Settings.SkipSSLVerification); }
+        public bool IsSkippingSSLVerificationEnable { get => this.isSkippingSSLVerificationEnableField; set => this.Savesetting(ref this.isSkippingSSLVerificationEnableField, value, SettingsEnum.SkipSSLVerification); }
 
         /// <summary>
         /// 展開状況を保存する
         /// </summary>
-        public bool IsSavePrevPlaylistExpandedStateEnable { get => this.isSavePrevPlaylistExpandedStateEnableField; set => this.Savesetting(ref this.isSavePrevPlaylistExpandedStateEnableField, value, Settings.InheritExpandedState); }
+        public bool IsSavePrevPlaylistExpandedStateEnable { get => this.isSavePrevPlaylistExpandedStateEnableField; set => this.Savesetting(ref this.isSavePrevPlaylistExpandedStateEnableField, value, SettingsEnum.InheritExpandedState); }
 
         /// <summary>
         /// すべて展開する
         /// </summary>
-        public bool IsExpandallPlaylistsEnable { get => this.isExpandallPlaylistsEnableField; set => this.Savesetting(ref this.isExpandallPlaylistsEnableField, value, Settings.ExpandAll); }
+        public bool IsExpandallPlaylistsEnable { get => this.isExpandallPlaylistsEnableField; set => this.Savesetting(ref this.isExpandallPlaylistsEnableField, value, SettingsEnum.ExpandAll); }
 
         /// <summary>
         /// ニコニコ動画のIDのみを保存する
         /// </summary>
-        public bool IsStoreOnlyNiconicoIDEnable { get => this.isStoreOnlyNiconicoIDEnableField; set => this.Savesetting(ref this.isStoreOnlyNiconicoIDEnableField, value, Settings.StoreOnlyNiconicoID); }
+        public bool IsStoreOnlyNiconicoIDEnable { get => this.isStoreOnlyNiconicoIDEnableField; set => this.Savesetting(ref this.isStoreOnlyNiconicoIDEnableField, value, SettingsEnum.StoreOnlyNiconicoID); }
 
 
     }
