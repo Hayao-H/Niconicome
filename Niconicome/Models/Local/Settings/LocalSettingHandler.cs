@@ -168,6 +168,7 @@ namespace Niconicome.Models.Local
                 SettingsEnum.MWStateColumnWid => STypes::SettingNames.MainWindowStateColumnWidth,
                 SettingsEnum.MWThumbColumnWid=>STypes::SettingNames.MainWindowThumbnailColumnWidth,
                 SettingsEnum.ReAllocateCommands => STypes::SettingNames.ReAllocateIfVideoisNotSaved,
+                SettingsEnum.VListItemdbClick => STypes::SettingNames.VideoListItemdbClickAction,
                 _ => null
             };
         }
@@ -226,5 +227,6 @@ namespace Niconicome.Models.Local
         MWStateColumnWid,
         MWThumbColumnWid,
         ReAllocateCommands,
+        VListItemdbClick,
     }
 }
