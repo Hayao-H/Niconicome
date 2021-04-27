@@ -11,6 +11,7 @@ using Niconicome.Models.Network.Download;
 using VideoList = Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Network.Watch;
 using Ext = Niconicome.Models.Local.External;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Workspaces
 {

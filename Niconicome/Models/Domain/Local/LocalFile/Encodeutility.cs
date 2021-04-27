@@ -5,12 +5,12 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Niconicome.Models.Local;
 using System.Threading;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Domain.Local.LocalFile
 {

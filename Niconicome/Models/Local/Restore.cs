@@ -7,6 +7,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Local.Settings;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Local

@@ -11,9 +11,9 @@ using State = Niconicome.Models.Local.State;
 using DWatch = Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Utils;
-using Niconicome.Models.Local;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Network.Watch;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Network
 {

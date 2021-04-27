@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network;
 using Niconicome.Models.Playlist;
 using Xeno = Niconicome.Models.Domain.Local.External.Import.Xeno;

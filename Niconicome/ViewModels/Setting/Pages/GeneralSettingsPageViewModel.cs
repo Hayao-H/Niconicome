@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Auth;
-using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Mainpage.Utils;
 using WS = Niconicome.Workspaces;
 

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualBasic;
 using Niconicome.Models.Domain.Niconico;
-using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Auth
 {

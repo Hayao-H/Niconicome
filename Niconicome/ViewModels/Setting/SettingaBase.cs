@@ -3,7 +3,7 @@ using System.Windows.Documents;
 using System.Windows.Navigation;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions.System.Diagnostics;
-using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Mainpage.Utils;
 using WS = Niconicome.Workspaces;
 

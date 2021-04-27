@@ -8,6 +8,7 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network;
 
 namespace Niconicome.Models.Playlist.VideoList

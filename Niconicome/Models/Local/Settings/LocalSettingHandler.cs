@@ -1,7 +1,7 @@
 ﻿using Niconicome.Models.Domain.Local.Store;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
-namespace Niconicome.Models.Local
+namespace Niconicome.Models.Local.Settings
 {
 
 
@@ -166,7 +166,7 @@ namespace Niconicome.Models.Local
                 SettingsEnum.MWViewCountColumnWid => STypes::SettingNames.MainWindowViewCountColumnWidth,
                 SettingsEnum.MWDownloadedFlagColumnWid => STypes::SettingNames.MainWindowDownloadedFlagColumnWidth,
                 SettingsEnum.MWStateColumnWid => STypes::SettingNames.MainWindowStateColumnWidth,
-                SettingsEnum.MWThumbColumnWid=>STypes::SettingNames.MainWindowThumbnailColumnWidth,
+                SettingsEnum.MWThumbColumnWid => STypes::SettingNames.MainWindowThumbnailColumnWidth,
                 SettingsEnum.ReAllocateCommands => STypes::SettingNames.ReAllocateIfVideoisNotSaved,
                 SettingsEnum.VListItemdbClick => STypes::SettingNames.VideoListItemdbClickAction,
                 _ => null

@@ -16,7 +16,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
 using Niconicome.Models.Const;
 using Niconicome.Models.Helper.Event.Generic;
-using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;

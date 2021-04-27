@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
-using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Download;
 using Niconicome.Models.Playlist;
 using Niconicome.Views;

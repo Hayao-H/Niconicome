@@ -9,6 +9,7 @@ using Niconicome.Models.Domain.Utils;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using NicoIO = Niconicome.Models.Domain.Local.IO;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Local.Application
 {

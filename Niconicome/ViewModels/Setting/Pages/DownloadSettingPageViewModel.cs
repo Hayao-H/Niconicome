@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using WS = Niconicome.Workspaces;
 using Local = Niconicome.Models.Local;
 using System.ComponentModel;
-using Niconicome.Models.Local;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
