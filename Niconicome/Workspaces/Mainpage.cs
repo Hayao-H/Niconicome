@@ -37,6 +37,6 @@ namespace Niconicome.Workspaces
         public static VideoList::ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::ICurrent>();
         public static VideoList::IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::IVideoListContainer>();
         public static Ext::IExternalAppUtils ExternalAppUtils { get; private set; } = DIFactory.Provider.GetRequiredService<Ext::IExternalAppUtils>();
-
+        public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
     }
 }

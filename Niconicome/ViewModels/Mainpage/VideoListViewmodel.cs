@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System;
@@ -25,6 +28,7 @@ using MaterialDesign = MaterialDesignThemes.Wpf;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
+using EnumSettings = Niconicome.Models.Local.Settings.EnumSettingsValue;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -990,6 +994,34 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.SettingHandler.SaveSetting(this.ThumbColumnWidth, SettingsEnum.MWThumbColumnWid);
         }
 
+        public void OnDoubleClick(object? sender)
+        {
+            if (sender is not ListViewItem item) return;
+            if (item.DataContext is not BindableListVIdeoInfo videoInfo) return;
+            var setting = WS::Mainpage.EnumSettingsHandler.GetSetting<EnumSettings::VideodbClickSettings>();
+
+            if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
+            {
+                this.OpenInPlayerAcommand.Execute(videoInfo);
+            }
+            else if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerB)
+            {
+                this.OpenInPlayerBcommand.Execute(videoInfo);
+            }
+            else if (setting == EnumSettings::VideodbClickSettings.SendToAppA)
+            {
+                this.SendToappACommand.Execute(videoInfo);
+            }
+            else if (setting == EnumSettings::VideodbClickSettings.SendToAppB)
+            {
+                this.SendToappBCommand.Execute(videoInfo);
+            }
+            else if (setting == EnumSettings::VideodbClickSettings.Download)
+            {
+                this.OpenInPlayerAcommand.Execute(videoInfo);
+            }
+        }
+
         #region private
 
         /// <summary>
@@ -1394,6 +1426,50 @@ namespace Niconicome.ViewModels.Mainpage
         private double scrollPos;
     }
 
+    class VideoListItemBehavior : Behavior<ListViewItem>
+    {
+        protected override void OnAttached()
+        {
+            this.AssociatedObject.MouseLeftButtonDown += this.OnClick;
+            base.OnAttached();
+        }
+
+        protected override void OnDetaching()
+        {
+            this.AssociatedObject.MouseLeftButtonDown -= this.OnClick;
+            base.OnDetaching();
+        }
+
+        private void OnClick(object? sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                if (this.AssociatedObject.Tag is not VideoListViewModel vm) return;
+                var setting = WS::Mainpage.EnumSettingsHandler.GetSetting<EnumSettings::VideodbClickSettings>();
+
+                if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
+                {
+                    vm.OpenInPlayerAcommand.Execute(this.AssociatedObject);
+                }
+                else if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerB)
+                {
+                    vm.OpenInPlayerBcommand.Execute(this.AssociatedObject);
+                }
+                else if (setting == EnumSettings::VideodbClickSettings.SendToAppA)
+                {
+                    vm.SendToappACommand.Execute(this.AssociatedObject);
+                }
+                else if (setting == EnumSettings::VideodbClickSettings.SendToAppB)
+                {
+                    vm.SendToappBCommand.Execute(this.AssociatedObject);
+                }
+                else if (setting == EnumSettings::VideodbClickSettings.Download)
+                {
+                    vm.OpenInPlayerAcommand.Execute(this.AssociatedObject);
+                }
+            }
+        }
+    }
 
     /// <summary>
     /// プレイリストの並び替えパターン
