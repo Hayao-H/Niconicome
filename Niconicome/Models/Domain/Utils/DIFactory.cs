@@ -102,6 +102,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideo::IVideoEncoader, DlVideo::VideoEncoader>();
             services.AddTransient<DlVideo::ITsMerge, DlVideo::TsMerge>();
             services.AddSingleton<Download::IContentDownloader, Download::ContentDownloader>();
+            services.AddSingleton<Download::IContentDownloadHelper, Download::ContentDownloadHelper>();
             services.AddTransient<DlThumb::IThumbDownloader, DlThumb::ThumbDownloader>();
             services.AddTransient<Playlist::IVideoFilter, Playlist::VideoFilter>();
             services.AddTransient<Search::ISearch, Search::Search>();
