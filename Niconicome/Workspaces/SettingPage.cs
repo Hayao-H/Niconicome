@@ -21,5 +21,6 @@ namespace Niconicome.Workspaces
         public static IXenoImportGeneralManager XenoImportManager { get; private set; } = DIFactory.Provider.GetRequiredService<IXenoImportGeneralManager>();
         public static IMessageHandler MessageHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IMessageHandler>();
         public static IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoListContainer>();
+        public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
     }
 }

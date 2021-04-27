@@ -53,7 +53,7 @@ namespace Niconicome.Models.Local.Settings
         {
             if (data is Value::VideodbClickSettings value)
             {
-                this.localSettingHandler.SaveSetting(value, SettingsEnum.VListItemdbClick);
+                this.localSettingHandler.SaveSetting((int)value, SettingsEnum.VListItemdbClick);
 
                 return new AttemptResult() { IsSucceeded = true };
             }
