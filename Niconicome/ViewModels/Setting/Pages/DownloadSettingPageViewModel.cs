@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WS = Niconicome.Workspaces;
-using Local = Niconicome.Models.Local;
 using System.ComponentModel;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Niconicome.Models.Local.Settings;
@@ -15,7 +14,7 @@ namespace Niconicome.ViewModels.Setting.Pages
     {
         public DownloadSettingPageViewModel()
         {
-            var cOffset = WS::SettingPage.SettingHandler.GetIntSetting(Local::SettingsEnum.CommentOffset);
+            var cOffset = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.CommentOffset);
             if (cOffset == -1)
             {
                 this.commentOffsetField = 40;
@@ -108,7 +107,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             set
             {
                 if (!int.TryParse(value.ToString(), out int _)) return;
-                this.Savesetting(ref this.commentOffsetField, value, Local::SettingsEnum.CommentOffset);
+                this.Savesetting(ref this.commentOffsetField, value, SettingsEnum.CommentOffset);
             }
         }
 
