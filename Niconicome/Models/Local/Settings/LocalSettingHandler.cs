@@ -169,6 +169,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.MWThumbColumnWid => STypes::SettingNames.MainWindowThumbnailColumnWidth,
                 SettingsEnum.ReAllocateCommands => STypes::SettingNames.ReAllocateIfVideoisNotSaved,
                 SettingsEnum.VListItemdbClick => STypes::SettingNames.VideoListItemdbClickAction,
+                SettingsEnum.AutoRenameNetPlaylist => STypes::SettingNames.AutoRenamingAfterSetNetworkPlaylist,
                 _ => null
             };
         }
@@ -228,5 +229,6 @@ namespace Niconicome.Models.Local.Settings
         MWThumbColumnWid,
         ReAllocateCommands,
         VListItemdbClick,
+        AutoRenameNetPlaylist,
     }
 }

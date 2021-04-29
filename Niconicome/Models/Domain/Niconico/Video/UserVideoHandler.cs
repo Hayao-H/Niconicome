@@ -10,28 +10,29 @@ using Niconicome.Models.Playlist;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using UVideo = Niconicome.Models.Domain.Niconico.Net.Json.API.Video;
 using Utils = Niconicome.Models.Domain.Utils;
+using Microsoft.Xaml.Behaviors;
+using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Niconico.Video
 {
     public interface IUserVideoHandler
     {
-        Task<List<IListVideoInfo>> GetVideosAsync(string userId);
-        Exception? CurrentException { get; }
+        Task<IAttemptResult<string>> GetVideosAsync(string userId, List<IListVideoInfo> videos);
     }
 
     public class UserVideoHandler : IUserVideoHandler
     {
 
-        public UserVideoHandler(INicoHttp http)
+        public UserVideoHandler(INicoHttp http, ILogger logger)
         {
             this.http = http;
+            this.logger = logger;
         }
 
         private readonly INicoHttp http;
 
-        private int allVideos = -1;
-
-        public Exception? CurrentException { get; private set; }
+        private readonly ILogger logger;
 
 
         /// <summary>
@@ -39,10 +40,10 @@ namespace Niconicome.Models.Domain.Niconico.Video
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<List<IListVideoInfo>> GetVideosAsync(string userId)
+        public async Task<IAttemptResult<string>> GetVideosAsync(string userId, List<IListVideoInfo> videos)
         {
-            var rawData = await this.GetAllVideosInternalAsync(userId);
-            return this.ConvertToTreeVideoInfo(rawData);
+            var result = await this.GetAllVideosInternalAsync(userId,videos);
+            return result;
         }
 
         /// <summary>
@@ -50,20 +51,20 @@ namespace Niconicome.Models.Domain.Niconico.Video
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private async Task<List<UVideo::Video>> GetAllVideosInternalAsync(string id)
+        private async Task<IAttemptResult<string>> GetAllVideosInternalAsync(string id, List<IListVideoInfo> videos)
         {
-            var videos = new List<UVideo::Video>();
             int page = 1;
+            long total = 0;
+            IAttemptResult<UVideo::UserVideo> result;
             do
             {
-                List<UVideo::Video> data;
-                data = await this.GetUserVideosAsync(id, page);
-                if (data.Count == 0) break;
-                videos.AddRange(data);
+                result = await this.GetUserVideosAsync(id, page, v => total = v.Data.TotalCount);
+                if (!result.IsSucceeded) return new AttemptResult<string>() { Message = result.Message, Exception = result.Exception };
+                videos.AddRange(this.ConvertToTreeVideoInfo(result.Data!.Data.Items));
                 ++page;
-            } while (videos.Count < this.allVideos);
+            } while (videos.Count < total);
 
-            return videos.Distinct(v => v.Id).ToList();
+            return new AttemptResult<string>() { Data = videos.FirstOrDefault()?.OwnerName ?? string.Empty, IsSucceeded = true };
         }
 
         /// <summary>
@@ -72,22 +73,21 @@ namespace Niconicome.Models.Domain.Niconico.Video
         /// <param name="id"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        private async Task<List<UVideo::Video>> GetUserVideosAsync(string id, int page)
+        private async Task<IAttemptResult<UVideo::UserVideo>> GetUserVideosAsync(string id, int page, Action<UVideo::UserVideo> onGet)
         {
             string rawData;
-            UVideo::UserVideo? data;
-            var logger = Utils::DIFactory.Provider.GetRequiredService<Utils::ILogger>();
 
             try
             {
-                rawData = await this.http.GetStringAsync(new Uri($"https://nvapi.nicovideo.jp/v1/users/{id}/videos?pageSize=100&page={page}"));
+                rawData = await this.http.GetStringAsync(new Uri($"https://nvapi.nicovideo.jp/v2/users/{id}/videos?pageSize=100&page={page}"));
             }
             catch (Exception e)
             {
-                logger.Error($"投稿動画一覧の取得に失敗しました。(id:{id}, page:{page})", e);
-                this.CurrentException = e;
-                throw new HttpRequestException();
+                this.logger.Error($"投稿動画一覧の取得に失敗しました。(id:{id}, page:{page})", e);
+                return new AttemptResult<UVideo::UserVideo>() { Message = $"投稿動画一覧の取得に失敗しました。(id:{id}, page:{page})", Exception = e };
             }
+
+            UVideo::UserVideo data;
 
             try
             {
@@ -96,12 +96,12 @@ namespace Niconicome.Models.Domain.Niconico.Video
             catch (Exception e)
             {
                 logger.Error($"投稿動画一覧の解析に失敗しました。(id:{id}, page:{page})", e);
-                this.CurrentException = e;
-                throw new JsonException();
+                return new AttemptResult<UVideo::UserVideo>() { Message = $"投稿動画一覧の解析に失敗しました。(id:{id}, page:{page})", Exception = e };
             }
 
-            if (this.allVideos == -1) this.allVideos = data?.Data?.TotalCount ?? -1;
-            return data?.Data?.Items ?? new List<UVideo.Video>();
+            onGet(data);
+            return new AttemptResult<UVideo::UserVideo>() { IsSucceeded = true, Data = data };
+
         }
 
         /// <summary>
@@ -109,10 +109,10 @@ namespace Niconicome.Models.Domain.Niconico.Video
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        private List<IListVideoInfo> ConvertToTreeVideoInfo(List<UVideo::Video> videos)
+        private List<IListVideoInfo> ConvertToTreeVideoInfo(List<UVideo::Item> videos)
         {
             var converted = new List<IListVideoInfo>();
-            converted.AddRange(videos.Select(v => new BindableListVIdeoInfo() { Title = v.Title, NiconicoId = v.Id, UploadedOn = v.RegisteredAt, ThumbUrl = v.Thumbnail.MiddleUrl, LargeThumbUrl = v.Thumbnail.LargeUrl }));
+            converted.AddRange(videos.Select(v => v.Essential).Select(v => new BindableListVIdeoInfo() { Title = v.Title, NiconicoId = v.Id, UploadedOn = v.RegisteredAt.DateTime, ThumbUrl = v.Thumbnail.MiddleUrl, LargeThumbUrl = v.Thumbnail.LargeUrl, ViewCount = (int)v.Count.View, CommentCount = (int)v.Count.Comment, MylistCount = (int)v.Count.Mylist, LikeCount = (int)v.Count.Like, OwnerName = v.Owner.Name }));
             return converted;
         }
     }

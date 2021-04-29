@@ -11,14 +11,14 @@ using Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Extensions.System.List;
 using Utils = Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result.Generic;
 
 namespace Niconicome.Models.Domain.Niconico.Mylist
 {
 
     public interface IWatchLaterHandler
     {
-        Task<List<IListVideoInfo>> GetVideosAsync();
-        Exception? CurrentException { get; }
+        Task<IAttemptResult<string>> GetVideosAsync(List<IListVideoInfo> videos);
     }
 
     /// <summary>
@@ -26,15 +26,15 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
     /// </summary>
     class WatchLaterHandler : MylistHandler, IWatchLaterHandler
     {
-        public WatchLaterHandler(INicoHttp http,Utils::ILogger logger) : base(http,logger) { }
+        public WatchLaterHandler(INicoHttp http, Utils::ILogger logger) : base(http, logger) { }
 
         /// <summary>
         /// 「あとで見る」を取得する
         /// </summary>
         /// <returns></returns>
-        public async Task<List<IListVideoInfo>> GetVideosAsync()
+        public async Task<IAttemptResult<string>> GetVideosAsync(List<IListVideoInfo> videos)
         {
-            return await this.GetVideosAsync("0");
+            return await this.GetVideosAsync("0", videos);
         }
 
         /// <summary>
@@ -64,31 +64,33 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        protected async override Task<List<Net.Json.API.Mylist.Video>> GetAllMylistVideos(string id)
+        protected async override Task<IAttemptResult<string>> GetAllMylistVideos(string id, List<Net.Json.API.Mylist.Video> rawData)
         {
             var videos = new List<Mylist::Video>();
 
 
-            var data = new WatchLater::WatchLaterResponse();
+            IAttemptResult<WatchLater::WatchLaterResponse>? data;
             int page = 1;
 
             do
             {
                 data = await this.TryGetWatchLater(id, page.ToString());
+                if (!data.IsSucceeded) return new AttemptResult<string>() { Message = data.Message };
                 page++;
-                videos.AddRange(data.Data.WatchLater.Items.Select(i => i.Video));
+                videos.AddRange(data.Data!.Data.WatchLater.Items.Select(i => i.Video));
             }
-            while (data.Data.WatchLater.HasNext);
+            while (data.Data!.Data.WatchLater.HasNext);
 
             var vList = videos.Distinct(v => v.Id).ToList();
             this.logger.Log($"{vList.Count}件の動画を「あとで見る」から取得しました。");
-            return vList;
+            return new AttemptResult<string>() { IsSucceeded = true, Data = "あとで見る" };
         }
 
 
-        private async Task<WatchLater::WatchLaterResponse> TryGetWatchLater(string id, string page)
+        private async Task<IAttemptResult<WatchLater::WatchLaterResponse>> TryGetWatchLater(string id, string page)
         {
             WatchLater::WatchLaterResponse? data;
+
             string rawData;
 
             try
@@ -98,8 +100,7 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
             catch (Exception e)
             {
                 this.logger.Error($"「あとで見る」の取得に失敗しました。(page:{page})", e);
-                this.CurrentException = e;
-                throw new HttpRequestException();
+                return new AttemptResult<WatchLater::WatchLaterResponse>() { Message = $"「あとで見る」の取得に失敗しました。(page:{page})", Exception = e };
             }
 
             try
@@ -109,11 +110,10 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
             catch (Exception e)
             {
                 this.logger.Error($"「あとで見る」の解析に失敗しました。(page:{page})", e);
-                this.CurrentException = e;
-                throw new System.Text.Json.JsonException();
+                return new AttemptResult<WatchLater::WatchLaterResponse>() { Message = $"「あとで見る」の解析に失敗しました。(page:{page})", Exception = e };
             }
 
-            return data;
+            return new AttemptResult<WatchLater::WatchLaterResponse>() { IsSucceeded = true, Data = data };
         }
     }
 }

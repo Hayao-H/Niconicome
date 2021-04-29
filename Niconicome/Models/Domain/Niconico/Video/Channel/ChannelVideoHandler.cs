@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using AngleSharp.Attributes;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using WatchInfo = Niconicome.Models.Domain.Niconico.Watch;
@@ -23,8 +25,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
     public interface IChannelVideoHandler
     {
-        Task<IEnumerable<string>> GetVideosAsync(string channelId,IEnumerable<string> registeredVideo, Action<string> onMessage);
-        Exception? CurrentException { get; }
+        Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<string> ids, IEnumerable<string> registeredVideo, Action<string> onMessage);
     }
 
     class ChannelVideoHandler : IChannelVideoHandler
@@ -47,9 +48,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GetVideosAsync(string channelId, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        public async Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<string> ids, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
-            var result = new ChannelResult();
 
             string html;
             try
@@ -58,30 +58,22 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
             }
             catch (Exception e)
             {
-                this.CurrentException = e;
-                throw new HttpRequestException();
+                return new AttemptResult<string>() { Message = $"チャンネルページ取得に失敗しました。(詳細: {e.Message}" };
             }
 
-            List<string> ids;
             try
             {
-                ids = this.GetIdsFromHtml(html).ToList();
+                var retlieved = this.GetIdsFromHtml(html);
+                ids.AddRange(retlieved);
             }
             catch (Exception e)
             {
-
-                this.CurrentException = e;
-                throw new InvalidOperationException();
+                return new AttemptResult<string>() { Message = $"チャンネルページの解析に失敗しました。(詳細: {e.Message}" };
             }
 
-            return ids;
+            return new AttemptResult<string>() { IsSucceeded = true };
         }
 
-
-        /// <summary>
-        /// 直近の例外
-        /// </summary>
-        public Exception? CurrentException { get; private set; }
 
 
         /// <summary>
@@ -99,7 +91,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
             catch (Exception e)
             {
                 this.logger.Error("チャンネルページの取得に失敗しました。", e);
-                throw new HttpRequestException("チャンネルページの取得に失敗しました。");
+                throw new HttpRequestException(e.Message);
             }
 
             return content;

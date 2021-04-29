@@ -10,18 +10,18 @@ using Niconicome.Models.Domain.Niconico.Net.Json;
 using Mylist = Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist;
 using Utils = Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Helper.Result.Generic;
 
 namespace Niconicome.Models.Domain.Niconico.Mylist
 {
     public interface IMylistHandler
     {
-        Task<List<IListVideoInfo>> GetVideosAsync(string playlistId);
-        Exception? CurrentException { get; }
+        Task<IAttemptResult<string>> GetVideosAsync(string playlistId, List<IListVideoInfo> videos);
     }
 
     public class MylistHandler : IMylistHandler
     {
-        public MylistHandler(INicoHttp http,Utils::ILogger logger)
+        public MylistHandler(INicoHttp http, Utils::ILogger logger)
         {
             this.http = http;
             this.logger = logger;
@@ -42,17 +42,16 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// </summary>
         /// <param name="mylistId"></param>
         /// <returns></returns>
-        public virtual async Task<List<IListVideoInfo>> GetVideosAsync(string mylistId)
+        public virtual async Task<IAttemptResult<string>> GetVideosAsync(string playlistId, List<IListVideoInfo> videos)
         {
-            var rawdata = await this.GetAllMylistVideos(mylistId);
-            var converted = this.ConvertToTreeVideoInfo(rawdata);
-            return converted;
-        }
+            var rawVideos = new List<Mylist::Video>();
 
-        /// <summary>
-        /// 例外情報
-        /// </summary>
-        public Exception? CurrentException { get; protected set; }
+            var result = await this.GetAllMylistVideos(playlistId, rawVideos);
+            var converted = this.ConvertToTreeVideoInfo(rawVideos);
+            videos.AddRange(converted);
+
+            return result;
+        }
 
 
         /// <summary>
@@ -60,24 +59,25 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        protected virtual async Task<List<Mylist::Video>> GetAllMylistVideos(string id)
+        protected virtual async Task<IAttemptResult<string>> GetAllMylistVideos(string id, List<Mylist::Video> rawData)
         {
             var videos = new List<Mylist::Video>();
 
-            var data = new Mylist::MylistResponse();
+            IAttemptResult<Mylist::MylistResponse> data;
             int page = 1;
 
             do
             {
                 data = await this.TryGetmylist(id, page.ToString());
+                if (!data.IsSucceeded) return new AttemptResult<string>() { Message = data.Message };
                 page++;
-                videos.AddRange(data.Data.Mylist.Items.Select(i => i.Video));
+                videos.AddRange(data.Data!.Data.Mylist.Items.Select(i => i.Video));
             }
-            while (data.Data.Mylist.HasNext);
+            while (data.Data!.Data.Mylist.HasNext);
 
-            var vList= videos.Distinct(v => v.Id).ToList();
+            var vList = videos.Distinct(v => v.Id).ToList();
             this.logger.Log($"{vList.Count}件の動画をマイリスト(id:{id})から取得しました。");
-            return vList;
+            return new AttemptResult<string>() { Data = data.Data!.Data.Mylist.Name, IsSucceeded = true };
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// <param name="id"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        private async Task<Mylist::MylistResponse> TryGetmylist(string id, string page)
+        private async Task<IAttemptResult<Mylist::MylistResponse>> TryGetmylist(string id, string page)
         {
             Mylist::MylistResponse? data;
             string rawData;
@@ -98,8 +98,7 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
             catch (Exception e)
             {
                 this.logger.Error($"マイリストデータの取得に失敗しました。(id:{id}, page:{page})", e);
-                this.CurrentException = e;
-                throw new HttpRequestException();
+                return new AttemptResult<Mylist::MylistResponse>() { Message = $"マイリストデータの取得に失敗しました。(id:{id}, page:{page})", Exception = e };
             }
 
             try
@@ -109,11 +108,11 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
             catch (Exception e)
             {
                 this.logger.Error($"マイリストデータの解析に失敗しました。(id:{id}, page:{page})", e);
-                this.CurrentException = e;
-                throw new System.Text.Json.JsonException();
+                return new AttemptResult<Mylist::MylistResponse>() { Message = $"マイリストデータの解析に失敗しました。(id:{id}, page:{page})", Exception = e };
+
             }
 
-            return data;
+            return new AttemptResult<Mylist::MylistResponse>() { IsSucceeded = true, Data = data };
         }
 
         /// <summary>
@@ -130,8 +129,8 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
                 Title = video.Title,
                 UploadedOn = video.RegisteredAt,
                 NiconicoId = video.Id,
-                LargeThumbUrl = video.Thumbnail.LargeUrl.IsNullOrEmpty()?video.Thumbnail.Url: video.Thumbnail.LargeUrl,
-                ThumbUrl = video.Thumbnail.MiddleUrl.IsNullOrEmpty()?video.Thumbnail.Url:video.Thumbnail.MiddleUrl,
+                LargeThumbUrl = video.Thumbnail.LargeUrl.IsNullOrEmpty() ? video.Thumbnail.Url : video.Thumbnail.LargeUrl,
+                ThumbUrl = video.Thumbnail.MiddleUrl.IsNullOrEmpty() ? video.Thumbnail.Url : video.Thumbnail.MiddleUrl,
 
             }).ToList());
 
