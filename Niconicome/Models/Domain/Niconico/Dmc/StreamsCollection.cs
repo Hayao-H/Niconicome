@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Linq;
+using Niconicome.Extensions;
 
 namespace Niconicome.Models.Domain.Niconico.Dmc
 {
     public interface IStreamsCollection
     {
         IEnumerable<IStreamInfo> GetAllStreams();
-        IStreamInfo GetTheBestStream();
-        IStreamInfo GetTheWorstStream();
-        IStreamInfo GetStream(uint verticalResolution);
+        IStreamInfo GetTheBestStream(bool preferLowBitrate = false);
+        IStreamInfo GetTheWorstStream(bool preferLowBitrate = false);
+        IStreamInfo GetStream(uint verticalResolution, bool preferLowBitrate = false);
         void Add(IStreamInfo stream);
         void AddRange(IEnumerable<IStreamInfo> streams);
     }
@@ -57,20 +58,40 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
         /// 最高解像度のストリームを取得する
         /// </summary>
         /// <returns></returns>
-        public IStreamInfo GetTheBestStream()
+        public IStreamInfo GetTheBestStream(bool preferLowBitrate = false)
         {
             this.CheckStreamsListAndThrowError();
-            return this.innerList.OrderBy(s => s.Resolution!.Vertical).Last();
+            var last = this.innerList.OrderBy(s => s.Resolution!.Vertical).Last();
+            var bests = this.innerList.Where(p => p.Resolution!.Vertical == last.Resolution!.Vertical).OrderByDescending(p=>p.BandWidth);
+
+            if (preferLowBitrate)
+            {
+                return bests.First();
+            } else
+            {
+                return bests.Last();
+            }
+            
         }
 
         /// <summary>
         /// 最低解像度のストリームを取得する
         /// </summary>
         /// <returns></returns>
-        public IStreamInfo GetTheWorstStream()
+        public IStreamInfo GetTheWorstStream(bool preferLowBitrate = false)
         {
             this.CheckStreamsListAndThrowError();
-            return this.innerList.OrderBy(s => s.Resolution!.Vertical).First();
+            var last = this.innerList.OrderByDescending(s => s.Resolution!.Vertical).Last();
+            var bests = this.innerList.Where(p => p.Resolution!.Vertical == last.Resolution!.Vertical).OrderByDescending(p => p.BandWidth);
+
+            if (preferLowBitrate)
+            {
+                return bests.First();
+            }
+            else
+            {
+                return bests.Last();
+            }
         }
 
         /// <summary>
@@ -78,10 +99,23 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
         /// </summary>
         /// <param name="verticalResolution"></param>
         /// <returns></returns>
-        public IStreamInfo GetStream(uint verticalResolution)
+        public IStreamInfo GetStream(uint verticalResolution, bool preferLowBitrate = false)
         {
             this.CheckStreamsListAndThrowError();
-            return this.innerList.OrderByDescending(s => s.Resolution!.Vertical).SkipWhile(s => s.Resolution!.Vertical > verticalResolution).FirstOrDefault() ?? this.GetTheWorstStream();
+            var first = this.innerList.OrderByDescending(s => s.Resolution!.Vertical).SkipWhile(s => s.Resolution!.Vertical > verticalResolution).FirstOrDefault();
+
+            if (first is null) return this.GetTheWorstStream();
+
+            var bests = this.innerList.Where(p => p.Resolution!.Vertical == first.Resolution!.Vertical).OrderByDescending(p => p.BandWidth);
+
+            if (preferLowBitrate)
+            {
+                return bests.First();
+            }
+            else
+            {
+                return bests.Last();
+            }
         }
 
         private void CheckStreamsListAndThrowError(int least = 1)
