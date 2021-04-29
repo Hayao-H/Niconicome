@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System;
-using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels;
-using Local = Niconicome.Models.Local;
-using Net = Niconicome.Models.Domain.Network;
+using State = Niconicome.Models.Local.State;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Utils = Niconicome.Models.Domain.Utils;
-using State = Niconicome.Models.Local.State;
-using LiteDB;
 
 namespace Niconicome.Models.Playlist
 {
@@ -30,7 +26,7 @@ namespace Niconicome.Models.Playlist
         void Refresh();
         void Refresh(bool expandAll, bool inheritExpandedState);
         void Move(int id, int targetId);
-        void SetAsRemotePlaylist(int playlistId, string Id, RemoteType type);
+        void SetAsRemotePlaylist(int playlistId, string Id, string name, RemoteType type);
         void SetAsLocalPlaylist(int playlistId);
         void SaveAllPlaylists();
         bool IsLastChild(int id);
@@ -86,25 +82,28 @@ namespace Niconicome.Models.Playlist
 
     /// <summary>
     /// ViewModelから触るAPI
-    /// これはあくまでメモリ上への動画データしか変更できないため、
-    /// DBのデータを変更したい場合は別途VideoHandlerクラスのインスタンスを利用する必要がある
     /// </summary>
     public class PlaylistHandler : IPlaylistHandler
     {
-        public PlaylistHandler(IPlaylistTreeConstructor handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger)
+        public PlaylistHandler(IPlaylistTreeConstructor handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger, ILocalSettingHandler settingHandler)
         {
             this.Playlists = new ObservableCollection<ITreePlaylistInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Playlists, new object());
             this.handler = handler;
             this.playlistStoreHandler = playlistStoreHandler;
             this.errorMessanger = errorMessanger;
+            this.settingHandler = settingHandler;
         }
 
+        #region field
         private readonly IPlaylistTreeConstructor handler;
 
         private readonly IPlaylistStoreHandler playlistStoreHandler;
 
         private readonly State::IErrorMessanger errorMessanger;
+
+        private readonly ILocalSettingHandler settingHandler;
+        #endregion
 
         public ObservableCollection<ITreePlaylistInfo> Playlists { get; private set; }
 
@@ -169,9 +168,33 @@ namespace Niconicome.Models.Playlist
         /// <param name="playlistId"></param>
         /// <param name="Id"></param>
         /// <param name="type"></param>
-        public void SetAsRemotePlaylist(int playlistId, string Id, RemoteType type)
+        public void SetAsRemotePlaylist(int playlistId, string Id, string name, RemoteType type)
         {
             this.playlistStoreHandler.SetAsRemotePlaylist(playlistId, Id, type);
+
+            if (this.settingHandler.GetBoolSetting(SettingsEnum.AutoRenameNetPlaylist))
+            {
+                var playlistName = type switch
+                {
+                    RemoteType.Mylist => name,
+                    RemoteType.UserVideos => $"{name}さんの投稿動画",
+                    RemoteType.WatchLater => "あとで見る",
+                    RemoteType.Channel => name,
+                    _ => name,
+                };
+
+                if (!name.IsNullOrEmpty())
+                {
+                    var playlist = this.GetPlaylist(playlistId);
+
+                    if (playlist is not null)
+                    {
+                        playlist.Name = playlistName;
+                        this.Update(playlist);
+                    }
+                }
+            }
+
             this.SetPlaylists();
         }
 
@@ -249,6 +272,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         public void SaveAllPlaylists()
         {
+            this.Refresh();
             var playlists = this.handler.GetAllPlaylists();
             foreach (var p in playlists)
             {

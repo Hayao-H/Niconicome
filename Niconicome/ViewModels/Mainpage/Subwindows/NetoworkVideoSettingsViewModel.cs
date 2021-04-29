@@ -70,6 +70,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     this.OnPropertyChanged(messagePropName);
 
                     var videos = new List<Playlist::IListVideoInfo>();
+                    int playlistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
 
                     this.Message = "情報を取得中です...";
 
@@ -80,29 +81,22 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     });
 
 
-                    if (result.IsFailed)
+                    if (!result.IsSucceeded)
                     {
-                        string detail = WS::Mainpage.RemotePlaylistHandler.ExceptionDetails ?? "None";
-                        string logfile = WS::Mainpage.LocalInfo.LogFileName;
-                        this.Message = $"{this.CurrentSetting.Name}(id:{id})の取得に失敗しました。";
+                        string detail = result.Exception?.Message ?? "None";
+                        this.Message = $"{this.CurrentSetting.Name}(id:{id})の取得に失敗しました。({result.Message})";
                         this.Message = $"詳細情報:{detail}";
-                        this.Message = $"更に詳しい情報は、ログファイル({logfile})を参照してください。";
 
                         this.isfetching = false;
                         this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
 
                         return;
                     }
-                    else if (result.SucceededCount == 0)
+                    else if (videos.Count == 0)
                     {
                         this.Message = "取得に成功しましたが、動画は一件も存在しませんでした。";
                     }
-                    else if (!result.IsSucceededAll)
-                    {
-                        this.Message = $"{result.FailedCount}件の取得に失敗しました。";
-                    }
 
-                    int playlistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
 
 
                     if (videos.Count > 0)
@@ -118,14 +112,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     }
                     else
                     {
-                        WS::Mainpage.PlaylistTree.SetAsRemotePlaylist(playlistID, id, this.CurrentSetting.NetworkMode);
+                        WS::Mainpage.PlaylistTree.SetAsRemotePlaylist(playlistID, id, result.Data!, this.CurrentSetting.NetworkMode);
                     }
-
-                    if (result.IsSucceededAll)
-                    {
-                        window.Close();
-                    }
-
 
                     this.isfetching = false;
                     this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
