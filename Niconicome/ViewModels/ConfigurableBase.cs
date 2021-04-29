@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels
@@ -19,7 +19,7 @@ namespace Niconicome.ViewModels
         /// <param name="data"></param>
         /// <param name="settingname"></param>
         /// <param name="propertyname"></param>
-        protected void Savesetting<T>(ref T fiels, T data, Settings setting, [CallerMemberName] string? propertyname = null)
+        protected void Savesetting<T>(ref T fiels, T data, SettingsEnum setting, [CallerMemberName] string? propertyname = null)
         {
             if (data is bool boolData)
             {

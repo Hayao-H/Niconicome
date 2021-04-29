@@ -37,6 +37,7 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using DomainExt = Niconicome.Models.Domain.Local.External;
 using Ext = Niconicome.Models.Local.External;
+using Settings = Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -49,8 +50,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddHttpClient<Niconico::INicoHttp, Niconico::NicoHttp>()
                 .ConfigureHttpMessageHandlerBuilder(builder =>
                 {
-                    var shandler = builder.Services.GetRequiredService<Local::ILocalSettingHandler>();
-                    var skip = shandler.GetBoolSetting(Local::Settings.SkipSSLVerification);
+                    var shandler = builder.Services.GetRequiredService<Settings::ILocalSettingHandler>();
+                    var skip = shandler.GetBoolSetting(Settings::SettingsEnum.SkipSSLVerification);
                     if (builder.PrimaryHandler is HttpClientHandler handler)
                     {
                         handler.CookieContainer = builder.Services.GetRequiredService<Niconico::ICookieManager>().CookieContainer;
@@ -101,6 +102,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideo::IVideoEncoader, DlVideo::VideoEncoader>();
             services.AddTransient<DlVideo::ITsMerge, DlVideo::TsMerge>();
             services.AddSingleton<Download::IContentDownloader, Download::ContentDownloader>();
+            services.AddSingleton<Download::IContentDownloadHelper, Download::ContentDownloadHelper>();
             services.AddTransient<DlThumb::IThumbDownloader, DlThumb::ThumbDownloader>();
             services.AddTransient<Playlist::IVideoFilter, Playlist::VideoFilter>();
             services.AddTransient<Search::ISearch, Search::Search>();
@@ -109,7 +111,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<State::IErrorMessanger, State::ErrorMessenger>();
             services.AddSingleton<MyApplication::IStartUp, MyApplication::StartUp>();
             services.AddTransient<Store::ISettingHandler, Store::SettingHandler>();
-            services.AddTransient<Local::ILocalSettingHandler, Local::LocalSettingHandler>();
+            services.AddTransient<Settings::ILocalSettingHandler, Settings::LocalSettingHandler>();
+            services.AddTransient<Settings.IEnumSettingsHandler, Settings::EnumSettingsHandler>();
             services.AddTransient<INiconicoUtils, NiconicoUtils>();
             services.AddSingleton<State::ILocalState, State::LocalState>();
             services.AddTransient<LocalFile::IEncodeutility, LocalFile::Encodeutility>();

@@ -9,6 +9,7 @@ using Niconicome.Models.Domain.Utils;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using NicoIO = Niconicome.Models.Domain.Local.IO;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -84,7 +85,7 @@ namespace Niconicome.Models.Local.Application
         {
             if (this.nicoDirectoryIO.Exists("tmp"))
             {
-                var maxTmp = this.settingHandler.GetIntSetting(Settings.MaxTmpDirCount);
+                var maxTmp = this.settingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
                 if (maxTmp < 0) maxTmp = 20;
                 var infos = this.streamResumer.GetAllSegmentsDirectoryInfo().ToList();
                 if (infos.Count <= maxTmp) return;

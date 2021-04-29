@@ -44,6 +44,7 @@ namespace Niconicome.ViewModels.Setting
                 SettingPages.Import => "/Views/Setting/Pages/ImportPage.xaml",
                 SettingPages.Download=> "/Views/Setting/Pages/DownloadSettingPage.xaml",
                 SettingPages.General=> "/Views/Setting/Pages/GeneralPage.xaml",
+                SettingPages.VideoList=> "/Views/Setting/Pages/VideoListSettingPage.xaml",
                 _ => "/Views/Setting/Pages/EmptyPage.xaml",
             };
             this.PageUri = new Uri(uri, UriKind.Relative);
@@ -115,6 +116,7 @@ namespace Niconicome.ViewModels.Setting
                 "インポート" => SettingPages.Import,
                 "ダウンロード設定"=>SettingPages.Download,
                 "一般設定"=>SettingPages.General,
+                "動画リスト設定"=>SettingPages.VideoList,
                 _ => SettingPages.None
             };
         }
@@ -154,6 +156,7 @@ namespace Niconicome.ViewModels.Setting
         Import,
         Restore,
         Download,
-        General
+        General,
+        VideoList
     }
 }

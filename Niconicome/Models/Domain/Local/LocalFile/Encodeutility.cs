@@ -5,12 +5,12 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Niconicome.Models.Local;
 using System.Threading;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Domain.Local.LocalFile
 {
@@ -47,7 +47,7 @@ namespace Niconicome.Models.Domain.Local.LocalFile
         public async Task EncodeAsync(string inputFilePath, string outputFileName, CancellationToken token, EncodeOptions options = EncodeOptions.Default)
         {
             var errorOutput = new StringBuilder();
-            var useShell = this.settingHandler.GetBoolSetting(Settings.FFmpegShell);
+            var useShell = this.settingHandler.GetBoolSetting(SettingsEnum.FFmpegShell);
 
             using var p = new Process();
             p.StartInfo.FileName = useShell ? Environment.GetEnvironmentVariable("ComSpec") ?? "cmd.exe" : this.GetffmpegPath();
@@ -125,7 +125,7 @@ namespace Niconicome.Models.Domain.Local.LocalFile
         {
 
             string defaultPath = Path.Combine(AppContext.BaseDirectory, "bin", "ffmpeg.exe");
-            string? ffmpegPath = this.settingHandler.GetStringSetting(Settings.FfmpegPath);
+            string? ffmpegPath = this.settingHandler.GetStringSetting(SettingsEnum.FfmpegPath);
             var path = string.IsNullOrEmpty(ffmpegPath) ? defaultPath : ffmpegPath;
 
             return path;

@@ -11,6 +11,7 @@ using Niconicome.Models.Network.Download;
 using VideoList = Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Network.Watch;
 using Ext = Niconicome.Models.Local.External;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Workspaces
 {
@@ -36,6 +37,6 @@ namespace Niconicome.Workspaces
         public static VideoList::ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::ICurrent>();
         public static VideoList::IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::IVideoListContainer>();
         public static Ext::IExternalAppUtils ExternalAppUtils { get; private set; } = DIFactory.Provider.GetRequiredService<Ext::IExternalAppUtils>();
-
+        public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
     }
 }

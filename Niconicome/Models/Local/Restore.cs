@@ -7,6 +7,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Local.Settings;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Local
@@ -187,7 +188,7 @@ namespace Niconicome.Models.Local
             foreach (var file in filePaths)
             {
                 string id;
-                string format = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? string.Empty;
+                string format = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? string.Empty;
                 try
                 {
                     id = this.niconicoUtils.GetIdFromFIleName(format, file);

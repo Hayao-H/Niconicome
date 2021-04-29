@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network;
 using Niconicome.Models.Playlist;
 using Xeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
@@ -153,7 +154,7 @@ namespace Niconicome.Models.Local.External.Import
             playlist.Name = playlistInfo.Name;
             if (playlistInfo.IsRemotePlaylist)
             {
-                var registerOnlyID = this.settingHandler.GetBoolSetting(Settings.StoreOnlyNiconicoID);
+                var registerOnlyID = this.settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
                 if (!registerOnlyID)
                 {
                     onMessage("待機中(10s)");

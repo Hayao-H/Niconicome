@@ -8,6 +8,7 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network;
 
 namespace Niconicome.Models.Playlist.VideoList
@@ -81,9 +82,9 @@ namespace Niconicome.Models.Playlist.VideoList
                 };
             }
 
-            var format = this.settingHandler.GetStringSetting(Settings.FileNameFormat) ?? "[<id>]<title>";
-            var replaceStricted = this.settingHandler.GetBoolSetting(Settings.ReplaceSBToMB);
-            var defaultDir = this.settingHandler.GetStringSetting(Settings.DefaultFolder) ?? FileFolder.DefaultDownloadDir;
+            var format = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
+            var replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
+            var defaultDir = this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir;
             var folderPath = playlist.FolderPath ?? defaultDir;
 
             foreach (var originVideo in originVideos)

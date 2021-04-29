@@ -8,6 +8,7 @@ using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.External;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 
@@ -45,7 +46,7 @@ namespace Niconicome.Models.Local.External
         /// <returns></returns>
         public IAttemptResult OpenInPlayerA(IListVideoInfo videoInfo)
         {
-            var appPath = this.localSettingHandler.GetStringSetting(Settings.PlayerAPath);
+            var appPath = this.localSettingHandler.GetStringSetting(SettingsEnum.PlayerAPath);
             if (appPath is null) return new AttemptResult() { Message = "プレイヤーAは登録されていません。" };
 
             return this.OpenPlayer(appPath, videoInfo);
@@ -58,7 +59,7 @@ namespace Niconicome.Models.Local.External
         /// <returns></returns>
         public IAttemptResult OpenInPlayerB(IListVideoInfo videoInfo)
         {
-            var appPath = this.localSettingHandler.GetStringSetting(Settings.PlayerBPath);
+            var appPath = this.localSettingHandler.GetStringSetting(SettingsEnum.PlayerBPath);
             if (appPath is null) return new AttemptResult() { Message = "プレイヤーBは登録されていません。" };
 
             return this.OpenPlayer(appPath, videoInfo);
@@ -71,10 +72,10 @@ namespace Niconicome.Models.Local.External
         /// <returns></returns>
         public IAttemptResult SendToAppA(IListVideoInfo videoInfo)
         {
-            var appPath = this.localSettingHandler.GetStringSetting(Settings.AppAPath);
+            var appPath = this.localSettingHandler.GetStringSetting(SettingsEnum.AppAPath);
             if (appPath is null) return new AttemptResult() { Message = "アプリAは登録されていません。" };
 
-            var paramBase = this.localSettingHandler.GetStringSetting(Settings.AppAParam);
+            var paramBase = this.localSettingHandler.GetStringSetting(SettingsEnum.AppAParam);
             if (paramBase is null)
             {
                 paramBase = "<url>";
@@ -90,10 +91,10 @@ namespace Niconicome.Models.Local.External
         /// <returns></returns>
         public IAttemptResult SendToAppB(IListVideoInfo videoInfo)
         {
-            var appPath = this.localSettingHandler.GetStringSetting(Settings.AppBPath);
+            var appPath = this.localSettingHandler.GetStringSetting(SettingsEnum.AppBPath);
             if (appPath is null) return new AttemptResult() { Message = "アプリBは登録されていません。" };
 
-            var paramBase = this.localSettingHandler.GetStringSetting(Settings.AppBParam);
+            var paramBase = this.localSettingHandler.GetStringSetting(SettingsEnum.AppBParam);
             if (paramBase is null)
             {
                 paramBase = "<id>";

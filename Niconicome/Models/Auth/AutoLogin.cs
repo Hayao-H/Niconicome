@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualBasic;
 using Niconicome.Models.Domain.Niconico;
-using Niconicome.Models.Local;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Auth
 {
@@ -71,7 +71,7 @@ namespace Niconicome.Models.Auth
         /// </summary>
         public bool IsAUtologinEnable
         {
-            get => this.settingHandler.GetBoolSetting(Settings.AutologinEnable);
+            get => this.settingHandler.GetBoolSetting(SettingsEnum.AutologinEnable);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Niconicome.Models.Auth
         /// <returns></returns>
         private AutoLoginType GetAutoLoginType()
         {
-            var mode = this.settingHandler.GetStringSetting(Settings.AutologinMode) ?? AutoLoginTypeString.Normal;
+            var mode = this.settingHandler.GetStringSetting(SettingsEnum.AutologinMode) ?? AutoLoginTypeString.Normal;
 
             if (mode == AutoLoginTypeString.Normal)
             {

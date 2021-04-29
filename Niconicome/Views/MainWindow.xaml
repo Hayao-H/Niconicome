@@ -245,9 +245,6 @@
                             </Grid>
                             <Grid Grid.Row="2">
                                 <ListView Name="videolist" ItemsSource="{Binding Videos,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" BorderThickness="1" BorderBrush="#e7e7e7" >
-                                    <i:Interaction.Behaviors>
-                                        <vm:VideoListBehavior/>
-                                    </i:Interaction.Behaviors>
                                     <ListView.View>
                                         <GridView>
                                             <GridViewColumn Header="選択" Width="{Binding SelectColumnWidth,Mode=TwoWay}">
@@ -331,6 +328,7 @@
                                                     </ContextMenu>
                                                 </Setter.Value>
                                             </Setter>
+                                            <EventSetter Event="MouseDoubleClick" Handler="Videolist_db_click"/>
                                         </Style>
                                     </ListView.ItemContainerStyle>
                                     <ListView.Resources>
