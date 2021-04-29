@@ -347,12 +347,8 @@ namespace Niconicome.ViewModels.Mainpage
 
                      var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId, videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType, this.Videos.Select(v => v.NiconicoId), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
-                     if (!result.IsFailed)
+                     if (result.IsSucceeded)
                      {
-                         if (!result.IsSucceededAll)
-                         {
-                             WS::Mainpage.Messagehandler.AppendMessage($"{result.FailedCount}件の取得に失敗しました。");
-                         }
 
                          videos = videos.Where(v => !WS::Mainpage.PlaylistTree.ContainsVideo(v.NiconicoId, playlistId)).ToList();
 
@@ -380,7 +376,7 @@ namespace Niconicome.ViewModels.Mainpage
                      }
                      else
                      {
-                         string detail = WS::Mainpage.RemotePlaylistHandler.ExceptionDetails ?? "None";
+                         string detail = result.Exception?.Message ?? "None";
                          WS::Mainpage.Messagehandler.AppendMessage($"情報の取得に失敗しました。(詳細: {detail})");
                          this.SnackbarMessageQueue.Enqueue($"情報の取得に失敗しました。(詳細: {detail})");
                      }

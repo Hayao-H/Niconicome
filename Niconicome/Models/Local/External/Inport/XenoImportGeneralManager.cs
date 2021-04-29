@@ -164,27 +164,18 @@ namespace Niconicome.Models.Local.External.Import
                 playlist.IsRemotePlaylist = true;
                 playlist.RemoteType = RemoteType.Channel;
                 playlist.RemoteId = playlistInfo.RemoteId;
-                this.playlistHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
+                this.playlistHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.Name, playlistInfo.RemoteType);
 
                 var videos = new List<IListVideoInfo>();
                 var rResult = await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(playlistInfo.RemoteId, videos, RemoteType.Channel, new List<string>(), m => onMessageVerbose(m));
 
-                if (!rResult.IsFailed)
+                if (result.IsSucceeded)
                 {
                     foreach (var video in videos)
                     {
                         this.videoHandler.AddVideo(video, id);
                     }
-                    result.SucceededVideoCount += rResult.SucceededCount;
-                    if (registerOnlyID)
-                    {
-                        result.SucceededVideoCount += rResult.FailedCount;
-                    }
-                    else if (!rResult.IsSucceededAll)
-                    {
-                        onMessage($"{rResult.FailedCount}件の動画の取得に失敗しました。");
-                        result.FailedVideoCount += rResult.FailedCount;
-                    }
+                    result.SucceededVideoCount += videos.Count;
                 }
                 else
                 {
