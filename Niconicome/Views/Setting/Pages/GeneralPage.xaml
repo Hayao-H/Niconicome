@@ -112,6 +112,16 @@
                 <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsStoreOnlyNiconicoIDEnable}"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="Rename" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="リモートプレイリストに設定した際に自動でプレイリストをリネームする"  />
+                <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsAutoRenamingRemotePlaylistEnable}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
         
     </Grid>

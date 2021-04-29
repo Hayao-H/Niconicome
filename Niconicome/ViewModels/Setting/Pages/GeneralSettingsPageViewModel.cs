@@ -65,6 +65,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.isExpandallPlaylistsEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
             this.isSavePrevPlaylistExpandedStateEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
             this.isStoreOnlyNiconicoIDEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
+            this.isAutoRenamingRemotePlaylistEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.AutoRenameNetPlaylist);
         }
 
         private bool isAutologinEnableField;
@@ -76,6 +77,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         private bool isExpandallPlaylistsEnableField;
 
         private bool isStoreOnlyNiconicoIDEnableField;
+
+        private bool isAutoRenamingRemotePlaylistEnableField;
 
         private string empty = string.Empty;
 
@@ -151,6 +154,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public bool IsStoreOnlyNiconicoIDEnable { get => this.isStoreOnlyNiconicoIDEnableField; set => this.Savesetting(ref this.isStoreOnlyNiconicoIDEnableField, value, SettingsEnum.StoreOnlyNiconicoID); }
 
+        /// <summary>
+        /// 自動リネーム
+        /// </summary>
+        public bool IsAutoRenamingRemotePlaylistEnable { get => this.isAutoRenamingRemotePlaylistEnableField; set => this.Savesetting(ref this.isAutoRenamingRemotePlaylistEnableField, value, SettingsEnum.AutoRenameNetPlaylist); }
+
+
 
     }
 
@@ -181,6 +190,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public bool IsExpandallPlaylistsEnable { get; set; } = true;
 
         public bool IsStoreOnlyNiconicoIDEnable { get; set; } = true;
+
+        public bool IsAutoRenamingRemotePlaylistEnable { get; set; } = true;
 
         public List<AutoLoginTypes> SelectableAutoLoginTypes { get; init; } = new();
 
