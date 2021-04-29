@@ -328,7 +328,7 @@
                                                     </ContextMenu>
                                                 </Setter.Value>
                                             </Setter>
-                                            <EventSetter Event="MouseDoubleClick" Handler="videolist_db_click"/>
+                                            <EventSetter Event="MouseDoubleClick" Handler="Videolist_db_click"/>
                                         </Style>
                                     </ListView.ItemContainerStyle>
                                     <ListView.Resources>

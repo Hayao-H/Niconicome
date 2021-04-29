@@ -28,7 +28,7 @@ namespace Niconicome
             this.videoList.DataContext = new VideoListViewModel();
         }
 
-        private void videolist_db_click(object sender, MouseButtonEventArgs e)
+        private void Videolist_db_click(object sender, MouseButtonEventArgs e)
         {
             ((VideoListViewModel)this.videolist.DataContext).OnDoubleClick(sender);
         }

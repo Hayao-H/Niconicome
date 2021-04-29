@@ -22,7 +22,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             //var download = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.Download, "ダウンロードする");
             var none = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.NotConfigured, "何もしない");
 
-            this.SelectableVideodbClickAction = new List<ComboboxItem<VideodbClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download };
+            this.SelectableVideodbClickAction = new List<ComboboxItem<VideodbClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, };
             var settingdbClickvalue = WS::SettingPage.EnumSettingsHandler.GetSetting<VideodbClickSettings>();
             this.videodbClickActionField = settingdbClickvalue switch
             {
@@ -30,7 +30,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                 VideodbClickSettings.OpenInPlayerB => openInPlayerB,
                 VideodbClickSettings.SendToAppA => sendToAppA,
                 VideodbClickSettings.SendToAppB => sendToAppB,
-                VideodbClickSettings.Download => download,
+                //VideodbClickSettings.Download => download,
                 _ => none,
             };
             #endregion
@@ -48,7 +48,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// ダブルクリックアクション
         /// </summary>
-        public ComboboxItem<VideodbClickSettings> VideodbClickAction { get=>this.videodbClickActionField; set=>this.SaveEnumSetting(ref this.videodbClickActionField,value); }
+        public ComboboxItem<VideodbClickSettings> VideodbClickAction { get => this.videodbClickActionField; set => this.SaveEnumSetting(ref this.videodbClickActionField, value); }
     }
 
     class VideoListSettingsPageViewModelD
