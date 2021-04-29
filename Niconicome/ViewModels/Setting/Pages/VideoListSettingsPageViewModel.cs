@@ -19,7 +19,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             var openInPlayerB = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.OpenInPlayerB, "アプリで開く(B)");
             var sendToAppA = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.SendToAppA, "アプリに送る(A)");
             var sendToAppB = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.SendToAppB, "アプリに送る(B)");
-            var download = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.Download, "ダウンロードする");
+            //var download = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.Download, "ダウンロードする");
             var none = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.NotConfigured, "何もしない");
 
             this.SelectableVideodbClickAction = new List<ComboboxItem<VideodbClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download };
