@@ -52,26 +52,46 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         {
 
             string html;
-            try
-            {
-                html = await this.GetChannelPage(channelId);
-            }
-            catch (Exception e)
-            {
-                return new AttemptResult<string>() { Message = $"チャンネルページ取得に失敗しました。(詳細: {e.Message}" };
-            }
+            var index = 0;
+            var baseUrl = $"https://ch.nicovideo.jp/{channelId}/video";
+            var urlQuery = string.Empty;
+            IChannelPageInfo info;
 
-            try
+            do
             {
-                var retlieved = this.GetIdsFromHtml(html);
-                ids.AddRange(retlieved);
-            }
-            catch (Exception e)
-            {
-                return new AttemptResult<string>() { Message = $"チャンネルページの解析に失敗しました。(詳細: {e.Message}" };
-            }
+                if ((index + 1) % 5 == 0)
+                {
+                    onMessage("待機中...(10s)");
+                    await Task.Delay(10 * 1000);
+                }
 
-            return new AttemptResult<string>() { IsSucceeded = true };
+                onMessage($"{index + 1}ページ目を取得します");
+                try
+                {
+                    html = await this.GetChannelPage(baseUrl + urlQuery);
+                }
+                catch (Exception e)
+                {
+                    return new AttemptResult<string>() { Message = $"チャンネルページ取得に失敗しました。(詳細: {e.Message}" };
+                }
+
+                try
+                {
+                    info = this.GetINfoFromHtml(html);
+                }
+                catch (Exception e)
+                {
+                    return new AttemptResult<string>() { Message = $"チャンネルページの解析に失敗しました。(詳細: {e.Message}" };
+                }
+
+                urlQuery = info.NextPageQuery ?? string.Empty;
+                ids.AddRange(info.IDs);
+                onMessage($"{info.IDs.Count()}件の動画を新たに取得しました。(現在の取得数:{ids.Count})");
+                ++index;
+            }
+            while (info.HasNext);
+
+            return new AttemptResult<string>() { IsSucceeded = true, Data = info.ChannelName };
         }
 
 
@@ -81,12 +101,13 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        private async Task<string> GetChannelPage(string channelId)
+        private async Task<string> GetChannelPage(string url)
         {
             string content;
+
             try
             {
-                content = await this.http.GetStringAsync(new Uri($"https://ch.nicovideo.jp/{channelId}"));
+                content = await this.http.GetStringAsync(new Uri(url));
             }
             catch (Exception e)
             {
@@ -102,7 +123,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="html"></param>
         /// <returns></returns>
-        private IEnumerable<string> GetIdsFromHtml(string html)
+        private IChannelPageInfo GetINfoFromHtml(string html)
         {
             return this.htmlParser.ParseAndGetIds(html);
         }

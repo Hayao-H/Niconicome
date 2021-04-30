@@ -7,7 +7,6 @@ using Niconicome.Models.Playlist;
 using System.Net.Http;
 using WatchLater = Niconicome.Models.Domain.Niconico.Net.Json.API.WatchLater;
 using Mylist = Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist;
-using Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Extensions.System.List;
 using Utils = Niconicome.Models.Domain.Utils;
@@ -64,10 +63,8 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        protected async override Task<IAttemptResult<string>> GetAllMylistVideos(string id, List<Net.Json.API.Mylist.Video> rawData)
+        protected async override Task<IAttemptResult<string>> GetAllMylistVideos(string id, List<Net.Json.API.Mylist.Video> videos)
         {
-            var videos = new List<Mylist::Video>();
-
 
             IAttemptResult<WatchLater::WatchLaterResponse>? data;
             int page = 1;
