@@ -115,6 +115,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                         WS::Mainpage.PlaylistTree.SetAsRemotePlaylist(playlistID, id, result.Data!, this.CurrentSetting.NetworkMode);
                     }
 
+                    this.Message = "取得処理が完了しました。";
                     this.isfetching = false;
                     this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
                 }

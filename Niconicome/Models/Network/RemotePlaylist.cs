@@ -217,10 +217,10 @@ namespace Niconicome.Models.Network
 
             try
             {
-                result = await this.channelVideoHandler.GetVideosAsync(id,ids, registeredVideo, m =>
-                {
-                    onMessage(m);
-                });
+                result = await this.channelVideoHandler.GetVideosAsync(id, ids, registeredVideo, m =>
+                 {
+                     onMessage(m);
+                 });
 
             }
             catch (Exception e)
@@ -241,7 +241,7 @@ namespace Niconicome.Models.Network
 
             videos.AddRange(retlieved);
 
-            return new AttemptResult<string>() { IsSucceeded = true};
+            return new AttemptResult<string>() { IsSucceeded = true, Data = result.Data };
         }
 
 
