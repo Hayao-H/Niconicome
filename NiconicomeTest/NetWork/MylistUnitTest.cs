@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Niconicome.Models.Playlist;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;
@@ -26,8 +28,9 @@ namespace NiconicomeTest.NetWork
         public async Task マイリストを取得する()
         {
             if (this.handler is null) throw new InvalidOperationException();
+            var videos = new List<IListVideoInfo>();
 
-            var videos = await this.handler.GetVideosAsync("67607290");
+            await this.handler.GetVideosAsync("67607290",videos);
 
             Assert.AreEqual(100, videos.Count);
         }

@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Niconicome.Models.Playlist;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 
@@ -18,15 +21,17 @@ namespace NiconicomeTest.NetWork
         {
             var content = new StringContent(Properties.Resources.User_Video_Response);
             var http = new NicoHttpStab(content, content);
-            this.handler = new UVideo::UserVideoHandler(http);
+            this.handler = new UVideo::UserVideoHandler(http, new LoggerStab());
         }
 
         [Test]
         public async Task 投稿動画を取得する()
         {
             if (this.handler is null) throw new InvalidOperationException();
+            var videos = new List<IListVideoInfo>();
 
-            var videos = await this.handler.GetVideosAsync("4");
+
+            await this.handler.GetVideosAsync("4", videos);
 
             Assert.AreEqual(19, videos.Count);
         }
