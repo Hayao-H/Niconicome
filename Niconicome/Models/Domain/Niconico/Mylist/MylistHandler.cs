@@ -59,9 +59,8 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        protected virtual async Task<IAttemptResult<string>> GetAllMylistVideos(string id, List<Mylist::Video> rawData)
+        protected virtual async Task<IAttemptResult<string>> GetAllMylistVideos(string id, List<Mylist::Video> videos)
         {
-            var videos = new List<Mylist::Video>();
 
             IAttemptResult<Mylist::MylistResponse> data;
             int page = 1;

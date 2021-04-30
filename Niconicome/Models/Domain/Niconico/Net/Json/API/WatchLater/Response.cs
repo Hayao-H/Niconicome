@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist;
 
 namespace Niconicome.Models.Domain.Niconico.Net.Json.API.WatchLater
 {
@@ -15,7 +16,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.WatchLater
 
     public partial class WatchLater
     {
-        public List<Mylist.Item> Items { get; set; } = new();
+        public List<Item> Items { get; set; } = new();
         public bool HasNext { get; set; }
     }
 
