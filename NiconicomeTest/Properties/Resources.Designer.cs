@@ -70,6 +70,37 @@ namespace NiconicomeTest.Properties {
         }
         
         /// <summary>
+        ///   &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot;
+        ///&quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;
+        ///
+        ///
+        ///
+        ///
+        ///&lt;html class=&quot;gecko &quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///&lt;script type=&quot;text/javascript&quot;&gt;
+        ///  try {
+        ///    window.NicoGoogleTagManagerDataLayer = [];
+        ///
+        ///    var data = {};
+        ///
+        ///        data.user = (function () {
+        ///      var user = {};
+        ///
+        ///                  user.user_id = parseInt(&apos;74537208&apos;, 10) || null;
+        ///      user.login_status = &apos;login&apos;;
+        ///      user.member_status = &apos;premium&apos;;
+        ///      user.birthday = &apos;1990-03-01&apos;;
+        ///             [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Channel_7 {
+            get {
+                return ResourceManager.GetString("Channel_7", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   [{&quot;ping&quot;:{&quot;content&quot;:&quot;rs: 0&quot;}},{&quot;ping&quot;:{&quot;content&quot;:&quot;ps: 0&quot;}},{&quot;thread&quot;:{&quot;thread&quot;:&quot;1173108780&quot;,&quot;version&quot;:&quot;20090904&quot;,&quot;fork&quot;:0,&quot;language&quot;:0,&quot;user_id&quot;:&quot;12345678&quot;,&quot;with_global&quot;:1,&quot;scores&quot;:1,&quot;nicoru&quot;:3,&quot;userkey&quot;:&quot;1611473223.~1~Oh8RqyodqkNiDk4_UjGjjgI2GflBg2nmG7JugAjyopQ&quot;}},{&quot;ping&quot;:{&quot;content&quot;:&quot;pf: 0&quot;}},{&quot;ping&quot;:{&quot;content&quot;:&quot;ps: 1&quot;}},{&quot;thread_leaves&quot;:{&quot;thread&quot;:&quot;1173108780&quot;,&quot;fork&quot;:0,&quot;language&quot;:0,&quot;user_id&quot;:&quot;12345678&quot;,&quot;content&quot;:&quot;0 - 6:100,500,nicoru: 100&quot;,&quot;scores&quot;:1,&quot;nicoru&quot;:3,&quot;userkey&quot;:&quot;1611473223.~1~Oh8RqyodqkNiDk4_UjGj [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string CommentRequest_sm9 {

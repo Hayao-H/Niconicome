@@ -18,11 +18,20 @@ namespace NiconicomeTest.NetWork.Niconico.Videos.Channel
         }
 
         [Test]
-        public void HTMLをパースする()
+        public void エルフェンリートのHTMLをパースする()
         {
-            var ids = this.parser!.ParseAndGetIds(Properties.Resources.Elfenlied_Channel);
-            Assert.That(ids.IDs.Count(), Is.EqualTo(14));
-            Assert.That(ids.HasNext, Is.False);
+            var info = this.parser!.ParseAndGetIds(Properties.Resources.Elfenlied_Channel);
+            Assert.That(info.IDs.Count(), Is.EqualTo(14));
+            Assert.That(info.HasNext, Is.False);
+        }
+
+        [Test]
+        public void Ch7のHTMLをパースする()
+        {
+            var info = this.parser!.ParseAndGetIds(Properties.Resources.Channel_7);
+            Assert.That(info.IDs.Count(), Is.EqualTo(20));
+            Assert.That(info.HasNext, Is.True);
+            Assert.That(info.NextPageQuery, Is.EqualTo("?&mode=&sort=f&order=d&type=&page=2"));
         }
     }
 }

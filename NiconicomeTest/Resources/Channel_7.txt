@@ -1,0 +1,2297 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+
+
+
+<html class="gecko ">
+
+<head>
+<script type="text/javascript">
+  try {
+    window.NicoGoogleTagManagerDataLayer = [];
+
+    var data = {};
+
+        data.user = (function () {
+      var user = {};
+
+                  user.user_id = parseInt('74537208', 10) || null;
+      user.login_status = 'login';
+      user.member_status = 'premium';
+      user.birthday = '1990-03-01';
+                user.sex = 'male';
+            user.country = 'Japan';
+      user.prefecture = '北海道';
+      user.ui_area = 'jp';
+      user.ui_lang = 'ja-jp';
+            
+      return user;
+      })();
+
+    data.content = (function () {
+      var content = {};
+      content.community_id = '57025';
+      content.ch_screen_name = 'ch7';
+      content.channel_id = 'ch7';
+      content.ch_monthly_charge = null;
+      content.ch_register_status = '未入会';
+      return content;
+    })();
+
+    window.NicoGoogleTagManagerDataLayer.push(data);
+    } catch (e) {}
+</script>
+
+<!-- Google Tag Manager For Channel Access Analytics -->
+
+
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','NicoChannelAccessAnalyticsGtmDataLayer','GTM-K8M6VGZ');</script>
+
+
+    
+    
+    
+    
+                    
+<script>
+        window.NicoChannelAccessAnalyticsGtmDataLayer.push({
+        'event': 'TriggerAccessAnalytics',
+        'PageParameter.ChannelId': 'ch7',
+        'PageParameter.ContentId': null,
+        'PageParameter.ContentBillingType': null,
+        'PageParameter.FrontendId': 32
+    });
+        window.NicoGoogleTagManagerDataLayer.push({
+        'ch_access_analytics': {
+            'channel_id': 'ch7',
+            'content_id': null,
+            'content_billing_type': null,
+            'membership_status': '未入会',
+            'login_status': 'ログイン'
+        }
+    });
+</script>
+<!-- End Google Tag Manager For Channel Access Analytics --><!-- Google Tag Manager -->
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','NicoGoogleTagManagerDataLayer','GTM-KXT7G5G');</script>
+
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager For Google Optimize -->
+    
+            
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','NicoChGoogleTagManagerForOptimizeDataLayer','GTM-K8CLHPH');</script>
+        
+    
+        <!-- End Google Tag Manager For Google Optimize  --><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+<meta name="copyright" content="(C) DWANGO Co., Ltd.">
+
+
+
+    
+
+<title>動画:テレビ東京あにてれちゃんねる - ニコニコチャンネル:アニメ</title>
+    <meta name="keywords" content="アニソン,アニメ,テレビ,声優,動画,無料,ニコニコチャンネル,niconico">    <meta name="description" content="テレビ東京公式アニメ動画配信サイト「あにてれしあたー」の出張所！">    
+        
+
+                                
+            
+        
+        
+        
+        
+        
+                
+        
+                
+        
+
+        
+
+                                            
+<meta property="og:title" content="動画:テレビ東京あにてれちゃんねる - ニコニコチャンネル:アニメ">
+<meta property="og:site_name" content="テレビ東京あにてれちゃんねる">
+<meta property="og:description" content="テレビ東京公式アニメ動画配信サイト「あに てれしあたー」の出張所！">
+<meta property="og:url" content="https://ch.nicovideo.jp/ch7/video">
+<meta property="og:image" content="https://img.cdn.nimg.jp/s/comch/channel-icon/original/ch7/6944906.jpg/512x512l_FFFFFFFF?key=bb4a7b4b3a60ace77b850511a004c9d0d1189fdf550717faca21e61142349a3d">
+<meta property="og:type" content="website">
+<meta property="fb:app_id" content="1080595878705344">
+<meta name="twitter:card" content="summary">
+                                    <link rel="canonical" href="https://ch.nicovideo.jp/ch7/video">
+
+
+    
+
+                        <link rel="alternate" media="only screen and (max-width: 640px)" href="https://sp.ch.nicovideo.jp/ch7/video" />
+
+    <link rel="shortcut icon" href="https://ch.nicovideo.jp/favicon.ico?111206">
+
+<link rel="stylesheet" href="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/css/legacy-less/base.css?1619248234">
+
+
+
+
+
+
+<link rel="alternate" type="application/rss+xml" title="テレビ東京あにてれちゃんねる チャンネル動画" href="/ch7/video?rss=2.0">
+
+<link rel="stylesheet" href="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/css/legacy-less/channel-channel_base.css?1619248234">
+
+    <style type="text/css"><!--
+section.site_body  {
+						background-color:#ffffff;
+						background-position:left top;
+			background-repeat:no-repeat;
+			background-attachment:scroll;
+			color:#555555;
+	}
+section.site_body a {
+		color:#ff3255;
+	}
+section.site_body a:visited {
+		color:#ff3255;
+	}
+
+
+div#channel-main  {
+						background-color:transparent;
+						background-position:left top;
+			background-repeat:no-repeat;
+			background-attachment:scroll;
+			color:#555555;
+	}
+div#channel-main a {
+		color:#adeb28;
+	}
+
+div#channel-main a:visited {
+		color:#adeb28;
+	}
+
+
+--></style>
+
+
+<link rel="stylesheet" href="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/css/channel/video.css?1619248234">
+
+
+
+
+
+<link rel="stylesheet" href="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/css/legacy-less/campaign-ticket_sale-ticket_sale.css?1619248234">
+
+
+
+
+<script>
+var is_login   = true;
+var is_premium = true;
+var is_channel = true;
+var user_is_joinable = true;
+var nicopo_balance = false;
+var page_code  = "video_list"||null;
+var page_id    = "ch_video"||null;
+var user       = null,
+    ad_age     = null;
+user = {
+    "id":74537208,
+    "sex":"男性",
+    "age":31
+};
+ad_age    = user.age;
+var community = {
+    "type":"normal"
+};
+var channeloption = {
+    "first_month_free_flag":false};
+var show_danimestore_invitation = false</script>
+
+
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/jquery/jquery-1.8.3.min.js"></script>
+<script>jQuery.noConflict();</script>
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/common.js?1619248234"></script>
+
+
+
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/swfobject.js?v1.5.1"></script>
+
+    
+<script src="https://res.ads.nicovideo.jp/assets/js/ads2.js?ref=ch"></script>
+
+
+
+
+
+
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/follow.js?1619248234"></script>
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/base_cp.js?1619248234"></script>
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/google_analytics.js"></script>
+    <script>
+                        ga('create', 'UA-96548570-4', 'auto', {
+            'name': 'chfrontAll',
+            'sampleRate': 5
+        });
+        ga('require', 'GTM-K8CLHPH');         ga('chfrontAll.send', 'pageview');
+    </script>
+
+
+
+
+</head>
+
+            
+                    
+        
+<body id="video_page"class="
+ ja  channel personal">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KXT7G5G" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- Google Tag Manager For Google Optimize (noscript) -->
+    
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K8CLHPH" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    
+        
+<!-- End Google Tag Manager For Google Optimize (noscript) -->
+
+
+
+                <div id="CommonHeader" class="c-siteCommonHeaderUnit"></div>
+
+<!---->
+<!---->
+
+<!---->
+
+
+<script>
+    window.onCommonHeaderReady = function(commonHeader) {
+        commonHeader.mount('#CommonHeader', {
+                        frontendId: 32,
+            site: 'channel',
+            nextUrl: '%2Fch7%2Fvideo',
+            user: {
+                                    id       :  74537208,
+                    nickname : 'ゲスト',
+                    iconUrl  : 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
+                    isPremium:  true,
+                                isLogin: true            },
+            customization: {
+                size: {
+                    maxWidth: '1024px',
+                    minWidth: '1024px'
+                },
+                userPanelLinks: [
+                    {
+                        href : '/my/purchased',
+                        label: '購入したもの'
+                    },
+                    {
+                        href : '/my/following',
+                        label: '登録したチャンネル'
+                    },
+                    {
+                        href : '/my/mail/subscribing',
+                        label: '購読中のブロマガ'
+                    },
+                    {
+                        href : '/start',
+                        label: 'チャンネルを開設'
+                    },
+                                        {
+                        href : '/portal/anime',
+                        label: 'アニメ'
+                    },
+                    {
+                        href : '/portal/blomaga',
+                        label: 'ブロマガ'
+                    },
+                    {
+                        href : '/chlist',
+                        label: 'その他のカテゴリ'
+                    }
+                ],
+                helpLink: {
+                    href: 'https://qa.nicovideo.jp/category/show/429?site_domain=default'
+                }
+            }
+        });
+    };
+</script>
+<script type="text/javascript" src="https://secure-dcdn.cdn.nimg.jp/common-header/res/2.0.2/pc/CommonHeaderLoader.min.js"></script>    
+        <header class="site">
+                                            <div id="head_cp">
+    <div class="head_inner">
+
+    <nav class="head_breadcrumb" id="head_cp_breadcrumb">
+        <h1 class="channel_name"><a href="/ch7">テレビ東京あにてれちゃんねる</a></h1>
+        <div class="site_logo"><a href="https://ch.nicovideo.jp/"><img src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/img/base/niconico_channel_small.png" alt="ニコニコチャンネル"></a></div>
+
+                                <div class="channel_category">
+                <a href="/portal/anime">
+                    アニメ
+                </a>
+                <menu class="switch_category">
+                    <span class="other">▼</span>
+                    <ul id="other_categories_list" style="display:none;">
+                        <li ><a href="/portal/event">イベント</a>
+<li ><a href="/portal/blomaga">ブロマガ</a>
+<li class="selected"><a href="/portal/anime">アニメ</a>
+<li ><a href="/portal/movie">映画・ドラマ</a>
+<li ><a href="/portal/media">社会・言論</a>
+<li ><a href="/portal/tokusatsu">特撮</a>
+<li ><a href="/portal/music">音楽</a>
+<li ><a href="/portal/entertainment">エンタメ</a>
+<li ><a href="/portal/sports">スポーツ</a>
+<li ><a href="/portal/showbiz">芸能</a>
+<li ><a href="/portal/life">生活</a>
+<li ><a href="/portal/politics">政治</a>
+<li ><a href="/portal/game">ゲーム</a>
+<li ><a href="/portal/variety">バラエティ</a>
+<li ><a href="/portal/gravure">グラビア</a>                    </ul>
+                </menu>
+            </div>
+            <script>Ch.categoryDropdown.init();</script>
+            </nav>
+
+        <menu id="head_sns_share" class="sns_share">
+        <!--SNS共有-->
+        
+        
+                                        <div class="sns_button twitter">
+            <a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-url="https://ch.nicovideo.jp/ch7" data-text="テレビ東京あにてれちゃんねる #nicoch" data-count="none" data-lang="ja">Tweet</a>
+        </div>
+
+        <div class="sns_button facebook">
+            <iframe src="https://www.facebook.com/plugins/like.php?href=https://ch.nicovideo.jp/ch7&locale=&app_id=227837487254498&amp;send=false&amp;layout=button&amp;width=100&amp;show_faces=false&amp;action=like&amp;colorscheme=light&amp;font&amp;height=21" scrolling="no" frameborder="0" allowTransparency="true"
+            style="width:110px; height:21px"></iframe>
+                    </div>
+
+        <!--その他のSNS: hatebu gp+-->
+        <div class="sns_other">
+            <button class="btn_share_toggle"><span class="down">▼</span><span class="up">▲</span></button>
+            <div id="head_sns_share_more">
+                <ul>
+                    <li class="hatebu"><a href="http://b.hatena.ne.jp/entry/s/ch.nicovideo.jp/ch7/video" class="hatena-bookmark-button" data-hatena-bookmark-title="テレビ東京あにてれちゃんねる - ニコニコチャンネル" data-hatena-bookmark-layout="basic" title="このエントリーをはてなブックマークに追加"><img src="https://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20"></a>
+                </ul>
+            </div>
+        </div>
+        
+        <script>
+        jQuery(".btn_share_toggle").on("click",function(){
+            var sns_other = jQuery(".sns_other");
+            var sns_other_panel = jQuery("#head_sns_share_more");
+            var target_height = sns_other_panel.find("ul").outerHeight();
+            var expanded_class = "expanded";
+            if(sns_other.hasClass(expanded_class)){
+                //close it
+                sns_other_panel.animate({"height":"0"},150);
+                sns_other.removeClass(expanded_class);
+            }else{
+                //open it
+                sns_other_panel.animate({"height":target_height},150);
+                sns_other.addClass(expanded_class);
+            }
+        });
+        </script>
+        
+    </menu>
+    
+    </div>
+    </div>
+    <div id="head_cp_menu">
+    <div class="head_inner">
+                                <nav class="current channel" id="cp_menu">
+                <ul>
+                                                                    
+                                    
+                        <li class="">
+                            <a href="/ch7">トップ</a>
+
+                                                                                                                                            <li class="selected">
+                                <a href="/ch7/video">動画</a>
+                        
+                                                                                <li class="">
+                                <a href="/ch7/pack">動画パック</a>
+                        
+                                                                                <li class="">
+                                <a href="/ch7/live">生放送</a>
+                        
+                        
+                        
+                        
+                                                    </ul>
+            </nav>
+                    
+        <div class="join_leave">
+                                    
+                                <div class="cell">
+                <a href="/ch7/video#"
+                class="bookmark  btn_follow send-ga-ga360-event"
+                api_add   ="https://ch.nicovideo.jp/api/addbookmark"
+                api_delete="https://ch.nicovideo.jp/api/deletebookmark"
+                params="channel_id=7&amp;time=1619790913&amp;key=abea16c1a5277107b1156cec77ac54f09ac05ba2&amp;return_json=1"
+                data-ga-category="ヘッダー" data-ga-action="フォロー" data-ga-event-tag="nicoch_click_header-follow-button">
+                    <span class="loader"></span>
+                    <span class="labels">
+                        <span class="off">フォロー</span>
+                        <span class="on">フォロー中</span>
+                    </span>
+                </a>
+            </div>
+                        
+                            <div class="cell ">
+    <a class="btn_app send-ga-ga360-event"
+    href="https://ex.ch.nicovideo.jp/channel/ch7/app?page=share&amp;from=pc_cp_header" target="_blank"
+    data-ga-category="ヘッダー" data-ga-action="アプリ" data-ga-event-tag="nicoch_click_header-app-button">
+        アプリ
+    </a>
+</div>                    </div>
+
+    </div>
+    </div>    
+    
+    
+    
+
+                    
+    
+        
+        
+    <script>
+
+    //共有ボタンに展開イベントを割り振り
+    var panel	= jQuery("#shareMenuBar"),
+            trigger = jQuery("#shareMenuTrigger");
+    jQuery("#shareMenuTrigger").click(function(event){
+        if(panel.is(':visible')){
+            toggleShareMenu(false);
+        }else{
+            toggleShareMenu(true);
+        }
+        return false;
+    });
+
+    //ヘッダーの初月無料プランリンクclick後に、入会プラン周りを目立たせる
+    jQuery("a#first_month_free_flag").click(function(){
+        var joinMenu = jQuery("#cp_joinmenu");
+        var animateDuration = 500;
+        var isScroll = Ch.smoothScroll("#cp_joinmenu", {"duration": animateDuration});
+        joinMenu
+            .wrapInner('<div class="cp_joinmenu_cnt"></div>')
+            .append('<span class="bg_cp_joinmenu"></span>')
+            .css({"position":"relative"});
+        var cnt = joinMenu.find(".cp_joinmenu_cnt");
+        var bg = joinMenu.find(".bg_cp_joinmenu");
+        cnt.css({"position":"relative", "z-index":"1"});
+        bg.css({
+            "position":"absolute",
+            "top":0,
+            "left":0,
+            "z-index":0,
+            "width": joinMenu.innerWidth(),
+            "height": joinMenu.innerHeight(),
+            "background": "#fff",
+            "opacity":"0"
+        });
+        setTimeout(function(){
+            bg.animate({"opacity":"1"},100).animate({"opacity":"0"},1000,function(){this.remove()})
+        }, animateDuration);
+        if(isScroll) {return false;}
+    });
+
+    </script>
+    
+
+
+
+
+
+                        </header>
+
+    <section class="site_body">
+                
+        <article class="content white" data-page-id="ch_video">
+            <section class="content_body">
+
+
+            <!---->
+
+                        
+                
+        
+        <section class="contents_list video tile zoom">
+
+                        <header>
+
+    <div class="shoulder">
+
+        <menu class="scopebar change_style">
+            <ul>
+                <li class="icon tile selected">
+                    <span class="scope" data-mode="tile"><span></span></span>
+                <li class="icon detail ">
+                    <span class="scope" data-mode="detail"><span></span></span>
+            </ul>
+            
+            <script>
+            var contents_list = jQuery("section.contents_list");
+            var scopebar = contents_list.find(".scopebar.change_style");
+
+            scopebar.on("click",".scope",function(){
+                var caller=jQuery(this);
+                var mode=caller.attr("data-mode");
+                var li=caller.closest("li");
+                var li_selected=li.closest("ul").find("li.selected");
+
+                li_selected.removeClass("selected");
+                li.addClass("selected");
+
+                cookie("li_video",mode,{path:"/"});
+
+                contents_list
+                    .removeClass("tile").removeClass("detail")
+                    .addClass(mode);
+
+                Ch.LazyImage.forceLoad("ul.items");
+            });
+            </script>
+            
+        </menu>
+
+                <div class="searchbox">
+            <form method="get">
+                <input type="text" class="search" value="">
+                <input type="hidden" name="channel_id" value="ch7">
+                <input type="hidden" name="mode" value="s">
+                <input type="hidden" name="sort" value="f">
+                <input type="hidden" name="order" value="d">
+                <input type="hidden" name="type" value="video">
+                <button type="submit" title="検索"></button>
+            </form>
+            
+            <script type="text/javascript">
+            jQuery(".searchbox form").on("submit",function(event){
+                var s 			= jQuery.trim(jQuery('input.search').val());
+                var s_replaced 	= s.replace(/^\s+|\s+$/g, '').replace(/%20/g, '+');
+                var s_encoded 	= encodeURIComponent(s_replaced);
+                var form 		= jQuery(this);
+                var channel_id 	= jQuery("input[name=channel_id]");
+                if(s!=""){
+                    var url = ['/search/',s_encoded].join("");
+                    channel_id.attr("disabled",false);
+                }else{
+                    var url = ['/',channel_id.val(),'/video/'].join("");
+                    channel_id.attr("disabled",true);
+                }
+                form.attr("action",url);
+                return true;
+            });
+            </script>
+            
+        </div>
+        
+
+    </div>
+
+        <menu class="scopebar isCpVideoList">
+        <ul>
+            <li class="selected">
+                <a class="scope" href="/ch7/video?sort=f&amp;order=d">すべて</a>
+                            <li class="">
+                    <a class="scope" href="/ch7/video/pay?sort=f&amp;order=d">有料</a>
+                                </ul>
+    </menu>
+    
+    <span class="count">
+            <var>2580</var>件
+    </span>
+
+    <menu class="sort">
+                <select data-href="/ch7/video?">
+            <option value="sort=f&amp;order=d" >投稿が新しい順</option>
+            <option value="sort=v&amp;order=d" >再生が多い順</option>
+            <option value="sort=r&amp;order=d" >コメントが多い順</option>
+            <option value="sort=m&amp;order=d" >マイリスト登録が多い順</option>
+            <option value="sort=n&amp;order=d" >コメントが新しい順</option>
+                        <option value="sort=l&amp;order=d" >再生時間が長い順</option>
+
+            <option disabled></option>
+
+            <option value="sort=f&amp;order=a" >投稿が古い順</option>
+                        <option value="sort=v&amp;order=a" >再生が少ない順</option>
+            <option value="sort=n&amp;order=a" >コメントが古い順</option>
+            <option value="sort=r&amp;order=a" >コメントが少ない順</option>
+            <option value="sort=m&amp;order=a" >マイリスト登録が少ない順</option>
+            <option value="sort=l&amp;order=a" >再生時間が短い順</option>
+
+        </select>
+        
+            <script type="text/javascript">
+            jQuery("menu.sort select").on("change",function(event){
+                var t = jQuery(this);
+                var jump_to = t.attr("data-href");
+                var val = t.val();
+                jump_to = jump_to+val;
+                location.href=jump_to;
+                return true;
+            });
+            </script>
+            
+    </menu>
+
+    
+    
+</header>
+                                        <ul class="items">
+                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38618153" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38618153/38618153.40499054"><span class="badge br length" title="24:24">24:24</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38618153" title="アイカツプラネット！　第16話　「パジャマ・パーティー・ナイト」"
+            >アイカツプラネット！　第16話　「パジャマ・パーティー・ナイト」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                                    <li>
+                        <a class="action_button" href="https://www.nicovideo.jp/watch/so38618153">視聴ページへ</a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>785</var>
+            </li>
+
+            <li class="comment empty">
+                <label>コメント</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38618153" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>10</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ローズとの初バトルを控え緊張する舞桜のããæ ãã¡ãä¼ç»ããã®ã¯ãã¸ã£ããã¼ãã£ã¼â¦ãããªãã¦åå®¿ï¼å¤¢ãè¦ã¦ããããã ã£ãã¨ä»ã¾ã§ã®æ¥ããæ¯ãè¿ãè...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/04/27 12:00'>
+                2021-04-27 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38583824" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38583824/38583824.46967754"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38583824" title="ã¢ã¤ã«ããã©ãããï¼ãç¬¬15è©±ããæç±ã®èèã"
+            >ã¢ã¤ã«ããã©ãããï¼ãç¬¬15è©±ããæç±ã®èèã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38583824">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38583824" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>1,208</var>
+            </li>
+
+            <li class="comment empty">
+                <label>ã³ã¡ã³ã</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>ãã¤ãªã¹ã</label>
+                <a href="https://www.nicovideo.jp/openlist/so38583824" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>6</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ã¤ãã«ã¢ã¤ã«ãï¼ãåéããæå²ãããéã£ãã¾ã¾ã ã£ãããã¿ã¸ã®ãµãã©ã¤ãºä»²ç´ããã¼ãã£ã¼ãä¼ç»ãããã¢ãã¿ã¼ãä½ã£ããããããã¨ã¯ãã£ã±ãï¼ããã¦...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/04/20 12:00'>
+                2021-04-20 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38551243" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38551243/38551243.95315398"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38551243" title="ã¢ã¤ã«ããã©ãããï¼ãç¬¬14è©±ãããããç§ã®èµ°ãéã"
+            >ã¢ã¤ã«ããã©ãããï¼ãç¬¬14è©±ãããããç§ã®èµ°ãéã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38551243">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38551243" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>1,185</var>
+            </li>
+
+            <li class="comment empty">
+                <label>ã³ã¡ã³ã</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>ãã¤ãªã¹ã</label>
+                <a href="https://www.nicovideo.jp/openlist/so38551243" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>4</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            èæ¡ã®åã«ç¾ããè¬ã®å°å¥³ã¯ãå§¿ãããã¾ãã¦ããé½æå²ã ã£ããã¢ã¤ã«ãçãå»ã£ãçç±ãæãããæå²ã¯ãæ¸æãèæ¡ãã¡ã«ã¢ã¤ãã«å¾©å¸°ãé«ããã«å®£è¨ãã...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/04/13 12:00'>
+                2021-04-13 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38518699" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38518699/38518699.42735162"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38518699" title="ã¢ã¤ã«ããã©ãããï¼ãç¬¬13è©±ããæºããæ³ãã"
+            >ã¢ã¤ã«ããã©ãããï¼ãç¬¬13è©±ããæºããæ³ãã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38518699">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38518699" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>1,212</var>
+            </li>
+
+            <li class="comment empty">
+                <label>ã³ã¡ã³ã</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>ãã¤ãªã¹ã</label>
+                <a href="https://www.nicovideo.jp/openlist/so38518699" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            æ§ãã®ã­ã¥ã¼ãããã¨ã®å¯¾æ¦ãæ±ºã¾ããå®ç§ãªå½¼å¥³ã«åã¤ããã«ã¯èªåãå®ç§ã§ãªããã°ã¨ãã¬ãã·ã£ã¼ãæããèæ¡ãããããããè¦ã¦ããè¬ã®å°å¥³ã«ãããã¯...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/04/06 12:00'>
+                2021-04-06 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38483796" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38483796/38483796.51936861"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38483796" title="ã¢ã¤ã«ããã©ãããï¼ãç¬¬12è©±ãããã¤ã¹ã¯ã¼ã«ã©ã©ãã¤ã"
+            >ã¢ã¤ã«ããã©ãããï¼ãç¬¬12è©±ãããã¤ã¹ã¯ã¼ã«ã©ã©ãã¤ã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38483796">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38483796" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>1,175</var>
+            </li>
+
+            <li class="comment empty">
+                <label>ã³ã¡ã³ã</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>ãã¤ãªã¹ã</label>
+                <a href="https://www.nicovideo.jp/openlist/so38483796" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>4</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ããã§ãããã¨ãæããããã¤ã³ãããªã»ããããèæ¡ãã¢ã¤ãã«ã®é ç¹ãæ±ºãããã©ãããããªã³ã»ã¹ã°ã©ã³ããªåºå ´ãç®æãã©ã³ã­ã³ã°ãä¸ãããã¨æ°ååå...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/30 12:00'>
+                2021-03-30 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38483794" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38483794/38483794.80372078"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge last_res" title="è¦ç´ã 4ãã£ã¨ ããè¨ãã°ã¿ã¤ã ãã· ããæ­¤ã¯ã¢ããããã  2get 1ã²ãã">è¦ç´ã 4ãã£ã¨ ããè¨ãã°ã¿ã¤ã ãã· ããæ­¤ã¯ã¢ããããã  2get 1ã²ãã</span><span class="badge br length" title="7:05">7:05</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38483794" title="ã©ããã ã¤ã³ãã¼ã¸ã§ã³ãç¬¬114è©±ãããã¬ã¼ã³ãï¼ã©ãããã"
+            >ã©ããã ã¤ã³ãã¼ã¸ã§ã³ãç¬¬114è©±ãããã¬ã¼ã³ãï¼ã©ãããã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38483794">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38483794" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>571</var>
+            </li>
+
+            <li class="comment ">
+                <label>ã³ã¡ã³ã</label>
+                <var>6</var>
+            </li>
+
+            <li class="mylist ">
+                <label>ãã¤ãªã¹ã</label>
+                <a href="https://www.nicovideo.jp/openlist/so38483794" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>2</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ã²ãã©ãããã®éå¥ä¼ã§ãæãã¬ãã¬ã¼ã³ããç¨æããã¦ããï¼æå¾é«ã¾ããã®ãã¬ã¼ã³ãã®ä¸­èº«ã¯æããã¦ï¼ï¼
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/28 12:00'>
+                2021-03-28 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38448908" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38448908/38448908.86336067"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38448908" title="ã¢ã¤ã«ããã©ãããï¼ãç¬¬11è©±ããããããæ°æã¡ã"
+            >ã¢ã¤ã«ããã©ãããï¼ãç¬¬11è©±ããããããæ°æã¡ã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38448908">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38448908" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>1,201</var>
+            </li>
+
+            <li class="comment empty">
+                <label>ã³ã¡ã³ã</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>ãã¤ãªã¹ã</label>
+                <a href="https://www.nicovideo.jp/openlist/so38448908" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ããã¨ããããã¢ã¤ãã«ã¨ãã¦æ´»èºããæãããã¬ã·ã¢ã«å¤§å¤±æï¼ï¼ã¹ã¦ã£ã¼ããã¼ã«ã±ã¼ã­ã«åãåãããã¨ãããæ­ããã¦ãã¾ãããããããããªãæã¯èæ¡...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/23 12:00'>
+                2021-03-23 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38448907" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38448907/38448907.29952496"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge last_res" title="è¦ç´ã ãããã¥ã¼ããããªã¼ ww ãã¿ã´ã©ã¹ã¹ã¤ãã? 1ãã¨">è¦ç´ã ãããã¥ã¼ããããªã¼ ww ãã¿ã´ã©ã¹ã¹ã¤ãã? 1ãã¨</span><span class="badge br length" title="7:08">7:08</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38448907" title="ã©ããã ã¤ã³ãã¼ã¸ã§ã³ãç¬¬113è©±ããç¸æ£ï¼ã©ãããã"
+            >ã©ããã ã¤ã³ãã¼ã¸ã§ã³ãç¬¬113è©±ããç¸æ£ï¼ã©ãããã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38448907">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38448907" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>740</var>
+            </li>
+
+            <li class="comment ">
+                <label>ã³ã¡ã³ã</label>
+                <var>5</var>
+            </li>
+
+            <li class="mylist ">
+                <label>ãã¤ãªã¹ã</label>
+                <a href="https://www.nicovideo.jp/openlist/so38448907" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>2</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ã²ã¨ããã§ã¹ãæ¥½ããã²ãã©ããããã­ããããç´æãã­ãããããã§ã¹ã®è¯ãç¸æã«ãã¦ãã¾ããã¨ãéããããã®ç¸æ£ãä»ã®ã©ãããã«åããã¦ãã¾ããã²ã...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/21 12:00'>
+                2021-03-21 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38402242" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38402242/38402242.38625432"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:24">24:24</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38402242" title="ã¢ã¤ã«ããã©ãããï¼ãç¬¬10è©±ããä¸çã«ä¸ã¤ã ãã®ããã"
+            >ã¢ã¤ã«ããã©ãããï¼ãç¬¬10è©±ããä¸çã«ä¸ã¤ã ãã®ããã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38402242">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38402242" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>2,144</var>
+            </li>
+
+            <li class="comment empty">
+                <label>ã³ã¡ã³ã</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>ãã¤ãªã¹ã</label>
+                <a href="https://www.nicovideo.jp/openlist/so38402242" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ã¤ãã«èªåãããã§ããã¨æããèæ¡ãå¤§åãªåç½ã®å ´ã«é¸ãã ã®ã¯ãç¨æããã¦ããä¼è¦ã§ã¯ãªãåãã¦ã®ãã¡ã³ã¤ãã³ãã ã£ããèªåã®è¨èã§ç´æ¥ãã¡ã³ã®ã¿...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/16 12:00'>
+                2021-03-16 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38402240" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38402240/38402240.463238"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge last_res" title="2get 1get">2get 1get</span><span class="badge br length" title="7:02">7:02</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38402240" title="ã©ããã ã¤ã³ãã¼ã¸ã§ã³ãç¬¬112è©±ããé¨å£«ï¼ã©ãããã"
+            >ã©ããã ã¤ã³ãã¼ã¸ã§ã³ãç¬¬112è©±ããé¨å£«ï¼ã©ãããã</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38402240">è¦è´ãã¼ã¸ã¸</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38402240" class="purchase_method_preview">
+                                                    è©³ç´°
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>åç</label>
+                <var>809</var>
+            </li>
+
+            <li class="comment ">
+                <label>コメント</label>
+                <var>2</var>
+            </li>
+
+            <li class="mylist empty">
+                <label>マイリスト</label>
+                <var>0</var>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            かぶとをかぶってすっかり騎士気取りのラビッツ。ライバル騎士との覇権争いの結末は！？
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/14 12:00'>
+                2021-03-14 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38364988" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38364988/38364988.95392915"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38364988" title="アイカツプラネット！　第9話　「マイ レボリューション」"
+            >アイカツプラネット！　第9話　「マイ レボリューション」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38364988">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38364988" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>1,378</var>
+            </li>
+
+            <li class="comment empty">
+                <label>コメント</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38364988" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>3</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            舞桜達のアイカツを見ているうちに、アイドルになりたいと思うようになった栞。小さい頃憧れていた童話の主人公のように誰かに元気を届けられるアイドルを目...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/09 12:00'>
+                2021-03-09 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38364981" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38364981/38364981.77107353"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge last_res" title="見納め こいつら外道過ぎる 洗濯機?乗ったまんま? 金魚鉢?強いな いもむし、どうなった 4getto スーパーラビッツボー ひどいw 1げと">見納め こいつら外道過ぎる 洗濯機?乗ったまんま? 金魚鉢?強いな いもむし、どうなった 4getto スーパーラビッツボー ひどいw 1げと</span><span class="badge br length" title="7:04">7:04</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38364981" title="ラビッツ インベージョン　第111話　「ドーム！ラビッツ」"
+            >ラビッツ インベージョン　第111話　「ドーム！ラビッツ」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38364981">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38364981" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>650</var>
+            </li>
+
+            <li class="comment ">
+                <label>コメント</label>
+                <var>9</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38364981" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>1</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            安全と静けさを求めてひげラビッツがドームを発明。ひげラビッツの意に反して、このドーム、スイッチひとつでとっても楽しい装置になってしまう！？
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/07 12:00'>
+                2021-03-07 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38352029" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38352029/38352029.5768151"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:24">24:24</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38352029" title="アイカツプラネット！　第8話　「ロックンビート！」"
+            >アイカツプラネット！　第8話　「ロックンビート！」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38352029">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38352029" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>1,343</var>
+            </li>
+
+            <li class="comment empty">
+                <label>コメント</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38352029" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>4</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            正体がわからないのもビートの魅力のひとつだと考える響子は、両親にもアイカツ！を秘密にしている。しかし番組の収録で思わず出た普段の響子らしい一面をお...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/03/02 12:00'>
+                2021-03-02 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38328913" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38328913/38328913.81202323"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge last_res" title="見納め 飛び降りw wwwwwwwww うぽつ 3getto 仲は良いのね 1getto">見納め 飛び降りw wwwwwwwww うぽつ 3getto 仲は良いのね 1getto</span><span class="badge br length" title="7:07">7:07</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38328913" title="ラビッツ インベージョン　第110話　「救出！ラビッツ」"
+            >ラビッツ インベージョン　第110話　「救出！ラビッツ」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38328913">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38328913" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>665</var>
+            </li>
+
+            <li class="comment ">
+                <label>コメント</label>
+                <var>7</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38328913" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>1</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            トリオでヒーローになりきるラビッツ。が、一匹のラビッツが猫の救出作戦を台無しにし、一人さみしく南極へ向かう。そこで出会ったペンギンとともに新たなト...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/02/28 12:00'>
+                2021-02-28 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38292592" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38292592/38292592.75986636"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38292592" title="アイカツプラネット！　第7話　「踊るメルリルリ！」"
+            >アイカツプラネット！　第7話　「踊るメルリルリ！」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38292592">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38292592" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>1,354</var>
+            </li>
+
+            <li class="comment empty">
+                <label>コメント</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38292592" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>2</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            メルリのドラマがつくられることになり、気合十分なるり。しかし自分の思いを上手く伝えられず、脚本家が辞退してしまう！大ピンチでも諦めないるりだったが...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/02/23 12:00'>
+                2021-02-23 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38292573" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38292573/38292573.71163373"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge last_res" title="見納め 確かに あ むしゃむしゃ いけーーーーーーーー 無理だよwww かわいそう きしょwww 怪物www いやみ?www 太ったwww 耳ながwww ちっちゃwww 寝るな 病院いこうね こどもあつかいeww どんだけつきいきた..">見納め 確かに あ むしゃむしゃ いけーーーーーーーー 無理だよwww かわいそう きしょwww 怪物www いやみ?www 太ったwww 耳ながwww ちっちゃwww 寝るな 病院いこうね こどもあつかいeww どんだけつきいきた..</span><span class="badge br length" title="7:00">7:00</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38292573" title="ラビッツ インベージョン　第109話　「巨大対決！？ラビッツ」"
+            >ラビッツ インベージョン　第109話　「巨大対決！？ラビッツ」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38292573">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38292573" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>663</var>
+            </li>
+
+            <li class="comment ">
+                <label>コメント</label>
+                <var>22</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38292573" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>2</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ≪配信限定エピソード！≫ミニサイズのラビッツが発明家ラビッツのもとで巨大に！？ところが思わぬ相手も巨大になり、バトル勃発！？
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/02/21 12:00'>
+                2021-02-21 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38251508" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38251508/38251508.57604195"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38251508" title="アイカツプラネット！　第6話　「パーフェクトの神様」"
+            >アイカツプラネット！　第6話　「パーフェクトの神様」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38251508">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38251508" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>1,437</var>
+            </li>
+
+            <li class="comment empty">
+                <label>コメント</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38251508" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>5</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            映画のオーディションでトップアイドル・キューピットのすごさを目の当たりにした舞桜は、すっかり彼女のファンになってしまう。全てが完璧な彼女と自分では...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/02/16 12:00'>
+                2021-02-16 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38251505" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38251505/38251505.61832157"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge last_res" title="見納めに参った wwwwwwwwwwwwwwwwww せこい手使うな 息できなくて死んだだ かわいい きもっ だから地味に痛いやつ 地味に痛いやつ wwwwwwwwww wwwwwww 4連続はきつい ダサっ 4getto 孤独の観測者ぁー ここの...">見納めに参った wwwwwwwwwwwwwwwwww せこい手使うな 息できなくて死んだだ かわいい きもっ だから地味に痛いやつ 地味に痛いやつ wwwwwwwwww wwwwwww 4連続はきつい ダサっ 4getto 孤独の観測者ぁー ここの...</span><span class="badge br length" title="6:58">6:58</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38251505" title="ラビッツ インベージョン　第108話　「対決！ラビッツ」"
+            >ラビッツ インベージョン　第108話　「対決！ラビッツ」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38251505">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38251505" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>669</var>
+            </li>
+
+            <li class="comment ">
+                <label>コメント</label>
+                <var>16</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38251505" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>3</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            ラビッツを狙う悪者ラビッツが南極に不時着、ペンギンを手なづけて衛兵にし、征服を企む。正義を守るべく、決死の戦いに挑むラビッツ。ところが、悪者の衛兵...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/02/14 12:00'>
+                2021-02-14 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38221248" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38221248/38221248.9322124"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge br length" title="24:25">24:25</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38221248" title="アイカツプラネット！　第5話　「シンデレラガール」"
+            >アイカツプラネット！　第5話　「シンデレラガール」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38221248">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38221248" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>1,457</var>
+            </li>
+
+            <li class="comment empty">
+                <label>コメント</label>
+                <var>0</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38221248" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>3</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            映画「シンデレラ」のオーディションに向け、響子達と特訓に励む舞桜。空から飴が降ってきたら？シンデレラなら今なんて言う？演技は想像力と表現力が大事だ...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/02/09 12:00'>
+                2021-02-09 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                            
+<li class="item">
+
+    <div class="item_left">
+        <a href="https://www.nicovideo.jp/watch/so38221227" class="thumb_video thumb_150 wide"><img src="https://nicovideo.cdn.nimg.jp/thumbnails/38221227/38221227.17232947"><span class="purchase_type" title=""><span class="inner ppv all_pay"></span></span><span class="badge last_res" title="見納め 北極にペンギン? 6 ブラックやなあ えぇ… 草 配信では初登場? おちびさん 1get">見納め 北極にペンギン? 6 ブラックやなあ えぇ… 草 配信では初登場? おちびさん 1get</span><span class="badge br length" title="7:07">7:07</span></a>    </div>
+
+    <div class="item_right">
+
+        <h6 class="title">
+            <a href="https://www.nicovideo.jp/watch/so38221227" title="ラビッツ インベージョン　第107話　「腹ペコ赤ちゃん！ラビッツ」"
+            >ラビッツ インベージョン　第107話　「腹ペコ赤ちゃん！ラビッツ」</a>
+        </h6>
+
+                <div class="actions">
+            <ul>
+                
+                                            <li>
+                            <a class="action_button trial" href="https://www.nicovideo.jp/watch/so38221227">視聴ページへ</a>
+                        </li>
+                    
+                    <li>
+                        <a href="/ch7/video/so38221227" class="purchase_method_preview">
+                                                    詳細
+                                                &raquo;
+                        </a>
+                    </li>
+                            </ul>
+        </div>
+        
+        <ul class="counts">
+
+            <li class="view ">
+                <label>再生</label>
+                <var>659</var>
+            </li>
+
+            <li class="comment ">
+                <label>コメント</label>
+                <var>8</var>
+            </li>
+
+            <li class="mylist ">
+                <label>マイリスト</label>
+                <a href="https://www.nicovideo.jp/openlist/so38221227" target="_blank" title="この動画を登録している公開マイリスト一覧"><var>2</var></a>
+            </li>
+
+        </ul>
+
+        <p class="description">
+            氷の上でアイスホッケーを楽しんでいると大きな卵を発見。中から出てきたのは、お腹を空かせた赤ちゃんペンギン。赤ちゃんペンギンに翻弄されてアイスホッケ...
+        </p>
+
+        <p class="time">
+            <time>
+                <var title='2021/02/07 12:00'>
+                2021-02-07 12:00
+                </var>
+            </time>
+        </p>
+
+        
+    </div>
+<!--/li-->                                    </ul>
+            
+            
+                        <div style="padding:20px;">
+                            </div>
+            
+
+            <footer>
+                                                                                                
+
+
+
+
+
+
+<menu class="pager">
+    <ul>
+                    <li class="counts">
+                <span><var class="articles_total_number">2580</var>件</span>
+                            <li class="prev disabled">
+                <a href="javascript://最後のページです"
+                >&lt;</a>
+        
+                    <li class="pages">
+                <select onchange="location.href='?&amp;mode=&sort=f&order=d&type=&page='+jQuery(this).val();">
+                                                                    <option value="1" selected>1</option>
+                                                                    <option value="2" >2</option>
+                                                                    <option value="3" >3</option>
+                                                                    <option value="4" >4</option>
+                                                                    <option value="5" >5</option>
+                                                                    <option value="6" >6</option>
+                                                                    <option value="7" >7</option>
+                                                                    <option value="8" >8</option>
+                                                                    <option value="9" >9</option>
+                                                                    <option value="10" >10</option>
+                                                                    <option value="11" >11</option>
+                                                                    <option value="12" >12</option>
+                                                                    <option value="13" >13</option>
+                                                                    <option value="14" >14</option>
+                                                                    <option value="15" >15</option>
+                                                                    <option value="16" >16</option>
+                                                                    <option value="17" >17</option>
+                                                                    <option value="18" >18</option>
+                                                                    <option value="19" >19</option>
+                                                                    <option value="20" >20</option>
+                                                                    <option value="21" >21</option>
+                                                                    <option value="22" >22</option>
+                                                                    <option value="23" >23</option>
+                                                                    <option value="24" >24</option>
+                                                                    <option value="25" >25</option>
+                                                                    <option value="26" >26</option>
+                                                                    <option value="27" >27</option>
+                                                                    <option value="28" >28</option>
+                                                                    <option value="29" >29</option>
+                                                                    <option value="30" >30</option>
+                                                                    <option value="31" >31</option>
+                                                                    <option value="32" >32</option>
+                                                                    <option value="33" >33</option>
+                                                                    <option value="34" >34</option>
+                                                                    <option value="35" >35</option>
+                                                                    <option value="36" >36</option>
+                                                                    <option value="37" >37</option>
+                                                                    <option value="38" >38</option>
+                                                                    <option value="39" >39</option>
+                                                                    <option value="40" >40</option>
+                                                                    <option value="41" >41</option>
+                                                                    <option value="42" >42</option>
+                                                                    <option value="43" >43</option>
+                                                                    <option value="44" >44</option>
+                                                                    <option value="45" >45</option>
+                                                                    <option value="46" >46</option>
+                                                                    <option value="47" >47</option>
+                                                                    <option value="48" >48</option>
+                                                                    <option value="49" >49</option>
+                                                                    <option value="50" >50</option>
+                                                                    <option value="51" >51</option>
+                                                                    <option value="52" >52</option>
+                                                                    <option value="53" >53</option>
+                                                                    <option value="54" >54</option>
+                                                                    <option value="55" >55</option>
+                                                                    <option value="56" >56</option>
+                                                                    <option value="57" >57</option>
+                                                                    <option value="58" >58</option>
+                                                                    <option value="59" >59</option>
+                                                                    <option value="60" >60</option>
+                                                                    <option value="61" >61</option>
+                                                                    <option value="62" >62</option>
+                                                                    <option value="63" >63</option>
+                                                                    <option value="64" >64</option>
+                                                                    <option value="65" >65</option>
+                                                                    <option value="66" >66</option>
+                                                                    <option value="67" >67</option>
+                                                                    <option value="68" >68</option>
+                                                                    <option value="69" >69</option>
+                                                                    <option value="70" >70</option>
+                                                                    <option value="71" >71</option>
+                                                                    <option value="72" >72</option>
+                                                                    <option value="73" >73</option>
+                                                                    <option value="74" >74</option>
+                                                                    <option value="75" >75</option>
+                                                                    <option value="76" >76</option>
+                                                                    <option value="77" >77</option>
+                                                                    <option value="78" >78</option>
+                                                                    <option value="79" >79</option>
+                                                                    <option value="80" >80</option>
+                                    </select>
+        
+        <li class="next">
+            <a href="?&amp;mode=&sort=f&order=d&type=&amp;page=2"
+            >次へ　&gt;</a>
+    </ul>
+</menu>
+                            </footer>
+
+        </section>
+
+    
+</section>        </article>
+    </section>
+
+    <footer class="site">
+                    
+
+    
+                        
+                                    
+
+
+
+    
+    <div id="foot_cp_outer">
+        <div class="foot_inner">
+
+            <div id="cp_symbol">
+                
+
+
+
+
+<span class="thumb_wrapper thumb_wrapper_ch updated_in_1week">
+
+            <a href="/ch7"
+        title="テレビ東京あにてれちゃんねる"
+        class="thumb_ch thumb_100 updated_in_1week">
+                <img src="https://secure-dcdn.cdn.nimg.jp/comch/channel-icon/128x128/ch7.jpg?1619593593">
+                                                </a>
+    
+    
+</span>            </div>
+
+            <div id="cp_profile">
+                <div class="inner_box">
+                    <h3 class="cp_chname">テレビ東京あにてれちゃんねる</h3>
+                                            <p class="cp_viewname">提供：株式会社　テレビ東京(テレビ東京あにてれ)</p>
+                                        <ul class="cp_footmenu"><li><a href="javascript:void(0);" onclick="window.open('/blogparts/ch7', 'ch_blogparts_popup', 'scrollbars=yes,resizable=yes,width=600,height=560');">貼り付けタグを取得する</a></li><li><a href="https://ch.nicovideo.jp/letter/ch7">ご意見・ご要望はこちら</a></li></ul>
+                </div>
+                                                            <div class="inner_box">
+                            <h3>タグ</h3>
+                            <ul class="cp_tags">
+                                                                    <li><a href="/search/%E3%82%A2%E3%83%8B%E3%82%BD%E3%83%B3?mode=t">アニソン</a></li>
+                                                                    <li><a href="/search/%E3%82%A2%E3%83%8B%E3%83%A1?mode=t">アニメ</a></li>
+                                                                    <li><a href="/search/%E3%83%86%E3%83%AC%E3%83%93?mode=t">テレビ</a></li>
+                                                                    <li><a href="/search/%E5%A3%B0%E5%84%AA?mode=t">声優</a></li>
+                                                            </ul>
+                        </div>
+                                                                <div class="inner_box">
+                            <h3>説明文</h3>
+                            <p>テレビ東京公式アニメ動画配信サイト「あにてれしあたー」の出張所！</p>
+                        </div>
+                                                            <div class="nanime_link">
+                        <script
+                            type="text/x-template"
+                            data-wktk-id="watch-portal-link"
+                            data-wktk-name="watch-portal-link"
+                            data-wktk-selector=".nanime_link"
+                        >
+                            
+                                <div class="inner_box">
+                                    <h3>ポータルサイトリンク</h3>
+                                    <ul>
+                                        <li><a href="{{items.[0].values.portalFirstLink.context}}?from=ch_article_7" target="_blank">{{items.[0].values.portalFirstText.context}}</a>
+                                        </li>
+                                        <li><a href="{{items.[0].values.portalSecondLink.context}}?from=ch_article_7" target="_blank">{{items.[0].values.portalSecondText.context}}</a>
+                                        </li>
+                                        <li><a href="{{items.[0].values.portalThirdLink.context}}?from=ch_article_7" target="_blank">{{items.[0].values.portalThirdText.context}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            
+                        </script>
+                    </div>
+                            </div>
+
+            <div id="join"></div>
+
+            <div id="cp_joinmenu">
+                <div class="join_leave">
+
+                                    </div>
+            </div>
+        </div>
+    </div>
+
+<div id="foot_common">
+    <div class="foot_inner">
+
+        <nav id="foot_nav_other" class="foot_common_nav">
+            <h3 class="nav_title">総合</h3>
+            <ul>
+                <li><a href="https://ch.nicovideo.jp/">ニコニコチャンネル トップ</a>
+                <li><a href="http://site.nicovideo.jp/ch/app/" target="_blank">アプリ niconico ch</a>
+                <li><a href="/channel_catalog">開設されたチャンネル</a>
+                <li><a href="/static/rule.html">利用規約</a>
+                <li><a href="/static/tokutei.html">特定商取引法の表示</a>
+                <li><a href="https://qa.nicovideo.jp/category/show/429?site_domain=default">ヘルプ</a>
+                <li><a href="http://dwango.co.jp/" target="_blank">運営会社</a>
+            </ul>
+        </nav>
+
+        <nav id="foot_nav_categories" class="foot_common_nav">
+            <h3 class="nav_title">カテゴリとポータル</h3>
+            <ul>
+                <li><a href="https://ch.nicovideo.jp/portal/event">イベント</a>
+                <li><a href="https://ch.nicovideo.jp/portal/blomaga">ブロマガ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/anime">アニメ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/movie">映画・ドラマ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/media">社会・言論</a>
+                <li><a href="https://ch.nicovideo.jp/portal/tokusatsu">特撮</a>
+            </ul>
+            <ul>
+                <li><a href="https://ch.nicovideo.jp/portal/music">音楽</a>
+                <li><a href="https://ch.nicovideo.jp/portal/entertainment">エンタメ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/sports">スポーツ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/showbiz">芸能</a>
+                <li><a href="https://ch.nicovideo.jp/portal/life">生活</a>
+                <li><a href="https://ch.nicovideo.jp/portal/politics">政治</a>
+                <li><a href="https://ch.nicovideo.jp/portal/game">ゲーム</a>
+                <li><a href="https://ch.nicovideo.jp/portal/variety">バラエティ</a>
+                <li><a href="https://ch.nicovideo.jp/portal/gravure">グラビア</a>
+            </ul>
+        </nav>
+
+        <nav id="foot_nav_account" class="foot_common_nav">
+            <h3 class="nav_title">アカウント</h3>
+            <ul>
+                            <li><a href="/my/purchased">購入したもの</a>
+                <li><a href="/my/following">登録したチャンネル</a>
+                <li><a href="https://www.nicovideo.jp/my/top">マイページ</a>
+                <li><a href="https://point.nicovideo.jp/index/purchase/">ポイントの購入</a>
+                <li><a href="https://account.nicovideo.jp/logout">ログアウト</a>
+                        </ul>
+        </nav>
+
+        <nav id="foot_nav_cpsupport" class="foot_common_nav">
+            <h3 class="nav_title">開設／お問い合わせ</h3>
+            <ul>
+                <li><a href="/start" class="wbr"><span>チャンネルを</span><span>開設する</span></a>
+                <li><a href="/start/mediaplan">
+                    ブログを開設する<small>(大手メディアプラン)</small>
+                </a>
+                <li><a href="https://qa.nicovideo.jp/faq/show/5008?site_domain=default" class="wbr">
+                    <span>niconicoへのご意見・ご要望</span>
+                </a>
+                <li><a href="http://site.nicovideo.jp/sales_ads" class="wbr"><span>広告出¿ã«</span><span>é¢ãã</span><span>ãåãåãã</span></a>
+            </ul>
+        </nav>
+
+        
+        <small id="foot_copyright">
+            <p><a href="http://dwango.co.jp/" target="_blank">&copy; DWANGO Co., Ltd.</a></p>
+        </small>
+
+    </div>
+</div>        
+                
+    </footer>
+
+            
+                <div class="nicoch_modal" id="timeshift_modal" style="display:none;">
+    <div class="nicoch_modal_overlay" onclick="TimeShift.registHide()"></div>
+    <div class="nicoch_modal_window" id="watching_reservation_regist">
+        <p class="modal_close">
+            <a href="javascript:TimeShift.registHide()">&times;</a>
+        </p>
+        <div class="modal_body load_spinner" id="watching_reservation_info"></div>
+    </div>
+</div>    
+        <div class="nicoch_notifybar" style="display:none" title="ã¯ãªãã¯ã§éãã">
+    <h6 class="title"></h6>
+    <div class="body"></div>
+    <span class="close">&times;</span>
+</div>
+        <div id="loginbox_mask" style="display: none;"></div>
+<section id="loginbox_balloon" style="display: none;">
+    <h1></h1>
+    <dl class="login">
+        <dt><a class="button"></a></dt>
+        <dd></dd>
+    </dl>
+    <dl class="register">
+        <dt><a class="button"></a></dt>
+        <dd></dd>
+    </dl>
+</section>
+
+
+<script>
+var MSG_loginbox = {
+    title : "niconicoã¢ã«ã¦ã³ãã«ã­ã°ã¤ã³",
+    login : {
+        label : "ã­ã°ã¤ã³",
+        url : "https://account.nicovideo.jp/login?next_url=%2Fch7%2Fvideo&site=channel&time=1619790913&hash_key=15cb18b4",
+        description : "ã¢ã«ã¦ã³ãããæã¡ã®æ¹ã¯ã­ã°ã¤ã³<br>ãã¦ãã ããã"
+    },
+    register : {
+        label : "ã¢ã«ã¦ã³ãç»é²",
+        url : "",
+        description : "ã¾ã ã¢ã«ã¦ã³ãããæã¡ã§ãªãæ¹ã§ã<br>ç¡æã§ä½æã§ãã¾ãã"
+    }
+};
+Ch.loginbox.init();
+</script>
+
+        
+<script src="https://platform.twitter.com/widgets.js" defer async></script>
+<script src="https://b.st-hatena.com/js/bookmark_button.js" defer async></script>
+<div id="fb-root"></div>
+
+<script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/timeshift.js?1619248234"></script>
+
+
+<script>
+if (parent != window) {
+    var allowed = false;
+
+    document.addEventListener('click', function(e) {
+        if (!allowed) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }, true);
+
+    window.addEventListener('message', function(e) {
+        if (e.origin == 'https://ch.nicovideo.jp/') {
+            allowed = true;
+        }
+    }, true);
+}
+</script>
+<script>
+var ptSampleRate = 0;
+</script>
+
+
+<script type="text/javascript">
+window._pt_lt = new Date().getTime();
+window._pt_sp_2 = [];
+_pt_sp_2.push('setAccount,4ef1ca6b');
+_pt_sp_2.push('setSampleRate,' + ptSampleRate);
+var _protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+(function() {
+    var atag = document.createElement('script');
+    atag.type = 'text/javascript';
+    atag.async = true;
+    atag.src = _protocol + 'js.ptengine.jp/pta.js';
+    var stag = document.createElement('script');
+    stag.type = 'text/javascript';
+    stag.async = true;
+    stag.src = _protocol + 'js.ptengine.jp/pts.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(atag, s);
+    s.parentNode.insertBefore(stag, s);
+})();
+</script>
+
+
+
+<script>
+
+    var sendGaAndGa360Event = function (e) {
+        var el = e.currentTarget;
+        var category = el.hasAttribute('data-ga-category') ? el.getAttribute('data-ga-category') : '';
+        var action = el.hasAttribute('data-ga-action') ? el.getAttribute('data-ga-action') : '';
+        var eventTag = el.hasAttribute('data-ga-event-tag') ? el.getAttribute('data-ga-event-tag') : '';
+
+        var isDebug = cookie('ch_debug') || false;
+        if (category === '' || action === '' || eventTag === '') {
+            if (isDebug) {
+                console.log('GAã¤ãã³ããã©ã¡ã¼ã¿ã¼ã®ãããããæªè¨­å®ã§ããã¤ãã³ãã¯éä¿¡ããã¾ãã');
+                console.log({category: category, action: action, eventTag: eventTag});
+            }
+            return true;
+        }
+
+        ga('chfrontAll.send', 'event', category, action, location.pathname);
+        NicoGoogleTagManagerDataLayer.push({'event': eventTag});
+    };
+
+    document.querySelectorAll('.send-ga-ga360-event').forEach(function (el) {
+        el.addEventListener('click', sendGaAndGa360Event);
+    });
+
+</script>
+
+</body>
+</html>

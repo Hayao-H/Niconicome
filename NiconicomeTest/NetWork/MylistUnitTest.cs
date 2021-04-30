@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Niconicome.Models.Playlist;
-using NiconicomeTest.MyResources;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;

@@ -121,6 +121,9 @@
   <data name="API_Mylist_Get" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\API_Mylist_Get.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
   </data>
+  <data name="Channel_7" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Channel_7.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
+  </data>
   <data name="CommentRequest_sm9" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CommentRequest_sm9.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
   </data>
