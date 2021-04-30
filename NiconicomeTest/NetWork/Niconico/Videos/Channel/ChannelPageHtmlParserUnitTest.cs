@@ -23,6 +23,7 @@ namespace NiconicomeTest.NetWork.Niconico.Videos.Channel
             var info = this.parser!.ParseAndGetIds(Properties.Resources.Elfenlied_Channel);
             Assert.That(info.IDs.Count(), Is.EqualTo(14));
             Assert.That(info.HasNext, Is.False);
+            Assert.That(info.ChannelName, Is.EqualTo("エルフェンリート"));
         }
 
         [Test]
@@ -32,6 +33,7 @@ namespace NiconicomeTest.NetWork.Niconico.Videos.Channel
             Assert.That(info.IDs.Count(), Is.EqualTo(20));
             Assert.That(info.HasNext, Is.True);
             Assert.That(info.NextPageQuery, Is.EqualTo("?&mode=&sort=f&order=d&type=&page=2"));
+            Assert.That(info.ChannelName, Is.EqualTo("テレビ東京あにてれちゃんねる"));
         }
     }
 }
