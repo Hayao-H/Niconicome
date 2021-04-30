@@ -52,12 +52,20 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         {
 
             string html;
+            var index = 0;
             var baseUrl = $"https://ch.nicovideo.jp/{channelId}/video";
             var urlQuery = string.Empty;
             IChannelPageInfo info;
 
             do
             {
+                if ((index + 1) % 5 == 0)
+                {
+                    onMessage("待機中...(10s)");
+                    await Task.Delay(10 * 1000);
+                }
+
+                onMessage($"{index + 1}ページ目を取得します");
                 try
                 {
                     html = await this.GetChannelPage(baseUrl + urlQuery);
@@ -78,10 +86,12 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
                 urlQuery = info.NextPageQuery ?? string.Empty;
                 ids.AddRange(info.IDs);
+                onMessage($"{info.IDs.Count()}件の動画を新たに取得しました。(現在の取得数:{ids.Count})");
+                ++index;
             }
             while (info.HasNext);
 
-            return new AttemptResult<string>() { IsSucceeded = true };
+            return new AttemptResult<string>() { IsSucceeded = true, Data = info.ChannelName };
         }
 
 
