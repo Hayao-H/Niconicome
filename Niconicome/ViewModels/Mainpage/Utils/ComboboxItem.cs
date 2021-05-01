@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Niconicome.ViewModels.Mainpage.Utils
 {
-    class ComboboxItem<T>
+    public class ComboboxItem<T>
     {
-        public ComboboxItem(T value,string displayvalue)
+        public ComboboxItem(T value, string displayvalue)
         {
             this.DisplayValue = displayvalue;
             this.Value = value;

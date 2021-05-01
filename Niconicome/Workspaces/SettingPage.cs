@@ -2,8 +2,10 @@
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local;
 using Niconicome.Models.Local.External.Import;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.VideoList;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 
 namespace Niconicome.Workspaces
@@ -15,9 +17,10 @@ namespace Niconicome.Workspaces
         public static ILocalInfo LocalInfo { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalInfo>();
         public static IRestore Restore { get; private set; } = DIFactory.Provider.GetRequiredService<IRestore>();
         public static MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; private set; } = new MaterialDesign::SnackbarMessageQueue();
-        public static ICurrent Current { get; private set; } = DIFactory.Provider.GetRequiredService<ICurrent>();
-        public static IPlaylistVideoHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistVideoHandler>();
+        public static IPlaylistHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
         public static IXenoImportGeneralManager XenoImportManager { get; private set; } = DIFactory.Provider.GetRequiredService<IXenoImportGeneralManager>();
         public static IMessageHandler MessageHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IMessageHandler>();
+        public static IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoListContainer>();
+        public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using Watch = Niconicome.Models.Domain.Niconico.Watch;
 using System.IO;
-using Niconicome.Models.Playlist;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Playlist;
+using Playlist = Niconicome.Models.Playlist;
+using Watch = Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -16,10 +16,13 @@ namespace Niconicome.Models.Domain.Utils
     {
         List<string> GetNiconicoIdsFromText(string source);
         string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null);
+        string GetFileName(string format, Playlist::IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null);
         string GetIdFromFIleName(string format, string filenameWithExt);
         string GetIdFromFIleName(string filenameWithExt);
         bool IsNiconicoID(string testString);
         RemoteType GetRemoteType(string url);
+        bool IsSearchUrl(string url);
+        ISearchQuery GetQueryFromUrl(string url);
         string GetID(string url, RemoteType type);
     }
 
@@ -44,33 +47,41 @@ namespace Niconicome.Models.Domain.Utils
         /// <returns></returns>
         public string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null)
         {
-            string filename = format.Replace("<id>", dmcInfo.Id)
-                         .Replace("<title>", dmcInfo.Title)
-                         .Replace("<owner>", dmcInfo.Owner)
-                         + suffix
-                         + extension;
-
-            filename = this.GetDateReplacedString(filename, dmcInfo);
-
-            if (replaceStricted)
+            var info = new VideoInfoForPath()
             {
-                filename = filename
-                    .Replace("/", "／")
-                    .Replace(":", "：")
-                    .Replace("*", "＊")
-                    .Replace("?", "？")
-                    .Replace("<", "＜")
-                    .Replace("<", "＞")
-                    .Replace("|", "｜")
-                    .Replace("\"", "”");
-            } else
-            {
-                filename = Regex.Replace(filename, @"[/:\*\?\<\>\|""]", "");
-            }
+                Title = dmcInfo.Title,
+                OwnerName = dmcInfo.Owner,
+                NiconicoID = dmcInfo.Id,
+                UploadedOn = dmcInfo.UploadedOn,
+                DownloadStartedOn = dmcInfo.DownloadStartedOn,
+            };
 
-
-            return filename;
+            return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
         }
+
+        /// <summary>
+        /// 動画情報からファイル名を取得する
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="video"></param>
+        /// <param name="extension"></param>
+        /// <param name="replaceStricted"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
+        public string GetFileName(string format, Playlist::IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null)
+        {
+            var info = new VideoInfoForPath()
+            {
+                Title = video.Title,
+                OwnerName = video.OwnerName,
+                NiconicoID = video.NiconicoId,
+                UploadedOn = video.UploadedOn,
+                DownloadStartedOn = DateTime.Now,
+            };
+
+            return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
+        }
+
 
         /// <summary>
         /// 日付情報を取得する
@@ -78,7 +89,7 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="format"></param>
         /// <param name="dt"></param>
         /// <returns></returns>
-        private string GetDateReplacedString(string format,IDmcInfo info)
+        private string GetDateReplacedString(string format, VideoInfoForPath info)
         {
             if (Regex.IsMatch(format, "^.*<uploadedon:.+>.*$"))
             {
@@ -86,7 +97,8 @@ namespace Niconicome.Models.Domain.Utils
                 var customFormat = match.Value[12..^1];
                 return format.Replace(match.Value, info.UploadedOn.ToString(customFormat));
 
-            } else if (Regex.IsMatch(format, "^.*<downloadon:.+>.*$"))
+            }
+            else if (Regex.IsMatch(format, "^.*<downloadon:.+>.*$"))
             {
                 var match = Regex.Match(format, "<downloadon:.+>");
                 var customFormat = match.Value[12..^1];
@@ -96,7 +108,7 @@ namespace Niconicome.Models.Domain.Utils
             else
             {
                 return format.Replace("<uploadedon>", info.UploadedOn.ToString("yyyy-MM-dd HH-mm-ss"))
-                    .Replace("<downloadon>",info.DownloadStartedOn.ToString("yyyy-MM-dd HH-mm-ss"))
+                    .Replace("<downloadon>", info.DownloadStartedOn.ToString("yyyy-MM-dd HH-mm-ss"))
                     ;
             }
         }
@@ -217,6 +229,133 @@ namespace Niconicome.Models.Domain.Utils
             }
         }
 
+        public ISearchQuery GetQueryFromUrl(string url)
+        {
+            //不正なURL
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            {
+                throw new ArgumentException($"URLが不正です。(url:{url})");
+            }
 
+            //クエリを含まないURL
+            if (!url.Contains("?"))
+            {
+                throw new ArgumentException($"URLが不正です。(url:{url})");
+            }
+
+            var result = new SearchQuery();
+            var splitted = url.Split("/");
+
+            //検索タイプ
+            var typeString = splitted[^1].IsNullOrEmpty() ? splitted[^3] : splitted[^2];
+            result.SearchType = typeString switch
+            {
+                "tag" => SearchType.Tag,
+                _ => SearchType.Keyword,
+            };
+
+            //検索文字列
+            var rawKweyword = splitted[^1].IsNullOrEmpty() ? splitted[^2] : splitted[^1];
+            rawKweyword = rawKweyword[0..rawKweyword.IndexOf("?")];
+            rawKweyword = HttpUtility.UrlDecode(rawKweyword);
+            result.Query = rawKweyword;
+
+            //クエリ解析
+            var rawQuery = url[(url.LastIndexOf("?") + 1)..];
+            var query = HttpUtility.ParseQueryString(rawQuery);
+
+            //並び替え
+            var isAscending = query["order"] == "a";
+            var rawSort = query["sort"];
+            var sortType = rawSort switch
+            {
+                "v" => Sort.ViewCount,
+                "m" => Sort.MylistCount,
+                "n" => Sort.LastCommentTime,
+                "r" => Sort.CommentCount,
+                "f" => Sort.UploadedTime,
+                "l" => Sort.Length,
+                _ => throw new ArgumentException($"対応していないソート形式です。(sort:{rawSort})")
+            };
+            result.SortOption = new SortOption() { Sort = sortType, IsAscending = isAscending };
+
+            return result;
+
+
+
+        }
+
+        /// <summary>
+        /// 検索URLをテストする
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public bool IsSearchUrl(string url)
+        {
+            //そもそもURLじゃない
+            if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+            {
+                return false;
+            }
+
+            return Regex.IsMatch(url, @"https?://(www\.)?nicovideo\.jp/(search|tag)/.*");
+        }
+
+
+
+        /// <summary>
+        /// 内部メソッド
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="info"></param>
+        /// <param name="extension"></param>
+        /// <param name="replaceStricted"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
+        private string GetFilenameInternal(string format, VideoInfoForPath info, string extension, bool replaceStricted, string? suffix = null)
+        {
+            string filename = format.Replace("<id>", info.NiconicoID)
+             .Replace("<title>", info.Title)
+             .Replace("<owner>", info.OwnerName)
+             + suffix
+             + extension;
+
+            filename = this.GetDateReplacedString(filename, info);
+
+            if (replaceStricted)
+            {
+                filename = filename
+                    .Replace("/", "／")
+                    .Replace(":", "：")
+                    .Replace("*", "＊")
+                    .Replace("?", "？")
+                    .Replace("<", "＜")
+                    .Replace("<", "＞")
+                    .Replace("|", "｜")
+                    .Replace("\"", "”");
+            }
+            else
+            {
+                filename = Regex.Replace(filename, @"[/:\*\?\<\>\|""]", "");
+            }
+
+
+            return filename;
+        }
+
+
+    }
+
+    class VideoInfoForPath
+    {
+        public string Title { get; set; } = string.Empty;
+
+        public DateTime UploadedOn { get; set; }
+
+        public DateTime DownloadStartedOn { get; set; }
+
+        public string OwnerName { get; set; } = string.Empty;
+
+        public string NiconicoID { get; set; } = string.Empty;
     }
 }

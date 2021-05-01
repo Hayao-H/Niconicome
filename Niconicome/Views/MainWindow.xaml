@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
+        xmlns:cv="clr-namespace:Niconicome.Views.Converter"
         xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
@@ -24,6 +25,9 @@
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
+    <Window.Resources>
+        <cv:BooleanCircleConverter x:Key="BooleanCircleConverter"/>
+    </Window.Resources>
     <materialDesign:DialogHost Identifier="default">
         <DockPanel>
             <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
@@ -65,7 +69,7 @@
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="17*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Column= "0" Background="#e7e7e7">
+                    <Grid Grid.Column= "0" Background="{DynamicResource  MaterialDesignSnackbarBackground}">
                         <Grid.DataContext>
                             <vm:PlaylistTreeViewModel/>
                         </Grid.DataContext>
@@ -78,7 +82,7 @@
                                 <materialDesign:PackIcon Kind="Refresh" />
                             </Button>
                         </DockPanel>
-                        <TreeView ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
+                        <TreeView Foreground="{DynamicResource MaterialDesignBody}" ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
                             <i:Interaction.Behaviors>
                                 <vm:PlaylistTreeBehavior/>
                             </i:Interaction.Behaviors>
@@ -90,7 +94,7 @@
                                                 <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
                                             </Grid.ToolTip>
                                             <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                            <TextBlock Text="{Binding Name}"/>
+                                            <TextBlock Foreground="{DynamicResource MaterialDesignSnackbarRipple}" Text="{Binding Name}"/>
                                             <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
                                         </Grid>
                                     </StackPanel>
@@ -137,7 +141,7 @@
                             <RowDefinition Height="19*"/>
                         </Grid.RowDefinitions>
                         <DockPanel >
-                            <ToggleButton Margin="10 0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignHamburgerToggleButton}" x:Name="MenuToggleButton"/>
+                            <ToggleButton Margin="10 0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignHamburgerToggleButton}" x:Name="MenuToggleButton" Foreground="{DynamicResource MaterialDesignBody}"/>
                             <DockPanel HorizontalAlignment="Right">
                                 <Button Margin="10,0" Grid.Column="0" Width="60" VerticalAlignment="Center" ToolTip="アプリケーション設定" Command="{Binding OpenSettingCommand}">
                                     <materialDesign:PackIcon Kind="cog">
@@ -246,31 +250,32 @@
                                     </i:Interaction.Behaviors>
                                     <ListView.View>
                                         <GridView>
-                                            <GridViewColumn Header="選択">
+                                            <GridViewColumn Header="選択" Width="{Binding SelectColumnWidth,Mode=TwoWay}">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                            <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                                        <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-                                            <GridViewColumn >
+                                            <GridViewColumn Width="{Binding ThumbColumnWidth}">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <Image Source="{Binding BindableThumbPath,UpdateSourceTrigger=PropertyChanged}" Height="80"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-                                            <GridViewColumn Width="150" Header="ID" DisplayMemberBinding="{Binding NiconicoId}"/>
-                                            <GridViewColumn Header="タイトル">
+                                            <GridViewColumn Width="{Binding IDColumnWidth,Mode=TwoWay}" Header="ID" DisplayMemberBinding="{Binding NiconicoId}"/>
+                                            <GridViewColumn Width="{Binding TitleColumnWidth,Mode=TwoWay}" Header="タイトル">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <TextBlock Text="{Binding Title}" ToolTip="{Binding Title}"/>
+                                                        <TextBlock Text="{Binding Title,Mode=TwoWay}" ToolTip="{Binding Title}"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-                                            <GridViewColumn Header="投稿日" DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
-                                            <GridViewColumn Header="再生回数" DisplayMemberBinding="{Binding ViewCount}"/>
-                                            <GridViewColumn Header="状態" DisplayMemberBinding="{Binding Message}"/>
+                                            <GridViewColumn Width="{Binding UploadColumnWidth,Mode=TwoWay}" Header="投稿日" DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
+                                            <GridViewColumn Width="{Binding ViewCountColumnWidth,Mode=TwoWay}" Header="再生回数" DisplayMemberBinding="{Binding ViewCount}"/>
+                                            <GridViewColumn Width="{Binding DownloadedFlagColumnWidth,Mode=TwoWay}" Header="DL済み" DisplayMemberBinding="{Binding IsDownloaded,Converter={StaticResource BooleanCircleConverter}}"/>
+                                            <GridViewColumn Width="{Binding StateColumnWidth,Mode=TwoWay}" Header="状態" DisplayMemberBinding="{Binding Message}"/>
                                         </GridView>
                                     </ListView.View>
                                     <ListView.ItemContainerStyle>
@@ -315,9 +320,9 @@
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         </MenuItem>
                                                         <MenuItem Header="送る">
-                                                            <MenuItem Header="アプリにURLを送る" Command="{Binding SendUrlToappCommand}"
+                                                            <MenuItem Header="アプリに送る(A)" Command="{Binding SendToappACommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                            <MenuItem Header="アプリにIDを送る" Command="{Binding SendIdToappCommand}"
+                                                            <MenuItem Header="アプリに送る(B)" Command="{Binding SendToappBCommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         </MenuItem>
                                                         <MenuItem Header="プレイリストを作成">
@@ -326,6 +331,7 @@
                                                     </ContextMenu>
                                                 </Setter.Value>
                                             </Setter>
+                                            <EventSetter Event="MouseDoubleClick" Handler="Videolist_db_click"/>
                                         </Style>
                                     </ListView.ItemContainerStyle>
                                     <ListView.Resources>
@@ -340,16 +346,36 @@
                                 </ListView>
                                 <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
                             </Grid>
-                            <TabControl Grid.Row="3" Margin="8">
+                            <TabControl Background="{DynamicResource MaterialDesignBackground}" Grid.Row="3" Margin="8">
+                                <TabControl.Resources>
+                                    <Style TargetType="TabItem">
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </Style>
+                                </TabControl.Resources>
                                 <TabItem Header="設定" d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingsViewModelD},IsDesignTimeCreatable=True}">
                                     <StackPanel Orientation="Vertical" x:Name="downloadSettings">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="{x:Type Label}">
+                                                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                                            </Style>
+                                            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource MaterialDesignComboBox}">
+                                                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                                            </Style>
+                                            <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MaterialDesignCheckBox}">
+                                                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                                            </Style>
+                                        </StackPanel.Resources>
                                         <Grid Margin="0 5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="61*"/>
+                                                <ColumnDefinition Width="1277*"/>
+                                            </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="auto"/>
                                                 <RowDefinition Height="auto"/>
                                             </Grid.RowDefinitions>
-                                            <Label Content="ダウンロードする項目"/>
-                                            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                            <Label Content="ダウンロードする項目" Grid.ColumnSpan="2" Margin="0,0,0,30" Grid.RowSpan="2"/>
+                                            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2">
                                                 <CheckBox Margin="5 0" Content="動画" IsChecked="{Binding IsDownloadingVideoEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                 <CheckBox Margin="5 0" Content="コメント" IsChecked="{Binding IsDownloadingCommentEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                                 <CheckBox Margin="5 0" Content="過去ログ" IsChecked="{Binding IsDownloadingCommentLogEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
@@ -405,7 +431,7 @@
                                             </Button>
                                         </StackPanel>
                                         <TextBox Grid.Row="1" Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="4" IsReadOnly="True"
-                                         BorderThickness="0 1 0 0" TextWrapping="Wrap"/>
+                                         BorderThickness="0 1 0 0" Foreground="{DynamicResource MaterialDesignBody}" TextWrapping="Wrap"/>
                                     </Grid>
                                 </TabItem>
                             </TabControl >

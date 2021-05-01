@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using System.Diagnostics;
+using System.Security.Permissions;
 
 namespace Niconicome.Models.Domain.Niconico.Dmc
 {
@@ -23,6 +24,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
         PlayListNodeType NodeType { get; set; }
         string Content { get; }
         IResolution PlaylistResolution { get; set; }
+        long PlaylistBandWidth { get; set; }
     }
 
     public interface IStreamUrl
@@ -40,6 +42,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
         string AbsoluteUri { get; }
 
         IResolution Resolution { get; }
+        long BandWidth { get; }
     }
 
     /// <summary>
@@ -84,7 +87,6 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
         /// <param name="playlist"></param>
         public void Parse(List<string> playlist)
         {
-            bool isPrevStreamInfo = false;
             bool isPrevTsFileDuration = false;
 
             this.PlayListNodes.Clear();
@@ -97,18 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
 
                 var node = new PlayListNode(line);
 
-                if (isPrevStreamInfo)
-                {
-                    if (node.NodeType != PlayListNodeType.PlaylistUri)
-                    {
-                        throw new InvalidDataException($"プレイリストファイルのURIが指定されていません。(行:{i + 1})");
-                    }
-
-                    node.PlaylistResolution = this.PlayListNodes[i - 1].PlaylistResolution;
-                    isPrevStreamInfo = false;
-
-                }
-                else if (isPrevTsFileDuration)
+                if (isPrevTsFileDuration)
                 {
                     if (node.NodeType != PlayListNodeType.Uri) throw new InvalidDataException($"セグメントファイルのURIが指定されていません。(行:{i + 1})");
                     isPrevTsFileDuration = false;
@@ -117,8 +108,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
                 switch (node.NodeType)
                 {
                     case PlayListNodeType.StreamInfo:
-                        node.PlaylistResolution = this.GetResolution(node.Content);
-                        isPrevStreamInfo = true;
+                        (node.PlaylistResolution, node.PlaylistBandWidth) = this.GetResolution(node.Content);
                         break;
                 }
 
@@ -159,7 +149,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
         /// 解像度を解析
         /// </summary>
         /// <param name="origin"></param>
-        private IResolution GetResolution(string origin)
+        private (IResolution, long) GetResolution(string origin)
         {
             string[] infoes = origin.Split(',');
             var infoLists = new List<KeyValuePair<string, string>>();
@@ -170,15 +160,22 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
                 infoLists.Add(new KeyValuePair<string, string>(splitedInfo[0], splitedInfo.Length > 1 ? splitedInfo[1] : string.Empty));
             }
 
+            var resolution = Resolution.Default;
+            long bandWidth = 0;
+
             foreach (var sInfo in infoLists)
             {
                 if (sInfo.Key == "RESOLUTION")
                 {
-                    return new Resolution(sInfo.Value);
+                    resolution = new Resolution(sInfo.Value);
+                }
+                else if (sInfo.Key == "BANDWIDTH")
+                {
+                    bandWidth = long.Parse(sInfo.Value);
                 }
             }
 
-            return Resolution.Default;
+            return (resolution, bandWidth);
 
         }
 
@@ -198,6 +195,12 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
         /// 解像度(プロパティ)
         /// </summary>
         public IResolution PlaylistResolution { get; set; } = Resolution.Default;
+
+        /// <summary>
+        /// BANDWIDTH
+        /// </summary>
+        public long PlaylistBandWidth { get; set; }
+
 
         public PlayListNode(string line)
         {
@@ -346,7 +349,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
             this.AbsoluteUrl = string.Concat(UrlBase, uri);
             this.SequenceZero = SequenceZero;
             this.Sequence = SequenceZero + 1;
-            this.FileName = uri.Substring(0, uri.Contains('?') ? uri.IndexOf('?'):uri.Length);
+            this.FileName = uri.Substring(0, uri.Contains('?') ? uri.IndexOf('?') : uri.Length);
         }
     }
 
@@ -370,11 +373,18 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
         /// </summary>
         public IResolution Resolution { get; init; }
 
-        public PlaylistUrl(string uri, string baseUrl, IResolution resolution)
+        /// <summary>
+        /// BANDWIDTH
+        /// </summary>
+        public long BandWidth { get; set; }
+
+
+        public PlaylistUrl(string uri, string baseUrl, IResolution resolution, long bandWidth)
         {
             this.Uri = uri;
             this.AbsoluteUri = string.Concat(baseUrl, uri);
             this.Resolution = resolution;
+            this.BandWidth = bandWidth;
         }
 
     }

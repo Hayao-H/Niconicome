@@ -11,6 +11,7 @@ namespace Niconicome.Models.Playlist
     public interface ILightVideoListInfo
     {
         string MessageGuid { get; }
+        string FileName { get; }
         int PlaylistId { get; }
         int VideoId { get; }
         bool IsSelected { get; }
@@ -23,14 +24,14 @@ namespace Niconicome.Models.Playlist
     {
         private static readonly List<ILightVideoListInfo> videoListInfos = new();
 
-        public static bool Contains(ILightVideoListInfo video)
+        public static bool Contains(int videoID, int playlistID)
         {
-            return LightVideoListinfoHandler.videoListInfos.Any(v => v.VideoId == video.VideoId && v.PlaylistId == video.PlaylistId);
+            return LightVideoListinfoHandler.videoListInfos.Any(v => v.VideoId == videoID && v.PlaylistId == playlistID);
         }
 
         public static void AddVideo(ILightVideoListInfo video)
         {
-            if (LightVideoListinfoHandler.Contains(video))
+            if (LightVideoListinfoHandler.Contains(video.VideoId, video.PlaylistId))
             {
                 LightVideoListinfoHandler.videoListInfos.RemoveAll(v => v.PlaylistId == video.PlaylistId && v.VideoId == video.VideoId);
             }
@@ -50,9 +51,10 @@ namespace Niconicome.Models.Playlist
     /// </summary>
     public class LightVideoListInfo : ILightVideoListInfo
     {
-        public LightVideoListInfo(string messageGud, int playlistId, int videoId, bool isSelected)
+        public LightVideoListInfo(string messageGud, string fileName, int playlistId, int videoId, bool isSelected)
         {
             this.MessageGuid = messageGud;
+            this.FileName = fileName;
             this.VideoId = videoId;
             this.PlaylistId = playlistId;
             this.IsSelected = isSelected;
@@ -65,6 +67,9 @@ namespace Niconicome.Models.Playlist
         public int VideoId { get; init; }
 
         public bool IsSelected { get; init; }
+
+        public string FileName { get; init; }
+
 
     }
 }

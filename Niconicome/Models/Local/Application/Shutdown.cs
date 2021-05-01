@@ -1,5 +1,6 @@
 ﻿using System;
 using Niconicome.Models.Domain.Local;
+using Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -10,12 +11,15 @@ namespace Niconicome.Models.Local.Application
 
     public class Shutdown : IShutdown
     {
-        public Shutdown(IDataBase dataBase)
+        public Shutdown(IDataBase dataBase,IPlaylistHandler playlistHandler)
         {
             this.dataBase = dataBase;
+            this.playlistHandler = playlistHandler;
         }
 
         private readonly IDataBase dataBase;
+
+        private readonly IPlaylistHandler playlistHandler;
 
         private bool isShutdowned;
 
@@ -25,6 +29,7 @@ namespace Niconicome.Models.Local.Application
         public void ShutdownApp()
         {
             if (this.isShutdowned) throw new InvalidOperationException("終了処理は一度のみ可能です。");
+            this.playlistHandler.SaveAllPlaylists();
             this.dataBase.Dispose();
             this.isShutdowned = true;
         }

@@ -43,14 +43,44 @@ namespace Niconicome.Models.Domain.Utils
         /// </summary>
         /// <param name="folderPath"></param>
         /// <param name="fileName"></param>
-        public static void CreateDirectoryIfNotExist(string folderPath,string fileName)
+        public static void CreateDirectoryIfNotExist(string folderPath, string fileName)
         {
             var path = Path.Combine(folderPath, fileName);
             var dirname = Path.GetDirectoryName(path);
-            if (dirname is not null&&!Directory.Exists(dirname))
+            if (dirname is not null && !Directory.Exists(dirname))
             {
                 Directory.CreateDirectory(dirname);
             }
+        }
+
+        /// <summary>
+        /// Win32API用のプレフィックスを追加する
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static string GetPrefixedPath(string p)
+        {
+            if (!p.StartsWith(@"\\?\"))
+            {
+                p = @"\\?\" + p;
+            }
+
+            return p;
+        }
+
+        /// <summary>
+        /// 相対パスを絶対パスに変換
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static string GetRootedPath(string p)
+        {
+            if (!Path.IsPathRooted(p))
+            {
+                p = Path.Combine(AppContext.BaseDirectory, p);
+            }
+
+            return p;
         }
     }
 }

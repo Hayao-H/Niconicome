@@ -10,18 +10,21 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Niconicome.ViewModels.Setting.Pages;
 
-namespace Niconicome.Views
+namespace Niconicome.Views.Setting.Pages
 {
     /// <summary>
-    /// SearchPage.xaml の相互作用ロジック
+    /// VideoListSettingPage.xaml の相互作用ロジック
     /// </summary>
-    public partial class SearchPage : Window
+    public partial class VideoListSettingPage : Page
     {
-        public SearchPage()
+        public VideoListSettingPage()
         {
             this.InitializeComponent();
+            this.DataContext = new VideoListSettingsPageViewModel();
         }
     }
 }

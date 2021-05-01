@@ -1,0 +1,169 @@
+﻿<Window x:Class="Niconicome.Views.Mainpage.SearchPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignBackground}"
+        FontFamily="Yu Gothic"
+        x:Name="window"
+        WindowStartupLocation="CenterOwner"
+        Style="{StaticResource Window_Style}"
+        d:DataContext="{d:DesignInstance {x:Type vm:SearchViewModelD},IsDesignTimeCreatable=True}"
+        Title="動画を検索する" Height="650" Width="850">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="5" Grid.Row="0">
+            <StackPanel HorizontalAlignment="Left" Margin="0 5">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton 
+                    Style="{StaticResource MaterialDesignTabRadioButton}" 
+                    Content="タグ"
+                    IsChecked="{Binding IsTag}"
+                    />
+                    <RadioButton 
+                    Style="{StaticResource MaterialDesignTabRadioButton}" 
+                    Content="キーワード"
+                    IsChecked="{Binding IsKeyword}"
+                    />
+                </StackPanel>
+                <TextBox Margin="0 5" 
+                         Width="200" 
+                         Padding="5 0"
+                         Text="{Binding Query,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Top" 
+                        materialDesign:HintAssist.Hint="検索キーワード" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
+            </StackPanel>
+            <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                <Label VerticalAlignment="Bottom"  Content="取得するページ："/>
+                <TextBlock VerticalAlignment="Center" Padding="18 0" Width="50" Text="{Binding Page,UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Margin="5 0" Command="{Binding IncrementPageCommand}">
+                    <Button.Content>
+                        <materialDesign:PackIcon Kind="Plus"/>
+                    </Button.Content>
+                </Button>
+                <Button Command="{Binding DecrementPageCommand}">
+                    <Button.Content>
+                        <materialDesign:PackIcon Kind="Minus"/>
+                    </Button.Content>
+                </Button>
+            </DockPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <StackPanel Margin=" 0 5" Orientation="Horizontal">
+                        <Label Content="並び替え："/>
+                        <ComboBox ItemsSource="{Binding SelectableSort}" SelectedItem="{Binding Sort}" DisplayMemberPath="DisplayValue"/>
+                    </StackPanel>
+                    <StackPanel Margin=" 0 5" Orientation="Horizontal">
+                        <Label Content="ジャンル："/>
+                        <ComboBox ItemsSource="{Binding SelectableGenre}" SelectedItem="{Binding Genre}" DisplayMemberPath="DisplayValue"/>
+                    </StackPanel>
+                    <StackPanel Margin=" 0 5" Orientation="Horizontal">
+                        <Label Content="期間："/>
+                        <ComboBox ItemsSource="{Binding SelectableUploadedDT}" SelectedItem="{Binding UploadedDT}" DisplayMemberPath="DisplayValue"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Margin="4" VerticalAlignment="Bottom" Orientation="Horizontal" Grid.Column="1">
+                    <CheckBox Margin="0 0 0 2" IsChecked="{Binding ConfigureDateTimeManualy}" Content="指定"/>
+                    <Label
+                        Visibility="{Binding ConfigureDateTimeManualy,Converter={StaticResource BooleanToVisibilityConverter}}"
+                        VerticalContentAlignment="Center"
+                        Content="開始日"/>
+                    <DatePicker
+                            Visibility="{Binding ConfigureDateTimeManualy,Converter=    {StaticResource BooleanToVisibilityConverter}}" 
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Bottom"/>
+                    <Label 
+                        Margin="5 0 0 0"
+                        Visibility="{Binding ConfigureDateTimeManualy,Converter={StaticResource BooleanToVisibilityConverter}}"
+                        VerticalContentAlignment="Center" 
+                        Content="終了日"/>
+                    <DatePicker 
+                        Visibility="{Binding ConfigureDateTimeManualy,Converter={StaticResource     BooleanToVisibilityConverter}}"
+                        HorizontalAlignment="Left" 
+                        VerticalAlignment="Bottom"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+        <TabControl  Grid.Row="1">
+            <TabItem Header="出力">
+                <ScrollViewer>
+                    <TextBlock Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="8" FontSize="14" TextWrapping="Wrap" />
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="結果">
+                <ListView ItemsSource="{Binding SearchResult}">
+                    <ListView.View>
+                        <GridView>
+                            <GridView.Columns>
+                                <GridViewColumn>
+                                    <GridViewColumn.Header>
+                                        <CheckBox IsChecked="{Binding IsAllSelected}"/>
+                                    </GridViewColumn.Header>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsSelected}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn 
+                                    Header="ID" 
+                                    DisplayMemberBinding="{Binding NiconicoId}"/>
+                                <GridViewColumn
+                                    Header="タイトル">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock 
+                                                Text="{Binding Title}"
+                                                ToolTip="{Binding Title}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn 
+                                    Header="投稿日時"
+                                    DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
+                            </GridView.Columns>
+                        </GridView>
+                    </ListView.View>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <Button 
+                Grid.Column="0" 
+                Margin="8 0" 
+                Content="検索" 
+                Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=window}"/>
+            <Button 
+                Grid.Column="1" 
+                Margin="8 0" 
+                Content="選択した動画をプレイリストに登録" 
+                Command="{Binding RegisterResultCommand}" CommandParameter="{Binding ElementName=window}"/>
+        </Grid>
+        <materialDesign:Snackbar MessageQueue="{Binding MessageQueue}"/>
+    </Grid>
+</Window>

@@ -13,8 +13,8 @@ namespace Niconicome.Models.Network.Download
         void ClearStaged();
         void MoveStagedToQueue(bool clearAfterMove = true);
         void MoveStagedToQueue(Func<IDownloadTask, bool> predicate, bool clearAfterMove = true);
-        void StageVIdeo(IVideoListInfo video, DownloadSettings settings, bool allowDupe);
-        void StageVIdeos(IEnumerable<IVideoListInfo> videos, DownloadSettings settings, bool allowDupe);
+        void StageVIdeo(IListVideoInfo video, DownloadSettings settings, bool allowDupe);
+        void StageVIdeos(IEnumerable<IListVideoInfo> videos, DownloadSettings settings, bool allowDupe);
         bool ContainsStage(Func<IDownloadTask, bool> predicate);
     }
 
@@ -42,7 +42,7 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         /// <param name="video"></param>
         /// <param name="settings"></param>
-        public void StageVIdeo(IVideoListInfo video, DownloadSettings settings, bool allowDupe)
+        public void StageVIdeo(IListVideoInfo video, DownloadSettings settings, bool allowDupe)
         {
             var task = new DownloadTask(video.NiconicoId, video.Title, video.Id, settings);
             void onMessageChange(object? sender, DownloadTaskMessageChangedEventArgs e)
@@ -62,7 +62,7 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         /// <param name="videos"></param>
         /// <param name="settings"></param>
-        public void StageVIdeos(IEnumerable<IVideoListInfo> videos, DownloadSettings settings, bool allowDupe)
+        public void StageVIdeos(IEnumerable<IListVideoInfo> videos, DownloadSettings settings, bool allowDupe)
         {
             foreach (var video in videos)
             {

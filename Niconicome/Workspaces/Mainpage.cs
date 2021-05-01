@@ -8,15 +8,18 @@ using MaterialDesign = MaterialDesignThemes.Wpf;
 using Niconicome.Models.Local.Application;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Download;
+using VideoList = Niconicome.Models.Playlist.VideoList;
+using Niconicome.Models.Network.Watch;
+using Ext = Niconicome.Models.Local.External;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Workspaces
 {
     static class Mainpage
     {
         public static ISession Session { get; private set; } = DIFactory.Provider.GetRequiredService<ISession>();
-        public static IPlaylistVideoHandler PlaylistTree { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistVideoHandler>();
+        public static IPlaylistHandler PlaylistTree { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
         public static IVideoHandler VideoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoHandler>();
-        public static ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<ICurrent>();
         public static IWatch Watch { get; private set; } = DIFactory.Provider.GetRequiredService<IWatch>();
         public static IRemotePlaylistHandler RemotePlaylistHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IRemotePlaylistHandler>();
         public static ILocalInfo LocalInfo { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalInfo>();
@@ -31,5 +34,9 @@ namespace Niconicome.Workspaces
         public static IStartUp StartUp { get; private set; } = DIFactory.Provider.GetRequiredService<IStartUp>();
         public static IVideoIDHandler VideoIDHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoIDHandler>();
         public static IDownloadTasksHandler DownloadTasksHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IDownloadTasksHandler>();
+        public static VideoList::ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::ICurrent>();
+        public static VideoList::IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::IVideoListContainer>();
+        public static Ext::IExternalAppUtils ExternalAppUtils { get; private set; } = DIFactory.Provider.GetRequiredService<Ext::IExternalAppUtils>();
+        public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
     }
 }

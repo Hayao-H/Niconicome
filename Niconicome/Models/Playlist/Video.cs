@@ -9,23 +9,22 @@ namespace Niconicome.Models.Playlist
 {
     public interface IVideoHandler
     {
-        int AddVideo(IVideoListInfo video, int playlidtId);
+        int AddVideo(IListVideoInfo video, int playlidtId);
         void RemoveVideo(int videoID, int playlistID);
-        void Update(IVideoListInfo video);
+        void Update(IListVideoInfo video);
         bool Exist(int id);
-        IEnumerable<IVideoListInfo> GetAllVideos();
-        IVideoListInfo GetVideo(int id);
+        IEnumerable<IListVideoInfo> GetAllVideos();
+        IListVideoInfo GetVideo(int id);
 
     }
 
     public class VideoHandler : IVideoHandler
     {
 
-        public VideoHandler(IVideoStoreHandler storeHandler,IPlaylistStoreHandler playlistStoreHandler,IPlaylistVideoHandler playlistVideoHandler)
+        public VideoHandler(IVideoStoreHandler storeHandler,IPlaylistStoreHandler playlistStoreHandler)
         {
             this.videoStoreHandler = storeHandler;
             this.playlistStoreHandler = playlistStoreHandler;
-            this.playlistVideoHandler = playlistVideoHandler;
         }
 
         /// <summary>
@@ -39,20 +38,14 @@ namespace Niconicome.Models.Playlist
         private readonly IPlaylistStoreHandler playlistStoreHandler;
 
         /// <summary>
-        /// プレイリストツリーにアクセスする
-        /// </summary>
-        private readonly IPlaylistVideoHandler playlistVideoHandler;
-
-        /// <summary>
         /// 動画を追加する
         /// </summary>
         /// <param name="video"></param>
         /// <param name="playlidtId"></param>
         /// <returns></returns>
-        public int AddVideo(IVideoListInfo video, int playlidtId)
+        public int AddVideo(IListVideoInfo video, int playlidtId)
         {
             int id = this.playlistStoreHandler.AddVideo(video, playlidtId);
-            this.playlistVideoHandler.AddVideo(video, playlidtId);
             return id;
         }
 
@@ -64,14 +57,13 @@ namespace Niconicome.Models.Playlist
         public void RemoveVideo(int videoID, int playlistID)
         {
             this.playlistStoreHandler.RemoveVideo(videoID, playlistID);
-            this.playlistVideoHandler.RemoveVideo(videoID, playlistID);
         }
 
         /// <summary>
         /// 動画情報を更新する
         /// </summary>
         /// <param name="video"></param>
-        public void Update(IVideoListInfo video)
+        public void Update(IListVideoInfo video)
         {
             this.videoStoreHandler.Update(video);
         }
@@ -81,9 +73,9 @@ namespace Niconicome.Models.Playlist
         /// 全ての動画を取得する
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IVideoListInfo> GetAllVideos()
+        public IEnumerable<IListVideoInfo> GetAllVideos()
         {
-            return this.videoStoreHandler.GetAllVideos().Select(v => BindableVIdeoListInfo.ConvertDbDataToVideoListInfo(v));
+            return this.videoStoreHandler.GetAllVideos().Select(v => BindableListVIdeoInfo.ConvertDbDataToVideoListInfo(v));
         }
 
         /// <summary>
@@ -91,10 +83,10 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IVideoListInfo GetVideo(int id)
+        public IListVideoInfo GetVideo(int id)
         {
             if (!this.videoStoreHandler.Exists(id)) throw new InvalidOperationException($"動画({id})はデータベースに存在しません。");
-            return BindableVIdeoListInfo.ConvertDbDataToVideoListInfo(this.videoStoreHandler.GetVideo(id)!);
+            return BindableListVIdeoInfo.ConvertDbDataToVideoListInfo(this.videoStoreHandler.GetVideo(id)!);
         }
 
         /// <summary>

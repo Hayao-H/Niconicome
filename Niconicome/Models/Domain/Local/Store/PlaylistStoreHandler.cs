@@ -12,7 +12,7 @@ namespace Niconicome.Models.Domain.Local.Store
         STypes::Playlist GetRootPlaylist();
         STypes::Playlist? GetPlaylist(int id);
         public int AddPlaylist(int parentID, string name);
-        public int AddVideo(IVideoListInfo video, int playlistId);
+        public int AddVideo(IListVideoInfo video, int playlistId);
         public void RemoveVideo(int id, int playlistId);
         public void Update(ITreePlaylistInfo newplaylist);
         IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self);
@@ -309,9 +309,8 @@ namespace Niconicome.Models.Domain.Local.Store
         public void Update(ITreePlaylistInfo newPlaylist)
         {
             if (!this.Exists(newPlaylist.Id)) throw new InvalidOperationException($"指定したプレイリストが存在しません。(id:{newPlaylist.Id})");
-            var dbPlaylist = this.GetPlaylist(newPlaylist.Id);
-            dbPlaylist!.PlaylistName = newPlaylist.Name;
-            dbPlaylist.FolderPath = newPlaylist.Folderpath;
+            var dbPlaylist = this.GetPlaylist(newPlaylist.Id)!;
+            this.SetData(dbPlaylist, newPlaylist);
             this.Update(dbPlaylist);
         }
 
@@ -404,7 +403,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="videoData"></param>
         /// <param name="playlistId"></param>
         /// <returns></returns>
-        public int AddVideo(IVideoListInfo videoData, int playlistId)
+        public int AddVideo(IListVideoInfo videoData, int playlistId)
         {
             if (!this.Exists(playlistId)) throw new InvalidOperationException($"指定したプレイリストが存在しません。(id:{playlistId})");
 
@@ -451,6 +450,18 @@ namespace Niconicome.Models.Domain.Local.Store
             {
                 this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
             }
+        }
+
+        /// <summary>
+        /// データをセットする
+        /// </summary>
+        /// <param name="dbPlaylist"></param>
+        /// <param name="playlistInfo"></param>
+        private void SetData(STypes::Playlist dbPlaylist,ITreePlaylistInfo playlistInfo)
+        {
+            dbPlaylist.PlaylistName = playlistInfo.Name;
+            dbPlaylist.FolderPath = playlistInfo.Folderpath;
+            dbPlaylist.IsExpanded = playlistInfo.IsExpanded;
         }
     }
 }

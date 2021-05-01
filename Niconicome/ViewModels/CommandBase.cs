@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Niconicome.ViewModels
 {
-    class CommandBase<T> : ICommand
+    public class CommandBase<T> : ICommand
     {
         public CommandBase(Func<object?,bool> canExecute,Action<T?> execute)
         {

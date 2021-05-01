@@ -8,6 +8,7 @@
         xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
         xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:cn ="clr-namespace:Niconicome.Views.Converter"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -19,6 +20,9 @@
         FontFamily="Yu Gothic"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="GeneralPage">
+    <Page.Resources>
+        <cn:BooleanInverseConverter x:Key="booleanInverseconverter"/>
+    </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -76,6 +80,46 @@
                 </materialDesign:PackIcon>
                 <Label Content="SSL証明書の検証をスキップする(強く非推奨)" ToolTip="安全性が著しく低下します。ほかの回避手段がない場合にのみ有効にしてください。"/>
                 <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsSkippingSSLVerificationEnable}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="FolderOpen" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="起動時にプレイリストをすべて展開する" />
+                <ToggleButton HorizontalAlignment="Right" x:Name="expandAllPlaylists" IsChecked="{Binding IsExpandallPlaylistsEnable}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="FolderRefresh" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="起動時に前回のプレイリスト展開状況を復元する" />
+                <ToggleButton HorizontalAlignment="Right" IsEnabled="{Binding ElementName=expandAllPlaylists,Path=IsChecked,Converter={StaticResource booleanInverseconverter }}" IsChecked="{Binding IsSavePrevPlaylistExpandedStateEnable}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="MovieOpenPlus" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="動画追加時にIDのみを登録する" ToolTip="動画情報は更新時、またはDL時に改めて登録されます。" />
+                <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsStoreOnlyNiconicoIDEnable}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="Rename" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="リモートプレイリストに設定した際に自動でプレイリストをリネームする"  />
+                <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsAutoRenamingRemotePlaylistEnable}"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>

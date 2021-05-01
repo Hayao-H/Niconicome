@@ -26,11 +26,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             };
 
 
-            if (WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist is not null && WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.IsRemotePlaylist)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.IsRemotePlaylist)
             {
-                this.idField = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.RemoteId;
+                this.idField = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId;
 
-                this.currentSettingField = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.RemoteType switch
+                this.currentSettingField = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType switch
                 {
                     Playlist::RemoteType.Mylist => mylist,
                     Playlist::RemoteType.UserVideos => userVideo,
@@ -52,7 +52,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                 if (arg is null) return;
 
-                if (WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist is null) return;
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null) return;
 
 
                 if (arg is Window window)
@@ -69,7 +69,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     this.messageField.Clear();
                     this.OnPropertyChanged(messagePropName);
 
-                    var videos = new List<Playlist::IVideoListInfo>();
+                    var videos = new List<Playlist::IListVideoInfo>();
+                    int playlistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
 
                     this.Message = "情報を取得中です...";
 
@@ -80,36 +81,28 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     });
 
 
-                    if (result.IsFailed)
+                    if (!result.IsSucceeded)
                     {
-                        string detail = WS::Mainpage.RemotePlaylistHandler.ExceptionDetails ?? "None";
-                        string logfile = WS::Mainpage.LocalInfo.LogFileName;
-                        this.Message = $"{this.CurrentSetting.Name}(id:{id})の取得に失敗しました。";
+                        string detail = result.Exception?.Message ?? "None";
+                        this.Message = $"{this.CurrentSetting.Name}(id:{id})の取得に失敗しました。({result.Message})";
                         this.Message = $"詳細情報:{detail}";
-                        this.Message = $"更に詳しい情報は、ログファイル({logfile})を参照してください。";
 
                         this.isfetching = false;
                         this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
 
                         return;
                     }
-                    else if (result.SucceededCount == 0)
+                    else if (videos.Count == 0)
                     {
                         this.Message = "取得に成功しましたが、動画は一件も存在しませんでした。";
                     }
-                    else if (!result.IsSucceededAll)
-                    {
-                        this.Message = $"{result.FailedCount}件の取得に失敗しました。";
-                    }
 
-                    int playlistID = WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist.Id;
 
 
                     if (videos.Count > 0)
                     {
-                        await WS::Mainpage.NetworkVideoHandler.AddVideosAsync(videos, playlistID);
-                        WS::Mainpage.PlaylistTree.Refresh();
-                        WS::Mainpage.CurrentPlaylist.Update(playlistID);
+                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistID);
+                        WS::Mainpage.VideoListContainer.Refresh();
                     }
 
                     if (this.CurrentSetting.NetworkMode == Playlist::RemoteType.None)
@@ -119,15 +112,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     }
                     else
                     {
-                        WS::Mainpage.PlaylistTree.SetAsRemotePlaylist(playlistID, id, this.CurrentSetting.NetworkMode);
+                        WS::Mainpage.PlaylistTree.SetAsRemotePlaylist(playlistID, id, result.Data!, this.CurrentSetting.NetworkMode);
                     }
 
-                    if (result.IsSucceededAll)
-                    {
-                        window.Close();
-                    }
-
-
+                    this.Message = "取得処理が完了しました。";
                     this.isfetching = false;
                     this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
                 }

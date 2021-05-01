@@ -11,7 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
     public interface IChannelPageHtmlParser
     {
-        IEnumerable<string> ParseAndGetIds(string html);
+        IChannelPageInfo ParseAndGetIds(string html);
     }
 
     public class ChannelPageHtmlParser : IChannelPageHtmlParser
@@ -38,9 +38,11 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="html"></param>
         /// <returns></returns>
-        public IEnumerable<string> ParseAndGetIds(string html)
+        public IChannelPageInfo ParseAndGetIds(string html)
         {
             IHtmlDocument document;
+            var info = new ChannelPageInfo();
+
             try
             {
                 document = HtmlParser.ParseDocument(html);
@@ -51,12 +53,12 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
                 throw new InvalidOperationException("チャンネルページの解析に失敗しました。");
             }
 
-            var wrapper = document.GetElementsByClassName("g-videolist").FirstOrDefault();
+            var wrapper = document.QuerySelectorAll(".items").FirstOrDefault();
             if (wrapper is null)
             {
-                throw new InvalidOperationException(".g-videolistを発見できませんでした。");
+                throw new InvalidOperationException(".itemsを発見できませんでした。");
             }
-            var elements = wrapper.QuerySelectorAll(".g-video-link");
+            var elements = wrapper.QuerySelectorAll(".thumb_video");
 
             var ids = elements.Select((element) =>
            {
@@ -66,7 +68,24 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
                return href[(lastindex + 1)..];
            }).Where(i => !i.IsNullOrEmpty()).Distinct();
 
-            return ids;
+            info.IDs = ids;
+
+            //ページャー
+            var pager = document.QuerySelector(".pager");
+            if (pager is not null)
+            {
+                var next = pager.QuerySelector(".next")?.Children?.FirstOrDefault()?.GetAttribute("href");
+                if (next is not null)
+                {
+                    info.HasNext = true;
+                    info.NextPageQuery = next;
+                }
+            }
+
+            var cName = document.QuerySelector(".channel_name")?.Children.FirstOrDefault()?.TextContent ?? string.Empty;
+            info.ChannelName = cName;
+
+            return info;
 
         }
 

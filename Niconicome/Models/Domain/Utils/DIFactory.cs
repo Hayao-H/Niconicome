@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
-using System.Runtime.ConstrainedExecution;
 using Microsoft.Extensions.DependencyInjection;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
@@ -19,6 +18,7 @@ using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Import = Niconicome.Models.Local.External.Import;
+using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 using MyApplication = Niconicome.Models.Local.Application;
@@ -26,12 +26,18 @@ using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using Playlist = Niconicome.Models.Playlist;
+using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Search;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
+using VList = Niconicome.Models.Playlist.VideoList;
+using Watch = Niconicome.Models.Network.Watch;
+using DomainExt = Niconicome.Models.Domain.Local.External;
+using Ext = Niconicome.Models.Local.External;
+using Settings = Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -44,8 +50,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddHttpClient<Niconico::INicoHttp, Niconico::NicoHttp>()
                 .ConfigureHttpMessageHandlerBuilder(builder =>
                 {
-                    var shandler = builder.Services.GetRequiredService<Local::ILocalSettingHandler>();
-                    var skip = shandler.GetBoolSetting(Local::Settings.SkipSSLVerification);
+                    var shandler = builder.Services.GetRequiredService<Settings::ILocalSettingHandler>();
+                    var skip = shandler.GetBoolSetting(Settings::SettingsEnum.SkipSSLVerification);
                     if (builder.PrimaryHandler is HttpClientHandler handler)
                     {
                         handler.CookieContainer = builder.Services.GetRequiredService<Niconico::ICookieManager>().CookieContainer;
@@ -67,13 +73,13 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<DataBase::IDataBase, DataBase::DataBase>();
             services.AddTransient<Store::IPlaylistStoreHandler, Store::PlaylistStoreHandler>();
             services.AddTransient<Store::IVideoStoreHandler, Store::VideoStoreHandler>();
-            services.AddSingleton<Playlist::IPlaylistVideoHandler, Playlist::PlaylistVideoHandler>();
-            services.AddTransient<Playlist::ITreePlaylistInfoHandler, Playlist::TreePlaylistInfoHandler>();
+            services.AddSingleton<Playlist::IPlaylistHandler, Playlist::PlaylistHandler>();
+            services.AddTransient<Playlist::IPlaylistTreeConstructor, Playlist::PlaylistTreeConstructor>();
             services.AddTransient<DomainWatch::IWatchPageHtmlParser, DomainWatch::WatchPageHtmlParser>();
             services.AddTransient<DomainWatch::IWatchInfohandler, DomainWatch::WatchInfohandler>();
-            services.AddTransient<Net::IWatch, Net::Watch>();
+            services.AddTransient<Watch::IWatch, Watch::Watch>();
+            services.AddTransient<Watch::IDomainModelConverter, Watch::DomainModelConverter>();
             services.AddTransient<Net::IVideoThumnailUtility, Net::VideoThumnailUtility>();
-            services.AddSingleton<Playlist::ICurrent, Playlist::Current>();
             services.AddTransient<Mylist::IMylistHandler, Mylist::MylistHandler>();
             services.AddTransient<Mylist::IWatchLaterHandler, Mylist::WatchLaterHandler>();
             services.AddTransient<UVideo::IUserVideoHandler, UVideo::UserVideoHandler>();
@@ -96,14 +102,17 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideo::IVideoEncoader, DlVideo::VideoEncoader>();
             services.AddTransient<DlVideo::ITsMerge, DlVideo::TsMerge>();
             services.AddSingleton<Download::IContentDownloader, Download::ContentDownloader>();
+            services.AddSingleton<Download::IContentDownloadHelper, Download::ContentDownloadHelper>();
             services.AddTransient<DlThumb::IThumbDownloader, DlThumb::ThumbDownloader>();
             services.AddTransient<Playlist::IVideoFilter, Playlist::VideoFilter>();
             services.AddTransient<Search::ISearch, Search::Search>();
             services.AddTransient<Search::ISearchClient, Search::SearchClient>();
+            services.AddTransient<Search::ISearchUrlConstructor, Search::SearchUrlConstructor>();
             services.AddSingleton<State::IErrorMessanger, State::ErrorMessenger>();
             services.AddSingleton<MyApplication::IStartUp, MyApplication::StartUp>();
             services.AddTransient<Store::ISettingHandler, Store::SettingHandler>();
-            services.AddTransient<Local::ILocalSettingHandler, Local::LocalSettingHandler>();
+            services.AddTransient<Settings::ILocalSettingHandler, Settings::LocalSettingHandler>();
+            services.AddTransient<Settings.IEnumSettingsHandler, Settings::EnumSettingsHandler>();
             services.AddTransient<INiconicoUtils, NiconicoUtils>();
             services.AddSingleton<State::ILocalState, State::LocalState>();
             services.AddTransient<LocalFile::IEncodeutility, LocalFile::Encodeutility>();
@@ -144,6 +153,16 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
             services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();
             services.AddTransient<DlDescription::IVideoInfoContentProducer, DlDescription::VideoInfoContentProducer>();
+            services.AddTransient<Local::ILocalVideoUtils, Local::LocalVideoUtils>();
+            services.AddTransient<IO::INicoDirectoryIO, IO::NicoDirectoryIO>();
+            services.AddTransient<IO::INicoFileIO, IO::NicoFileIO>();
+            services.AddTransient<Resume::ISegmentsDirectoryHandler, Resume::SegmentsDirectoryHandler>();
+            services.AddTransient<Resume::IStreamResumer, Resume::StreamResumer>();
+            services.AddSingleton<VList::ICurrent, VList::Current>();
+            services.AddSingleton<VList::IVideoListContainer, VList::VideoListContainer>();
+            services.AddTransient<VList::IVideoListRefresher, VList::VideoListRefresher>();
+            services.AddTransient<Ext::IExternalAppUtils, Ext::ExternalAppUtils>();
+            services.AddTransient<DomainExt::ICommandExecuter,DomainExt::CommandExecuter>();
 
             return services.BuildServiceProvider();
         }

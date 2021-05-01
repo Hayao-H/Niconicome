@@ -15,7 +15,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
         [SetUp]
         public void SetUp()
         {
-            this.collection = CommentCollection.GetInstance(0, 12345, 0);
+            this.collection = CommentCollection.GetInstance(0, 12345, 0, false);
             var com1 = new Response::Comment()
             {
                 Chat = new Response::Chat()

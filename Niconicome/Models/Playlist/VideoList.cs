@@ -11,7 +11,7 @@ using Utils = Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Playlist
 {
-    public interface IVideoListInfo
+    public interface IListVideoInfo
     {
         int Id { get; set; }
         int ViewCount { get; set; }
@@ -24,6 +24,7 @@ namespace Niconicome.Models.Playlist
         string Title { get; set; }
         bool IsDeleted { get; set; }
         bool IsSelected { get; set; }
+        bool IsDownloaded { get; set; }
         string OwnerName { get; set; }
         string LargeThumbUrl { get; set; }
         string ThumbUrl { get; set; }
@@ -32,17 +33,17 @@ namespace Niconicome.Models.Playlist
         string FileName { get; set; }
         string BindableThumbPath { get; }
         string MessageGuid { get; set; }
-        string ChannelId { get; set; }
+        string ChannelID { get; set; }
         string ChannelName { get; set; }
         IEnumerable<string> Tags { get; set; }
         DateTime UploadedOn { get; set; }
         Uri GetNiconicoPageUri();
         bool CheckDownloaded(string folderPath);
         string GetFilePath(string folderPath);
-        static BindableVIdeoListInfo ConvertDbDataToVideoListInfo(STypes::Video video)
+        static BindableListVIdeoInfo ConvertDbDataToVideoListInfo(STypes::Video video)
         {
             video.Void();
-            return new BindableVIdeoListInfo();
+            return new BindableListVIdeoInfo();
         }
 
     }
@@ -51,7 +52,7 @@ namespace Niconicome.Models.Playlist
     /// <summary>
     /// バインド不可能な動画情報
     /// </summary>
-    public class NonBindableVideoListInfo : BindableBase, IVideoListInfo
+    public class NonBindableListVideoInfo : BindableBase, IListVideoInfo
     {
 
         /// <summary>
@@ -62,7 +63,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// 再生回数
         /// </summary>
-        public int ViewCount { get; set; }
+        public virtual int ViewCount { get; set; }
 
         /// <summary>
         /// コメント数
@@ -98,7 +99,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// 動画タイトル
         /// </summary>
-        public string Title { get; set; } = string.Empty;
+        public virtual string Title { get; set; } = string.Empty;
 
         /// <summary>
         /// ファイル名
@@ -114,6 +115,11 @@ namespace Niconicome.Models.Playlist
         /// 選択フラグ
         /// </summary>
         public virtual bool IsSelected { get; set; }
+
+        /// <summary>
+        /// DL済みフラグ
+        /// </summary>
+        public virtual bool IsDownloaded { get; set; }
 
         /// <summary>
         /// 投稿者名
@@ -175,7 +181,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// チャンネルID
         /// </summary>
-        public string ChannelId { get; set; } = string.Empty;
+        public string ChannelID { get; set; } = string.Empty;
 
         /// <summary>
         /// チャンネル名
@@ -205,7 +211,12 @@ namespace Niconicome.Models.Playlist
             }
             else
             {
-                return File.Exists(Path.Combine(folderPath, this.FileName));
+                var p = Path.Combine(folderPath, this.FileName);
+                if (!p.StartsWith(@"\\?\"))
+                {
+                    p = @"\\?\" + p;
+                }
+                return File.Exists(p);
             }
         }
 
@@ -231,10 +242,10 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="dbVideo"></param>
         /// <returns></returns>
-        public static NonBindableVideoListInfo ConvertDbDataToVideoListInfo(STypes::Video dbVideo)
+        public static NonBindableListVideoInfo ConvertDbDataToVideoListInfo(STypes::Video dbVideo)
         {
-            var converted = new NonBindableVideoListInfo();
-            NonBindableVideoListInfo.SetDbData(converted, dbVideo);
+            var converted = new NonBindableListVideoInfo();
+            NonBindableListVideoInfo.SetDbData(converted, dbVideo);
             return converted;
         }
 
@@ -242,9 +253,9 @@ namespace Niconicome.Models.Playlist
         /// オブジェクトをクローンする
         /// </summary>
         /// <returns></returns>
-        public IVideoListInfo Clone()
+        public IListVideoInfo Clone()
         {
-            return (IVideoListInfo)this.MemberwiseClone();
+            return (IListVideoInfo)this.MemberwiseClone();
         }
 
         /// <summary>
@@ -252,7 +263,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="videoInfo"></param>
         /// <param name="dbVideo"></param>
-        protected static void SetDbData(IVideoListInfo videoInfo, STypes::Video dbVideo)
+        protected static void SetDbData(IListVideoInfo videoInfo, STypes::Video dbVideo)
         {
             videoInfo.Id = dbVideo.Id;
             videoInfo.NiconicoId = dbVideo.NiconicoId;
@@ -279,9 +290,8 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="newVideo"></param>
         /// <param name="oldVideo"></param>
-        public static void SetData(IVideoListInfo newVideo, IVideoListInfo oldVideo)
+        public static void SetData(IListVideoInfo newVideo, IListVideoInfo oldVideo)
         {
-            newVideo.Id = oldVideo.Id;
             newVideo.ViewCount = oldVideo.ViewCount;
             newVideo.NiconicoId = oldVideo.NiconicoId;
             newVideo.Title = oldVideo.Title;
@@ -291,7 +301,7 @@ namespace Niconicome.Models.Playlist
             newVideo.LargeThumbUrl = oldVideo.LargeThumbUrl;
             newVideo.ThumbUrl = oldVideo.ThumbUrl;
             newVideo.Message = oldVideo.Message;
-            newVideo.ThumbPath = oldVideo.ThumbPath;
+            if (!oldVideo.ThumbPath.IsNullOrEmpty()) newVideo.ThumbPath = oldVideo.ThumbPath;
             newVideo.FileName = oldVideo.FileName;
             newVideo.MessageGuid = oldVideo.MessageGuid;
             newVideo.Tags = oldVideo.Tags;
@@ -301,22 +311,33 @@ namespace Niconicome.Models.Playlist
             newVideo.LikeCount = oldVideo.LikeCount;
             newVideo.Duration = oldVideo.Duration;
             newVideo.OwnerID = oldVideo.OwnerID;
+            newVideo.IsDownloaded = oldVideo.IsDownloaded;
         }
     }
 
-    public class BindableVIdeoListInfo : NonBindableVideoListInfo
+    public class BindableListVIdeoInfo : NonBindableListVideoInfo
     {
-        public BindableVIdeoListInfo()
+        public BindableListVIdeoInfo()
         {
             VideoMessanger.VideoMessageChange += this.ListenMessageChange;
         }
 
-        ~BindableVIdeoListInfo()
+        ~BindableListVIdeoInfo()
         {
             VideoMessanger.VideoMessageChange -= this.ListenMessageChange;
         }
 
         private bool isSelectedField;
+
+        private int viewCountField;
+
+        private string titleField = string.Empty;
+
+        private bool isDownloadedField;
+
+        public override string Title { get => this.titleField; set => this.SetProperty(ref this.titleField, value); }
+
+        public override int ViewCount { get => this.viewCountField; set => this.SetProperty(ref this.viewCountField, value); }
 
         public override string Message
         {
@@ -330,15 +351,17 @@ namespace Niconicome.Models.Playlist
 
         public override bool IsSelected { get => this.isSelectedField; set => this.SetProperty(ref this.isSelectedField, value); }
 
+        public override bool IsDownloaded { get => this.isDownloadedField; set => this.SetProperty(ref this.isDownloadedField, value); }
+
         /// <summary>
         /// DBのデータをTreeVideoInfo型のインスタンスに変換する
         /// </summary>
         /// <param name="dbVideo"></param>
         /// <returns></returns>
-        public new static BindableVIdeoListInfo ConvertDbDataToVideoListInfo(STypes::Video dbVideo)
+        public new static BindableListVIdeoInfo ConvertDbDataToVideoListInfo(STypes::Video dbVideo)
         {
-            var converted = new BindableVIdeoListInfo();
-            NonBindableVideoListInfo.SetDbData(converted, dbVideo);
+            var converted = new BindableListVIdeoInfo();
+            NonBindableListVideoInfo.SetDbData(converted, dbVideo);
             return converted;
         }
 

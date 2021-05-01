@@ -25,7 +25,12 @@
             <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0" BorderThickness="0 0 1 0" BorderBrush="#e7e7e7">
-            <StackPanel Background="#e7e7e7">
+            <StackPanel Background="{DynamicResource MaterialDesignSnackbarBackground}">
+                <StackPanel.Resources>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
+                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignSnackbarRipple}"/>
+                    </Style>
+                </StackPanel.Resources>
                 <i:Interaction.Behaviors>
                     <vm:SettingNavigationBehavior/>
                 </i:Interaction.Behaviors>
@@ -67,6 +72,16 @@
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
                         <TextBlock Padding="8 2 0 0" Text="外部ソフト設定" FontSize="20" Cursor="Hand"/>
+                    </DockPanel>
+                </Border>
+                <Border BorderThickness="6 0 0 0" Padding="5 4">
+                    <DockPanel>
+                        <materialDesign:PackIcon Kind="FormatListBulleted" Foreground="#898989">
+                            <materialDesign:PackIcon.RenderTransform>
+                                <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
+                            </materialDesign:PackIcon.RenderTransform>
+                        </materialDesign:PackIcon>
+                        <TextBlock Padding="8 2 0 0" Text="動画リスト設定" FontSize="20" Cursor="Hand"/>
                     </DockPanel>
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">

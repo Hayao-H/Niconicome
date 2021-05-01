@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment
@@ -10,7 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
     public interface ICommentCollection
     {
-        List<Response::Comment> Comments { get; }
+        LinkedList<Response::Comment> Comments { get; }
         Response::Thread? ThreadInfo { get; }
         int Count { get; }
         long Thread { get; }
@@ -31,46 +32,51 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
     /// <summary>
     /// コメントのコレクション
+    /// コメ番昇順
     /// </summary>
     public class CommentCollection : ICommentCollection
     {
         public CommentCollection(ICommentCollection original)
         {
-            this.commentsfield = new List<Response::Comment>();
-            this.commentsfield.AddRange(original.Comments);
+            this.commentsfield = new LinkedList<Response.Comment>(original.Comments);
             this.ThreadInfo = original.ThreadInfo;
         }
 
-        public CommentCollection(int cOffset, long defaultThread, int defaultFork)
+        public CommentCollection(int cOffset, long defaultThread, int defaultFork, bool unsafeHandle)
         {
             this.comThroughSetting = cOffset;
             this.isRoot = true;
             this.defaultTread = defaultThread;
             this.defaultFork = defaultFork;
+            this.unsafeHandle = unsafeHandle;
         }
 
-        public CommentCollection(long thread, int fork, bool isDefault)
+        public CommentCollection(long thread, int fork, bool isDefault, bool unsafeHandle)
         {
             this.Thread = thread;
             this.Fork = fork;
             this.IsDefaultPostTarget = isDefault;
-
+            this.unsafeHandle = unsafeHandle;
         }
 
-        public static ICommentCollection GetInstance(int cOffset, long defaultThread, int defaultFork)
+        public static ICommentCollection GetInstance(int cOffset, long defaultThread, int defaultFork, bool unsafeHandle)
         {
-            return new CommentCollection(cOffset, defaultThread, defaultFork);
+            return new CommentCollection(cOffset, defaultThread, defaultFork, unsafeHandle);
         }
 
-        private readonly List<Response::Comment> commentsfield = new();
+        private readonly LinkedList<Response::Comment> commentsfield = new();
 
         private readonly List<ICommentCollection> childCollections = new();
+
+        private readonly LinkedList<long> CommentNumbers = new();
 
         public const int NumberToThrough = 40;
 
         private readonly int comThroughSetting;
 
         private readonly bool isRoot;
+
+        private readonly bool unsafeHandle;
 
         private readonly long defaultTread;
 
@@ -101,24 +107,27 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <summary>
         /// コメント
         /// </summary>
-        public List<Response::Comment> Comments
+        public LinkedList<Response::Comment> Comments
         {
             get
             {
                 if (this.isRoot)
                 {
 
-                    List<Response::Comment> comments = new();
+                    LinkedList<Response::Comment> comments = new();
                     foreach (var child in this.childCollections)
                     {
-                        comments.AddRange(child.Comments);
+                        foreach (var comment in child.Comments)
+                        {
+                            comments.AddFirst(comment);
+                        }
                     }
 
                     return comments;
                 }
                 else
                 {
-                    if (!this.isSorted)
+                    if (!this.unsafeHandle && !this.isSorted)
                     {
                         this.Sort();
                     }
@@ -128,11 +137,28 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             }
         }
 
-
         /// <summary>
         /// 要素数
         /// </summary>
-        public int Count { get => this.Comments.Count; }
+        public int Count
+        {
+            get
+            {
+                if (this.isRoot)
+                {
+                    var count = 0;
+                    foreach (var child in this.childCollections)
+                    {
+                        count += child.Count;
+                    }
+                    return count;
+                }
+                else
+                {
+                    return this.commentsfield.Count;
+                }
+            }
+        }
 
         /// <summary>
         /// スレッド
@@ -153,6 +179,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             private set => this.threadInfoField = value;
         }
 
+        #region 操作系メソッド
         /// <summary>
         /// コメントを追加
         /// </summary>
@@ -199,7 +226,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else if (comment.Chat is not null)
                 {
-                    this.commentsfield.Add(comment);
+                    if (!this.unsafeHandle)
+                    {
+                        if (this.CommentNumbers.Contains(comment.Chat.No)) return;
+                        this.CommentNumbers.AddLast(comment.Chat.No);
+
+                        if (this.CommentNumbers.Count > 5000)
+                        {
+                            foreach (var _ in Enumerable.Range(0, 2000))
+                            {
+                                this.CommentNumbers.RemoveFirst();
+                            }
+                        }
+                    }
+                    this.commentsfield.AddFirst(comment);
                     this.isSorted = false;
                 }
                 else
@@ -217,34 +257,50 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         public void Add(List<Response::Comment> comments, bool addSafe = true)
         {
             bool nicoruEnded = false;
-            int skipped = 0;
-            int cCounts = comments.Where(c => c.Chat is not null).Count();
-            var first = this.GetFirstComment();
-            bool isFirstIsOldEnough = first is null ? false : first.No < this.comThroughSetting + 10;
 
+            var chats = new LinkedList<Response::Comment>();
+
+            //チャットを抽出する
+            //LinkedListはAddFirstなので逆転させて処理する
             foreach (var item in comments)
             {
-                if (item.Chat is not null)
+                if (item.Chat is null) continue;
+
+                if (!nicoruEnded && item.Chat!.Nicoru is not null)
                 {
-                    if (!nicoruEnded && item.Chat.Nicoru is not null)
-                    {
-                        continue;
-                    }
-                    else if (!nicoruEnded && item.Chat.Nicoru is null)
-                    {
-                        nicoruEnded = true;
-                    }
+                    continue;
+                }
+                else if (!nicoruEnded && item.Chat!.Nicoru is null)
+                {
+                    nicoruEnded = true;
                 }
 
-                if (addSafe && !isFirstIsOldEnough && this.comThroughSetting > 0 && cCounts > this.comThroughSetting + 20 && item.Chat is not null)
+                //ここで逆転させる
+                chats.AddFirst(item);
+            }
+
+            //最初の方にある古いコメントを除去する
+            //この時点では降順
+            if (addSafe && chats.Count > this.comThroughSetting + 20)
+            {
+                var first = this.GetFirstComment();
+                bool isFirstIsOldEnough = first is null ? false : first.No < this.comThroughSetting + 10;
+
+                foreach (var _ in Enumerable.Range(0, this.comThroughSetting))
                 {
-                    if (skipped < this.comThroughSetting)
-                    {
-                        ++skipped;
-                        continue;
-                    }
+                    chats.RemoveLast();
                 }
+            }
+
+            foreach (var item in chats)
+            {
                 this.Add(item, false);
+            }
+
+            var thread = comments.FirstOrDefault(c => c.Thread is not null);
+            if (thread is not null)
+            {
+                this.Add(thread, false);
             }
         }
 
@@ -271,9 +327,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// </summary>
         public void Distinct()
         {
-            var copy = this.Clone();
-            this.commentsfield.Clear();
-            this.commentsfield.AddRange(copy.Comments.Distinct(c => c.Chat!.No));
+            if (this.isRoot)
+            {
+                foreach (var child in this.childCollections)
+                {
+                    child.Distinct();
+                }
+            } else
+            {
+                var copy = this.Clone();
+                this.commentsfield.Clear();
+                this.AddRange(copy.Comments.Distinct(c => c.Chat!.No));
+            }
         }
 
         /// <summary>
@@ -293,7 +358,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             {
                 var copy = this.Comments.Copy();
                 this.commentsfield.Clear();
-                this.commentsfield.AddRange(copy.Where(predicate));
+                this.AddRange(copy.Where(predicate));
             }
         }
 
@@ -315,10 +380,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (this.isRoot)
             {
 
-                List<Response::Chat> comments = new();
+                LinkedList<Response::Chat> comments = new();
                 foreach (var child in this.childCollections)
                 {
-                    comments.AddRange(child.GetAllComments());
+                    this.AddRange(comments, child.GetAllComments());
                 }
 
                 return comments;
@@ -355,10 +420,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         {
             if (this.isRoot) return;
 
-            this.commentsfield.Sort((a, b) => (int)(a.Chat!.No - b.Chat!.No));
-            var copy = this.commentsfield.Copy();
+            var copy = this.commentsfield.ToList();
+            copy.Sort((a, b) => (int)(b.Chat!.No - a.Chat!.No));
             this.commentsfield.Clear();
-            this.commentsfield.AddRange(copy);
+            this.AddRange(copy);
             this.isSorted = true;
         }
 
@@ -380,11 +445,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 {
                     count = this.commentsfield.Count;
                 }
-                this.commentsfield.RemoveRange(0, count);
+
+                foreach (var _ in Enumerable.Range(0, count))
+                {
+                    this.commentsfield.RemoveFirst();
+                }
 
                 return count;
             }
         }
+
+        #endregion
 
         #region private
 
@@ -410,7 +481,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             var isDefault = thread == this.defaultTread && fork == this.defaultFork;
 
-            this.childCollections.Add(new CommentCollection(thread, fork, isDefault));
+            this.childCollections.Add(new CommentCollection(thread, fork, isDefault, this.unsafeHandle));
         }
 
         /// <summary>
@@ -433,6 +504,31 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (!this.isRoot) throw new InvalidOperationException("このコレクションはルートではないためデフォルトスレッドを取得できません。");
 
             return this.childCollections.FirstOrDefault(c => c.IsDefaultPostTarget);
+        }
+
+        /// <summary>
+        /// 複数のコメントを追加する
+        /// </summary>
+        /// <param name="comments"></param>
+        private void AddRange(IEnumerable<Response::Comment> comments)
+        {
+            if (this.isRoot) throw new InvalidOperationException("ルートコレクションでは'Addrange'が許可されません。");
+
+            this.AddRange(this.commentsfield, comments);
+        }
+
+        /// <summary>
+        /// AddRangeの実装
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="comments"></param>
+        private void AddRange<T>(LinkedList<T> list, IEnumerable<T> comments)
+        {
+            foreach (var comment in comments)
+            {
+                list.AddFirst(comment);
+            }
         }
 
         #endregion

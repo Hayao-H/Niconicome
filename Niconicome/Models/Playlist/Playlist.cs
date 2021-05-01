@@ -1,38 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using LiteDB;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System;
-using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels;
-using Local = Niconicome.Models.Local;
-using Net = Niconicome.Models.Domain.Network;
+using State = Niconicome.Models.Local.State;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Utils = Niconicome.Models.Domain.Utils;
-using State = Niconicome.Models.Local.State;
 
 namespace Niconicome.Models.Playlist
 {
-    public interface IPlaylistVideoHandler
+    public interface IPlaylistHandler
     {
         int AddPlaylist(int parentId);
-        void AddVideo(IVideoListInfo video, int playlistId);
-        void RemoveVideo(int videoId, int playlistId);
-        void UpdateVideo(IVideoListInfo video, int playlistId);
         void DeletePlaylist(int playlistID);
         void Update(ITreePlaylistInfo newpaylist);
         void Refresh();
+        void Refresh(bool expandAll, bool inheritExpandedState);
         void Move(int id, int targetId);
-        void SetAsRemotePlaylist(int playlistId, string Id, RemoteType type);
+        void SetAsRemotePlaylist(int playlistId, string Id, string name, RemoteType type);
         void SetAsLocalPlaylist(int playlistId);
+        void SaveAllPlaylists();
         bool IsLastChild(int id);
         bool ContainsVideo(string niconicoId, int playlistId);
         ITreePlaylistInfo? GetPlaylist(int id);
@@ -42,7 +38,7 @@ namespace Niconicome.Models.Playlist
         ObservableCollection<ITreePlaylistInfo> Playlists { get; }
     }
 
-    public interface ITreePlaylistInfoHandler
+    public interface IPlaylistTreeConstructor
     {
         ITreePlaylistInfo? GetPlaylist(int id);
         void Remove(int id);
@@ -56,6 +52,7 @@ namespace Niconicome.Models.Playlist
         ITreePlaylistInfo? GetParent(int id);
         ITreePlaylistInfo GetRoot();
         ITreePlaylistInfo GetTree();
+        IEnumerable<ITreePlaylistInfo> GetAllPlaylists();
     }
 
     public interface ITreePlaylistInfo : IClonable<ITreePlaylistInfo>
@@ -66,7 +63,7 @@ namespace Niconicome.Models.Playlist
         string Folderpath { get; set; }
         List<int> ChildrensIds { get; }
         List<ITreePlaylistInfo> Children { get; }
-        List<IVideoListInfo> Videos { get; set; }
+        List<IListVideoInfo> Videos { get; set; }
         int ParentId { get; set; }
         bool IsExpanded { get; set; }
         bool IsRoot { get; set; }
@@ -78,80 +75,37 @@ namespace Niconicome.Models.Playlist
         bool HasVideo(string niconicoId);
         bool IsRemotePlaylist { get; set; }
         RemoteType RemoteType { get; set; }
-        int GetLayer(ITreePlaylistInfoHandler handler);
-        static ITreePlaylistInfo ConvertToTreePlaylistInfo(STypes::Playlist playlist)
-        {
-            playlist.Void();
-            return new NonBindableTreePlaylistInfo() { Id = playlist.Id };
-        }
-        static ITreePlaylistInfo ConvertToTreePlaylistInfo(STypes::Playlist playlist, IEnumerable<STypes::Playlist> childPlaylists)
-        {
-            playlist.Void();
-            childPlaylists.Void();
-            return new NonBindableTreePlaylistInfo();
-        }
+        int GetLayer(IPlaylistTreeConstructor handler);
 
     }
 
 
     /// <summary>
     /// ViewModelから触るAPI
-    /// これはあくまでメモリ上への動画データしか変更できないため、
-    /// DBのデータを変更したい場合は別途VideoHandlerクラスのインスタンスを利用する必要がある
     /// </summary>
-    public class PlaylistVideoHandler : IPlaylistVideoHandler
+    public class PlaylistHandler : IPlaylistHandler
     {
-        public PlaylistVideoHandler(ITreePlaylistInfoHandler handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger)
+        public PlaylistHandler(IPlaylistTreeConstructor handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger, ILocalSettingHandler settingHandler)
         {
             this.Playlists = new ObservableCollection<ITreePlaylistInfo>();
             BindingOperations.EnableCollectionSynchronization(this.Playlists, new object());
             this.handler = handler;
             this.playlistStoreHandler = playlistStoreHandler;
             this.errorMessanger = errorMessanger;
-            this.Refresh();
+            this.settingHandler = settingHandler;
         }
 
-        private readonly ITreePlaylistInfoHandler handler;
+        #region field
+        private readonly IPlaylistTreeConstructor handler;
 
         private readonly IPlaylistStoreHandler playlistStoreHandler;
 
         private readonly State::IErrorMessanger errorMessanger;
 
+        private readonly ILocalSettingHandler settingHandler;
+        #endregion
+
         public ObservableCollection<ITreePlaylistInfo> Playlists { get; private set; }
-
-        /// <summary>
-        /// 動画をメモリ上のプレイリストに追加する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistId"></param>
-       　public void AddVideo(IVideoListInfo video, int playlistId)
-        {
-            var playlist = this.handler.GetPlaylist(playlistId);
-            playlist?.Videos.AddUnique(video, list => !list.Any(v => v.Id == video.Id));
-        }
-
-        /// <summary>
-        /// 動画をメモリ上のプレイリストから削除する
-        /// </summary>
-        /// <param name="videoId"></param>
-        /// <param name="playlistId"></param>
-        public void RemoveVideo(int videoId, int playlistId)
-        {
-            var playlist = this.handler.GetPlaylist(playlistId);
-            playlist?.Videos.RemoveAll(v => v.Id == videoId);
-        }
-
-        /// <summary>
-        /// 動画情報を更新する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistId"></param>
-        public void UpdateVideo(IVideoListInfo video, int playlistId)
-        {
-            this.RemoveVideo(video.Id, playlistId);
-            this.AddVideo(video, playlistId);
-        }
-
 
         /// <summary>
         /// プレイリストを追加
@@ -214,9 +168,33 @@ namespace Niconicome.Models.Playlist
         /// <param name="playlistId"></param>
         /// <param name="Id"></param>
         /// <param name="type"></param>
-        public void SetAsRemotePlaylist(int playlistId, string Id, RemoteType type)
+        public void SetAsRemotePlaylist(int playlistId, string Id, string name, RemoteType type)
         {
             this.playlistStoreHandler.SetAsRemotePlaylist(playlistId, Id, type);
+
+            if (this.settingHandler.GetBoolSetting(SettingsEnum.AutoRenameNetPlaylist))
+            {
+                var playlistName = type switch
+                {
+                    RemoteType.Mylist => name,
+                    RemoteType.UserVideos => $"{name}さんの投稿動画",
+                    RemoteType.WatchLater => "あとで見る",
+                    RemoteType.Channel => name,
+                    _ => name,
+                };
+
+                if (!name.IsNullOrEmpty())
+                {
+                    var playlist = this.GetPlaylist(playlistId);
+
+                    if (playlist is not null)
+                    {
+                        playlist.Name = playlistName;
+                        this.Update(playlist);
+                    }
+                }
+            }
+
             this.SetPlaylists();
         }
 
@@ -278,6 +256,31 @@ namespace Niconicome.Models.Playlist
         }
 
         /// <summary>
+        /// 展開状況を引き継いで更新する
+        /// </summary>
+        /// <param name="expandAll"></param>
+        /// <param name="inheritExpandedState"></param>
+        public void Refresh(bool expandAll, bool inheritExpandedState)
+        {
+            this.playlistStoreHandler.Refresh();
+            this.SetPlaylists(expandAll, inheritExpandedState);
+        }
+
+
+        /// <summary>
+        /// すべてのプレイリストを保存する
+        /// </summary>
+        public void SaveAllPlaylists()
+        {
+            this.Refresh();
+            var playlists = this.handler.GetAllPlaylists();
+            foreach (var p in playlists)
+            {
+                this.playlistStoreHandler.Update(p);
+            }
+        }
+
+        /// <summary>
         /// プレイリストを更新する
         /// </summary>
         /// <param name="newpaylist"></param>
@@ -311,14 +314,25 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// プレイリストを初期化する
         /// </summary>
-        private void SetPlaylists()
+        private void SetPlaylists(bool expandAll = false, bool inheritExpandedState = false)
         {
 
             //プレイリストを取得する
             var playlists = this.playlistStoreHandler.GetAllPlaylists().Select(p =>
             {
+                var ex = false;
+                if (expandAll)
+                {
+                    ex = true;
+                }
+                else if (inheritExpandedState)
+                {
+                    ex = p.IsExpanded;
+                }
                 var childPlaylists = this.playlistStoreHandler.GetChildPlaylists(p.Id);
-                return BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
+                var playlist = BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
+                playlist.IsExpanded = ex;
+                return playlist;
             });
 
 
@@ -333,7 +347,7 @@ namespace Niconicome.Models.Playlist
     /// <summary>
     /// TreePlaylistInfoをよしなにしてくれる
     /// </summary>
-    public class TreePlaylistInfoHandler : ITreePlaylistInfoHandler
+    public class PlaylistTreeConstructor : IPlaylistTreeConstructor
     {
         private List<ITreePlaylistInfo> TreePlaylistInfoes { get; set; } = new();
 
@@ -444,7 +458,6 @@ namespace Niconicome.Models.Playlist
                     after.BeforeSeparatorVisibility = before.BeforeSeparatorVisibility;
                     after.AfterSeparatorVisibility = before.AfterSeparatorVisibility;
                     after.IsExpanded = before.IsExpanded;
-                    this.MergeVideo(before, after);
                     this.Remove(before.Id);
                 }
             }
@@ -453,23 +466,6 @@ namespace Niconicome.Models.Playlist
 
             //ツリーは未初期化
             this.IsTreeInitialized = false;
-        }
-
-        /// <summary>
-        /// メッセージを保持して動画を追加
-        /// </summary>
-        /// <param name="before"></param>
-        /// <param name="after"></param>
-        private void MergeVideo(ITreePlaylistInfo before, ITreePlaylistInfo after)
-        {
-            foreach (var afterVideo in after.Videos)
-            {
-                if (before.Videos.Any(v => v.Id == afterVideo.Id))
-                {
-                    var beforeVideo = before.Videos.First(v => v.Id == afterVideo.Id);
-                    afterVideo.Message = beforeVideo.Message;
-                }
-            }
         }
 
         /// <summary>
@@ -532,6 +528,16 @@ namespace Niconicome.Models.Playlist
             }
 
         }
+
+        /// <summary>
+        /// すべてのプレイリストを取得する
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ITreePlaylistInfo> GetAllPlaylists()
+        {
+            return this.TreePlaylistInfoes;
+        }
+
 
         /// <summary>
         /// 完全なプレイリストツリーを構築する
@@ -600,7 +606,7 @@ namespace Niconicome.Models.Playlist
         /// <summary>
         /// 動画情報のリスト
         /// </summary>
-        public List<IVideoListInfo> Videos { get; set; } = new();
+        public List<IListVideoInfo> Videos { get; set; } = new();
 
         /// <summary>
         /// 親プレイリストのID
@@ -683,7 +689,7 @@ namespace Niconicome.Models.Playlist
         /// </summary>
         /// <param name="handler"></param>
         /// <returns></returns>
-        public int GetLayer(ITreePlaylistInfoHandler handler)
+        public int GetLayer(IPlaylistTreeConstructor handler)
         {
 
             int layer = 1;
@@ -745,6 +751,7 @@ namespace Niconicome.Models.Playlist
             playlistInfo.RemoteType = dbPlaylist.IsMylist ? RemoteType.Mylist : dbPlaylist.IsUserVideos ? RemoteType.UserVideos : dbPlaylist.IsWatchLater ? RemoteType.WatchLater : dbPlaylist.IsChannel ? RemoteType.Channel : RemoteType.None;
             playlistInfo.RemoteId = dbPlaylist.RemoteId ?? string.Empty;
             playlistInfo.Folderpath = dbPlaylist.FolderPath ?? string.Empty;
+            playlistInfo.IsExpanded = dbPlaylist.IsExpanded;
         }
 
         /// <summary>

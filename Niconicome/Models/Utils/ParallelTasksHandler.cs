@@ -10,8 +10,13 @@ namespace Niconicome.Models.Utils
     public interface IParallelTask<T>
     {
         Guid TaskId { get; }
-        Func<T, object, Task> TaskFunction { get; }
+        Func<T, object, IParallelTaskToken, Task> TaskFunction { get; }
         Action<int> OnWait { get; }
+    }
+
+    public interface IParallelTaskToken
+    {
+        bool IsSkipped { get; set; }
     }
 
     class ParallelTasksHandler<T> where T : IParallelTask<T>
@@ -118,13 +123,13 @@ namespace Niconicome.Models.Utils
         /// 実処理
         /// </summary>
         /// <returns></returns>
-        public async Task ProcessTasksAsync(Action? preAction = null)
+        public async Task ProcessTasksAsync(Action? preAction = null, Action? onCancelled = null, CancellationToken? ct = null)
         {
             //すでにタスクを実行中の場合はキャンセル
             if (this.IsProcessing) return;
 
             var semaphore = new SemaphoreSlim(this.maxPallarelTasksCount, this.maxPallarelTasksCount);
-            int index = -1;
+            int index = 0;
             var mre = new ManualResetEventSlim(true);
             var tasks = new List<Task>();
             var lockObj = new object();
@@ -151,12 +156,11 @@ namespace Niconicome.Models.Utils
 
                 Func<Task> func = async () =>
                 {
-
                     await semaphore.WaitAsync();
-
-                    lock (this.lockobj)
+                    if (ct?.IsCancellationRequested ?? false)
                     {
-                        index++;
+                        onCancelled?.Invoke();
+                        return;
                     }
 
                     //待機処理
@@ -166,11 +170,28 @@ namespace Niconicome.Models.Utils
                         task.OnWait(index);
                         await Task.Delay(this.waitSeconds * 1000);
                         mre.Set();
+                        if (ct?.IsCancellationRequested ?? false)
+                        {
+                            onCancelled?.Invoke();
+                            return;
+                        }
                     }
 
                     mre.Wait();
+                    if (ct?.IsCancellationRequested ?? false)
+                    {
+                        onCancelled?.Invoke();
+                        return;
+                    }
 
-                    await Task.Run(async () => await task.TaskFunction(task, lockobj));
+                    var token = new ParallelTaskToken();
+
+                    await Task.Run(async () => await task.TaskFunction(task, lockobj, token));
+
+                    lock (this.lockobj)
+                    {
+                        index++;
+                    }
 
                     semaphore.Release();
                 };
@@ -196,5 +217,10 @@ namespace Niconicome.Models.Utils
             }
         }
 
+    }
+
+    public struct ParallelTaskToken : IParallelTaskToken
+    {
+        public bool IsSkipped { get; set; }
     }
 }

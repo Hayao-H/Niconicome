@@ -28,9 +28,9 @@ namespace Niconicome
             this.videoList.DataContext = new VideoListViewModel();
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void Videolist_db_click(object sender, MouseButtonEventArgs e)
         {
-
+            ((VideoListViewModel)this.videolist.DataContext).OnDoubleClick(sender);
         }
     }
 }

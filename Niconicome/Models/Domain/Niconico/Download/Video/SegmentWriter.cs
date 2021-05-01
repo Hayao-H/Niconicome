@@ -32,7 +32,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <param name="task"></param>
         public void Write(byte[] data, IParallelDownloadTask task, IDownloadContext context)
         {
-            this.folderName = Path.Combine("tmp", context.Id);
+            this.folderName = Path.Combine("tmp", context.SegmentsDirectoryName);
 
             if (!Directory.Exists(this.folderName))
             {

@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using AngleSharp.Attributes;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Network;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using WatchInfo = Niconicome.Models.Domain.Niconico.Watch;
 
@@ -15,7 +17,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 {
     public interface IChannelResult
     {
-        List<IVideoListInfo> RetrievedVideos { get; }
+        List<IListVideoInfo> RetrievedVideos { get; }
 
         int FailedCounts { get; }
         bool IsSucceededAll { get; }
@@ -23,18 +25,16 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
     public interface IChannelVideoHandler
     {
-        Task<IEnumerable<string>> GetVideosAsync(string channelId,IEnumerable<string> registeredVideo, Action<string> onMessage);
-        Exception? CurrentException { get; }
+        Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<string> ids, IEnumerable<string> registeredVideo, Action<string> onMessage);
     }
 
     class ChannelVideoHandler : IChannelVideoHandler
     {
-        public ChannelVideoHandler(INicoHttp http, ILogger logger, IChannelPageHtmlParser htmlParser, IWatch watch)
+        public ChannelVideoHandler(INicoHttp http, ILogger logger, IChannelPageHtmlParser htmlParser)
         {
             this.http = http;
             this.htmlParser = htmlParser;
             this.logger = logger;
-            this.watch = watch;
         }
 
         private readonly INicoHttp http;
@@ -43,48 +43,57 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
 
         private readonly IChannelPageHtmlParser htmlParser;
 
-        private readonly IWatch watch;
-
         /// <summary>
         /// チャンネル動画を取得する
         /// </summary>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GetVideosAsync(string channelId, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        public async Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<string> ids, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
-            var result = new ChannelResult();
 
             string html;
-            try
-            {
-                html = await this.GetChannelPage(channelId);
-            }
-            catch (Exception e)
-            {
-                this.CurrentException = e;
-                throw new HttpRequestException();
-            }
+            var index = 0;
+            var baseUrl = $"https://ch.nicovideo.jp/{channelId}/video";
+            var urlQuery = string.Empty;
+            IChannelPageInfo info;
 
-            List<string> ids;
-            try
+            do
             {
-                ids = this.GetIdsFromHtml(html).ToList();
-            }
-            catch (Exception e)
-            {
+                if ((index + 1) % 5 == 0)
+                {
+                    onMessage("待機中...(10s)");
+                    await Task.Delay(10 * 1000);
+                }
 
-                this.CurrentException = e;
-                throw new InvalidOperationException();
-            }
+                onMessage($"{index + 1}ページ目を取得します");
+                try
+                {
+                    html = await this.GetChannelPage(baseUrl + urlQuery);
+                }
+                catch (Exception e)
+                {
+                    return new AttemptResult<string>() { Message = $"チャンネルページ取得に失敗しました。(詳細: {e.Message}" };
+                }
 
-            return ids;
+                try
+                {
+                    info = this.GetINfoFromHtml(html);
+                }
+                catch (Exception e)
+                {
+                    return new AttemptResult<string>() { Message = $"チャンネルページの解析に失敗しました。(詳細: {e.Message}" };
+                }
+
+                urlQuery = info.NextPageQuery ?? string.Empty;
+                ids.AddRange(info.IDs);
+                onMessage($"{info.IDs.Count()}件の動画を新たに取得しました。(現在の取得数:{ids.Count})");
+                ++index;
+            }
+            while (info.HasNext);
+
+            return new AttemptResult<string>() { IsSucceeded = true, Data = info.ChannelName };
         }
 
-
-        /// <summary>
-        /// 直近の例外
-        /// </summary>
-        public Exception? CurrentException { get; private set; }
 
 
         /// <summary>
@@ -92,17 +101,18 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        private async Task<string> GetChannelPage(string channelId)
+        private async Task<string> GetChannelPage(string url)
         {
             string content;
+
             try
             {
-                content = await this.http.GetStringAsync(new Uri($"https://ch.nicovideo.jp/{channelId}"));
+                content = await this.http.GetStringAsync(new Uri(url));
             }
             catch (Exception e)
             {
                 this.logger.Error("チャンネルページの取得に失敗しました。", e);
-                throw new HttpRequestException("チャンネルページの取得に失敗しました。");
+                throw new HttpRequestException(e.Message);
             }
 
             return content;
@@ -113,7 +123,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
         /// </summary>
         /// <param name="html"></param>
         /// <returns></returns>
-        private IEnumerable<string> GetIdsFromHtml(string html)
+        private IChannelPageInfo GetINfoFromHtml(string html)
         {
             return this.htmlParser.ParseAndGetIds(html);
         }
@@ -124,7 +134,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
     /// </summary>
     public class ChannelResult : IChannelResult
     {
-        public List<IVideoListInfo> RetrievedVideos { get; init; } = new();
+        public List<IListVideoInfo> RetrievedVideos { get; init; } = new();
 
         public int FailedCounts { get; set; }
 

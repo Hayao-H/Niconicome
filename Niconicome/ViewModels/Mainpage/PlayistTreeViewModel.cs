@@ -68,7 +68,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.PlaylistRefreshcommand = new CommandBase<object>(_ => true, _ =>
             {
                 WS::Mainpage.PlaylistTree.Refresh();
-                WS::Mainpage.CurrentPlaylist.Update(WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id ?? -1);
+                WS::Mainpage.VideoListContainer.Refresh();
                 this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
 
@@ -97,7 +97,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// プレイリストのツリー
         /// </summary>
-        public IPlaylistVideoHandler? PlaylistTreeHandler { get; private set; }
+        public IPlaylistHandler? PlaylistTreeHandler { get; private set; }
 
         /// <summary>
         /// プレイリストのツリー
@@ -184,7 +184,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (playlistInfo is null) return;
 
             //変更がない場合はキャンセル
-            if (WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist?.Id == playlistInfo.Id) return;
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist?.Id == playlistInfo.Id) return;
 
             //ルートプレイリストは選択禁止
             if (playlistInfo.IsRoot) return;
@@ -192,7 +192,7 @@ namespace Niconicome.ViewModels.Mainpage
             //末端プレイリストでない場合はキャンセル
             if (playlistInfo.ChildrensIds.Count > 0) return;
 
-            WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist = playlistInfo;
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylist = playlistInfo;
         }
 
         /// <summary>

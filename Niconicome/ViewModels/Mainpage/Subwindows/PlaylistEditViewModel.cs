@@ -13,7 +13,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
     /// </summary>
     class PlaylistEditViewModel : BindableBase
     {
-        public PlaylistEditViewModel() : this(WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist??new BindableTreePlaylistInfo())
+        public PlaylistEditViewModel() : this(WS::Mainpage.CurrentPlaylist.SelectedPlaylist ??new BindableTreePlaylistInfo())
         {
         }
 
@@ -32,7 +32,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     newPlaylist.Name = this.PlaylistName;
                     newPlaylist.Folderpath = this.FolderPath;
                     WS::Mainpage.PlaylistTree.Update(newPlaylist);
-                    WS::Mainpage.CurrentPlaylist.CurrentSelectedPlaylist = newPlaylist;
+                    WS::Mainpage.CurrentPlaylist.SelectedPlaylist = newPlaylist;
                 }
 
                 if (arg is not null && arg is Window window) window.Close();

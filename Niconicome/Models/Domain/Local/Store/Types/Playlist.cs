@@ -111,7 +111,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public bool IsChannel { get; set; }
 
-        [BsonIgnore]
         public bool IsExpanded { get; set; }
 
         [BsonIgnore]

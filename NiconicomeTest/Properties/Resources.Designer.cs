@@ -61,11 +61,42 @@ namespace NiconicomeTest.Properties {
         }
         
         /// <summary>
-        ///   {&quot;meta&quot;:{&quot;status&quot;:200},&quot;data&quot;:{&quot;mylist&quot;:{&quot;id&quot;:67607290,&quot;name&quot;:&quot;東方&quot;,&quot;description&quot;:&quot;&quot;,&quot;defaultSortKey&quot;:&quot;addedAt&quot;,&quot;defaultSortOrder&quot;:&quot;desc&quot;,&quot;items&quot;:[{&quot;itemId&quot;:1287138662,&quot;watchId&quot;:&quot;sm12438432&quot;,&quot;description&quot;:&quot;&quot;,&quot;addedAt&quot;:&quot;2020-02-18T20:02:17+09:00&quot;,&quot;status&quot;:&quot;public&quot;,&quot;video&quot;:{&quot;type&quot;:&quot;essential&quot;,&quot;id&quot;:&quot;sm12438432&quot;,&quot;title&quot;:&quot;ナズがSpring of Dreams(春の湊に)を踊ってくれました【東方MMD】&quot;,&quot;registeredAt&quot;:&quot;2010-10-15T19:31:02+09:00&quot;,&quot;count&quot;:{&quot;view&quot;:1190659,&quot;comment&quot;:8979,&quot;mylist&quot;:20299},&quot;thumbnail&quot;:{&quot;url&quot;:&quot;https://nicovideo.cdn.nimg.jp/thu [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///   {&quot;meta&quot;:{&quot;status&quot;:200},&quot;data&quot;:{&quot;mylist&quot;:{&quot;id&quot;:67607290,&quot;name&quot;:&quot;東方&quot;,&quot;description&quot;:&quot;&quot;,&quot;defaultSortKey&quot;:&quot;addedAt&quot;,&quot;defaultSortOrder&quot;:&quot;desc&quot;,&quot;items&quot;:[{&quot;itemId&quot;:1287138662,&quot;watchId&quot;:&quot;sm12438432&quot;,&quot;description&quot;:&quot;&quot;,&quot;addedAt&quot;:&quot;2020-02-18T20:02:17+09:00&quot;,&quot;status&quot;:&quot;public&quot;,&quot;video&quot;:{&quot;type&quot;:&quot;essential&quot;,&quot;id&quot;:&quot;sm12438432&quot;,&quot;title&quot;:&quot;ナズがSpring of Dreams(春の湊に)を踊ってくれました【東方MMD】&quot;,&quot;registeredAt&quot;:&quot;2010-10-15T19:31:02+09:00&quot;,&quot;count&quot;:{&quot;view&quot;:1193334,&quot;comment&quot;:8989,&quot;mylist&quot;:20296,&quot;like&quot;:48},&quot;thumbnail&quot;:{&quot;url&quot;:&quot;https://nicovideo.cdn.n [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string API_Mylist_Get {
             get {
                 return ResourceManager.GetString("API_Mylist_Get", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot;
+        ///&quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;
+        ///
+        ///
+        ///
+        ///
+        ///&lt;html class=&quot;gecko &quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///&lt;script type=&quot;text/javascript&quot;&gt;
+        ///  try {
+        ///    window.NicoGoogleTagManagerDataLayer = [];
+        ///
+        ///    var data = {};
+        ///
+        ///        data.user = (function () {
+        ///      var user = {};
+        ///
+        ///                  user.user_id = parseInt(&apos;74537208&apos;, 10) || null;
+        ///      user.login_status = &apos;login&apos;;
+        ///      user.member_status = &apos;premium&apos;;
+        ///      user.birthday = &apos;1990-03-01&apos;;
+        ///             [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Channel_7 {
+            get {
+                return ResourceManager.GetString("Channel_7", resourceCulture);
             }
         }
         
@@ -97,14 +128,11 @@ namespace NiconicomeTest.Properties {
         ///        data.user = (function () {
         ///      var user = {};
         ///
-        ///                  user.login_status = &apos;not_login&apos;;
-        ///      
-        ///      return user;
-        ///      })();
-        ///
-        ///    data.content = (function () {
-        ///      var content = {};
-        ///      content.community_id = &apos;3760945 [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///                  user.user_id = parseInt(&apos;74537208&apos;, 10) || null;
+        ///      user.login_status = &apos;login&apos;;
+        ///      user.member_status = &apos;premium&apos;;
+        ///      user.birthday = &apos;1990-03-01&apos;;
+        ///             [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string Elfenlied_Channel {
             get {
