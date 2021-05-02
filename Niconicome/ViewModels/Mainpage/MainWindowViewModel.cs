@@ -9,7 +9,9 @@ using Niconicome.Extensions;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Views;
+using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
+using Prism.Regions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
@@ -20,7 +22,7 @@ namespace Niconicome.ViewModels.Mainpage
     class MainWindowViewModel : BindableBase
     {
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(IRegionManager regionManager)
         {
             if (WS::Mainpage.Session.IsLogin)
             {
@@ -75,6 +77,8 @@ namespace Niconicome.ViewModels.Mainpage
                 var windows = new DownloadTasksWindows();
                 windows.Show();
             });
+
+            regionManager.RegisterViewWithRegion("VideoListRegion", typeof(VideoList));
         }
 
         /// <summary>
@@ -161,7 +165,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// メッセージ(フィールド)
         /// </summary>
-        private readonly StringBuilder message = new StringBuilder();
+        private readonly StringBuilder message = new();
 
         /// <summary>
         /// メッセージ
@@ -240,9 +244,9 @@ namespace Niconicome.ViewModels.Mainpage
             if (sender is null || sender.AsNullable<Window>() is not Window window) return;
             if (window != Application.Current.MainWindow) return;
             if (window is not MainWindow mw) return;
-            if (mw.videolist.DataContext is not VideoListViewModel listVM) return;
-
-            listVM.SaveColumnWidth();
+            //if (mw.videolist.DataContext is not VideoListViewModel listVM) return;
+            //
+            //listVM.SaveColumnWidth();
             WS::Mainpage.Shutdown.ShutdownApp();
         }
     }
