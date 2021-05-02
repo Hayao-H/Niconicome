@@ -29,6 +29,11 @@ using Playlist = Niconicome.Models.Domain.Local.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 using EnumSettings = Niconicome.Models.Local.Settings.EnumSettingsValue;
+using Reactive.Bindings;
+using System.Reactive.Disposables;
+using Reactive.Bindings.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Net = Niconicome.Models.Domain.Network;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -50,7 +55,7 @@ namespace Niconicome.ViewModels.Mainpage
             //プレイリスト内容更新のイベントを購読する
             WS::Mainpage.VideoListContainer.ListChanged += (_, e) => this.VideoListUpdated(e);
 
-            this.Videos = new ObservableCollection<IListVideoInfo>();
+            this.Videos = WS::Mainpage.VideoListContainer.Videos.ToReadOnlyReactiveCollection(v => new VideoInfoViewModel(v)).AddTo(this.disposables);
 
             this.showMessageBox = showMessageBox;
 
@@ -108,7 +113,7 @@ namespace Niconicome.ViewModels.Mainpage
                   }
 
                   var videos = new List<IListVideoInfo>();
-                  var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, this.Videos.Select(v => v.NiconicoId.Value), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+                  var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, WS::Mainpage.VideoListContainer.Videos.Select(v => v.NiconicoId.Value), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
                   if (result.IsFailed)
                   {
@@ -151,7 +156,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                  if (arg is not null && arg.AsNullable<IListVideoInfo>() is IListVideoInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
 
-                 targetVideos.AddRange(this.Videos.Where(v => v.IsSelected.Value));
+                 targetVideos.AddRange(WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value));
                  targetVideos = targetVideos.Distinct(v => v.Id).ToList();
 
                  string confirmMessage = targetVideos.Count == 1
@@ -294,7 +299,7 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
 
-                var sourceVideos = this.Videos.Where(v => v.IsSelected.Value);
+                var sourceVideos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value);
                 int sourceVideosCount = sourceVideos.Count();
 
                 if (sourceVideosCount < 1) return;
@@ -345,7 +350,7 @@ namespace Niconicome.ViewModels.Mainpage
                      int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
                      var videos = new List<IListVideoInfo>();
 
-                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId, videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType, this.Videos.Select(v => v.NiconicoId.Value), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId, videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType, WS::Mainpage.VideoListContainer.Videos.Select(v => v.NiconicoId.Value), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
                      if (result.IsSucceeded)
                      {
@@ -440,7 +445,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in this.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
                 {
                     video.IsSelected.Value = true;
                 }
@@ -453,7 +458,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in this.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
                 {
                     video.IsSelected.Value = false;
                 }
@@ -466,7 +471,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in this.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
                 {
                     video.IsSelected.Value = false;
                 }
@@ -479,7 +484,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in this.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
                 {
                     video.IsSelected.Value = true;
                 }
@@ -511,7 +516,6 @@ namespace Niconicome.ViewModels.Mainpage
 
                   if (this.isFiltered)
                   {
-                      this.Videos.Clear();
                       WS::Mainpage.VideoListContainer.Refresh();
                       this.isFiltered = false;
                       this.FilterIcon = MaterialDesign::PackIconKind.Filter;
@@ -519,11 +523,11 @@ namespace Niconicome.ViewModels.Mainpage
                   else if (!this.InputString.IsNullOrEmpty())
                   {
                       FilterringOptions option = this.IsFilteringOnlyByTag ? FilterringOptions.OnlyByTag : FilterringOptions.None;
-                      var videos = this.IsFilteringFromAllVideos ? WS::Mainpage.VideoHandler.GetAllVideos() : this.Videos;
+                      var videos = this.IsFilteringFromAllVideos ? WS::Mainpage.VideoHandler.GetAllVideos() : WS::Mainpage.VideoListContainer.Videos;
                       videos = WS::Mainpage.VideoFilter.FilterVideos(this.InputString, videos, option);
 
-                      this.Videos.Clear();
-                      this.Videos.Addrange(videos);
+                      WS::Mainpage.VideoListContainer.Clear();
+                      WS::Mainpage.VideoListContainer.AddRange(videos, null, false);
                       this.isFiltered = true;
                       this.FilterIcon = MaterialDesign::PackIconKind.FilterOff;
                   }
@@ -551,9 +555,9 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg is not VideoInfoViewModel videoInfo || videoInfo is null) return;
 
-                var result = WS::Mainpage.ExternalAppUtils.SendToAppA(videoInfo);
+                var result = WS::Mainpage.ExternalAppUtils.SendToAppA(videoInfo.VideoInfo);
 
                 if (!result.IsSucceeded)
                 {
@@ -571,9 +575,9 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg is not VideoInfoViewModel videoInfo || videoInfo is null) return;
 
-                var result = WS::Mainpage.ExternalAppUtils.SendToAppB(videoInfo);
+                var result = WS::Mainpage.ExternalAppUtils.SendToAppB(videoInfo.VideoInfo);
 
                 if (!result.IsSucceeded)
                 {
@@ -591,16 +595,16 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg is not VideoInfoViewModel videoInfo || videoInfo is null) return;
 
-                if (!videoInfo.IsDownloaded.Value || videoInfo.FileName.Value.IsNullOrEmpty())
+                if (!videoInfo.VideoInfo.IsDownloaded.Value || videoInfo.VideoInfo.FileName.Value.IsNullOrEmpty())
                 {
                     var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
                     if (reAll) this.SendToappACommand.Execute(arg);
                     return;
                 }
 
-                var result = WS::Mainpage.ExternalAppUtils.OpenInPlayerA(videoInfo);
+                var result = WS::Mainpage.ExternalAppUtils.OpenInPlayerA(videoInfo.VideoInfo);
 
                 if (!result.IsSucceeded)
                 {
@@ -618,16 +622,16 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg is not VideoInfoViewModel videoInfo || videoInfo is null) return;
 
-                if (!videoInfo.IsDownloaded.Value || videoInfo.FileName.Value.IsNullOrEmpty())
+                if (!videoInfo.VideoInfo.IsDownloaded.Value || videoInfo.VideoInfo.FileName.Value.IsNullOrEmpty())
                 {
                     var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
                     if (reAll) this.SendToappBCommand.Execute(arg);
                     return;
                 }
 
-                var result = WS::Mainpage.ExternalAppUtils.OpenInPlayerB(videoInfo);
+                var result = WS::Mainpage.ExternalAppUtils.OpenInPlayerB(videoInfo.VideoInfo);
 
                 if (!result.IsSucceeded)
                 {
@@ -652,7 +656,7 @@ namespace Niconicome.ViewModels.Mainpage
                     _ => Playlist::PlaylistType.Aimp,
                 };
                 var folderPath = this.GetFolderPath();
-                var videos = this.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
+                var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
                 if (!videos.Any()) return;
 
                 var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Name, folderPath, type);
@@ -823,7 +827,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画のリスト
         /// </summary>
-        public ObservableCollection<IListVideoInfo> Videos { get; init; }
+        public ReadOnlyReactiveCollection<VideoInfoViewModel> Videos { get; init; }
 
         /// <summary>
         /// スナックバー
@@ -925,11 +929,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="orderBy"></param>
         public void SetOrder(SortType sortType, OrderBy orderBy)
         {
-            var videos = new List<IListVideoInfo>(this.Videos);
-            this.Videos.Clear();
+            var videos = new List<IListVideoInfo>(WS::Mainpage.VideoListContainer.Videos);
+            WS::Mainpage.VideoListContainer.Clear();
             if (orderBy != OrderBy.Descending)
             {
-                this.Videos.Addrange(sortType switch
+                WS::Mainpage.VideoListContainer.AddRange(sortType switch
                 {
                     SortType.DateTime => videos.OrderBy(v => v.UploadedOn.Value),
                     SortType.Id => videos.OrderBy(v => v.NiconicoId.Value),
@@ -938,11 +942,11 @@ namespace Niconicome.ViewModels.Mainpage
                     SortType.ViewCount => videos.OrderBy(v => v.ViewCount.Value),
                     SortType.Downloaded => videos.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
                     _ => videos,
-                }); ;
+                }, null, false); ;
             }
             else
             {
-                this.Videos.Addrange(sortType switch
+                WS::Mainpage.VideoListContainer.AddRange(sortType switch
                 {
                     SortType.DateTime => videos.OrderByDescending(v => v.UploadedOn.Value),
                     SortType.Id => videos.OrderByDescending(v => v.NiconicoId.Value),
@@ -951,7 +955,7 @@ namespace Niconicome.ViewModels.Mainpage
                     SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount.Value),
                     SortType.Downloaded => videos.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
                     _ => videos,
-                });
+                }, null, false);
             }
 
             string sortTypeStr = sortType switch
@@ -1029,6 +1033,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isFiltered;
 
+        private CompositeDisposable disposables = new();
+
         /// <summary>
         /// リソースの取得を開始する
         /// </summary>
@@ -1084,22 +1090,22 @@ namespace Niconicome.ViewModels.Mainpage
                 return;
             }
 
-            if (e.ChangeType == ChangeType.Add)
-            {
-                this.Videos.Add(e.Data!);
-            }
-            else if (e.ChangeType == ChangeType.Remove)
-            {
-                this.Videos.Remove(e.Data!);
-            }
-            else if (e.ChangeType == ChangeType.Clear)
-            {
-                this.Videos.Clear();
-            }
-            else if (e.ChangeType == ChangeType.Overall)
-            {
-                this.Videos.Addrange(WS::Mainpage.VideoListContainer.GetVideos());
-            }
+            //if (e.ChangeType == ChangeType.Add)
+            //{
+            //    this.Videos.Add(e.Data!);
+            //}
+            //else if (e.ChangeType == ChangeType.Remove)
+            //{
+            //    this.Videos.Remove(e.Data!);
+            //}
+            //else if (e.ChangeType == ChangeType.Clear)
+            //{
+            //    this.Videos.Clear();
+            //}
+            //else if (e.ChangeType == ChangeType.Overall)
+            //{
+            //    //this.Videos.Addrange(WS::Mainpage.VideoListContainer.GetVideos());
+            //}
         }
 
         /// <summary>
@@ -1266,7 +1272,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 強制的に元のスクロール位置に戻すスクロール変更値の最小値
         /// </summary>
-        private readonly double minimumVerticalOffsetChangeToFourceScroll = 5;
+        private readonly double minimumVerticalOffsetChangeToFourceScroll = 50;
 
         protected override void OnAttached()
         {
@@ -1461,6 +1467,72 @@ namespace Niconicome.ViewModels.Mainpage
                 }
             }
         }
+    }
+
+    class VideoInfoViewModel : BindableBase, IDisposable
+    {
+        public VideoInfoViewModel(IListVideoInfo video)
+        {
+            this.VideoInfo = video;
+            this.Id = video.Id.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
+            this.ViewCount = video.ViewCount.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
+            this.NiconicoId = video.NiconicoId.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
+            this.Title = video.Title.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
+            this.Message = video.Message.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
+            this.ThumbPath = video.ThumbPath.ToReactivePropertyAsSynchronized(p => p.Value, origin =>
+            {
+                var dir = AppContext.BaseDirectory;
+                if (video.ThumbPath is null || video.ThumbPath.Value == string.Empty)
+                {
+                    var cacheHandler = Utils::DIFactory.Provider.GetRequiredService<Net::ICacheHandler>();
+                    string cachePath = cacheHandler.GetCachePath("0", Net.CacheType.Thumbnail);
+                    return Path.Combine(dir, cachePath);
+                }
+                else
+                {
+                    return Path.Combine(dir, video.ThumbPath.Value);
+                }
+            }, x => x).AddTo(this.disposables);
+            this.IsSelected = video.IsSelected.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
+            this.IsDownloaded = video.IsDownloaded.ToReactivePropertyAsSynchronized(p => p.Value, p => p ? "○" : "×", x => x == "○").AddTo(this.disposables);
+            this.UploadedOn = video.UploadedOn.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
+
+        }
+
+        ~VideoInfoViewModel()
+        {
+            this.Dispose();
+        }
+
+        public IListVideoInfo VideoInfo { get; init; }
+
+        public ReactiveProperty<int> Id { get; init; }
+
+        public ReactiveProperty<int> ViewCount { get; init; }
+
+        public ReactiveProperty<string> NiconicoId { get; init; }
+
+        public ReactiveProperty<string> Title { get; init; }
+
+        public ReactiveProperty<string> Message { get; init; }
+
+        public ReactiveProperty<string> ThumbPath { get; init; }
+
+        public ReactiveProperty<string> IsDownloaded { get; init; }
+
+        public ReactiveProperty<bool> IsSelected { get; init; }
+
+        public ReactiveProperty<DateTime> UploadedOn { get; init; }
+
+        public void Dispose()
+        {
+            if (this.hasDisposed) return;
+            this.disposables.Dispose();
+            this.hasDisposed = true;
+            GC.SuppressFinalize(this);
+        }
+        private bool hasDisposed;
+        private readonly CompositeDisposable disposables = new();
     }
 
     /// <summary>

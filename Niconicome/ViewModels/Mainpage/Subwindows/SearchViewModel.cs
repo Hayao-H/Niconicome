@@ -84,7 +84,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                 this.StartFetching();
 
                 int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist?.Id ?? -1;
-                var sourceVideos = WS::Mainpage.VideoListContainer.GetVideos().Select(v => v.NiconicoId.Value) ?? new List<string>();
+                var sourceVideos = WS::Mainpage.VideoListContainer.Videos.Select(v => v.NiconicoId.Value) ?? new List<string>();
                 var sourceVideosCount = sourceVideos.Count();
 
                 if (playlistId == -1)

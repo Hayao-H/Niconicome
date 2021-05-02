@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public interface IVideoListRefresher
     {
-        IAttemptResult Refresh(List<IListVideoInfo> videos);
+        IAttemptResult Refresh(ObservableCollection<IListVideoInfo> videos);
     }
 
     public class VideoListRefresher : IVideoListRefresher
@@ -52,7 +53,7 @@ namespace Niconicome.Models.Playlist.VideoList
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public IAttemptResult Refresh(List<IListVideoInfo> videos)
+        public IAttemptResult Refresh(ObservableCollection<IListVideoInfo> videos)
         {
             var playlistID = this.current.SelectedPlaylist?.Id ?? -1;
 

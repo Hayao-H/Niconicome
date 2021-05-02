@@ -111,7 +111,13 @@
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
-                <ListView ItemsSource="{Binding Videos,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" BorderThickness="1" BorderBrush="#e7e7e7" >
+                <ListView 
+                    VirtualizingPanel.IsVirtualizing="True"
+                    VirtualizingPanel.VirtualizationMode="Recycling"
+                    VirtualizingPanel.ScrollUnit="Pixel"
+                    ItemsSource="{Binding Videos,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" 
+                    BorderThickness="1"
+                    BorderBrush="#e7e7e7" >
                     <i:Interaction.Behaviors>
                         <vm:VideoListBehavior/>
                     </i:Interaction.Behaviors>
@@ -127,7 +133,7 @@
                             <GridViewColumn Width="{Binding ThumbColumnWidth}">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding BindableThumbPath,UpdateSourceTrigger=PropertyChanged}" Height="80"/>
+                                        <Image Source="{Binding ThumbPath.Value,UpdateSourceTrigger=PropertyChanged}" Height="80"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -141,7 +147,7 @@
                             </GridViewColumn>
                         <GridViewColumn Width="{Binding UploadColumnWidth,Mode=TwoWay}" Header="投稿日" DisplayMemberBinding="{Binding UploadedOn.Value, StringFormat=yyyy年MM月dd日 HH:mm}"/>
                         <GridViewColumn Width="{Binding ViewCountColumnWidth,Mode=TwoWay}" Header="再生回数" DisplayMemberBinding="{Binding ViewCount.Value}"/>
-                        <GridViewColumn Width="{Binding DownloadedFlagColumnWidth,Mode=TwoWay}" Header="DL済み" DisplayMemberBinding="{Binding IsDownloaded.Value,Converter={StaticResource BooleanCircleConverter}}"/>
+                        <GridViewColumn Width="{Binding DownloadedFlagColumnWidth,Mode=TwoWay}" Header="DL済み" DisplayMemberBinding="{Binding IsDownloaded.Value}"/>
                         <GridViewColumn Width="{Binding StateColumnWidth,Mode=TwoWay}" Header="状態" DisplayMemberBinding="{Binding Message.Value}"/>
                         </GridView>
                     </ListView.View>

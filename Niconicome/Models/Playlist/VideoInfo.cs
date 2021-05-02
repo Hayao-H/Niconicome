@@ -36,7 +36,6 @@ namespace Niconicome.Models.Playlist
         ReactiveProperty<string> ChannelName { get; }
         ReactiveProperty<DateTime> UploadedOn { get; }
         IEnumerable<string> Tags { get; set; }
-        string BindableThumbPath { get;  }
         string MessageGuid { get; set; }
         Uri GetNiconicoPageUri();
         bool CheckDownloaded(string folderPath);
