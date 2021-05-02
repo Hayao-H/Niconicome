@@ -4,6 +4,8 @@ using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Application;
+using Prism.Ioc;
+using Prism.Unity;
 
 namespace Niconicome
 {
@@ -11,7 +13,7 @@ namespace Niconicome
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : PrismApplication
     {
         public App()
         {
@@ -23,14 +25,13 @@ namespace Niconicome
             AppDomain.CurrentDomain.UnhandledException += this.CurrentDomain_UnhandledException;
         }
 
-
-        [System.STAThreadAttribute()]
-        public static void Main()
+        protected override Window CreateShell()
         {
-            Niconicome.App app = new Niconicome.App();
-            app.RunStartUpTask();
-            app.InitializeComponent();
-            app.Run();
+            return Container.Resolve<MainWindow>();
+        }
+
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
         }
 
         public void RunStartUpTask()
