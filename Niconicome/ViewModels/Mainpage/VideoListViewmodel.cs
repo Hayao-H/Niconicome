@@ -108,7 +108,7 @@ namespace Niconicome.ViewModels.Mainpage
                   }
 
                   var videos = new List<IListVideoInfo>();
-                  var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, this.Videos.Select(v => v.NiconicoId), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+                  var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, this.Videos.Select(v => v.NiconicoId.Value), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
                   if (result.IsFailed)
                   {
@@ -128,12 +128,12 @@ namespace Niconicome.ViewModels.Mainpage
 
                   this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
 
-                  if (!videos.First().ChannelID.IsNullOrEmpty())
+                  if (!videos.First().ChannelID.Value.IsNullOrEmpty())
                   {
                       var video = videos.First();
                       WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName}」です", "IDをコピー", () =>
                       {
-                          Clipboard.SetText(video.ChannelID);
+                          Clipboard.SetText(video.ChannelID.Value);
                           WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
                       });
                   }
@@ -151,7 +151,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                  if (arg is not null && arg.AsNullable<IListVideoInfo>() is IListVideoInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
 
-                 targetVideos.AddRange(this.Videos.Where(v => v.IsSelected));
+                 targetVideos.AddRange(this.Videos.Where(v => v.IsSelected.Value));
                  targetVideos = targetVideos.Distinct(v => v.Id).ToList();
 
                  string confirmMessage = targetVideos.Count == 1
@@ -165,7 +165,7 @@ namespace Niconicome.ViewModels.Mainpage
                  foreach (var video in targetVideos)
                  {
                      //取得失敗動画の場合
-                     if (video.Title == "取得失敗")
+                     if (video.Title.Value == "取得失敗")
                      {
                          WS::Mainpage.VideoListContainer.Remove(video, null, false);
                      }
@@ -294,7 +294,7 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
 
-                var sourceVideos = this.Videos.Where(v => v.IsSelected);
+                var sourceVideos = this.Videos.Where(v => v.IsSelected.Value);
                 int sourceVideosCount = sourceVideos.Count();
 
                 if (sourceVideosCount < 1) return;
@@ -345,12 +345,12 @@ namespace Niconicome.ViewModels.Mainpage
                      int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
                      var videos = new List<IListVideoInfo>();
 
-                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId, videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType, this.Videos.Select(v => v.NiconicoId), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId, videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType, this.Videos.Select(v => v.NiconicoId.Value), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
                      if (result.IsSucceeded)
                      {
 
-                         videos = videos.Where(v => !WS::Mainpage.PlaylistTree.ContainsVideo(v.NiconicoId, playlistId)).ToList();
+                         videos = videos.Where(v => !WS::Mainpage.PlaylistTree.ContainsVideo(v.NiconicoId.Value, playlistId)).ToList();
 
                          if (videos.Count == 0)
                          {
@@ -415,7 +415,7 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 foreach (var video in this.Videos)
                 {
-                    video.IsSelected = true;
+                    video.IsSelected.Value = true;
                 }
             });
 
@@ -429,7 +429,7 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 foreach (var video in this.Videos)
                 {
-                    video.IsSelected = false;
+                    video.IsSelected.Value = false;
                 }
             });
 
@@ -442,7 +442,7 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 foreach (var video in this.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
                 {
-                    video.IsSelected = true;
+                    video.IsSelected.Value = true;
                 }
             });
 
@@ -455,7 +455,7 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 foreach (var video in this.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
                 {
-                    video.IsSelected = false;
+                    video.IsSelected.Value = false;
                 }
             });
 
@@ -468,7 +468,7 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 foreach (var video in this.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
                 {
-                    video.IsSelected = false;
+                    video.IsSelected.Value = false;
                 }
             });
 
@@ -481,7 +481,7 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 foreach (var video in this.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
                 {
-                    video.IsSelected = true;
+                    video.IsSelected.Value = true;
                 }
             });
 
@@ -593,7 +593,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
-                if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty())
+                if (!videoInfo.IsDownloaded.Value || videoInfo.FileName.Value.IsNullOrEmpty())
                 {
                     var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
                     if (reAll) this.SendToappACommand.Execute(arg);
@@ -620,7 +620,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
 
-                if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty())
+                if (!videoInfo.IsDownloaded.Value || videoInfo.FileName.Value.IsNullOrEmpty())
                 {
                     var reAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
                     if (reAll) this.SendToappBCommand.Execute(arg);
@@ -652,7 +652,7 @@ namespace Niconicome.ViewModels.Mainpage
                     _ => Playlist::PlaylistType.Aimp,
                 };
                 var folderPath = this.GetFolderPath();
-                var videos = this.Videos.Where(v => v.IsSelected && v.CheckDownloaded(folderPath));
+                var videos = this.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
                 if (!videos.Any()) return;
 
                 var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Name, folderPath, type);
@@ -931,12 +931,12 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 this.Videos.Addrange(sortType switch
                 {
-                    SortType.DateTime => videos.OrderBy(v => v.UploadedOn),
-                    SortType.Id => videos.OrderBy(v => v.NiconicoId),
-                    SortType.Title => videos.OrderBy(v => v.Title),
-                    SortType.Selected => videos.OrderBy(v => !v.IsSelected ? 1 : 0),
-                    SortType.ViewCount => videos.OrderBy(v => v.ViewCount),
-                    SortType.Downloaded => videos.OrderBy(v => v.IsDownloaded ? 1 : 0),
+                    SortType.DateTime => videos.OrderBy(v => v.UploadedOn.Value),
+                    SortType.Id => videos.OrderBy(v => v.NiconicoId.Value),
+                    SortType.Title => videos.OrderBy(v => v.Title.Value),
+                    SortType.Selected => videos.OrderBy(v => !v.IsSelected.Value ? 1 : 0),
+                    SortType.ViewCount => videos.OrderBy(v => v.ViewCount.Value),
+                    SortType.Downloaded => videos.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
                     _ => videos,
                 }); ;
             }
@@ -944,12 +944,12 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 this.Videos.Addrange(sortType switch
                 {
-                    SortType.DateTime => videos.OrderByDescending(v => v.UploadedOn),
-                    SortType.Id => videos.OrderByDescending(v => v.NiconicoId),
-                    SortType.Title => videos.OrderByDescending(v => v.Title),
-                    SortType.Selected => videos.OrderByDescending(v => !v.IsSelected ? 1 : 0),
-                    SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount),
-                    SortType.Downloaded => videos.OrderByDescending(v => v.IsDownloaded ? 1 : 0),
+                    SortType.DateTime => videos.OrderByDescending(v => v.UploadedOn.Value),
+                    SortType.Id => videos.OrderByDescending(v => v.NiconicoId.Value),
+                    SortType.Title => videos.OrderByDescending(v => v.Title.Value),
+                    SortType.Selected => videos.OrderByDescending(v => !v.IsSelected.Value ? 1 : 0),
+                    SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount.Value),
+                    SortType.Downloaded => videos.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
                     _ => videos,
                 });
             }
@@ -993,7 +993,7 @@ namespace Niconicome.ViewModels.Mainpage
         public void OnDoubleClick(object? sender)
         {
             if (sender is not ListViewItem item) return;
-            if (item.DataContext is not BindableListVIdeoInfo videoInfo) return;
+            if (item.DataContext is not NonBindableListVideoInfo videoInfo) return;
             var setting = WS::Mainpage.EnumSettingsHandler.GetSetting<EnumSettings::VideodbClickSettings>();
 
             if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
@@ -1155,19 +1155,15 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public VideoListViewModelD()
         {
-            var v1 = new BindableListVIdeoInfo()
-            {
-                Title = "レッツゴー!陰陽師",
-                NiconicoId = "sm9",
-                IsDownloaded = true,
-            };
+            var v1 = new NonBindableListVideoInfo();
+            v1.Title.Value = "レッツゴー!陰陽師";
+            v1.NiconicoId.Value = "sm9";
+            v1.IsDownloaded.Value = true;
 
-            var v2 = new BindableListVIdeoInfo()
-            {
-                Title = "Bad Apple!! feat. nomico",
-                NiconicoId = "sm8628149",
-                IsDownloaded = false,
-            };
+            var v2 = new NonBindableListVideoInfo();
+            v1.Title.Value = "Bad Apple!! feat. nomico";
+            v1.NiconicoId.Value = "sm8628149";
+            v1.IsDownloaded.Value = false;
 
             this.Videos = new ObservableCollection<IListVideoInfo>() { v1, v2 };
 

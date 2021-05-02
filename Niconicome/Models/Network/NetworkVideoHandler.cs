@@ -73,7 +73,12 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null)
         {
-            return await this.GetVideoListInfosAsync(ids.Select(i => new BindableListVIdeoInfo() { NiconicoId = i }), uncheck, playlistID, ct);
+            return await this.GetVideoListInfosAsync(ids.Select(i =>
+            {
+                var v = new NonBindableListVideoInfo();
+                v.NiconicoId.Value = i;
+                return v;
+            }), uncheck, playlistID, ct);
         }
 
         /// <summary>
@@ -146,7 +151,7 @@ namespace Niconicome.Models.Network
                 {
                     this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得を開始します。");
 
-                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, item.video, DWatch::WatchInfoOptions.NoDmcData);
+                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId.Value, item.video, DWatch::WatchInfoOptions.NoDmcData);
 
                     if (result.IsSucceeded)
                     {
@@ -154,7 +159,7 @@ namespace Niconicome.Models.Network
                         videos.Add(item.video);
                         if (uncheck)
                         {
-                            this.videoListContainer.Uncheck(item.video.Id, playlistID ?? -1);
+                            this.videoListContainer.Uncheck(item.video.Id.Value, playlistID ?? -1);
                         }
                     }
                     else

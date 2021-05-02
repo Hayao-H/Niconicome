@@ -52,7 +52,7 @@ namespace Niconicome.Models.Playlist
             var result = new List<IListVideoInfo>();
             foreach (var word in keywords.Select(k=>k.ToLower()))
             {
-                result.AddRange(source.Where(v => v.Title.ToLower().Contains(word)));
+                result.AddRange(source.Where(v => v.Title.Value.ToLower().Contains(word)));
             }
             result = result.Distinct(v => v.Id).ToList();
             return result;

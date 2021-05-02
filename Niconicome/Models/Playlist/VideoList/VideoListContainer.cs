@@ -66,7 +66,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             foreach (var video in this.videos)
             {
-                var info = new LightVideoListInfo(video.MessageGuid, video.FileName, this.current.PrevSelectedPlaylistID, video.Id, video.IsSelected);
+                var info = new LightVideoListInfo(video.MessageGuid, video.FileName.Value, this.current.PrevSelectedPlaylistID, video.Id.Value, video.IsSelected.Value);
                 LightVideoListinfoHandler.AddVideo(info);
             }
         }
@@ -149,7 +149,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             try
             {
-                this.playlistStoreHandler.RemoveVideo(video.Id, id);
+                this.playlistStoreHandler.RemoveVideo(video.Id.Value, id);
             }
             catch (Exception e)
             {
@@ -302,7 +302,7 @@ namespace Niconicome.Models.Playlist.VideoList
             try
             {
                 var targetVIdeo = this.videos.First(v => v.NiconicoId == video.NiconicoId);
-                BindableListVIdeoInfo.SetData(targetVIdeo, video);
+                NonBindableListVideoInfo.SetData(targetVIdeo, video);
             }
             catch (Exception e)
             {
@@ -372,10 +372,10 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <returns></returns>
         public IAttemptResult Uncheck(int videoID, int playlistID)
         {
-            if (this.videos.Any(v => v.Id == videoID))
+            if (this.videos.Any(v => v.Id.Value == videoID))
             {
-                var target = this.videos.First(v => v.Id == videoID);
-                target.IsSelected = false;
+                var target = this.videos.First(v => v.Id.Value == videoID);
+                target.IsSelected.Value = false;
             }
             else if (LightVideoListinfoHandler.Contains(videoID, playlistID))
             {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Niconicome.Models.Playlist;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Domain.Local.Store
@@ -51,9 +52,9 @@ namespace Niconicome.Models.Domain.Local.Store
             int videoId;
 
             //既にデータベースに存在する場合は再利用
-            if (this.Exists(videoData.NiconicoId))
+            if (this.Exists(videoData.NiconicoId.Value))
             {
-                var video = this.GetVideo(videoData.NiconicoId)!;
+                var video = this.GetVideo(videoData.NiconicoId.Value)!;
                 if (video.PlaylistIds is null)
                 {
                     video.PlaylistIds = new List<int>();
@@ -128,9 +129,9 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="videoData"></param>
         public void Update(IListVideoInfo videoData)
         {
-            if (this.Exists(videoData.Id))
+            if (this.Exists(videoData.Id.Value))
             {
-                var video = this.GetVideo(videoData.Id)!;
+                var video = this.GetVideo(videoData.Id.Value)!;
                 this.SetData(video, videoData);
                 this.Update(video);
             }
@@ -194,22 +195,22 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="videoData"></param>
         private void SetData(STypes::Video dbVideo, IListVideoInfo videoData)
         {
-            dbVideo.NiconicoId = videoData.NiconicoId;
-            dbVideo.Title = videoData.Title;
-            dbVideo.UploadedOn = videoData.UploadedOn;
-            dbVideo.ThumbUrl = videoData.ThumbUrl;
-            dbVideo.LargeThumbUrl = videoData.LargeThumbUrl;
-            dbVideo.ThumbPath = videoData.ThumbPath;
-            dbVideo.IsSelected = videoData.IsSelected;
-            dbVideo.FileName = videoData.FileName;
+            dbVideo.NiconicoId = videoData.NiconicoId.Value;
+            dbVideo.Title = videoData.Title.Value;
+            dbVideo.UploadedOn = videoData.UploadedOn.Value;
+            dbVideo.ThumbUrl = videoData.ThumbUrl.Value;
+            dbVideo.LargeThumbUrl = videoData.LargeThumbUrl.Value;
+            dbVideo.ThumbPath = videoData.ThumbPath.Value;
+            dbVideo.IsSelected = videoData.IsSelected.Value;
+            dbVideo.FileName = videoData.FileName.Value;
             dbVideo.Tags = videoData.Tags.ToList();
-            dbVideo.ViewCount = videoData.ViewCount;
-            dbVideo.CommentCount = videoData.CommentCount;
-            dbVideo.MylistCount = videoData.MylistCount;
-            dbVideo.LikeCount = videoData.LikeCount;
-            dbVideo.Duration = videoData.Duration;
-            dbVideo.OwnerID = videoData.OwnerID;
-            dbVideo.OwnerName = videoData.OwnerName;
+            dbVideo.ViewCount = videoData.ViewCount.Value;
+            dbVideo.CommentCount = videoData.CommentCount.Value;
+            dbVideo.MylistCount = videoData.MylistCount.Value;
+            dbVideo.LikeCount = videoData.LikeCount.Value;
+            dbVideo.Duration = videoData.Duration.Value;
+            dbVideo.OwnerID = videoData.OwnerID.Value;
+            dbVideo.OwnerName = videoData.OwnerName.Value;
         }
 
         private void JustifyVideo(STypes::Video video)

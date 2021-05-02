@@ -105,20 +105,20 @@ namespace Niconicome.Models.Playlist.VideoList
                 if (lightVideo is not null)
                 {
                     video.MessageGuid = lightVideo.MessageGuid;
-                    video.IsSelected = lightVideo.IsSelected;
-                    video.Message = VideoMessanger.GetMessage(lightVideo.MessageGuid);
-                    video.FileName = lightVideo.FileName;
+                    video.IsSelected.Value = lightVideo.IsSelected;
+                    video.Message.Value = VideoMessanger.GetMessage(lightVideo.MessageGuid);
+                    video.FileName.Value = lightVideo.FileName;
                 }
                 else
                 {
-                    video.FileName = string.Empty;
+                    video.FileName.Value = string.Empty;
                 }
 
-                if (video.FileName.IsNullOrEmpty())
+                if (video.FileName.Value.IsNullOrEmpty())
                 {
-                    video.FileName = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted);
+                    video.FileName.Value = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted);
                 }
-                video.IsDownloaded = !video.FileName.IsNullOrEmpty();
+                video.IsDownloaded.Value = !video.FileName.Value.IsNullOrEmpty();
 
                 //サムネイル
                 bool hasCache = this.videoThumnailUtility.HasThumbnailCache(video);
@@ -128,18 +128,18 @@ namespace Niconicome.Models.Playlist.VideoList
                 if (IsValidUrl && !hasCache)
                 {
                     this.videoThumnailUtility.GetThumbAsync(video);
-                    video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath("0");
+                    video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath("0");
                     videos.Add(video);
                 }
                 else if (!IsValidPath && hasCache)
                 {
-                    video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
+                    video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId.Value);
                     this.videoHandler.Update(video);
                     videos.Add(video);
                 }
                 else if (!hasCache)
                 {
-                    video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath("0");
+                    video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath("0");
                     videos.Add(video);
                 }
                 else

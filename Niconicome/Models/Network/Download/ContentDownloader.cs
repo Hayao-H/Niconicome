@@ -301,9 +301,9 @@ namespace Niconicome.Models.Network.Download
                         {
                             if (!downloadResult.VideoFileName.IsNullOrEmpty())
                             {
-                                video.FileName = downloadResult.VideoFileName;
+                                video.FileName.Value = downloadResult.VideoFileName;
                             }
-                            BindableListVIdeoInfo.SetData(video, downloadResult.VideoInfo);
+                            NonBindableListVideoInfo.SetData(video, downloadResult.VideoInfo);
                             this.videoHandler.Update(video);
                         }
                         this.videoListContainer.Uncheck(task.VideoID, task.PlaylistID);
@@ -366,7 +366,7 @@ namespace Niconicome.Models.Network.Download
 
         public string? VideoFileName { get; set; }
 
-        public IListVideoInfo VideoInfo { get; set; } = new BindableListVIdeoInfo();
+        public IListVideoInfo VideoInfo { get; set; } = new NonBindableListVideoInfo();
 
         public uint VideoVerticalResolution { get; set; }
 

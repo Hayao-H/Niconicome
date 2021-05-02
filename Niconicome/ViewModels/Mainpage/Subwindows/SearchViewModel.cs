@@ -84,7 +84,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                 this.StartFetching();
 
                 int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist?.Id ?? -1;
-                var sourceVideos = WS::Mainpage.VideoListContainer.GetVideos().Select(v => v.NiconicoId) ?? new List<string>();
+                var sourceVideos = WS::Mainpage.VideoListContainer.GetVideos().Select(v => v.NiconicoId.Value) ?? new List<string>();
                 var sourceVideosCount = sourceVideos.Count();
 
                 if (playlistId == -1)
@@ -151,8 +151,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                      return;
                  }
 
-                 var videos = this.SearchResult.Where(v => v.IsSelected).Select(v=> {
-                     v.IsSelected = false;
+                 var videos = this.SearchResult.Where(v => v.IsSelected.Value).Select(v=> {
+                     v.IsSelected.Value = false;
                      return v;
                  }).Copy();
 
@@ -278,7 +278,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             {
                 foreach (var video in this.SearchResult)
                 {
-                    video.IsSelected = value;
+                    video.IsSelected.Value = value;
                 }
 
                 this.SetProperty(ref this.isAllSelectedField, value);
@@ -411,7 +411,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             this.SelectableSort = new List<ComboboxItem<Search.ISortOption>>() { sortByViewCount, sortByMylistCount, sortByCommentCount, sortByLength, sortByUploadedTime, sortByLastCommentTime, sortByViewCountA, sortByMylistCountA, sortByCommentCountA, sortByLengthA, sortByUploadedTimeA, sortByLastCommentTimeA };
 
             this.SearchResult = new ObservableCollection<IListVideoInfo>();
-            var v1 = new BindableListVIdeoInfo() { NiconicoId = "sm9", Title = "レッツゴー!陰陽師", UploadedOn = DateTime.Now, ViewCount = 1000000 };
+            var v1 = new NonBindableListVideoInfo();
+            v1.NiconicoId.Value = "sm9";
+            v1.Title.Value = "レッツゴー!陰陽師";
+            v1.UploadedOn.Value = DateTime.Now;
+            v1.ViewCount.Value = 1000000;
+
             this.SearchResult.Add(v1);
         }
 

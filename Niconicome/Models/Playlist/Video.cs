@@ -75,7 +75,7 @@ namespace Niconicome.Models.Playlist
         /// <returns></returns>
         public IEnumerable<IListVideoInfo> GetAllVideos()
         {
-            return this.videoStoreHandler.GetAllVideos().Select(v => BindableListVIdeoInfo.ConvertDbDataToVideoListInfo(v));
+            return this.videoStoreHandler.GetAllVideos().Select(v => NonBindableListVideoInfo.ConvertDbDataToVideoListInfo(v));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Niconicome.Models.Playlist
         public IListVideoInfo GetVideo(int id)
         {
             if (!this.videoStoreHandler.Exists(id)) throw new InvalidOperationException($"動画({id})はデータベースに存在しません。");
-            return BindableListVIdeoInfo.ConvertDbDataToVideoListInfo(this.videoStoreHandler.GetVideo(id)!);
+            return NonBindableListVideoInfo.ConvertDbDataToVideoListInfo(this.videoStoreHandler.GetVideo(id)!);
         }
 
         /// <summary>

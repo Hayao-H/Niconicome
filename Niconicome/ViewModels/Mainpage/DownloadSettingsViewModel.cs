@@ -68,7 +68,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                    if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable && !this.IsDownloadingVideoInfoEnable) return;
 
-                   var videos = WS::Mainpage.VideoListContainer.GetVideos().Where(v => v.IsSelected).Copy();
+                   var videos = WS::Mainpage.VideoListContainer.GetVideos().Where(v => v.IsSelected.Value).Copy();
                    if (!videos.Any()) return;
 
                    var cts = new CancellationTokenSource();
@@ -112,7 +112,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!this.IsDownloadingVideoEnable && !this.IsDownloadingCommentEnable && !this.IsDownloadingThumbEnable && !this.IsDownloadingVideoInfoEnable) return;
 
-                var videos = WS::Mainpage.VideoListContainer.GetVideos().Where(v => v.IsSelected).Copy();
+                var videos = WS::Mainpage.VideoListContainer.GetVideos().Where(v => v.IsSelected.Value).Copy();
                 if (!videos.Any()) return;
 
                 int videoCount = videos.Count();

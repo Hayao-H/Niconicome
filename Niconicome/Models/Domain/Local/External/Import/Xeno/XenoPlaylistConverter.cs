@@ -26,7 +26,11 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
                 RemoteId = playlist.ChannelId??string.Empty,
             };
 
-            converted.Videos.AddRange(playlist.Videos.Select(v => new NonBindableListVideoInfo() { NiconicoId = v }));
+            converted.Videos.AddRange(playlist.Videos.Select(v => {
+                var video = new NonBindableListVideoInfo();
+                video.NiconicoId.Value = v;
+                return video;
+            }));
 
             if (playlist.ChildPlaylists.Count > 0 && recurse)
             {
