@@ -140,6 +140,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Download::ILocalContentHandler, Download::LocalContentHandler>();
             services.AddTransient<Download::IDownloadTaskPool, Download::DownloadTaskPool>();
             services.AddSingleton<Download::IDownloadTasksHandler, Download::DownloadTasksHandler>();
+            services.AddSingleton<Download::IDownloadSettingsHandler, Download::DownloadSettingsHandler>();
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
             services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();
             services.AddSingleton<State::ISnackbarHandler, State::SnackbarHandler>();

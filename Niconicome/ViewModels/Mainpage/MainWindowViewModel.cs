@@ -79,6 +79,7 @@ namespace Niconicome.ViewModels.Mainpage
             });
 
             regionManager.RegisterViewWithRegion("VideoListRegion", typeof(VideoList));
+            regionManager.RegisterViewWithRegion("DownloadSettingsRegion", typeof(DownloadSettings));
         }
 
         /// <summary>
