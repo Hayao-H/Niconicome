@@ -89,7 +89,16 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.PlaylistTree.Refresh(expandAll, inheritExpandedState);
 
             #region コマンドの初期化
-            this.AddVideoCommand = new CommandBase<object>(_ => WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && !WS::Mainpage.VideoIDHandler.IsProcessing, async arg =>
+            this.AddVideoCommand = new[] {
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+            .Select(p=>p is not null),
+            WS::Mainpage.VideoIDHandler.IsProcessing
+            .Select(f=>!f)
+            }
+            .CombineLatestValuesAreAllTrue()
+            .ToReactiveCommand<object>()
+            .WithSubscribe
+            (async arg =>
               {
                   if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                   {
@@ -748,7 +757,7 @@ namespace Niconicome.ViewModels.Mainpage
             #endregion
 
             //動画情報取得クラスの実行可能状態変更イベントを購読する
-            WS::Mainpage.VideoIDHandler.StateChange += (_, _) => this.AddVideoCommand.RaiseCanExecutechanged();
+            //WS::Mainpage.VideoIDHandler.StateChange += (_, _) => this.AddVideoCommand.RaiseCanExecutechanged();
         }
 
         private MaterialDesign::PackIconKind refreshCommandIconField = MaterialDesign::PackIconKind.Refresh;
@@ -769,7 +778,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画を追加する
         /// </summary>
-        public CommandBase<object> AddVideoCommand { get; init; }
+        public ReactiveCommand<object> AddVideoCommand { get; init; }
 
         /// <summary>
         /// 動画を削除する
@@ -1114,14 +1123,6 @@ namespace Niconicome.ViewModels.Mainpage
         private CompositeDisposable disposables = new();
 
         /// <summary>
-        /// コマンドの実行可能状態を変更する
-        /// </summary>
-        private void RaiseOverallCanExecuteChanged()
-        {
-            this.AddVideoCommand.RaiseCanExecutechanged();
-        }
-
-        /// <summary>
         /// 出力メッセージ
         /// </summary>
         public string Message
@@ -1168,7 +1169,6 @@ namespace Niconicome.ViewModels.Mainpage
         {
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.ChildrensIds.Count == 0)
             {
-                this.RaiseOverallCanExecuteChanged();
                 WS::Mainpage.Messagehandler.ClearMessage();
                 string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
@@ -1538,7 +1538,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.ThumbPath = video.ThumbPath.ToReactivePropertyAsSynchronized(p => p.Value, origin =>
             {
                 var dir = AppContext.BaseDirectory;
-                if (video.ThumbPath is null || video.ThumbPath.Value == string.Empty)
+                if (video.ThumbPath.Value is null || video.ThumbPath.Value == string.Empty)
                 {
                     var cacheHandler = Utils::DIFactory.Provider.GetRequiredService<Net::ICacheHandler>();
                     string cachePath = cacheHandler.GetCachePath("0", Net.CacheType.Thumbnail);
