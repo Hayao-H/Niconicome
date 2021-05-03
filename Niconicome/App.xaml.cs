@@ -26,6 +26,7 @@ namespace Niconicome
             TaskScheduler.UnobservedTaskException += this.TaskScheduler_UnobservedTaskException;
 #pragma warning restore CS8622
             AppDomain.CurrentDomain.UnhandledException += this.CurrentDomain_UnhandledException;
+            this.RunStartUpTask();
         }
 
         protected override Window CreateShell()
