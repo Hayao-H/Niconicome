@@ -768,6 +768,11 @@ namespace Niconicome.ViewModels.Mainpage
             //WS::Mainpage.VideoIDHandler.StateChange += (_, _) => this.AddVideoCommand.RaiseCanExecutechanged();
         }
 
+        ~VideoListViewModel()
+        {
+            this.Dispose();
+        }
+
         private MaterialDesign::PackIconKind refreshCommandIconField = MaterialDesign::PackIconKind.Refresh;
 
         private MaterialDesign::PackIconKind filterIconFIeld = MaterialDesign::PackIconKind.Filter;
@@ -1097,6 +1102,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (this.hasDisposed) return;
             this.disposables.Dispose();
             this.hasDisposed = true;
+            GC.SuppressFinalize(this);
         }
 
         #region private
