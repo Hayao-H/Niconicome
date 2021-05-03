@@ -8,6 +8,7 @@
              xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
              xmlns:cv="clr-namespace:Niconicome.Views.Converter"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              mc:Ignorable="d"
              TextElement.Foreground="{DynamicResource MaterialDesignLightForeground}"
              TextElement.FontWeight="Regular"
@@ -204,19 +205,23 @@
                                     </ContextMenu>
                                 </Setter.Value>
                             </Setter>
-                            <EventSetter Event="MouseDoubleClick" Handler="Videolist_db_click"/>
                         </Style>
                     </ListView.ItemContainerStyle>
-                    <ListView.Resources>
-                        <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
-                            <Style.Triggers>
-                                <Trigger Property="Tag" Value="Selected">
-                                    <Setter Property="Background" Value="#757575"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ListView.Resources>
-                </ListView>
+                <ListView.Resources>
+                    <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+                        <Style.Triggers>
+                            <Trigger Property="Tag" Value="Selected">
+                                <Setter Property="Background" Value="#757575"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.Resources>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <interactivity:EventToReactiveCommand Command="{Binding VideoDoubleClickCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListView>
             <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="1" MessageQueue="{Binding SnackbarMessageQueue}"/>
         </Grid>
     </Grid>

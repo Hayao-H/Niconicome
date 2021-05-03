@@ -34,6 +34,7 @@ using System.Reactive.Disposables;
 using Reactive.Bindings.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Net = Niconicome.Models.Domain.Network;
+using Niconicome.Models.Network.Watch;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -672,6 +673,37 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストの作成に失敗しました。詳しくはログファイルを参照して下さい。");
                 }
             });
+
+            this.VideoDoubleClickCommand = new ReactiveCommand<MouseEventArgs>()
+                .WithSubscribe(e =>
+                {
+                    if (e.Source is not FrameworkElement source) return;
+                    if (source.DataContext is not VideoInfoViewModel videoInfo) return;
+
+                    var setting = WS::Mainpage.EnumSettingsHandler.GetSetting<EnumSettings::VideodbClickSettings>();
+
+                    if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
+                    {
+                        this.OpenInPlayerAcommand.Execute(videoInfo);
+                    }
+                    else if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerB)
+                    {
+                        this.OpenInPlayerBcommand.Execute(videoInfo);
+                    }
+                    else if (setting == EnumSettings::VideodbClickSettings.SendToAppA)
+                    {
+                        this.SendToappACommand.Execute(videoInfo);
+                    }
+                    else if (setting == EnumSettings::VideodbClickSettings.SendToAppB)
+                    {
+                        this.SendToappBCommand.Execute(videoInfo);
+                    }
+                    else if (setting == EnumSettings::VideodbClickSettings.Download)
+                    {
+                        this.OpenInPlayerAcommand.Execute(videoInfo);
+                    }
+                }).AddTo(this.disposables);
+
             #endregion
 
             //動画情報取得クラスの実行可能状態変更イベントを購読する
@@ -817,6 +849,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// プレイリスト作成コマンド
         /// </summary>
         public CommandBase<string> CreatePlaylistCommand { get; init; }
+
+        /// <summary>
+        /// ダブルクリック
+        /// </summary>
+        public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; }
         #endregion
 
         /// <summary>
@@ -1157,6 +1194,9 @@ namespace Niconicome.ViewModels.Mainpage
 
     }
 
+    /// <summary>
+    /// デザイナー用のVM
+    /// </summary>
     class VideoListViewModelD
     {
         public VideoListViewModelD()
@@ -1228,6 +1268,8 @@ namespace Niconicome.ViewModels.Mainpage
         public CommandBase<object> SearchCommand { get; init; } = new(_ => true, _ => { });
 
         public CommandBase<string> CreatePlaylistCommand { get; init; } = new(_ => true, _ => { });
+
+        public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; } = new ReactiveCommand<MouseEventArgs>();
 
         public ObservableCollection<IListVideoInfo> Videos { get; private set; }
 

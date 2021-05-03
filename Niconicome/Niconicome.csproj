@@ -57,6 +57,7 @@
     <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
     <PackageReference Include="Prism.Unity" Version="8.0.0.1909" />
     <PackageReference Include="ReactiveProperty" Version="7.10.0" />
+    <PackageReference Include="ReactiveProperty.WPF" Version="7.10.0" />
     <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
