@@ -105,7 +105,7 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <returns></returns>
         public IAttemptResult Remove(IListVideoInfo video, int? playlistID = null, bool commit = true)
         {
-            var id = playlistID ?? this.current.SelectedPlaylist?.Id ?? -1;
+            var id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
 
             if (!this.Videos.Any(v => v.NiconicoId == video.NiconicoId))
             {
@@ -131,7 +131,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (!commit)
             {
-                if (id == (this.current.SelectedPlaylist?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Remove);
+                if (id == (this.current.SelectedPlaylist.Value?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Remove);
                 return new AttemptResult()
                 {
                     IsSucceeded = true,
@@ -160,7 +160,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 };
             }
 
-            if (id == (this.current.SelectedPlaylist?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Remove);
+            if (id == (this.current.SelectedPlaylist.Value?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Remove);
             return new AttemptResult()
             {
                 IsSucceeded = true,
@@ -198,7 +198,7 @@ namespace Niconicome.Models.Playlist.VideoList
         public IAttemptResult Add(IListVideoInfo video, int? playlistID = null, bool commit = true)
         {
 
-            var id = playlistID ?? this.current.SelectedPlaylist?.Id ?? -1;
+            var id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
 
             if (this.Videos.Any(v => v.NiconicoId == video.NiconicoId))
             {
@@ -224,7 +224,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (!commit)
             {
-                if (id == (this.current.SelectedPlaylist?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Add);
+                if (id == (this.current.SelectedPlaylist.Value?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Add);
                 return new AttemptResult()
                 {
                     IsSucceeded = true,
@@ -253,7 +253,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 };
             }
 
-            if (id == (this.current.SelectedPlaylist?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Add);
+            if (id == (this.current.SelectedPlaylist.Value?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Add);
             return new AttemptResult()
             {
                 IsSucceeded = true,

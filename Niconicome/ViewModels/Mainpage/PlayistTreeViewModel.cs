@@ -184,7 +184,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (playlistInfo is null) return;
 
             //変更がない場合はキャンセル
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist?.Id == playlistInfo.Id) return;
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value?.Id == playlistInfo.Id) return;
 
             //ルートプレイリストは選択禁止
             if (playlistInfo.IsRoot) return;
@@ -192,7 +192,7 @@ namespace Niconicome.ViewModels.Mainpage
             //末端プレイリストでない場合はキャンセル
             if (playlistInfo.ChildrensIds.Count > 0) return;
 
-            WS::Mainpage.CurrentPlaylist.SelectedPlaylist = playlistInfo;
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = playlistInfo;
         }
 
         /// <summary>

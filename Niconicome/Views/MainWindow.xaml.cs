@@ -28,7 +28,6 @@ namespace Niconicome
         {
             this.InitializeComponent();
             this.downloadSettings.DataContext = new DownloadSettingsViewModel();
-            this.videoList.DataContext = new VideoListViewModel();
         }
 
         private void Videolist_db_click(object sender, MouseButtonEventArgs e)

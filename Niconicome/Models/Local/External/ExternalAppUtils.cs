@@ -112,7 +112,7 @@ namespace Niconicome.Models.Local.External
         /// <returns></returns>
         private IAttemptResult OpenPlayer(string appPath, IListVideoInfo videoInfo)
         {
-            var folderPath = this.current.SelectedPlaylist?.Folderpath;
+            var folderPath = this.current.SelectedPlaylist.Value?.Folderpath;
 
             if (!videoInfo.IsDownloaded.Value || videoInfo.FileName.Value.IsNullOrEmpty()) return new AttemptResult() { Message = $"{videoInfo.NiconicoId}はダウンロードされていません。", };
             if (folderPath is null) return new AttemptResult() { Message = "フォルダーパスが設定されていません。" };

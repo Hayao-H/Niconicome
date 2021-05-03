@@ -52,13 +52,13 @@ namespace Niconicome.Models.Network.Download
         public DownloadSettings CreateDownloadSettings()
         {
 
-            if (this.current.SelectedPlaylist is null) throw new InvalidOperationException("");
+            if (this.current.SelectedPlaylist.Value is null) throw new InvalidOperationException("");
 
             var replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
             var overrideVideoDT = this.settingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT);
             var resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
             var unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
-            string folderPath = this.current.SelectedPlaylist.Folderpath.IsNullOrEmpty() ? this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? "downloaded" : this.current.SelectedPlaylist.Folderpath;
+            string folderPath = this.current.SelectedPlaylist.Value.Folderpath.IsNullOrEmpty() ? this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? "downloaded" : this.current.SelectedPlaylist.Value.Folderpath;
 
             return new DownloadSettings
             {
@@ -73,7 +73,7 @@ namespace Niconicome.Models.Network.Download
                 Skip = this.IsSkippingEnable,
                 FolderPath = folderPath,
                 VerticalResolution = this.Resolution.Vertical,
-                PlaylistID = this.current.SelectedPlaylist?.Id ?? 0,
+                PlaylistID = this.current.SelectedPlaylist.Value.Id,
                 IsReplaceStrictedEnable = replaceStricted,
                 OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                 MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,

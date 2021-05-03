@@ -133,7 +133,7 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.Videodownloader.Cancel();
             });
 
-            WS::Mainpage.CurrentPlaylist.SelectedPlaylistChanged += this.OnSelectedChanged;
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Subscribe(_ => this.OnSelectedChanged());
         }
 
         ~DownloadSettingsViewModel()
@@ -271,11 +271,11 @@ namespace Niconicome.ViewModels.Mainpage
             this.CancelCommand.RaiseCanExecutechanged();
         }
 
-        private void OnSelectedChanged(object? sender, EventArgs e)
+        private void OnSelectedChanged()
         {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
             {
-                this.playlist = WS::Mainpage.CurrentPlaylist.SelectedPlaylist;
+                this.playlist = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value;
                 this.RaiseCanExecuteChange();
             }
         }
@@ -311,7 +311,7 @@ namespace Niconicome.ViewModels.Mainpage
                 Skip = this.IsSkippingEnable,
                 FolderPath = folderPath,
                 VerticalResolution = this.SelectedResolution.Resolution.Vertical,
-                PlaylistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist?.Id ?? 0,
+                PlaylistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value?.Id ?? 0,
                 IsReplaceStrictedEnable = replaceStricted,
                 OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                 MaxCommentsCount = this.IsLimittingCommentCountEnable ? this.MaxCommentsCount : 0,

@@ -55,7 +55,7 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <returns></returns>
         public IAttemptResult Refresh(ObservableCollection<IListVideoInfo> videos)
         {
-            var playlistID = this.current.SelectedPlaylist?.Id ?? -1;
+            var playlistID = this.current.SelectedPlaylist.Value?.Id ?? -1;
 
             if (playlistID == -1)
             {
@@ -90,7 +90,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             foreach (var originVideo in originVideos)
             {
-                if (playlistID != (this.current.SelectedPlaylist?.Id ?? -1))
+                if (playlistID != (this.current.SelectedPlaylist.Value?.Id ?? -1))
                 {
                     return new AttemptResult()
                     {

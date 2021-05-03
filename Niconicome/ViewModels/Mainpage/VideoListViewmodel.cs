@@ -51,7 +51,7 @@ namespace Niconicome.ViewModels.Mainpage
         public VideoListViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox)
         {
             //プレイリスト選択変更イベントを購読する
-            WS::Mainpage.CurrentPlaylist.SelectedPlaylistChanged += this.OnSelectedPlaylistChanged;
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Subscribe(_ => this.OnSelectedPlaylistChanged());
 
             //プレイリスト内容更新のイベントを購読する
             WS::Mainpage.VideoListContainer.ListChanged += (_, e) => this.VideoListUpdated(e);
@@ -89,14 +89,14 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.PlaylistTree.Refresh(expandAll, inheritExpandedState);
 
             #region コマンドの初期化
-            this.AddVideoCommand = new CommandBase<object>(_ => WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null && !WS::Mainpage.VideoIDHandler.IsProcessing, async arg =>
+            this.AddVideoCommand = new CommandBase<object>(_ => WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && !WS::Mainpage.VideoIDHandler.IsProcessing, async arg =>
               {
-                  if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                  if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                   {
                       this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
                       return;
                   }
-                  int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
+                  int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
 
                   string niconicoId;
                   if (arg is not null and string)
@@ -231,13 +231,13 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.AddVideoFromClipboardCommand = new CommandBase<object>(_ => WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null, async _ =>
             {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                 {
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
                     return;
                 }
 
-                int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
+                int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
 
                 var data = Clipboard.GetText();
                 if (data == string.Empty) return;
@@ -292,13 +292,13 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                 {
 
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を更新できません");
                     return;
                 }
-                int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
+                int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
 
                 var sourceVideos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value);
                 int sourceVideosCount = sourceVideos.Count();
@@ -329,7 +329,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             });
 
-            this.SyncWithNetowrkCommand = new CommandBase<object>(_ => !this.isFetching && (WS::Mainpage.CurrentPlaylist.SelectedPlaylist?.IsRemotePlaylist ?? false), async _ =>
+            this.SyncWithNetowrkCommand = new CommandBase<object>(_ => !this.isFetching && (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value?.IsRemotePlaylist ?? false), async _ =>
                  {
 
                      if (!WS::Mainpage.Session.IsLogin)
@@ -338,20 +338,20 @@ namespace Niconicome.ViewModels.Mainpage
                          return;
                      }
 
-                     if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                     if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                      {
                          this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、同期できません");
                          return;
                      }
 
-                     if (!WS::Mainpage.CurrentPlaylist.SelectedPlaylist.IsRemotePlaylist || (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId.IsNullOrEmpty() && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType != RemoteType.WatchLater)) return;
+                     if (!WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.IsRemotePlaylist || (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteId.IsNullOrEmpty() && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteType != RemoteType.WatchLater)) return;
 
                      this.StartFetching();
 
-                     int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
+                     int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
                      var videos = new List<IListVideoInfo>();
 
-                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId, videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType, WS::Mainpage.VideoListContainer.Videos.Select(v => v.NiconicoId.Value), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+                     var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteId, videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteType, WS::Mainpage.VideoListContainer.Videos.Select(v => v.NiconicoId.Value), m => WS::Mainpage.Messagehandler.AppendMessage(m));
 
                      if (result.IsSucceeded)
                      {
@@ -644,7 +644,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.CreatePlaylistCommand = new CommandBase<string>(_ => true, arg =>
             {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                 {
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
@@ -660,7 +660,7 @@ namespace Niconicome.ViewModels.Mainpage
                 var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
                 if (!videos.Any()) return;
 
-                var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Name, folderPath, type);
+                var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name, folderPath, type);
 
                 if (result)
                 {
@@ -1150,13 +1150,13 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnSelectedPlaylistChanged(object? sender, EventArgs e)
+        private void OnSelectedPlaylistChanged()
         {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.ChildrensIds.Count == 0)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.ChildrensIds.Count == 0)
             {
                 this.RaiseOverallCanExecuteChanged();
                 WS::Mainpage.Messagehandler.ClearMessage();
-                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Name;
+                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
                 WS::Mainpage.SnaclbarHandler.Enqueue($"プレイリスト:{name}");
                 WS::Mainpage.VideoListContainer.Refresh();
@@ -1173,10 +1173,11 @@ namespace Niconicome.ViewModels.Mainpage
                 this.UpdateList(e);
             }
 
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
             {
-                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Name;
-                this.PlaylistTitle = $"{name}({this.Videos.Count}件)";
+                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
+                var count = WS::Mainpage.VideoListContainer.Count;
+                this.PlaylistTitle = $"{name}({count}件)";
             }
         }
 
@@ -1186,9 +1187,9 @@ namespace Niconicome.ViewModels.Mainpage
         /// <returns></returns>
         private string GetFolderPath()
         {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null) return string.Empty;
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null) return string.Empty;
 
-            return WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir : WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Folderpath;
+            return WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir : WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Folderpath;
         }
         #endregion
 
@@ -1319,7 +1320,7 @@ namespace Niconicome.ViewModels.Mainpage
         protected override void OnAttached()
         {
             base.OnAttached();
-            WS::Mainpage.CurrentPlaylist.SelectedPlaylistChanged += this.OnSourceChanged;
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Subscribe(_ => this.OnSourceChanged());
             this.AssociatedObject.AddHandler(GridViewColumnHeader.ClickEvent, this.headerClickedHandler);
 
         }
@@ -1327,7 +1328,6 @@ namespace Niconicome.ViewModels.Mainpage
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            WS::Mainpage.CurrentPlaylist.SelectedPlaylistChanged -= this.OnSourceChanged;
             this.AssociatedObject.RemoveHandler(GridViewColumnHeader.ClickEvent, this.headerClickedHandler);
         }
 
@@ -1363,7 +1363,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnSourceChanged(object? sender, EventArgs e)
+        private void OnSourceChanged()
         {
             var child = this.AssociatedObject.GetChildrenList<ScrollViewer>().FirstOrDefault();
             if (child is not null)
