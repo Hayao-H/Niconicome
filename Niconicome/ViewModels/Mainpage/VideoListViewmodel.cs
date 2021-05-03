@@ -40,7 +40,7 @@ namespace Niconicome.ViewModels.Mainpage
     /// <summary>
     /// 動画一覧のVM
     /// </summary>
-    class VideoListViewModel : BindableBase
+    class VideoListViewModel : BindableBase, IDisposable
     {
         public VideoListViewModel() : this((message, button, image) => MaterialMessageBox.Show(message, button, image))
         {
@@ -152,7 +152,8 @@ namespace Niconicome.ViewModels.Mainpage
                           WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
                       });
                   }
-              });
+              })
+            .AddTo(this.disposables);
 
             this.RemoveVideoCommand = new CommandBase<IListVideoInfo>(_ => true, async arg =>
              {
@@ -240,7 +241,8 @@ namespace Niconicome.ViewModels.Mainpage
                     Owner = Application.Current.MainWindow
                 };
                 window.Show();
-            });
+            })
+                .AddTo(this.disposables);
 
             this.AddVideoFromClipboardCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
                 .Select(p => p is not null)
@@ -281,7 +283,8 @@ namespace Niconicome.ViewModels.Mainpage
                     WS::Mainpage.Messagehandler.AppendMessage($"{ids.Count}件の動画の追加に失敗しました。");
                 }
 
-            });
+            })
+                .AddTo(this.disposables);
 
             this.OpenNetworkSettingsCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
                 .Select(p => p is not null)
@@ -302,7 +305,8 @@ namespace Niconicome.ViewModels.Mainpage
                     Owner = Application.Current.MainWindow
                 };
                 window.Show();
-            });
+            })
+            .AddTo(this.disposables);
 
             this.UpdateVideoCommand = new[]
             {
@@ -359,7 +363,8 @@ namespace Niconicome.ViewModels.Mainpage
                         WS::Mainpage.Messagehandler.AppendMessage($"{sourceVideosCount - videos.Count}件の動画の更新に失敗しました。");
                     }
 
-                });
+                })
+            .AddTo(this.disposables);
 
             this.SyncWithNetowrkCommand = new[]
             {
@@ -428,7 +433,61 @@ namespace Niconicome.ViewModels.Mainpage
                     }
 
                     this.isFetching.Value = false;
-                });
+                })
+            .AddTo(this.disposables);
+
+            this.FilterCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(p => p is not null)
+                .ToReadOnlyReactivePropertySlim()
+                .ToReactiveCommand()
+                .WithSubscribe
+                (() =>
+              {
+                  if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                  {
+                      this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                      return;
+                  }
+
+                  if (this.isFiltered)
+                  {
+                      WS::Mainpage.VideoListContainer.Refresh();
+                      this.isFiltered = false;
+                      this.FilterIcon = MaterialDesign::PackIconKind.Filter;
+                  }
+                  else if (!this.InputString.IsNullOrEmpty())
+                  {
+                      FilterringOptions option = this.IsFilteringOnlyByTag ? FilterringOptions.OnlyByTag : FilterringOptions.None;
+                      var videos = this.IsFilteringFromAllVideos ? WS::Mainpage.VideoHandler.GetAllVideos() : WS::Mainpage.VideoListContainer.Videos;
+                      videos = WS::Mainpage.VideoFilter.FilterVideos(this.InputString, videos, option);
+
+                      WS::Mainpage.VideoListContainer.Clear();
+                      WS::Mainpage.VideoListContainer.AddRange(videos, null, false);
+                      this.isFiltered = true;
+                      this.FilterIcon = MaterialDesign::PackIconKind.FilterOff;
+                  }
+              })
+            .AddTo(this.disposables);
+
+            this.SearchCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(p => p is not null)
+                .ToReadOnlyReactiveProperty()
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
+                    {
+                        this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、検索画面を表示できません。");
+                        return;
+                    }
+
+                    var window = new SearchPage()
+                    {
+                        Owner = Application.Current.MainWindow,
+                    };
+                    window.Show();
+                })
+            .AddTo(this.disposables);
 
             this.ClearMessageCommand = new CommandBase<object>(_ => true, _ =>
             {
@@ -546,58 +605,6 @@ namespace Niconicome.ViewModels.Mainpage
                 }
                 catch { }
             });
-
-            this.FilterCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(p => p is not null)
-                .ToReadOnlyReactivePropertySlim()
-                .ToReactiveCommand()
-                .WithSubscribe
-                (() =>
-              {
-                  if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
-                  {
-                      this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
-                      return;
-                  }
-
-                  if (this.isFiltered)
-                  {
-                      WS::Mainpage.VideoListContainer.Refresh();
-                      this.isFiltered = false;
-                      this.FilterIcon = MaterialDesign::PackIconKind.Filter;
-                  }
-                  else if (!this.InputString.IsNullOrEmpty())
-                  {
-                      FilterringOptions option = this.IsFilteringOnlyByTag ? FilterringOptions.OnlyByTag : FilterringOptions.None;
-                      var videos = this.IsFilteringFromAllVideos ? WS::Mainpage.VideoHandler.GetAllVideos() : WS::Mainpage.VideoListContainer.Videos;
-                      videos = WS::Mainpage.VideoFilter.FilterVideos(this.InputString, videos, option);
-
-                      WS::Mainpage.VideoListContainer.Clear();
-                      WS::Mainpage.VideoListContainer.AddRange(videos, null, false);
-                      this.isFiltered = true;
-                      this.FilterIcon = MaterialDesign::PackIconKind.FilterOff;
-                  }
-              });
-
-            this.SearchCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(p => p is not null)
-                .ToReadOnlyReactiveProperty()
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
-                {
-                    if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
-                    {
-                        this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、検索画面を表示できません。");
-                        return;
-                    }
-
-                    var window = new SearchPage()
-                    {
-                        Owner = Application.Current.MainWindow,
-                    };
-                    window.Show();
-                })
-                ;
 
             this.SendToappACommand = new CommandBase<object>(_ => true, arg =>
             {
@@ -752,7 +759,8 @@ namespace Niconicome.ViewModels.Mainpage
                     {
                         this.OpenInPlayerAcommand.Execute(videoInfo);
                     }
-                }).AddTo(this.disposables);
+                }).AddTo(this.disposables)
+            .AddTo(this.disposables);
 
             #endregion
 
@@ -1081,32 +1089,14 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.SettingHandler.SaveSetting(this.ThumbColumnWidth, SettingsEnum.MWThumbColumnWid);
         }
 
-        public void OnDoubleClick(object? sender)
+        /// <summary>
+        /// インスタンスを破棄する
+        /// </summary>
+        public void Dispose()
         {
-            if (sender is not ListViewItem item) return;
-            if (item.DataContext is not NonBindableListVideoInfo videoInfo) return;
-            var setting = WS::Mainpage.EnumSettingsHandler.GetSetting<EnumSettings::VideodbClickSettings>();
-
-            if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
-            {
-                this.OpenInPlayerAcommand.Execute(videoInfo);
-            }
-            else if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerB)
-            {
-                this.OpenInPlayerBcommand.Execute(videoInfo);
-            }
-            else if (setting == EnumSettings::VideodbClickSettings.SendToAppA)
-            {
-                this.SendToappACommand.Execute(videoInfo);
-            }
-            else if (setting == EnumSettings::VideodbClickSettings.SendToAppB)
-            {
-                this.SendToappBCommand.Execute(videoInfo);
-            }
-            else if (setting == EnumSettings::VideodbClickSettings.Download)
-            {
-                this.OpenInPlayerAcommand.Execute(videoInfo);
-            }
+            if (this.hasDisposed) return;
+            this.disposables.Dispose();
+            this.hasDisposed = true;
         }
 
         #region private
@@ -1121,6 +1111,8 @@ namespace Niconicome.ViewModels.Mainpage
         private bool isFiltered;
 
         private CompositeDisposable disposables = new();
+
+        private bool hasDisposed;
 
         /// <summary>
         /// 出力メッセージ
