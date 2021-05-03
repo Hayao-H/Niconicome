@@ -41,16 +41,5 @@ namespace Niconicome.Models.Playlist.VideoList
         /// </summary>
         public int PrevSelectedPlaylistID { get; private set; }
 
-
-        /// <summary>
-        /// プレイリスト変更イベント
-        /// </summary>
-        public event EventHandler? SelectedPlaylistChanged;
-
-        private void RaiseSelectedPlaylistChanged()
-        {
-            this.SelectedPlaylistChanged?.Invoke(this, EventArgs.Empty);
-        }
-
     }
 }

@@ -17,6 +17,8 @@
              TextOptions.TextRenderingMode="Auto"
              Background="{DynamicResource MaterialDesignBackground}"
              FontFamily="Yu Gothic"
+             d:Width="1200"
+             d:Height="600"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <cv:BooleanCircleConverter x:Key="BooleanCircleConverter"/>
