@@ -208,17 +208,17 @@ namespace Niconicome.ViewModels.Mainpage
 
              });
 
-            this.WatchOnNiconicoCommand = new CommandBase<IListVideoInfo>(_ => true, arg =>
+            this.WatchOnNiconicoCommand = new CommandBase<VideoInfoViewModel>(_ => true, arg =>
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を視聴できません");
                     return;
                 }
-                if (arg is null || arg.AsNullable<IListVideoInfo>() is not IListVideoInfo videoInfo || videoInfo is null) return;
+                if (arg is null || arg is not VideoInfoViewModel videoInfo) return;
                 try
                 {
-                    ProcessEx.StartWithShell($"https://nico.ms/{videoInfo.NiconicoId}");
+                    ProcessEx.StartWithShell($"https://nico.ms/{videoInfo.NiconicoId.Value}");
                 }
                 catch (Exception ex)
                 {
@@ -774,7 +774,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// ニコニコ動画で開く
         /// </summary>
-        public CommandBase<IListVideoInfo> WatchOnNiconicoCommand { get; init; }
+        public CommandBase<VideoInfoViewModel> WatchOnNiconicoCommand { get; init; }
 
         /// <summary>
         /// クリップボードから動画を追加する
