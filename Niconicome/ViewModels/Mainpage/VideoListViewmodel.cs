@@ -25,6 +25,7 @@ using Niconicome.Models.Playlist;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
+using Prism.Events;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using EnumSettings = Niconicome.Models.Local.Settings.EnumSettingsValue;
@@ -42,11 +43,11 @@ namespace Niconicome.ViewModels.Mainpage
     /// </summary>
     class VideoListViewModel : BindableBase, IDisposable
     {
-        public VideoListViewModel() : this((message, button, image) => MaterialMessageBox.Show(message, button, image))
+        public VideoListViewModel(IEventAggregator ea) : this((message, button, image) => MaterialMessageBox.Show(message, button, image), ea)
         {
 
         }
-        public VideoListViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox)
+        public VideoListViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox, IEventAggregator ea)
         {
             //プレイリスト選択変更イベントを購読する
             WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Subscribe(_ => this.OnSelectedPlaylistChanged());
@@ -61,6 +62,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
             this.isFetching = new ReactiveProperty<bool>(false);
+            this.ea = ea;
 
             //幅
             var scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
@@ -757,7 +759,8 @@ namespace Niconicome.ViewModels.Mainpage
                     }
                     else if (setting == EnumSettings::VideodbClickSettings.Download)
                     {
-                        this.OpenInPlayerAcommand.Execute(videoInfo);
+                        this.ea.GetEvent<PubSubEvent<MVVMEvent<VideoInfoViewModel>>>().Publish(new MVVMEvent<VideoInfoViewModel>(videoInfo, typeof(DownloadSettingsViewModel), EventType.Download));
+                        //this.OpenInPlayerAcommand.Execute(videoInfo);
                     }
                 }).AddTo(this.disposables)
             .AddTo(this.disposables);
@@ -1021,7 +1024,6 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isFilteringFromAllVideosEnableField;
 
-
         /// <summary>
         /// 並び替える
         /// </summary>
@@ -1119,6 +1121,8 @@ namespace Niconicome.ViewModels.Mainpage
         private CompositeDisposable disposables = new();
 
         private bool hasDisposed;
+
+        private IEventAggregator ea;
 
         /// <summary>
         /// 出力メッセージ
@@ -1478,51 +1482,9 @@ namespace Niconicome.ViewModels.Mainpage
         private double scrollPos;
     }
 
-    class VideoListItemBehavior : Behavior<ListViewItem>
-    {
-        protected override void OnAttached()
-        {
-            this.AssociatedObject.MouseLeftButtonDown += this.OnClick;
-            base.OnAttached();
-        }
-
-        protected override void OnDetaching()
-        {
-            this.AssociatedObject.MouseLeftButtonDown -= this.OnClick;
-            base.OnDetaching();
-        }
-
-        private void OnClick(object? sender, MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                if (this.AssociatedObject.Tag is not VideoListViewModel vm) return;
-                var setting = WS::Mainpage.EnumSettingsHandler.GetSetting<EnumSettings::VideodbClickSettings>();
-
-                if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
-                {
-                    vm.OpenInPlayerAcommand.Execute(this.AssociatedObject);
-                }
-                else if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerB)
-                {
-                    vm.OpenInPlayerBcommand.Execute(this.AssociatedObject);
-                }
-                else if (setting == EnumSettings::VideodbClickSettings.SendToAppA)
-                {
-                    vm.SendToappACommand.Execute(this.AssociatedObject);
-                }
-                else if (setting == EnumSettings::VideodbClickSettings.SendToAppB)
-                {
-                    vm.SendToappBCommand.Execute(this.AssociatedObject);
-                }
-                else if (setting == EnumSettings::VideodbClickSettings.Download)
-                {
-                    vm.OpenInPlayerAcommand.Execute(this.AssociatedObject);
-                }
-            }
-        }
-    }
-
+    /// <summary>
+    /// 動画情報のVM
+    /// </summary>
     class VideoInfoViewModel : BindableBase, IDisposable
     {
         public VideoInfoViewModel(IListVideoInfo video)

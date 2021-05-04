@@ -4,10 +4,14 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Playlist;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Niconicome.Views;
+using Prism.Events;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using MaterialDesign = MaterialDesignThemes.Wpf;
@@ -17,7 +21,7 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class DownloadSettingsViewModel : ConfigurableBase, IDisposable
     {
-        public DownloadSettingsViewModel()
+        public DownloadSettingsViewModel(IEventAggregator ea)
         {
             this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value);
             this.IsLimittingCommentCountEnable = WS::Mainpage.DownloadSettingsHandler.IsLimittingCommentCountEnable.ToReactivePropertyAsSynchronized(x => x.Value);
@@ -40,6 +44,8 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.Resolutions = new List<ComboboxItem<VideoInfo::IResolution>>() { s1, s2, s3, s4, s5 };
 
+            this.disposables = new CompositeDisposable();
+
             this.SelectedResolution = WS::Mainpage.DownloadSettingsHandler.Resolution
                 .ToReactivePropertyAsSynchronized(
                 x => x.Value,
@@ -54,8 +60,6 @@ namespace Niconicome.ViewModels.Mainpage
                 }, x => x.Value)
                 .AddTo(this.disposables);
 
-            this.disposables = new CompositeDisposable();
-
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
             this.IsDownloading = WS::Mainpage.Videodownloader.CanDownload
@@ -69,56 +73,7 @@ namespace Niconicome.ViewModels.Mainpage
             }
             .CombineLatestValuesAreAllTrue()
             .ToReactiveCommand()
-            .WithSubscribe(
-            async () =>
-               {
-                   if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
-                   {
-                       this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
-                       return;
-                   }
-
-                   if (!WS::Mainpage.Session.IsLogin)
-                   {
-                       this.SnackbarMessageQueue.Enqueue("動画をダウンロードするにはログインが必要です。");
-                       return;
-                   }
-
-                   if (!this.IsDownloadingCommentEnable.Value && (this.IsDownloadingCommentLogEnable.Value || this.IsDownloadingEasyComment.Value || this.IsDownloadingOwnerComment.Value))
-                   {
-                       this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
-                       return;
-                   }
-
-                   if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value) return;
-
-                   var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).Copy();
-                   if (!videos.Any()) return;
-
-                   var cts = new CancellationTokenSource();
-
-                   int videoCount = videos.Count();
-                   var firstVideo = videos.First();
-                   var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.AllowDupeOnStage);
-                   var setting = WS::Mainpage.DownloadSettingsHandler.CreateDownloadSettings();
-                   var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLAllFromQueue);
-
-
-                   WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting, allowDupe);
-
-                   if (dlFromQueue)
-                   {
-                       WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
-                   }
-                   else
-                   {
-                       WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
-                   }
-
-                   await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
-
-
-               })
+            .WithSubscribe(async () => await this.DownloadVideo(null))
             .AddTo(this.disposables);
 
             this.StageVideosCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
@@ -164,6 +119,9 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.Videodownloader.Cancel();
             })
             .AddTo(this.disposables);
+
+            //イベントを購読
+            ea.GetEvent<PubSubEvent<MVVMEvent<VideoInfoViewModel>>>().Subscribe(this.OnDoubleClick);
         }
 
         ~DownloadSettingsViewModel()
@@ -273,15 +231,87 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public void Dispose()
         {
-            if (this.hasDIsposed) return;
+            if (this.hasDisposed) return;
             this.disposables.Dispose();
-            this.hasDIsposed = true;
+            this.hasDisposed = true;
             GC.SuppressFinalize(this);
         }
 
-        private bool hasDIsposed;
+        #region private
+        /// <summary>
+        /// 廃棄フラグ
+        /// </summary>
+        private bool hasDisposed;
 
+        /// <summary>
+        /// 破棄コレクション
+        /// </summary>
         private CompositeDisposable disposables;
+
+        /// <summary>
+        /// 動画をダウンロードする
+        /// </summary>
+        /// <param name="vm"></param>
+        /// <returns></returns>
+        private async Task DownloadVideo(VideoInfoViewModel? vm)
+        {
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
+            {
+                this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
+                return;
+            }
+
+            if (!WS::Mainpage.Session.IsLogin)
+            {
+                this.SnackbarMessageQueue.Enqueue("動画をダウンロードするにはログインが必要です。");
+                return;
+            }
+
+            if (!this.IsDownloadingCommentEnable.Value && (this.IsDownloadingCommentLogEnable.Value || this.IsDownloadingEasyComment.Value || this.IsDownloadingOwnerComment.Value))
+            {
+                this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
+                return;
+            }
+
+            if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value) return;
+
+            var videos = vm is null ? WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).Copy() : new List<IListVideoInfo>() { vm.VideoInfo };
+            if (!videos.Any()) return;
+
+            var cts = new CancellationTokenSource();
+
+            int videoCount = videos.Count();
+            var firstVideo = videos.First();
+            var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.AllowDupeOnStage);
+            var setting = WS::Mainpage.DownloadSettingsHandler.CreateDownloadSettings();
+            var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLAllFromQueue);
+
+
+            WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting, allowDupe);
+
+            if (dlFromQueue)
+            {
+                WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
+            }
+            else
+            {
+                WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
+            }
+
+            await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
+        }
+
+        /// <summary>
+        /// ダブルクリックでDL
+        /// </summary>
+        /// <param name="e"></param>
+        private void OnDoubleClick(MVVMEvent<VideoInfoViewModel> e)
+        {
+            if (!e.CheckTarget(this.GetType())) return;
+            if (e.EventType != EventType.Download) return;
+            _ = this.DownloadVideo(e.Data);
+        }
+        #endregion
     }
 
     class DownloadSettingsViewModelD

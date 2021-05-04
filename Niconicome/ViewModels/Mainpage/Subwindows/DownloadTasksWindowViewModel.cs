@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Network.Download;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using Material = MaterialDesignThemes.Wpf;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows
 {
-    class DownloadTasksWindowViewModel : BindableBase
+    class DownloadTasksWindowViewModel : BindableBase,IDisposable
     {
         public DownloadTasksWindowViewModel()
         {
@@ -25,6 +27,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             this.RefreshTask(TaskPoolType.Download);
             this.RefreshTask(TaskPoolType.Staged);
 
+            this.disposables = new CompositeDisposable();
+
             this.RefreshStagedTaskCommand = new CommandBase<object>(_ => true, _ => this.RefreshTask(TaskPoolType.Staged));
             this.RefreshTaskCommand = new CommandBase<object>(_ => true, _ => this.RefreshTask(TaskPoolType.Download));
 
@@ -33,7 +37,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             .WithSubscribe(async () =>
            {
                await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.Queue.Enqueue(m));
-           });
+           })
+            .AddTo(this.disposables);
 
             this.CancelDownloadCommand = WS::Mainpage.Videodownloader.CanDownload
                 .Select(f => !f)
@@ -43,7 +48,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.CancelAllTasks();
                     this.Queue.Enqueue("ユーザーによってダウンロードがキャンセルされました。");
                     WS::Mainpage.Messagehandler.AppendMessage("ユーザーによってダウンロードがキャンセルされました。");
-                });
+                })
+            .AddTo(this.disposables);
 
             this.ClearStagedCommand = new CommandBase<object>(_ => true, _ =>
             {
@@ -73,11 +79,23 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         {
             WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.TaskPoolChange -= this.OnStagedTaskChanged;
             WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.TaskPoolChange -= this.OnTaskChanged;
+            this.Dispose();
         }
 
         private bool displayCanceledField;
 
         private bool displayCompletedField;
+
+        private bool hasDisposed;
+
+        private readonly CompositeDisposable disposables;
+        public void Dispose()
+        {
+            if (this.hasDisposed) return;
+            this.disposables.Dispose();
+            this.hasDisposed = true;
+            GC.SuppressFinalize(this);
+        }
 
         /// <summary>
         /// ステージング済みタスク
@@ -211,6 +229,41 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public Material::SnackbarMessageQueue Queue { get; init; } = new();
     }
 
+    class DownloadTasksWindowViewModelD
+    {
+        public DownloadTasksWindowViewModelD()
+        {
+            this.StagedTasks = new ObservableCollection<DownloadTaskViewModel>();
+            this.Tasks = new ObservableCollection<DownloadTaskViewModel>();
+            this.StagedTasks.Add(new DownloadTaskViewModel(new BindableDownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = true, Message = "初期化完了" }) { IsChecked = true });
+            this.Tasks.Add(new DownloadTaskViewModel(new BindableDownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = true, Message = "初期化完了" }) { IsChecked = true });
+        }
+
+        public ObservableCollection<DownloadTaskViewModel> StagedTasks { get; init; }
+
+        public ObservableCollection<DownloadTaskViewModel> Tasks { get; init; }
+
+        public bool DisplayCanceled { get; set; } = true;
+
+        public bool DisplayCompleted { get; set; } = true;
+
+        public CommandBase<object> RefreshTaskCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public CommandBase<object> RefreshStagedTaskCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public ReactiveCommand StartDownloadCommand { get; init; } = new();
+
+        public ReactiveCommand CancelDownloadCommand { get; init; } = new();
+
+        public CommandBase<object> ClearStagedCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public CommandBase<object> RemoveStagedTaskCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public CommandBase<object> MoveTasksToQueue { get; init; } = new CommandBase<object>(_ => true, _ => { });
+
+        public Material::SnackbarMessageQueue Queue { get; init; } = new();
+    }
+
     enum TaskPoolType
     {
         Staged,
@@ -333,40 +386,5 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public CommandBase<object> CancelCommand { get; init; }
 
 
-    }
-
-    class DownloadTasksWindowViewModelD
-    {
-        public DownloadTasksWindowViewModelD()
-        {
-            this.StagedTasks = new ObservableCollection<DownloadTaskViewModel>();
-            this.Tasks = new ObservableCollection<DownloadTaskViewModel>();
-            this.StagedTasks.Add(new DownloadTaskViewModel(new BindableDownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = true, Message = "初期化完了" }) { IsChecked = true });
-            this.Tasks.Add(new DownloadTaskViewModel(new BindableDownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = true, Message = "初期化完了" }) { IsChecked = true });
-        }
-
-        public ObservableCollection<DownloadTaskViewModel> StagedTasks { get; init; }
-
-        public ObservableCollection<DownloadTaskViewModel> Tasks { get; init; }
-
-        public bool DisplayCanceled { get; set; } = true;
-
-        public bool DisplayCompleted { get; set; } = true;
-
-        public CommandBase<object> RefreshTaskCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
-
-        public CommandBase<object> RefreshStagedTaskCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
-
-        public ReactiveCommand StartDownloadCommand { get; init; } = new();
-
-        public ReactiveCommand CancelDownloadCommand { get; init; } = new();
-
-        public CommandBase<object> ClearStagedCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
-
-        public CommandBase<object> RemoveStagedTaskCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
-
-        public CommandBase<object> MoveTasksToQueue { get; init; } = new CommandBase<object>(_ => true, _ => { });
-
-        public Material::SnackbarMessageQueue Queue { get; init; } = new();
     }
 }

@@ -2,6 +2,7 @@
 using Niconicome.Extensions.System;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist.VideoList;
+using Niconicome.ViewModels;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
@@ -28,7 +29,7 @@ namespace Niconicome.Models.Network.Download
         DownloadSettings CreateDownloadSettings();
     }
 
-    class DownloadSettingsHandler : IDownloadSettingsHandler
+    class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
     {
         public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current)
         {
