@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Niconicome.ViewModels.Mainpage.Subwindows;
 
 namespace Niconicome.Views
 {
@@ -21,7 +22,8 @@ namespace Niconicome.Views
     {
         public LogWindow()
         {
-            InitializeComponent();
+            this.DataContext = new LogWindowViewModel();
+            this.InitializeComponent();
         }
     }
 }

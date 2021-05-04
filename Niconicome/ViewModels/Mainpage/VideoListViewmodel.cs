@@ -86,9 +86,6 @@ namespace Niconicome.ViewModels.Mainpage
             this.stateColumnWidthField = stWidth <= 0 ? 150 : stWidth;
             this.thumbColumnWidthField = tnWidth <= 0 ? 150 : tnWidth;
 
-            //メッセージハンドラーにイベントハンドラを追加する
-            WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
-
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
             var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
@@ -494,28 +491,6 @@ namespace Niconicome.ViewModels.Mainpage
                 })
             .AddTo(this.disposables);
 
-            this.ClearMessageCommand = new CommandBase<object>(_ => true, _ =>
-            {
-                WS::Mainpage.Messagehandler.ClearMessage();
-            });
-
-            this.CopyMessageCommand = new CommandBase<object>(_ => true, _ =>
-            {
-                string content = WS::Mainpage.Messagehandler.Message;
-                Clipboard.SetText(content);
-                WS::Mainpage.Messagehandler.AppendMessage("出力をクリップボードにコピーしました。");
-                this.SnackbarMessageQueue.Enqueue("出力をクリップボードにコピーしました。");
-            });
-
-            this.OpenLogWindowCommand = new CommandBase<object>(_ => true, _ =>
-            {
-                var window = new LogWindow()
-                {
-                    Owner = Application.Current.MainWindow,
-                };
-                window.Show();
-            });
-
             this.SelectAllVideosCommand = new CommandBase<object>(_ => true, _ =>
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
@@ -827,21 +802,6 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveCommand SyncWithNetowrkCommand { get; init; }
 
         /// <summary>
-        /// メッセージ出力をクリアする
-        /// </summary>
-        public CommandBase<object> ClearMessageCommand { get; init; }
-
-        /// <summary>
-        /// メッセージを
-        /// </summary>
-        public CommandBase<object> CopyMessageCommand { get; init; }
-
-        /// <summary>
-        /// 出力を別窓で開く
-        /// </summary>
-        public CommandBase<object> OpenLogWindowCommand { get; init; }
-
-        /// <summary>
         /// 全ての動画を選択する
         /// </summary>
         public CommandBase<object> SelectAllVideosCommand { get; init; }
@@ -1112,14 +1072,6 @@ namespace Niconicome.ViewModels.Mainpage
         private IEventAggregator ea;
 
         /// <summary>
-        /// 出力メッセージ
-        /// </summary>
-        public string Message
-        {
-            get => WS::Mainpage.Messagehandler.Message;
-        }
-
-        /// <summary>
         /// 動画リストを更新する
         /// </summary>
         /// <param name="e"></param>
@@ -1238,12 +1190,6 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveCommand UpdateVideoCommand { get; init; } = new();
 
         public ReactiveCommand SyncWithNetowrkCommand { get; init; } = new();
-
-        public CommandBase<object> ClearMessageCommand { get; init; } = new(_ => true, _ => { });
-
-        public CommandBase<object> CopyMessageCommand { get; init; } = new(_ => true, _ => { });
-
-        public CommandBase<object> OpenLogWindowCommand { get; init; } = new(_ => true, _ => { });
 
         public CommandBase<object> SelectAllVideosCommand { get; init; } = new(_ => true, _ => { });
 

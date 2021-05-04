@@ -167,25 +167,7 @@
                                     <UserControl prism:RegionManager.RegionName="DownloadSettingsRegion"/>
                                 </TabItem>
                                 <TabItem Header="出力">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="2*"/>
-                                            <RowDefinition Height="5*"/>
-                                        </Grid.RowDefinitions>
-                                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
-                                            <Button Width="auto" Margin="4" Command="{Binding ClearMessageCommand}" ToolTip="出力をクリアする">
-                                                <materialDesign:PackIcon Kind="Delete"/>
-                                            </Button>
-                                            <Button Width="auto" Margin="4" Command="{Binding CopyMessageCommand}" ToolTip="出力内容をクリップボードにコピーする">
-                                                <materialDesign:PackIcon Kind="Clipboard"/>
-                                            </Button>
-                                            <Button Width="auto" Margin="4" Command="{Binding OpenLogWindowCommand}" ToolTip="出力内容を別ウィンドウで開く">
-                                                <materialDesign:PackIcon Kind="DockWindow"/>
-                                            </Button>
-                                        </StackPanel>
-                                        <TextBox Grid.Row="1" Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="4" IsReadOnly="True"
-                                         BorderThickness="0 1 0 0" Foreground="{DynamicResource MaterialDesignBody}" TextWrapping="Wrap"/>
-                                    </Grid>
+                                    <UserControl prism:RegionManager.RegionName="OutputRegion"/>
                                 </TabItem>
                             </TabControl >
                         </Grid>
