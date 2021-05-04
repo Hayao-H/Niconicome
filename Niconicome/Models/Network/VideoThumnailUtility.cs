@@ -68,7 +68,7 @@ namespace Niconicome.Models.Network
 
             string deletedVideoPath = this.GetThumbFilePath("0");
 
-            return (!video.ThumbPath.IsNullOrEmpty() && video.ThumbPath != deletedVideoPath);
+            return (!video.ThumbPath.Value.IsNullOrEmpty() && video.ThumbPath.Value != deletedVideoPath);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Niconicome.Models.Network
         public bool IsValidThumbnailUrl(IListVideoInfo video)
         {
             string deletedVideoUrl = VIdeoInfo.DeletedVideoThumb;
-            return !(video.ThumbUrl.IsNullOrEmpty() || video.ThumbUrl == deletedVideoUrl);
+            return !(video.ThumbUrl.Value.IsNullOrEmpty() || video.ThumbUrl.Value == deletedVideoUrl);
         }
 
         /// <summary>
@@ -94,10 +94,10 @@ namespace Niconicome.Models.Network
 
             lock (this.lockObj)
             {
-                if (!this.niconicoIDs.Any(id => id == video.NiconicoId))
+                if (!this.niconicoIDs.Any(id => id == video.NiconicoId.Value))
                 {
-                    this.thumbConfigs.Enqueue(new ThumbConfig() { NiconicoID = video.NiconicoId, Url = video.ThumbUrl, Overwrite = overwrite });
-                    this.niconicoIDs.Add(video.NiconicoId);
+                    this.thumbConfigs.Enqueue(new ThumbConfig() { NiconicoID = video.NiconicoId.Value, Url = video.ThumbUrl.Value, Overwrite = overwrite });
+                    this.niconicoIDs.Add(video.NiconicoId.Value);
                 }
             }
 
@@ -149,7 +149,7 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public bool HasThumbnailCache(IListVideoInfo video)
         {
-            return this.cacheHandler.HasCache(video.NiconicoId, CacheType.Thumbnail);
+            return this.cacheHandler.HasCache(video.NiconicoId.Value, CacheType.Thumbnail);
         }
 
         private class ThumbConfig

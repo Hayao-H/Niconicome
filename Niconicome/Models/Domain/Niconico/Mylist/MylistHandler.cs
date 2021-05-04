@@ -123,14 +123,16 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
         {
             var converted = new List<IListVideoInfo>();
 
-            converted.AddRange(source.Select(video => new BindableListVIdeoInfo()
+            converted.AddRange(source.Select(video =>
             {
-                Title = video.Title,
-                UploadedOn = video.RegisteredAt,
-                NiconicoId = video.Id,
-                LargeThumbUrl = video.Thumbnail.LargeUrl.IsNullOrEmpty() ? video.Thumbnail.Url : video.Thumbnail.LargeUrl,
-                ThumbUrl = video.Thumbnail.MiddleUrl.IsNullOrEmpty() ? video.Thumbnail.Url : video.Thumbnail.MiddleUrl,
+                var v = new NonBindableListVideoInfo();
 
+                v.UploadedOn.Value = video.RegisteredAt;
+                v.NiconicoId.Value = video.Id;
+                v.LargeThumbUrl.Value = video.Thumbnail.LargeUrl.IsNullOrEmpty() ? video.Thumbnail.Url : video.Thumbnail.LargeUrl;
+                v.ThumbUrl.Value = video.Thumbnail.MiddleUrl.IsNullOrEmpty() ? video.Thumbnail.Url : video.Thumbnail.MiddleUrl;
+                v.Title.Value = video.Title;
+                return v;
             }).ToList());
 
             return converted;

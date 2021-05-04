@@ -174,7 +174,7 @@ namespace Niconicome.Models.Network
                 IsSucceeded = true,
                 Data = searchResult.Videos?.Select(v =>
                 {
-                    var lVIdeo = new BindableListVIdeoInfo();
+                    var lVIdeo = new NonBindableListVideoInfo();
                     this.converter.ConvertDomainVideoInfoToListVideoInfo(lVIdeo, v);
                     return lVIdeo;
                 }),

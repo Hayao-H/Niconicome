@@ -112,12 +112,12 @@ namespace Niconicome.Models.Local.External
         /// <returns></returns>
         private IAttemptResult OpenPlayer(string appPath, IListVideoInfo videoInfo)
         {
-            var folderPath = this.current.SelectedPlaylist?.Folderpath;
+            var folderPath = this.current.SelectedPlaylist.Value?.Folderpath;
 
-            if (!videoInfo.IsDownloaded || videoInfo.FileName.IsNullOrEmpty()) return new AttemptResult() { Message = $"{videoInfo.NiconicoId}はダウンロードされていません。", };
+            if (!videoInfo.IsDownloaded.Value || videoInfo.FileName.Value.IsNullOrEmpty()) return new AttemptResult() { Message = $"{videoInfo.NiconicoId.Value}はダウンロードされていません。", };
             if (folderPath is null) return new AttemptResult() { Message = "フォルダーパスが設定されていません。" };
 
-            var path = Path.Combine(folderPath, videoInfo.FileName)
+            var path = Path.Combine(folderPath, videoInfo.FileName.Value)
                 .Replace(@"\\?\", string.Empty)
                 ;
             return this.commandExecuter.Execute(appPath, $"\"{path}\"");
@@ -133,9 +133,9 @@ namespace Niconicome.Models.Local.External
         private IAttemptResult SendToAppCommand(string appPath, string argBase, IListVideoInfo videoInfo)
         {
             var constructedArg = argBase
-                .Replace("<url>", Net.NiconicoWatchUrl + videoInfo.NiconicoId)
-                .Replace("<url:short>", Net.NiconicoShortUrl + videoInfo.NiconicoId)
-                .Replace("<id>", videoInfo.NiconicoId)
+                .Replace("<url>", Net.NiconicoWatchUrl + videoInfo.NiconicoId.Value)
+                .Replace("<url:short>", Net.NiconicoShortUrl + videoInfo.NiconicoId.Value)
+                .Replace("<id>", videoInfo.NiconicoId.Value)
                 ;
 
             return this.commandExecuter.Execute(appPath, constructedArg);

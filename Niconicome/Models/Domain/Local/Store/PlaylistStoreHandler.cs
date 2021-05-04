@@ -413,7 +413,7 @@ namespace Niconicome.Models.Domain.Local.Store
 
             if (playlist!.Videos is null) playlist.Videos = new List<STypes.Video>();
 
-            if (playlist.Videos.Any(v => v.NiconicoId == videoData.NiconicoId)) return -1;
+            if (playlist.Videos.Any(v => v.NiconicoId == videoData.NiconicoId.Value)) return -1;
 
             playlist.Videos.Add(video);
 

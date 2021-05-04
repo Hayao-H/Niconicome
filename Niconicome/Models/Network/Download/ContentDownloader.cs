@@ -14,6 +14,9 @@ using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
+using Niconicome.ViewModels;
+using Reactive.Bindings;
+using Reactive.Bindings.Binding;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Download = Niconicome.Models.Domain.Niconico.Download;
@@ -26,9 +29,8 @@ namespace Niconicome.Models.Network.Download
     {
         Task<INetworkResult?> DownloadVideos();
         Task<INetworkResult?> DownloadVideosFriendly(Action<string> onMessage, Action<string> onMessageShort);
-        bool CanDownload { get; }
+        ReactiveProperty<bool> CanDownload { get; }
         void Cancel();
-        event EventHandler? CanDownloadChange;
     }
 
     public interface IDownloadSettings
@@ -93,10 +95,10 @@ namespace Niconicome.Models.Network.Download
     /// <summary>
     /// DL実処理
     /// </summary>
-    class ContentDownloader : IContentDownloader
+    class ContentDownloader : BindableBase, IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer,IContentDownloadHelper downloadHelper)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -151,9 +153,9 @@ namespace Niconicome.Models.Network.Download
                 return new NetworkResult();
             }
 
-            await this.parallelTasksHandler.ProcessTasksAsync(() => this.RaiseCanDownloadChange());
+            await this.parallelTasksHandler.ProcessTasksAsync(() => this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing);
 
-            this.RaiseCanDownloadChange();
+            this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
 
             return this.CurrentResult;
 
@@ -190,8 +192,8 @@ namespace Niconicome.Models.Network.Download
             {
                 if (result?.FirstVideo is not null)
                 {
-                    onMessage($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
-                    onMessageShort($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                    onMessage($"{result.FirstVideo.NiconicoId.Value}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                    onMessageShort($"{result.FirstVideo.NiconicoId.Value}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
 
                     if (!result.IsSucceededAll)
                     {
@@ -203,8 +205,8 @@ namespace Niconicome.Models.Network.Download
             {
                 if (result?.FirstVideo is not null)
                 {
-                    onMessage($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
-                    onMessageShort($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
+                    onMessage($"{result.FirstVideo.NiconicoId.Value}をダウンロードしました。");
+                    onMessageShort($"{result.FirstVideo.NiconicoId.Value}をダウンロードしました。");
                 }
             }
             else
@@ -219,12 +221,7 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// DL可能フラグ
         /// </summary>
-        public bool CanDownload { get => !this.parallelTasksHandler.IsProcessing; }
-
-        /// <summary>
-        /// DL可能フラグ変更イベント
-        /// </summary>
-        public event EventHandler? CanDownloadChange;
+        public ReactiveProperty<bool> CanDownload { get; init; } = new(true);
 
         /// <summary>
         /// ダウンロードをキャンセル
@@ -233,6 +230,7 @@ namespace Niconicome.Models.Network.Download
         {
             this.parallelTasksHandler.CancellAllTasks();
             this.downloadTasksHandler.DownloadTaskPool.Clear();
+            this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
         }
 
         #region private
@@ -301,9 +299,9 @@ namespace Niconicome.Models.Network.Download
                         {
                             if (!downloadResult.VideoFileName.IsNullOrEmpty())
                             {
-                                video.FileName = downloadResult.VideoFileName;
+                                video.FileName.Value = downloadResult.VideoFileName;
                             }
-                            BindableListVIdeoInfo.SetData(video, downloadResult.VideoInfo);
+                            NonBindableListVideoInfo.SetData(video, downloadResult.VideoInfo);
                             this.videoHandler.Update(video);
                         }
                         this.videoListContainer.Uncheck(task.VideoID, task.PlaylistID);
@@ -342,14 +340,6 @@ namespace Niconicome.Models.Network.Download
             }
         }
 
-        /// <summary>
-        /// DL可能フラグ変更イベントを発火させる
-        /// </summary>
-        private void RaiseCanDownloadChange()
-        {
-            this.CanDownloadChange?.Invoke(this, EventArgs.Empty);
-        }
-
         #endregion
     }
 
@@ -366,7 +356,7 @@ namespace Niconicome.Models.Network.Download
 
         public string? VideoFileName { get; set; }
 
-        public IListVideoInfo VideoInfo { get; set; } = new BindableListVIdeoInfo();
+        public IListVideoInfo VideoInfo { get; set; } = new NonBindableListVideoInfo();
 
         public uint VideoVerticalResolution { get; set; }
 

@@ -26,11 +26,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             };
 
 
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.IsRemotePlaylist)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.IsRemotePlaylist)
             {
-                this.idField = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteId;
+                this.idField = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteId;
 
-                this.currentSettingField = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.RemoteType switch
+                this.currentSettingField = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteType switch
                 {
                     Playlist::RemoteType.Mylist => mylist,
                     Playlist::RemoteType.UserVideos => userVideo,
@@ -52,7 +52,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                 if (arg is null) return;
 
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null) return;
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null) return;
 
 
                 if (arg is Window window)
@@ -70,7 +70,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     this.OnPropertyChanged(messagePropName);
 
                     var videos = new List<Playlist::IListVideoInfo>();
-                    int playlistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Id;
+                    int playlistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
 
                     this.Message = "情報を取得中です...";
 

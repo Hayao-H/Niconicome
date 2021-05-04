@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Local.State
 {
     public interface IMessageHandler
     {
-        string Message { get; }
+        ReactiveProperty<string> Message { get; }
         void AppendMessage(string message);
         void ClearMessage();
         void AddChangeHandler(Action handler);
@@ -19,11 +20,14 @@ namespace Niconicome.Models.Local.State
 
         private readonly List<Action> changeEventHandlers = new();
 
+
         /// <summary>
         /// イベントを発火する
         /// </summary>
         private void OnMessageChanged()
         {
+            this.Message.Value = this.messagefield.ToString();
+
             foreach (var handler in this.changeEventHandlers)
             {
                 handler();
@@ -52,10 +56,7 @@ namespace Niconicome.Models.Local.State
         /// <summary>
         /// メッセージ
         /// </summary>
-        public string Message
-        {
-            get => this.messagefield.ToString();
-        }
+        public ReactiveProperty<string> Message { get; init; } = new();
 
         /// <summary>
         /// メッセージを追加する

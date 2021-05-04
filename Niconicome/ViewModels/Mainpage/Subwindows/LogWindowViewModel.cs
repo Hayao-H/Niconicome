@@ -1,50 +1,102 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Xaml.Behaviors;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows
 {
-    class LogWindowViewModel:BindableBase
+    class LogWindowViewModel : BindableBase, IDisposable
     {
         public LogWindowViewModel()
         {
-            WS::Mainpage.Messagehandler.AddChangeHandler(() => this.OnPropertyChanged(nameof(this.Message)));
+            this.disposables = new CompositeDisposable();
 
-            this.CopyMessageCommand = new CommandBase<object>(_ => true, _ =>
-            {
-                try
+            this.Message = WS::Mainpage.Messagehandler.Message.ToReactiveProperty().AddTo(this.disposables);
+
+            this.CopyMessageCommand = new ReactiveCommand()
+                .WithSubscribe(() =>
                 {
-                    Clipboard.SetText(this.Message);
-                }
-                catch { }
-            });
+                    try
+                    {
+                        Clipboard.SetText(this.Message.Value);
+                    }
+                    catch { }
+                }).AddTo(this.disposables);
 
-            this.ClearMessageCommand = new CommandBase<object>(_ => true, _ =>
-              {
-                  WS::Mainpage.Messagehandler.ClearMessage();
-              });
+            this.ClearMessageCommand = new ReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    try
+                    {
+                        WS::Mainpage.Messagehandler.ClearMessage();
+
+                    }
+                    catch { }
+                }).AddTo(this.disposables);
+        }
+
+        ~LogWindowViewModel()
+        {
+            this.Dispose();
         }
 
         /// <summary>
         /// 出力
-        /// </summary>
-        public string Message { get => WS::Mainpage.Messagehandler.Message; }
+        /// </summary>        
+        public ReactiveProperty<string?> Message { get; init; }
+
 
         /// <summary>
         /// 出力をコピー
         /// </summary>
-        public CommandBase<object> CopyMessageCommand { get; init; }
+        public ReactiveCommand CopyMessageCommand { get; init; } = new();
+
 
         /// <summary>
         /// 出力をクリア
         /// </summary>
-        public CommandBase<object> ClearMessageCommand { get; init; }
+        public ReactiveCommand ClearMessageCommand { get; init; } = new();
+
+        /// <summary>
+        /// インスタンスを破棄
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.hasDisposed) return;
+            this.disposables.Dispose();
+            this.hasDisposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        #region private
+
+        private readonly CompositeDisposable disposables;
+
+        private bool hasDisposed;
+        #endregion
+
+    }
+
+    /// <summary>
+    /// デザイナー用のVM
+    /// </summary>
+    public class LogWindowViewModelD
+    {
+        public LogWindowViewModelD()
+        {
+            this.Message = new ReactiveProperty<string?>();
+            this.Message.Value = "初期化済み";
+        }
+
+        public ReactiveProperty<string?> Message { get; init; }
+
+        public ReactiveCommand CopyMessageCommand { get; init; } = new();
+
+        public ReactiveCommand ClearMessageCommand { get; init; } = new();
     }
 
     class LogWindowBehavior : Behavior<TextBox>

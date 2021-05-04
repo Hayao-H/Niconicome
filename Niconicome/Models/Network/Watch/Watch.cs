@@ -42,7 +42,7 @@ namespace Niconicome.Models.Network.Watch
 
     public class Watch : IWatch
     {
-        public Watch(IWatchInfohandler handler, ILogger logger,IDomainModelConverter converter)
+        public Watch(IWatchInfohandler handler, ILogger logger, IDomainModelConverter converter)
         {
             this.handler = handler;
             this.logger = logger;
@@ -171,25 +171,24 @@ namespace Niconicome.Models.Network.Watch
         /// <returns></returns>
         public IListVideoInfo ConvertToTreeVideoInfo()
         {
-            return new BindableListVIdeoInfo()
-            {
-                Title = this.Title,
-                NiconicoId = this.Id,
-                UploadedOn = this.UploadedOn,
-                LargeThumbUrl = this.LargeThumbUri.AbsoluteUri,
-                ThumbUrl = this.ThumbUri.AbsoluteUri,
-                Tags = this.Tags,
-                ViewCount = this.ViewCount,
-                FileName = this.FileName,
-                ChannelID = this.ChannelID,
-                ChannelName = this.ChannelName,
-                MylistCount = this.MylistCount,
-                CommentCount = this.CommentCount,
-                LikeCount = this.LikeCount,
-                OwnerID = this.OwnerID,
-                Duration = this.Duration,
-                OwnerName = this.OwnerName,
-            };
+            var video = new NonBindableListVideoInfo();
+            video.Title.Value = this.Title;
+            video.NiconicoId.Value = this.Id;
+            video.UploadedOn.Value = this.UploadedOn;
+            video.LargeThumbUrl.Value = this.LargeThumbUri.AbsoluteUri;
+            video.ThumbUrl.Value = this.ThumbUri.AbsoluteUri;
+            video.Tags = this.Tags;
+            video.ViewCount.Value = this.ViewCount;
+            video.FileName.Value = this.FileName;
+            video.ChannelID.Value = this.ChannelID;
+            video.ChannelName.Value = this.ChannelName;
+            video.MylistCount.Value = this.MylistCount;
+            video.CommentCount.Value = this.CommentCount;
+            video.LikeCount.Value = this.LikeCount;
+            video.OwnerID.Value = this.OwnerID;
+            video.Duration.Value = this.Duration;
+            video.OwnerName.Value = this.OwnerName;
+            return video;
         }
 
     }

@@ -25,35 +25,35 @@ namespace Niconicome.Models.Network.Watch
         {
 
             //タイトル
-            info.Title = domainVideoInfo.Title;
+            info.Title.Value = domainVideoInfo.Title;
 
             //ID
-            info.NiconicoId = domainVideoInfo.Id;
+            info.NiconicoId.Value = domainVideoInfo.Id;
 
             //タグ
             info.Tags = domainVideoInfo.Tags;
 
             //再生回数
-            info.ViewCount = domainVideoInfo.ViewCount;
-            info.CommentCount = domainVideoInfo.CommentCount;
-            info.MylistCount = domainVideoInfo.MylistCount;
-            info.LikeCount = domainVideoInfo.LikeCount;
+            info.ViewCount.Value = domainVideoInfo.ViewCount;
+            info.CommentCount.Value = domainVideoInfo.CommentCount;
+            info.MylistCount.Value = domainVideoInfo.MylistCount;
+            info.LikeCount.Value = domainVideoInfo.LikeCount;
 
             //チャンネル情報
-            info.ChannelID = domainVideoInfo.ChannelID;
-            info.ChannelName = domainVideoInfo.ChannelName;
+            info.ChannelID.Value = domainVideoInfo.ChannelID;
+            info.ChannelName.Value = domainVideoInfo.ChannelName;
 
             //投稿者情報
-            info.OwnerID = domainVideoInfo.OwnerID;
-            info.OwnerName = domainVideoInfo.Owner;
+            info.OwnerID.Value = domainVideoInfo.OwnerID;
+            info.OwnerName.Value = domainVideoInfo.Owner;
 
             //再生時間
-            info.Duration = domainVideoInfo.Duration;
+            info.Duration.Value = domainVideoInfo.Duration;
 
             //投稿日時
             if (domainVideoInfo.DmcInfo is not null)
             {
-                info.UploadedOn = domainVideoInfo.DmcInfo.UploadedOn;
+                info.UploadedOn.Value = domainVideoInfo.DmcInfo.UploadedOn;
             }
 
             //サムネイル
@@ -61,12 +61,12 @@ namespace Niconicome.Models.Network.Watch
             {
                 if (!domainVideoInfo.DmcInfo.ThumbInfo.Large.IsNullOrEmpty())
                 {
-                    info.ThumbUrl = domainVideoInfo.DmcInfo.ThumbInfo.Large;
+                    info.ThumbUrl.Value = domainVideoInfo.DmcInfo.ThumbInfo.Large;
                 }
 
                 if (!domainVideoInfo.DmcInfo.ThumbInfo.Normal.IsNullOrEmpty())
                 {
-                    info.ThumbUrl = domainVideoInfo.DmcInfo.ThumbInfo.Normal;
+                    info.ThumbUrl.Value = domainVideoInfo.DmcInfo.ThumbInfo.Normal;
                 }
             }
 

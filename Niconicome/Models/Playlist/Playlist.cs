@@ -681,7 +681,7 @@ namespace Niconicome.Models.Playlist
         {
             if (this.Videos is null) return false;
 
-            return this.Videos.Any(v => v.NiconicoId == niconicoId);
+            return this.Videos.Any(v => v.NiconicoId.Value == niconicoId);
         }
 
         /// <summary>

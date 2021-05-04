@@ -141,7 +141,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = true;
                         result.VideoFileName = vResult.VideoFileName ?? string.Empty;
-                        result.VideoInfo.FileName = vResult.VideoFileName ?? string.Empty;
+                        result.VideoInfo.FileName.Value = vResult.VideoFileName ?? string.Empty;
                         result.VideoVerticalResolution = vResult.VideoVerticalResolution;
                     }
                 }

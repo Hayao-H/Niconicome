@@ -19,10 +19,10 @@ namespace Niconicome.ViewModels.Setting.Pages
             var openInPlayerB = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.OpenInPlayerB, "アプリで開く(B)");
             var sendToAppA = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.SendToAppA, "アプリに送る(A)");
             var sendToAppB = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.SendToAppB, "アプリに送る(B)");
-            //var download = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.Download, "ダウンロードする");
+            var download = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.Download, "ダウンロードする");
             var none = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.NotConfigured, "何もしない");
 
-            this.SelectableVideodbClickAction = new List<ComboboxItem<VideodbClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, };
+            this.SelectableVideodbClickAction = new List<ComboboxItem<VideodbClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download };
             var settingdbClickvalue = WS::SettingPage.EnumSettingsHandler.GetSetting<VideodbClickSettings>();
             this.videodbClickActionField = settingdbClickvalue switch
             {
@@ -30,7 +30,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                 VideodbClickSettings.OpenInPlayerB => openInPlayerB,
                 VideodbClickSettings.SendToAppA => sendToAppA,
                 VideodbClickSettings.SendToAppB => sendToAppB,
-                //VideodbClickSettings.Download => download,
+                VideodbClickSettings.Download => download,
                 _ => none,
             };
             #endregion

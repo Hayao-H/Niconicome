@@ -7,6 +7,7 @@ using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist;
+using Reactive.Bindings;
 using Search = Niconicome.Models.Domain.Niconico.Search;
 
 namespace Niconicome.Models.Network
@@ -15,8 +16,7 @@ namespace Niconicome.Models.Network
     {
         Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose);
         Task<INetworkResult> TryGetVideoListInfosAsync(List<IListVideoInfo> videos, string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose);
-        bool IsProcessing { get; }
-        event EventHandler? StateChange;
+        ReactiveProperty<bool> IsProcessing { get; }
     }
 
     class VideoIDHandler : IVideoIDHandler
@@ -37,25 +37,10 @@ namespace Niconicome.Models.Network
 
         private readonly IRemotePlaylistHandler remotePlaylistHandler;
 
-        private bool isProcessingField;
-
         /// <summary>
         /// 処理中フラグ
         /// </summary>
-        public bool IsProcessing
-        {
-            get => this.isProcessingField;
-            private set
-            {
-                this.isProcessingField = value;
-                this.RaiseStatechange();
-            }
-        }
-
-        /// <summary>
-        /// 状態変更イベント
-        /// </summary>
-        public event EventHandler? StateChange;
+        public ReactiveProperty<bool> IsProcessing { get; init; } = new(false);
 
         /// <summary>
         /// 動画情報を取得する
@@ -66,7 +51,7 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose)
         {
-            this.IsProcessing = true;
+            this.IsProcessing.Value = true;
 
             inputText = inputText.Trim();
             var videos = new List<IListVideoInfo>();
@@ -76,7 +61,7 @@ namespace Niconicome.Models.Network
                 onMessage("ローカルディレクトリーから動画を取得します");
                 var retlieved = await this.GetVideoListInfosFromLocalPath(inputText);
                 videos.AddRange(retlieved);
-                this.IsProcessing = false;
+                this.IsProcessing.Value = false;
                 return videos;
             }
             else if (inputText.StartsWith("http"))
@@ -93,13 +78,13 @@ namespace Niconicome.Models.Network
                     {
                         onMessage("検索URLの解析に失敗しました");
                         onMessageVerbose($"検索URLの解析に失敗しました(詳細:{e.Message})");
-                        this.IsProcessing = false;
+                        this.IsProcessing.Value = false;
                         return videos;
                     }
 
                     var retlieved = await this.GetVideoListInfosFromSearchResult(query, onMessageVerbose);
                     videos.AddRange(retlieved);
-                    this.IsProcessing = false;
+                    this.IsProcessing.Value = false;
                     return videos;
                 }
                 else
@@ -116,7 +101,7 @@ namespace Niconicome.Models.Network
                         onMessage("ネットワークから動画を取得します");
                         var retlieved = await this.GetVideoListInfosFromRemote(registeredVideos, type, id, (m) => onMessageVerbose(m));
                         videos.AddRange(retlieved);
-                        this.IsProcessing = false;
+                        this.IsProcessing.Value = false;
                         return videos;
                     }
                 }
@@ -128,7 +113,7 @@ namespace Niconicome.Models.Network
                 onMessage("IDを登録します");
                 var retlievedId = await this.GetVideoListInfosFromID(inputText);
                 videos.AddRange(retlievedId);
-                this.IsProcessing = false;
+                this.IsProcessing.Value = false;
                 return videos;
             }
             else
@@ -136,7 +121,7 @@ namespace Niconicome.Models.Network
                 onMessage("動画を検索します");
                 var retlievedId = await this.GetVideoListInfosFromSearchResult(inputText, onMessageVerbose);
                 videos.AddRange(retlievedId);
-                this.IsProcessing = false;
+                this.IsProcessing.Value = false;
                 return videos;
             }
 
@@ -171,14 +156,6 @@ namespace Niconicome.Models.Network
             return new NetworkResult();
 
 
-        }
-
-        /// <summary>
-        /// 状態変更イベントを発火させる
-        /// </summary>
-        private void RaiseStatechange()
-        {
-            this.StateChange?.Invoke(this, EventArgs.Empty);
         }
 
         #region 内部処理
