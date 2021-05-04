@@ -3,6 +3,7 @@ using Niconicome.Extensions.System;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist.VideoList;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 
@@ -45,7 +46,22 @@ namespace Niconicome.Models.Network.Download
             this.IsOverwriteEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLOverwrite));
             this.IsSkippingEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLSkip));
             this.IsCopyFromAnotherFolderEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLCopy));
+            this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount));
             this.MaxCommentsCount = new ReactiveProperty<int>(this.settingHandler.GetIntSetting(SettingsEnum.MaxCommentsCount));
+
+            this.IsDownloadingVideoInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideoInfo));
+            this.IsDownloadingVideoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideo));
+            this.IsDownloadingCommentEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLComment));
+            this.IsDownloadingCommentLogEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLKako));
+            this.IsDownloadingEasyComment.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLEasy));
+            this.IsDownloadingThumbEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLThumb));
+            this.IsDownloadingOwnerComment.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLOwner));
+            this.IsOverwriteEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLOverwrite));
+            this.IsSkippingEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLSkip));
+            this.IsCopyFromAnotherFolderEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLCopy));
+            this.IsLimittingCommentCountEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.LimitCommentsCount));
+            this.MaxCommentsCount.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.MaxCommentsCount));
+
             this.Resolution = new ReactiveProperty<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"));
         }
 
@@ -96,62 +112,62 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// 動画DL
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingVideoEnable { get; init; } 
+        public ReactiveProperty<bool> IsDownloadingVideoEnable { get; init; }
 
         /// <summary>
         /// コメントDL
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingCommentEnable { get; init; } 
+        public ReactiveProperty<bool> IsDownloadingCommentEnable { get; init; }
 
         /// <summary>
         /// 過去ログ
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingCommentLogEnable { get; init; } 
+        public ReactiveProperty<bool> IsDownloadingCommentLogEnable { get; init; }
 
         /// <summary>
         /// 投コメ
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingOwnerComment { get; init; } 
+        public ReactiveProperty<bool> IsDownloadingOwnerComment { get; init; }
 
         /// <summary>
         /// かんたんコメント
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingEasyComment { get; init; } 
+        public ReactiveProperty<bool> IsDownloadingEasyComment { get; init; }
 
         /// <summary>
         /// サムネ
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingThumbEnable { get; init; } 
+        public ReactiveProperty<bool> IsDownloadingThumbEnable { get; init; }
 
         /// <summary>
         /// 上書き
         /// </summary>
-        public ReactiveProperty<bool> IsOverwriteEnable { get; init; } 
+        public ReactiveProperty<bool> IsOverwriteEnable { get; init; }
 
         /// <summary>
         /// DL済みをスキップ
         /// </summary>
-        public ReactiveProperty<bool> IsSkippingEnable { get; init; } 
+        public ReactiveProperty<bool> IsSkippingEnable { get; init; }
 
         /// <summary>
         /// 他フォルダーからコピー
         /// </summary>
-        public ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; init; } 
+        public ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; init; }
 
         /// <summary>
         /// 最大コメ数
         /// </summary>
-        public ReactiveProperty<bool> IsLimittingCommentCountEnable { get; init; } 
+        public ReactiveProperty<bool> IsLimittingCommentCountEnable { get; init; }
 
         /// <summary>
         /// 動画情報
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; init; } 
+        public ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; init; }
 
         /// <summary>
         /// 最大コメ数
         /// </summary>
-        public ReactiveProperty<int> MaxCommentsCount { get; init; } 
+        public ReactiveProperty<int> MaxCommentsCount { get; init; }
 
         /// <summary>
         /// 解像度

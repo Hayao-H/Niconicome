@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Network.Download;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Reactive.Bindings;
 using Material = MaterialDesignThemes.Wpf;
 using WS = Niconicome.Workspaces;
 
@@ -20,25 +22,28 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.TaskPoolChange += this.OnStagedTaskChanged;
             WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.TaskPoolChange += this.OnTaskChanged;
 
-            WS::Mainpage.Videodownloader.CanDownloadChange += this.OnCandownloadChanged;
-
             this.RefreshTask(TaskPoolType.Download);
             this.RefreshTask(TaskPoolType.Staged);
 
             this.RefreshStagedTaskCommand = new CommandBase<object>(_ => true, _ => this.RefreshTask(TaskPoolType.Staged));
             this.RefreshTaskCommand = new CommandBase<object>(_ => true, _ => this.RefreshTask(TaskPoolType.Download));
 
-            this.StartDownloadCommand = new CommandBase<object>(_ => WS::Mainpage.Videodownloader.CanDownload, async _ =>
-            {
-                await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.Queue.Enqueue(m));
-            });
+            this.StartDownloadCommand = WS::Mainpage.Videodownloader.CanDownload
+            .ToReactiveCommand()
+            .WithSubscribe(async () =>
+           {
+               await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.Queue.Enqueue(m));
+           });
 
-            this.CancelDownloadCommand = new CommandBase<object>(_ => !WS::Mainpage.Videodownloader.CanDownload, _ =>
-            {
-                WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.CancelAllTasks();
-                this.Queue.Enqueue("ユーザーによってダウンロードがキャンセルされました。");
-                WS::Mainpage.Messagehandler.AppendMessage("ユーザーによってダウンロードがキャンセルされました。");
-            });
+            this.CancelDownloadCommand = WS::Mainpage.Videodownloader.CanDownload
+                .Select(f => !f)
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.CancelAllTasks();
+                    this.Queue.Enqueue("ユーザーによってダウンロードがキャンセルされました。");
+                    WS::Mainpage.Messagehandler.AppendMessage("ユーザーによってダウンロードがキャンセルされました。");
+                });
 
             this.ClearStagedCommand = new CommandBase<object>(_ => true, _ =>
             {
@@ -68,7 +73,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         {
             WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.TaskPoolChange -= this.OnStagedTaskChanged;
             WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.TaskPoolChange -= this.OnTaskChanged;
-            WS::Mainpage.Videodownloader.CanDownloadChange -= this.OnCandownloadChanged;
         }
 
         private bool displayCanceledField;
@@ -114,17 +118,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         }
 
         /// <summary>
-        /// DL可能フラグ変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnCandownloadChanged(object? sender, EventArgs e)
-        {
-            this.StartDownloadCommand.RaiseCanExecutechanged();
-            this.CancelDownloadCommand.RaiseCanExecutechanged();
-        }
-
-        /// <summary>
         /// キャンセル済みを表示
         /// </summary>
         public bool DisplayCanceled { get => this.displayCanceledField; set => this.SetProperty(ref this.displayCanceledField, value); }
@@ -147,12 +140,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// DLを開始
         /// </summary>
-        public CommandBase<object> StartDownloadCommand { get; init; }
+        public ReactiveCommand StartDownloadCommand { get; init; }
 
         /// <summary>
         /// DLを中止
         /// </summary>
-        public CommandBase<object> CancelDownloadCommand { get; init; }
+        public ReactiveCommand CancelDownloadCommand { get; init; }
 
         /// <summary>
         /// ステージング済みをクリア
@@ -364,9 +357,9 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         public CommandBase<object> RefreshStagedTaskCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
 
-        public CommandBase<object> StartDownloadCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+        public ReactiveCommand StartDownloadCommand { get; init; } = new();
 
-        public CommandBase<object> CancelDownloadCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+        public ReactiveCommand CancelDownloadCommand { get; init; } = new();
 
         public CommandBase<object> ClearStagedCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
 

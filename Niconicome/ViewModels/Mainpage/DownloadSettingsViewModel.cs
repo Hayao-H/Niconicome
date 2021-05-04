@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading;
-using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Local.Settings;
-using Niconicome.Models.Network.Download;
-using Niconicome.Models.Playlist;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Niconicome.Views;
 using Reactive.Bindings;
@@ -14,13 +13,10 @@ using Reactive.Bindings.Extensions;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 using WS = Niconicome.Workspaces;
-
 namespace Niconicome.ViewModels.Mainpage
 {
-    class DownloadSettingsViewModel : ConfigurableBase
+    class DownloadSettingsViewModel : ConfigurableBase, IDisposable
     {
-
-
         public DownloadSettingsViewModel()
         {
             this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value);
@@ -36,8 +32,6 @@ namespace Niconicome.ViewModels.Mainpage
             this.IsCopyFromAnotherFolderEnable = WS::Mainpage.DownloadSettingsHandler.IsCopyFromAnotherFolderEnable.ToReactivePropertyAsSynchronized(x => x.Value);
             this.MaxCommentsCount = WS::Mainpage.DownloadSettingsHandler.MaxCommentsCount.ToReactivePropertyAsSynchronized(x => x.Value);
 
-            WS::Mainpage.Videodownloader.CanDownloadChange += this.OnCanDownloadChange;
-
             var s1 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"), "1080px");
             var s2 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("1280x720"), "720px");
             var s3 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("854x480"), "480px");
@@ -45,6 +39,7 @@ namespace Niconicome.ViewModels.Mainpage
             var s5 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("426x240"), "240px");
 
             this.Resolutions = new List<ComboboxItem<VideoInfo::IResolution>>() { s1, s2, s3, s4, s5 };
+
             this.SelectedResolution = WS::Mainpage.DownloadSettingsHandler.Resolution
                 .ToReactivePropertyAsSynchronized(
                 x => x.Value,
@@ -56,13 +51,28 @@ namespace Niconicome.ViewModels.Mainpage
                     360 => s4,
                     240 => s5,
                     _ => s1
-                }, x => x.Value);
+                }, x => x.Value)
+                .AddTo(this.disposables);
+
+            this.disposables = new CompositeDisposable();
 
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
-            this.DownloadCommand = new CommandBase<object>(_ => this.playlist is not null && !this.IsDownloading, async _ =>
+            this.IsDownloading = WS::Mainpage.Videodownloader.CanDownload
+                .ToReactivePropertyAsSynchronized(x => x.Value, x => !x, x => !x)
+                .AddTo(this.disposables);
+
+            this.DownloadCommand = new[] {
+                WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(p=>p is not null),
+                WS::Mainpage.Videodownloader.CanDownload
+            }
+            .CombineLatestValuesAreAllTrue()
+            .ToReactiveCommand()
+            .WithSubscribe(
+            async () =>
                {
-                   if (this.playlist is null)
+                   if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                    {
                        this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
                        return;
@@ -102,17 +112,21 @@ namespace Niconicome.ViewModels.Mainpage
                    }
                    else
                    {
-                       WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == this.playlist.Id);
+                       WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
                    }
 
                    await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
 
 
-               });
+               })
+            .AddTo(this.disposables);
 
-            this.StageVideosCommand = new CommandBase<object>(_ => true, _ =>
+            this.StageVideosCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(p => p is not null)
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
             {
-                if (this.playlist is null)
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                 {
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ステージできません");
                     return;
@@ -140,42 +154,43 @@ namespace Niconicome.ViewModels.Mainpage
                     var windows = new DownloadTasksWindows();
                     windows.Show();
                 });
-            });
+            })
+            .AddTo(this.disposables);
 
-            this.CancelCommand = new CommandBase<object>(_ => this.IsDownloading, _ =>
+            this.CancelCommand = this.IsDownloading
+            .ToReactiveCommand()
+            .WithSubscribe(() =>
             {
                 WS::Mainpage.Videodownloader.Cancel();
-            });
-
-            WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Subscribe(_ => this.OnSelectedChanged());
+            })
+            .AddTo(this.disposables);
         }
 
         ~DownloadSettingsViewModel()
         {
-            WS::Mainpage.Videodownloader.CanDownloadChange -= this.OnCanDownloadChange;
+            this.Dispose();
         }
 
-        private ITreePlaylistInfo? playlist;
 
         /// <summary>
         /// ダウンロードフラグ
         /// </summary>
-        public bool IsDownloading { get => !WS::Mainpage.Videodownloader.CanDownload; }
+        public ReactiveProperty<bool> IsDownloading { get; init; }
 
         /// <summary>
         /// 動画をダウンロードする
         /// </summary>
-        public CommandBase<object> DownloadCommand { get; init; }
+        public ReactiveCommand DownloadCommand { get; init; }
 
         /// <summary>
         /// ダウンロードをキャンセルする
         /// </summary>
-        public CommandBase<object> CancelCommand { get; init; }
+        public ReactiveCommand CancelCommand { get; init; }
 
         /// <summary>
         /// ステージする
         /// </summary>
-        public CommandBase<object> StageVideosCommand { get; init; }
+        public ReactiveCommand StageVideosCommand { get; init; }
 
         /// <summary>
         /// 動画ダウンロードフラグ
@@ -253,25 +268,20 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; }
 
-        private void RaiseCanExecuteChange()
+        /// <summary>
+        /// インスタンスを破棄する
+        /// </summary>
+        public void Dispose()
         {
-            this.DownloadCommand.RaiseCanExecutechanged();
-            this.CancelCommand.RaiseCanExecutechanged();
+            if (this.hasDIsposed) return;
+            this.disposables.Dispose();
+            this.hasDIsposed = true;
+            GC.SuppressFinalize(this);
         }
 
-        private void OnSelectedChanged()
-        {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
-            {
-                this.playlist = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value;
-                this.RaiseCanExecuteChange();
-            }
-        }
+        private bool hasDIsposed;
 
-        private void OnCanDownloadChange(object? sender, EventArgs e)
-        {
-            this.RaiseCanExecuteChange();
-        }
+        private CompositeDisposable disposables;
     }
 
     class DownloadSettingsViewModelD
@@ -289,13 +299,13 @@ namespace Niconicome.ViewModels.Mainpage
             this.SelectedResolution = new ReactiveProperty<ComboboxItem<VideoInfo::IResolution>>(s1);
         }
 
-        public bool IsDownloading { get => false; }
+        public ReactiveProperty<bool> IsDownloading { get; init; } = new();
 
-        public CommandBase<object> DownloadCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+        public ReactiveCommand DownloadCommand { get; init; } = new();
 
-        public CommandBase<object> CancelCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+        public ReactiveCommand CancelCommand { get; init; } = new();
 
-        public CommandBase<object> StageVideosCommand { get; init; } = new CommandBase<object>(_ => true, _ => { });
+        public ReactiveCommand StageVideosCommand { get; init; } = new();
 
         public ReactiveProperty<bool> IsDownloadingVideoEnable { get; set; } = new(true);
 

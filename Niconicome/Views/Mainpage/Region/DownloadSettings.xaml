@@ -74,6 +74,6 @@
                 </DockPanel>
             </DockPanel>
         </Grid>
-        <ProgressBar Margin="2 5" IsIndeterminate="{Binding IsDownloading,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}"/>
+        <ProgressBar Margin="2 5" IsIndeterminate="{Binding IsDownloading.Value,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}"/>
     </StackPanel>
 </UserControl>
