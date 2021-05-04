@@ -64,6 +64,10 @@ namespace Niconicome.ViewModels.Mainpage
             this.isFetching = new ReactiveProperty<bool>(false);
             this.ea = ea;
 
+            //アイコン
+            this.RefreshCommandIcon = new ReactivePropertySlim<MaterialDesign.PackIconKind>(MaterialDesign::PackIconKind.Refresh);
+            this.FilterIcon = new ReactivePropertySlim<MaterialDesign.PackIconKind>(MaterialDesign::PackIconKind.Filter);
+
             //幅
             var scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
             var idWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWIDColumnWid);
@@ -114,10 +118,10 @@ namespace Niconicome.ViewModels.Mainpage
                   {
                       niconicoId = (string)arg;
                   }
-                  else if (this.InputString != string.Empty)
+                  else if (this.InputString.Value != string.Empty)
                   {
-                      niconicoId = this.InputString;
-                      this.InputString = string.Empty;
+                      niconicoId = this.InputString.Value;
+                      this.InputString.Value = string.Empty;
                   }
                   else
                   {
@@ -157,7 +161,7 @@ namespace Niconicome.ViewModels.Mainpage
               })
             .AddTo(this.disposables);
 
-            this.RemoveVideoCommand = new CommandBase<IListVideoInfo>(_ => true, async arg =>
+            this.RemoveVideoCommand = new CommandBase<VideoInfoViewModel>(_ => true, async arg =>
              {
                  if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                  {
@@ -167,14 +171,14 @@ namespace Niconicome.ViewModels.Mainpage
 
                  var targetVideos = new List<IListVideoInfo>();
 
-                 if (arg is not null && arg.AsNullable<IListVideoInfo>() is IListVideoInfo videoInfo && videoInfo is not null) targetVideos.Add(videoInfo);
+                 if (arg is not null && arg is VideoInfoViewModel videoVM) targetVideos.Add(videoVM.VideoInfo);
 
                  targetVideos.AddRange(WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value));
                  targetVideos = targetVideos.Distinct(v => v.Id).ToList();
 
                  string confirmMessage = targetVideos.Count == 1
-                 ? $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」を削除しますか？"
-                 : $"本当に「[{targetVideos[0].NiconicoId}]{targetVideos[0].Title}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
+                 ? $"本当に「[{targetVideos[0].NiconicoId.Value}]{targetVideos[0].Title.Value}」を削除しますか？"
+                 : $"本当に「[{targetVideos[0].NiconicoId.Value}]{targetVideos[0].Title.Value}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
 
 
                  var confirm = await this.showMessageBox(confirmMessage, MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
@@ -196,13 +200,13 @@ namespace Niconicome.ViewModels.Mainpage
                  if (targetVideos.Count > 1)
                  {
 
-                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
                  }
                  else
                  {
-                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId}を削除しました。");
-                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId}を削除しました。");
+                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}を削除しました。");
+                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}を削除しました。");
                  }
 
              });
@@ -323,7 +327,7 @@ namespace Niconicome.ViewModels.Mainpage
                     if (this.isFetching.Value)
                     {
                         this.cts?.Cancel();
-                        this.RefreshCommandIcon = MaterialDesign::PackIconKind.Refresh;
+                        this.RefreshCommandIcon.Value = MaterialDesign::PackIconKind.Refresh;
                         this.cts = null;
                         this.isFetching.Value = false;
                         return;
@@ -345,7 +349,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue($"{sourceVideosCount}件の動画を更新します。");
                     WS::Mainpage.Messagehandler.AppendMessage($"{sourceVideosCount}件の動画を更新します。");
 
-                    this.RefreshCommandIcon = MaterialDesign::PackIconKind.Close;
+                    this.RefreshCommandIcon.Value = MaterialDesign::PackIconKind.Close;
                     this.isFetching.Value = true;
 
                     this.cts = new CancellationTokenSource();
@@ -355,7 +359,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                     this.isFetching.Value = false;
                     this.cts = null;
-                    this.RefreshCommandIcon = MaterialDesign::PackIconKind.Refresh;
+                    this.RefreshCommandIcon.Value = MaterialDesign::PackIconKind.Refresh;
 
                     this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を更新しました。");
                     WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を更新しました。");
@@ -417,14 +421,13 @@ namespace Niconicome.ViewModels.Mainpage
 
                         if (videos.Count > 1)
                         {
-                            WS::Mainpage.Messagehandler.AppendMessage($"{videos[0].NiconicoId}ほか{videos.Count - 1}件の動画を追加しました。");
-                            this.SnackbarMessageQueue.Enqueue($"{videos[0].NiconicoId}ほか{videos.Count - 1}件の動画を追加しました。");
-                            WS::Mainpage.PlaylistTree.Refresh();
+                            WS::Mainpage.Messagehandler.AppendMessage($"{videos[0].NiconicoId.Value}ほか{videos.Count - 1}件の動画を追加しました。");
+                            this.SnackbarMessageQueue.Enqueue($"{videos[0].NiconicoId.Value}ほか{videos.Count - 1}件の動画を追加しました。");
                         }
                         else
                         {
-                            WS::Mainpage.Messagehandler.AppendMessage($"{videos[0].NiconicoId}を追加しました。");
-                            this.SnackbarMessageQueue.Enqueue($"{videos[0].NiconicoId}を追加しました。");
+                            WS::Mainpage.Messagehandler.AppendMessage($"{videos[0].NiconicoId.Value}を追加しました。");
+                            this.SnackbarMessageQueue.Enqueue($"{videos[0].NiconicoId.Value}を追加しました。");
                         }
                     }
                     else
@@ -455,18 +458,18 @@ namespace Niconicome.ViewModels.Mainpage
                   {
                       WS::Mainpage.VideoListContainer.Refresh();
                       this.isFiltered = false;
-                      this.FilterIcon = MaterialDesign::PackIconKind.Filter;
+                      this.FilterIcon.Value = MaterialDesign::PackIconKind.Filter;
                   }
-                  else if (!this.InputString.IsNullOrEmpty())
+                  else if (!this.InputString.Value.IsNullOrEmpty())
                   {
-                      FilterringOptions option = this.IsFilteringOnlyByTag ? FilterringOptions.OnlyByTag : FilterringOptions.None;
-                      var videos = this.IsFilteringFromAllVideos ? WS::Mainpage.VideoHandler.GetAllVideos() : WS::Mainpage.VideoListContainer.Videos;
-                      videos = WS::Mainpage.VideoFilter.FilterVideos(this.InputString, videos, option);
+                      FilterringOptions option = this.IsFilteringOnlyByTag.Value ? FilterringOptions.OnlyByTag : FilterringOptions.None;
+                      var videos = this.IsFilteringFromAllVideos.Value ? WS::Mainpage.VideoHandler.GetAllVideos() : WS::Mainpage.VideoListContainer.Videos;
+                      videos = WS::Mainpage.VideoFilter.FilterVideos(this.InputString.Value, videos, option);
 
                       WS::Mainpage.VideoListContainer.Clear();
                       WS::Mainpage.VideoListContainer.AddRange(videos, null, false);
                       this.isFiltered = true;
-                      this.FilterIcon = MaterialDesign::PackIconKind.FilterOff;
+                      this.FilterIcon.Value = MaterialDesign::PackIconKind.FilterOff;
                   }
               })
             .AddTo(this.disposables);
@@ -760,15 +763,11 @@ namespace Niconicome.ViewModels.Mainpage
                     else if (setting == EnumSettings::VideodbClickSettings.Download)
                     {
                         this.ea.GetEvent<PubSubEvent<MVVMEvent<VideoInfoViewModel>>>().Publish(new MVVMEvent<VideoInfoViewModel>(videoInfo, typeof(DownloadSettingsViewModel), EventType.Download));
-                        //this.OpenInPlayerAcommand.Execute(videoInfo);
                     }
                 }).AddTo(this.disposables)
             .AddTo(this.disposables);
 
             #endregion
-
-            //動画情報取得クラスの実行可能状態変更イベントを購読する
-            //WS::Mainpage.VideoIDHandler.StateChange += (_, _) => this.AddVideoCommand.RaiseCanExecutechanged();
         }
 
         ~VideoListViewModel()
@@ -776,19 +775,15 @@ namespace Niconicome.ViewModels.Mainpage
             this.Dispose();
         }
 
-        private MaterialDesign::PackIconKind refreshCommandIconField = MaterialDesign::PackIconKind.Refresh;
-
-        private MaterialDesign::PackIconKind filterIconFIeld = MaterialDesign::PackIconKind.Filter;
-
         /// <summary>
         /// フィルターアイコン
         /// </summary>
-        public MaterialDesign::PackIconKind FilterIcon { get => this.filterIconFIeld; set => this.SetProperty(ref this.filterIconFIeld, value); }
+        public ReactivePropertySlim<MaterialDesign::PackIconKind> FilterIcon { get; init; }
 
         /// <summary>
         /// 更新アイコン
         /// </summary>
-        public MaterialDesign::PackIconKind RefreshCommandIcon { get => this.refreshCommandIconField; set => this.SetProperty(ref this.refreshCommandIconField, value); }
+        public ReactivePropertySlim<MaterialDesign::PackIconKind> RefreshCommandIcon { get; init; }
 
         #region コマンド
         /// <summary>
@@ -799,7 +794,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画を削除する
         /// </summary>
-        public CommandBase<IListVideoInfo> RemoveVideoCommand { get; init; }
+        public CommandBase<VideoInfoViewModel> RemoveVideoCommand { get; init; }
 
         /// <summary>
         /// ニコニコ動画で開く
@@ -940,22 +935,22 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// ユーザーの入力値
         /// </summary>
-        public string InputString { get => this.inputStringFIeld; set => this.SetProperty(ref this.inputStringFIeld, value); }
+        public ReactivePropertySlim<string> InputString { get; init; } = new();
 
         /// <summary>
         /// フィルターの設定
         /// </summary>
-        public bool IsFilteringOnlyByTag { get => this.isFilteringOnlyByTagEnableField; set => this.SetProperty(ref this.isFilteringOnlyByTagEnableField, value); }
+        public ReactivePropertySlim<bool> IsFilteringOnlyByTag { get; init; } = new();
 
         /// <summary>
         /// 全ての動画から検索する
         /// </summary>
-        public bool IsFilteringFromAllVideos { get => this.isFilteringFromAllVideosEnableField; set => this.SetProperty(ref this.isFilteringFromAllVideosEnableField, value); }
+        public ReactivePropertySlim<bool> IsFilteringFromAllVideos { get; init; } = new();
 
         /// <summary>
         /// プレイリストのタイトル
         /// </summary>
-        public string PlaylistTitle { get => this.playlistTitleFIeld; set => this.SetProperty(ref this.playlistTitleFIeld, value); }
+        public ReactivePropertySlim<string> PlaylistTitle { get; init; } = new();
 
         #region Width
         public int selectColumnWidthField;
@@ -1015,14 +1010,6 @@ namespace Niconicome.ViewModels.Mainpage
         public int ThumbColumnWidth { get => this.thumbColumnWidthField; set => this.SetProperty(ref this.thumbColumnWidthField, value); }
 
         #endregion
-
-        private string inputStringFIeld = string.Empty;
-
-        private string playlistTitleFIeld = string.Empty;
-
-        private bool isFilteringOnlyByTagEnableField;
-
-        private bool isFilteringFromAllVideosEnableField;
 
         /// <summary>
         /// 並び替える
@@ -1193,7 +1180,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
                 var count = WS::Mainpage.VideoListContainer.Count;
-                this.PlaylistTitle = $"{name}({count}件)";
+                this.PlaylistTitle.Value = $"{name}({count}件)";
             }
         }
 
@@ -1224,21 +1211,21 @@ namespace Niconicome.ViewModels.Mainpage
             v1.IsDownloaded.Value = true;
 
             var v2 = new NonBindableListVideoInfo();
-            v1.Title.Value = "Bad Apple!! feat. nomico";
-            v1.NiconicoId.Value = "sm8628149";
-            v1.IsDownloaded.Value = false;
+            v2.Title.Value = "Bad Apple!! feat. nomico";
+            v2.NiconicoId.Value = "sm8628149";
+            v2.IsDownloaded.Value = false;
 
-            this.Videos = new ObservableCollection<IListVideoInfo>() { v1, v2 };
+            this.Videos = new ReactiveCollection<VideoInfoViewModel>();
 
         }
 
-        public MaterialDesign::PackIconKind FilterIcon { get; set; } = MaterialDesign::PackIconKind.Filter;
+        public ReactivePropertySlim<MaterialDesign::PackIconKind> FilterIcon { get; init; } = new(MaterialDesign::PackIconKind.Filter);
 
-        public MaterialDesign::PackIconKind RefreshCommandIcon { get; set; } = MaterialDesign::PackIconKind.Refresh;
+        public ReactivePropertySlim<MaterialDesign::PackIconKind> RefreshCommandIcon { get; init; } = new(MaterialDesign::PackIconKind.Refresh);
 
         public CommandBase<object> AddVideoCommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<IListVideoInfo> RemoveVideoCommand { get; init; } = new(_ => true, _ => { });
+        public CommandBase<VideoInfoViewModel> RemoveVideoCommand { get; init; } = new(_ => true, _ => { });
 
         public CommandBase<IListVideoInfo> WatchOnNiconicoCommand { get; init; } = new(_ => true, _ => { });
 
@@ -1288,17 +1275,17 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; } = new ReactiveCommand<MouseEventArgs>();
 
-        public ObservableCollection<IListVideoInfo> Videos { get; private set; }
+        public ReactiveCollection<VideoInfoViewModel> Videos { get; init; }
 
         public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
 
-        public string InputString { get; set; } = string.Empty;
+        public ReactivePropertySlim<string> InputString { get; init; } = new("Hello World!!");
 
-        public bool IsFilteringOnlyByTag { get; set; } = false;
+        public ReactivePropertySlim<bool> IsFilteringOnlyByTag { get; set; } = new();
 
-        public bool IsFilteringFromAllVideos { get; set; } = false;
+        public ReactivePropertySlim<bool> IsFilteringFromAllVideos { get; set; } = new();
 
-        public string PlaylistTitle { get; set; } = "空白のプレイリスト";
+        public ReactivePropertySlim<string> PlaylistTitle { get; set; } = new("空白のプレイリスト");
 
         public int SelectColumnWidth { get; set; }
 

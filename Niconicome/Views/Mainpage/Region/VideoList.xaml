@@ -29,7 +29,7 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
-        <TextBlock FontSize="30" Text="{Binding PlaylistTitle,UpdateSourceTrigger=PropertyChanged}" Margin="10 0"/>
+        <TextBlock FontSize="30" Text="{Binding PlaylistTitle.Value,UpdateSourceTrigger=PropertyChanged}" Margin="10 0"/>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
@@ -40,12 +40,12 @@
                     <ColumnDefinition Width="17*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Text="{Binding InputString,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignTextBox}" FontSize="20" Margin="5,0" VerticalContentAlignment="Bottom" materialDesign:HintAssist.Hint="ID・検索キーワード入力窓" Padding="5 0"/>
+                <TextBox Text="{Binding InputString.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignTextBox}" FontSize="20" Margin="5,0" VerticalContentAlignment="Bottom" materialDesign:HintAssist.Hint="ID・検索キーワード入力窓" Padding="5 0"/>
                 <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する（インテリインプット）" Command="{Binding AddVideoCommand}"/>
             </Grid>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Button Margin="5,0" Grid.Column="0" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="入力したキーワードでフィルター" Command="{Binding FilterCommand}">
-                    <materialDesign:PackIcon Kind="{Binding FilterIcon}">
+                    <materialDesign:PackIcon Kind="{Binding FilterIcon.Value}">
                         <materialDesign:PackIcon.RenderTransform>
                             <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.8" ScaleY="1.8"/>
                         </materialDesign:PackIcon.RenderTransform>
@@ -55,9 +55,9 @@
                             <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource Mode=Self}}"/>
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
-                                    <ContextMenu DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
-                                        <MenuItem IsCheckable="True" Header="タグのみでフィルター" IsChecked="{Binding IsFilteringOnlyByTag}"/>
-                                        <MenuItem IsCheckable="True" Header="データベースの全ての動画からフィルター" IsChecked="{Binding IsFilteringFromAllVideos}"/>
+                                    <ContextMenu d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD},IsDesignTimeCreatable=True}" DataContext="{Binding PlacementTarget.Tag,RelativeSource={RelativeSource Mode=Self}}">
+                                        <MenuItem IsCheckable="True" Header="タグのみでフィルター" IsChecked="{Binding IsFilteringOnlyByTag.Value}"/>
+                                        <MenuItem IsCheckable="True" Header="データベースの全ての動画からフィルター" IsChecked="{Binding IsFilteringFromAllVideos.Value}"/>
                                     </ContextMenu>
                                 </Setter.Value>
                             </Setter>
@@ -97,7 +97,7 @@
                 </Button>
 
                 <Button Margin="5,0" Grid.Column="4" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="動画情報を更新する" Command="{Binding UpdateVideoCommand}">
-                    <materialDesign:PackIcon Kind="{Binding RefreshCommandIcon}">
+                    <materialDesign:PackIcon Kind="{Binding RefreshCommandIcon.Value}">
                         <materialDesign:PackIcon.RenderTransform>
                             <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
                         </materialDesign:PackIcon.RenderTransform>
