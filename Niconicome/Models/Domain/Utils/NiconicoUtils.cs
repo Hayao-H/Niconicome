@@ -330,7 +330,7 @@ namespace Niconicome.Models.Domain.Utils
                     .Replace("*", "＊")
                     .Replace("?", "？")
                     .Replace("<", "＜")
-                    .Replace("<", "＞")
+                    .Replace(">", "＞")
                     .Replace("|", "｜")
                     .Replace("\"", "”");
             }
