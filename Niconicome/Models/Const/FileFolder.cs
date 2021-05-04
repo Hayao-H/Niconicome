@@ -8,6 +8,6 @@ namespace Niconicome.Models.Const
 {
     public static class FileFolder
     {
-       public const string DefaultDownloadDir = "download";
+       public const string DefaultDownloadDir = "downloaded";
     }
 }
