@@ -149,13 +149,13 @@ namespace Niconicome.Models.Network
 
                 var task = new NetworkVideoParallelTask(async (_, lockObj, _) =>
                 {
-                    this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得を開始します。");
+                    this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得を開始します。");
 
                     IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId.Value, item.video, DWatch::WatchInfoOptions.NoDmcData);
 
                     if (result.IsSucceeded)
                     {
-                        this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得に成功しました。");
+                        this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に成功しました。");
                         videos.Add(item.video);
                         if (uncheck)
                         {
@@ -164,7 +164,7 @@ namespace Niconicome.Models.Network
                     }
                     else
                     {
-                        this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得に失敗しました。(詳細:{result.Message})");
+                        this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に失敗しました。(詳細:{result.Message})");
                     }
                 }, index => this.messageHandler.AppendMessage("待機中...(15s)"));
 

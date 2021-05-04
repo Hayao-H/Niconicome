@@ -192,8 +192,8 @@ namespace Niconicome.Models.Network.Download
             {
                 if (result?.FirstVideo is not null)
                 {
-                    onMessage($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
-                    onMessageShort($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                    onMessage($"{result.FirstVideo.NiconicoId.Value}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                    onMessageShort($"{result.FirstVideo.NiconicoId.Value}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
 
                     if (!result.IsSucceededAll)
                     {
@@ -205,8 +205,8 @@ namespace Niconicome.Models.Network.Download
             {
                 if (result?.FirstVideo is not null)
                 {
-                    onMessage($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
-                    onMessageShort($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
+                    onMessage($"{result.FirstVideo.NiconicoId.Value}をダウンロードしました。");
+                    onMessageShort($"{result.FirstVideo.NiconicoId.Value}をダウンロードしました。");
                 }
             }
             else

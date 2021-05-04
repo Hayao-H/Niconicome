@@ -114,7 +114,7 @@ namespace Niconicome.Models.Local.External
         {
             var folderPath = this.current.SelectedPlaylist.Value?.Folderpath;
 
-            if (!videoInfo.IsDownloaded.Value || videoInfo.FileName.Value.IsNullOrEmpty()) return new AttemptResult() { Message = $"{videoInfo.NiconicoId}はダウンロードされていません。", };
+            if (!videoInfo.IsDownloaded.Value || videoInfo.FileName.Value.IsNullOrEmpty()) return new AttemptResult() { Message = $"{videoInfo.NiconicoId.Value}はダウンロードされていません。", };
             if (folderPath is null) return new AttemptResult() { Message = "フォルダーパスが設定されていません。" };
 
             var path = Path.Combine(folderPath, videoInfo.FileName.Value)
