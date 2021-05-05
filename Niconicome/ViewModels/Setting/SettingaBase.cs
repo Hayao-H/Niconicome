@@ -55,6 +55,35 @@ namespace Niconicome.ViewModels.Setting
         /// <param name="data"></param>
         /// <param name="settingname"></param>
         /// <param name="propertyname"></param>
+        protected void Savesetting<T>(T data, SettingsEnum setting, [CallerMemberName] string? propertyname = null)
+        {
+            if (data is bool boolData)
+            {
+                WS::SettingPage.SettingHandler.SaveSetting(boolData, setting);
+            }
+            else if (data is string stringData)
+            {
+                WS::SettingPage.SettingHandler.SaveSetting(stringData, setting);
+            }
+            else if (data is int intData)
+            {
+                WS::SettingPage.SettingHandler.SaveSetting(intData, setting);
+            }
+            else
+            {
+                return;
+            }
+
+        }
+
+        /// <summary>
+        /// 設定を保存する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fiels"></param>
+        /// <param name="data"></param>
+        /// <param name="settingname"></param>
+        /// <param name="propertyname"></param>
         protected void Savesetting<T>(ref ComboboxItem<T> field, ComboboxItem<T> data, SettingsEnum setting, [CallerMemberName] string? propertyname = null)
         {
             if (data.Value is bool boolData)
@@ -94,6 +123,17 @@ namespace Niconicome.ViewModels.Setting
             field = data;
 
             this.OnPropertyChanged(propertyname);
+        }
+
+        /// <summary>
+        /// 列挙型設定を保存する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="propertyname"></param>
+        protected void SaveEnumSetting<T>(ComboboxItem<T> data, [CallerMemberName] string? propertyname = null) where T : Enum
+        {
+            WS::SettingPage.EnumSettingsHandler.SaveSetting(data.Value);
         }
     }
 
