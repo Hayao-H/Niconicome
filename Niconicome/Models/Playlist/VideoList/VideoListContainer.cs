@@ -200,7 +200,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             var id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
 
-            if (this.Videos.Any(v => v.NiconicoId == video.NiconicoId))
+            if (this.Videos.Any(v => v.NiconicoId.Value == video.NiconicoId.Value))
             {
                 return new AttemptResult()
                 {
