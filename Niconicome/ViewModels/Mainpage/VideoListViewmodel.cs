@@ -1058,17 +1058,6 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.SettingHandler.SaveSetting(this.ThumbColumnWidth, SettingsEnum.MWThumbColumnWid);
         }
 
-        /// <summary>
-        /// インスタンスを破棄する
-        /// </summary>
-        public void Dispose()
-        {
-            if (this.hasDisposed) return;
-            this.disposables.Dispose();
-            this.hasDisposed = true;
-            GC.SuppressFinalize(this);
-        }
-
         #region private
 
         /// <summary>
@@ -1079,10 +1068,6 @@ namespace Niconicome.ViewModels.Mainpage
         private ReactiveProperty<bool> isFetching;
 
         private bool isFiltered;
-
-        private CompositeDisposable disposables = new();
-
-        private bool hasDisposed;
 
         private IEventAggregator ea;
 
@@ -1490,15 +1475,6 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveProperty<DateTime> UploadedOn { get; init; }
 
-        public void Dispose()
-        {
-            if (this.hasDisposed) return;
-            this.disposables.Dispose();
-            this.hasDisposed = true;
-            GC.SuppressFinalize(this);
-        }
-        private bool hasDisposed;
-        private readonly CompositeDisposable disposables = new();
     }
 
     /// <summary>

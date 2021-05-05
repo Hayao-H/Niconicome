@@ -86,17 +86,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         private bool displayCompletedField;
 
-        private bool hasDisposed;
-
-        private readonly CompositeDisposable disposables;
-        public void Dispose()
-        {
-            if (this.hasDisposed) return;
-            this.disposables.Dispose();
-            this.hasDisposed = true;
-            GC.SuppressFinalize(this);
-        }
-
         /// <summary>
         /// ステージング済みタスク
         /// </summary>
