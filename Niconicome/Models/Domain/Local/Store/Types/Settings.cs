@@ -159,5 +159,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string ReAllocateIfVideoisNotSaved { get; private set; } = "reallocateifvideoisnotsaved";
         public static string VideoListItemdbClickAction { get; private set; } = "videolistitemdbclickaction";
         public static string AutoRenamingAfterSetNetworkPlaylist { get; private set; } = "autorenamingaftersetnetworkplaylist";
+        public static string VideoInfoType { get; private set; } = "videoInfotype";
     }
 }
