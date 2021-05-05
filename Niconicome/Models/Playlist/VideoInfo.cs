@@ -190,7 +190,7 @@ namespace Niconicome.Models.Playlist
             videoInfo.ThumbUrl.Value = dbVideo.ThumbUrl;
             videoInfo.ThumbPath.Value = dbVideo.ThumbPath;
             videoInfo.FileName.Value = dbVideo.FileName;
-            videoInfo.IsSelected.Value = dbVideo.IsSelected;
+            //videoInfo.IsSelected.Value = dbVideo.IsSelected;
             videoInfo.Tags = dbVideo.Tags ?? new List<string>();
             videoInfo.ViewCount.Value = dbVideo.ViewCount;
             videoInfo.CommentCount.Value = dbVideo.CommentCount;
