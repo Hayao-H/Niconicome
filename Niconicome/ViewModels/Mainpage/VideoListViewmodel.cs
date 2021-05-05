@@ -91,6 +91,13 @@ namespace Niconicome.ViewModels.Mainpage
             var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
             WS::Mainpage.PlaylistTree.Refresh(expandAll, inheritExpandedState);
 
+            //すべて選択する
+            this.IsSelectedAll = new ReactivePropertySlim<bool>().AddTo(this.disposables);
+            this.IsSelectedAll.Subscribe(value =>
+            {
+                WS::Mainpage.VideoListContainer.ForEach(v => v.IsSelected.Value = value);
+            });
+
             #region コマンドの初期化
             this.AddVideoCommand = new[] {
             WS::Mainpage.CurrentPlaylist.SelectedPlaylist
@@ -914,6 +921,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactivePropertySlim<string> PlaylistTitle { get; init; } = new();
 
+        /// <summary>
+        /// すべて選択
+        /// </summary>
+        public ReactivePropertySlim<bool> IsSelectedAll { get; init; }
+
+
         #region Width
         public int selectColumnWidthField;
 
@@ -1234,6 +1247,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<bool> IsFilteringFromAllVideos { get; set; } = new();
 
         public ReactivePropertySlim<string> PlaylistTitle { get; set; } = new("空白のプレイリスト");
+
+        public ReactivePropertySlim<bool> IsSelectedAll { get; init; } = new();
 
         public int SelectColumnWidth { get; set; }
 

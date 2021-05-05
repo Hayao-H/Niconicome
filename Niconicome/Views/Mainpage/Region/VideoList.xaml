@@ -126,12 +126,15 @@
                     </i:Interaction.Behaviors>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="選択" Width="{Binding SelectColumnWidth,Mode=TwoWay}">
+                            <GridViewColumn Width="{Binding SelectColumnWidth,Mode=TwoWay}">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                     <CheckBox IsChecked="{Binding IsSelected.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
+                            <GridViewColumn.Header>
+                                <CheckBox IsChecked="{Binding IsSelectedAll.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                            </GridViewColumn.Header>
                             </GridViewColumn>
                             <GridViewColumn Width="{Binding ThumbColumnWidth}">
                                 <GridViewColumn.CellTemplate>

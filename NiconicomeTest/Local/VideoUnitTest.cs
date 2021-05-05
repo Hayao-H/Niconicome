@@ -46,11 +46,9 @@ namespace NiconicomeTest.Local.Video
         [Test]
         public void 動画を追加する()
         {
-            var videoInfo = new NonBindableListVideoInfo()
-            {
-                NiconicoId = "sm9",
-                Title = "テスト動画"
-            };
+            var videoInfo = new NonBindableListVideoInfo();
+            videoInfo.NiconicoId.Value = "sm9";
+            videoInfo.Title.Value = "テスト動画";
 
             int videoId = this.handler?.AddVideo(videoInfo, this.playlist1Id) ?? -1;
 
@@ -62,11 +60,9 @@ namespace NiconicomeTest.Local.Video
         [Test]
         public void 複数プレイリストに単一動画を追加する()
         {
-            var videoInfo = new NonBindableListVideoInfo()
-            {
-                NiconicoId = "sm9",
-                Title = "テスト動画"
-            };
+            var videoInfo = new NonBindableListVideoInfo();
+            videoInfo.NiconicoId.Value = "sm9";
+            videoInfo.Title.Value = "テスト動画";
 
             int videoId1 = this.handler?.AddVideo(videoInfo, this.playlist1Id) ?? -1;
             int videoId2 = this.handler?.AddVideo(videoInfo, this.playlist2Id) ?? -1;
@@ -84,11 +80,9 @@ namespace NiconicomeTest.Local.Video
         [Test]
         public void 動画を削除する()
         {
-            var videoInfo = new NonBindableListVideoInfo()
-            {
-                NiconicoId = "sm9",
-                Title = "テスト動画"
-            };
+            var videoInfo = new NonBindableListVideoInfo();
+            videoInfo.NiconicoId.Value = "sm9";
+            videoInfo.Title.Value = "テスト動画";
 
             int videoId = this.handler?.AddVideo(videoInfo, this.playlist1Id) ?? -1;
             this.handler?.RemoveVideo(videoId, this.playlist1Id);
@@ -101,11 +95,9 @@ namespace NiconicomeTest.Local.Video
         [Test]
         public void 複数プレイリストに追加した動画を削除する()
         {
-            var videoInfo = new NonBindableListVideoInfo()
-            {
-                NiconicoId = "sm9",
-                Title = "テスト動画"
-            };
+            var videoInfo = new NonBindableListVideoInfo();
+            videoInfo.NiconicoId.Value = "sm9";
+            videoInfo.Title.Value = "テスト動画";
 
             int videoId = this.handler?.AddVideo(videoInfo, this.playlist1Id) ?? -1;
             this.handler?.AddVideo(videoInfo, this.playlist2Id);
