@@ -7,6 +7,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
 
 namespace Niconicome.Models.Playlist.VideoList
 {
@@ -22,6 +23,7 @@ namespace Niconicome.Models.Playlist.VideoList
         IAttemptResult Refresh();
         IAttemptResult Clear();
         IAttemptResult Uncheck(int videoID, int playlistID);
+        IAttemptResult ForEach(Action<IListVideoInfo> foreachFunc);
         int Count { get; }
         ObservableCollection<IListVideoInfo> Videos { get; }
         event EventHandler<ListChangedEventArgs<IListVideoInfo>>? ListChanged;
@@ -441,6 +443,28 @@ namespace Niconicome.Models.Playlist.VideoList
                 IsSucceeded = true,
             };
         }
+
+        /// <summary>
+        /// 動画に対するforeach処理
+        /// </summary>
+        /// <param name="foreachFunc"></param>
+        /// <returns></returns>
+        public IAttemptResult ForEach(Action<IListVideoInfo> foreachFunc)
+        {
+            foreach (var video in this.Videos)
+            {
+                try
+                {
+                    foreachFunc(video);
+                } catch (Exception e)
+                {
+                    return new AttemptResult<IListVideoInfo>() { Exception = e, Data = video, Message = $"{video.NiconicoId.Value}への処理中にエラーが発生しました。" };
+                }
+            }
+
+            return new AttemptResult<IListVideoInfo>() { IsSucceeded = true};
+        }
+
 
 
         /// <summary>

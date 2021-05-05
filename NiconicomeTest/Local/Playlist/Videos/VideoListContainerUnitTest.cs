@@ -94,5 +94,22 @@ namespace NiconicomeTest.Local.Playlist.Videos
             Assert.That(result.IsSucceeded, Is.False);
         }
 
+        [Test]
+        public void すべての動画にチェックを入れる()
+        {
+            var video1 = new NonBindableListVideoInfo();
+            var video2 = new NonBindableListVideoInfo();
+            var video3 = new NonBindableListVideoInfo();
+            this.videoListContainer!.AddRange(new IListVideoInfo[] { video1, video2, video3 });
+            this.videoListContainer!.ForEach(v => v.IsSelected.Value = true);
+
+            foreach (var video in this.videoListContainer!.Videos)
+            {
+                Assert.That(video.IsSelected.Value, Is.True);
+            }
+            
+
+        }
+
     }
 }
