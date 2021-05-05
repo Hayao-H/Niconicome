@@ -149,7 +149,7 @@ namespace Niconicome.ViewModels.Mainpage
                   if (!videos.First().ChannelID.Value.IsNullOrEmpty())
                   {
                       var video = videos.First();
-                      WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName}」です", "IDをコピー", () =>
+                      WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName.Value}」です", "IDをコピー", () =>
                       {
                           Clipboard.SetText(video.ChannelID.Value);
                           WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
