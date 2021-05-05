@@ -10,7 +10,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:prism="http://prismlibrary.com/"  
         mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignLightForeground}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
