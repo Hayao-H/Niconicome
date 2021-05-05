@@ -374,7 +374,9 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.CurrentPlaylist.SelectedPlaylist
                 .Select(p=>p is not null),
                 this.isFetching
-                .Select(f=>!f)
+                .Select(f=>!f),
+                WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(p=>p?.IsRemotePlaylist??false),
             }.CombineLatestValuesAreAllTrue()
                 .ToReactiveCommand()
                 .WithSubscribe(async () =>
