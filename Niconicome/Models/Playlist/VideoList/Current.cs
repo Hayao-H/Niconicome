@@ -11,7 +11,7 @@ namespace Niconicome.Models.Playlist.VideoList
 {
     public interface ICurrent
     {
-        ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; set; }
+        ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; }
         int PrevSelectedPlaylistID { get; }
     }
 
@@ -31,10 +31,7 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <summary>
         /// 現在選択されているプレイリストのID
         /// </summary>
-        public ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist
-        {
-            set; get;
-        }
+        public ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; init; }
 
         /// <summary>
         /// ひとつまえに選択していたプレイリスト
