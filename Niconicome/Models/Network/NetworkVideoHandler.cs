@@ -21,8 +21,8 @@ namespace Niconicome.Models.Network
     {
         bool IsVideoDownloaded(string niconicoId);
         string GetFilePath(string niconicoId);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> videos, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> videos, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null);
     }
 
     public interface INetworkResult
@@ -71,14 +71,14 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null)
         {
             return await this.GetVideoListInfosAsync(ids.Select(i =>
             {
                 var v = new NonBindableListVideoInfo();
                 v.NiconicoId.Value = i;
                 return v;
-            }), uncheck, playlistID, ct);
+            }), uncheck, playlistID, forceRegister, ct);
         }
 
         /// <summary>
@@ -126,10 +126,10 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null)
         {
 
-            var registerOnlyID = this.settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
+            var registerOnlyID = forceRegister ? false : this.settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
             if (registerOnlyID)
             {
                 return emptyVideos;

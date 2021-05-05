@@ -351,7 +351,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                     this.cts = new CancellationTokenSource();
 
-                    var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(sourceVideos, true, playlistId, this.cts.Token)).ToList();
+                    var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(sourceVideos, true, playlistId, true, this.cts.Token)).ToList();
                     var result = WS::Mainpage.VideoListContainer.UpdateRange(videos);
 
                     this.isFetching.Value = false;

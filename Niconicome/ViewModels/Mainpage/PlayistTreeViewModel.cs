@@ -68,7 +68,10 @@ namespace Niconicome.ViewModels.Mainpage
             this.PlaylistRefreshcommand = new CommandBase<object>(_ => true, _ =>
             {
                 WS::Mainpage.PlaylistTree.Refresh();
-                WS::Mainpage.VideoListContainer.Refresh();
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
+                {
+                    WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistTree.GetPlaylist(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
+                }
                 this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
 
