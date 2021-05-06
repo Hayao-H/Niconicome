@@ -23,6 +23,7 @@ namespace Niconicome.Models.Network.Download
         ReactiveProperty<bool> IsLimittingCommentCountEnable { get; }
         ReactiveProperty<bool> IsOverwriteEnable { get; }
         ReactiveProperty<bool> IsSkippingEnable { get; }
+        ReactiveProperty<bool> IsNoEncodeEnable { get; }
         ReactiveProperty<int> MaxCommentsCount { get; }
         ReactiveProperty<VideoInfo::IResolution> Resolution { get; }
 
@@ -36,19 +37,20 @@ namespace Niconicome.Models.Network.Download
             this.settingHandler = settingHandler;
             this.current = current;
 
-            this.IsDownloadingVideoInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLVideoInfo));
-            this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount));
-            this.IsDownloadingVideoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLVideo));
-            this.IsDownloadingCommentEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLComment));
-            this.IsDownloadingCommentLogEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLKako));
-            this.IsDownloadingEasyComment = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLEasy));
-            this.IsDownloadingThumbEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLThumb));
-            this.IsDownloadingOwnerComment = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLOwner));
-            this.IsOverwriteEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLOverwrite));
-            this.IsSkippingEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLSkip));
-            this.IsCopyFromAnotherFolderEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLCopy));
-            this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount));
-            this.MaxCommentsCount = new ReactiveProperty<int>(this.settingHandler.GetIntSetting(SettingsEnum.MaxCommentsCount));
+            this.IsDownloadingVideoInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLVideoInfo)).AddTo(this.disposables);
+            this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount)).AddTo(this.disposables);
+            this.IsDownloadingVideoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLVideo)).AddTo(this.disposables);
+            this.IsDownloadingCommentEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLComment)).AddTo(this.disposables);
+            this.IsDownloadingCommentLogEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLKako)).AddTo(this.disposables);
+            this.IsDownloadingEasyComment = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLEasy)).AddTo(this.disposables);
+            this.IsDownloadingThumbEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLThumb)).AddTo(this.disposables);
+            this.IsDownloadingOwnerComment = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLOwner)).AddTo(this.disposables);
+            this.IsOverwriteEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLOverwrite)).AddTo(this.disposables);
+            this.IsSkippingEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLSkip)).AddTo(this.disposables);
+            this.IsCopyFromAnotherFolderEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLCopy)).AddTo(this.disposables);
+            this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount)).AddTo(this.disposables);
+            this.MaxCommentsCount = new ReactiveProperty<int>(this.settingHandler.GetIntSetting(SettingsEnum.MaxCommentsCount)).AddTo(this.disposables);
+            this.IsNoEncodeEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlWithoutEncode)).AddTo(this.disposables);
 
             this.IsDownloadingVideoInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideoInfo));
             this.IsDownloadingVideoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideo));
@@ -62,8 +64,14 @@ namespace Niconicome.Models.Network.Download
             this.IsCopyFromAnotherFolderEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLCopy));
             this.IsLimittingCommentCountEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.LimitCommentsCount));
             this.MaxCommentsCount.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.MaxCommentsCount));
+            this.IsNoEncodeEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DlWithoutEncode));
 
             this.Resolution = new ReactiveProperty<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"));
+        }
+
+        ~DownloadSettingsHandler()
+        {
+            this.Dispose();
         }
 
         #region フィールド
@@ -154,6 +162,12 @@ namespace Niconicome.Models.Network.Download
         /// 他フォルダーからコピー
         /// </summary>
         public ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; init; }
+
+        /// <summary>
+        /// エンコードしない
+        /// </summary>
+        public ReactiveProperty<bool> IsNoEncodeEnable { get; init; }
+
 
         /// <summary>
         /// 最大コメ数
