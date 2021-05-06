@@ -6,6 +6,7 @@ using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using Net = Niconicome.Models.Domain.Network;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Utils = Niconicome.Models.Domain.Utils;
@@ -54,25 +55,30 @@ namespace Niconicome.Models.Playlist
     /// </summary>
     public class NonBindableListVideoInfo : BindableBase, IListVideoInfo
     {
+        public NonBindableListVideoInfo()
+        {
+            VideoMessenger.VideoMessageChange += this.OnMessage;
+            this.Message = new ReactiveProperty<string>().AddTo(this.disposables);
+            this.Message.Subscribe(m => VideoMessenger.Write(this.MessageGuid, m));
+        }
 
         public ReactiveProperty<int> Id { get; init; } = new ReactiveProperty<int>();
-       public ReactiveProperty<int> ViewCount { get; init; } = new ReactiveProperty<int>();
+        public ReactiveProperty<int> ViewCount { get; init; } = new ReactiveProperty<int>();
         public ReactiveProperty<int> CommentCount { get; init; } = new ReactiveProperty<int>();
         public ReactiveProperty<int> MylistCount { get; init; } = new ReactiveProperty<int>();
         public ReactiveProperty<int> LikeCount { get; init; } = new ReactiveProperty<int>();
         public ReactiveProperty<int> OwnerID { get; init; } = new ReactiveProperty<int>();
         public ReactiveProperty<int> Duration { get; init; } = new ReactiveProperty<int>();
         public ReactiveProperty<string> NiconicoId { get; init; } = new ReactiveProperty<string>();
-       public ReactiveProperty<string> Title { get; init; } = new ReactiveProperty<string>();
+        public ReactiveProperty<string> Title { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> OwnerName { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> LargeThumbUrl { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> ThumbUrl { get; init; } = new ReactiveProperty<string>();
-        public ReactiveProperty<string> Message { get; init; } = new ReactiveProperty<string>();
+        public ReactiveProperty<string> Message { get; init; }
         public ReactiveProperty<string> ThumbPath { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> FileName { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> ChannelID { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> ChannelName { get; init; } = new ReactiveProperty<string>();
-
         public ReactiveProperty<bool> IsDeleted { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsSelected { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsDownloaded { get; init; } = new ReactiveProperty<bool>();
@@ -207,26 +213,45 @@ namespace Niconicome.Models.Playlist
         /// <param name="oldVideo"></param>
         public static void SetData(IListVideoInfo newVideo, IListVideoInfo oldVideo)
         {
-            newVideo.ViewCount.Value= oldVideo.ViewCount.Value;
-            newVideo.NiconicoId.Value= oldVideo.NiconicoId.Value;
-            newVideo.Title.Value= oldVideo.Title.Value;
-            newVideo.IsDeleted.Value= oldVideo.IsDeleted.Value;
-            newVideo.IsSelected.Value= oldVideo.IsSelected.Value;
-            newVideo.OwnerName.Value= oldVideo.OwnerName.Value;
-            newVideo.LargeThumbUrl.Value= oldVideo.LargeThumbUrl.Value;
-            newVideo.ThumbUrl.Value= oldVideo.ThumbUrl.Value;
-            newVideo.Message.Value= oldVideo.Message.Value;
-            if (!oldVideo.ThumbPath.Value.IsNullOrEmpty()) newVideo.ThumbPath.Value= oldVideo.ThumbPath.Value;
-            newVideo.FileName.Value= oldVideo.FileName.Value;
-            newVideo.MessageGuid= oldVideo.MessageGuid;
-            newVideo.Tags= oldVideo.Tags;
-            newVideo.UploadedOn.Value= oldVideo.UploadedOn.Value;
-            newVideo.CommentCount.Value= oldVideo.CommentCount.Value;
-            newVideo.MylistCount.Value= oldVideo.MylistCount.Value;
-            newVideo.LikeCount.Value= oldVideo.LikeCount.Value;
-            newVideo.Duration.Value= oldVideo.Duration.Value;
-            newVideo.OwnerID.Value= oldVideo.OwnerID.Value;
-            newVideo.IsDownloaded.Value= oldVideo.IsDownloaded.Value;
+            newVideo.ViewCount.Value = oldVideo.ViewCount.Value;
+            newVideo.NiconicoId.Value = oldVideo.NiconicoId.Value;
+            newVideo.Title.Value = oldVideo.Title.Value;
+            newVideo.IsDeleted.Value = oldVideo.IsDeleted.Value;
+            newVideo.IsSelected.Value = oldVideo.IsSelected.Value;
+            newVideo.OwnerName.Value = oldVideo.OwnerName.Value;
+            newVideo.LargeThumbUrl.Value = oldVideo.LargeThumbUrl.Value;
+            newVideo.ThumbUrl.Value = oldVideo.ThumbUrl.Value;
+            newVideo.Message.Value = oldVideo.Message.Value;
+            if (!oldVideo.ThumbPath.Value.IsNullOrEmpty()) newVideo.ThumbPath.Value = oldVideo.ThumbPath.Value;
+            newVideo.FileName.Value = oldVideo.FileName.Value;
+            newVideo.MessageGuid = oldVideo.MessageGuid;
+            newVideo.Tags = oldVideo.Tags;
+            newVideo.UploadedOn.Value = oldVideo.UploadedOn.Value;
+            newVideo.CommentCount.Value = oldVideo.CommentCount.Value;
+            newVideo.MylistCount.Value = oldVideo.MylistCount.Value;
+            newVideo.LikeCount.Value = oldVideo.LikeCount.Value;
+            newVideo.Duration.Value = oldVideo.Duration.Value;
+            newVideo.OwnerID.Value = oldVideo.OwnerID.Value;
+            newVideo.IsDownloaded.Value = oldVideo.IsDownloaded.Value;
+        }
+
+        public override void Dispose()
+        {
+            VideoMessenger.VideoMessageChange -= this.OnMessage;
+            base.Dispose();
+        }
+
+        /// <summary>
+        /// メッセージ受信
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnMessage(object? sender, VideoMessageChangeEventArgs e)
+        {
+            if (e.ID == this.MessageGuid && e.NewValue != this.Message.Value)
+            {
+                this.Message.Value = e.NewValue;
+            }
         }
     }
 
