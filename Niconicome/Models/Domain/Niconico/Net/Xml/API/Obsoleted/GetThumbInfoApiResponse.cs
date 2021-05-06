@@ -41,7 +41,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted
         public string ThumbnailUrl { get; set; } = string.Empty;
 
         [XmlElement(ElementName = "first_retrieve")]
-        public DateTimeOffset FirstRetrieve { get; set; }
+        public string FirstRetrieve { get; set; } = string.Empty;
 
         [XmlElement(ElementName = "length")]
         public long Length { get; set; }
@@ -52,6 +52,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted
         [XmlElement(ElementName = "comment_num")]
         public long CommentNum { get; set; }
 
+        [XmlElement(ElementName ="like_counter")]
+        public long LikeCounter { get; set; }
+
         [XmlElement(ElementName = "mylist_counter")]
         public long MylistCounter { get; set; }
 
@@ -61,16 +64,16 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted
         [XmlElement(ElementName = "tags")]
         public Tags Tags { get; set; } = new();
 
-        [XmlElement(ElementName = "user_id", IsNullable = true)]
+        [XmlElement(ElementName = "user_id", IsNullable =false)]
         public string? UserId { get; set; }
 
-        [XmlElement(ElementName = "user_nickname", IsNullable = true)]
+        [XmlElement(ElementName = "user_nickname", IsNullable = false)]
         public string? UserNickname { get; set; }
 
-        [XmlElement(ElementName = "ch_id", IsNullable = true)]
+        [XmlElement(ElementName = "ch_id", IsNullable = false)]
         public string? ChId { get; set; }
 
-        [XmlElement(ElementName = "ch_name", IsNullable = true)]
+        [XmlElement(ElementName = "ch_name", IsNullable = false)]
         public string? ChName { get; set; }
     }
 
