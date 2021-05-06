@@ -6,9 +6,14 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
+using Xml = Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted;
+using Const = Niconicome.Models.Const;
+using System.Linq;
+using Niconicome.Models.Domain.Niconico.Net.Xml;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Description
 {
@@ -19,6 +24,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         bool IsOverwriteEnable { get; set; }
         bool IsReplaceRestrictedEnable { get; set; }
         bool IsSaveInJsonEnabled { get; set; }
+        bool IsSaveInXmlEnabled { get; set; }
+        bool IsSaveInTextEnabled { get; set; }
     }
 
     interface IDescriptionDownloader
@@ -29,6 +36,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
     {
         string GetContent(IDmcInfo info);
         string GetJsonContent(IDmcInfo info);
+        string GetXmlContent(IDmcInfo info);
     }
 
     public class DescriptionSetting : IDescriptionSetting
@@ -42,6 +50,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         public bool IsReplaceRestrictedEnable { get; set; }
 
         public bool IsSaveInJsonEnabled { get; set; }
+
+        public bool IsSaveInXmlEnabled { get; set; }
+
+        public bool IsSaveInTextEnabled { get; set; }
     }
 
     class DescriptionDownloader : IDescriptionDownloader
@@ -87,6 +99,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             {
                 fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".json", setting.IsReplaceRestrictedEnable);
             }
+            else if (setting.IsSaveInXmlEnabled)
+            {
+                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".xml", setting.IsReplaceRestrictedEnable);
+            }
             else
             {
                 fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".txt", setting.IsReplaceRestrictedEnable);
@@ -107,6 +123,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             if (setting.IsSaveInJsonEnabled)
             {
                 content = this.producer.GetJsonContent(session.Video.DmcInfo);
+            }
+            else if (setting.IsSaveInXmlEnabled)
+            {
+                content = this.producer.GetXmlContent(session.Video.DmcInfo);
             }
             else
             {
@@ -198,6 +218,35 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
 
             return JsonParser.Serialize(data, options);
         }
+
+        /// <summary>
+        /// XML文字列を取得する
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public string GetXmlContent(IDmcInfo info)
+        {
+            var data = new Xml::GetThumbInfoApiResponse();
+            data.Thumb.VideoId = info.Id;
+            data.Thumb.Title = info.Title;
+            data.Thumb.Description = info.Description;
+            data.Thumb.ThumbnailUrl = (info.ThumbInfo.Large?.IsNullOrEmpty() ?? true) ? info.ThumbInfo.Normal ?? string.Empty : info.ThumbInfo.Large;
+            data.Thumb.FirstRetrieve = new DateTimeOffset(info.UploadedOn, TimeSpan.FromHours(9)).ToString("yyyy-MM-ddTHH:mm:sszzz");
+            data.Thumb.Length = info.Duration;
+            data.Thumb.ViewCounter = info.ViewCount;
+            data.Thumb.CommentNum = info.CommentCount;
+            data.Thumb.LikeCounter = info.LikeCount;
+            data.Thumb.MylistCounter = info.MylistCount;
+            data.Thumb.WatchUrl = Const::Net.NiconicoWatchUrl + info.Id;
+            data.Thumb.Tags.Tag.AddRange(info.Tags.Select(t => new Xml::Tag() { Text = t }));
+            data.Thumb.UserId = info.ChannelName.IsNullOrEmpty() ? info.OwnerID.ToString() : null;
+            data.Thumb.UserNickname = info.ChannelName.IsNullOrEmpty() ? info.Owner : null;
+            data.Thumb.ChName = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelName;
+            data.Thumb.ChId = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelID;
+
+            return Xmlparser.Serialize(data, new System.Xml.XmlWriterSettings());
+        }
+
 
         class VideoInfoJson
         {

@@ -13,6 +13,7 @@ using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Download = Niconicome.Models.Domain.Niconico.Download;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
+using EnumSetting = Niconicome.Models.Local.Settings.EnumSettingsValue;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -25,12 +26,13 @@ namespace Niconicome.Models.Network.Download
 
     class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter)
+        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter, IEnumSettingsHandler enumSettingsHander)
         {
             this.localContentHandler = localContentHandler;
             this.settingHandler = localSettingHandler;
             this.converter = converter;
             this.logger = logger;
+            this.enumSettingsHandler = enumSettingsHander;
         }
 
         #region フィールド
@@ -41,6 +43,8 @@ namespace Niconicome.Models.Network.Download
         private readonly ILocalContentHandler localContentHandler;
 
         private readonly IDomainModelConverter converter;
+
+        private readonly IEnumSettingsHandler enumSettingsHandler;
 
         #endregion
 
@@ -281,9 +285,9 @@ namespace Niconicome.Models.Network.Download
         private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
         {
             string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
-            bool dlInJson = this.settingHandler.GetBoolSetting(SettingsEnum.VideoInfoInJson);
+            var dlType = this.enumSettingsHandler.GetSetting<EnumSetting::VideoInfoTypeSettings>();
 
-            var dSettings = settings.ConvertToDescriptionDownloadSetting(fileNameFormat, dlInJson);
+            var dSettings = settings.ConvertToDescriptionDownloadSetting(fileNameFormat, dlType == EnumSetting::VideoInfoTypeSettings.Json, dlType == EnumSetting::VideoInfoTypeSettings.Xml, dlType == EnumSetting::VideoInfoTypeSettings.Text);
             var descriptionDownloader = DIFactory.Provider.GetRequiredService<DDL::IDescriptionDownloader>();
             Download::IDownloadResult result;
             try
