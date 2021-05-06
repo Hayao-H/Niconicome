@@ -17,13 +17,16 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static string Serialize<T>(T data)
+        public static string Serialize<T>(T data, XmlWriterSettings? settings = null)
         {
             var serializer = new XmlSerializer(typeof(T));
-            var settings = new XmlWriterSettings()
+            if (settings is null)
             {
-                OmitXmlDeclaration = true
-            };
+                settings = new XmlWriterSettings()
+                {
+                    OmitXmlDeclaration = true
+                };
+            }
             var emptyns = new XmlSerializerNamespaces();
             emptyns.Add(string.Empty, string.Empty);
             var stringWriter = new StringWriter();

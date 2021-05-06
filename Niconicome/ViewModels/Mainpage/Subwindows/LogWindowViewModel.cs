@@ -61,24 +61,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// </summary>
         public ReactiveCommand ClearMessageCommand { get; init; } = new();
 
-        /// <summary>
-        /// インスタンスを破棄
-        /// </summary>
-        public void Dispose()
-        {
-            if (this.hasDisposed) return;
-            this.disposables.Dispose();
-            this.hasDisposed = true;
-            GC.SuppressFinalize(this);
-        }
-
-        #region private
-
-        private readonly CompositeDisposable disposables;
-
-        private bool hasDisposed;
-        #endregion
-
     }
 
     /// <summary>

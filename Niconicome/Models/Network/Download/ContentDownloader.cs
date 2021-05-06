@@ -57,7 +57,7 @@ namespace Niconicome.Models.Network.Download
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
         Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset);
-        DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson);
+        DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson, bool dlInXml, bool dlInText);
     }
 
     public interface IDownloadResult
@@ -453,7 +453,7 @@ namespace Niconicome.Models.Network.Download
             };
         }
 
-        public DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson)
+        public DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson, bool dlInXml, bool dlInText)
         {
             return new DDL::DescriptionSetting()
             {
@@ -462,6 +462,8 @@ namespace Niconicome.Models.Network.Download
                 IsReplaceRestrictedEnable = this.IsReplaceStrictedEnable,
                 Format = fileFormat,
                 IsSaveInJsonEnabled = dlInJson,
+                IsSaveInXmlEnabled = dlInXml,
+                IsSaveInTextEnabled = dlInText,
             };
         }
 

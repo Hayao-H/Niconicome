@@ -170,6 +170,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.ReAllocateCommands => STypes::SettingNames.ReAllocateIfVideoisNotSaved,
                 SettingsEnum.VListItemdbClick => STypes::SettingNames.VideoListItemdbClickAction,
                 SettingsEnum.AutoRenameNetPlaylist => STypes::SettingNames.AutoRenamingAfterSetNetworkPlaylist,
+                SettingsEnum.VideoInfoType=>STypes::SettingNames.VideoInfoType,
                 _ => null
             };
         }
@@ -230,5 +231,6 @@ namespace Niconicome.Models.Local.Settings
         ReAllocateCommands,
         VListItemdbClick,
         AutoRenameNetPlaylist,
+        VideoInfoType,
     }
 }

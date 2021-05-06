@@ -226,27 +226,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; }
 
-        /// <summary>
-        /// インスタンスを破棄する
-        /// </summary>
-        public void Dispose()
-        {
-            if (this.hasDisposed) return;
-            this.disposables.Dispose();
-            this.hasDisposed = true;
-            GC.SuppressFinalize(this);
-        }
-
         #region private
-        /// <summary>
-        /// 廃棄フラグ
-        /// </summary>
-        private bool hasDisposed;
-
-        /// <summary>
-        /// 破棄コレクション
-        /// </summary>
-        private CompositeDisposable disposables;
 
         /// <summary>
         /// 動画をダウンロードする
