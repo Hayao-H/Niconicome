@@ -107,7 +107,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 {
                     video.MessageGuid = lightVideo.MessageGuid;
                     video.IsSelected.Value = lightVideo.IsSelected;
-                    video.Message.Value = VideoMessanger.GetMessage(lightVideo.MessageGuid);
+                    video.Message.Value = VideoMessenger.GetMessage(lightVideo.MessageGuid);
                     video.FileName.Value = lightVideo.FileName;
                 }
                 else

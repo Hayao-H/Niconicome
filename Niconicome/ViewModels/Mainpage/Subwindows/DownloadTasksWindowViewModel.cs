@@ -77,8 +77,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         ~DownloadTasksWindowViewModel()
         {
-            WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.TaskPoolChange -= this.OnStagedTaskChanged;
-            WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.TaskPoolChange -= this.OnTaskChanged;
             this.Dispose();
         }
 
@@ -216,6 +214,17 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// メッセージキュー
         /// </summary>
         public Material::SnackbarMessageQueue Queue { get; init; } = new();
+
+        /// <summary>
+        /// インスタンスを破棄する
+        /// </summary>
+        public override void Dispose()
+        {
+            WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.TaskPoolChange -= this.OnStagedTaskChanged;
+            WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.TaskPoolChange -= this.OnTaskChanged;
+            base.Dispose();
+            GC.SuppressFinalize(this);
+        }
     }
 
     class DownloadTasksWindowViewModelD

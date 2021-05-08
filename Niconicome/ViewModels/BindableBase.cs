@@ -33,7 +33,7 @@ namespace Niconicome.ViewModels
 
         protected bool hasDisposed;
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (this.hasDisposed) return;
             this.disposables.Dispose();
