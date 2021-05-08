@@ -115,6 +115,7 @@ namespace Niconicome.Models.Network.Download
                 DownloadVideoInfo = this.IsDownloadingVideoInfoEnable.Value,
                 ResumeEnable = resumeEnable,
                 EnableUnsafeCommentHandle = unsafeHandle,
+                SaveWithoutEncode = this.IsNoEncodeEnable.Value,
             };
         }
 

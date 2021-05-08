@@ -29,6 +29,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         string FolderName { get; }
         bool IsOverwriteEnable { get; }
         bool IsOverrideDTEnable { get; }
+        bool IsNoEncodeEnable { get; }
         DateTime UploadedOn { get; }
         IEnumerable<string> TsFilePaths { get; }
     }
@@ -95,9 +96,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             if (token.IsCancellationRequested) return;
 
-            messenger.SendMessage("ffmpegで変換を開始(.ts=>.mp4)");
-            await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, token, LocalFile::EncodeOptions.Copy);
-            messenger.SendMessage("ffmpegの変換が完了");
+            if (settings.IsNoEncodeEnable)
+            {
+                messenger.SendMessage("動画ファイルをコピー中");
+                File.Copy(targetFilePath, mp4Filename);
+                messenger.SendMessage("動画ファイルのコピーが完了");
+            }
+            else
+            {
+                messenger.SendMessage("ffmpegで変換を開始(.ts=>.mp4)");
+                await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, token, LocalFile::EncodeOptions.Copy);
+                messenger.SendMessage("ffmpegの変換が完了");
+            }
 
             if (settings.IsOverrideDTEnable)
             {
@@ -183,6 +193,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public bool IsOverwriteEnable { get; set; }
 
         public bool IsOverrideDTEnable { get; set; }
+
+        public bool IsNoEncodeEnable { get; set; }
 
         public DateTime UploadedOn { get; set; }
 

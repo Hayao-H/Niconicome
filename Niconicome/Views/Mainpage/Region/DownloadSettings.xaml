@@ -71,10 +71,10 @@
             </Grid.RowDefinitions>
             <Label Content="オプション"/>
             <DockPanel  Grid.Row="1">
-                <CheckBox Margin="5 0" Content="同名時に上書き" IsChecked="{Binding IsOverwriteEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                <CheckBox Margin="5 0" Content="ダウンロード済をスキップ" IsChecked="{Binding IsSkippingEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                <CheckBox Margin="5 0" Content="ファイルを別フォルダーからコピー" IsChecked="{Binding IsCopyFromAnotherFolderEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                <CheckBox Margin="5 0" Content="動画をエンコードしない" ToolTip="mp4形式にエンコードせずにMpeg2-TSのまま保存します。" IsChecked="{Binding IsNotEncodeEnable,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Margin="5 0" Content="同名時に上書き" IsChecked="{Binding IsOverwriteEnable.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Margin="5 0" Content="ダウンロード済をスキップ" IsChecked="{Binding IsSkippingEnable.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Margin="5 0" Content="ファイルを別フォルダーからコピー" IsChecked="{Binding IsCopyFromAnotherFolderEnable.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Margin="5 0" Content="動画をエンコードしない" ToolTip="mp4形式にエンコードせずにMpeg2-TSのまま保存します。" IsChecked="{Binding IsNotEncodeEnable.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 <DockPanel HorizontalAlignment="Right">
                     <Button Content="ステージ" HorizontalAlignment="Right" Margin="10 0" Command="{Binding StageVideosCommand}"/>
                     <Button Content="中断" HorizontalAlignment="Right" Margin="10 0" Command="{Binding CancelCommand}"/>
