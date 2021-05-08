@@ -21,7 +21,7 @@ namespace NiconicomeTest.NetWork.Niconico.Search
         {
             var query = new SearchQuery() { SearchType = SearchType.Tag, Query = "東方", Page = 1, SortOption = new SortOption() { Sort = Sort.ViewCount } };
             var result = this.searchUrlConstructor!.GetUrl(query);
-            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tags&_sort=-viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&_limit=50&_offset=0";
+            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tagsExact&_sort=-viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&_limit=50&_offset=0";
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -31,7 +31,7 @@ namespace NiconicomeTest.NetWork.Niconico.Search
         {
             var query = new SearchQuery() { SearchType = SearchType.Tag, Query = "東方", Page = 1, SortOption = new SortOption() { Sort = Sort.ViewCount, IsAscending = true } };
             var result = this.searchUrlConstructor!.GetUrl(query);
-            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tags&_sort=%2bviewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&_limit=50&_offset=0";
+            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tagsExact&_sort=%2bviewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&_limit=50&_offset=0";
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -41,7 +41,7 @@ namespace NiconicomeTest.NetWork.Niconico.Search
         {
             var query = new SearchQuery() { SearchType = SearchType.Tag, Query = "東方", Page = 2, SortOption = new SortOption() { Sort = Sort.ViewCount } };
             var result = this.searchUrlConstructor!.GetUrl(query);
-            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tags&_sort=-viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&_limit=50&_offset=50";
+            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tagsExact&_sort=-viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&_limit=50&_offset=50";
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -62,7 +62,7 @@ namespace NiconicomeTest.NetWork.Niconico.Search
         {
             var query = new SearchQuery() { SearchType = SearchType.Tag, Query = "東方", Page = 1, SortOption = new SortOption() { Sort = Sort.ViewCount }, Genre = Genre.Game };
             var result = this.searchUrlConstructor!.GetUrl(query);
-            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tags&_sort=-viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&jsonFilter={\"type\":\"and\",\"filters\":[{\"type\":\"equal\",\"field\":\"genre\",\"value\":\"ゲーム\"}]}&_limit=50&_offset=0";
+            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tagsExact&_sort=-viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&jsonFilter={\"type\":\"and\",\"filters\":[{\"type\":\"equal\",\"field\":\"genre\",\"value\":\"ゲーム\"}]}&_limit=50&_offset=0";
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -72,7 +72,7 @@ namespace NiconicomeTest.NetWork.Niconico.Search
         {
             var query = new SearchQuery() { SearchType = SearchType.Tag, Query = "東方", Page = 1, SortOption = new SortOption() { Sort = Sort.ViewCount }, UploadedDateTimeStart = new DateTimeOffset(2021, 4, 18, 0, 0, 0, TimeSpan.FromHours(9)), UploadedDateTimeEnd = new DateTimeOffset(2021, 4, 18, 0, 0, 0, TimeSpan.FromHours(9)) };
             var result = this.searchUrlConstructor!.GetUrl(query);
-            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tags&_sort=-viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&jsonFilter={\"type\":\"and\",\"filters\":[{\"type\":\"range\",\"field\":\"startTime\",\"from\":\"" + HttpUtility.UrlEncode("2021-04-18T00:00:00+09:00") + "\",\"to\":\"" + HttpUtility.UrlEncode("2021-04-18T00:00:00+09:00") + "\",\"include_lower\":true,\"include_upper\":true}]}&_limit=50&_offset=0";
+            var expected = API.SnapshotAPIV2 + "?" + "q=東方&targets=tagsExact&_sort=-viewCounter&fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter&jsonFilter={\"type\":\"and\",\"filters\":[{\"type\":\"range\",\"field\":\"startTime\",\"from\":\"" + HttpUtility.UrlEncode("2021-04-18T00:00:00+09:00") + "\",\"to\":\"" + HttpUtility.UrlEncode("2021-04-18T00:00:00+09:00") + "\",\"include_lower\":true,\"include_upper\":true}]}&_limit=50&_offset=0";
 
             Assert.That(result, Is.EqualTo(expected));
         }
