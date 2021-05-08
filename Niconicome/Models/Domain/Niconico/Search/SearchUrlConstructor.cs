@@ -32,7 +32,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
             //検索タイプ
             var sType = query.SearchType switch
             {
-                SearchType.Tag => "tags",
+                SearchType.Tag => "tagsExact",
                 _ => "title,description,tags"
             };
             list.Add($"targets={sType}");
