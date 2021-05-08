@@ -144,6 +144,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 }
                 else
                 {
+                    video.ThumbPath = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId);
                     videos.Add(video);
                 }
             }
