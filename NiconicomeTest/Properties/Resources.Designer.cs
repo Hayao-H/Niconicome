@@ -142,6 +142,24 @@ namespace NiconicomeTest.Properties {
         
         /// <summary>
         ///   &lt;!DOCTYPE html&gt;
+        ///&lt;div class=&quot;IchibaForWatch&quot;&gt;
+        ///    &lt;div class=&quot;IchibaForWatch_Header&quot;&gt;
+        ///        &lt;div class=&quot;IchibaForWatch_Title&quot;&gt;
+        ///            &lt;span class=&quot;IchibaForWatch_Title_Body&quot;&gt;ニコニコ市場&lt;/span&gt;
+        ///            &lt;a href=&quot;https://qa.nicovideo.jp/faq/show/758?site_domain=default&quot; class=&quot;IchibaForWatch_Title_Hint&quot;
+        ///                title=&quot;ニコニコ市場とは？&quot; target=&quot;_blank&quot;&gt;&lt;svg width=&quot;10px&quot; height=&quot;10px&quot; viewBox=&quot;0 0 10 10&quot;
+        ///                    xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+        ///                    &lt;path
+        ///             [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string IchibaHtml {
+            get {
+                return ResourceManager.GetString("IchibaHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &lt;!DOCTYPE html&gt;
         ///&lt;html lang=&quot;ja&quot;&gt;
         ///  &lt;head&gt;
         ///    &lt;meta charset=&quot;UTF-8&quot;&gt;

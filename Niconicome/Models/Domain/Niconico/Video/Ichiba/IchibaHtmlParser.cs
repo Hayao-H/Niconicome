@@ -17,7 +17,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
     /// <summary>
     /// 市場情報の解析を担当する
     /// </summary>
-    class IchibaHtmlParser : IIchibaHtmlParser
+    public class IchibaHtmlParser : IIchibaHtmlParser
     {
         /// <summary>
         /// 市場情報のHTMlを解析する
