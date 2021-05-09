@@ -13,6 +13,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
         string Category { get; }
         string Price { get; }
         string LinkUrl { get; }
+        string ThumbUrl { get; }
     }
 
     public interface INiconicoIchibaInfo
@@ -23,7 +24,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
     /// <summary>
     /// 商品情報のラッパー
     /// </summary>
-    class NiconicoIchibaInfo: INiconicoIchibaInfo
+    class NiconicoIchibaInfo : INiconicoIchibaInfo
     {
         public List<IIchibaItem> IchibaItems { get; init; } = new();
     }
@@ -35,10 +36,13 @@ namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
     {
         public string Name { get; set; } = string.Empty;
 
-       public string Category { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
 
         public string Price { get; set; } = string.Empty;
 
         public string LinkUrl { get; set; } = string.Empty;
+
+        public string ThumbUrl { get; set; } = string.Empty;
+
     }
 }
