@@ -163,7 +163,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<VList::IVideoListContainer, VList::VideoListContainer>();
             services.AddTransient<VList::IVideoListRefresher, VList::VideoListRefresher>();
             services.AddTransient<Ext::IExternalAppUtils, Ext::ExternalAppUtils>();
-            services.AddTransient<DomainExt::ICommandExecuter,DomainExt::CommandExecuter>();
+            services.AddTransient<DomainExt::ICommandExecuter, DomainExt::CommandExecuter>();
+            services.AddTransient<DomainNet::INetWorkHelper, DomainNet::NetWorkHelper>();
 
             return services.BuildServiceProvider();
         }
