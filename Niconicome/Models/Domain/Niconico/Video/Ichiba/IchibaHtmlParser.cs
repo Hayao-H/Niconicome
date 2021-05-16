@@ -65,7 +65,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
                 var title = titleElm.InnerHtml;
                 var link = titleElm.GetAttribute("href");
                 var category = item.QuerySelector(".IchibaMainItem_Info_Category").InnerHtml;
-                var price = item.QuerySelector(".IchibaMainItem_Price_Number").InnerHtml;
+                var price = item.QuerySelector(".IchibaMainItem_Price_Number")?.InnerHtml??"NaN";
                 var thumb = item.QuerySelector(".IchibaMainItem_Thumbnail img").GetAttribute("src");
                 var itemInfo = new IchibaItem()
                 {
