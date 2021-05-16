@@ -21,7 +21,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
                 .Replace("{item_url}", item.LinkUrl);
         }
 
-        private const string template = "<li class=\"market_item\"><div class=\"market_item_img_wrapper\"><a target=\"_blank\" href = \"{thumb_url}\" ><img src=\"{thumb_url}\"></a><span class=\"img_tip\">ニコニコ市場</span></div><div class=\"market_item_info_wrapper\"><p class=\"market_item_name\" title=\"{item_name}\">{item_name}</p><p>{item_price}</p><p>{item_category}</p><a href=\"{item_url}\" target=\"_blank\">売り場に行く</a></div></li>";
+        private const string template = "<li class=\"market_item\"><div class=\"market_item_img_wrapper\"><a target=\"_blank\" href = \"{thumb_url}\" ><img src=\"{thumb_url}\"></a><span class=\"img_tip\">ニコニコ市場</span></div><div class=\"market_item_info_wrapper\"><p class=\"market_item_name\" title=\"{item_name}\">{item_name}</p><p class=\"market_item_price\">{item_price}</p><p class=\"market_item_category\">{item_category}</p><a href=\"{item_url}\" target=\"_blank\">売り場に行く</a></div></li>";
     }
 
     public static class IchibaTemplate
@@ -45,7 +45,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
             ".market_item_name{ font-weight: 700; display: inline; } " + Environment.NewLine +
             ".market_item_info_wrapper{ display: flex; flex-direction: column; text-align: center; } " + Environment.NewLine +
             "#footer{ text-align: center; background-color: rgb(34, 34, 34); color: whitesmoke;  padding: 8px; } " + Environment.NewLine +
-            ".img_tip{ position: absolute; background-color: rgba(0, 0, 0, 0.575); bottom: 3px; right: 5px; color: white;} " + Environment.NewLine +
+            ".img_tip{ position: absolute; background-color: rgba(0, 0, 0, 0.575); bottom: 3px; right: 5px; color: white; mlfont-size: 14px; padding: 0 2px;} " + Environment.NewLine +
+            ".market_item_price { color: #870C1E; }" + Environment.NewLine +
+            ".market_item_category { color: #6C6C6C; }" + Environment.NewLine +
             "</style></head><body><div><h1 id=\"title\"><a target=\"_blank\" href=\"{watch_url}\">{title}</a></h1></div><ul id=\"market_items_container\">{items}</ul></body><footer id=\"footer\"><p>This document was produced automatically by <a href=\"https://github.com/Hayao-H/Niconicome\">Niconicome</a>.</p></footer></html>";
     }
 }
