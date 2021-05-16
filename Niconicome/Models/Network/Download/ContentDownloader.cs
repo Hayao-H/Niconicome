@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.VideoList;
@@ -51,6 +52,7 @@ namespace Niconicome.Models.Network.Download
         uint VerticalResolution { get; }
         int PlaylistID { get; }
         int MaxCommentsCount { get; }
+        IchibaInfoTypeSettings IchibaInfoType { get; }
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(bool autodispose, int maxParallelDLCount);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting();
         Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(int commentOffset);
@@ -398,6 +400,8 @@ namespace Niconicome.Models.Network.Download
 
         public string IchibaInfoExt { get; set; } = string.Empty;
 
+        public IchibaInfoTypeSettings IchibaInfoType { get; set; }
+
         public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(bool autodispose, int maxParallelDLCount)
         {
             return new Vdl::VideoDownloadSettings()
@@ -465,6 +469,9 @@ namespace Niconicome.Models.Network.Download
             return new IDl::IchibaInfoDownloadSettings()
             {
                 IsReplacingStrictedEnabled = this.IsReplaceStrictedEnable,
+                IsXml = this.IchibaInfoType == IchibaInfoTypeSettings.Xml,
+                IsJson = this.IchibaInfoType == IchibaInfoTypeSettings.Json,
+                IsHtml = this.IchibaInfoType == IchibaInfoTypeSettings.Html,
             };
         }
 

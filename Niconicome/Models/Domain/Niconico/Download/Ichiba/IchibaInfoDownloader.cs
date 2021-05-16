@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Niconicome.Extensions;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Net.Xml;
 using Niconicome.Models.Domain.Niconico.Video.Ichiba;
@@ -86,19 +89,32 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
 
             string content;
 
-            //if (!settings.IsHtml)
-            //{
-            try
+            if (!settings.IsHtml)
             {
-                content = this.GetContent(getResult.Data, settings.IsXml);
-            }
-            catch (Exception e)
+                try
+                {
+                    content = this.GetContent(getResult.Data, settings.IsXml);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error($"市場情報のシリアル化に失敗しました。(詳細:{getResult.Message} ,ctx:{context.GetLogContent()})", e);
+                    onMessage($"市場情報のシリアル化に失敗しました。({session.Video.Id})");
+                    return new AttemptResult() { Message = "市場情報のシリアル化に失敗しました。" };
+                }
+            } else
             {
-                this.logger.Error($"市場情報のシリアル化に失敗しました。(詳細:{getResult.Message} ,ctx:{context.GetLogContent()})", e);
-                onMessage($"市場情報のシリアル化に失敗しました。({session.Video.Id})");
-                return new AttemptResult() { Message = "市場情報のシリアル化に失敗しました。" };
+
+                try
+                {
+                    content = this.GetHtmlContent(getResult.Data, session.Video.Id);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error($"市場情報のシリアル化に失敗しました。(詳細:{getResult.Message} ,ctx:{context.GetLogContent()})", e);
+                    onMessage($"市場情報のシリアル化に失敗しました。({session.Video.Id})");
+                    return new AttemptResult() { Message = "市場情報のシリアル化に失敗しました。" };
+                }
             }
-            //}
 
             try
             {
@@ -152,6 +168,26 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
             }
 
             return serialized;
+        }
+
+        /// <summary>
+        /// Htmlを取得するを
+        /// </summary>
+        /// <param name="niconicoIchibaInfo"></param>
+        /// <param name="niconicoId"></param>
+        /// <returns></returns>
+        private string GetHtmlContent(INiconicoIchibaInfo niconicoIchibaInfo, string niconicoId)
+        {
+            var page = IchibaTemplate.GetReplacedString(niconicoId);
+            var items = new List<string>();
+            foreach (var item in niconicoIchibaInfo.IchibaItems)
+            {
+                var htmlItem = IchibaItemTemplate.GetReplacedString(item);
+                items.Add(htmlItem);
+            }
+
+            var combined = string.Join("", items);
+            return page.Replace("{items}", combined);
         }
         #endregion
 

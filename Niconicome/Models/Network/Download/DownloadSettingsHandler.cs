@@ -135,6 +135,7 @@ namespace Niconicome.Models.Network.Download
                 VideoInfoExt = videoInfoExt,
                 IchibaInfoExt = ichibaInfoExt,
                 DownloadIchibaInfo = this.IsDownloadingIchibaInfoEnable.Value,
+                IchibaInfoType = ichibaInfoT,
             };
         }
 

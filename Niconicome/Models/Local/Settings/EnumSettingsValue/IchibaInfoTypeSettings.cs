@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Local.Settings.EnumSettingsValue
 {
-    enum IchibaInfoTypeSettings
+    public enum IchibaInfoTypeSettings
     {
         Html,
         Json,
