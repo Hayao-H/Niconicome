@@ -399,8 +399,9 @@ namespace Niconicome.Models.Network.Download
         private async Task<IAttemptResult> DownloadIchibaInfoAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context)
         {
             var iSettings = settings.ConvertToIchibaInfoDownloadSettings();
-            var filePath = this.pathOrganizer.GetFIlePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.IchibaInfoExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
+            var filePath = this.pathOrganizer.GetFIlePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.IchibaInfoExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite,"[ichiba]");
             IOUtils.CreateDirectoryIfNotExist(filePath);
+            iSettings.FilePath = filePath;
 
             var iDownloader = DIFactory.Provider.GetRequiredService<IIchibaInfoDownloader>();
             var result = await iDownloader.DownloadIchibaInfo(session, iSettings, onMessage, context);

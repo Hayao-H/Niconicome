@@ -17,7 +17,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
         bool IsJson { get; }
         bool IsXml { get; }
         bool IsReplacingStrictedEnabled { get; }
-        string FilePath { get; }
+        string FilePath { get; set; }
 
     }
 
