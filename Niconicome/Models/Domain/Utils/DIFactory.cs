@@ -11,12 +11,15 @@ using DlThumb = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using DlVideo = Niconicome.Models.Domain.Niconico.Download.Video;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
 using DomainDownload = Niconicome.Models.Domain.Niconico.Download;
+using DomainExt = Niconicome.Models.Domain.Local.External;
 using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
+using Ext = Niconicome.Models.Local.External;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
+using Ichiba = Niconicome.Models.Domain.Niconico.Video.Ichiba;
 using Import = Niconicome.Models.Local.External.Import;
 using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
@@ -28,6 +31,7 @@ using Niconico = Niconicome.Models.Domain.Niconico;
 using Playlist = Niconicome.Models.Playlist;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Search;
+using Settings = Niconicome.Models.Local.Settings;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
@@ -35,9 +39,7 @@ using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
-using DomainExt = Niconicome.Models.Domain.Local.External;
-using Ext = Niconicome.Models.Local.External;
-using Settings = Niconicome.Models.Local.Settings;
+using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -163,7 +165,12 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<VList::IVideoListContainer, VList::VideoListContainer>();
             services.AddTransient<VList::IVideoListRefresher, VList::VideoListRefresher>();
             services.AddTransient<Ext::IExternalAppUtils, Ext::ExternalAppUtils>();
-            services.AddTransient<DomainExt::ICommandExecuter,DomainExt::CommandExecuter>();
+            services.AddTransient<DomainExt::ICommandExecuter, DomainExt::CommandExecuter>();
+            services.AddTransient<DomainNet::INetWorkHelper, DomainNet::NetWorkHelper>();
+            services.AddTransient<Ichiba::IIchibaHtmlParser, Ichiba::IchibaHtmlParser>();
+            services.AddTransient<Ichiba::INiconicoIchibaHandler, Ichiba::NiconicoIchibaHandler>();
+            services.AddTransient<Utils::IPathOrganizer, Utils::PathOrganizer>();
+            services.AddTransient<DlIchiba::IIchibaInfoDownloader, DlIchiba::IchibaInfoDownloader>();
 
             return services.BuildServiceProvider();
         }

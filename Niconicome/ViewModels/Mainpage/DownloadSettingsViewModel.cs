@@ -23,19 +23,20 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public DownloadSettingsViewModel(IEventAggregator ea)
         {
-            this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsLimittingCommentCountEnable = WS::Mainpage.DownloadSettingsHandler.IsLimittingCommentCountEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsDownloadingVideoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsDownloadingCommentEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingCommentEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsDownloadingCommentLogEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingCommentLogEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsDownloadingEasyComment = WS::Mainpage.DownloadSettingsHandler.IsDownloadingEasyComment.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsDownloadingThumbEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingThumbEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsDownloadingOwnerComment = WS::Mainpage.DownloadSettingsHandler.IsDownloadingOwnerComment.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsOverwriteEnable = WS::Mainpage.DownloadSettingsHandler.IsOverwriteEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsSkippingEnable = WS::Mainpage.DownloadSettingsHandler.IsSkippingEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsCopyFromAnotherFolderEnable = WS::Mainpage.DownloadSettingsHandler.IsCopyFromAnotherFolderEnable.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.MaxCommentsCount = WS::Mainpage.DownloadSettingsHandler.MaxCommentsCount.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsNotEncodeEnable = WS::Mainpage.DownloadSettingsHandler.IsNoEncodeEnable.ToReactivePropertyAsSynchronized(x => x.Value);
+            this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsLimittingCommentCountEnable = WS::Mainpage.DownloadSettingsHandler.IsLimittingCommentCountEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsDownloadingVideoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsDownloadingCommentEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingCommentEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsDownloadingCommentLogEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingCommentLogEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsDownloadingEasyComment = WS::Mainpage.DownloadSettingsHandler.IsDownloadingEasyComment.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsDownloadingThumbEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingThumbEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsDownloadingOwnerComment = WS::Mainpage.DownloadSettingsHandler.IsDownloadingOwnerComment.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsOverwriteEnable = WS::Mainpage.DownloadSettingsHandler.IsOverwriteEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsSkippingEnable = WS::Mainpage.DownloadSettingsHandler.IsSkippingEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsCopyFromAnotherFolderEnable = WS::Mainpage.DownloadSettingsHandler.IsCopyFromAnotherFolderEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.MaxCommentsCount = WS::Mainpage.DownloadSettingsHandler.MaxCommentsCount.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsNotEncodeEnable = WS::Mainpage.DownloadSettingsHandler.IsNoEncodeEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsDownloadingIchibaInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingIchibaInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
 
             var s1 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"), "1080px");
             var s2 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("1280x720"), "720px");
@@ -94,7 +95,7 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value) return;
+                if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value && !this.IsDownloadingIchibaInfoEnable.Value) return;
 
                 var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).Copy();
                 if (!videos.Any()) return;
@@ -186,6 +187,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; init; }
 
+        /// <summary>
+        /// 市場情報
+        /// </summary>
+        public ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; init; }
+
 
         /// <summary>
         /// 上書き保存フラグ
@@ -210,7 +216,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// エンコードしない
         /// </summary>
-        public ReactiveProperty<bool> IsNotEncodeEnable { get; init; } 
+        public ReactiveProperty<bool> IsNotEncodeEnable { get; init; }
 
         /// <summary>
         /// コメントの最大取得数
@@ -259,7 +265,7 @@ namespace Niconicome.ViewModels.Mainpage
                 return;
             }
 
-            if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value) return;
+            if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value && !this.IsDownloadingIchibaInfoEnable.Value) return;
 
             var videos = vm is null ? WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).Copy() : new List<IListVideoInfo>() { vm.VideoInfo };
             if (!videos.Any()) return;
@@ -344,6 +350,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<bool> IsLimittingCommentCountEnable { get; set; } = new(true);
 
         public ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; set; } = new(true);
+
+        public ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; set; } = new(true);
 
         public ReactiveProperty<bool> IsNotEncodeEnable { get; init; } = new(false);
 

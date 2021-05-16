@@ -142,6 +142,33 @@ namespace NiconicomeTest.Properties {
         
         /// <summary>
         ///   &lt;!DOCTYPE html&gt;
+        ///&lt;div class=&quot;IchibaForWatch&quot;&gt;
+        ///    &lt;div class=&quot;IchibaForWatch_Header&quot;&gt;
+        ///        &lt;div class=&quot;IchibaForWatch_Title&quot;&gt;
+        ///            &lt;span class=&quot;IchibaForWatch_Title_Body&quot;&gt;ニコニコ市場&lt;/span&gt;
+        ///            &lt;a href=&quot;https://qa.nicovideo.jp/faq/show/758?site_domain=default&quot; class=&quot;IchibaForWatch_Title_Hint&quot;
+        ///                title=&quot;ニコニコ市場とは？&quot; target=&quot;_blank&quot;&gt;&lt;svg width=&quot;10px&quot; height=&quot;10px&quot; viewBox=&quot;0 0 10 10&quot;
+        ///                    xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+        ///                    &lt;path
+        ///             [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string IchibaHtml {
+            get {
+                return ResourceManager.GetString("IchibaHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {&quot;main&quot;:&quot;&lt;div class=\&quot;IchibaForWatch\&quot;&gt;\r\n  &lt;div class=\&quot;IchibaForWatch_Header\&quot;&gt;\r\n    &lt;div class=\&quot;IchibaForWatch_Title\&quot;&gt;\r\n      &lt;span class=\&quot;IchibaForWatch_Title_Body\&quot;&gt;\u30cb\u30b3\u30cb\u30b3\u5e02\u5834&lt;\/span&gt;\r\n      &lt;a href=\&quot;https:\/\/qa.nicovideo.jp\/faq\/show\/758?site_domain=default\&quot; class=\&quot;IchibaForWatch_Title_Hint\&quot; title=\&quot;\u30cb\u30b3\u30cb\u30b3\u5e02\u5834\u3068\u306f\uff1f\&quot; target=\&quot;_blank\&quot;&gt;&lt;svg width=\&quot;10px\&quot; height=\&quot;10px\&quot; viewBox=\&quot;0 0 10 10\&quot; xmlns=\&quot;http:\/\/www.w3.org\/ [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string IchibaResponse {
+            get {
+                return ResourceManager.GetString("IchibaResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &lt;!DOCTYPE html&gt;
         ///&lt;html lang=&quot;ja&quot;&gt;
         ///  &lt;head&gt;
         ///    &lt;meta charset=&quot;UTF-8&quot;&gt;

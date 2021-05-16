@@ -103,6 +103,19 @@ namespace Niconicome.ViewModels.Setting.Pages
             };
             this.VideoInfoType.Subscribe(value => this.SaveEnumSetting(value)).AddTo(this.disposables);
 
+
+            var i1 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Html, "html");
+            var i2 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Json, "json");
+            var i3 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Xml, "xml");
+            this.SelectableIchibaInfoType = new List<ComboboxItem<IchibaInfoTypeSettings>>() { i1, i2, i3 };
+            this.IchibaInfoType = WS::SettingPage.EnumSettingsHandler.GetSetting<IchibaInfoTypeSettings>() switch
+            {
+                IchibaInfoTypeSettings.Xml => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i3) ,
+                IchibaInfoTypeSettings.Json => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i2),
+                _ => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i1),
+            };
+            this.IchibaInfoType.Subscribe(value => this.SaveEnumSetting(value)).AddTo(this.disposables);
+
         }
 
         #region 設定値のフィールド
@@ -118,6 +131,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// 選択可能な動画情報ファイルの保存形式
         /// </summary>
         public List<ComboboxItem<VideoInfoTypeSettings>> SelectableVideoInfoType { get; init; }
+
+        /// <summary>
+        /// 選択可能な市場情報ファイルの保存形式
+        /// </summary>
+        public List<ComboboxItem<IchibaInfoTypeSettings>> SelectableIchibaInfoType { get; init; }
 
 
         /// <summary>
@@ -144,6 +162,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// 動画情報ファイルの保存形式
         /// </summary>
         public ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>> VideoInfoType { get; init; }
+
+        /// <summary>
+        /// 市場情報の保存形式
+        /// </summary>
+        public ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>> IchibaInfoType { get; init; }
 
         /// <summary>
         /// キューからもDLする
@@ -204,6 +227,12 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             this.SelectableVideoInfoType = new List<ComboboxItem<VideoInfoTypeSettings>>() { t1, t2, t3 };
             this.VideoInfoType = new ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>>(t2);
+
+            var i1 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Html, "html");
+            var i2 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Json, "json");
+            var i3 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Xml, "xml");
+            this.SelectableIchibaInfoType = new List<ComboboxItem<IchibaInfoTypeSettings>>() { i1, i2, i3 };
+            this.IchibaInfoType = new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i1);
         }
 
 
@@ -211,11 +240,15 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public List<ComboboxItem<VideoInfoTypeSettings>> SelectableVideoInfoType { get; init; }
 
+        public List<ComboboxItem<IchibaInfoTypeSettings>> SelectableIchibaInfoType { get; init; }
+
         public ReactivePropertySlim<ComboboxItem<int>> MaxParallelDownloadCount { get; init; }
 
         public ReactivePropertySlim<ComboboxItem<int>> MaxParallelSegmentDownloadCount { get; init; }
 
         public ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>> VideoInfoType { get; init; }
+
+        public ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>> IchibaInfoType { get; init; }
 
         public ReactivePropertySlim<int> CommentOffset { get; set; } = new(200);
 

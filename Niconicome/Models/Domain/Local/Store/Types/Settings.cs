@@ -138,6 +138,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string LimitCommentCount { get; private set; } = "limitcommentcount";
         public static string MaxCommentCount { get; private set; } = "maxcommentcount";
         public static string IsDownloadingVideoInfoEnable { get; private set; } = "isdownloadingvideoinfoenable";
+        public static string IsDownloadingIchibaInfoEnable { get; private set; } = "isdownloadingichibainfoenable";
         public static string IsDownloadingVideoInfoInJsonEnable { get; private set; } = "isdownloadingvideoinfoinjsonenable";
         public static string MaxParallelFetchCount { get; private set; } = "maxparallelfetchcount";
         public static string FetchSleepInterval { get; private set; } = "fetchsleepinterval";
@@ -161,5 +162,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string AutoRenamingAfterSetNetworkPlaylist { get; private set; } = "autorenamingaftersetnetworkplaylist";
         public static string VideoInfoType { get; private set; } = "videoInfotype";
         public static string DownloadVideoWithoutEncodeEnable { get; private set; } = "downloadvideowithoutencodeenable";
+        public static string IchibaInfoType { get; private set; } = "chibainfotype";
     }
 }

@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Watch = Niconicome.Models.Domain.Niconico.Watch;
+
+namespace Niconicome.Models.Domain.Utils
+{
+    public interface IPathOrganizer
+    {
+        string GetFIlePath(string format, Watch.IDmcInfo dmcInfo, string extension, string folderName, bool replaceStricted, bool overWrite, string? suffix = null);
+    }
+
+    public class PathOrganizer : IPathOrganizer
+    {
+        public PathOrganizer(INiconicoUtils niconicoUtils)
+        {
+            this.niconicoUtils = niconicoUtils;
+        }
+
+        #region DI
+        private readonly INiconicoUtils niconicoUtils;
+        #endregion
+
+        public string GetFIlePath(string format, Watch::IDmcInfo dmcInfo, string extension, string folderName, bool replaceStricted, bool overWrite, string? suffix = null)
+        {
+            var filename = this.niconicoUtils.GetFileName(format, dmcInfo, extension, replaceStricted, suffix);
+            var filePath = Path.Combine(folderName, filename);
+
+            if (!overWrite)
+            {
+                filePath = IOUtils.CheclFileExistsAndReturnNewFilename(filePath);
+            }
+
+            return filePath;
+
+        }
+    }
+}
