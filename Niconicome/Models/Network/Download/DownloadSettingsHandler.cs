@@ -1,6 +1,8 @@
 ﻿using System;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Const;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
@@ -32,10 +34,11 @@ namespace Niconicome.Models.Network.Download
 
     class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
     {
-        public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current)
+        public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current,IEnumSettingsHandler enumSettingsHandler)
         {
             this.settingHandler = settingHandler;
             this.current = current;
+            this.enumSettingsHandler = enumSettingsHandler;
 
             this.IsDownloadingVideoInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLVideoInfo)).AddTo(this.disposables);
             this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount)).AddTo(this.disposables);
@@ -78,6 +81,8 @@ namespace Niconicome.Models.Network.Download
         private readonly ILocalSettingHandler settingHandler;
 
         private readonly ICurrent current;
+
+        private readonly IEnumSettingsHandler enumSettingsHandler;
         #endregion
 
         /// <summary>
@@ -94,6 +99,13 @@ namespace Niconicome.Models.Network.Download
             var resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
             var unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
             string folderPath = this.current.SelectedPlaylist.Value.Folderpath.IsNullOrEmpty() ? this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? "downloaded" : this.current.SelectedPlaylist.Value.Folderpath;
+            var fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.FIleFormat;
+
+            var videoInfoT = this.enumSettingsHandler.GetSetting<VideoInfoTypeSettings>();
+            var videoInfoExt = videoInfoT == VideoInfoTypeSettings.Json ? ".json" : videoInfoT == VideoInfoTypeSettings.Xml ? ".xml" : ".txt";
+
+            var ichibaInfoT = this.enumSettingsHandler.GetSetting<IchibaInfoTypeSettings>();
+            var ichibaInfoExt = ichibaInfoT == IchibaInfoTypeSettings.Json ? ".json" :ichibaInfoT == IchibaInfoTypeSettings.Xml ? ".xml" : ".html";
 
             return new DownloadSettings
             {
@@ -116,6 +128,9 @@ namespace Niconicome.Models.Network.Download
                 ResumeEnable = resumeEnable,
                 EnableUnsafeCommentHandle = unsafeHandle,
                 SaveWithoutEncode = this.IsNoEncodeEnable.Value,
+                FileNameFormat=fileFormat,
+                VideoInfoExt=videoInfoExt,
+                IchibaInfoExt = ichibaInfoExt,
             };
         }
 

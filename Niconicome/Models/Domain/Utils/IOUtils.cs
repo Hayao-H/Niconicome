@@ -43,9 +43,18 @@ namespace Niconicome.Models.Domain.Utils
         /// </summary>
         /// <param name="folderPath"></param>
         /// <param name="fileName"></param>
-        public static void CreateDirectoryIfNotExist(string folderPath, string fileName)
+        public static void CreateDirectoryIfNotExist(string folderPath, string? fileName = null)
         {
-            var path = Path.Combine(folderPath, fileName);
+            string path;
+            if (fileName is not null)
+            {
+                path = Path.Combine(folderPath, fileName);
+            }
+            else
+            {
+                path = folderPath;
+            }
+
             var dirname = Path.GetDirectoryName(path);
             if (dirname is not null && !Directory.Exists(dirname))
             {

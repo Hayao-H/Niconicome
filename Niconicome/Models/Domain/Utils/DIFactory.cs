@@ -39,6 +39,7 @@ using Utils = Niconicome.Models.Domain.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
+using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -168,6 +169,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainNet::INetWorkHelper, DomainNet::NetWorkHelper>();
             services.AddTransient<Ichiba::IIchibaHtmlParser, Ichiba::IchibaHtmlParser>();
             services.AddTransient<Ichiba::INiconicoIchibaHandler, Ichiba::NiconicoIchibaHandler>();
+            services.AddTransient<Utils::IPathOrganizer, Utils::PathOrganizer>();
+            services.AddTransient<DlIchiba::IIchibaInfoDownloader, DlIchiba::IchibaInfoDownloader>();
 
             return services.BuildServiceProvider();
         }

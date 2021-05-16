@@ -14,6 +14,9 @@ using Download = Niconicome.Models.Domain.Niconico.Download;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
 using EnumSetting = Niconicome.Models.Local.Settings.EnumSettingsValue;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.Settings.EnumSettingsValue;
+using Niconicome.Models.Domain.Niconico.Download.Ichiba;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -26,16 +29,17 @@ namespace Niconicome.Models.Network.Download
 
     class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter, IEnumSettingsHandler enumSettingsHander)
+        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter, IEnumSettingsHandler enumSettingsHander, IPathOrganizer pathOrganizer)
         {
             this.localContentHandler = localContentHandler;
             this.settingHandler = localSettingHandler;
             this.converter = converter;
             this.logger = logger;
             this.enumSettingsHandler = enumSettingsHander;
+            this.pathOrganizer = pathOrganizer;
         }
 
-        #region フィールド
+        #region DI
         private readonly ILogger logger;
 
         private readonly ILocalSettingHandler settingHandler;
@@ -45,6 +49,8 @@ namespace Niconicome.Models.Network.Download
         private readonly IDomainModelConverter converter;
 
         private readonly IEnumSettingsHandler enumSettingsHandler;
+
+        private readonly IPathOrganizer pathOrganizer;
 
         #endregion
 
@@ -96,9 +102,8 @@ namespace Niconicome.Models.Network.Download
             ILocalContentInfo? info = null;
             if (setting.Skip)
             {
-                bool dlInJson = this.settingHandler.GetBoolSetting(SettingsEnum.VideoInfoInJson);
-                string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, dlInJson);
+                string fileNameFormat = setting.FileNameFormat;
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt);
             }
 
             if (!Directory.Exists(setting.FolderPath))
@@ -234,6 +239,35 @@ namespace Niconicome.Models.Network.Download
                 }
             }
 
+            if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+            //市場情報
+            if (setting.DownloadIchibaInfo)
+            {
+
+                if (!info?.IchibaInfoExist ?? true)
+                {
+                    var iResult = await this.DownloadIchibaInfoAsync(setting, session, OnMessage, context);
+
+                    if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
+
+                    if (!iResult.IsSucceeded)
+                    {
+                        result.IsSucceeded = false;
+                        result.Message = iResult.Message ?? "None";
+                        return result;
+                    }
+                    else
+                    {
+                        result.IsSucceeded = true;
+                    }
+                }
+                else
+                {
+                    OnMessage("市場情報を保存済みのためスキップしました。");
+                    result.IsSucceeded = true;
+                }
+            }
 
             if (session.IsSessionEnsured) session.Dispose();
 
@@ -250,7 +284,6 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         private async Task<IDownloadResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
         {
-            string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
             int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelSegDl);
             if (maxParallel <= 0)
             {
@@ -261,7 +294,7 @@ namespace Niconicome.Models.Network.Download
                 maxParallel = 5;
             }
 
-            var vSettings = settings.ConvertToVideoDownloadSettings(fileNameFormat, false, maxParallel);
+            var vSettings = settings.ConvertToVideoDownloadSettings(false, maxParallel);
             var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::IVideoDownloader>();
             Download::IDownloadResult result;
             try
@@ -284,10 +317,9 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
         {
-            string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
             var dlType = this.enumSettingsHandler.GetSetting<EnumSetting::VideoInfoTypeSettings>();
 
-            var dSettings = settings.ConvertToDescriptionDownloadSetting(fileNameFormat, dlType == EnumSetting::VideoInfoTypeSettings.Json, dlType == EnumSetting::VideoInfoTypeSettings.Xml, dlType == EnumSetting::VideoInfoTypeSettings.Text);
+            var dSettings = settings.ConvertToDescriptionDownloadSetting(dlType == EnumSetting::VideoInfoTypeSettings.Json, dlType == EnumSetting::VideoInfoTypeSettings.Xml, dlType == EnumSetting::VideoInfoTypeSettings.Text);
             var descriptionDownloader = DIFactory.Provider.GetRequiredService<DDL::IDescriptionDownloader>();
             Download::IDownloadResult result;
             try
@@ -310,8 +342,7 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         private async Task<IDownloadResult> TryDownloadThumbAsync(IDownloadSettings setting, IWatchSession session)
         {
-            string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
-            var tSettings = setting.ConvertToThumbDownloadSetting(fileNameFormat);
+            var tSettings = setting.ConvertToThumbDownloadSetting();
             var thumbDownloader = DIFactory.Provider.GetRequiredService<Tdl::IThumbDownloader>();
             Download::IDownloadResult result;
             try
@@ -342,8 +373,7 @@ namespace Niconicome.Models.Network.Download
             if (cOffset < 0) cOffset = Cdl::CommentCollection.NumberToThrough;
             if (autoSwicth && session.Video!.DmcInfo.IsOfficial) cOffset = 0;
 
-            string fileNameFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
-            var cSettings = settings.ConvertToCommentDownloadSetting(fileNameFormat, cOffset);
+            var cSettings = settings.ConvertToCommentDownloadSetting(cOffset);
             var commentDownloader = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
             Download::IDownloadResult result;
             try
@@ -356,6 +386,26 @@ namespace Niconicome.Models.Network.Download
                 return new DownloadResult() { IsSucceeded = false, Message = e.Message };
             }
             return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null };
+        }
+
+        /// <summary>
+        /// 市場情報をダウンロードする
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="session"></param>
+        /// <param name="onMessage"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        private async Task<IAttemptResult> DownloadIchibaInfoAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context)
+        {
+            var iSettings = settings.ConvertToIchibaInfoDownloadSettings();
+            var filePath = this.pathOrganizer.GetFIlePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.IchibaInfoExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
+            IOUtils.CreateDirectoryIfNotExist(filePath);
+
+            var iDownloader = DIFactory.Provider.GetRequiredService<IIchibaInfoDownloader>();
+            var result = await iDownloader.DownloadIchibaInfo(session, iSettings, onMessage, context);
+            return result;
+
         }
 
         /// <summary>

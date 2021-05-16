@@ -9,5 +9,7 @@ namespace Niconicome.Models.Const
     class Format
     {
         public const string ISO8601 = "yyyy-MM-ddTHH:mm:ssK";
+
+        public const string FIleFormat = "[<id>]<title>";
     }
 }
