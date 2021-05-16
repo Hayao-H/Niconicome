@@ -132,6 +132,20 @@
                 <ToggleButton IsChecked="{Binding IsUnsafeCommentHandleEnable.Value}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="ShoppingOutline" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="市場情報ファイルの保存形式" />
+                <ComboBox ItemsSource="{Binding SelectableIchibaInfoType}"
+                          SelectedItem="{Binding IchibaInfoType.Value}"
+                          DisplayMemberPath="DisplayValue"
+                          HorizontalAlignment="Right" Margin="10 0"       
+                          HorizontalContentAlignment="Right" />
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
 
 
