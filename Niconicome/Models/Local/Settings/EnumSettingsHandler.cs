@@ -70,6 +70,9 @@ namespace Niconicome.Models.Local.Settings
             else if (typeof(T) == typeof(Value::VideoInfoTypeSettings))
             {
                 return SettingsEnum.VideoInfoType;
+            }　else if (typeof(T) == typeof(Value::IchibaInfoTypeSettings))
+            {
+                return SettingsEnum.IchibaInfoType;
             }
             else
             {

@@ -172,6 +172,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.AutoRenameNetPlaylist => STypes::SettingNames.AutoRenamingAfterSetNetworkPlaylist,
                 SettingsEnum.VideoInfoType => STypes::SettingNames.VideoInfoType,
                 SettingsEnum.DlWithoutEncode => STypes::SettingNames.DownloadVideoWithoutEncodeEnable,
+                SettingsEnum.IchibaInfoType => STypes::SettingNames.IchibaInfoType,
                 _ => null
             };
         }
@@ -234,5 +235,6 @@ namespace Niconicome.Models.Local.Settings
         AutoRenameNetPlaylist,
         VideoInfoType,
         DlWithoutEncode,
+        IchibaInfoType,
     }
 }
