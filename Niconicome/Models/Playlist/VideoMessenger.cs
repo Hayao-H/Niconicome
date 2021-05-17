@@ -10,7 +10,7 @@ namespace Niconicome.Models.Playlist
     /// <summary>
     /// メッセージ共有クラス
     /// </summary>
-    public static class VideoMessanger
+    public static class VideoMessenger
     {
 
         private static readonly Dictionary<string, string> messages = new();
@@ -26,21 +26,21 @@ namespace Niconicome.Models.Playlist
         /// <param name="message"></param>
         public static void Write(string guid, string message)
         {
-            lock (VideoMessanger.lockObj)
+            lock (VideoMessenger.lockObj)
             {
                 string old = string.Empty;
 
-                if (!VideoMessanger.messages.ContainsKey(guid))
+                if (!VideoMessenger.messages.ContainsKey(guid))
                 {
-                    VideoMessanger.messages.Add(guid, message);
+                    VideoMessenger.messages.Add(guid, message);
                 }
                 else
                 {
-                    old = VideoMessanger.messages[guid];
-                    VideoMessanger.messages[guid] = message;
+                    old = VideoMessenger.messages[guid];
+                    VideoMessenger.messages[guid] = message;
                 }
 
-                VideoMessanger.RaiseOnMessage(guid, old, message);
+                VideoMessenger.RaiseOnMessage(guid, old, message);
             }
 
         }
@@ -52,15 +52,15 @@ namespace Niconicome.Models.Playlist
         /// <returns></returns>
         public static string GetMessage(string guid)
         {
-            lock (VideoMessanger.lockObj)
+            lock (VideoMessenger.lockObj)
             {
-                if (!VideoMessanger.messages.ContainsKey(guid))
+                if (!VideoMessenger.messages.ContainsKey(guid))
                 {
                     return String.Empty;
                 }
                 else
                 {
-                    return VideoMessanger.messages[guid];
+                    return VideoMessenger.messages[guid];
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace Niconicome.Models.Playlist
         /// <param name="newm"></param>
         private static void RaiseOnMessage(string id, string oldm, string newm)
         {
-            VideoMessanger.VideoMessageChange?.Invoke(null, new VideoMessageChangeEventArgs(id, oldm, newm));
+            VideoMessenger.VideoMessageChange?.Invoke(null, new VideoMessageChangeEventArgs(id, oldm, newm));
         }
     }
 

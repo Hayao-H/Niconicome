@@ -72,10 +72,10 @@ namespace Niconicome.Models.Domain.Utils
         {
             var info = new VideoInfoForPath()
             {
-                Title = video.Title,
-                OwnerName = video.OwnerName,
-                NiconicoID = video.NiconicoId,
-                UploadedOn = video.UploadedOn,
+                Title = video.Title.Value,
+                OwnerName = video.OwnerName.Value,
+                NiconicoID = video.NiconicoId.Value,
+                UploadedOn = video.UploadedOn.Value,
                 DownloadStartedOn = DateTime.Now,
             };
 

@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Application;
+using Niconicome.ViewModels;
+using Prism.Ioc;
+using Prism.Mvvm;
+using Prism.Unity;
 
 namespace Niconicome
 {
@@ -11,7 +16,7 @@ namespace Niconicome
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : PrismApplication
     {
         public App()
         {
@@ -21,16 +26,29 @@ namespace Niconicome
             TaskScheduler.UnobservedTaskException += this.TaskScheduler_UnobservedTaskException;
 #pragma warning restore CS8622
             AppDomain.CurrentDomain.UnhandledException += this.CurrentDomain_UnhandledException;
+            this.RunStartUpTask();
         }
 
-
-        [System.STAThreadAttribute()]
-        public static void Main()
+        protected override Window CreateShell()
         {
-            Niconicome.App app = new Niconicome.App();
-            app.RunStartUpTask();
-            app.InitializeComponent();
-            app.Run();
+            return this.Container.Resolve<MainWindow>();
+        }
+
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+        }
+
+        /// <summary>
+        /// ViewModelAttricute属性でVMを定義できるようにする
+        /// </summary>
+        protected override void ConfigureViewModelLocator()
+        {
+            base.ConfigureViewModelLocator();
+            ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(vType =>
+            {
+                var vm = vType.GetTypeInfo().GetCustomAttribute<ViewModelAttribute>();
+                return vm?.ViewModelType;
+            });
         }
 
         public void RunStartUpTask()

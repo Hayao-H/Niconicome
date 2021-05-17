@@ -62,6 +62,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         bool IsAutoDisposingEnable { get; }
         bool IsReplaceStrictedEnable { get; }
         bool IsOvwrridingFileDTEnable { get; }
+        bool IsNoEncodeEnable { get; }
         bool IsResumeEnable { get; }
         uint VerticalResolution { get; }
         int MaxParallelDownloadCount { get; }
@@ -131,8 +132,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
 
 
-            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".mp4", settings.IsReplaceStrictedEnable)
-                : $"[{session.Video!.Id}]{session.Video!.Title}.mp4"
+            string ext = settings.IsNoEncodeEnable ? ".ts" : ".mp4";
+            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ext, settings.IsReplaceStrictedEnable)
+                : $"[{session.Video!.Id}]{session.Video!.Title}{ext}"
                 ;
 
             if (token.IsCancellationRequested)
@@ -219,6 +221,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 IsOverwriteEnable = settings.IsOverwriteEnable,
                 IsOverrideDTEnable = settings.IsOvwrridingFileDTEnable,
                 UploadedOn = session.Video.DmcInfo.UploadedOn,
+                IsNoEncodeEnable = settings.IsNoEncodeEnable,
             };
 
             try
@@ -527,6 +530,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         public bool IsResumeEnable { get; set; }
 
+        public bool IsNoEncodeEnable { get; set; }
 
         public uint VerticalResolution { get; set; }
 

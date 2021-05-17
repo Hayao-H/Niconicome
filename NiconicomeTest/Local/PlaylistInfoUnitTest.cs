@@ -179,11 +179,22 @@ namespace NiconicomeTest.Local.Playlist
         {
             this.videoFilter = new VideoFilter();
             this.videos = new List<IListVideoInfo>();
-            var video1 = new BindableListVIdeoInfo() { Title = "テスト東方", Tags = new List<string>() { "東方", "テスト" }, Id = 1 };
-            var video2 = new BindableListVIdeoInfo() { Title = "テストMMD", Tags = new List<string>() { "MMD", "テスト" }, Id = 2 };
-            var video3 = new BindableListVIdeoInfo() { Title = "テストIDOL M@STER", Tags = new List<string>() { "IDOL_M@STER", "テスト" }, Id = 3 };
-            var video4 = new BindableListVIdeoInfo() { Title = "レッツゴー!陰陽師", Tags = new List<string>() { "最古の動画", "sm9", "テスト" }, Id = 4 };
-            var video5 = new BindableListVIdeoInfo() { Title = "タグテスト", Tags = new List<string>() { "タグ", "テスト" }, Id = 5 };
+            var video1 = new NonBindableListVideoInfo() { Tags = new List<string>() { "東方", "テスト" } };
+            var video2 = new NonBindableListVideoInfo() { Tags = new List<string>() { "MMD", "テスト" } };
+            var video3 = new NonBindableListVideoInfo() { Tags = new List<string>() { "IDOL_M@STER", "テスト" } };
+            var video4 = new NonBindableListVideoInfo() { Tags = new List<string>() { "最古の動画", "sm9", "テスト" } };
+            var video5 = new NonBindableListVideoInfo() { Tags = new List<string>() { "タグ", "テスト" } };
+
+            video1.Title.Value = "テスト東方";
+            video1.Id.Value = 1;
+            video2.Title.Value = "テストMMD";
+            video2.Id.Value = 2;
+            video3.Title.Value = "テストIDOL M@STER";
+            video3.Id.Value = 3;
+            video4.Title.Value = "レッツゴー!陰陽師";
+            video4.Id.Value = 4;
+            video5.Title.Value = "タグテスト";
+            video5.Id.Value = 5;
             this.videos.AddRange(new List<IListVideoInfo>() { video1, video2, video3, video4, video5 });
         }
 

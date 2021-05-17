@@ -17,16 +17,12 @@ namespace Niconicome.Models.Local
 
     class LocalVideoUtils : ILocalVideoUtils
     {
-        public LocalVideoUtils(INiconicoUtils niconicoUtils, IVideoFileStorehandler videoFileStorehandler)
+        public LocalVideoUtils(INiconicoUtils niconicoUtils)
         {
             this.niconicoUtils = niconicoUtils;
-            this.videoFileStorehandler = videoFileStorehandler;
         }
 
         private readonly INiconicoUtils niconicoUtils;
-
-        private readonly IVideoFileStorehandler videoFileStorehandler;
-
 
         /// <summary>
         /// ローカルファイルの取得を試行する
@@ -43,7 +39,17 @@ namespace Niconicome.Models.Local
             var fn = this.niconicoUtils.GetFileName(format, video, ".mp4", replaceStricted);
             var path = IOUtils.GetPrefixedPath(Path.Combine(folderPath, fn));
 
-            if (File.Exists(path)) return path;
+            //.mp4ファイルを確認
+            if (File.Exists(path))
+            {
+                return path;
+            } else
+            //.tsファイルを確認
+            {
+                fn = this.niconicoUtils.GetFileName(format, video, ".ts", replaceStricted);
+                path = IOUtils.GetPrefixedPath(Path.Combine(folderPath, fn));
+                if (File.Exists(path)) return path;
+            }
 
             return string.Empty;
 

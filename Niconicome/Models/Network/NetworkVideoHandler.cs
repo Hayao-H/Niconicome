@@ -21,8 +21,8 @@ namespace Niconicome.Models.Network
     {
         bool IsVideoDownloaded(string niconicoId);
         string GetFilePath(string niconicoId);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> videos, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null);
+        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> videos, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null);
     }
 
     public interface INetworkResult
@@ -71,9 +71,14 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null)
         {
-            return await this.GetVideoListInfosAsync(ids.Select(i => new BindableListVIdeoInfo() { NiconicoId = i }), uncheck, playlistID, ct);
+            return await this.GetVideoListInfosAsync(ids.Select(i =>
+            {
+                var v = new NonBindableListVideoInfo();
+                v.NiconicoId.Value = i;
+                return v;
+            }), uncheck, playlistID, forceRegister, ct);
         }
 
         /// <summary>
@@ -121,10 +126,10 @@ namespace Niconicome.Models.Network
         /// <param name="onStarted"></param>
         /// <param name="onWaiting"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, bool uncheck = false, int? playlistID = null, CancellationToken? ct = null)
+        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null)
         {
 
-            var registerOnlyID = this.settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
+            var registerOnlyID = forceRegister ? false : this.settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
             if (registerOnlyID)
             {
                 return emptyVideos;
@@ -144,22 +149,22 @@ namespace Niconicome.Models.Network
 
                 var task = new NetworkVideoParallelTask(async (_, lockObj, _) =>
                 {
-                    this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得を開始します。");
+                    this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得を開始します。");
 
-                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId, item.video, DWatch::WatchInfoOptions.NoDmcData);
+                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId.Value, item.video, DWatch::WatchInfoOptions.NoDmcData);
 
                     if (result.IsSucceeded)
                     {
-                        this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得に成功しました。");
+                        this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に成功しました。");
                         videos.Add(item.video);
                         if (uncheck)
                         {
-                            this.videoListContainer.Uncheck(item.video.Id, playlistID ?? -1);
+                            this.videoListContainer.Uncheck(item.video.Id.Value, playlistID ?? -1);
                         }
                     }
                     else
                     {
-                        this.messageHandler.AppendMessage($"{item.video.NiconicoId}の取得に失敗しました。(詳細:{result.Message})");
+                        this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に失敗しました。(詳細:{result.Message})");
                     }
                 }, index => this.messageHandler.AppendMessage("待機中...(15s)"));
 

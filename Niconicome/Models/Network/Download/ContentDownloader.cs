@@ -1,22 +1,18 @@
 ﻿using System;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Local.Store;
-using Niconicome.Models.Domain.Niconico.Download;
-using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Local.State;
-using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
+using Niconicome.ViewModels;
+using Reactive.Bindings;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
-using Download = Niconicome.Models.Domain.Niconico.Download;
+using IDl = Niconicome.Models.Domain.Niconico.Download.Ichiba;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
 
@@ -26,9 +22,8 @@ namespace Niconicome.Models.Network.Download
     {
         Task<INetworkResult?> DownloadVideos();
         Task<INetworkResult?> DownloadVideosFriendly(Action<string> onMessage, Action<string> onMessageShort);
-        bool CanDownload { get; }
+        ReactiveProperty<bool> CanDownload { get; }
         void Cancel();
-        event EventHandler? CanDownloadChange;
     }
 
     public interface IDownloadSettings
@@ -43,19 +38,26 @@ namespace Niconicome.Models.Network.Download
         bool DownloadLog { get; }
         bool DownloadOwner { get; }
         bool DownloadVideoInfo { get; }
+        bool DownloadIchibaInfo { get; }
         bool IsReplaceStrictedEnable { get; }
         bool OverrideVideoFileDateToUploadedDT { get; }
         bool ResumeEnable { get; }
         bool EnableUnsafeCommentHandle { get; }
+        bool SaveWithoutEncode { get; }
         string NiconicoId { get; }
         string FolderPath { get; }
+        string FileNameFormat { get; }
+        string VideoInfoExt { get; }
+        string IchibaInfoExt { get; }
         uint VerticalResolution { get; }
         int PlaylistID { get; }
         int MaxCommentsCount { get; }
-        Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount);
-        Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat);
-        Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset);
-        DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson);
+        IchibaInfoTypeSettings IchibaInfoType { get; }
+        Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(bool autodispose, int maxParallelDLCount);
+        Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting();
+        Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(int commentOffset);
+        DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(bool dlInJson, bool dlInXml, bool dlInText);
+        IDl::IIchibaInfoDownloadSettings ConvertToIchibaInfoDownloadSettings();
     }
 
     public interface IDownloadResult
@@ -74,29 +76,13 @@ namespace Niconicome.Models.Network.Download
         int Index { get; }
     }
 
-    public interface ILocalContentHandler
-    {
-        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, bool downloadInJson);
-        IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath);
-    }
-
-    public interface ILocalContentInfo
-    {
-        bool CommentExist { get; init; }
-        bool ThumbExist { get; init; }
-        bool VideoExist { get; init; }
-        bool VIdeoExistInOnotherFolder { get; init; }
-        bool VideoInfoExist { get; init; }
-        string? LocalPath { get; init; }
-    }
-
     /// <summary>
     /// DL実処理
     /// </summary>
-    class ContentDownloader : IContentDownloader
+    class ContentDownloader : BindableBase, IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer,IContentDownloadHelper downloadHelper)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -107,11 +93,16 @@ namespace Niconicome.Models.Network.Download
             this.downloadHelper = downloadHelper;
 
             int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelDL);
+            var sleepInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
             if (maxParallel <= 0)
             {
                 maxParallel = 3;
             }
-            this.parallelTasksHandler = new ParallelTasksHandler<DownloadTaskParallel>(maxParallel, 5, 15);
+            if (sleepInterval <= 0)
+            {
+                sleepInterval = 5;
+            }
+            this.parallelTasksHandler = new ParallelTasksHandler<DownloadTaskParallel>(maxParallel, sleepInterval, 15);
             this.downloadTasksHandler.DownloadTaskPool.TaskPoolChange += this.DownloadTaskPoolChangedEventHandler;
         }
 
@@ -151,9 +142,9 @@ namespace Niconicome.Models.Network.Download
                 return new NetworkResult();
             }
 
-            await this.parallelTasksHandler.ProcessTasksAsync(() => this.RaiseCanDownloadChange());
+            await this.parallelTasksHandler.ProcessTasksAsync(() => this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing);
 
-            this.RaiseCanDownloadChange();
+            this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
 
             return this.CurrentResult;
 
@@ -190,8 +181,8 @@ namespace Niconicome.Models.Network.Download
             {
                 if (result?.FirstVideo is not null)
                 {
-                    onMessage($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
-                    onMessageShort($"{result.FirstVideo.NiconicoId}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                    onMessage($"{result.FirstVideo.NiconicoId.Value}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
+                    onMessageShort($"{result.FirstVideo.NiconicoId.Value}ほか{result.SucceededCount - 1}件の動画をダウンロードしました。");
 
                     if (!result.IsSucceededAll)
                     {
@@ -203,8 +194,8 @@ namespace Niconicome.Models.Network.Download
             {
                 if (result?.FirstVideo is not null)
                 {
-                    onMessage($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
-                    onMessageShort($"{result.FirstVideo.NiconicoId}をダウンロードしました。");
+                    onMessage($"{result.FirstVideo.NiconicoId.Value}をダウンロードしました。");
+                    onMessageShort($"{result.FirstVideo.NiconicoId.Value}をダウンロードしました。");
                 }
             }
             else
@@ -219,12 +210,7 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// DL可能フラグ
         /// </summary>
-        public bool CanDownload { get => !this.parallelTasksHandler.IsProcessing; }
-
-        /// <summary>
-        /// DL可能フラグ変更イベント
-        /// </summary>
-        public event EventHandler? CanDownloadChange;
+        public ReactiveProperty<bool> CanDownload { get; init; } = new(true);
 
         /// <summary>
         /// ダウンロードをキャンセル
@@ -233,6 +219,7 @@ namespace Niconicome.Models.Network.Download
         {
             this.parallelTasksHandler.CancellAllTasks();
             this.downloadTasksHandler.DownloadTaskPool.Clear();
+            this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
         }
 
         #region private
@@ -301,9 +288,9 @@ namespace Niconicome.Models.Network.Download
                         {
                             if (!downloadResult.VideoFileName.IsNullOrEmpty())
                             {
-                                video.FileName = downloadResult.VideoFileName;
+                                video.FileName.Value = downloadResult.VideoFileName;
                             }
-                            BindableListVIdeoInfo.SetData(video, downloadResult.VideoInfo);
+                            NonBindableListVideoInfo.SetData(video, downloadResult.VideoInfo);
                             this.videoHandler.Update(video);
                         }
                         this.videoListContainer.Uncheck(task.VideoID, task.PlaylistID);
@@ -342,14 +329,6 @@ namespace Niconicome.Models.Network.Download
             }
         }
 
-        /// <summary>
-        /// DL可能フラグ変更イベントを発火させる
-        /// </summary>
-        private void RaiseCanDownloadChange()
-        {
-            this.CanDownloadChange?.Invoke(this, EventArgs.Empty);
-        }
-
         #endregion
     }
 
@@ -366,7 +345,7 @@ namespace Niconicome.Models.Network.Download
 
         public string? VideoFileName { get; set; }
 
-        public IListVideoInfo VideoInfo { get; set; } = new BindableListVIdeoInfo();
+        public IListVideoInfo VideoInfo { get; set; } = new NonBindableListVideoInfo();
 
         public uint VideoVerticalResolution { get; set; }
 
@@ -398,6 +377,8 @@ namespace Niconicome.Models.Network.Download
 
         public bool DownloadVideoInfo { get; set; }
 
+        public bool DownloadIchibaInfo { get; set; }
+
         public bool IsReplaceStrictedEnable { get; set; }
 
         public bool OverrideVideoFileDateToUploadedDT { get; set; }
@@ -405,6 +386,8 @@ namespace Niconicome.Models.Network.Download
         public bool ResumeEnable { get; set; }
 
         public bool EnableUnsafeCommentHandle { get; set; }
+
+        public bool SaveWithoutEncode { get; set; }
 
         public uint VerticalResolution { get; set; }
 
@@ -416,12 +399,20 @@ namespace Niconicome.Models.Network.Download
 
         public string FolderPath { get; set; } = string.Empty;
 
-        public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(string filenameFormat, bool autodispose, int maxParallelDLCount)
+        public string FileNameFormat { get; set; } = string.Empty;
+
+        public string VideoInfoExt { get; set; } = string.Empty;
+
+        public string IchibaInfoExt { get; set; } = string.Empty;
+
+        public IchibaInfoTypeSettings IchibaInfoType { get; set; }
+
+        public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(bool autodispose, int maxParallelDLCount)
         {
             return new Vdl::VideoDownloadSettings()
             {
                 NiconicoId = this.NiconicoId,
-                FileNameFormat = filenameFormat,
+                FileNameFormat = this.FileNameFormat,
                 FolderName = this.FolderPath,
                 IsAutoDisposingEnable = autodispose,
                 IsOverwriteEnable = this.Overwrite,
@@ -430,28 +421,29 @@ namespace Niconicome.Models.Network.Download
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
                 IsOvwrridingFileDTEnable = this.OverrideVideoFileDateToUploadedDT,
                 IsResumeEnable = this.ResumeEnable,
+                IsNoEncodeEnable = this.SaveWithoutEncode,
             };
         }
 
-        public Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting(string fileFormat)
+        public Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting()
         {
             return new Tdl::ThumbDownloadSettings()
             {
                 NiconicoId = this.NiconicoId,
                 FolderName = this.FolderPath,
-                FileNameFormat = fileFormat,
+                FileNameFormat = this.FileNameFormat,
                 IsOverwriteEnable = this.Overwrite,
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
             };
         }
 
-        public Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(string fileFormat, int commentOffset)
+        public Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(int commentOffset)
         {
             return new Cdl::CommentDownloadSettings()
             {
                 NiconicoId = this.NiconicoId,
                 FolderName = this.FolderPath,
-                FileNameFormat = fileFormat,
+                FileNameFormat = this.FileNameFormat,
                 IsOverwriteEnable = this.Overwrite,
                 IsDownloadingEasyCommentEnable = this.DownloadEasy,
                 IsDownloadingLogEnable = this.DownloadLog,
@@ -463,17 +455,31 @@ namespace Niconicome.Models.Network.Download
             };
         }
 
-        public DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(string fileFormat, bool dlInJson)
+        public DDL::IDescriptionSetting ConvertToDescriptionDownloadSetting(bool dlInJson, bool dlInXml, bool dlInText)
         {
             return new DDL::DescriptionSetting()
             {
                 IsOverwriteEnable = this.Overwrite,
                 FolderName = this.FolderPath,
                 IsReplaceRestrictedEnable = this.IsReplaceStrictedEnable,
-                Format = fileFormat,
+                Format = this.FileNameFormat,
                 IsSaveInJsonEnabled = dlInJson,
+                IsSaveInXmlEnabled = dlInXml,
+                IsSaveInTextEnabled = dlInText,
             };
         }
+
+        public IDl::IIchibaInfoDownloadSettings ConvertToIchibaInfoDownloadSettings()
+        {
+            return new IDl::IchibaInfoDownloadSettings()
+            {
+                IsReplacingStrictedEnabled = this.IsReplaceStrictedEnable,
+                IsXml = this.IchibaInfoType == IchibaInfoTypeSettings.Xml,
+                IsJson = this.IchibaInfoType == IchibaInfoTypeSettings.Json,
+                IsHtml = this.IchibaInfoType == IchibaInfoTypeSettings.Html,
+            };
+        }
+
 
 
     }
@@ -497,124 +503,4 @@ namespace Niconicome.Models.Network.Download
 
     }
 
-    /// <summary>
-    /// ローカルデータの処理
-    /// </summary>
-    public class LocalContentHandler : ILocalContentHandler
-    {
-        public LocalContentHandler(INiconicoUtils niconicoUtils, IVideoFileStorehandler videoFileStorehandler, ILogger logger)
-        {
-            this.niconicoUtils = niconicoUtils;
-            this.videoFileStorehandler = videoFileStorehandler;
-            this.logger = logger;
-        }
-
-        private readonly INiconicoUtils niconicoUtils;
-
-        private readonly IVideoFileStorehandler videoFileStorehandler;
-
-        private readonly ILogger logger;
-
-        /// <summary>
-        /// ローカルの保存状況を取得する
-        /// </summary>
-        /// <param name="folderPath"></param>
-        /// <param name="format"></param>
-        /// <param name="dmcInfo"></param>
-        /// <returns></returns>
-        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, bool downloadInJson)
-        {
-            string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4", replaceStricted);
-            string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml", replaceStricted);
-            string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".jpg", replaceStricted);
-            string videoInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, downloadInJson ? ".json" : ".txt", replaceStricted);
-            bool videoExist = this.videoFileStorehandler.Exists(dmcInfo.Id);
-            string? localPath = null;
-
-            if (videoExist)
-            {
-                localPath = this.videoFileStorehandler.GetFilePath(dmcInfo.Id);
-            }
-
-            return new LocalContentInfo()
-            {
-                VideoExist = File.Exists(Path.Combine(folderPath, videoFIlename)),
-                CommentExist = File.Exists(Path.Combine(folderPath, commentFIlename)),
-                ThumbExist = File.Exists(Path.Combine(folderPath, thumbFIlename)),
-                VideoInfoExist = File.Exists(Path.Combine(folderPath, videoInfoFilename)),
-                VIdeoExistInOnotherFolder = videoExist,
-                LocalPath = localPath,
-            };
-        }
-
-        /// <summary>
-        /// ダウンロード済のファイルをコピーする
-        /// </summary>
-        /// <param name="niconicoId"></param>
-        /// <param name="downloadedFilePath"></param>
-        /// <param name="destinationPath"></param>
-        /// <returns></returns>
-        public IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath)
-        {
-            if (!File.Exists(downloadedFilePath))
-            {
-                return new DownloadResult() { Message = "そのようなファイルは存在しません。" };
-            }
-
-            if (!Directory.Exists(destinationPath))
-            {
-                try
-                {
-                    Directory.CreateDirectory(destinationPath);
-                }
-                catch (Exception e)
-                {
-                    this.logger.Error("移動先フォルダーの作成に失敗しました。", e);
-                    return new DownloadResult() { Message = "移動先フォルダーの作成に失敗しました。" };
-                }
-            }
-
-            string filename = Path.GetFileName(downloadedFilePath);
-            try
-            {
-                File.Copy(downloadedFilePath, Path.Combine(destinationPath, filename));
-            }
-            catch (Exception e)
-            {
-                this.logger.Error("ファイルのコピーに失敗しました。", e);
-                return new DownloadResult() { Message = $"ファイルのコピーに失敗しました。" };
-            }
-
-            this.videoFileStorehandler.Add(niconicoId, Path.Combine(destinationPath, filename));
-
-            return new DownloadResult() { IsSucceeded = true };
-
-        }
-
-    }
-
-    /// <summary>
-    /// ローカル情報
-    /// </summary>
-    public class LocalContentInfo : ILocalContentInfo
-    {
-        public LocalContentInfo(string? localPath)
-        {
-            this.LocalPath = localPath;
-        }
-
-        public LocalContentInfo() : this(null) { }
-
-        public bool VideoExist { get; init; }
-
-        public bool VIdeoExistInOnotherFolder { get; init; }
-
-        public bool CommentExist { get; init; }
-
-        public bool ThumbExist { get; init; }
-
-        public bool VideoInfoExist { get; init; }
-
-        public string? LocalPath { get; init; }
-    }
 }

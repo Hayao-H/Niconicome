@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Niconicome.ViewModels;
 using Niconicome.ViewModels.Mainpage;
 
 namespace Niconicome
@@ -19,18 +20,13 @@ namespace Niconicome
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+
+    [ViewModelAttribute(typeof(MainWindowViewModel))]
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             this.InitializeComponent();
-            this.downloadSettings.DataContext = new DownloadSettingsViewModel();
-            this.videoList.DataContext = new VideoListViewModel();
-        }
-
-        private void Videolist_db_click(object sender, MouseButtonEventArgs e)
-        {
-            ((VideoListViewModel)this.videolist.DataContext).OnDoubleClick(sender);
         }
     }
 }

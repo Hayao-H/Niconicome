@@ -170,6 +170,10 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.ReAllocateCommands => STypes::SettingNames.ReAllocateIfVideoisNotSaved,
                 SettingsEnum.VListItemdbClick => STypes::SettingNames.VideoListItemdbClickAction,
                 SettingsEnum.AutoRenameNetPlaylist => STypes::SettingNames.AutoRenamingAfterSetNetworkPlaylist,
+                SettingsEnum.VideoInfoType => STypes::SettingNames.VideoInfoType,
+                SettingsEnum.DlWithoutEncode => STypes::SettingNames.DownloadVideoWithoutEncodeEnable,
+                SettingsEnum.IchibaInfoType => STypes::SettingNames.IchibaInfoType,
+                SettingsEnum.DlIchiba => STypes::SettingNames.IsDownloadingIchibaInfoEnable,
                 _ => null
             };
         }
@@ -230,5 +234,9 @@ namespace Niconicome.Models.Local.Settings
         ReAllocateCommands,
         VListItemdbClick,
         AutoRenameNetPlaylist,
+        VideoInfoType,
+        DlWithoutEncode,
+        IchibaInfoType,
+        DlIchiba,
     }
 }

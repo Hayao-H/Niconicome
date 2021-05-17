@@ -13,6 +13,7 @@ using Utils = Niconicome.Models.Domain.Utils;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Domain.Utils;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Niconicome.Models.Domain.Niconico.Video
 {
@@ -42,7 +43,7 @@ namespace Niconicome.Models.Domain.Niconico.Video
         /// <returns></returns>
         public async Task<IAttemptResult<string>> GetVideosAsync(string userId, List<IListVideoInfo> videos)
         {
-            var result = await this.GetAllVideosInternalAsync(userId,videos);
+            var result = await this.GetAllVideosInternalAsync(userId, videos);
             return result;
         }
 
@@ -64,7 +65,7 @@ namespace Niconicome.Models.Domain.Niconico.Video
                 ++page;
             } while (videos.Count < total);
 
-            return new AttemptResult<string>() { Data = videos.FirstOrDefault()?.OwnerName ?? string.Empty, IsSucceeded = true };
+            return new AttemptResult<string>() { Data = videos.FirstOrDefault()?.OwnerName.Value ?? string.Empty, IsSucceeded = true };
         }
 
         /// <summary>
@@ -112,7 +113,21 @@ namespace Niconicome.Models.Domain.Niconico.Video
         private List<IListVideoInfo> ConvertToTreeVideoInfo(List<UVideo::Item> videos)
         {
             var converted = new List<IListVideoInfo>();
-            converted.AddRange(videos.Select(v => v.Essential).Select(v => new BindableListVIdeoInfo() { Title = v.Title, NiconicoId = v.Id, UploadedOn = v.RegisteredAt.DateTime, ThumbUrl = v.Thumbnail.MiddleUrl, LargeThumbUrl = v.Thumbnail.LargeUrl, ViewCount = (int)v.Count.View, CommentCount = (int)v.Count.Comment, MylistCount = (int)v.Count.Mylist, LikeCount = (int)v.Count.Like, OwnerName = v.Owner.Name }));
+            converted.AddRange(videos.Select(v => v.Essential).Select(v =>
+            {
+                var video = new NonBindableListVideoInfo();
+                video.Title.Value = v.Title;
+                video.NiconicoId.Value = v.Id;
+                video.UploadedOn.Value = v.RegisteredAt.DateTime;
+                video.ThumbUrl.Value = v.Thumbnail.MiddleUrl;
+                video.LargeThumbUrl.Value = v.Thumbnail.LargeUrl;
+                video.ViewCount.Value = (int)v.Count.View;
+                video.CommentCount.Value = (int)v.Count.Comment;
+                video.MylistCount.Value = (int)v.Count.Mylist;
+                video.LikeCount.Value = (int)v.Count.Like;
+                video.OwnerName.Value = v.Owner.Name;
+                return video;
+            }));
             return converted;
         }
     }

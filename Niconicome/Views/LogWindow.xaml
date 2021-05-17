@@ -6,7 +6,9 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows"
         xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"        
+        xmlns:cv="clr-namespace:Niconicome.Views.Converter"
+        xmlns:prism="http://prismlibrary.com/"  
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -18,10 +20,7 @@
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource Window_Style}"
         Title="出力" Height="450" Width="400">
-    <Window.DataContext>
-        <vm:LogWindowViewModel/>
-    </Window.DataContext>
-    <Grid Margin="8">
+    <Grid Margin="8" d:DataContext="{d:DesignInstance {x:Type vm:LogWindowViewModel}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="9*"/>
@@ -34,7 +33,7 @@
                 <materialDesign:PackIcon Kind="Clipboard"/>
             </Button>
         </DockPanel>
-        <TextBox Padding="4" BorderThickness="1" BorderBrush="#e7e7e7" IsReadOnly="True" Grid.Row="1" Text="{Binding Message,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" TextWrapping="Wrap">
+        <TextBox Padding="4" BorderThickness="1" BorderBrush="#e7e7e7" IsReadOnly="True" Grid.Row="1" Text="{Binding Message.Value,UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap">
             <i:Interaction.Behaviors>
                 <vm:LogWindowBehavior/>
             </i:Interaction.Behaviors>

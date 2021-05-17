@@ -51,7 +51,7 @@ namespace Niconicome.Models.Local
             string data;
             try
             {
-                data = this.fileFactory.GetPlaylist(videos.Select(v => this.videoFileStorehandler.GetFilePath(v.NiconicoId, directoryPath) ?? string.Empty).Where(p => !p.IsNullOrEmpty()), playlistName, type);
+                data = this.fileFactory.GetPlaylist(videos.Select(v => this.videoFileStorehandler.GetFilePath(v.NiconicoId.Value, directoryPath) ?? string.Empty).Where(p => !p.IsNullOrEmpty()), playlistName, type);
             }
             catch (Exception e)
             {

@@ -117,26 +117,26 @@
                                     </GridViewColumn.Header>
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <CheckBox IsChecked="{Binding IsSelected}"/>
+                                            <CheckBox IsChecked="{Binding IsSelected.Value}"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn 
                                     Header="ID" 
-                                    DisplayMemberBinding="{Binding NiconicoId}"/>
+                                    DisplayMemberBinding="{Binding NiconicoId.Value}"/>
                                 <GridViewColumn
                                     Header="タイトル">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock 
-                                                Text="{Binding Title}"
-                                                ToolTip="{Binding Title}"/>
+                                                Text="{Binding Title.Value}"
+                                                ToolTip="{Binding Title.Value}"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn 
                                     Header="投稿日時"
-                                    DisplayMemberBinding="{Binding UploadedOn, StringFormat=yyyy年MM月dd日 HH:mm}"/>
+                                    DisplayMemberBinding="{Binding UploadedOn.Value, StringFormat=yyyy年MM月dd日 HH:mm}"/>
                             </GridView.Columns>
                         </GridView>
                     </ListView.View>

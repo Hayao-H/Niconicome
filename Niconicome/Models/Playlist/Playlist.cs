@@ -46,6 +46,7 @@ namespace Niconicome.Models.Playlist
         void AddRange(IEnumerable<ITreePlaylistInfo> playlists);
         void Merge(ITreePlaylistInfo playlist);
         void MergeRange(IEnumerable<ITreePlaylistInfo> playlists);
+        void Clear();
         bool Contains(int id);
         bool IsLastChild(ITreePlaylistInfo child);
         bool IsLastChild(int id);
@@ -276,6 +277,7 @@ namespace Niconicome.Models.Playlist
             var playlists = this.handler.GetAllPlaylists();
             foreach (var p in playlists)
             {
+                if (!this.playlistStoreHandler.Exists(p.Id)) continue;
                 this.playlistStoreHandler.Update(p);
             }
         }
@@ -335,7 +337,6 @@ namespace Niconicome.Models.Playlist
                 return playlist;
             });
 
-
             this.handler.MergeRange(playlists);
             ITreePlaylistInfo treePlaylistInfo = handler.GetTree();
             this.Playlists.Clear();
@@ -373,6 +374,15 @@ namespace Niconicome.Models.Playlist
         public void Remove(int id)
         {
             this.TreePlaylistInfoes.RemoveAll(pl => pl.Id == id);
+        }
+        
+        /// <summary>
+        /// プレイリストをクリアする
+        /// </summary>
+        public void Clear()
+        {
+            this.TreePlaylistInfoes.Clear();
+            this.IsTreeInitialized = false;
         }
 
         /// <summary>
@@ -681,7 +691,7 @@ namespace Niconicome.Models.Playlist
         {
             if (this.Videos is null) return false;
 
-            return this.Videos.Any(v => v.NiconicoId == niconicoId);
+            return this.Videos.Any(v => v.NiconicoId.Value == niconicoId);
         }
 
         /// <summary>

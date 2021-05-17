@@ -5,7 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>0.4.1.*</AssemblyVersion>
+    <AssemblyVersion>0.5.0.*</AssemblyVersion>
     <FileVersion>0.0.0.0</FileVersion>
     <StartupObject>Niconicome.App</StartupObject>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -15,7 +15,7 @@
     <PublishTrimmed>false</PublishTrimmed>
     <Deterministic>false</Deterministic>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <Version>0.4.1</Version>
+    <Version>0.5.0</Version>
     <PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
     <Copyright>c2021 Hayao-H</Copyright>
     <Authors>Hayao-H</Authors>
@@ -34,8 +34,11 @@
 
   <ItemGroup>
     <None Remove="src\app.ico" />
-    <None Remove="Views\Setting\DownloadTasksWindows.xaml" />
-    <None Remove="Views\Setting\Pages\VideoListSettingPage.xaml" />
+    <None Remove="Views\Mainpage\Region\DownloadSettings.xaml" />
+    <None Remove="Views\Mainpage\Region\Output.xaml" />
+    <None Remove="Views\Mainpage\Region\VideoList.xaml" />
+    <Page Remove="App.xaml" />
+    <ApplicationDefinition Include="App.xaml" />
     <None Include="src\icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -54,6 +57,9 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.774.44" />
     <PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
     <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+    <PackageReference Include="Prism.Unity" Version="8.0.0.1909" />
+    <PackageReference Include="ReactiveProperty" Version="7.10.0" />
+    <PackageReference Include="ReactiveProperty.WPF" Version="7.10.0" />
     <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
@@ -76,12 +82,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Views\Setting\Pages\VideoListSettingPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
   </ItemGroup>
 
 </Project>

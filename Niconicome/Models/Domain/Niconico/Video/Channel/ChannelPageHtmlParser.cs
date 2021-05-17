@@ -75,7 +75,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Channel
             if (pager is not null)
             {
                 var next = pager.QuerySelector(".next")?.Children?.FirstOrDefault()?.GetAttribute("href");
-                if (next is not null)
+                if (next is not null && !next.Contains("最後のページです"))
                 {
                     info.HasNext = true;
                     info.NextPageQuery = next;

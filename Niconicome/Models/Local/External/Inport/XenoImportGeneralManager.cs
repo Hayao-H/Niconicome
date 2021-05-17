@@ -184,7 +184,7 @@ namespace Niconicome.Models.Local.External.Import
             }
             else
             {
-                var videos = (await this.networkVideoHandler.GetVideoListInfosAsync(playlistInfo.Videos.Select(v => v.NiconicoId))).ToList();
+                var videos = (await this.networkVideoHandler.GetVideoListInfosAsync(playlistInfo.Videos.Select(v => v.NiconicoId.Value))).ToList();
                 if (playlistInfo.Videos.Count > videos.Count)
                 {
                     result.FailedVideoCount += playlistInfo.Videos.Count - videos.Count;

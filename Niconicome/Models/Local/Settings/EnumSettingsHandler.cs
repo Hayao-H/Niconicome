@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Windows.Media;
+using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Helper.Result;
 using Value = Niconicome.Models.Local.Settings.EnumSettingsValue;
 
@@ -10,7 +12,7 @@ namespace Niconicome.Models.Local.Settings
         IAttemptResult SaveSetting<T>(T data) where T:Enum;
     }
 
-    class EnumSettingsHandler:IEnumSettingsHandler
+    class EnumSettingsHandler : IEnumSettingsHandler
     {
         public EnumSettingsHandler(ILocalSettingHandler localSettingHandler)
         {
@@ -31,16 +33,12 @@ namespace Niconicome.Models.Local.Settings
         /// <returns></returns>
         public T GetSetting<T>() where T : Enum
         {
-            if (typeof(T) == typeof(Value::VideodbClickSettings))
-            {
-                var value = this.localSettingHandler.GetIntSetting(SettingsEnum.VListItemdbClick);
+            SettingsEnum setting = this.GetSettingType<T>();
 
-                if (value == -1) value = 0;
+            var value = this.localSettingHandler.GetIntSetting(setting);
+            if (value == -1) value = 0;
 
-                return (T)Enum.ToObject(typeof(T), value);
-            }
-
-            throw new InvalidOperationException($"指定した型に一致する設定は存在しません。({typeof(T).Name})");
+            return (T)Enum.ToObject(typeof(T), value);
         }
 
         /// <summary>
@@ -51,14 +49,35 @@ namespace Niconicome.Models.Local.Settings
         /// <returns></returns>
         public IAttemptResult SaveSetting<T>(T data) where T : Enum
         {
-            if (data is Value::VideodbClickSettings value)
+            SettingsEnum setting = this.GetSettingType<T>();
+
+            this.localSettingHandler.SaveSetting(Convert.ToInt32(data), setting);
+
+            return new AttemptResult() { IsSucceeded = true };
+        }
+
+        /// <summary>
+        /// 設定名を取得
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private SettingsEnum GetSettingType<T>()
+        {
+            if (typeof(T) == typeof(Value::VideodbClickSettings))
             {
-                this.localSettingHandler.SaveSetting((int)value, SettingsEnum.VListItemdbClick);
-
-                return new AttemptResult() { IsSucceeded = true };
+                return SettingsEnum.VListItemdbClick;
             }
-
-            throw new InvalidOperationException($"指定した型に一致する設定は存在しません。({typeof(T).Name})");
+            else if (typeof(T) == typeof(Value::VideoInfoTypeSettings))
+            {
+                return SettingsEnum.VideoInfoType;
+            }　else if (typeof(T) == typeof(Value::IchibaInfoTypeSettings))
+            {
+                return SettingsEnum.IchibaInfoType;
+            }
+            else
+            {
+                throw new InvalidOperationException($"指定した型に一致する設定は存在しません。({typeof(T).Name})");
+            }
         }
     }
 }
