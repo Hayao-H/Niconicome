@@ -77,14 +77,6 @@ namespace Niconicome.ViewModels.Mainpage
             var dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWDownloadedFlagColumnWid);
             var stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
             var tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
-            this.selectColumnWidthField = scWidth <= 0 ? 150 : scWidth;
-            this.iDColumnWidthField = idWidth <= 0 ? 150 : idWidth;
-            this.titleColumnWidthField = titleWIdth <= 0 ? 150 : titleWIdth;
-            this.uploadColumnWidthField = uploadWidth <= 0 ? 150 : uploadWidth;
-            this.viewCountColumnWidthField = vctWidth <= 0 ? 150 : vctWidth;
-            this.downloadedFlagColumnWidthField = dlfWidth <= 0 ? 150 : dlfWidth;
-            this.stateColumnWidthField = stWidth <= 0 ? 150 : stWidth;
-            this.thumbColumnWidthField = tnWidth <= 0 ? 150 : tnWidth;
 
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
@@ -752,6 +744,50 @@ namespace Niconicome.ViewModels.Mainpage
             .AddTo(this.disposables);
 
             #endregion
+
+            #region Width系プロパティー
+            this.SelectColumnWidth = new ReactiveProperty<int>(scWidth <= 0 ? 150 : scWidth);
+            this.IDColumnWidth = new ReactiveProperty<int>(idWidth <= 0 ? 150 : idWidth);
+            this.TitleColumnWidth = new ReactiveProperty<int>(titleWIdth <= 0 ? 150 : titleWIdth);
+            this.UploadColumnWidth = new ReactiveProperty<int>(uploadWidth <= 0 ? 150 : uploadWidth);
+            this.ViewCountColumnWidth = new ReactiveProperty<int>(vctWidth <= 0 ? 150 : vctWidth);
+            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(dlfWidth <= 0 ? 150 : dlfWidth);
+            this.StateColumnWidth = new ReactiveProperty<int>(stWidth <= 0 ? 150 : stWidth);
+            this.ThumbColumnWidth = new ReactiveProperty<int>(tnWidth <= 0 ? 150 : tnWidth);
+
+            this.SelectColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWSelectColumnWid))
+                .AddTo(this.disposables);
+            this.IDColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWIDColumnWid))
+                .AddTo(this.disposables);
+            this.TitleColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWTitleColumnWid))
+                .AddTo(this.disposables);
+            this.UploadColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWUploadColumnWid))
+                .AddTo(this.disposables);
+            this.ViewCountColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWViewCountColumnWid))
+                .AddTo(this.disposables);
+            this.DownloadedFlagColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWDownloadedFlagColumnWid))
+                .AddTo(this.disposables);
+            this.StateColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWStateColumnWid))
+                .AddTo(this.disposables);
+            this.ThumbColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
+                .AddTo(this.disposables);
+            #endregion
         }
 
         ~VideoListViewModel()
@@ -926,63 +962,46 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; }
 
-
         #region Width
-        public int selectColumnWidthField;
-
-        public int iDColumnWidthField;
-
-        public int titleColumnWidthField;
-
-        public int uploadColumnWidthField;
-
-        public int viewCountColumnWidthField;
-
-        public int downloadedFlagColumnWidthField;
-
-        public int stateColumnWidthField;
-
-        public int thumbColumnWidthField;
 
         /// <summary>
         /// 選択
         /// </summary>
-        public int SelectColumnWidth { get => this.selectColumnWidthField; set => this.SetProperty(ref this.selectColumnWidthField, value); }
+        public ReactiveProperty<int> SelectColumnWidth { get; init; }
 
         /// <summary>
         /// ID
         /// </summary>
-        public int IDColumnWidth { get => this.iDColumnWidthField; set => this.SetProperty(ref this.iDColumnWidthField, value); }
+        public ReactiveProperty<int> IDColumnWidth { get; init; }
 
         /// <summary>
         /// タイトル
         /// </summary>
-        public int TitleColumnWidth { get => this.titleColumnWidthField; set => this.SetProperty(ref this.titleColumnWidthField, value); }
+        public ReactiveProperty<int> TitleColumnWidth { get; init; }
 
         /// <summary>
         /// 投稿日時
         /// </summary>
-        public int UploadColumnWidth { get => this.uploadColumnWidthField; set => this.SetProperty(ref this.uploadColumnWidthField, value); }
+        public ReactiveProperty<int> UploadColumnWidth { get; init; }
 
         /// <summary>
         /// 再生回数
         /// </summary>
-        public int ViewCountColumnWidth { get => this.viewCountColumnWidthField; set => this.SetProperty(ref this.viewCountColumnWidthField, value); }
-
+        public ReactiveProperty<int> ViewCountColumnWidth { get; init; }
         /// <summary>
         /// DL済み
         /// </summary>
-        public int DownloadedFlagColumnWidth { get => this.downloadedFlagColumnWidthField; set => this.SetProperty(ref this.downloadedFlagColumnWidthField, value); }
+        public ReactiveProperty<int> DownloadedFlagColumnWidth { get; init; }
 
         /// <summary>
         /// 状態
         /// </summary>
-        public int StateColumnWidth { get => this.stateColumnWidthField; set => this.SetProperty(ref this.stateColumnWidthField, value); }
+        public ReactiveProperty<int> StateColumnWidth { get; init; }
 
         /// <summary>
         /// サムネイル
         /// </summary>
-        public int ThumbColumnWidth { get => this.thumbColumnWidthField; set => this.SetProperty(ref this.thumbColumnWidthField, value); }
+        public ReactiveProperty<int> ThumbColumnWidth { get; init; }
 
         #endregion
 
@@ -1041,21 +1060,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
             this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
-        }
-
-        /// <summary>
-        /// 幅を保持する
-        /// </summary>
-        public void SaveColumnWidth()
-        {
-            WS::Mainpage.SettingHandler.SaveSetting(this.SelectColumnWidth, SettingsEnum.MWSelectColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.IDColumnWidth, SettingsEnum.MWIDColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.TitleColumnWidth, SettingsEnum.MWTitleColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.UploadColumnWidth, SettingsEnum.MWUploadColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.ViewCountColumnWidth, SettingsEnum.MWViewCountColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.DownloadedFlagColumnWidth, SettingsEnum.MWDownloadedFlagColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.StateColumnWidth, SettingsEnum.MWStateColumnWid);
-            WS::Mainpage.SettingHandler.SaveSetting(this.ThumbColumnWidth, SettingsEnum.MWThumbColumnWid);
         }
 
         #region private
@@ -1235,21 +1239,21 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; } = new();
 
-        public int SelectColumnWidth { get; set; }
+        public ReactivePropertySlim<int> SelectColumnWidth { get; set; } = new();
 
-        public int IDColumnWidth { get; set; }
+        public ReactivePropertySlim<int> IDColumnWidth { get; set; } = new();
 
-        public int TitleColumnWidth { get; set; }
+        public ReactivePropertySlim<int> TitleColumnWidth { get; set; } = new();
 
-        public int UploadColumnWidth { get; set; }
+        public ReactivePropertySlim<int> UploadColumnWidth { get; set; } = new();
 
-        public int ViewCountColumnWidth { get; set; }
+        public ReactivePropertySlim<int> ViewCountColumnWidth { get; set; } = new();
 
-        public int DownloadedFlagColumnWidth { get; set; }
+        public ReactivePropertySlim<int> DownloadedFlagColumnWidth { get; set; } = new();
 
-        public int StateColumnWidth { get; set; }
+        public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new();
 
-        public int ThumbColumnWidth { get; set; }
+        public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
 
     }
 
