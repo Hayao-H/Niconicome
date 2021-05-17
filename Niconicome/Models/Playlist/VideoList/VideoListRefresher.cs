@@ -88,6 +88,8 @@ namespace Niconicome.Models.Playlist.VideoList
             var defaultDir = this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir;
             var folderPath = playlist.FolderPath ?? defaultDir;
 
+            this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
+
             foreach (var originVideo in originVideos)
             {
                 if (playlistID != (this.current.SelectedPlaylist.Value?.Id ?? -1))

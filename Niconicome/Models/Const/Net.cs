@@ -17,5 +17,10 @@ namespace Niconicome.Models.Const
         /// ニコニコの短縮リンク
         /// </summary>
         public const string NiconicoShortUrl = "https://nico.ms/";
+
+        /// <summary>
+        /// 削除動画のサムネ
+        /// </summary>
+        public const string NiconicoDeletedVideothumb = @"https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg";
     }
 }

@@ -2,15 +2,18 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Network;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
+using Unity;
 
 namespace Niconicome.Models.Network
 {
     public interface IVideoThumnailUtility
     {
         void GetThumbAsync(IListVideoInfo video, bool overwrite = false);
+        void GetFundamentalThumbsIfNotExist();
         string GetThumbFilePath(string niconicoId);
         bool IsValidThumbnailUrl(IListVideoInfo video);
         bool IsValidThumbnailPath(IListVideoInfo video);
@@ -151,6 +154,29 @@ namespace Niconicome.Models.Network
         {
             return this.cacheHandler.HasCache(video.NiconicoId.Value, CacheType.Thumbnail);
         }
+
+        /// <summary>
+        /// 基本的な画像を取得する
+        /// </summary>
+        public void GetFundamentalThumbsIfNotExist()
+        {
+            if (this.cacheHandler.HasCache("0",CacheType.Thumbnail)) return;
+
+            lock (this.lockObj)
+            {
+                if (!this.niconicoIDs.Any(id => id == "0"))
+{
+                    this.thumbConfigs.Enqueue(new ThumbConfig() { NiconicoID = "0", Url = Net.NiconicoDeletedVideothumb, Overwrite = false });
+                    this.niconicoIDs.Add("0");
+                }
+            }
+
+            if (!this.isFetching)
+            {
+                Task.Run(() => this.GetThumbAsync());
+            }
+        }
+
 
         private class ThumbConfig
         {
