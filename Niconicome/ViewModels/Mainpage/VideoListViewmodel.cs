@@ -1447,6 +1447,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.IsSelected = video.IsSelected.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
             this.IsDownloaded = video.IsDownloaded.ToReactivePropertyAsSynchronized(p => p.Value, p => p ? "○" : "×", x => x == "○").AddTo(this.disposables);
             this.UploadedOn = video.UploadedOn.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
+            this.IsThumbDownloading = video.IsThumbDownloading.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
 
         }
 
@@ -1472,6 +1473,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<string> IsDownloaded { get; init; }
 
         public ReactiveProperty<bool> IsSelected { get; init; }
+
+        public ReactiveProperty<bool> IsThumbDownloading { get; init; }
 
         public ReactiveProperty<DateTime> UploadedOn { get; init; }
 
