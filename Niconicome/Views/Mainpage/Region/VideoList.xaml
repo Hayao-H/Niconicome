@@ -139,8 +139,11 @@
                             <GridViewColumn Width="{Binding ThumbColumnWidth}">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
+                                    <StackPanel Orientation="Vertical">
                                         <Image Source="{Binding ThumbPath.Value,UpdateSourceTrigger=PropertyChanged}" Height="80"/>
-                                    </DataTemplate>
+                                        <ProgressBar IsIndeterminate="{Binding IsThumbDownloading.Value,UpdateSourceTrigger=PropertyChanged}"/>
+                                    </StackPanel>
+                                </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Width="{Binding IDColumnWidth,Mode=TwoWay}" Header="ID" DisplayMemberBinding="{Binding NiconicoId.Value}"/>

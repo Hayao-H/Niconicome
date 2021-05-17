@@ -27,6 +27,7 @@ namespace Niconicome.Models.Playlist
         ReactiveProperty<bool> IsDeleted { get; }
         ReactiveProperty<bool> IsSelected { get; }
         ReactiveProperty<bool> IsDownloaded { get; }
+        ReactiveProperty<bool> IsThumbDownloading { get; }
         ReactiveProperty<string> OwnerName { get; }
         ReactiveProperty<string> LargeThumbUrl { get; }
         ReactiveProperty<string> ThumbUrl { get; }
@@ -82,6 +83,7 @@ namespace Niconicome.Models.Playlist
         public ReactiveProperty<bool> IsDeleted { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsSelected { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsDownloaded { get; init; } = new ReactiveProperty<bool>();
+        public ReactiveProperty<bool> IsThumbDownloading { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<DateTime> UploadedOn { get; init; } = new ReactiveProperty<DateTime>();
         /// <summary>
         /// バインド可能なサムネイルフィルパス

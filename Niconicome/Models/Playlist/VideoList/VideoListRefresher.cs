@@ -131,6 +131,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 if (IsValidUrl && !hasCache)
                 {
                     this.videoThumnailUtility.GetThumbAsync(video);
+                    video.IsThumbDownloading.Value = true;
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath("0");
                     videos.Add(video);
                 }
