@@ -93,11 +93,16 @@ namespace Niconicome.Models.Network.Download
             this.downloadHelper = downloadHelper;
 
             int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelDL);
+            var sleepInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
             if (maxParallel <= 0)
             {
                 maxParallel = 3;
             }
-            this.parallelTasksHandler = new ParallelTasksHandler<DownloadTaskParallel>(maxParallel, 5, 15);
+            if (sleepInterval <= 0)
+            {
+                sleepInterval = 5;
+            }
+            this.parallelTasksHandler = new ParallelTasksHandler<DownloadTaskParallel>(maxParallel, sleepInterval, 15);
             this.downloadTasksHandler.DownloadTaskPool.TaskPoolChange += this.DownloadTaskPoolChangedEventHandler;
         }
 
