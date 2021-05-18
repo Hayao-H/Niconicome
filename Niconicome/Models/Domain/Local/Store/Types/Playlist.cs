@@ -49,6 +49,10 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public bool IsExpanded { get; set; }
 
+        public List<int> CustomVideoSequence { get; set; } = new();
+
+        public VideoSortType SortType { get; set; }
+
         [BsonIgnore]
         public bool IsConcretePlaylist
         {
@@ -104,5 +108,16 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         UserVideo,
         Ranking,
         Search
+    }
+
+    public enum VideoSortType
+    {
+        Register,
+        NiconicoID,
+        Title,
+        UploadedDT,
+        ViewCount,
+        DownloadedFlag,
+        Custom
     }
 }
