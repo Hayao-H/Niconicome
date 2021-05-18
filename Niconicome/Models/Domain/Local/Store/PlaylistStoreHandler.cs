@@ -4,6 +4,7 @@ using System.Linq;
 using Niconicome.Models.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Local.Store
 {
@@ -18,6 +19,8 @@ namespace Niconicome.Models.Domain.Local.Store
         IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self);
         IEnumerable<STypes::Playlist> GetChildPlaylists(int id);
         IEnumerable<STypes::Playlist> GetAllPlaylists();
+        IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex);
+        IAttemptResult MoveVideoToForward(int playlistID, int videoIndex);
         void RemoveChildPlaylist(int selfId);
         void DeletePlaylist(int id);
         bool Exists(int id);
@@ -52,9 +55,19 @@ namespace Niconicome.Models.Domain.Local.Store
         public STypes::Playlist? GetPlaylist(int id)
         {
 
-            return this.databaseInstance.GetCollection<STypes::Playlist>(STypes::Playlist.TableName)
+            var playlist = this.databaseInstance.GetCollection<STypes::Playlist>(STypes::Playlist.TableName)
                     .Include(p => p.Videos)
                     .FindById(id);
+
+            if (playlist is null) return null;
+
+            if (playlist.Videos.Count > 0 && playlist.CustomVideoSequence.Count == 0)
+            {
+                playlist.CustomVideoSequence.AddRange(playlist.Videos.Select(v => v.Id));
+            }
+
+            return playlist;
+
         }
 
         /// <summary>
@@ -133,6 +146,66 @@ namespace Niconicome.Models.Domain.Local.Store
         public IEnumerable<STypes::Playlist> GetAllPlaylists()
         {
             return this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName);
+        }
+
+        /// <summary>
+        /// 動画を後ろに挿入する
+        /// </summary>
+        /// <param name="playlistID"></param>
+        /// <param name="videoIndex"></param>
+        /// <returns></returns>
+        public IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex)
+        {
+            if (!this.Exists(playlistID)) return new AttemptResult() { Message = $"指定されたプレイリストは存在しません。(id={playlistID})" };
+
+            var playlist = this.GetPlaylist(playlistID)!;
+
+            if (playlist.Videos.Count < videoIndex + 1) return new AttemptResult() { Message = $"指定されたインデックスは範囲外です。(index={videoIndex}, actual={playlist.Videos.Count})" };
+
+            if (videoIndex == 0) return new AttemptResult() { Message = $"指定されたインデックスは最初の動画です。(index={videoIndex})" };
+
+            try
+            {
+                playlist.CustomVideoSequence.InsertIntoPrev(videoIndex);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult() { Message = $"挿入操作に失敗しました。", Exception = e };
+            }
+
+            this.Update(playlist);
+
+            return new AttemptResult() { IsSucceeded = true };
+        }
+
+        /// <summary>
+        /// 動画をうしろに挿入する
+        /// </summary>
+        /// <param name="playlistID"></param>
+        /// <param name="videoIndex"></param>
+        /// <returns></returns>
+        public IAttemptResult MoveVideoToForward(int playlistID, int videoIndex)
+        {
+            if (!this.Exists(playlistID)) return new AttemptResult() { Message = $"指定されたプレイリストは存在しません。(id={playlistID})" };
+
+            var playlist = this.GetPlaylist(playlistID)!;
+
+            if (playlist.Videos.Count < videoIndex + 1) return new AttemptResult() { Message = $"指定されたインデックスは範囲外です。(index={videoIndex}, actual={playlist.Videos.Count})" };
+
+            if (videoIndex + 1 == playlist.Videos.Count) return new AttemptResult() { Message = $"指定されたインデックスは最後の動画です。(index={videoIndex})" };
+
+            try
+            {
+                playlist.CustomVideoSequence.InsertIntoForward(videoIndex);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult() { Message = $"挿入操作に失敗しました。", Exception = e };
+            }
+
+            this.Update(playlist);
+
+            return new AttemptResult() { IsSucceeded = true };
         }
 
         /// <summary>
@@ -457,7 +530,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="dbPlaylist"></param>
         /// <param name="playlistInfo"></param>
-        private void SetData(STypes::Playlist dbPlaylist,ITreePlaylistInfo playlistInfo)
+        private void SetData(STypes::Playlist dbPlaylist, ITreePlaylistInfo playlistInfo)
         {
             dbPlaylist.PlaylistName = playlistInfo.Name;
             dbPlaylist.FolderPath = playlistInfo.Folderpath;
