@@ -87,6 +87,31 @@ namespace Niconicome.Extensions.System.List
         {
             await Task.WhenAll(source);
         }
+
+        /// <summary>
+        /// ひとつ前に挿入する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="index"></param>
+        public static void InsertToPrev<T>(this IList<T> source,int index)
+        {
+            var tmp = source[index];
+            source[index] = source[index - 1];
+            source[index - 1] = tmp;
+        }
+
+        /// <summary>
+        /// ひとつ後ろに挿入する
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="index"></param>
+        public static void InsertIntoForward(this IList<T> source, int index)
+        {
+            var tmp = source[index];
+            source[index] = source[index + 1];
+            source[index + 1] = tmp;
+        }
     }
 
     public class EqualityComparer<T, TMem> : IEqualityComparer<T>
