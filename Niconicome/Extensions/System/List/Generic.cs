@@ -94,7 +94,7 @@ namespace Niconicome.Extensions.System.List
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="index"></param>
-        public static void InsertToPrev<T>(this IList<T> source,int index)
+        public static void InsertIntoPrev<T>(this IList<T> source,int index)
         {
             var tmp = source[index];
             source[index] = source[index - 1];
@@ -106,7 +106,7 @@ namespace Niconicome.Extensions.System.List
         /// </summary>
         /// <param name="source"></param>
         /// <param name="index"></param>
-        public static void InsertIntoForward(this IList<T> source, int index)
+        public static void InsertIntoForward<T>(this IList<T> source, int index)
         {
             var tmp = source[index];
             source[index] = source[index + 1];
