@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.Models.Domain.Local.External.Import.Xeno
 {

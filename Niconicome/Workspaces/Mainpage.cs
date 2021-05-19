@@ -1,24 +1,25 @@
-﻿using Niconicome.Models.Auth;
-using Niconicome.Models.Playlist;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Network;
-using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Local;
-using MaterialDesign = MaterialDesignThemes.Wpf;
 using Niconicome.Models.Local.Application;
-using Niconicome.Models.Local.State;
-using Niconicome.Models.Network.Download;
-using VideoList = Niconicome.Models.Playlist.VideoList;
-using Niconicome.Models.Network.Watch;
-using Ext = Niconicome.Models.Local.External;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.State;
+using Niconicome.Models.Network;
+using Niconicome.Models.Network.Download;
+using Niconicome.Models.Network.Watch;
+using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
+using Ext = Niconicome.Models.Local.External;
+using VideoList = Niconicome.Models.Playlist.VideoList;
 
 namespace Niconicome.Workspaces
 {
     static class Mainpage
     {
         public static ISession Session { get; private set; } = DIFactory.Provider.GetRequiredService<ISession>();
-        public static IPlaylistHandler PlaylistTree { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
+        public static IPlaylistHandler PlaylistHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
+        public static IPlaylistTreeHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistTreeHandler>();
         public static IVideoHandler VideoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoHandler>();
         public static IWatch Watch { get; private set; } = DIFactory.Provider.GetRequiredService<IWatch>();
         public static IRemotePlaylistHandler RemotePlaylistHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IRemotePlaylistHandler>();

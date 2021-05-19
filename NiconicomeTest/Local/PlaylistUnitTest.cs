@@ -3,7 +3,7 @@ using System;
 using Niconicome.Models.Domain.Local;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Local.Store;
-using Playlist = Niconicome.Models.Playlist;
+using Playlist = Niconicome.Models.Playlist.Playlist;
 
 namespace NiconicomeTest
 {

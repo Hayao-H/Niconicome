@@ -10,6 +10,7 @@ using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
 using Playlist = Niconicome.Models.Playlist;
 using Search = Niconicome.Models.Domain.Niconico.Search;

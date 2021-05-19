@@ -7,9 +7,9 @@ using WS = Niconicome.Workspaces;
 using MsApi = Microsoft.WindowsAPICodePack;
 using System.Windows;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Playlist;
 using Niconicome.Models.Local.External.Import;
 using System.Threading;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {

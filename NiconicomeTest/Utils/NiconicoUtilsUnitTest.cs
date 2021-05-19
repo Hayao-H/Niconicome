@@ -1,9 +1,9 @@
 using NUnit.Framework;
 using System;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Playlist;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace NiconicomeTest.Utils
 {

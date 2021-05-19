@@ -40,6 +40,7 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
+using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -75,8 +76,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<DataBase::IDataBase, DataBase::DataBase>();
             services.AddTransient<Store::IPlaylistStoreHandler, Store::PlaylistStoreHandler>();
             services.AddTransient<Store::IVideoStoreHandler, Store::VideoStoreHandler>();
-            services.AddSingleton<Playlist::IPlaylistHandler, Playlist::PlaylistHandler>();
-            services.AddTransient<Playlist::IPlaylistTreeConstructor, Playlist::PlaylistTreeConstructor>();
+            services.AddTransient<PlaylistPlaylist::IPlaylistHandler, PlaylistPlaylist::PlaylistHandler>();
+            services.AddSingleton<PlaylistPlaylist::IPlaylistTreeHandler, PlaylistPlaylist::PlaylistTreeHandler>();
             services.AddTransient<DomainWatch::IWatchPageHtmlParser, DomainWatch::WatchPageHtmlParser>();
             services.AddTransient<DomainWatch::IWatchInfohandler, DomainWatch::WatchInfohandler>();
             services.AddTransient<Watch::IWatch, Watch::Watch>();

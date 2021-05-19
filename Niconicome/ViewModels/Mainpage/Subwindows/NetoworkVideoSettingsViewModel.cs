@@ -4,7 +4,8 @@ using System.Text;
 using System.Windows;
 using Niconicome.Models.Domain.Local.Playlist;
 using Niconicome.Models.Network;
-using Playlist = Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist;
+using Playlist = Niconicome.Models.Playlist.Playlist;
 using WS = Niconicome.Workspaces;
 
 
@@ -69,7 +70,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     this.messageField.Clear();
                     this.OnPropertyChanged(messagePropName);
 
-                    var videos = new List<Playlist::IListVideoInfo>();
+                    var videos = new List<IListVideoInfo>();
                     int playlistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
 
                     this.Message = "情報を取得中です...";
@@ -107,12 +108,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     if (this.CurrentSetting.NetworkMode == Playlist::RemoteType.None)
                     {
-                        WS::Mainpage.PlaylistTree.SetAsLocalPlaylist(playlistID);
+                        WS::Mainpage.PlaylistHandler.SetAsLocalPlaylist(playlistID);
 
                     }
                     else
                     {
-                        WS::Mainpage.PlaylistTree.SetAsRemotePlaylist(playlistID, id, result.Data!, this.CurrentSetting.NetworkMode);
+                        WS::Mainpage.PlaylistHandler.SetAsRemotePlaylist(playlistID, id, result.Data!, this.CurrentSetting.NetworkMode);
                     }
 
                     this.Message = "取得処理が完了しました。";

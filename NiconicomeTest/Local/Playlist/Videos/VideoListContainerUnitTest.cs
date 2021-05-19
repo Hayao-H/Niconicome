@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 using NiconicomeTest.Stabs.Models.Domain.Local.Store;
 using NiconicomeTest.Stabs.Models.Playlist;

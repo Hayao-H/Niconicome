@@ -22,6 +22,7 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
@@ -81,7 +82,7 @@ namespace Niconicome.ViewModels.Mainpage
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
             var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
-            WS::Mainpage.PlaylistTree.Refresh(expandAll, inheritExpandedState);
+            WS::Mainpage.PlaylistHandler.Refresh(expandAll, inheritExpandedState);
 
             //すべて選択する
             this.IsSelectedAll = new ReactivePropertySlim<bool>().AddTo(this.disposables);
@@ -141,7 +142,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                   WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
 
-                  WS::Mainpage.PlaylistTree.Refresh();
+                  WS::Mainpage.PlaylistHandler.Refresh();
 
                   this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
 
@@ -265,7 +266,7 @@ namespace Niconicome.ViewModels.Mainpage
                 if (data == string.Empty) return;
 
                 Utils::INiconicoUtils reader = new Utils::NiconicoUtils();
-                var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistTree.ContainsVideo(i, playlistId)).ToList();
+                var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistHandler.ContainsVideo(i, playlistId)).ToList();
 
                 var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(ids)).ToList();
                 var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
@@ -405,7 +406,7 @@ namespace Niconicome.ViewModels.Mainpage
                     if (result.IsSucceeded)
                     {
 
-                        videos = videos.Where(v => !WS::Mainpage.PlaylistTree.ContainsVideo(v.NiconicoId.Value, playlistId)).ToList();
+                        videos = videos.Where(v => !WS::Mainpage.PlaylistHandler.ContainsVideo(v.NiconicoId.Value, playlistId)).ToList();
 
                         if (videos.Count == 0)
                         {
