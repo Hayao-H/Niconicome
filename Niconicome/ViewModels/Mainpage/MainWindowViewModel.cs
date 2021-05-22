@@ -12,6 +12,7 @@ using Niconicome.Views;
 using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
 using Prism.Regions;
+using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
@@ -24,46 +25,41 @@ namespace Niconicome.ViewModels.Mainpage
 
         public MainWindowViewModel(IRegionManager regionManager)
         {
-            if (WS::Mainpage.Session.IsLogin)
-            {
-                this.OnLogin(this, EventArgs.Empty);
-            } else
-            {
-                WS::Mainpage.StartUp.AutoLoginSucceeded += this.OnLogin;
-            }
+
+            WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
+            this.LoginBtnVal= new ReactiveProperty<string>("ログイン");
+            this.Username = new ReactiveProperty<string>("未ログイン");
+            this.LoginBtnTooltip = new ReactiveProperty<string>("ログイン画面を表示する");
+            this.UserImage = new ReactiveProperty<Uri>(new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg"));
 
 
-            this.LoginCommand = new CommandBase<object>(
-                    (object? arg) => true,
-                    async (object? arg) =>
+            this.LoginCommand = new ReactiveCommand()
+                .WithSubscribe(async () =>
+                {
+
+                    if (!WS::Mainpage.Session.IsLogin.Value)
                     {
-
-                        if (!this.IsLogin)
+                        Window loginpage = new Loginxaml
                         {
-                            Window loginpage = new Loginxaml
-                            {
-                                Owner = Application.Current.MainWindow,
-                                ShowInTaskbar = true
-                            };
-#pragma warning disable CS8602
-                            (loginpage.DataContext as Login.LoginWindowViewModel).LoginSucceeded += this.OnLogin;
-                            loginpage.Show();
-                        }
-                        else
-                        {
-                            ISession session = WS::Mainpage.Session;
-                            await session.Logout();
-                            this.IsLogin = false;
-                            this.LoginBtnVal = "ログイン";
-                            this.OnPropertyChanged(nameof(this.LoginBtnTooltip));
-                            this.user = null;
-                            this.OnPropertyChanged(nameof(this.Username));
-                            this.OnPropertyChanged(nameof(this.UserImage));
-                        }
-
+                            Owner = Application.Current.MainWindow,
+                            ShowInTaskbar = true
+                        };
+                        loginpage.Show();
                     }
-                );
-            this.OpenSettingCommand = new CommandBase<object>(_ => true, _ =>
+                    else
+                    {
+                        ISession session = WS::Mainpage.Session;
+                        await session.Logout();
+                        this.LoginBtnVal.Value = "ログイン";
+                        this.Username.Value = "未ログイン";
+                        this.LoginBtnTooltip.Value = "ログイン画面を表示する";
+                        this.UserImage.Value = new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg");
+                    }
+
+                });
+
+            this.OpenSettingCommand = new ReactiveCommand()
+                .WithSubscribe(() =>
             {
                 var window = new SettingWindow()
                 {
@@ -72,11 +68,12 @@ namespace Niconicome.ViewModels.Mainpage
                 window.Show();
             });
 
-            this.OpenDownloadTaskWindowsCommand = new CommandBase<object>(_ => true,_=>
-            {
-                var windows = new DownloadTasksWindows();
-                windows.Show();
-            });
+            this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
+                .WithSubscribe(()=>
+             {
+                 var windows = new DownloadTasksWindows();
+                 windows.Show();
+             });
 
             regionManager.RegisterViewWithRegion("VideoListRegion", typeof(VideoList));
             regionManager.RegisterViewWithRegion("DownloadSettingsRegion", typeof(DownloadSettings));
@@ -91,78 +88,31 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// ユーザー名
         /// </summary>
-        public string Username
-        {
-            get
-            {
-                return this.user?.Nickname ?? "未ログイン";
-            }
-        }
+        public ReactiveProperty<string> Username { get; init; }
 
         /// <summary>
         /// ユーザー画像
         /// </summary>
-        public Uri UserImage
-        {
-            get
-            {
-                return this.user?.UserImage ?? new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg");
-            }
-        }
+        public ReactiveProperty<Uri> UserImage { get; init; }
 
         /// <summary>
         /// ログインボタンのツールチップ
         /// </summary>
-        public string LoginBtnTooltip
-        {
-            get
-            {
-                return this.IsLogin ? "ログアウトする" : "ログイン画面を表示する";
-            }
-        }
-
-        /// <summary>
-        /// ログインボタンの表示文字(フィールド)
-        /// </summary>
-        private string loginBtnVal = "ログイン";
+        public ReactiveProperty<string> LoginBtnTooltip { get; init; }
 
         /// <summary>
         /// ログインボタンの表示文字
         /// </summary>
-        public string LoginBtnVal
-        {
-            get { return this.loginBtnVal; }
-            set { this.SetProperty(ref this.loginBtnVal, value, nameof(this.LoginBtnVal)); }
-        }
+        public ReactiveProperty<string> LoginBtnVal { get; init; }
 
         /// <summary>
         /// ログインコマンド
         /// </summary>
-        public CommandBase<object> LoginCommand { get; private set; }
+        public ReactiveCommand LoginCommand { get; private set; }
 
-        public CommandBase<object> OpenSettingCommand { get; init; }
+        public ReactiveCommand OpenSettingCommand { get; init; }
 
-        public CommandBase<object> OpenDownloadTaskWindowsCommand { get; init; }
-
-        /// <summary>
-        /// ログイン状態(フィールド)
-        /// </summary>
-        private bool isLogin;
-
-        /// <summary>
-        /// ログイン状態を取得
-        /// </summary>
-        public bool IsLogin
-        {
-            get
-            {
-                return this.isLogin;
-            }
-            set
-            {
-                this.SetProperty(ref this.isLogin, value, nameof(this.IsLogin));
-            }
-        }
+        public ReactiveCommand OpenDownloadTaskWindowsCommand { get; init; }
 
         /// <summary>
         /// メッセージ(フィールド)
@@ -190,14 +140,14 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnLogin(object? sender,EventArgs e)
+        private void OnLogin()
         {
-            this.IsLogin = true;
-            this.user = NiconicoContext.User;
-            this.LoginBtnVal = "ログアウト";
-            this.OnPropertyChanged(nameof(this.LoginBtnTooltip));
-            this.OnPropertyChanged(nameof(this.Username));
-            this.OnPropertyChanged(nameof(this.UserImage));
+            if (WS::Mainpage.Session.User.Value is null) return; 
+            this.user = WS::Mainpage.Session.User.Value;
+            this.LoginBtnVal.Value = "ログアウト";
+            this.LoginBtnTooltip.Value = "ログアウトする";
+            this.Username.Value = this.user.Nickname;
+            this.UserImage.Value = this.user.UserImage;
         }
 
 

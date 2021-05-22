@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
-using Niconicome.Models.Playlist.Playlist;
 
 namespace NiconicomeTest.Local.Playlist
 {
@@ -44,7 +43,7 @@ namespace NiconicomeTest.Local.Playlist
     [TestFixture]
     class PlaylistInfoHandlerUnitTest
     {
-        private IPlaylistTreeHandler handler = new PlaylistTreeHandler();
+        private IPlaylistTreeConstructor handler = new PlaylistTreeConstructor();
 
         [SetUp]
         public void SetUp()
@@ -73,8 +72,8 @@ namespace NiconicomeTest.Local.Playlist
 
             //全て追加
             var playlists = new List<STypes::Playlist>() { first, second, third, fourth, fifth, sixth, seventh };
-            this.handler = new PlaylistTreeHandler();
-            this.handler.Initialize(playlists.Select(p => NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, playlists.Where(pl => pl?.ParentPlaylist?.Id == p.Id))));
+            this.handler = new PlaylistTreeConstructor();
+            this.handler.AddRange(playlists.Select(p => NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, playlists.Where(pl => pl?.ParentPlaylist?.Id == p.Id))));
         }
 
         [TestCase(1)]
@@ -89,6 +88,12 @@ namespace NiconicomeTest.Local.Playlist
             Assert.IsTrue(this.handler.Contains(id));
         }
 
+        [Test]
+        public void プレイリストを追加する()
+        {
+            this.handler.Add(new NonBindableTreePlaylistInfo() { Id = 8 });
+            Assert.IsTrue(this.handler.Contains(8));
+        }
 
         [Test]
         public void プレイリストを削除する()
@@ -122,11 +127,17 @@ namespace NiconicomeTest.Local.Playlist
         }
 
         [Test]
+        public void ルートプレイリストを取得する()
+        {
+            ITreePlaylistInfo root = this.handler.GetRoot();
+            Assert.AreEqual(1, root.Id);
+        }
+
+        [Test]
         public void ツリーを構築する()
         {
-            ITreePlaylistInfo tree = this.handler.Playlists.FirstOrDefault()!;
+            ITreePlaylistInfo tree = this.handler.GetTree();
 
-            Assert.That(tree, Is.Not.Null);
             //子プレイリストの概観チェック
             Assert.AreEqual(2, tree.Children.Count);
             Assert.AreEqual(1, tree.Children[0].Children.Count);

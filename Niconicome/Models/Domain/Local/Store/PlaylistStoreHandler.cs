@@ -4,8 +4,8 @@ using System.Linq;
 using Niconicome.Models.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Extensions.System.List;
-using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Local.Store
 {
@@ -103,7 +103,7 @@ namespace Niconicome.Models.Domain.Local.Store
 
                 var playlist = new STypes::Playlist(parent)
                 {
-                    PlaylistName = "新しいプレイリスト"
+                    PlaylistName = name
                 };
 
                 int childId = this.databaseInstance.Store(playlist, STypes::Playlist.TableName);
@@ -490,7 +490,6 @@ namespace Niconicome.Models.Domain.Local.Store
             if (playlist.Videos.Any(v => v.NiconicoId == videoData.NiconicoId.Value)) return -1;
 
             playlist.Videos.Add(video);
-            playlist.CustomVideoSequence.Add(videoId);
 
             this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
 
@@ -512,7 +511,6 @@ namespace Niconicome.Models.Domain.Local.Store
 
             this.videoHandler.RemoveVideo(videoId, playlistId);
             playlist!.Videos.RemoveAll(v => v.Id == videoId);
-            playlist!.CustomVideoSequence.RemoveAll(v => v == videoId);
             this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
         }
 

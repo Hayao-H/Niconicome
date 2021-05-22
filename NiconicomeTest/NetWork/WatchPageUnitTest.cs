@@ -12,6 +12,7 @@ using Niconicome.Models.Playlist;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using System.Net.Http;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
+using NiconicomeTest.Stabs.Models.Domain.Niconico;
 
 namespace NiconicomeTest.NetWork
 {
@@ -27,7 +28,7 @@ namespace NiconicomeTest.NetWork
         {
             var content = new StringContent(Properties.Resources.sm9_page);
             var http = new NicoHttpStab(content, content);
-            this.info = new WatchInfohandler(http, new WatchPageHtmlPaserStab(this.title),new LoggerStab());
+            this.info = new WatchInfohandler(http, new WatchPageHtmlPaserStab(this.title), new LoggerStab(), new NiconicoContextStab());
         }
 
         [Test]
@@ -53,7 +54,7 @@ namespace NiconicomeTest.NetWork
         [Test]
         public void 非暗号化動画のページをパースする()
         {
-            IDmcInfo? info = this.parser?.GetDmcInfo(Properties.Resources.Niconico_Onmyoji,"sm9", WatchInfoOptions.Default);
+            IDmcInfo? info = this.parser?.GetDmcInfo(Properties.Resources.Niconico_Onmyoji, "sm9", "0", WatchInfoOptions.Default);
 
             //nullチェック
             Assert.IsNotNull(info);
@@ -69,7 +70,7 @@ namespace NiconicomeTest.NetWork
         [Test]
         public void 暗号化動画ページをパースする()
         {
-            IDmcInfo? info = this.parser?.GetDmcInfo(Properties.Resources.Niconico_Kakushigoto, "so36605534", WatchInfoOptions.Default);
+            IDmcInfo? info = this.parser?.GetDmcInfo(Properties.Resources.Niconico_Kakushigoto, "so36605534", "0", WatchInfoOptions.Default);
 
             //nullチェック
             Assert.IsNotNull(info);
@@ -129,7 +130,7 @@ namespace NiconicomeTest.NetWork
 
         public bool HasJsDataElement { get; init; }
 
-        public IDmcInfo GetDmcInfo(string source,string niconicoId, WatchInfoOptions options)
+        public IDmcInfo GetDmcInfo(string source, string niconicoId, string userID, WatchInfoOptions options)
         {
             return new DmcInfo()
             {

@@ -297,7 +297,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null) return;
 
-                if (!WS::Mainpage.Session.IsLogin)
+                if (!WS::Mainpage.Session.IsLogin.Value)
                 {
                     this.SnackbarMessageQueue.Enqueue("リモートプレイリストを登録する為にはログインが必要です。");
                     return;
@@ -382,7 +382,7 @@ namespace Niconicome.ViewModels.Mainpage
                 .WithSubscribe(async () =>
                 {
 
-                    if (!WS::Mainpage.Session.IsLogin)
+                    if (!WS::Mainpage.Session.IsLogin.Value)
                     {
                         this.SnackbarMessageQueue.Enqueue("リモートプレイリストと同期する為にはログインが必要です。");
                         return;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,11 +10,13 @@ using System.Windows.Media;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System.Windows;
+using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Mainpage.Subwindows;
 using Niconicome.Views;
 using Reactive.Bindings;
+using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
@@ -29,13 +32,14 @@ namespace Niconicome.ViewModels.Mainpage
         public PlaylistTreeViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox)
         {
             this.ShowMessageBox = showMessageBox;
-            this.PlaylistTree = WS::Mainpage.PlaylistTreeHandler.Playlists.ToReadOnlyReactiveCollection(x => x);
 
+            this.PlaylistTree = WS::Mainpage.PlaylistTreeHandler.Playlists.ToReadOnlyReactiveCollection(x => x);
 
 #pragma warning disable CS8622
             this.AddPlaylist = new CommandBase<int>((object? arg) => true, (int parent) =>
             {
                 WS::Mainpage.PlaylistHandler.AddPlaylist(parent);
+                this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
             this.RemovePlaylist = new CommandBase<int>((object? arg) => true, async (int playlist) =>
             {
@@ -44,6 +48,7 @@ namespace Niconicome.ViewModels.Mainpage
                 if (result != MaterialMessageBoxResult.Yes) return;
 
                 WS::Mainpage.PlaylistHandler.DeletePlaylist(playlist);
+                this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
 #pragma warning restore CS8622
 
@@ -54,6 +59,7 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistHandler.GetPlaylist(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
                 }
+                this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
 
             this.EditPlaylistCommand = new CommandBase<object>(_ => true, arg =>
@@ -77,7 +83,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// メッセージボックスを表示する
         /// </summary>
         private Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> ShowMessageBox { get; set; }
-
 
         /// <summary>
         /// プレイリストのツリー

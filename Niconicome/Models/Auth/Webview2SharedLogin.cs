@@ -14,12 +14,14 @@ namespace Niconicome.Models.Auth
 
     class Webview2SharedLogin : IWebview2SharedLogin
     {
-        public Webview2SharedLogin(IWebview2LocalCookieManager webview2LocalCookieManager, ILogger logger, INicoHttp http, ICookieManager cookieManager)
+        public Webview2SharedLogin(IWebview2LocalCookieManager webview2LocalCookieManager, ILogger logger, INicoHttp http, ICookieManager cookieManager,INiconicoContext context)
         {
             this.webview2LocalCookieManager = webview2LocalCookieManager;
             this.logger = logger;
             this.http = http;
             this.cookieManager = cookieManager;
+            this.context = context;
+
         }
 
         private readonly IWebview2LocalCookieManager webview2LocalCookieManager;
@@ -29,6 +31,8 @@ namespace Niconicome.Models.Auth
         private readonly INicoHttp http;
 
         private readonly ICookieManager cookieManager;
+
+        private readonly INiconicoContext context;
 
         /// <summary>
         /// ログインを試行する
@@ -55,6 +59,11 @@ namespace Niconicome.Models.Auth
             this.cookieManager.AddCookie("nicosid", cookie.Nicosid);
 
             var result = await this.CheckIfLoginSucceeded();
+
+            if (result)
+            {
+                await this.context.RefreshUser();
+            }
 
             return result;
         }

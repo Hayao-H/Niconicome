@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Playlist = Niconicome.Models.Playlist;
 using Watch = Niconicome.Models.Domain.Niconico.Watch;

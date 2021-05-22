@@ -2,8 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
-using Niconicome.Models.Domain.Local.Playlist;
-using Niconicome.Models.Network;
 using Niconicome.Models.Playlist;
 using Playlist = Niconicome.Models.Playlist.Playlist;
 using WS = Niconicome.Workspaces;

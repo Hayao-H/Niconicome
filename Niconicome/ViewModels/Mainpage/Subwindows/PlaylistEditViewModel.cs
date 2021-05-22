@@ -2,7 +2,8 @@
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using WS = Niconicome.Workspaces;
+using Niconicome.Models.Playlist;
+using WS=Niconicome.Workspaces;
 using MsApi = Microsoft.WindowsAPICodePack;
 using Niconicome.Models.Playlist.Playlist;
 

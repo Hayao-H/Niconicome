@@ -1,5 +1,6 @@
 ﻿using System;
 using Niconicome.Models.Domain.Local;
+using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.Models.Local.Application

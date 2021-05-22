@@ -9,8 +9,6 @@ using LiteDB;
 
 namespace Niconicome.Models.Domain.Local.Store.Types
 {
-   
-
     public record Playlist : IStorable
     {
 

@@ -7,8 +7,12 @@ using WS = Niconicome.Workspaces;
 using MsApi = Microsoft.WindowsAPICodePack;
 using System.Windows;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Playlist;
 using Niconicome.Models.Local.External.Import;
 using System.Threading;
+using Reactive.Bindings;
+using System.Reactive.Linq;
+using Reactive.Bindings.Extensions;
 using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.ViewModels.Setting.Pages
@@ -17,168 +21,185 @@ namespace Niconicome.ViewModels.Setting.Pages
     {
         public ImportPageViewModel()
         {
-            this.SetXenoPathCommand = new CommandBase<object>(_ => !this.isFetching, _ =>
-            {
-                var dialog = new MsApi::Dialogs.CommonOpenFileDialog
-                {
-                    Title = "「設定：固定URL.txt」を選択してください",
-                    InitialDirectory = AppContext.BaseDirectory,
-                    DefaultExtension = ".txt"
-                };
-
-                var result = dialog.ShowDialog();
-
-                if (result == MsApi::Dialogs.CommonFileDialogResult.Ok)
-                {
-                    if (!dialog.FileName.EndsWith(".txt")) return;
-                    this.xenoFilePath = dialog.FileName;
-                }
-
-                this.XenoPathCheckVisibility = Visibility.Visible;
-            });
-
-            this.ImportFromXenoCommand = new CommandBase<object>(_ => !this.isFetching, async _ =>
-             {
-                 if (this.xenoFilePath.IsNullOrEmpty())
-                 {
-                     WS::SettingPage.SnackbarMessageQueue.Enqueue("Xenoの設定ファイルが選択されていません。");
-                     return;
-                 }
-                 if (this.SelectedParent is null)
-                 {
-                     WS::SettingPage.SnackbarMessageQueue.Enqueue("追加先プレイリストが選択されていません。");
-                     return;
-                 }
-
-                 this.message.Clear();
-                 this.OnPropertyChanged(nameof(this.Message));
-                 this.Message = "インポートを開始します。";
-                 this.StartFetch();
-                 this.XenoImportProgressVisibility = Visibility.Visible;
-                 this.importCTS = new CancellationTokenSource();
-                 WS::SettingPage.State.IsImportingFromXeno = true;
-
-                 var setting = new XenoImportSettings()
-                 {
-                     AddDirectly = true,
-                     TargetPlaylistId = this.SelectedParent.Id,
-                     DataFilePath = this.xenoFilePath
-                 };
-
-                 IXenoImportTaskResult result = await WS::SettingPage.XenoImportManager.InportFromXeno(setting, m => this.Message = m, m => WS::SettingPage.MessageHandler.AppendMessage(m), this.importCTS.Token);
-
-                 this.Message = $"インポートに成功したプレイリストの数; {result.SucceededPaylistCount}";
-                 if (result.FailedPlaylistCount > 0)
-                 {
-                     this.Message = $"インポートに失敗したプレイリストの数; {result.FailedPlaylistCount}";
-                 }
-
-                 this.Message = $"インポートに成功した動画の数; {result.SucceededVideoCount}";
-                 if (result.FailedVideoCount > 0)
-                 {
-                     this.Message = $"インポートに失敗した動画の数; {result.FailedPlaylistCount}";
-                 }
-
-                 this.CompleteFetch();
-                 this.XenoImportProgressVisibility = Visibility.Hidden;
-                 WS::SettingPage.State.IsImportingFromXeno = false;
-
-             });
-
-            this.ImportCancellCommand = new CommandBase<object>(_ => this.isFetching, _ =>
-            {
-                this.importCTS?.Cancel();
-                this.importCTS = null;
-                this.CompleteFetch();
-                this.XenoImportProgressVisibility = Visibility.Hidden;
-                WS::SettingPage.State.IsImportingFromXeno = false;
-            });
-
-            this.SelectedParent = WS::SettingPage.PlaylistTreeHandler.GetRootPlaylist();
+            this.Message = WS::SettingPage.XenoImportManager.Message.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+            this.XenoPathCheckVisibility = new ReactivePropertySlim<Visibility>(Visibility.Hidden);
+            this.XenoImportProgressVisibility = WS::SettingPage.XenoImportManager.IsProcessing
+                .Select(v => v ? Visibility.Visible : Visibility.Hidden)
+                .ToReadOnlyReactivePropertySlim();
+            this.SelectedParent = new ReactivePropertySlim<ITreePlaylistInfo?>(WS::SettingPage.PlaylistTreeHandler.GetRootPlaylist());
 
             this.SelectablePlaylists = new List<ITreePlaylistInfo>();
             var playlists = WS::SettingPage.PlaylistTreeHandler.GetAllPlaylists().Where(p => !p.IsConcrete);
             this.SelectablePlaylists.AddRange(playlists);
+
+            #region コマンドの初期化
+            this.SetXenoPathCommand = WS::SettingPage.XenoImportManager.IsProcessing
+    .Select(v => !v)
+    .ToReactiveCommand()
+    .WithSubscribe(() =>
+    {
+        var dialog = new MsApi::Dialogs.CommonOpenFileDialog
+        {
+            Title = "「設定：固定URL.txt」を選択してください",
+            InitialDirectory = AppContext.BaseDirectory,
+            DefaultExtension = ".txt"
+        };
+
+        var result = dialog.ShowDialog();
+
+        if (result == MsApi::Dialogs.CommonFileDialogResult.Ok)
+        {
+            if (!dialog.FileName.EndsWith(".txt")) return;
+            this.xenoFilePath = dialog.FileName;
         }
 
-        private Visibility xenoImportProgressVisibility = Visibility.Hidden;
+        this.XenoPathCheckVisibility.Value = Visibility.Visible;
+    });
 
-        private Visibility xenoPathCheckVisibility = Visibility.Hidden;
+            this.ImportFromXenoCommand = WS::SettingPage.XenoImportManager.IsProcessing
+                .Select(v => !v)
+                .ToAsyncReactiveCommand()
+                .WithSubscribe(
+                async () =>
+                {
+                    if (this.xenoFilePath.IsNullOrEmpty())
+                    {
+                        WS::SettingPage.SnackbarMessageQueue.Enqueue("Xenoの設定ファイルが選択されていません。");
+                        return;
+                    }
+                    if (this.SelectedParent.Value is null)
+                    {
+                        WS::SettingPage.SnackbarMessageQueue.Enqueue("追加先プレイリストが選択されていません。");
+                        return;
+                    }
 
-        private ITreePlaylistInfo? selectedParent;
+                    this.message.Clear();
+                    this.OnPropertyChanged(nameof(this.Message));
+                    WS::SettingPage.XenoImportManager.AppendMessage("インポートを開始します。");
+                    WS::SettingPage.State.IsImportingFromXeno = true;
+
+                    var setting = new XenoImportSettings()
+                    {
+                        AddDirectly = true,
+                        TargetPlaylistId = this.SelectedParent.Value.Id,
+                        DataFilePath = this.xenoFilePath
+                    };
+
+                    IXenoImportTaskResult result = await WS::SettingPage.XenoImportManager.InportFromXeno(setting);
+
+                    WS::SettingPage.XenoImportManager.AppendMessage($"インポートに成功したプレイリストの数; {result.SucceededPaylistCount}");
+                    if (result.FailedPlaylistCount > 0)
+                    {
+                        WS::SettingPage.XenoImportManager.AppendMessage($"インポートに失敗したプレイリストの数; {result.FailedPlaylistCount}");
+                    }
+
+                    WS::SettingPage.XenoImportManager.AppendMessage($"インポートに成功した動画の数; {result.SucceededVideoCount}");
+                    if (result.FailedVideoCount > 0)
+                    {
+                        WS::SettingPage.XenoImportManager.AppendMessage($"インポートに失敗した動画の数; {result.FailedPlaylistCount}");
+                    }
+
+                    WS::SettingPage.State.IsImportingFromXeno = false;
+
+                });
+
+            this.ImportCancellCommand = WS::SettingPage.XenoImportManager.IsProcessing
+                .ToReactiveCommand()
+                .WithSubscribe(
+                () =>
+                {
+                    WS::SettingPage.State.IsImportingFromXeno = false;
+                    WS::SettingPage.XenoImportManager.Cancel();
+                });
+            #endregion
+        }
 
         private readonly StringBuilder message = new();
 
         private string xenoFilePath = string.Empty;
 
-        private CancellationTokenSource? importCTS;
-
-        private bool isFetching;
-
         /// <summary>
         /// プログレスバーの可視性
         /// </summary>
-        public Visibility XenoImportProgressVisibility { get => this.xenoImportProgressVisibility; set => this.SetProperty(ref this.xenoImportProgressVisibility, value); }
+        public ReadOnlyReactivePropertySlim<Visibility> XenoImportProgressVisibility { get; init; }
 
         /// <summary>
         /// チェックマークの可視性
         /// </summary>
-        public Visibility XenoPathCheckVisibility { get => this.xenoPathCheckVisibility; set => this.SetProperty(ref this.xenoPathCheckVisibility, value); }
+        public ReactivePropertySlim<Visibility> XenoPathCheckVisibility { get; init; }
 
         /// <summary>
         /// 選択されたプレイリスト
         /// </summary>
-        public ITreePlaylistInfo? SelectedParent { get => this.selectedParent; set => this.SetProperty(ref this.selectedParent, value); }
+        public ReactivePropertySlim<ITreePlaylistInfo?> SelectedParent { get; init; }
 
         /// <summary>
         /// メッセージ
         /// </summary>
-        public string Message
-        {
-            get => this.message.ToString(); set
-            {
-                this.message.AppendLine(value);
-                this.OnPropertyChanged();
-            }
-        }
+        public ReadOnlyReactiveProperty<string?> Message { get; init; }
 
         /// <summary>
         /// インポートコマンド(Xeno)
         /// </summary>
-        public CommandBase<object> ImportFromXenoCommand { get; init; }
+        public AsyncReactiveCommand ImportFromXenoCommand { get; init; }
 
         /// <summary>
         /// Xeno設定コマンド
         /// </summary>
-        public CommandBase<object> SetXenoPathCommand { get; init; }
+        public ReactiveCommand SetXenoPathCommand { get; init; }
 
         /// <summary>
         /// インポートをキャンセル
         /// </summary>
-        public CommandBase<object> ImportCancellCommand { get; init; }
+        public ReactiveCommand ImportCancellCommand { get; init; }
 
         /// <summary>
         /// 選択可能なプレイリスト
         /// </summary>
         public List<ITreePlaylistInfo> SelectablePlaylists { get; init; }
 
-        private void StartFetch()
-        {
-            this.isFetching = true;
-            this.RefreshCommand();
-        }
+    }
 
-        private void CompleteFetch()
-        {
-            this.isFetching = false;
-            this.RefreshCommand();
-        }
+    public class ImportPageViewModelD
+    {
+        /// <summary>
+        /// プログレスバーの可視性
+        /// </summary>
+        public ReactivePropertySlim<Visibility> XenoImportProgressVisibility { get; init; } = new(Visibility.Visible);
 
-        private void RefreshCommand()
-        {
-            this.SetXenoPathCommand.RaiseCanExecutechanged();
-            this.ImportFromXenoCommand.RaiseCanExecutechanged();
-            this.ImportCancellCommand.RaiseCanExecutechanged();
-        }
+        /// <summary>
+        /// チェックマークの可視性
+        /// </summary>
+        public ReactivePropertySlim<Visibility> XenoPathCheckVisibility { get; init; } = new(Visibility.Visible);
+
+        /// <summary>
+        /// 選択されたプレイリスト
+        /// </summary>
+        public ReactivePropertySlim<ITreePlaylistInfo?> SelectedParent { get; init; } = new();
+
+        /// <summary>
+        /// メッセージ
+        /// </summary>
+        public ReactiveProperty<string> Message { get; init; } = new ReactiveProperty<string>("Hello World!!");
+
+        /// <summary>
+        /// インポートコマンド(Xeno)
+        /// </summary>
+        public AsyncReactiveCommand ImportFromXenoCommand { get; init; } = new();
+
+        /// <summary>
+        /// Xeno設定コマンド
+        /// </summary>
+        public ReactiveCommand SetXenoPathCommand { get; init; } = new();
+
+        /// <summary>
+        /// インポートをキャンセル
+        /// </summary>
+        public ReactiveCommand ImportCancellCommand { get; init; } = new();
+
+        /// <summary>
+        /// 選択可能なプレイリスト
+        /// </summary>
+        public List<ITreePlaylistInfo> SelectablePlaylists { get; init; } = new();
     }
 }
