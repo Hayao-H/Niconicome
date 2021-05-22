@@ -87,7 +87,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     }
     public interface IWatchPageHtmlParser
     {
-        IDmcInfo GetDmcInfo(string sourceHtml, string niconicoId, WatchInfoOptions options);
+        IDmcInfo GetDmcInfo(string sourceHtml, string niconicoId, string userID, WatchInfoOptions options);
         bool HasJsDataElement { get; }
     }
 
@@ -105,11 +105,12 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     /// </summary>
     public class WatchInfohandler : IWatchInfohandler
     {
-        public WatchInfohandler(INicoHttp http, IWatchPageHtmlParser parser, ILogger logger)
+        public WatchInfohandler(INicoHttp http, IWatchPageHtmlParser parser, ILogger logger, INiconicoContext context)
         {
             this.http = http;
             this.parser = parser;
             this.logger = logger;
+            this.context = context;
         }
 
         /// <summary>
@@ -123,6 +124,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         private readonly INicoHttp http;
 
         private readonly ILogger logger;
+
+        private readonly INiconicoContext context;
 
 
         public WatchInfoHandlerState State { get; private set; } = WatchInfoHandlerState.RequestHasNotCompleted;
@@ -152,7 +155,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             try
             {
                 //htmlをパース
-                info = this.parser.GetDmcInfo(source, id, options);
+                info = this.parser.GetDmcInfo(source, id, this.context.User.Value?.ID ?? string.Empty, options);
             }
             catch (Exception e)
             {
@@ -195,6 +198,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     public class WatchPageHtmlParser : IWatchPageHtmlParser
     {
 
+
         public bool HasJsDataElement { get; private set; }
 
         /// <summary>
@@ -202,10 +206,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="sourceHtml"></param>
         /// <returns></returns>
-        public IDmcInfo GetDmcInfo(string sourceHtml, string niconicoId, WatchInfoOptions options)
+        public IDmcInfo GetDmcInfo(string sourceHtml, string niconicoId, string userID, WatchInfoOptions options)
         {
             var document = HtmlParser.ParseDocument(sourceHtml);
-            return this.ConvertToDmcData(this.GetApiData(document), niconicoId, options);
+            return this.ConvertToDmcData(this.GetApiData(document), niconicoId, userID, options);
         }
 
         /// <summary>
@@ -241,7 +245,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="original"></param>
         /// <returns></returns>
-        private IDmcInfo ConvertToDmcData(WatchJson::DataApiData original, string niconicoId, WatchInfoOptions options)
+        private IDmcInfo ConvertToDmcData(WatchJson::DataApiData original, string niconicoId, string userID, WatchInfoOptions options)
         {
             var info = new DmcInfo
             {
@@ -278,7 +282,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             info.CommentThreads = original?.Comment?.Threads ?? new List<WatchJson::Thread>();
 
             //ユーザー情報
-            info.UserId = NiconicoContext.User?.ID ?? string.Empty;
+            info.UserId = userID;
             info.Userkey = original?.Comment?.Keys?.UserKey ?? string.Empty;
 
             //公式フラグ

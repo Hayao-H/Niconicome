@@ -10,16 +10,17 @@ using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Niconico.Net.Xml;
 using Niconicome.Models.Domain.Utils;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Niconico
 {
     public interface INiconicoContext
     {
+        bool IsLogin { get; }
+        ReactiveProperty<User?> User { get; }
         Task<bool> Login(string u, string p);
         Task Logout();
-        bool IsLogin { get; }
         Task<string> GetUserName(string i);
-        static User? User { get; }
         Uri GetPageUri(string id);
         Task RefreshUser();
     }
@@ -271,6 +272,7 @@ namespace Niconicome.Models.Domain.Niconico
         {
             this.http = http;
             this.cookieManager = cookieManager;
+            this.User = new ReactiveProperty<User?>();
 
             //ニコニコのアドレスを設定
             this.niconicoLoginUri = this.http.NiconicoLoginUri;
@@ -310,7 +312,7 @@ namespace Niconicome.Models.Domain.Niconico
         /// <summary>
         /// ユーザー情報
         /// </summary>
-        public static User? User { get; private set; }
+        public ReactiveProperty<User?> User { get; init; }
 
         /// <summary>
         /// ログイン状態を取得する
@@ -373,6 +375,7 @@ namespace Niconicome.Models.Domain.Niconico
             if (!this.IsLogin) return;
             await this.http.GetAsync(this.niconicoLogoutUri);
             this.cookieManager.DeleteAllCookies();
+            this.User.Value = null;
         }
 
         /// <summary>
@@ -422,7 +425,7 @@ namespace Niconicome.Models.Domain.Niconico
             string userID = this.cookieManager.GetCookie("user_session").Split('_')[2];
             string userName = await this.GetUserName(userID) + "さん";
 
-            NiconicoContext.User = new User(userName, userID);
+            this.User.Value = new User(userName, userID);
         }
 
         /// <summary>

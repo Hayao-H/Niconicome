@@ -47,7 +47,7 @@ namespace Niconicome.ViewModels.Login
                                     LoginPage.AccountManager.Save(this.UserCredentialName, this.UserCredentialPassword);
                                 }
 
-                                this.Message = $"ログインに成功しました。({session.User?.Nickname}さん)";
+                                this.Message = $"ログインに成功しました。({session.User.Value?.Nickname}さん)";
                                 this.IsLogin = true;
                                 this.RaiseLoginSucceeded();
                                 window?.Close();
