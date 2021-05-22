@@ -39,14 +39,14 @@
                         <materialDesign:ColorZone materialDesign:ShadowAssist.ShadowDepth="Depth1" Padding="8" >
                             <StackPanel Orientation="Vertical">
                                 <DockPanel>
-                                    <Image Source="{Binding UserImage}" Height="40"  Margin="5 0">
+                                    <Image Source="{Binding UserImage.Value}" Height="40"  Margin="5 0">
                                         <i:Interaction.Behaviors>
                                             <vm:UserImageBehavior/>
                                         </i:Interaction.Behaviors>
                                     </Image>
-                                    <TextBlock Text="{Binding Username}" Style="{DynamicResource MaterialDesignBody1TextBlock}" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Username.Value}" Style="{DynamicResource MaterialDesignBody1TextBlock}" VerticalAlignment="Center" />
                                 </DockPanel>
-                                <Button Content="{Binding LoginBtnVal}"  Command="{Binding LoginCommand}" Margin="8 10" ToolTip="{Binding LoginBtnTooltip}"/>
+                                <Button Content="{Binding LoginBtnVal.Value}"  Command="{Binding LoginCommand}" Margin="8 10" ToolTip="{Binding LoginBtnTooltip.Value}"/>
                             </StackPanel>
                         </materialDesign:ColorZone>
                         <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">

@@ -68,7 +68,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Niconico::ICookieManager, Niconico::CookieManager>();
             services.AddTransient<Niconico.IDbUrlHandler, Niconico::DbUrlHandler>();
             services.AddTransient<Auth::ISession, Auth::Session>();
-            services.AddTransient<Niconico::INiconicoContext, Niconico::NiconicoContext>();
+            services.AddSingleton<Niconico::INiconicoContext, Niconico::NiconicoContext>();
             services.AddTransient<Utils::IErrorHandler, Utils::ErrorHandler>();
             services.AddSingleton<Utils::ILogStream, Utils::LogStream>();
             services.AddTransient<Utils::ILogger, Utils::Logger>();

@@ -253,7 +253,7 @@ namespace Niconicome.ViewModels.Mainpage
                 return;
             }
 
-            if (!WS::Mainpage.Session.IsLogin)
+            if (!WS::Mainpage.Session.IsLogin.Value)
             {
                 this.SnackbarMessageQueue.Enqueue("動画をダウンロードするにはログインが必要です。");
                 return;
