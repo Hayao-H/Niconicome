@@ -89,7 +89,7 @@ namespace Niconicome.Models.Domain.Local.Store
 
                 var playlist = new STypes::Playlist(parent)
                 {
-                    PlaylistName = "新しいプレイリスト"
+                    PlaylistName = name
                 };
 
                 int childId = this.databaseInstance.Store(playlist, STypes::Playlist.TableName);
@@ -457,7 +457,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="dbPlaylist"></param>
         /// <param name="playlistInfo"></param>
-        private void SetData(STypes::Playlist dbPlaylist,ITreePlaylistInfo playlistInfo)
+        private void SetData(STypes::Playlist dbPlaylist, ITreePlaylistInfo playlistInfo)
         {
             dbPlaylist.PlaylistName = playlistInfo.Name;
             dbPlaylist.FolderPath = playlistInfo.Folderpath;
