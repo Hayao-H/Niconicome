@@ -1,43 +1,47 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico;
-using Niconicome.Models.Domain.Utils;
+using Niconicome.ViewModels;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 
 namespace Niconicome.Models.Auth
 {
 
     public interface ISession
     {
-        User? User { get; }
-        bool IsLogin { get; }
         Task<bool> Login(IUserCredential credential);
         Task Logout();
+        ReactiveProperty<bool> IsLogin { get; }
+        ReactiveProperty<User?> User { get; }
     }
 
     /// <summary>
     /// ログインセッション
     /// </summary>
-    class Session:ISession
+    class Session : BindableBase, ISession
     {
         public Session(INiconicoContext context)
         {
             this.context = context;
+            this.IsLogin = new ReactiveProperty<bool>(context.IsLogin);
+            this.User = context.User.ToReactiveProperty().AddTo(this.disposables);
+            context.User.Subscribe(value => this.IsLogin.Value = value is not null);
         }
 
-        /// <summary>
-        /// ユーザー情報
-        /// </summary>
-        public User? User { get; private set; }
+        #region DI
+        private readonly INiconicoContext context;
+        #endregion
 
         /// <summary>
         /// ログインフラグ
         /// </summary>
-        public bool IsLogin { get => this.context.IsLogin; }
+        public ReactiveProperty<bool> IsLogin { get; }
 
         /// <summary>
-        /// コンテキスト
+        /// ユーザー
         /// </summary>
-        private readonly INiconicoContext context;
+        public ReactiveProperty<User?> User { get; }
 
         /// ログイン
         /// </summary>
@@ -45,13 +49,9 @@ namespace Niconicome.Models.Auth
         /// <returns></returns>
         public async Task<bool> Login(IUserCredential credential)
         {
-            if (this.IsLogin) return true;
-            bool result = await this.context.Login(credential.Username, credential.Password);
+            if (this.context.IsLogin) return true;
 
-            if (result)
-            {
-                this.User = NiconicoContext.User;
-            }
+            bool result = await this.context.Login(credential.Username, credential.Password);
 
             return result;
         }
