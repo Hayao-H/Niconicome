@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 

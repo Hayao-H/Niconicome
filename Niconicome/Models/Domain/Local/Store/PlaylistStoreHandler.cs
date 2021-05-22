@@ -4,6 +4,7 @@ using System.Linq;
 using Niconicome.Models.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.Models.Domain.Local.Store
 {

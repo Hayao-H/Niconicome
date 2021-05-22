@@ -11,9 +11,11 @@ using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System.Windows;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Mainpage.Subwindows;
 using Niconicome.Views;
+using Reactive.Bindings;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 
@@ -31,27 +33,12 @@ namespace Niconicome.ViewModels.Mainpage
         {
             this.ShowMessageBox = showMessageBox;
 
-            //初期化失敗時
-            void initializeFailed()
-            {
-                this.ShowMessageBox("アプリケーションの初期化中にエラーが発生しました。詳しくはエラーログをご確認下さい。", MessageBoxButtons.OK, MessageBoxIcons.Error);
-                Application.Current?.Shutdown();
-            }
-
-            try
-            {
-                this.PlaylistTreeHandler = WS::Mainpage.PlaylistTree;
-            }
-            catch (Exception e)
-            {
-                Utils::Logger.GetLogger().Error("初期化中にエラーが発生しました。", e);
-                initializeFailed();
-            }
+            this.PlaylistTree = WS::Mainpage.PlaylistTreeHandler.Playlists.ToReadOnlyReactiveCollection(x => x);
 
 #pragma warning disable CS8622
             this.AddPlaylist = new CommandBase<int>((object? arg) => true, (int parent) =>
             {
-                WS::Mainpage.PlaylistTree.AddPlaylist(parent);
+                WS::Mainpage.PlaylistHandler.AddPlaylist(parent);
                 this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
             this.RemovePlaylist = new CommandBase<int>((object? arg) => true, async (int playlist) =>
@@ -60,17 +47,17 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (result != MaterialMessageBoxResult.Yes) return;
 
-                WS::Mainpage.PlaylistTree.DeletePlaylist(playlist);
+                WS::Mainpage.PlaylistHandler.DeletePlaylist(playlist);
                 this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
 #pragma warning restore CS8622
 
             this.PlaylistRefreshcommand = new CommandBase<object>(_ => true, _ =>
             {
-                WS::Mainpage.PlaylistTree.Refresh();
+                WS::Mainpage.PlaylistHandler.Refresh();
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
                 {
-                    WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistTree.GetPlaylist(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
+                    WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistHandler.GetPlaylist(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
                 }
                 this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
@@ -100,18 +87,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// プレイリストのツリー
         /// </summary>
-        public IPlaylistHandler? PlaylistTreeHandler { get; private set; }
-
-        /// <summary>
-        /// プレイリストのツリー
-        /// </summary>
-        public ObservableCollection<ITreePlaylistInfo> PlaylistTree
-        {
-            get
-            {
-                return this.PlaylistTreeHandler?.Playlists ?? new ObservableCollection<ITreePlaylistInfo>();
-            }
-        }
+        public ReadOnlyReactiveCollection<ITreePlaylistInfo> PlaylistTree { get; init; }
 
         /// <summary>
         /// プレイリスト追加
@@ -346,7 +322,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             if (this.insertType == InsertType.Child)
             {
-                context.PlaylistTreeHandler?.Move(sourceInfo.Id, parentInfo.Id);
+                WS::Mainpage.PlaylistHandler.Move(sourceInfo.Id, parentInfo.Id);
                 this.insertType = InsertType.None;
             }
         }

@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.Models.Domain.Local.External.Import.Xeno
 {
@@ -34,7 +36,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
 
             if (playlist.ChildPlaylists.Count > 0 && recurse)
             {
-                converted.Children.AddRange(playlist.ChildPlaylists.Select(c => this.ConvertToTreePlaylistInfo(c, true)));
+                converted.Children.Addrange(playlist.ChildPlaylists.Select(c => this.ConvertToTreePlaylistInfo(c, true)));
             }
 
             return converted;

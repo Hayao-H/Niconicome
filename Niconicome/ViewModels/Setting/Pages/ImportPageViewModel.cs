@@ -13,6 +13,7 @@ using System.Threading;
 using Reactive.Bindings;
 using System.Reactive.Linq;
 using Reactive.Bindings.Extensions;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {

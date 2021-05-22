@@ -12,13 +12,15 @@ using VideoList = Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Network.Watch;
 using Ext = Niconicome.Models.Local.External;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.Workspaces
 {
     static class Mainpage
     {
         public static ISession Session { get; private set; } = DIFactory.Provider.GetRequiredService<ISession>();
-        public static IPlaylistHandler PlaylistTree { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
+        public static IPlaylistHandler PlaylistHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
+        public static IPlaylistTreeHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistTreeHandler>();
         public static IVideoHandler VideoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoHandler>();
         public static IWatch Watch { get; private set; } = DIFactory.Provider.GetRequiredService<IWatch>();
         public static IRemotePlaylistHandler RemotePlaylistHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IRemotePlaylistHandler>();
