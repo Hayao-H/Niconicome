@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VList = Niconicome.Models.Playlist.VideoList;
-using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Reactive.Bindings;
 
 namespace NiconicomeTest.Stabs.Models.Playlist.VideoList

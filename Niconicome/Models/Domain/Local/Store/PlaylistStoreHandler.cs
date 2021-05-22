@@ -64,7 +64,8 @@ namespace Niconicome.Models.Domain.Local.Store
 
             if (playlist.Videos.Count > 0 && playlist.CustomVideoSequence.Count == 0)
             {
-                playlist.CustomVideoSequence.AddRange(playlist.Videos.Select(v => v.Id));
+                var ids = playlist.Videos.Select(v => v.Id);
+                playlist.CustomVideoSequence.AddRange(ids);
             }
 
             return playlist;
@@ -490,6 +491,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (playlist.Videos.Any(v => v.NiconicoId == videoData.NiconicoId.Value)) return -1;
 
             playlist.Videos.Add(video);
+            playlist.CustomVideoSequence.Add(video.Id);
 
             this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
 
@@ -511,6 +513,8 @@ namespace Niconicome.Models.Domain.Local.Store
 
             this.videoHandler.RemoveVideo(videoId, playlistId);
             playlist!.Videos.RemoveAll(v => v.Id == videoId);
+            playlist!.CustomVideoSequence.RemoveAll(v => v == videoId);
+
             this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
         }
 

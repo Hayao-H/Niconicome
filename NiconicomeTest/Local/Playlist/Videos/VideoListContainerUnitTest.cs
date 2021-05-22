@@ -25,7 +25,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         public void SetUp()
         {
             this.playlistStoreHandler = new PlaylistStoreHandlerStab();
-            var p = new NonBindableTreePlaylistInfo() { Id=1};
+            ITreePlaylistInfo? p = new NonBindableTreePlaylistInfo() { Id = 1 };
             var cStab = new CurrentStab();
             cStab.SelectedPlaylist.Value = p;
             this.videoListContainer = new VideoListContainer(this.playlistStoreHandler, new VideoHandlerStab(), new VideoListRefresherStab(), cStab);
@@ -86,7 +86,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         [Test]
         public void 存在しない動画を削除する()
         {
-            var video = new NonBindableListVideoInfo() ;
+            var video = new NonBindableListVideoInfo();
             video.NiconicoId.Value = "sm9";
             var result = this.videoListContainer!.Remove(video);
 
@@ -108,7 +108,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
             {
                 Assert.That(video.IsSelected.Value, Is.True);
             }
-            
+
 
         }
 

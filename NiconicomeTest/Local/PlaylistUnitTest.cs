@@ -4,6 +4,8 @@ using Niconicome.Models.Domain.Local;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Local.Store;
 using Playlist = Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist;
+using Reactive.Bindings;
 
 namespace NiconicomeTest
 {
@@ -24,7 +26,7 @@ namespace NiconicomeTest
                     this.database = Static.DataBaseInstance;
                     //プレイリストテーブルをクリア
                     this.database.Clear(STypes::Playlist.TableName);
-                    this.playlistStorehandler = new PlaylistStoreHandler(this.database,new VideoStoreHandler(this.database));
+                    this.playlistStorehandler = new PlaylistStoreHandler(this.database, new VideoStoreHandler(this.database));
                     this.playlistStorehandler.Refresh();
                 }
 
@@ -104,8 +106,8 @@ namespace NiconicomeTest
                     int playlist1Id = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト1");
                     int playlist2Id = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト2");
 
-                    this.playlistStorehandler.SetAsRemotePlaylist(playlist1Id, "1234", Playlist::RemoteType.Mylist);
-                    this.playlistStorehandler.SetAsRemotePlaylist(playlist2Id, "1234", Playlist::RemoteType.UserVideos);
+                    this.playlistStorehandler.SetAsRemotePlaylist(playlist1Id, "1234", Playlist::Playlist.RemoteType.Mylist);
+                    this.playlistStorehandler.SetAsRemotePlaylist(playlist2Id, "1234", Playlist::Playlist.RemoteType.UserVideos);
 
                     var playlist1 = this.playlistStorehandler.GetPlaylist(playlist1Id);
                     var playlist2 = this.playlistStorehandler.GetPlaylist(playlist2Id);
@@ -135,6 +137,56 @@ namespace NiconicomeTest
                     Assert.IsFalse(playlist.IsMylist);
                     Assert.IsFalse(playlist.IsUserVideos);
                 }
+
+                [Test]
+                public void プレイリストのシーケンスを確認する()
+                {
+                    //設定
+                    var rootId = this.playlistStorehandler!.GetRootPlaylist().Id;
+                    var mainPlaylstID = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト");
+                    var video1Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("0") }, mainPlaylstID);
+                    var video2Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("1") }, mainPlaylstID);
+
+                    var playlist = this.playlistStorehandler!.GetPlaylist(mainPlaylstID)!;
+                    Assert.That(playlist.CustomVideoSequence.Count, Is.EqualTo(2));
+                    Assert.That(playlist.CustomVideoSequence[0], Is.EqualTo(video1Id));
+                    Assert.That(playlist.CustomVideoSequence[1], Is.EqualTo(video2Id));
+                }
+
+                [Test]
+                public void 二番目のプレイリストを先頭に移動する()
+                {
+                    //設定
+                    var rootId = this.playlistStorehandler!.GetRootPlaylist().Id;
+                    var mainPlaylstID = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト");
+                    var video1Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("0") }, mainPlaylstID);
+                    var video2Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("1") }, mainPlaylstID);
+
+                    this.playlistStorehandler!.MoveVideoToPrev(mainPlaylstID, 1);
+
+                    var playlist = this.playlistStorehandler!.GetPlaylist(mainPlaylstID)!;
+                    Assert.That(playlist.CustomVideoSequence.Count, Is.EqualTo(2));
+                    Assert.That(playlist.CustomVideoSequence[0], Is.EqualTo(video2Id));
+                    Assert.That(playlist.CustomVideoSequence[1], Is.EqualTo(video1Id));
+                }
+
+                [Test]
+                public void 先頭のプレイリストを二番目に移動する()
+                {
+                    //設定
+                    var rootId = this.playlistStorehandler!.GetRootPlaylist().Id;
+                    var mainPlaylstID = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト");
+                    var video1Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("0") }, mainPlaylstID);
+                    var video2Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("1") }, mainPlaylstID);
+
+                    this.playlistStorehandler!.MoveVideoToForward(mainPlaylstID, 0);
+
+                    var playlist = this.playlistStorehandler!.GetPlaylist(mainPlaylstID)!;
+                    Assert.That(playlist.CustomVideoSequence.Count, Is.EqualTo(2));
+                    Assert.That(playlist.CustomVideoSequence[0], Is.EqualTo(video2Id));
+                    Assert.That(playlist.CustomVideoSequence[1], Is.EqualTo(video1Id));
+                }
+
 
             }
         }
