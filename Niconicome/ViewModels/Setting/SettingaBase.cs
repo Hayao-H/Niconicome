@@ -55,7 +55,7 @@ namespace Niconicome.ViewModels.Setting
         /// <param name="data"></param>
         /// <param name="settingname"></param>
         /// <param name="propertyname"></param>
-        protected void Savesetting<T>(T data, SettingsEnum setting, [CallerMemberName] string? propertyname = null)
+        protected void SaveSetting<T>(T data, SettingsEnum setting, [CallerMemberName] string? propertyname = null)
         {
             if (data is bool boolData)
             {
@@ -74,6 +74,18 @@ namespace Niconicome.ViewModels.Setting
                 return;
             }
 
+        }
+
+        /// <summary>
+        /// 選択式の設定を保存する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="setting"></param>
+        /// <param name="propertyname"></param>
+        protected void SaveSetting<T>(ComboboxItem<T> data, SettingsEnum setting, [CallerMemberName] string? propertyname = null)
+        {
+            this.SaveSetting(data.Value, setting, propertyname);
         }
 
         /// <summary>

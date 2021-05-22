@@ -15,10 +15,8 @@
         Background="{DynamicResource MaterialDesignBackground}"
         FontFamily="Yu Gothic"
       d:DesignHeight="450" d:DesignWidth="800"
+      d:DataContext="{d:DesignInstance {x:Type vm:ImportPageViewModelD},IsDesignTimeCreatable=True}"
       Title="インポート">
-    <Page.DataContext>
-        <vm:ImportPageViewModel/>
-    </Page.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -37,9 +35,18 @@
                     </materialDesign:PackIcon>
                     <Label Content="NicomentXenoglossiaからインポート" />
                 </StackPanel>
-                <StackPanel Margin="10 5" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Label VerticalContentAlignment="Center" Content="手順1: 「設定：固定URL.txt」ファイルを選択"/>
-                    <materialDesign:PackIcon Kind="Check" Visibility="{Binding XenoPathCheckVisibility}" Margin="8 0" Foreground="Green">
+                <StackPanel 
+                    Margin="10 5" 
+                    Orientation="Horizontal" 
+                    VerticalAlignment="Center">
+                    <Label 
+                        VerticalContentAlignment="Center" 
+                        Content="手順1: 「設定：固定URL.txt」ファイルを選択"/>
+                    <materialDesign:PackIcon 
+                        Kind="Check" 
+                        Visibility="{Binding XenoPathCheckVisibility.Value}" 
+                        Margin="8 0" 
+                        Foreground="Green">
                         <materialDesign:PackIcon.RenderTransform>
                             <TranslateTransform Y="7"/>
                         </materialDesign:PackIcon.RenderTransform>
@@ -47,8 +54,13 @@
                     <Button Content="参照" Command="{Binding SetXenoPathCommand}"/>
                 </StackPanel>
                 <StackPanel Margin="10 5" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Label VerticalContentAlignment="Center" Content="手順2: 追加先プレイリスト"/>
-                    <ComboBox ItemsSource="{Binding SelectablePlaylists}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedParent,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label 
+                        VerticalContentAlignment="Center" 
+                        Content="手順2: 追加先プレイリスト"/>
+                    <ComboBox 
+                        ItemsSource="{Binding SelectablePlaylists}" 
+                        DisplayMemberPath="Name" 
+                        SelectedItem="{Binding SelectedParent.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
                 <StackPanel Margin="10 5" Orientation="Horizontal" VerticalAlignment="Center">
                     <Label VerticalContentAlignment="Center" Content="手順3: インポート開始！"/>
@@ -57,12 +69,12 @@
                         Value="35"
                         Margin="8 0"
                         IsIndeterminate="True"
-                        Visibility="{Binding XenoImportProgressVisibility}"/>
+                        Visibility="{Binding XenoImportProgressVisibility.Value}"/>
                     <Button Content="開始" Margin="0 0 10 0" Command="{Binding ImportFromXenoCommand}"/>
                     <Button Content="キャンセル" Command="{Binding ImportCancellCommand}"/>
                 </StackPanel>
                 <ScrollViewer Height="300">
-                    <TextBlock Margin="10 6" Text="{Binding Message}" Padding="4" TextWrapping="Wrap"/>
+                    <TextBlock Margin="10 6" Text="{Binding Message.Value}" Padding="4" TextWrapping="Wrap"/>
                 </ScrollViewer>
             </StackPanel>
             <Separator BorderThickness="1" Margin="0 5" BorderBrush="#e7e7e7"/>

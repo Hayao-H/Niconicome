@@ -26,7 +26,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             {
                 this.CommentOffset = new ReactiveProperty<int>(cOffset);
             }
-            this.CommentOffset.Subscribe(value => this.Savesetting(value, SettingsEnum.CommentOffset));
+            this.CommentOffset.Subscribe(value => this.SaveSetting(value, SettingsEnum.CommentOffset));
 
             this.isAutoSwitchOffsetEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.SwitchOffset);
 
@@ -43,22 +43,22 @@ namespace Niconicome.ViewModels.Setting.Pages
             }
 
             this.IsDownloadVideoInfoInJsonEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.VideoInfoInJson)).AddTo(this.disposables);
-            this.IsDownloadVideoInfoInJsonEnable.Subscribe(value => this.Savesetting(value, SettingsEnum.VideoInfoInJson));
+            this.IsDownloadVideoInfoInJsonEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.VideoInfoInJson));
 
             this.IsDownloadFromQueueEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.DLAllFromQueue)).AddTo(this.disposables);
-            this.IsDownloadFromQueueEnable.Subscribe(value => this.Savesetting(value, SettingsEnum.DLAllFromQueue));
+            this.IsDownloadFromQueueEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.DLAllFromQueue));
 
             this.IsDupeOnStageAllowed = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.AllowDupeOnStage)).AddTo(this.disposables);
-            this.IsDupeOnStageAllowed.Subscribe(value => this.Savesetting(value, SettingsEnum.AllowDupeOnStage));
+            this.IsDupeOnStageAllowed.Subscribe(value => this.SaveSetting(value, SettingsEnum.AllowDupeOnStage));
 
             this.IsOverrideVideoFileDTToUploadedDT = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT)).AddTo(this.disposables);
-            this.IsOverrideVideoFileDTToUploadedDT.Subscribe(value => this.Savesetting(value, SettingsEnum.OverrideVideoFileDTToUploadedDT));
+            this.IsOverrideVideoFileDTToUploadedDT.Subscribe(value => this.SaveSetting(value, SettingsEnum.OverrideVideoFileDTToUploadedDT));
 
             this.IsUnsafeCommentHandleEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle)).AddTo(this.disposables);
-            this.IsUnsafeCommentHandleEnable.Subscribe(value => this.Savesetting(value, SettingsEnum.UnsafeCommentHandle));
+            this.IsUnsafeCommentHandleEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.UnsafeCommentHandle));
 
             this.IsDownloadResumingEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.EnableResume)).AddTo(this.disposables);
-            this.IsDownloadResumingEnable.Subscribe(value => this.Savesetting(value, SettingsEnum.EnableResume));
+            this.IsDownloadResumingEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.EnableResume));
 
             var n1 = new ComboboxItem<int>(1, "1");
             var n2 = new ComboboxItem<int>(2, "2");
@@ -74,7 +74,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                 4 => new ReactivePropertySlim<ComboboxItem<int>>(n4),
                 _ => new ReactivePropertySlim<ComboboxItem<int>>(n4),
             };
-            this.MaxParallelDownloadCount.Subscribe(value => this.Savesetting(value, SettingsEnum.MaxParallelDL)).AddTo(this.disposables);
+            this.MaxParallelDownloadCount.Subscribe(value => this.SaveSetting(value, SettingsEnum.MaxParallelDL)).AddTo(this.disposables);
 
             this.MaxParallelSegmentDownloadCount = maxSP switch
             {
@@ -84,11 +84,11 @@ namespace Niconicome.ViewModels.Setting.Pages
                 4 => new ReactivePropertySlim<ComboboxItem<int>>(n4),
                 _ => new ReactivePropertySlim<ComboboxItem<int>>(n4),
             };
-            this.MaxParallelSegmentDownloadCount.Subscribe(value => this.Savesetting(value, SettingsEnum.MaxParallelSegDl)).AddTo(this.disposables);
+            this.MaxParallelSegmentDownloadCount.Subscribe(value => this.SaveSetting(value, SettingsEnum.MaxParallelSegDl)).AddTo(this.disposables);
 
             var maxTmp = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
             this.MaxTmpDirCount = new ReactiveProperty<int>(maxTmp < 0 ? 20 : maxTmp).AddTo(this.disposables);
-            this.MaxTmpDirCount.Subscribe(value => this.Savesetting(value, SettingsEnum.MaxTmpDirCount));
+            this.MaxTmpDirCount.Subscribe(value => this.SaveSetting(value, SettingsEnum.MaxTmpDirCount));
 
             var t1 = new ComboboxItem<VideoInfoTypeSettings>(VideoInfoTypeSettings.Text, "テキスト(Xeno互換)");
             var t2 = new ComboboxItem<VideoInfoTypeSettings>(VideoInfoTypeSettings.Json, "JSON");
