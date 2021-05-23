@@ -62,9 +62,9 @@ namespace Niconicome.Models.Domain.Local.Store
 
             if (playlist is null) return null;
 
-            if (playlist.Videos.Count > 0 && playlist.CustomVideoSequence.Count == 0)
+            if (playlist.Videos.Count > 0 && playlist.CustomVideoSequence.Count != playlist.Videos.Count)
             {
-                var ids = playlist.Videos.Select(v => v.Id);
+                var ids = playlist.Videos.Select(v => v.Id).Where(id => !playlist.CustomVideoSequence.Contains(id));
                 playlist.CustomVideoSequence.AddRange(ids);
             }
 
