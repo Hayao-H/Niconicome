@@ -1367,9 +1367,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (headerString.IsNullOrEmpty()) return;
 
             var sortType = this.GetSortType(headerString);
-            var isDecending = sortType == WS::Mainpage.SortInfoHandler.SortType.Value;
-
-            this.ResetHeaderState();
+            var isDecending = sortType == WS::Mainpage.SortInfoHandler.SortType.Value ? !WS::Mainpage.SortInfoHandler.IsDescending.Value : false;
 
             header.Tag = "Selected";
 
@@ -1377,18 +1375,6 @@ namespace Niconicome.ViewModels.Mainpage
 
         }
 
-        private GridViewColumnHeader? currentSortHeader;
-
-        /// <summary>
-        /// ヘッダーの状態をリセットする
-        /// </summary>
-        private void ResetHeaderState()
-        {
-            if (this.currentSortHeader is not null)
-            {
-                this.currentSortHeader.Tag = null;
-            }
-        }
 
         /// <summary>
         /// 並び替えのタイプを取得する

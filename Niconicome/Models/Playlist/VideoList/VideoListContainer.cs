@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 using Niconicome.Extensions.System;
@@ -414,6 +415,8 @@ namespace Niconicome.Models.Playlist.VideoList
             this.Clear();
             var result = this.refresher.Refresh(this.Videos);
 
+            this.Sort(this.current.SelectedPlaylist.Value!.VideoSortType, this.current.SelectedPlaylist.Value!.IsVideoDescending, this.current.SelectedPlaylist.Value!.CustomSortSequence);
+
             if (result.IsSucceeded)
             {
                 this.RaiseListChanged(null, ChangeType.Overall);
@@ -500,7 +503,7 @@ namespace Niconicome.Models.Playlist.VideoList
                     VideoSortType.DownloadedFlag => tmp.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
                     _ => SortWithCustom(tmp, customSortSequence),
                 };
-                this.AddRange(sorted);
+                this.Videos.Addrange(sorted);
             }
             else
             {
@@ -515,7 +518,7 @@ namespace Niconicome.Models.Playlist.VideoList
                     VideoSortType.DownloadedFlag => tmp.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
                     _ => SortWithCustom(tmp, customSortSequence),
                 };
-                this.AddRange(sorted);
+                this.Videos.Addrange(sorted);
             }
 
             return new AttemptResult() { IsSucceeded = true };

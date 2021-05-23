@@ -47,29 +47,36 @@ namespace Niconicome.Models.Playlist.Playlist
             this.current.SelectedPlaylist.Subscribe(value =>
             {
                 if (value is null) return;
+                noSort = true;
                 this.SortType.Value = value.VideoSortType;
                 this.IsDescending.Value = value.IsVideoDescending;
+                noSort = false;
                 this.SetTitle();
             }).AddTo(this.disposables);
 
             //並び替え情報が変更されたら永続化する
             this.SortType.Subscribe(value =>
             {
+                if (noSort) return;
+                this.SetTitle();
+
                 var playlist = this.current.SelectedPlaylist.Value;
                 if (playlist is null) return;
+
                 playlist.VideoSortType = value;
-                this.playlistHandler.Update(playlist);
-                this.SetTitle();
                 this.container.Sort(value, this.IsDescending.Value, this.current.SelectedPlaylist.Value?.CustomSortSequence);
             }).AddTo(this.disposables);
 
             this.IsDescending.Subscribe(value =>
             {
+                if (noSort) return;
+                this.SetTitle();
+
                 var playlist = this.current.SelectedPlaylist.Value;
                 if (playlist is null) return;
+
                 playlist.IsVideoDescending = value;
                 this.playlistHandler.Update(playlist);
-                this.SetTitle();
                 this.container.Sort(this.SortType.Value, value, this.current.SelectedPlaylist.Value?.CustomSortSequence);
             }).AddTo(this.disposables);
         }
@@ -94,6 +101,8 @@ namespace Niconicome.Models.Playlist.Playlist
         public const string DefaultViewCountColumnTitle = "再生回数";
 
         public const string DefaultDlFlagColumnTitle = "DL済み";
+
+        private bool noSort;
         #endregion
 
         /// <summary>
