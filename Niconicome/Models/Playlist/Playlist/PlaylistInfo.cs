@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Media;
 using LiteDB;
+using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.ViewModels;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
@@ -18,7 +19,8 @@ namespace Niconicome.Models.Playlist.Playlist
         string Folderpath { get; set; }
         List<int> ChildrensIds { get; }
         ObservableCollection<ITreePlaylistInfo> Children { get; }
-        List<IListVideoInfo> Videos { get; set; }
+        List<IListVideoInfo> Videos { get; }
+        List<int> CustomSortSequence { get; }
         int ParentId { get; set; }
         bool IsExpanded { get; set; }
         bool IsRoot { get; set; }
@@ -31,6 +33,7 @@ namespace Niconicome.Models.Playlist.Playlist
         bool IsRemotePlaylist { get; set; }
         RemoteType RemoteType { get; set; }
         int GetLayer(IPlaylistTreeHandler handler);
+        VideoSortType VideoSortType { get; set; }
 
     }
 
@@ -75,7 +78,9 @@ namespace Niconicome.Models.Playlist.Playlist
         /// <summary>
         /// 動画情報のリスト
         /// </summary>
-        public List<IListVideoInfo> Videos { get; set; } = new();
+        public List<IListVideoInfo> Videos { get; init; } = new();
+
+        public List<int> CustomSortSequence { get; init; } = new();
 
         /// <summary>
         /// 親プレイリストのID
@@ -129,6 +134,11 @@ namespace Niconicome.Models.Playlist.Playlist
         /// 下部セパレーターの可視性
         /// </summary>
         public virtual Visibility AfterSeparatorVisibility { get; set; } = Visibility.Hidden;
+
+        /// <summary>
+        /// 並び替え順
+        /// </summary>
+        public VideoSortType VideoSortType { get; set; }
 
         /// <summary>
         /// 子プレイリストが存在する場合
