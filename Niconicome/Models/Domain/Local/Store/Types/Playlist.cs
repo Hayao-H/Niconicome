@@ -47,6 +47,8 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public bool IsExpanded { get; set; }
 
+        public  bool IsVideoDescending { get; set; }
+
         public List<int> CustomVideoSequence { get; set; } = new();
 
         public VideoSortType SortType { get; set; }

@@ -25,6 +25,7 @@ namespace Niconicome.Models.Playlist.Playlist
         bool IsExpanded { get; set; }
         bool IsRoot { get; set; }
         bool IsConcrete { get; }
+        bool IsVideoDescending { get; set; }
         Brush BackgroundColor { get; set; }
         Visibility BeforeSeparatorVisibility { get; set; }
         Visibility AfterSeparatorVisibility { get; set; }
@@ -114,6 +115,12 @@ namespace Niconicome.Models.Playlist.Playlist
         /// 選択フラグ
         /// </summary>
         public virtual bool IsSelected { get; set; }
+
+        /// <summary>
+        /// 降順フラグ
+        /// </summary>
+        public bool IsVideoDescending { get; set; }
+
 
         /// <summary>
         /// リモート設定
@@ -231,6 +238,9 @@ namespace Niconicome.Models.Playlist.Playlist
             playlistInfo.RemoteId = dbPlaylist.RemoteId ?? string.Empty;
             playlistInfo.Folderpath = dbPlaylist.FolderPath ?? string.Empty;
             playlistInfo.IsExpanded = dbPlaylist.IsExpanded;
+            playlistInfo.VideoSortType = dbPlaylist.SortType;
+            playlistInfo.CustomSortSequence.AddRange(dbPlaylist.CustomVideoSequence);
+            playlistInfo.IsVideoDescending = dbPlaylist.IsVideoDescending;
         }
 
         /// <summary>

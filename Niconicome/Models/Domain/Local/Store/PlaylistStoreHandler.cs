@@ -6,6 +6,7 @@ using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Helper.Result;
+using System.Data.Common;
 
 namespace Niconicome.Models.Domain.Local.Store
 {
@@ -540,6 +541,10 @@ namespace Niconicome.Models.Domain.Local.Store
             dbPlaylist.PlaylistName = playlistInfo.Name;
             dbPlaylist.FolderPath = playlistInfo.Folderpath;
             dbPlaylist.IsExpanded = playlistInfo.IsExpanded;
+            dbPlaylist.CustomVideoSequence.Clear();
+            dbPlaylist.CustomVideoSequence.AddRange(playlistInfo.CustomSortSequence);
+            dbPlaylist.SortType = playlistInfo.VideoSortType;
+            dbPlaylist.IsVideoDescending = playlistInfo.IsVideoDescending;
         }
     }
 }
