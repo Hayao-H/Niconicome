@@ -414,8 +414,6 @@ namespace Niconicome.Models.Playlist.VideoList
             this.Clear();
             var result = this.refresher.Refresh(this.Videos);
 
-            this.Sort(this.current.SelectedPlaylist.Value!.VideoSortType, this.current.SelectedPlaylist.Value!.IsVideoDescending, this.current.SelectedPlaylist.Value!.CustomSortSequence);
-
             if (result.IsSucceeded)
             {
                 this.RaiseListChanged(null, ChangeType.Overall);
