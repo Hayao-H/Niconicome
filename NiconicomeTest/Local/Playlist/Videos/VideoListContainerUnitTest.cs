@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
@@ -110,6 +111,20 @@ namespace NiconicomeTest.Local.Playlist.Videos
             }
 
 
+        }
+
+        [TestCase(VideoSortType.Register,1)]
+        [TestCase(VideoSortType.Title,3)]
+        [TestCase(VideoSortType.NiconicoID,3)]
+        public void 動画を並び替える(VideoSortType sortType, int expectedID)
+        {
+            var video1 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(1), Title = new Reactive.Bindings.ReactiveProperty<string>("3"),NiconicoId=new Reactive.Bindings.ReactiveProperty<string>("3") };
+            var video2 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(2), Title = new Reactive.Bindings.ReactiveProperty<string>("2"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("2") };
+            var video3 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(3), Title = new Reactive.Bindings.ReactiveProperty<string>("1"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
+            this.videoListContainer!.AddRange(new IListVideoInfo[] { video1, video2, video3 });
+            this.videoListContainer!.Sort(sortType,false);
+
+            Assert.That(this.videoListContainer!.Videos.First().Id.Value, Is.EqualTo(expectedID));
         }
 
     }
