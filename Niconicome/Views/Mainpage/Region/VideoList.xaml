@@ -146,17 +146,17 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Width="{Binding IDColumnWidth.Value,Mode=TwoWay}" Header="ID" DisplayMemberBinding="{Binding NiconicoId.Value}"/>
-                        <GridViewColumn Width="{Binding TitleColumnWidth.Value,Mode=TwoWay}" Header="タイトル">
+                        <GridViewColumn Width="{Binding IDColumnWidth.Value,Mode=TwoWay}" Header="{Binding IdColumnTitle.Value}" DisplayMemberBinding="{Binding NiconicoId.Value}"/>
+                        <GridViewColumn Width="{Binding TitleColumnWidth.Value,Mode=TwoWay}" Header="{Binding TitleColumnTitle.Value}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Title.Value,Mode=TwoWay}" ToolTip="{Binding Title.Value}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Width="{Binding UploadColumnWidth.Value,Mode=TwoWay}" Header="投稿日" DisplayMemberBinding="{Binding UploadedOn.Value, StringFormat=yyyy年MM月dd日 HH:mm}"/>
-                        <GridViewColumn Width="{Binding ViewCountColumnWidth.Value,Mode=TwoWay}" Header="再生回数" DisplayMemberBinding="{Binding ViewCount.Value}"/>
-                        <GridViewColumn Width="{Binding DownloadedFlagColumnWidth.Value,Mode=TwoWay}" Header="DL済み" DisplayMemberBinding="{Binding IsDownloaded.Value}"/>
+                        <GridViewColumn Width="{Binding UploadColumnWidth.Value,Mode=TwoWay}" Header="{Binding UploadColumnTitle.Value}" DisplayMemberBinding="{Binding UploadedOn.Value, StringFormat=yyyy年MM月dd日 HH:mm}"/>
+                        <GridViewColumn Width="{Binding ViewCountColumnWidth.Value,Mode=TwoWay}" Header="{Binding ViewCountColumnTitle.Value}" DisplayMemberBinding="{Binding ViewCount.Value}"/>
+                        <GridViewColumn Width="{Binding DownloadedFlagColumnWidth.Value,Mode=TwoWay}" Header="{Binding DlFlagColumnTitle.Value}" DisplayMemberBinding="{Binding IsDownloaded.Value}"/>
                         <GridViewColumn Width="{Binding StateColumnWidth.Value,Mode=TwoWay}" Header="状態" DisplayMemberBinding="{Binding Message.Value}"/>
                     </GridView>
                 </ListView.View>
