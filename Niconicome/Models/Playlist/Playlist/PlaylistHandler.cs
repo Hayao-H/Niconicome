@@ -6,6 +6,7 @@ using System.Windows.Data;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Settings;
@@ -26,6 +27,8 @@ namespace Niconicome.Models.Playlist.Playlist
         void Move(int id, int targetId);
         void SetAsRemotePlaylist(int playlistId, string Id, string name, RemoteType type);
         void SetAsLocalPlaylist(int playlistId);
+        IAttemptResult MoveVideoToPrev(int videoIndex, int playlistID);
+        IAttemptResult MoveVideoToForward(int videoIndex, int playlistID);
         void SaveAllPlaylists();
         bool IsLastChild(int id);
         bool ContainsVideo(string niconicoId, int playlistId);
@@ -40,13 +43,14 @@ namespace Niconicome.Models.Playlist.Playlist
     /// </summary>
     public class PlaylistHandler : IPlaylistHandler
     {
-        public PlaylistHandler(IPlaylistTreeHandler handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger, ILocalSettingHandler settingHandler)
+        public PlaylistHandler(IPlaylistTreeHandler handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger, ILocalSettingHandler settingHandler,ILogger logger)
         {
             //BindingOperations.EnableCollectionSynchronization(this.Playlists, new object());
             this.treeHandler = handler;
             this.playlistStoreHandler = playlistStoreHandler;
             this.errorMessanger = errorMessanger;
             this.settingHandler = settingHandler;
+            this.logger = logger;
         }
 
         #region field
@@ -57,6 +61,8 @@ namespace Niconicome.Models.Playlist.Playlist
         private readonly State::IErrorMessanger errorMessanger;
 
         private readonly ILocalSettingHandler settingHandler;
+
+        private readonly ILogger logger;
         #endregion
 
 
@@ -101,7 +107,6 @@ namespace Niconicome.Models.Playlist.Playlist
             }
             catch (Exception e)
             {
-                var logger = Utils::DIFactory.Provider.GetRequiredService<Utils::ILogger>();
                 logger.Error("プレイリストの削除に失敗しました。", e);
                 this.errorMessanger.FireError($"プレイリストの削除に失敗しました。操作は反映されません。");
                 return;
@@ -186,6 +191,55 @@ namespace Niconicome.Models.Playlist.Playlist
         public void SetAsLocalPlaylist(int playlistId)
         {
             this.playlistStoreHandler.SetAsLocalPlaylist(playlistId);
+        }
+
+
+        /// <summary>
+        /// 動画を一つ前に移動させる
+        /// </summary>
+        /// <param name="videoIndex"></param>
+        /// <param name="playlistID"></param>
+        /// <returns></returns>
+        public IAttemptResult MoveVideoToPrev(int videoIndex, int playlistID)
+        {
+            var result = this.playlistStoreHandler.MoveVideoToPrev(playlistID, videoIndex);
+            if (!result.IsSucceeded)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error(result.Message!, result.Exception);
+                } else
+                {
+                    this.logger.Error($"動画の並び替え操作に失敗しました。({nameof(this.MoveVideoToPrev)})");
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 動画を一つあとに移動させる
+        /// </summary>
+        /// <param name="videoIndex"></param>
+        /// <param name="playlistID"></param>
+        /// <returns></returns>
+        public IAttemptResult MoveVideoToForward(int videoIndex, int playlistID)
+        {
+
+            var result = this.playlistStoreHandler.MoveVideoToForward(playlistID, videoIndex);
+            if (!result.IsSucceeded)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error(result.Message!, result.Exception);
+                }
+                else
+                {
+                    this.logger.Error($"動画の並び替え操作に失敗しました。({nameof(this.MoveVideoToPrev)})");
+                }
+            }
+
+            return result;
         }
 
         /// <summary>

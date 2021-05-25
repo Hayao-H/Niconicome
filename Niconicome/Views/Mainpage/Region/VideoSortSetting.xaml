@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="Niconicome.Views.Mainpage.Region.VideoSortSetting"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"  
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
+             xmlns:cv="clr-namespace:Niconicome.Views.Converter"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
+             mc:Ignorable="d"
+             TextElement.Foreground="{DynamicResource MaterialDesignLightForeground}"
+             TextElement.FontWeight="Regular"
+             TextElement.FontSize="13"
+             TextOptions.TextFormattingMode="Ideal"
+             TextOptions.TextRenderingMode="Auto"
+             Background="{DynamicResource MaterialDesignBackground}"
+             FontFamily="Yu Gothic"
+             d:Width="1200"
+             d:Height="300"
+             d:DataContext="{d:DesignInstance {x:Type vm:SortViewModelD},IsDesignTimeCreatable=True}"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             >
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <StackPanel Orientation="Vertical">
+                <Label Margin="5 0" Content="並び替える"/>
+                <Separator BorderThickness="2" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}" Margin="0 5"/>
+            </StackPanel>
+            <StackPanel Margin="10" Grid.Row="1" Orientation="Horizontal">
+                <Button Margin="5 0" Content="登録順" Command="{Binding SortVideosByRegister}"/>
+                <Button Margin="5 0" Content="ID" Command="{Binding SortVideosByID}"/>
+                <Button Margin="5 0" Content="タイトル" Command="{Binding SortVideosByTitle}"/>
+                <Button Margin="5 0" Content="投稿日時" Command="{Binding SortVideosByUploadedDT}"/>
+                <Button Margin="5 0" Content="再生回数" Command="{Binding SortVideosByViewCount}"/>
+                <Button Margin="5 0" Content="DL済み" Command="{Binding SortVideosByDLFlag}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
