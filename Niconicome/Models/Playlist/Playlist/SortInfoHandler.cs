@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.Types;
@@ -15,7 +16,9 @@ namespace Niconicome.Models.Playlist.Playlist
     public interface ISortInfoHandler
     {
         ReactiveProperty<VideoSortType> SortType { get; }
+        ReactiveProperty<string?> SortTypeStr { get; }
         ReactiveProperty<bool> IsDescending { get; }
+        ReactiveProperty<string?> IsDescendingStr { get; }
         ReactiveProperty<string> IdColumnTitle { get; }
         ReactiveProperty<string> TitleColumnTitle { get; }
         ReactiveProperty<string> UploadColumnTitle { get; }
@@ -42,6 +45,16 @@ namespace Niconicome.Models.Playlist.Playlist
             this.UploadColumnTitle = new ReactiveProperty<string>(DefaultUploadColumnTitle);
             this.DlFlagColumnTitle = new ReactiveProperty<string>(DefaultDlFlagColumnTitle);
             this.ViewCountColumnTitle = new ReactiveProperty<string>(DefaultViewCountColumnTitle);
+            this.SortTypeStr = this.SortType.Select(value => value switch
+            {
+                VideoSortType.NiconicoID => "ID",
+                VideoSortType.Title => "タイトル",
+                VideoSortType.UploadedDT => "投稿日",
+                VideoSortType.ViewCount => "再生回数",
+                _ => "登録順",
+            }).ToReactiveProperty().AddTo(this.disposables);
+            this.IsDescendingStr = this.IsDescending.Select(value => value ? "降順" : "昇順").ToReactiveProperty().AddTo(this.disposables);
+
 
             //プレイリストが変更されたら並び替え情報を変更する
             this.current.SelectedPlaylist.Subscribe(value =>
@@ -115,6 +128,18 @@ namespace Niconicome.Models.Playlist.Playlist
         /// </summary>
         public ReactiveProperty<bool> IsDescending { get; init; }
 
+
+        /// <summary>
+        /// 並び替え情報(文字列)
+        /// </summary>
+        /// <value></value>
+        public ReactiveProperty<string?> SortTypeStr { get; init; }
+
+        /// <summary>
+        /// 降順(文字列)
+        /// </summary>
+        /// <value></value>
+        public ReactiveProperty<string?> IsDescendingStr { get; init; }
 
         /// <summary>
         /// ID

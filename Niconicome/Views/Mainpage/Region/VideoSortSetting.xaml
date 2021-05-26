@@ -24,13 +24,18 @@
              >
     <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height=".7*"/>
+            <RowDefinition Height=".3*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <StackPanel Orientation="Vertical">
                 <Label Margin="5 0" Content="並び替える"/>
                 <Separator BorderThickness="2" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}" Margin="0 5"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="現在の並び替えタイプ："/>
+                <Label Content="{Binding CurrentSortType.Value}"/>
+                <Label Content="{Binding IsDscending.Value}"/>
             </StackPanel>
             <StackPanel Margin="10" Grid.Row="1" Orientation="Horizontal">
                 <Button Margin="5 0" Content="登録順" Command="{Binding SortVideosByRegister}"/>

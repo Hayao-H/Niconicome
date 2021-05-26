@@ -1057,16 +1057,8 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.SortInfoHandler.SortType.Value = sortType;
             }
 
-            string sortTypeStr = sortType switch
-            {
-                VideoSortType.UploadedDT => "投稿日時",
-                VideoSortType.NiconicoID => "ID",
-                VideoSortType.Title => "タイトル",
-                VideoSortType.ViewCount => "再生回数",
-                VideoSortType.DownloadedFlag => "DL済み",
-                _ => "登録"
-            };
-            string orderStr = isDesscending ? "降順" : "昇順";
+            var sortTypeStr = WS::Mainpage.SortInfoHandler.SortTypeStr.Value;
+            var orderStr = WS::Mainpage.SortInfoHandler.IsDescendingStr.Value;
 
             WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
             this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
