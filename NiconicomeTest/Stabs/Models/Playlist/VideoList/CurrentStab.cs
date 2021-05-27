@@ -14,8 +14,7 @@ namespace NiconicomeTest.Stabs.Models.Playlist.VideoList
         public ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; init; } = new();
 
         public int PrevSelectedPlaylistID { get; set; }
+        public ReactiveProperty<int> CurrentSelectedIndex { get; init; } = new();
 
-
-        public event EventHandler? SelectedPlaylistChanged;
     }
 }

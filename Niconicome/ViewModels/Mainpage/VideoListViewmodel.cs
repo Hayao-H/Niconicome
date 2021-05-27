@@ -83,6 +83,9 @@ namespace Niconicome.ViewModels.Mainpage
             var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
             WS::Mainpage.PlaylistHandler.Refresh(expandAll, inheritExpandedState);
 
+            //インデックス
+            this.SelectedIndex = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.ToReactivePropertyAsSynchronized(x => x.Value);
+
             //すべて選択する
             this.IsSelectedAll = new ReactivePropertySlim<bool>().AddTo(this.disposables);
             this.IsSelectedAll.Subscribe(value =>
@@ -950,6 +953,12 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<string> InputString { get; init; } = new();
 
         /// <summary>
+        /// 選択されている動画のインデックス
+        /// </summary>
+        public ReactiveProperty<int> SelectedIndex { get; init; }
+
+
+        /// <summary>
         /// フィルターの設定
         /// </summary>
         public ReactivePropertySlim<bool> IsFilteringOnlyByTag { get; init; } = new();
@@ -1256,6 +1265,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new();
 
         public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
+
+        public ReactiveProperty<int> SelectedIndex { get; init; } = new();
 
         public ReactivePropertySlim<string> IdColumnTitle { get; init; } = new("ID");
 

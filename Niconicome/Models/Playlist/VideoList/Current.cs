@@ -13,6 +13,7 @@ namespace Niconicome.Models.Playlist.VideoList
     public interface ICurrent
     {
         ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; }
+        ReactiveProperty<int> CurrentSelectedIndex { get; }
         int PrevSelectedPlaylistID { get; }
     }
 
@@ -27,12 +28,18 @@ namespace Niconicome.Models.Playlist.VideoList
                     if (v.OldValue is null) return;
                     this.PrevSelectedPlaylistID = v.OldValue.Id;
                 });
+            this.CurrentSelectedIndex = new ReactiveProperty<int>();
         }
 
         /// <summary>
         /// 現在選択されているプレイリストのID
         /// </summary>
         public ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; init; }
+
+        /// <summary>
+        /// 選択された動画のインデックス
+        /// </summary>
+        public ReactiveProperty<int> CurrentSelectedIndex { get; init; }
 
         /// <summary>
         /// ひとつまえに選択していたプレイリスト

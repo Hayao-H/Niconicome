@@ -24,8 +24,8 @@
              >
     <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".7*"/>
-            <RowDefinition Height=".3*"/>
+            <RowDefinition Height=".6*"/>
+            <RowDefinition Height=".4*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <StackPanel Orientation="Vertical">
@@ -37,13 +37,24 @@
                 <Label Content="{Binding CurrentSortType.Value}"/>
                 <Label Content="{Binding IsDscending.Value}"/>
             </StackPanel>
-            <StackPanel Margin="10" Grid.Row="1" Orientation="Horizontal">
+            <StackPanel Margin="10 0" Grid.Row="1" Orientation="Horizontal">
                 <Button Margin="5 0" Content="登録順" Command="{Binding SortVideosByRegister}"/>
                 <Button Margin="5 0" Content="ID" Command="{Binding SortVideosByID}"/>
                 <Button Margin="5 0" Content="タイトル" Command="{Binding SortVideosByTitle}"/>
                 <Button Margin="5 0" Content="投稿日時" Command="{Binding SortVideosByUploadedDT}"/>
                 <Button Margin="5 0" Content="再生回数" Command="{Binding SortVideosByViewCount}"/>
                 <Button Margin="5 0" Content="DL済み" Command="{Binding SortVideosByDLFlag}"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Row="1">
+                <Separator BorderThickness="2" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}" Margin="0 5"/>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="選択されている動画："/>
+                <Label Content="{Binding SelectedVideoInfo.Value}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10 0">
+                <Button Margin="5 0" Content="動画を1つ前に移動する" Command="{Binding MoveVideoToPrevCommand}"/>
+                <Button Margin="5 0" Content="動画を1つ後ろに移動する" Command="{Binding MoveVideoToForwardCommand}"/>
             </StackPanel>
         </StackPanel>
     </Grid>

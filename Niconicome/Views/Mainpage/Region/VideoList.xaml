@@ -118,6 +118,8 @@
                     VirtualizingPanel.IsVirtualizing="True"
                     VirtualizingPanel.VirtualizationMode="Recycling"
                     VirtualizingPanel.ScrollUnit="Pixel"
+                    SelectionMode="Single"
+                    SelectedIndex="{Binding SelectedIndex.Value}"
                     ItemsSource="{Binding Videos,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" 
                     BorderThickness="1"
                     BorderBrush="#e7e7e7" >
