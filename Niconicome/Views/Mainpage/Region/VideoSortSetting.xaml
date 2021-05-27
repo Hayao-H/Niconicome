@@ -44,6 +44,7 @@
                 <Button Margin="5 0" Content="投稿日時" Command="{Binding SortVideosByUploadedDT}"/>
                 <Button Margin="5 0" Content="再生回数" Command="{Binding SortVideosByViewCount}"/>
                 <Button Margin="5 0" Content="DL済み" Command="{Binding SortVideosByDLFlag}"/>
+                <Button Margin="5 0" Content="昇順・降順を切り替える" Command="{Binding SwitchDesending}"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="1">
@@ -53,8 +54,9 @@
                 <Label Content="{Binding SelectedVideoInfo.Value}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="10 0">
-                <Button Margin="5 0" Content="動画を1つ前に移動する" Command="{Binding MoveVideoToPrevCommand}"/>
-                <Button Margin="5 0" Content="動画を1つ後ろに移動する" Command="{Binding MoveVideoToForwardCommand}"/>
+                <Label Margin="5 0" Content="動画の順番を移動する"/>
+                <Button Margin="5 0" Content="↑" Command="{Binding MoveVideoToPrevCommand}"/>
+                <Button Margin="5 0" Content="↓" Command="{Binding MoveVideoToForwardCommand}"/>
             </StackPanel>
         </StackPanel>
     </Grid>

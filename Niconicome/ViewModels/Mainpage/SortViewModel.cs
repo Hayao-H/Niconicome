@@ -132,7 +132,8 @@ namespace Niconicome.ViewModels.Mainpage
                 .ToReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    var result = WS::Mainpage.VideoListContainer.MovevideotoPrev(WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value);
+                    var index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
+                    var result = WS::Mainpage.VideoListContainer.MovevideotoPrev(index);
                     if (!result.IsSucceeded)
                     {
                         WS::Mainpage.SnaclbarHandler.Enqueue("動画の並び替えに失敗しました。");
@@ -147,14 +148,15 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.MoveVideoToForwardCommand = new[]
             {
-                WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Select(value=>value+1< WS::Mainpage.VideoListContainer.Count),
+                WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Select(value=>value>=0&&value+1< WS::Mainpage.VideoListContainer.Count),
                 WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Select(value=>value is not null),
             }
                 .CombineLatestValuesAreAllTrue()
                 .ToReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    var result = WS::Mainpage.VideoListContainer.MovevideotoForward(WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value);
+                    var index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
+                    var result = WS::Mainpage.VideoListContainer.MovevideotoForward(index);
                     if (!result.IsSucceeded)
                     {
                         WS::Mainpage.SnaclbarHandler.Enqueue("動画の並び替えに失敗しました。");
@@ -166,9 +168,18 @@ namespace Niconicome.ViewModels.Mainpage
                         WS::Mainpage.Messagehandler.AppendMessage($"動画を1つ後ろに移動しました。({this.SelectedVideoInfo.Value})");
                     }
                 }).AddTo(this.disposables);
+
+            this.SwitchDesending = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(value => value is not null)
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    WS::Mainpage.SortInfoHandler.IsDescending.Value = !WS::Mainpage.SortInfoHandler.IsDescending.Value;
+                }).AddTo(this.disposables);
             #endregion
         }
 
+        #region コマンド
         /// <summary>
         /// IDでソート
         /// </summary>
@@ -210,6 +221,12 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveCommand MoveVideoToForwardCommand { get; init; }
 
         /// <summary>
+        /// 昇順・降順を切り替える
+        /// </summary>
+        public ReactiveCommand SwitchDesending { get; init; } = new();
+        #endregion
+
+        /// <summary>
         /// 現在のソート方法
         /// </summary>
         public ReactiveProperty<string?> CurrentSortType { get; init; }
@@ -236,8 +253,6 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
             WS::Mainpage.SnaclbarHandler.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
         }
-
-
     }
 
     [Obsolete("デザイナー専用！", true)]
@@ -258,6 +273,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveCommand MoveVideoToPrevCommand { get; init; } = new();
 
         public ReactiveCommand MoveVideoToForwardCommand { get; init; } = new();
+
+        public ReactiveCommand SwitchDesending { get; init; } = new();
 
         public ReactiveProperty<string?> CurrentSortType { get; init; } = new("再生回数");
 
