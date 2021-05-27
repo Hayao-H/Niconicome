@@ -45,5 +45,30 @@ namespace Niconicome.Extensions.System.List
 
             return -1;
         }
+
+        /// <summary>
+        /// ひとつ前に挿入する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="index"></param>
+        public static void InsertIntoPrev<T>(this ObservableCollection<T> source, int index)
+        {
+            var tmp = source[index];
+            source[index] = source[index - 1];
+            source[index - 1] = tmp;
+        }
+
+        /// <summary>
+        /// ひとつ後ろに挿入する
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="index"></param>
+        public static void InsertIntoForward<T>(this ObservableCollection<T> source, int index)
+        {
+            var tmp = source[index];
+            source[index] = source[index + 1];
+            source[index + 1] = tmp;
+        }
     }
 }

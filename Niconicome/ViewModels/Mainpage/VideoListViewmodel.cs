@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,15 +11,16 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xaml.Behaviors;
-using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
@@ -34,6 +33,7 @@ using Net = Niconicome.Models.Domain.Network;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
+using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -53,7 +53,7 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Subscribe(_ => this.OnSelectedPlaylistChanged());
 
             //プレイリスト内容更新のイベントを購読する
-            WS::Mainpage.VideoListContainer.ListChanged += (_, e) => this.VideoListUpdated(e);
+            WS::Mainpage.VideoListContainer.ListChanged += (_, _) => this.VideoListUpdated();
 
             this.Videos = WS::Mainpage.VideoListContainer.Videos.ToReadOnlyReactiveCollection(v => new VideoInfoViewModel(v)).AddTo(this.disposables);
 
@@ -81,7 +81,10 @@ namespace Niconicome.ViewModels.Mainpage
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
             var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
-            WS::Mainpage.PlaylistTree.Refresh(expandAll, inheritExpandedState);
+            WS::Mainpage.PlaylistHandler.Refresh(expandAll, inheritExpandedState);
+
+            //インデックス
+            this.SelectedIndex = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.ToReactivePropertyAsSynchronized(x => x.Value);
 
             //すべて選択する
             this.IsSelectedAll = new ReactivePropertySlim<bool>().AddTo(this.disposables);
@@ -89,6 +92,13 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 WS::Mainpage.VideoListContainer.ForEach(v => v.IsSelected.Value = value);
             });
+
+            //カラム
+            this.IdColumnTitle = WS::Mainpage.SortInfoHandler.IdColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+            this.TitleColumnTitle = WS::Mainpage.SortInfoHandler.TitleColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+            this.UploadColumnTitle = WS::Mainpage.SortInfoHandler.UploadColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+            this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+            this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
             #region コマンドの初期化
             this.AddVideoCommand = new[] {
@@ -141,7 +151,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                   WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
 
-                  WS::Mainpage.PlaylistTree.Refresh();
+                  WS::Mainpage.PlaylistHandler.Refresh();
 
                   this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
 
@@ -265,7 +275,7 @@ namespace Niconicome.ViewModels.Mainpage
                 if (data == string.Empty) return;
 
                 Utils::INiconicoUtils reader = new Utils::NiconicoUtils();
-                var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistTree.ContainsVideo(i, playlistId)).ToList();
+                var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistHandler.ContainsVideo(i, playlistId)).ToList();
 
                 var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(ids)).ToList();
                 var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
@@ -393,7 +403,7 @@ namespace Niconicome.ViewModels.Mainpage
                         return;
                     }
 
-                    if (!WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.IsRemotePlaylist || (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteId.IsNullOrEmpty() && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteType != RemoteType.WatchLater)) return;
+                    if (!WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.IsRemotePlaylist || (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteId.IsNullOrEmpty() && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteType != PlaylistPlaylist::RemoteType.WatchLater)) return;
 
                     this.isFetching.Value = true;
 
@@ -405,7 +415,7 @@ namespace Niconicome.ViewModels.Mainpage
                     if (result.IsSucceeded)
                     {
 
-                        videos = videos.Where(v => !WS::Mainpage.PlaylistTree.ContainsVideo(v.NiconicoId.Value, playlistId)).ToList();
+                        videos = videos.Where(v => !WS::Mainpage.PlaylistHandler.ContainsVideo(v.NiconicoId.Value, playlistId)).ToList();
 
                         if (videos.Count == 0)
                         {
@@ -943,6 +953,12 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<string> InputString { get; init; } = new();
 
         /// <summary>
+        /// 選択されている動画のインデックス
+        /// </summary>
+        public ReactiveProperty<int> SelectedIndex { get; init; }
+
+
+        /// <summary>
         /// フィルターの設定
         /// </summary>
         public ReactivePropertySlim<bool> IsFilteringOnlyByTag { get; init; } = new();
@@ -961,6 +977,33 @@ namespace Niconicome.ViewModels.Mainpage
         /// すべて選択
         /// </summary>
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; }
+
+        #region カラムタイトル
+        /// <summary>
+        /// ID
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> IdColumnTitle { get; init; }
+
+        /// <summary>
+        /// タイトル
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> TitleColumnTitle { get; init; }
+
+        /// <summary>
+        /// 投稿日時
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> UploadColumnTitle { get; init; }
+
+        /// <summary>
+        /// 再生回数
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> ViewCountColumnTitle { get; init; }
+
+        /// <summary>
+        /// DLフラグ
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> DlFlagColumnTitle { get; init; }
+        #endregion
 
         #region Width
 
@@ -1010,53 +1053,21 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         /// <param name="sortType"></param>
         /// <param name="orderBy"></param>
-        public void SetOrder(SortType sortType, OrderBy orderBy)
+        public void SetOrder(VideoSortType sortType, bool isDesscending)
         {
             var videos = new List<IListVideoInfo>(WS::Mainpage.VideoListContainer.Videos);
-            WS::Mainpage.VideoListContainer.Clear();
-            if (orderBy != OrderBy.Descending)
+
+            if (WS::Mainpage.SortInfoHandler.SortType.Value == sortType)
             {
-                WS::Mainpage.VideoListContainer.AddRange(sortType switch
-                {
-                    SortType.DateTime => videos.OrderBy(v => v.UploadedOn.Value),
-                    SortType.Id => videos.OrderBy(v => v.NiconicoId.Value),
-                    SortType.Title => videos.OrderBy(v => v.Title.Value),
-                    SortType.Selected => videos.OrderBy(v => !v.IsSelected.Value ? 1 : 0),
-                    SortType.ViewCount => videos.OrderBy(v => v.ViewCount.Value),
-                    SortType.Downloaded => videos.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
-                    _ => videos,
-                }, null, false); ;
+                WS::Mainpage.SortInfoHandler.IsDescending.Value = isDesscending;
             }
             else
             {
-                WS::Mainpage.VideoListContainer.AddRange(sortType switch
-                {
-                    SortType.DateTime => videos.OrderByDescending(v => v.UploadedOn.Value),
-                    SortType.Id => videos.OrderByDescending(v => v.NiconicoId.Value),
-                    SortType.Title => videos.OrderByDescending(v => v.Title.Value),
-                    SortType.Selected => videos.OrderByDescending(v => !v.IsSelected.Value ? 1 : 0),
-                    SortType.ViewCount => videos.OrderByDescending(v => v.ViewCount.Value),
-                    SortType.Downloaded => videos.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
-                    _ => videos,
-                }, null, false);
+                WS::Mainpage.SortInfoHandler.SortType.Value = sortType;
             }
 
-            string sortTypeStr = sortType switch
-            {
-                SortType.DateTime => "投稿日時",
-                SortType.Id => "ID",
-                SortType.Title => "タイトル",
-                SortType.Selected => "選択",
-                SortType.ViewCount => "再生回数",
-                SortType.Downloaded => "DL済み",
-                _ => "並び替えなし"
-            };
-            string orderStr = orderBy switch
-            {
-                OrderBy.Ascending => "昇順",
-                OrderBy.Descending => "降順",
-                _ => "昇順",
-            };
+            var sortTypeStr = WS::Mainpage.SortInfoHandler.SortTypeStr.Value;
+            var orderStr = WS::Mainpage.SortInfoHandler.IsDescendingStr.Value;
 
             WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
             this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
@@ -1125,12 +1136,8 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// プレイリストのタイトルを変更する
         /// </summary>
-        private void VideoListUpdated(ListChangedEventArgs<IListVideoInfo>? e = null)
+        private void VideoListUpdated()
         {
-            if (e is not null)
-            {
-                this.UpdateList(e);
-            }
 
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
             {
@@ -1255,6 +1262,18 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
 
+        public ReactiveProperty<int> SelectedIndex { get; init; } = new();
+
+        public ReactivePropertySlim<string> IdColumnTitle { get; init; } = new("ID");
+
+        public ReactivePropertySlim<string> TitleColumnTitle { get; init; } = new("タイトル");
+
+        public ReactivePropertySlim<string> UploadColumnTitle { get; init; } = new("投稿日時");
+
+        public ReactivePropertySlim<string> ViewCountColumnTitle { get; init; } = new("再生回数");
+
+        public ReactivePropertySlim<string> DlFlagColumnTitle { get; init; } = new("DL済み");
+
     }
 
     /// <summary>
@@ -1346,76 +1365,48 @@ namespace Niconicome.ViewModels.Mainpage
             string? headerString = header.Column.Header.ToString();
             if (headerString.IsNullOrEmpty()) return;
 
-            SortType sortType = this.GetSortType(headerString);
-            OrderBy orderBy = this.GetOrderBy(sortType);
-
-            this.ResetHeaderState();
+            var sortType = this.GetSortType(headerString);
+            var isDecending = sortType == WS::Mainpage.SortInfoHandler.SortType.Value ? !WS::Mainpage.SortInfoHandler.IsDescending.Value : false;
 
             header.Tag = "Selected";
-            this.currentSortHeader = header;
-            this.CurrentSortType = sortType;
-            this.CurrentOrder = orderBy;
 
-            context.SetOrder(sortType, orderBy);
+            context.SetOrder(sortType, isDecending);
 
         }
 
-        private GridViewColumnHeader? currentSortHeader;
-
-        private OrderBy CurrentOrder;
-
-        private SortType CurrentSortType;
-
-        /// <summary>
-        /// ヘッダーの状態をリセットする
-        /// </summary>
-        private void ResetHeaderState()
-        {
-            if (this.currentSortHeader is not null)
-            {
-                this.currentSortHeader.Tag = null;
-            }
-        }
 
         /// <summary>
         /// 並び替えのタイプを取得する
         /// </summary>
         /// <param name="header"></param>
         /// <returns></returns>
-        private SortType GetSortType(string header)
+        private VideoSortType GetSortType(string header)
         {
-            return header switch
+            if (header.StartsWith(SortInfoHandler.DefaultIdColumnTitle))
             {
-                "ID" => SortType.Id,
-                "投稿日" => SortType.DateTime,
-                "タイトル" => SortType.Title,
-                "選択" => SortType.Selected,
-                "再生回数" => SortType.ViewCount,
-                "DL済み" => SortType.Downloaded,
-                _ => SortType.None
-            };
-        }
-
-        /// <summary>
-        /// 昇順・降順を取得する
-        /// </summary>
-        /// <param name="sortType"></param>
-        /// <returns></returns>
-        private OrderBy GetOrderBy(SortType sortType)
-        {
-            if (sortType == this.CurrentSortType)
+                return VideoSortType.NiconicoID;
+            }
+            else if (header.StartsWith(SortInfoHandler.DefaultTitleColumnTitle))
             {
-                return this.CurrentOrder switch
-                {
-                    OrderBy.Ascending => OrderBy.Descending,
-                    OrderBy.Descending => OrderBy.Ascending,
-                    _ => OrderBy.Ascending,
-                };
+                return VideoSortType.Title;
+            }
+            else if (header.StartsWith(SortInfoHandler.DefaultUploadColumnTitle))
+            {
+                return VideoSortType.UploadedDT;
+            }
+            else if (header.StartsWith(SortInfoHandler.DefaultViewCountColumnTitle))
+            {
+                return VideoSortType.ViewCount;
+            }
+            else if (header.StartsWith(SortInfoHandler.DefaultDlFlagColumnTitle))
+            {
+                return VideoSortType.DownloadedFlag;
             }
             else
             {
-                return OrderBy.Ascending;
+                return VideoSortType.Register;
             }
+
         }
 
         private double scrollPos;
@@ -1495,21 +1486,4 @@ namespace Niconicome.ViewModels.Mainpage
         None
     }
 
-    enum SortType
-    {
-        None,
-        DateTime,
-        Id,
-        Title,
-        Selected,
-        ViewCount,
-        Downloaded,
-    }
-
-    enum OrderBy
-    {
-        None,
-        Ascending,
-        Descending,
-    }
 }

@@ -5,6 +5,7 @@ using Niconicome.Models.Local.External.Import;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 

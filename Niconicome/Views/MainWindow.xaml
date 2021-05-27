@@ -169,6 +169,9 @@
                                 <TabItem Header="出力">
                                     <UserControl prism:RegionManager.RegionName="OutputRegion"/>
                                 </TabItem>
+                                <TabItem Header="並び替え">
+                                    <UserControl prism:RegionManager.RegionName="VideoSortSetting"/>
+                                </TabItem>
                             </TabControl >
                         </Grid>
                     </Grid>
