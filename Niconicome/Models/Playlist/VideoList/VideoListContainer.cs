@@ -9,6 +9,7 @@ using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Local.Store.Types;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
@@ -29,6 +30,8 @@ namespace Niconicome.Models.Playlist.VideoList
         IAttemptResult Uncheck(int videoID, int playlistID);
         IAttemptResult ForEach(Action<IListVideoInfo> foreachFunc);
         IAttemptResult Sort(VideoSortType sortType, bool isDescending, List<int>? customSortSequence = null);
+        IAttemptResult MovevideotoPrev(int videoIndex, int? playlistID = null, bool commit = true);
+        IAttemptResult MovevideotoForward(int videoIndex, int? playlistID = null, bool commit = true);
         int Count { get; }
         ObservableCollection<IListVideoInfo> Videos { get; }
         event EventHandler<ListChangedEventArgs<IListVideoInfo>>? ListChanged;
@@ -36,12 +39,13 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public class VideoListContainer : IVideoListContainer
     {
-        public VideoListContainer(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, IVideoListRefresher refresher, ICurrent current)
+        public VideoListContainer(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, IVideoListRefresher refresher, ICurrent current, ILogger logger)
         {
             this.playlistStoreHandler = playlistStoreHandler;
             this.videoHandler = videoHandler;
             this.refresher = refresher;
             this.current = current;
+            this.logger = logger;
             this.Videos = new ObservableCollection<IListVideoInfo>();
         }
 
@@ -55,6 +59,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
         private readonly ICurrent current;
 
+        private readonly ILogger logger;
         #endregion
 
         #region プライベートフィールド
@@ -519,6 +524,109 @@ namespace Niconicome.Models.Playlist.VideoList
                     _ => SortWithCustom(tmp, customSortSequence),
                 };
                 this.Videos.Addrange(sorted);
+            }
+
+            return new AttemptResult() { IsSucceeded = true };
+        }
+
+        /// <summary>
+        /// 動画を一つ前に挿入する
+        /// </summary>
+        /// <param name="videoIndex"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
+        public IAttemptResult MovevideotoPrev(int videoIndex, int? playlistID = null, bool commit = true)
+        {
+            var determinedPlaylistID = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
+
+            if (determinedPlaylistID == -1)
+            {
+                return new AttemptResult() { Message = "プレイリストが選択されていません" };
+            }
+
+            if (determinedPlaylistID == this.current.SelectedPlaylist.Value!.Id)
+            {
+                if (videoIndex == 0) return new AttemptResult() { Message = "選択している動画は既に先頭にあるため、これ以上前に移動できません。" };
+                try
+                {
+                    this.Videos.InsertIntoPrev(videoIndex);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error("メモリ上のプレイリストにおける動画の並び替えに失敗しました。", e);
+                    return new AttemptResult() { Message = "メモリ上のプレイリストにおける動画の並び替えに失敗しました。", Exception = e };
+                }
+            }
+
+            if (commit)
+            {
+                var result = this.playlistStoreHandler.MoveVideoToPrev(determinedPlaylistID, videoIndex);
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error("プレイリストにおける動画の並び替えに失敗しました。", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error("プレイリストにおける動画の並び替えに失敗しました。");
+                    }
+
+                    return new AttemptResult() { Message = "プレイリストにおける動画の並び替えに失敗しました。", Exception = result.Exception };
+                }
+            }
+
+            return new AttemptResult() { IsSucceeded = true };
+
+        }
+
+        /// <summary>
+        /// 動画を一つ後ろに挿入する
+        /// </summary>
+        /// <param name="videoIndex"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
+        public IAttemptResult MovevideotoForward(int videoIndex, int? playlistID = null, bool commit = true)
+        {
+            var determinedPlaylistID = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
+
+            if (determinedPlaylistID == -1)
+            {
+                return new AttemptResult() { Message = "プレイリストが選択されていません" };
+            }
+
+            if (determinedPlaylistID == this.current.SelectedPlaylist.Value!.Id)
+            {
+                if (videoIndex + 1 == this.Videos.Count) return new AttemptResult() { Message = "選択している動画は既に最後尾にあるため、これ以上後ろに移動できません。" };
+                try
+                {
+                    this.Videos.InsertIntoForward(videoIndex);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error("メモリ上のプレイリストにおける動画の並び替えに失敗しました。", e);
+                    return new AttemptResult() { Message = "メモリ上のプレイリストにおける動画の並び替えに失敗しました。", Exception = e };
+                }
+            }
+
+            if (commit)
+            {
+                var result = this.playlistStoreHandler.MoveVideoToForward(determinedPlaylistID, videoIndex);
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error("プレイリストにおける動画の並び替えに失敗しました。", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error("プレイリストにおける動画の並び替えに失敗しました。");
+                    }
+
+                    return new AttemptResult() { Message = "プレイリストにおける動画の並び替えに失敗しました。", Exception = result.Exception };
+                }
             }
 
             return new AttemptResult() { IsSucceeded = true };

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.ViewModels;
