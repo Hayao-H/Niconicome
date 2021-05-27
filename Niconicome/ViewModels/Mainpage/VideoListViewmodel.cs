@@ -53,7 +53,7 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Subscribe(_ => this.OnSelectedPlaylistChanged());
 
             //プレイリスト内容更新のイベントを購読する
-            WS::Mainpage.VideoListContainer.ListChanged += (_, e) => this.VideoListUpdated(e);
+            WS::Mainpage.VideoListContainer.ListChanged += (_, _) => this.VideoListUpdated();
 
             this.Videos = WS::Mainpage.VideoListContainer.Videos.ToReadOnlyReactiveCollection(v => new VideoInfoViewModel(v)).AddTo(this.disposables);
 
@@ -1136,12 +1136,8 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// プレイリストのタイトルを変更する
         /// </summary>
-        private void VideoListUpdated(ListChangedEventArgs<IListVideoInfo>? e = null)
+        private void VideoListUpdated()
         {
-            if (e is not null)
-            {
-                this.UpdateList(e);
-            }
 
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
             {

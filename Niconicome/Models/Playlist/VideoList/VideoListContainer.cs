@@ -526,6 +526,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 this.Videos.Addrange(sorted);
             }
 
+            this.RaiseListChanged(null, ChangeType.Overall);
             return new AttemptResult() { IsSucceeded = true };
         }
 
