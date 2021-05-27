@@ -176,6 +176,8 @@ namespace Niconicome.Models.Domain.Local.Store
                 return new AttemptResult() { Message = $"挿入操作に失敗しました。", Exception = e };
             }
 
+            playlist.SortType = STypes.VideoSortType.Custom;
+
             this.Update(playlist);
 
             return new AttemptResult() { IsSucceeded = true };
@@ -205,6 +207,8 @@ namespace Niconicome.Models.Domain.Local.Store
             {
                 return new AttemptResult() { Message = $"挿入操作に失敗しました。", Exception = e };
             }
+
+            playlist.SortType = STypes.VideoSortType.Custom;
 
             this.Update(playlist);
 
