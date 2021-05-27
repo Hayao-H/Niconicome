@@ -7,6 +7,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", ElementName = "nicovideo_thumb_response", IsNullable = false)]
     public class GetThumbInfoApiResponse
     {
+        [XmlAttribute("status")]
+        public string Status { get; set; } = "ok";
+
         [XmlElement(ElementName = "thumb")]
         public Thumb Thumb { get; set; } = new();
     }
@@ -28,6 +31,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted
     [XmlRoot(ElementName = "thumb")]
     public class Thumb
     {
+
         [XmlElement(ElementName = "video_id")]
         public string VideoId { get; set; } = string.Empty;
 
@@ -44,7 +48,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted
         public string FirstRetrieve { get; set; } = string.Empty;
 
         [XmlElement(ElementName = "length")]
-        public long Length { get; set; }
+        public string Length { get; set; } = string.Empty;
 
         [XmlElement(ElementName = "view_counter")]
         public long ViewCounter { get; set; }
