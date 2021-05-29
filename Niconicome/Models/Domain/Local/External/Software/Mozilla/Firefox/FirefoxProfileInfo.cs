@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox
 {
@@ -14,12 +15,12 @@ namespace Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox
         string CookiePath { get; }
     }
 
-    public class FirefoxProfileInfo:IFirefoxProfileInfo
+    public class FirefoxProfileInfo : IFirefoxProfileInfo
     {
         public string ProfileName { get; set; } = string.Empty;
 
         public string ProfilePath { get; set; } = string.Empty;
 
-       public string CookiePath { get => Path.Combine(this.ProfilePath, "cookies.sqlite"); }
+        public string CookiePath { get => Path.Combine(this.ProfilePath, FileFolder.FirefoxCookieFileName); }
     }
 }

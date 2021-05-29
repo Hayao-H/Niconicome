@@ -9,5 +9,7 @@ namespace Niconicome.Models.Const
     public static class FileFolder
     {
        public const string DefaultDownloadDir = "downloaded";
+
+        public const string FirefoxCookieFileName= "cookies.sqlite";
     }
 }
