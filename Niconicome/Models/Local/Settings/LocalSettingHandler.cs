@@ -174,6 +174,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.DlWithoutEncode => STypes::SettingNames.DownloadVideoWithoutEncodeEnable,
                 SettingsEnum.IchibaInfoType => STypes::SettingNames.IchibaInfoType,
                 SettingsEnum.DlIchiba => STypes::SettingNames.IsDownloadingIchibaInfoEnable,
+                SettingsEnum.NoRestoreClumnWIdth => STypes::SettingNames.IsRestoringColumnWidthDisabled,
                 _ => null
             };
         }
@@ -238,5 +239,6 @@ namespace Niconicome.Models.Local.Settings
         DlWithoutEncode,
         IchibaInfoType,
         DlIchiba,
+        NoRestoreClumnWIdth,
     }
 }

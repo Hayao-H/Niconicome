@@ -163,5 +163,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string VideoInfoType { get; private set; } = "videoInfotype";
         public static string DownloadVideoWithoutEncodeEnable { get; private set; } = "downloadvideowithoutencodeenable";
         public static string IchibaInfoType { get; private set; } = "chibainfotype";
+        public static string IsRestoringColumnWidthDisabled { get; private set; } = "isrestoringcolumnwidthdisabled";
     }
 }
