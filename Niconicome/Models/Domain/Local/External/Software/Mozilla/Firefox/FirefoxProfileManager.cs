@@ -48,6 +48,7 @@ namespace Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox
         /// <returns></returns>
         public IEnumerable<IFirefoxProfileInfo> GetAllProfiles()
         {
+            if (!this.directoryIO.Exists(this.ProfileFolder)) return Enumerable.Empty<IFirefoxProfileInfo>();
             var profiles = this.directoryIO.GetDirectorys(this.ProfileFolder);
             var infos = profiles.Select(p => new FirefoxProfileInfo()
             {
