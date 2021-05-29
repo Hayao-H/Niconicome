@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
@@ -14,21 +17,47 @@ namespace Niconicome.ViewModels.Setting.Pages
     {
         public GeneralSettingsPageViewModel()
         {
+            #region 自動ログイン
             this.isAutologinEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.AutologinEnable);
 
-            var normal = new AutoLoginTypes(AutoLoginTypeString.Normal, "パスワードログイン");
-            var wv2 = new AutoLoginTypes(AutoLoginTypeString.Webview2, "Webview2とCookieを共有");
-
-            this.SelectableAutoLoginTypes = new List<AutoLoginTypes>() { normal, wv2 };
-            this.isSkippingSSLVerificationEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.SkipSSLVerification);
-
-            var type = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.AutologinMode);
-            this.selectedAutoLoginTypeField = type switch
+            this.SelectableFirefoxProfiles = WS::SettingPage.AutoLogin.GetFirefoxProfiles().Select(p => p.ProfileName).ToList();
+            var profile = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.FFProfileName) ?? string.Empty;
+            this.SelectedFirefoxProfileName = new ReactiveProperty<string?>(this.SelectableFirefoxProfiles.FirstOrDefault(p => p == profile));
+            this.SelectedFirefoxProfileName.Subscribe(value =>
             {
-                AutoLoginTypeString.Normal => normal,
-                AutoLoginTypeString.Webview2 => wv2,
-                _ => normal
+                if (value is not null)
+                {
+                    this.SaveSetting(value, SettingsEnum.FFProfileName);
+                }
+            });
+
+            var normal = new ComboboxItem<string>(AutoLoginTypeString.Normal, "パスワードログイン");
+            var wv2 = new ComboboxItem<string>(AutoLoginTypeString.Webview2, "Webview2とCookieを共有");
+            var firefox = new ComboboxItem<string>(AutoLoginTypeString.Firefox, "FirefoxとCookieを共有");
+
+            this.SelectableAutoLoginTypes = new List<ComboboxItem<string>>() { normal, wv2, firefox };
+
+            //自動ログインのタイプ
+            var type = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.AutologinMode);
+            this.SelectedAutoLoginType = type switch
+            {
+                AutoLoginTypeString.Normal => new ReactiveProperty<ComboboxItem<string>>(normal),
+                AutoLoginTypeString.Webview2 => new ReactiveProperty<ComboboxItem<string>>(wv2),
+                AutoLoginTypeString.Firefox => new ReactiveProperty<ComboboxItem<string>>(firefox),
+                _ => new ReactiveProperty<ComboboxItem<string>>(normal),
             };
+            this.SelectedAutoLoginType.Subscribe(value =>
+            {
+                this.SaveSetting(value.Value, SettingsEnum.AutologinMode);
+            }).AddTo(this.disposables);
+
+            //Firefoxのプロファイル選択肢を表示するかどうか
+            this.DisplayFirefoxPrifile = this.SelectedAutoLoginType
+                .Select(value => value.Value == AutoLoginTypeString.Firefox)
+                .ToReactiveProperty();
+            #endregion
+
+            this.isSkippingSSLVerificationEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.SkipSSLVerification);
 
             var n1 = new ComboboxItem<int>(1, "1");
             var n2 = new ComboboxItem<int>(2, "2");
@@ -68,6 +97,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.isAutoRenamingRemotePlaylistEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.AutoRenameNetPlaylist);
         }
 
+        #region field
         private bool isAutologinEnableField;
 
         private bool isSkippingSSLVerificationEnableField;
@@ -85,25 +115,33 @@ namespace Niconicome.ViewModels.Setting.Pages
         private ComboboxItem<int> maxFetchParallelCountField;
 
         private ComboboxItem<int> fetchSleepIntervalFIeld;
-
-        private AutoLoginTypes selectedAutoLoginTypeField;
+        #endregion
 
         /// <summary>
         /// 選択可能な自動ログインの種別
         /// </summary>
-        public List<AutoLoginTypes> SelectableAutoLoginTypes { get; init; }
+        public List<ComboboxItem<string>> SelectableAutoLoginTypes { get; init; }
 
         /// <summary>
         /// 自動ログインの種別
         /// </summary>
-        public AutoLoginTypes SelectedAutoLoginType
-        {
-            get => this.selectedAutoLoginTypeField; set
-            {
-                this.Savesetting(ref this.empty, value.Value, SettingsEnum.AutologinMode);
-                this.SetProperty(ref this.selectedAutoLoginTypeField, value);
-            }
-        }
+        public ReactiveProperty<ComboboxItem<string>> SelectedAutoLoginType { get; init; }
+
+        /// <summary>
+        /// Firefoxのプロファイル
+        /// </summary>
+        public ReactiveProperty<string?> SelectedFirefoxProfileName { get; init; }
+
+        /// <summary>
+        /// Firefoxのプロファイルを表示するかどうか
+        /// </summary>
+        public ReactiveProperty<bool> DisplayFirefoxPrifile { get; init; }
+
+        /// <summary>
+        /// 選択可能なFirefoxのプロファイル
+        /// </summary>
+        public List<string> SelectableFirefoxProfiles { get; init; }
+
 
         /// <summary>
         /// 同時取得数
@@ -177,6 +215,14 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.SelectablefetchSleepInterval = new List<ComboboxItem<int>> { n1, n2, n3, n4, n5 };
             this.SelectableMaxParallelFetch = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
 
+            var al = new ComboboxItem<string>(AutoLoginTypeString.Normal, "パスワード");
+            this.SelectableAutoLoginTypes = new List<ComboboxItem<string>>() { al };
+            this.SelectedAutoLoginType = new ReactiveProperty<ComboboxItem<string>>(al);
+
+            var ffp = "Hello_World";
+            this.SelectableFirefoxProfiles = new List<string>() { ffp };
+            this.SelectedFirefoxProfileName = new ReactiveProperty<string>(ffp);
+
             this.MaxFetchParallelCount = n3;
             this.FetchSleepInterval = n5;
         }
@@ -193,9 +239,15 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public bool IsAutoRenamingRemotePlaylistEnable { get; set; } = true;
 
-        public List<AutoLoginTypes> SelectableAutoLoginTypes { get; init; } = new();
+        public List<string> SelectableFirefoxProfiles { get; init; }
 
-        public AutoLoginTypes SelectedAutoLoginType { get; init; } = new AutoLoginTypes(AutoLoginTypeString.Normal, "パスワード");
+        public List<ComboboxItem<string>> SelectableAutoLoginTypes { get; init; }
+
+        public ReactiveProperty<ComboboxItem<string>> SelectedAutoLoginType { get; init; }
+
+        public ReactiveProperty<string> SelectedFirefoxProfileName { get; init; }
+
+        public ReactiveProperty<bool> DisplayFirefoxPrifile { get; init; } = new(true);
 
         public List<ComboboxItem<int>> SelectableMaxParallelFetch { get; init; }
 
@@ -204,34 +256,6 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ComboboxItem<int> MaxFetchParallelCount { get; set; }
 
         public ComboboxItem<int> FetchSleepInterval { get; set; }
-
-    }
-
-    class AutoLoginTypes
-    {
-        public AutoLoginTypes(string value, string displayvalue)
-        {
-            this.Value = value;
-            this.DisplayValue = displayvalue;
-
-            var n1 = new ComboboxItem<int>(1, "1");
-            var n2 = new ComboboxItem<int>(2, "2");
-            var n3 = new ComboboxItem<int>(3, "3");
-            var n4 = new ComboboxItem<int>(4, "4");
-            var n5 = new ComboboxItem<int>(5, "5");
-
-            this.SelectablefetchSleepInterval = new List<ComboboxItem<int>> { n1, n2, n3, n4, n5 };
-            this.SelectableMaxParallelFetch = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
-        }
-
-        public string Value { get; init; }
-
-        public string DisplayValue { get; init; }
-
-        public List<ComboboxItem<int>> SelectableMaxParallelFetch { get; init; }
-
-        public List<ComboboxItem<int>> SelectablefetchSleepInterval { get; init; }
-
 
     }
 }
