@@ -40,6 +40,19 @@
                   DisplayMemberPath="DisplayValue"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="RestoreAlert" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="起動時にカラム幅を復元しない"/>
+                <ToggleButton 
+                    IsChecked="{Binding IsRestoreingColumnWidthDisabled.Value}"
+                    HorizontalAlignment="Right"
+                    />
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
 
 
