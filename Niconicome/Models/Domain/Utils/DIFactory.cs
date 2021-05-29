@@ -155,6 +155,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
             services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
             services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
+            services.AddTransient<Auth::IFirefoxSharedLogin, Auth::FirefoxSharedLogin>();
             services.AddTransient<LocalFile::ILocalDirectoryHandler, LocalFile::LocalDirectoryHandler>();
             services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
             services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();

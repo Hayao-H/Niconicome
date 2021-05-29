@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic;
+using Microsoft.Web.WebView2.Core;
+using Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Local.Settings;
 
@@ -11,16 +15,18 @@ namespace Niconicome.Models.Auth
         bool IsAUtologinEnable { get; }
         bool Canlogin();
         Task<bool> LoginAsync();
+        IEnumerable<IFirefoxProfileInfo> GetFirefoxProfiles();
     }
 
     class AutoLogin : IAutoLogin
     {
-        public AutoLogin(ISession session, IAccountManager accountManager, ILocalSettingHandler settingHandler, IWebview2SharedLogin webview2SharedLogin)
+        public AutoLogin(ISession session, IAccountManager accountManager, ILocalSettingHandler settingHandler, IWebview2SharedLogin webview2SharedLogin,IFirefoxSharedLogin firefoxSharedLogin)
         {
             this.session = session;
             this.accountManager = accountManager;
             this.settingHandler = settingHandler;
             this.webview2SharedLogin = webview2SharedLogin;
+            this.firefoxSharedLogin = firefoxSharedLogin;
         }
 
         private readonly ISession session;
@@ -30,6 +36,8 @@ namespace Niconicome.Models.Auth
         private readonly ILocalSettingHandler settingHandler;
 
         private readonly IWebview2SharedLogin webview2SharedLogin;
+
+        private readonly IFirefoxSharedLogin firefoxSharedLogin;
 
         /// <summary>
         /// 自動ログインが可能であるかどうか
@@ -62,6 +70,11 @@ namespace Niconicome.Models.Auth
             {
                 result = await this.webview2SharedLogin.TryLogin();
             }
+            else if (type == AutoLoginType.Firefox)
+            {
+                var ffProfile = this.settingHandler.GetStringSetting(SettingsEnum.FfmpegPath);
+                result = await this.firefoxSharedLogin.TryLogin(ffProfile!);
+            }
 
             return result;
         }
@@ -81,6 +94,7 @@ namespace Niconicome.Models.Auth
         private AutoLoginType GetAutoLoginType()
         {
             var mode = this.settingHandler.GetStringSetting(SettingsEnum.AutologinMode) ?? AutoLoginTypeString.Normal;
+            var ffProfile = this.settingHandler.GetStringSetting(SettingsEnum.FfmpegPath);
 
             if (mode == AutoLoginTypeString.Normal)
             {
@@ -92,16 +106,32 @@ namespace Niconicome.Models.Auth
                 bool canLoginWithWebview2 = this.webview2SharedLogin.CanLogin();
                 if (canLoginWithWebview2) return AutoLoginType.Webview2;
             }
+            else if (mode == AutoLoginTypeString.Firefox && ffProfile is not null)
+            {
+                bool canLoginWithFirefox = this.firefoxSharedLogin.CanLogin(ffProfile);
+                if (canLoginWithFirefox) return AutoLoginType.Firefox;
+            }
 
             return AutoLoginType.None;
         }
+
+        /// <summary>
+        /// Firefoxのプロファイルを取得する
+        /// </summary>
+        /// <returns></returns>
+        public　IEnumerable<IFirefoxProfileInfo> GetFirefoxProfiles()
+        {
+            return this.firefoxSharedLogin.GetFirefoxProfiles();
+        }
+
     }
 
     enum AutoLoginType
     {
         None,
         Normal,
-        Webview2
+        Webview2,
+        Firefox
     }
 
     static class AutoLoginTypeString
@@ -109,5 +139,7 @@ namespace Niconicome.Models.Auth
         public const string Normal = "Normal";
 
         public const string Webview2 = "Webview2";
+
+        public const string Firefox = "Firefox";
     }
 }

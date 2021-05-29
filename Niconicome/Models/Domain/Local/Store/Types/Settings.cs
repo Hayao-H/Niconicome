@@ -164,5 +164,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string DownloadVideoWithoutEncodeEnable { get; private set; } = "downloadvideowithoutencodeenable";
         public static string IchibaInfoType { get; private set; } = "chibainfotype";
         public static string IsRestoringColumnWidthDisabled { get; private set; } = "isrestoringcolumnwidthdisabled";
+        public static string FirefoxProfileName { get; private set; } = "firefoxprofilename";
     }
 }
