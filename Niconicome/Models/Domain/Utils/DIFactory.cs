@@ -41,6 +41,7 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
+using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -154,6 +155,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
             services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
             services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
+            services.AddTransient<Auth::IFirefoxSharedLogin, Auth::FirefoxSharedLogin>();
             services.AddTransient<LocalFile::ILocalDirectoryHandler, LocalFile::LocalDirectoryHandler>();
             services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
             services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();
@@ -173,6 +175,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Ichiba::INiconicoIchibaHandler, Ichiba::NiconicoIchibaHandler>();
             services.AddTransient<Utils::IPathOrganizer, Utils::PathOrganizer>();
             services.AddTransient<DlIchiba::IIchibaInfoDownloader, DlIchiba::IchibaInfoDownloader>();
+            services.AddTransient<FF::IFirefoxProfileManager, FF::FirefoxProfileManager>();
+            services.AddTransient<Cookies::IFirefoxCookieManager, Cookies::FirefoxCookieManager>();
 
             return services.BuildServiceProvider();
         }

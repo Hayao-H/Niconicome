@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Niconicome.Models.Domain.Local.External;
 
 namespace Niconicome.Models.Domain.Local.SQLite
 {
@@ -15,7 +17,7 @@ namespace Niconicome.Models.Domain.Local.SQLite
     public interface ISqliteCookieLoader
     {
         string GetCookiePath(CookieType type);
-        IUserCookieRaw GetCookies(string path);
+        IUserCookieRaw GetCookies(string path, CookieType cookieType = CookieType.Webview2);
     }
 
     public class SqliteCookieLoader : ISqliteCookieLoader
@@ -37,14 +39,32 @@ namespace Niconicome.Models.Domain.Local.SQLite
             };
         }
 
-        public IUserCookieRaw GetCookies(string path)
+        /// <summary>
+        /// 指定したブラウザーの形式に合わせてSQL分を発行しCookieを取得する
+        /// 対応ブラウザー：Firefox 90, Webview2
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="cookieType"></param>
+        /// <returns></returns>
+        public IUserCookieRaw GetCookies(string path, CookieType cookieType = CookieType.Webview2)
         {
             using var loader = this.loader;
 
-            var command =
-                $"Select name,encrypted_value,expires_utc " +
-                $"From cookies " +
-                $"Where host_key = '.nicovideo.jp'";
+            var commandRaw = new List<string>();
+            if (cookieType == CookieType.Firefox)
+            {
+                commandRaw.Add("Select name,value,expiry");
+                commandRaw.Add("From moz_cookies");
+                commandRaw.Add("Where host = '.nicovideo.jp'");
+            }
+            else
+            {
+                commandRaw.Add("Select name,encrypted_value,expires_utc");
+                commandRaw.Add("From cookies");
+                commandRaw.Add("Where host_key = '.nicovideo.jp'");
+            }
+
+            var command = string.Join(' ', commandRaw);
 
             var reader = loader.GetDataReader(path, command);
 
@@ -101,6 +121,7 @@ namespace Niconicome.Models.Domain.Local.SQLite
 
     public enum CookieType
     {
-        Webview2
+        Webview2,
+        Firefox
     }
 }

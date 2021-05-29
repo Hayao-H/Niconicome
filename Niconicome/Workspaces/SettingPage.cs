@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local;
 using Niconicome.Models.Local.External.Import;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
-using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 using MaterialDesign = MaterialDesignThemes.Wpf;
@@ -23,5 +23,6 @@ namespace Niconicome.Workspaces
         public static IMessageHandler MessageHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IMessageHandler>();
         public static IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoListContainer>();
         public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
+        public static IAutoLogin AutoLogin { get; private set; } = DIFactory.Provider.GetRequiredService<IAutoLogin>();
     }
 }

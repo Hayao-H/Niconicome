@@ -175,6 +175,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.IchibaInfoType => STypes::SettingNames.IchibaInfoType,
                 SettingsEnum.DlIchiba => STypes::SettingNames.IsDownloadingIchibaInfoEnable,
                 SettingsEnum.NoRestoreClumnWIdth => STypes::SettingNames.IsRestoringColumnWidthDisabled,
+                SettingsEnum.FFProfileName => STypes::SettingNames.FirefoxProfileName,
                 _ => null
             };
         }
@@ -240,5 +241,6 @@ namespace Niconicome.Models.Local.Settings
         IchibaInfoType,
         DlIchiba,
         NoRestoreClumnWIdth,
+        FFProfileName,
     }
 }
