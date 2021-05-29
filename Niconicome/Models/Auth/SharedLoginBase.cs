@@ -9,7 +9,7 @@ namespace Niconicome.Models.Auth
 {
     public class SharedLoginBase
     {
-        public SharedLoginBase(INicoHttp http, ICookieManager cookieManager,INiconicoContext context)
+        public SharedLoginBase(INicoHttp http, ICookieManager cookieManager, INiconicoContext context)
         {
             this.cookieManager = cookieManager;
             this.http = http;
