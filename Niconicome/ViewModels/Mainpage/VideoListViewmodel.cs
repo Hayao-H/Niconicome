@@ -756,29 +756,33 @@ namespace Niconicome.ViewModels.Mainpage
             #endregion
 
             #region Width系プロパティー
-            this.SelectColumnWidth = new ReactiveProperty<int>(scWidth <= 0 ? 150 : scWidth);
-            this.IDColumnWidth = new ReactiveProperty<int>(idWidth <= 0 ? 150 : idWidth);
-            this.TitleColumnWidth = new ReactiveProperty<int>(titleWIdth <= 0 ? 150 : titleWIdth);
-            this.UploadColumnWidth = new ReactiveProperty<int>(uploadWidth <= 0 ? 150 : uploadWidth);
-            this.ViewCountColumnWidth = new ReactiveProperty<int>(vctWidth <= 0 ? 150 : vctWidth);
-            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(dlfWidth <= 0 ? 150 : dlfWidth);
-            this.StateColumnWidth = new ReactiveProperty<int>(stWidth <= 0 ? 150 : stWidth);
-            this.ThumbColumnWidth = new ReactiveProperty<int>(tnWidth <= 0 ? 150 : tnWidth);
+
+            var isRestoreEnable = !WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth);
+            const int defaultWidth = 150;
+
+            this.SelectColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? scWidth <= 0 ? defaultWidth : scWidth : defaultWidth);
+            this.IDColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? idWidth <= 0 ? defaultWidth : idWidth : defaultWidth);
+            this.TitleColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? titleWIdth <= 0 ? defaultWidth : titleWIdth : defaultWidth);
+            this.UploadColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? uploadWidth <= 0 ? defaultWidth : uploadWidth : defaultWidth);
+            this.ViewCountColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? vctWidth <= 0 ? defaultWidth : vctWidth : defaultWidth);
+            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? dlfWidth <= 0 ? defaultWidth : dlfWidth : defaultWidth);
+            this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
+            this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
 
             this.SelectColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
+                .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWSelectColumnWid))
                 .AddTo(this.disposables);
             this.IDColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
+                .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWIDColumnWid))
                 .AddTo(this.disposables);
             this.TitleColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
+                .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWTitleColumnWid))
                 .AddTo(this.disposables);
             this.UploadColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
+                .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWUploadColumnWid))
                 .AddTo(this.disposables);
             this.ViewCountColumnWidth
@@ -786,15 +790,15 @@ namespace Niconicome.ViewModels.Mainpage
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWViewCountColumnWid))
                 .AddTo(this.disposables);
             this.DownloadedFlagColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
+                .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWDownloadedFlagColumnWid))
                 .AddTo(this.disposables);
             this.StateColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
+                .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWStateColumnWid))
                 .AddTo(this.disposables);
             this.ThumbColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
+                .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
                 .AddTo(this.disposables);
             #endregion
