@@ -41,6 +41,7 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
+using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -173,6 +174,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Ichiba::INiconicoIchibaHandler, Ichiba::NiconicoIchibaHandler>();
             services.AddTransient<Utils::IPathOrganizer, Utils::PathOrganizer>();
             services.AddTransient<DlIchiba::IIchibaInfoDownloader, DlIchiba::IchibaInfoDownloader>();
+            services.AddTransient<FF::IFirefoxProfileManager, FF::FirefoxProfileManager>();
 
             return services.BuildServiceProvider();
         }
