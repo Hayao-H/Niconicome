@@ -68,8 +68,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private readonly List<ICommentCollection> childCollections = new();
 
-        private readonly LinkedList<long> CommentNumbers = new();
-
         public const int NumberToThrough = 40;
 
         private readonly int comThroughSetting;
