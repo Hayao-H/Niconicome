@@ -72,7 +72,7 @@ namespace Niconicome.Models.Auth
             }
             else if (type == AutoLoginType.Firefox)
             {
-                var ffProfile = this.settingHandler.GetStringSetting(SettingsEnum.FfmpegPath);
+                var ffProfile = this.settingHandler.GetStringSetting(SettingsEnum.FFProfileName);
                 result = await this.firefoxSharedLogin.TryLogin(ffProfile!);
             }
 
@@ -94,7 +94,7 @@ namespace Niconicome.Models.Auth
         private AutoLoginType GetAutoLoginType()
         {
             var mode = this.settingHandler.GetStringSetting(SettingsEnum.AutologinMode) ?? AutoLoginTypeString.Normal;
-            var ffProfile = this.settingHandler.GetStringSetting(SettingsEnum.FfmpegPath);
+            var ffProfile = this.settingHandler.GetStringSetting(SettingsEnum.FFProfileName);
 
             if (mode == AutoLoginTypeString.Normal)
             {
