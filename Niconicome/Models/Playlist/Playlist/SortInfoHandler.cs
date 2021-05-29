@@ -74,6 +74,7 @@ namespace Niconicome.Models.Playlist.Playlist
                 if (playlist is null) return;
 
                 playlist.VideoSortType = value;
+                this.playlistHandler.Update(playlist);
                 this.container.Sort(value, this.IsDescending.Value, this.current.SelectedPlaylist.Value?.CustomSortSequence);
             }).AddTo(this.disposables);
 

@@ -51,6 +51,8 @@ namespace Niconicome.Models.Domain.Local
         public DataBase()
         {
 
+            this.Configure();
+
             try
             {
                 this.Open();
@@ -104,8 +106,6 @@ namespace Niconicome.Models.Domain.Local
         /// </summary>
         private void SetUp()
         {
-            BsonMapper.Global.Entity<STypes::Playlist>()
-                .DbRef(playlist => playlist.Videos, STypes::Video.TableName);
 
             if (!this.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot))
             {
@@ -116,6 +116,17 @@ namespace Niconicome.Models.Domain.Local
                 };
                 this.Store(root, STypes::Playlist.TableName);
             }
+        }
+
+        /// <summary>
+        /// マッパーの設定
+        /// </summary>
+        private void Configure()
+        {
+
+            BsonMapper.Global.Entity<STypes::Playlist>()
+                .DbRef(playlist => playlist.Videos, STypes::Video.TableName);
+            BsonMapper.Global.TrimWhitespace = false;
         }
 
         /// <summary>
