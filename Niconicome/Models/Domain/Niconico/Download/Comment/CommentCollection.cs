@@ -226,21 +226,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else if (comment.Chat is not null)
                 {
-                    if (!this.unsafeHandle)
-                    {
-                        if (this.CommentNumbers.Contains(comment.Chat.No)) return;
-                        this.CommentNumbers.AddLast(comment.Chat.No);
-
-                        if (this.CommentNumbers.Count > 5000)
-                        {
-                            foreach (var _ in Enumerable.Range(0, 2000))
-                            {
-                                this.CommentNumbers.RemoveFirst();
-                            }
-                        }
-                    }
                     this.commentsfield.AddFirst(comment);
                     this.isSorted = false;
+                    if (!this.unsafeHandle)
+                    {
+                        this.Distinct();
+                    }
                 }
                 else
                 {
