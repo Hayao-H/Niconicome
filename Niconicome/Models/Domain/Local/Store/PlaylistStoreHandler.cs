@@ -18,9 +18,9 @@ namespace Niconicome.Models.Domain.Local.Store
         public int AddVideo(IListVideoInfo video, int playlistId);
         public void RemoveVideo(int id, int playlistId);
         public void Update(ITreePlaylistInfo newplaylist);
-        IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self);
-        IEnumerable<STypes::Playlist> GetChildPlaylists(int id);
-        IEnumerable<STypes::Playlist> GetAllPlaylists();
+        List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self);
+        List<STypes::Playlist> GetChildPlaylists(int id);
+        List<STypes::Playlist> GetAllPlaylists();
         IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex);
         IAttemptResult MoveVideoToForward(int playlistID, int videoIndex);
         void RemoveChildPlaylist(int selfId);
@@ -126,7 +126,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="self"></param>
         /// <returns></returns>
-        public IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
+        public List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
         {
             return this.GetChildPlaylists(self.Id);
         }
@@ -136,7 +136,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IEnumerable<STypes::Playlist> GetChildPlaylists(int id)
+        public List<STypes::Playlist> GetChildPlaylists(int id)
         {
             return this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName).FindAll(p => p.ParentPlaylist?.Id == id);
 
@@ -146,7 +146,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// 全てのプレイリストを取得する
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<STypes::Playlist> GetAllPlaylists()
+        public List<STypes::Playlist> GetAllPlaylists()
         {
             return this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName);
         }

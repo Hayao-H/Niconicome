@@ -74,7 +74,7 @@ namespace NiconicomeTest.Local.Playlist
             //全て追加
             var playlists = new List<STypes::Playlist>() { first, second, third, fourth, fifth, sixth, seventh };
             this.handler = new PlaylistTreeHandler();
-            this.handler.Initialize(playlists.Select(p => NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, playlists.Where(pl => pl?.ParentPlaylist?.Id == p.Id))));
+            this.handler.Initialize(playlists.Select(p => NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, playlists.Where(pl => pl?.ParentPlaylist?.Id == p.Id))).ToList());
         }
 
         [TestCase(1)]
