@@ -35,7 +35,7 @@
                     </materialDesign:PackIcon>
                     <Label Content="ファイル名のフォーマット(_F)" Target="{Binding ElementName=fileformat}"/>
                 </StackPanel>
-                <TextBox Margin="10 0 0 0" Text="{Binding FileFormat,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="fileformat"/>
+                <TextBox Margin="10 0 0 0" Text="{Binding FileFormat.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="fileformat"/>
                 <StackPanel Margin="15 5 0 0" Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="InfoCircle" Foreground="SkyBlue">
                         <materialDesign:PackIcon.RenderTransform>
@@ -64,8 +64,36 @@
                     </materialDesign:PackIcon>
                     <Label Content="保存フォルダーが指定されていなかった場合に使用するフォルダー(_D)" Target="{Binding ElementName=fileformat}"/>
                 </StackPanel>
-                <TextBox Margin="10 0 0 0" Text="{Binding DefaultFolder,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="defaultfolder"/>
+                <TextBox Margin="10 0 0 0" Text="{Binding DefaultFolder.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="defaultfolder"/>
             </StackPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="FileDocument" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="htmlファイルの拡張子（ピリオド付き）" ToolTip="市場情報ファイルなど"/>
+                <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding HtmlFileExt.Value,Mode=TwoWay}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="FileImage" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="jpegファイルの拡張子（ピリオド付き）" ToolTip="サムネイルファイルなど"/>
+                <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding JpegFileExt.Value,Mode=TwoWay}"/>
+            </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>
                 <materialDesign:PackIcon Kind="FindReplace" Foreground="SkyBlue">
@@ -74,7 +102,7 @@
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
                 <Label Content="禁則文字をマルチバイト文字に置き換える" />
-                <ToggleButton IsChecked="{Binding IsReplaceSBToSBEnable,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"/>
+                <ToggleButton IsChecked="{Binding IsReplaceSBToSBEnable.Value,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
