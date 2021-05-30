@@ -1059,8 +1059,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="orderBy"></param>
         public void SetOrder(VideoSortType sortType, bool isDesscending)
         {
-            var videos = new List<IListVideoInfo>(WS::Mainpage.VideoListContainer.Videos);
-
             if (WS::Mainpage.SortInfoHandler.SortType.Value == sortType)
             {
                 WS::Mainpage.SortInfoHandler.IsDescending.Value = isDesscending;
@@ -1084,41 +1082,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         private CancellationTokenSource? cts;
 
-        private ReactiveProperty<bool> isFetching;
+        private readonly ReactiveProperty<bool> isFetching;
 
         private bool isFiltered;
 
-        private IEventAggregator ea;
-
-        /// <summary>
-        /// 動画リストを更新する
-        /// </summary>
-        /// <param name="e"></param>
-        private void UpdateList(ListChangedEventArgs<IListVideoInfo> e)
-        {
-            if ((e.ChangeType is ChangeType.Add or ChangeType.Remove) && e.Data is null)
-            {
-                WS::Mainpage.Messagehandler.AppendMessage("動画リストの更新に失敗しました。(VIDEO_DATA_IS_NULL)");
-                return;
-            }
-
-            //if (e.ChangeType == ChangeType.Add)
-            //{
-            //    this.Videos.Add(e.Data!);
-            //}
-            //else if (e.ChangeType == ChangeType.Remove)
-            //{
-            //    this.Videos.Remove(e.Data!);
-            //}
-            //else if (e.ChangeType == ChangeType.Clear)
-            //{
-            //    this.Videos.Clear();
-            //}
-            //else if (e.ChangeType == ChangeType.Overall)
-            //{
-            //    //this.Videos.Addrange(WS::Mainpage.VideoListContainer.GetVideos());
-            //}
-        }
+        private readonly IEventAggregator ea;
 
         /// <summary>
         /// 選択したプレイリストが変更された場合
@@ -1360,7 +1328,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (headerString.IsNullOrEmpty()) return;
 
             var sortType = this.GetSortType(headerString);
-            var isDecending = sortType == WS::Mainpage.SortInfoHandler.SortType.Value ? !WS::Mainpage.SortInfoHandler.IsDescending.Value : false;
+            bool isDecending = sortType == WS::Mainpage.SortInfoHandler.SortType.Value && !WS::Mainpage.SortInfoHandler.IsDescending.Value;
 
             header.Tag = "Selected";
 
