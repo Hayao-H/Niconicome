@@ -11,5 +11,9 @@ namespace Niconicome.Models.Const
        public const string DefaultDownloadDir = "downloaded";
 
         public const string FirefoxCookieFileName= "cookies.sqlite";
+
+        public const string Mp4FileExt = ".mp4";
+
+        public const string TsFileExt = ".ts";
     }
 }

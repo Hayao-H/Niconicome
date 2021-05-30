@@ -581,14 +581,15 @@ namespace Niconicome.ViewModels.Mainpage
                 }
             });
 
-            this.OpenPlaylistFolder = new CommandBase<object>(_ => true, _ =>
+            this.OpenPlaylistFolder = new ReactiveCommand<VideoInfoViewModel>()
+                .WithSubscribe(video =>
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                string folderPath = WS::Mainpage.CurrentPlaylist.PlaylistFolderPath;
+                string folderPath = video.VideoInfo.FolderPath.Value;
                 if (folderPath.IsNullOrEmpty() || !Directory.Exists(folderPath)) return;
                 try
                 {
@@ -893,7 +894,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 保存フォルダーを開く
         /// </summary>
-        public CommandBase<object> OpenPlaylistFolder { get; init; }
+        public ReactiveCommand<VideoInfoViewModel> OpenPlaylistFolder { get; init; }
 
         /// <summary>
         /// プレイヤーAで開く
@@ -1176,7 +1177,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<object> DisSelectAllDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<object> OpenPlaylistFolder { get; init; } = new(_ => true, _ => { });
+        public ReactiveCommand<VideoInfoViewModel> OpenPlaylistFolder { get; init; } = new();
 
         public CommandBase<object> OpenInPlayerAcommand { get; init; } = new(_ => true, _ => { });
 
