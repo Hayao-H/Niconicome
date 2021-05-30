@@ -180,9 +180,9 @@ namespace Niconicome.Models.Playlist.Playlist
             //nullチェック
             if (parent == null) return false;
 
-            if (parent.ChildrensIds.Count == 0) return false;
+            if (parent.Children.Count == 0) return false;
 
-            return parent.ChildrensIds.Last() == id;
+            return parent.Children.Last().Id == id;
         }
 
         /// <summary>

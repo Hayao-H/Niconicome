@@ -169,7 +169,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (playlistInfo.IsRoot) return;
 
             //末端プレイリストでない場合はキャンセル
-            if (playlistInfo.ChildrensIds.Count > 0) return;
+            if (playlistInfo.Children.Count > 0) return;
 
             WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = playlistInfo;
         }

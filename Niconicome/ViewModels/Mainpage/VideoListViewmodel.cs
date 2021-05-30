@@ -1127,7 +1127,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="e"></param>
         private void OnSelectedPlaylistChanged()
         {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.ChildrensIds.Count == 0)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Children.Count == 0)
             {
                 WS::Mainpage.Messagehandler.ClearMessage();
                 string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;

@@ -46,18 +46,18 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Store
         public void Update(ITreePlaylistInfo newplaylist)
         {
         }
-        public IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
+        public List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
         {
             return new List<STypes::Playlist>() { this.GetRootPlaylist() };
         }
 
-        public IEnumerable<STypes::Playlist> GetChildPlaylists(int id)
+        public List<STypes::Playlist> GetChildPlaylists(int id)
         {
             return new List<STypes::Playlist>() { this.GetRootPlaylist() };
 
         }
 
-        public IEnumerable<STypes::Playlist> GetAllPlaylists()
+        public List<STypes::Playlist> GetAllPlaylists()
         {
             return new List<STypes::Playlist>() { this.GetRootPlaylist() };
         }

@@ -17,7 +17,6 @@ namespace Niconicome.Models.Playlist.Playlist
         string Name { get; set; }
         string RemoteId { get; set; }
         string Folderpath { get; set; }
-        List<int> ChildrensIds { get; }
         ObservableCollection<ITreePlaylistInfo> Children { get; }
         List<IListVideoInfo> Videos { get; }
         List<int> CustomSortSequence { get; }
@@ -64,12 +63,6 @@ namespace Niconicome.Models.Playlist.Playlist
         /// </summary>
         public string Folderpath { get; set; } = string.Empty;
 
-
-        /// <summary>
-        /// 子プレイリストのID一覧
-        /// </summary>
-        public List<int> ChildrensIds { get; set; } = new();
-
         /// <summary>
         /// 子プレイリスト一覧
         /// 通常は空のリスト
@@ -81,6 +74,9 @@ namespace Niconicome.Models.Playlist.Playlist
         /// </summary>
         public List<IListVideoInfo> Videos { get; init; } = new();
 
+        /// <summary>
+        /// 動画の並び替え順
+        /// </summary>
         public List<int> CustomSortSequence { get; init; } = new();
 
         /// <summary>
@@ -154,7 +150,7 @@ namespace Niconicome.Models.Playlist.Playlist
         {
             get
             {
-                return this.ChildrensIds.Count > 0;
+                return this.Children.Count > 0;
             }
         }
 
@@ -191,22 +187,6 @@ namespace Niconicome.Models.Playlist.Playlist
                 ++layer;
             }
             return layer;
-        }
-
-        /// <summary>
-        /// DBの型をNonBindableTreePlaylistInfo型のインスタンスに変換する
-        /// </summary>
-        /// <param name="playlist"></param>
-        /// <returns></returns>
-        public static ITreePlaylistInfo ConvertToTreePlaylistInfo(STypes::Playlist playlist, IEnumerable<STypes::Playlist> childPlaylists)
-        {
-
-            var converted = new NonBindableTreePlaylistInfo()
-            {
-                ChildrensIds = childPlaylists.Select(p => p.Id).ToList(),
-            };
-            SetData(playlist, converted);
-            return converted;
         }
 
         /// <summary>
@@ -274,22 +254,6 @@ namespace Niconicome.Models.Playlist.Playlist
         public override Visibility AfterSeparatorVisibility { get => this.afterSeparatorVisibilityField; set => this.SetProperty(ref this.afterSeparatorVisibilityField, value); }
 
         public override Visibility BeforeSeparatorVisibility { get => this.beforeSeparatorVisibilityField; set => this.SetProperty(ref this.beforeSeparatorVisibilityField, value); }
-
-        /// <summary>
-        /// DBの型をBindableTreePlaylistInfo型のインスタンスに変換する
-        /// </summary>
-        /// <param name="playlist"></param>
-        /// <returns></returns>
-        public static new ITreePlaylistInfo ConvertToTreePlaylistInfo(STypes::Playlist playlist, IEnumerable<STypes::Playlist> childPlaylists)
-        {
-
-            var converted = new BindableTreePlaylistInfo()
-            {
-                ChildrensIds = childPlaylists.Select(p => p.Id).ToList(),
-            };
-            SetData(playlist, converted);
-            return converted;
-        }
 
         /// <summary>
         /// DBの型をBindablePlaylistInfo型のインスタンスに変換する
