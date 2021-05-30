@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -85,8 +86,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             var format = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
             var replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
-            var defaultDir = this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir;
-            var folderPath = playlist.FolderPath ?? defaultDir;
+            var folderPath = this.current.PlaylistFolderPath;
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
 
@@ -117,11 +117,17 @@ namespace Niconicome.Models.Playlist.VideoList
                     video.FileName.Value = string.Empty;
                 }
 
-                if (video.FileName.Value.IsNullOrEmpty())
+
+                var filename = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted);
+                if (filename.EndsWith(FileFolder.Mp4FileExt) || filename.EndsWith(FileFolder.TsFileExt))
                 {
-                    video.FileName.Value = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted);
+                    video.FileName.Value = filename;
+                    video.IsDownloaded.Value = !video.FileName.Value.IsNullOrEmpty();
                 }
-                video.IsDownloaded.Value = !video.FileName.Value.IsNullOrEmpty();
+                else
+                {
+                    video.FolderPath.Value = filename;
+                }
 
                 //サムネイル
                 bool hasCache = this.videoThumnailUtility.HasThumbnailCache(video);

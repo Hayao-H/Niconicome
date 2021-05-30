@@ -536,7 +536,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in this.Videos.Where(v => !v.VideoInfo.IsDownloaded.Value))
                 {
                     video.IsSelected.Value = true;
                 }
@@ -549,7 +549,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in this.Videos.Where(v => v.VideoInfo.IsDownloaded.Value))
                 {
                     video.IsSelected.Value = false;
                 }
@@ -562,7 +562,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in this.Videos.Where(v => !v.VideoInfo.IsDownloaded.Value))
                 {
                     video.IsSelected.Value = false;
                 }
@@ -575,20 +575,21 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in this.Videos.Where(v => v.VideoInfo.IsDownloaded.Value))
                 {
                     video.IsSelected.Value = true;
                 }
             });
 
-            this.OpenPlaylistFolder = new CommandBase<object>(_ => true, _ =>
+            this.OpenPlaylistFolder = new ReactiveCommand<VideoInfoViewModel>()
+                .WithSubscribe(video =>
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                string folderPath = this.GetFolderPath();
+                string folderPath = video.VideoInfo.FolderPath.Value;
                 if (folderPath.IsNullOrEmpty() || !Directory.Exists(folderPath)) return;
                 try
                 {
@@ -704,7 +705,7 @@ namespace Niconicome.ViewModels.Mainpage
                     "aimp" => Playlist::PlaylistType.Aimp,
                     _ => Playlist::PlaylistType.Aimp,
                 };
-                var folderPath = this.GetFolderPath();
+                var folderPath = WS::Mainpage.CurrentPlaylist.PlaylistFolderPath;
                 var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
                 if (!videos.Any()) return;
 
@@ -893,7 +894,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 保存フォルダーを開く
         /// </summary>
-        public CommandBase<object> OpenPlaylistFolder { get; init; }
+        public ReactiveCommand<VideoInfoViewModel> OpenPlaylistFolder { get; init; }
 
         /// <summary>
         /// プレイヤーAで開く
@@ -1059,8 +1060,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="orderBy"></param>
         public void SetOrder(VideoSortType sortType, bool isDesscending)
         {
-            var videos = new List<IListVideoInfo>(WS::Mainpage.VideoListContainer.Videos);
-
             if (WS::Mainpage.SortInfoHandler.SortType.Value == sortType)
             {
                 WS::Mainpage.SortInfoHandler.IsDescending.Value = isDesscending;
@@ -1084,41 +1083,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         private CancellationTokenSource? cts;
 
-        private ReactiveProperty<bool> isFetching;
+        private readonly ReactiveProperty<bool> isFetching;
 
         private bool isFiltered;
 
-        private IEventAggregator ea;
-
-        /// <summary>
-        /// 動画リストを更新する
-        /// </summary>
-        /// <param name="e"></param>
-        private void UpdateList(ListChangedEventArgs<IListVideoInfo> e)
-        {
-            if ((e.ChangeType is ChangeType.Add or ChangeType.Remove) && e.Data is null)
-            {
-                WS::Mainpage.Messagehandler.AppendMessage("動画リストの更新に失敗しました。(VIDEO_DATA_IS_NULL)");
-                return;
-            }
-
-            //if (e.ChangeType == ChangeType.Add)
-            //{
-            //    this.Videos.Add(e.Data!);
-            //}
-            //else if (e.ChangeType == ChangeType.Remove)
-            //{
-            //    this.Videos.Remove(e.Data!);
-            //}
-            //else if (e.ChangeType == ChangeType.Clear)
-            //{
-            //    this.Videos.Clear();
-            //}
-            //else if (e.ChangeType == ChangeType.Overall)
-            //{
-            //    //this.Videos.Addrange(WS::Mainpage.VideoListContainer.GetVideos());
-            //}
-        }
+        private readonly IEventAggregator ea;
 
         /// <summary>
         /// 選択したプレイリストが変更された場合
@@ -1127,7 +1096,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="e"></param>
         private void OnSelectedPlaylistChanged()
         {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.ChildrensIds.Count == 0)
+            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Children.Count == 0)
             {
                 WS::Mainpage.Messagehandler.ClearMessage();
                 string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
@@ -1151,16 +1120,6 @@ namespace Niconicome.ViewModels.Mainpage
             }
         }
 
-        /// <summary>
-        /// フォルダーパスを取得する
-        /// </summary>
-        /// <returns></returns>
-        private string GetFolderPath()
-        {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null) return string.Empty;
-
-            return WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir : WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Folderpath;
-        }
         #endregion
 
     }
@@ -1218,7 +1177,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<object> DisSelectAllDownloadedVideosCommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<object> OpenPlaylistFolder { get; init; } = new(_ => true, _ => { });
+        public ReactiveCommand<VideoInfoViewModel> OpenPlaylistFolder { get; init; } = new();
 
         public CommandBase<object> OpenInPlayerAcommand { get; init; } = new(_ => true, _ => { });
 
@@ -1370,7 +1329,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (headerString.IsNullOrEmpty()) return;
 
             var sortType = this.GetSortType(headerString);
-            var isDecending = sortType == WS::Mainpage.SortInfoHandler.SortType.Value ? !WS::Mainpage.SortInfoHandler.IsDescending.Value : false;
+            bool isDecending = sortType == WS::Mainpage.SortInfoHandler.SortType.Value && !WS::Mainpage.SortInfoHandler.IsDescending.Value;
 
             header.Tag = "Selected";
 

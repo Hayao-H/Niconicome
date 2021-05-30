@@ -183,7 +183,10 @@
                                             <materialDesign:PackIcon Kind="Web"/>
                                         </MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="保存フォルダーを開く" Command="{Binding OpenPlaylistFolder}">
+                                    <MenuItem Header="保存フォルダーを開く" 
+                                              Command="{Binding OpenPlaylistFolder}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                              >
                                         <MenuItem.Icon>
                                             <materialDesign:PackIcon Kind="Folder"/>
                                         </MenuItem.Icon>

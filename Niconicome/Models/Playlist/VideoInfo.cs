@@ -34,6 +34,7 @@ namespace Niconicome.Models.Playlist
         ReactiveProperty<string> Message { get; }
         ReactiveProperty<string> ThumbPath { get; }
         ReactiveProperty<string> FileName { get; }
+        ReactiveProperty<string> FolderPath { get; }
         ReactiveProperty<string> ChannelID { get; }
         ReactiveProperty<string> ChannelName { get; }
         ReactiveProperty<DateTime> UploadedOn { get; }
@@ -78,6 +79,8 @@ namespace Niconicome.Models.Playlist
         public ReactiveProperty<string> Message { get; init; }
         public ReactiveProperty<string> ThumbPath { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> FileName { get; init; } = new ReactiveProperty<string>();
+        public ReactiveProperty<string> FolderPath { get; init; } = new ReactiveProperty<string>();
+
         public ReactiveProperty<string> ChannelID { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> ChannelName { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> IsDeleted { get; init; } = new ReactiveProperty<bool>();

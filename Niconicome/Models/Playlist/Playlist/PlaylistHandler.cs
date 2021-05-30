@@ -12,6 +12,7 @@ using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Settings;
 using State = Niconicome.Models.Local.State;
 using Utils = Niconicome.Models.Domain.Utils;
+using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Playlist.Playlist
 {
@@ -43,7 +44,7 @@ namespace Niconicome.Models.Playlist.Playlist
     /// </summary>
     public class PlaylistHandler : IPlaylistHandler
     {
-        public PlaylistHandler(IPlaylistTreeHandler handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger, ILocalSettingHandler settingHandler,ILogger logger)
+        public PlaylistHandler(IPlaylistTreeHandler handler, IPlaylistStoreHandler playlistStoreHandler, State::IErrorMessanger errorMessanger, ILocalSettingHandler settingHandler, ILogger logger)
         {
             //BindingOperations.EnableCollectionSynchronization(this.Playlists, new object());
             this.treeHandler = handler;
@@ -90,7 +91,7 @@ namespace Niconicome.Models.Playlist.Playlist
             //ありえないけどエラー処理
             if (playlist is null) return -1;
 
-            this.treeHandler.Merge(playlist);
+            this.treeHandler.MergeRange(new List<ITreePlaylistInfo>(){ playlist });
             return id;
         }
 
@@ -208,7 +209,8 @@ namespace Niconicome.Models.Playlist.Playlist
                 if (result.Exception is not null)
                 {
                     this.logger.Error(result.Message!, result.Exception);
-                } else
+                }
+                else
                 {
                     this.logger.Error($"動画の並び替え操作に失敗しました。({nameof(this.MoveVideoToPrev)})");
                 }
@@ -325,7 +327,7 @@ namespace Niconicome.Models.Playlist.Playlist
             if (this.playlistStoreHandler.Exists(newpaylist.Id))
             {
                 this.playlistStoreHandler.Update(newpaylist);
-                this.treeHandler.Merge(newpaylist);
+                this.treeHandler.MergeRange(new List<ITreePlaylistInfo>{ newpaylist });
             }
         }
 
@@ -353,9 +355,16 @@ namespace Niconicome.Models.Playlist.Playlist
         private void SetPlaylists(bool expandAll = false, bool inheritExpandedState = false)
         {
 
+            //プレイリスト
+            var list = new List<ITreePlaylistInfo>();
+
             //プレイリストを取得する
-            var playlists = this.playlistStoreHandler.GetAllPlaylists().Select(p =>
+            var dbplaylists = this.playlistStoreHandler.GetAllPlaylists();
+
+            for (var i = 0; i < dbplaylists.Count; ++i)
             {
+                STypes::Playlist p = dbplaylists[i];
+
                 var ex = false;
                 if (expandAll)
                 {
@@ -365,13 +374,13 @@ namespace Niconicome.Models.Playlist.Playlist
                 {
                     ex = p.IsExpanded;
                 }
-                var childPlaylists = this.playlistStoreHandler.GetChildPlaylists(p.Id);
-                var playlist = BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, childPlaylists);
+                //var childPlaylists = this.playlistStoreHandler.GetChildPlaylists(p.Id);
+                var playlist = BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p);
                 playlist.IsExpanded = ex;
-                return playlist;
-            });
+                list.Add(playlist);
+            }
 
-            this.treeHandler.Initialize(playlists);
+            this.treeHandler.Initialize(list);
         }
 
     }

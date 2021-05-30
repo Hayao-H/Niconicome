@@ -23,8 +23,7 @@ namespace NiconicomeTest.Local.Playlist
                 IsRoot = true,
                 PlaylistName = "テスト"
             };
-            var childPlaylists = new List<STypes.Playlist>() { new STypes.Playlist() { Id = 1 }, new STypes.Playlist() { Id = 2 }, new STypes.Playlist() { Id = 3 } };
-            var playlistInfo = NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(storeData, childPlaylists);
+            var playlistInfo = NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(storeData);
 
             //プレイリスト名
             Assert.AreEqual("テスト", storeData.PlaylistName);
@@ -34,10 +33,6 @@ namespace NiconicomeTest.Local.Playlist
             Assert.AreEqual(playlistInfo.ParentId, 1);
             //ルートフラグ
             Assert.IsTrue(playlistInfo.IsRoot);
-            //子プレイリスト
-            Assert.AreEqual(1, playlistInfo.ChildrensIds[0]);
-            Assert.AreEqual(2, playlistInfo.ChildrensIds[1]);
-            Assert.AreEqual(3, playlistInfo.ChildrensIds[2]);
         }
     }
 
@@ -74,7 +69,7 @@ namespace NiconicomeTest.Local.Playlist
             //全て追加
             var playlists = new List<STypes::Playlist>() { first, second, third, fourth, fifth, sixth, seventh };
             this.handler = new PlaylistTreeHandler();
-            this.handler.Initialize(playlists.Select(p => NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p, playlists.Where(pl => pl?.ParentPlaylist?.Id == p.Id))));
+            this.handler.Initialize(playlists.Select(p => NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p)).ToList());
         }
 
         [TestCase(1)]

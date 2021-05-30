@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist;
@@ -36,22 +37,23 @@ namespace Niconicome.Models.Local
             {
                 folderPath = Path.Combine(AppContext.BaseDirectory, folderPath);
             }
-            var fn = this.niconicoUtils.GetFileName(format, video, ".mp4", replaceStricted);
+            var fn = this.niconicoUtils.GetFileName(format, video, FileFolder.Mp4FileExt, replaceStricted);
             var path = IOUtils.GetPrefixedPath(Path.Combine(folderPath, fn));
 
             //.mp4ファイルを確認
             if (File.Exists(path))
             {
                 return path;
-            } else
+            }
+            else
             //.tsファイルを確認
             {
-                fn = this.niconicoUtils.GetFileName(format, video, ".ts", replaceStricted);
+                fn = this.niconicoUtils.GetFileName(format, video, FileFolder.TsFileExt, replaceStricted);
                 path = IOUtils.GetPrefixedPath(Path.Combine(folderPath, fn));
                 if (File.Exists(path)) return path;
             }
 
-            return string.Empty;
+            return Path.GetDirectoryName(path) ?? folderPath;
 
         }
 
