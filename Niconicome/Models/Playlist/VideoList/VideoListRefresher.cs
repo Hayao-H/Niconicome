@@ -122,6 +122,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 if (filename.EndsWith(FileFolder.Mp4FileExt) || filename.EndsWith(FileFolder.TsFileExt))
                 {
                     video.FileName.Value = filename;
+                    video.FolderPath.Value = Path.GetDirectoryName(filename) ?? folderPath;
                     video.IsDownloaded.Value = !video.FileName.Value.IsNullOrEmpty();
                 }
                 else
