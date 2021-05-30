@@ -165,5 +165,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string IchibaInfoType { get; private set; } = "chibainfotype";
         public static string IsRestoringColumnWidthDisabled { get; private set; } = "isrestoringcolumnwidthdisabled";
         public static string FirefoxProfileName { get; private set; } = "firefoxprofilename";
+        public static string HtmlFileExtension { get; private set; } = "htmlfileextension";
+        public static string JpegFileExtension { get; private set; } = "jpegfileextension";
     }
 }
