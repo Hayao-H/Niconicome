@@ -536,7 +536,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in this.Videos.Where(v => !v.VideoInfo.IsDownloaded.Value))
                 {
                     video.IsSelected.Value = true;
                 }
@@ -549,7 +549,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in this.Videos.Where(v => v.VideoInfo.IsDownloaded.Value))
                 {
                     video.IsSelected.Value = false;
                 }
@@ -562,7 +562,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => !v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in this.Videos.Where(v => !v.VideoInfo.IsDownloaded.Value))
                 {
                     video.IsSelected.Value = false;
                 }
@@ -575,7 +575,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                foreach (var video in WS::Mainpage.VideoListContainer.Videos.Where(v => v.CheckDownloaded(this.GetFolderPath())))
+                foreach (var video in this.Videos.Where(v => v.VideoInfo.IsDownloaded.Value))
                 {
                     video.IsSelected.Value = true;
                 }
@@ -588,7 +588,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
-                string folderPath = this.GetFolderPath();
+                string folderPath = WS::Mainpage.CurrentPlaylist.PlaylistFolderPath;
                 if (folderPath.IsNullOrEmpty() || !Directory.Exists(folderPath)) return;
                 try
                 {
@@ -704,7 +704,7 @@ namespace Niconicome.ViewModels.Mainpage
                     "aimp" => Playlist::PlaylistType.Aimp,
                     _ => Playlist::PlaylistType.Aimp,
                 };
-                var folderPath = this.GetFolderPath();
+                var folderPath = WS::Mainpage.CurrentPlaylist.PlaylistFolderPath;
                 var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
                 if (!videos.Any()) return;
 
@@ -1151,16 +1151,6 @@ namespace Niconicome.ViewModels.Mainpage
             }
         }
 
-        /// <summary>
-        /// フォルダーパスを取得する
-        /// </summary>
-        /// <returns></returns>
-        private string GetFolderPath()
-        {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null) return string.Empty;
-
-            return WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Folderpath.IsNullOrEmpty() ? WS::Mainpage.SettingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir : WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Folderpath;
-        }
         #endregion
 
     }
