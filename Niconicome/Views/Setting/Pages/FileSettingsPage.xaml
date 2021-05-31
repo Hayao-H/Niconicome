@@ -78,7 +78,7 @@
                     HorizontalAlignment="Right" 
                     Margin="10 0 0 0" 
                     Width="200"
-                    Text="{Binding HtmlFileExt.Value,Mode=TwoWay}"/>
+                    Text="{Binding HtmlFileExt.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>
@@ -92,7 +92,7 @@
                     HorizontalAlignment="Right" 
                     Margin="10 0 0 0" 
                     Width="200"
-                    Text="{Binding JpegFileExt.Value,Mode=TwoWay}"/>
+                    Text="{Binding JpegFileExt.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>

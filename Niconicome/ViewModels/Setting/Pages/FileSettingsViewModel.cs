@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -17,17 +18,25 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public FileSettingsViewModel()
         {
-            this.FileFormat=new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? string.Empty);
+            this.FileFormat = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? string.Empty);
             this.DefaultFolder = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir);
-            this.IsReplaceSBToSBEnable=new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB));
-            this.HtmlFileExt = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.HtmlExt)??FileFolder.DefaultHtmlFileExt);
-            this.JpegFileExt = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.JpegExt)??FileFolder.DefaultJpegFileExt);
+            this.IsReplaceSBToSBEnable = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB));
+            this.HtmlFileExt = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.HtmlExt) ?? FileFolder.DefaultHtmlFileExt).SetValidateAttribute(() => this.HtmlFileExt);
+            this.JpegFileExt = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.JpegExt) ?? FileFolder.DefaultJpegFileExt).SetValidateAttribute(() => this.JpegFileExt);
 
             this.FileFormat.Subscribe(value => this.SaveSetting(value, SettingsEnum.FileNameFormat)).AddTo(this.disposables);
             this.DefaultFolder.Subscribe(value => this.SaveSetting(value, SettingsEnum.DefaultFolder)).AddTo(this.disposables);
             this.IsReplaceSBToSBEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.ReplaceSBToMB)).AddTo(this.disposables);
-            this.HtmlFileExt.Subscribe(value => this.SaveSetting(value, SettingsEnum.HtmlExt)).AddTo(this.disposables);
-            this.JpegFileExt.Subscribe(value => this.SaveSetting(value, SettingsEnum.JpegExt)).AddTo(this.disposables);
+            this.HtmlFileExt.Subscribe(value =>
+            {
+                if (this.HtmlFileExt.HasErrors) return;
+                this.SaveSetting(value, SettingsEnum.HtmlExt);
+            }).AddTo(this.disposables);
+            this.JpegFileExt.Subscribe(value =>
+            {
+                if (this.JpegFileExt.HasErrors) return;
+                this.SaveSetting(value, SettingsEnum.JpegExt);
+            }).AddTo(this.disposables);
         }
 
         /// <summary>
@@ -48,11 +57,13 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// htmlファイル
         /// </summary>
+        [RegularExpression(Format.FileExtRegExp, ErrorMessage = "正しい形式で指定してください。")]
         public ReactiveProperty<string> HtmlFileExt { get; init; }
 
         /// <summary>
         /// jpegファイル
         /// </summary>
+        [RegularExpression(Format.FileExtRegExp, ErrorMessage = "正しい形式で指定してください。")]
         public ReactiveProperty<string> JpegFileExt { get; init; }
 
 
