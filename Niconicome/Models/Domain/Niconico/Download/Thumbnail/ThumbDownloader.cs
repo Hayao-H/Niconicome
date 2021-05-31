@@ -28,6 +28,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         string NiconicoId { get; }
         string FolderName { get; }
         string FileNameFormat { get; }
+        string Extension { get; }
         bool IsOverwriteEnable { get; }
         bool IsReplaceStrictedEnable { get; }
     }
@@ -55,8 +56,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
             }
 
 
-            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".jpg",settings.IsReplaceStrictedEnable);
-            string fileName = generatedFIlename.IsNullOrEmpty() ? $"[{session.Video!.Id}]{session.Video!.Title}.jpg" : generatedFIlename;
+            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, settings.Extension, settings.IsReplaceStrictedEnable);
+            string fileName = generatedFIlename.IsNullOrEmpty() ? $"[{session.Video!.Id}]{session.Video!.Title}{settings.Extension}" : generatedFIlename;
 
             IOUtils.CreateDirectoryIfNotExist(settings.FolderName, fileName);
 
@@ -193,6 +194,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         public string FolderName { get; set; } = string.Empty;
 
         public string FileNameFormat { get; set; } = string.Empty;
+
+        public string Extension { get; set; } = string.Empty;
 
         public bool IsOverwriteEnable { get; set; }
 
