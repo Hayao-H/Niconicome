@@ -49,7 +49,17 @@
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
                 <Label Content="自動ログインの種別"/>
-                <ComboBox HorizontalAlignment="Right" Width="300" ItemsSource="{Binding SelectableAutoLoginTypes}" SelectedItem="{Binding SelectedAutoLoginType}" DisplayMemberPath="DisplayValue"/>
+                <ComboBox HorizontalAlignment="Right" Width="300" ItemsSource="{Binding SelectableAutoLoginTypes}" SelectedItem="{Binding SelectedAutoLoginType.Value}" DisplayMemberPath="DisplayValue"/>
+            </DockPanel>
+            <Separator Visibility="{Binding DisplayFirefoxPrifile.Value,Converter={StaticResource BooleanToVisibilityConverter}}" BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel Visibility="{Binding DisplayFirefoxPrifile.Value,Converter={StaticResource BooleanToVisibilityConverter}}">
+                <materialDesign:PackIcon Kind="MozillaFirefox" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="ログインに利用するFirefoxのプロファイル"/>
+                <ComboBox HorizontalAlignment="Right" Width="250" ItemsSource="{Binding SelectableFirefoxProfiles}" SelectedItem="{Binding SelectedFirefoxProfileName.Value}"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>

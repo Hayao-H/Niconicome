@@ -232,7 +232,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             data.Thumb.Description = info.Description;
             data.Thumb.ThumbnailUrl = (info.ThumbInfo.Large?.IsNullOrEmpty() ?? true) ? info.ThumbInfo.Normal ?? string.Empty : info.ThumbInfo.Large;
             data.Thumb.FirstRetrieve = new DateTimeOffset(info.UploadedOn, TimeSpan.FromHours(9)).ToString("yyyy-MM-ddTHH:mm:sszzz");
-            data.Thumb.Length = info.Duration;
+            data.Thumb.Length = $"{Math.Floor((double)info.Duration / 60).ToString().PadLeft(2, '0')}:{info.Duration % 60}";
             data.Thumb.ViewCounter = info.ViewCount;
             data.Thumb.CommentNum = info.CommentCount;
             data.Thumb.LikeCounter = info.LikeCount;

@@ -223,7 +223,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// <param name="url"></param>
         /// <param name="streams"></param>
         /// <returns></returns>
-        private async Task GetAvailableStreamsAsync(string url, List<Dmc::IStreamInfo> streams, Video::IResolution? resolution = null)
+        private async Task GetAvailableStreamsAsync(string url, List<Dmc::IStreamInfo> streams, Video::IResolution? resolution = null, long bandWidth = 0)
         {
             Dmc::IStreamInfo stream;
 
@@ -242,7 +242,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             {
                 foreach (var childStream in stream.PlaylistUrls)
                 {
-                    await this.GetAvailableStreamsAsync(childStream.AbsoluteUri, streams, childStream.Resolution);
+                    await this.GetAvailableStreamsAsync(childStream.AbsoluteUri, streams, childStream.Resolution, childStream.BandWidth);
                 }
             }
             else
@@ -250,6 +250,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 if (resolution is not null)
                 {
                     stream.Resolution = resolution;
+                    stream.BandWidth = bandWidth;
                 }
                 streams.Add(stream);
             }

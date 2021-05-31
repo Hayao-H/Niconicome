@@ -64,7 +64,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
             var last = this.innerList.OrderBy(s => s.Resolution!.Vertical).Last();
             var bests = this.innerList.Where(p => p.Resolution!.Vertical == last.Resolution!.Vertical).OrderByDescending(p=>p.BandWidth);
 
-            if (preferLowBitrate)
+            if (!preferLowBitrate)
             {
                 return bests.First();
             } else
@@ -84,7 +84,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
             var last = this.innerList.OrderByDescending(s => s.Resolution!.Vertical).Last();
             var bests = this.innerList.Where(p => p.Resolution!.Vertical == last.Resolution!.Vertical).OrderByDescending(p => p.BandWidth);
 
-            if (preferLowBitrate)
+            if (!preferLowBitrate)
             {
                 return bests.First();
             }
@@ -108,7 +108,7 @@ namespace Niconicome.Models.Domain.Niconico.Dmc
 
             var bests = this.innerList.Where(p => p.Resolution!.Vertical == first.Resolution!.Vertical).OrderByDescending(p => p.BandWidth);
 
-            if (preferLowBitrate)
+            if (!preferLowBitrate)
             {
                 return bests.First();
             }

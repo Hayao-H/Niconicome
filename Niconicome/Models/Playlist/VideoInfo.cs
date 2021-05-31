@@ -34,6 +34,7 @@ namespace Niconicome.Models.Playlist
         ReactiveProperty<string> Message { get; }
         ReactiveProperty<string> ThumbPath { get; }
         ReactiveProperty<string> FileName { get; }
+        ReactiveProperty<string> FolderPath { get; }
         ReactiveProperty<string> ChannelID { get; }
         ReactiveProperty<string> ChannelName { get; }
         ReactiveProperty<DateTime> UploadedOn { get; }
@@ -78,6 +79,8 @@ namespace Niconicome.Models.Playlist
         public ReactiveProperty<string> Message { get; init; }
         public ReactiveProperty<string> ThumbPath { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> FileName { get; init; } = new ReactiveProperty<string>();
+        public ReactiveProperty<string> FolderPath { get; init; } = new ReactiveProperty<string>();
+
         public ReactiveProperty<string> ChannelID { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> ChannelName { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> IsDeleted { get; init; } = new ReactiveProperty<bool>();
@@ -173,43 +176,21 @@ namespace Niconicome.Models.Playlist
         }
 
         /// <summary>
-        /// オブジェクトをクローンする
+        /// インスタンスを破棄する
         /// </summary>
-        /// <returns></returns>
-        public IListVideoInfo Clone()
+        public override void Dispose()
         {
-            return (IListVideoInfo)this.MemberwiseClone();
+            VideoMessenger.VideoMessageChange -= this.OnMessage;
+            base.Dispose();
+        }
+
+        public override string ToString()
+        {
+            return $"[{this.NiconicoId.Value}]{this.Title.Value}";
         }
 
         /// <summary>
-        /// データを設定する
-        /// </summary>
-        /// <param name="videoInfo"></param>
-        /// <param name="dbVideo"></param>
-        protected static void SetDbData(IListVideoInfo videoInfo, STypes::Video dbVideo)
-        {
-            videoInfo.Id.Value = dbVideo.Id;
-            videoInfo.NiconicoId.Value = dbVideo.NiconicoId;
-            videoInfo.Title.Value = dbVideo.Title;
-            videoInfo.IsDeleted.Value = dbVideo.IsDeleted;
-            videoInfo.OwnerName.Value = dbVideo.OwnerName;
-            videoInfo.UploadedOn.Value = dbVideo.UploadedOn;
-            videoInfo.LargeThumbUrl.Value = dbVideo.LargeThumbUrl;
-            videoInfo.ThumbUrl.Value = dbVideo.ThumbUrl;
-            videoInfo.ThumbPath.Value = dbVideo.ThumbPath;
-            videoInfo.FileName.Value = dbVideo.FileName;
-            //videoInfo.IsSelected.Value = dbVideo.IsSelected;
-            videoInfo.Tags = dbVideo.Tags ?? new List<string>();
-            videoInfo.ViewCount.Value = dbVideo.ViewCount;
-            videoInfo.CommentCount.Value = dbVideo.CommentCount;
-            videoInfo.MylistCount.Value = dbVideo.MylistCount;
-            videoInfo.LikeCount.Value = dbVideo.LikeCount;
-            videoInfo.OwnerID.Value = dbVideo.OwnerID;
-            videoInfo.Duration.Value = dbVideo.Duration;
-        }
-
-        /// <summary>
-        /// 値をセットする
+        /// 値をセットする(Local=>Locals)
         /// </summary>
         /// <param name="newVideo"></param>
         /// <param name="oldVideo"></param>
@@ -237,11 +218,33 @@ namespace Niconicome.Models.Playlist
             newVideo.IsDownloaded.Value = oldVideo.IsDownloaded.Value;
         }
 
-        public override void Dispose()
+        /// <summary>
+        /// データを設定する(DB=>Local)
+        /// </summary>
+        /// <param name="videoInfo"></param>
+        /// <param name="dbVideo"></param>
+        protected static void SetDbData(IListVideoInfo videoInfo, STypes::Video dbVideo)
         {
-            VideoMessenger.VideoMessageChange -= this.OnMessage;
-            base.Dispose();
+            videoInfo.Id.Value = dbVideo.Id;
+            videoInfo.NiconicoId.Value = dbVideo.NiconicoId;
+            videoInfo.Title.Value = dbVideo.Title;
+            videoInfo.IsDeleted.Value = dbVideo.IsDeleted;
+            videoInfo.OwnerName.Value = dbVideo.OwnerName;
+            videoInfo.UploadedOn.Value = dbVideo.UploadedOn;
+            videoInfo.LargeThumbUrl.Value = dbVideo.LargeThumbUrl;
+            videoInfo.ThumbUrl.Value = dbVideo.ThumbUrl;
+            videoInfo.ThumbPath.Value = dbVideo.ThumbPath;
+            videoInfo.FileName.Value = dbVideo.FileName;
+            //videoInfo.IsSelected.Value = dbVideo.IsSelected;
+            videoInfo.Tags = dbVideo.Tags ?? new List<string>();
+            videoInfo.ViewCount.Value = dbVideo.ViewCount;
+            videoInfo.CommentCount.Value = dbVideo.CommentCount;
+            videoInfo.MylistCount.Value = dbVideo.MylistCount;
+            videoInfo.LikeCount.Value = dbVideo.LikeCount;
+            videoInfo.OwnerID.Value = dbVideo.OwnerID;
+            videoInfo.Duration.Value = dbVideo.Duration;
         }
+
 
         /// <summary>
         /// メッセージ受信

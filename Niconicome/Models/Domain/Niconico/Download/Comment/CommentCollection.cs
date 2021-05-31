@@ -64,11 +64,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             return new CommentCollection(cOffset, defaultThread, defaultFork, unsafeHandle);
         }
 
+        /// <summary>
+        /// コメントの実体
+        /// 降順で管理
+        /// </summary>
         private readonly LinkedList<Response::Comment> commentsfield = new();
 
         private readonly List<ICommentCollection> childCollections = new();
-
-        private readonly LinkedList<long> CommentNumbers = new();
 
         public const int NumberToThrough = 40;
 
@@ -226,21 +228,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else if (comment.Chat is not null)
                 {
-                    if (!this.unsafeHandle)
-                    {
-                        if (this.CommentNumbers.Contains(comment.Chat.No)) return;
-                        this.CommentNumbers.AddLast(comment.Chat.No);
-
-                        if (this.CommentNumbers.Count > 5000)
-                        {
-                            foreach (var _ in Enumerable.Range(0, 2000))
-                            {
-                                this.CommentNumbers.RemoveFirst();
-                            }
-                        }
-                    }
                     this.commentsfield.AddFirst(comment);
                     this.isSorted = false;
+                    if (!this.unsafeHandle)
+                    {
+                        this.Distinct();
+                    }
                 }
                 else
                 {
@@ -261,7 +254,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             var chats = new LinkedList<Response::Comment>();
 
             //チャットを抽出する
-            //LinkedListはAddFirstなので逆転させて処理する
+            //コレクションの実装はAddFirst(降順)なのでこれは昇順になるようにする
             foreach (var item in comments)
             {
                 if (item.Chat is null) continue;
@@ -275,12 +268,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                     nicoruEnded = true;
                 }
 
-                //ここで逆転させる
-                chats.AddFirst(item);
+                chats.AddLast(item);
             }
 
             //最初の方にある古いコメントを除去する
-            //この時点では降順
+            //この時点ではすでに昇順
             if (addSafe && chats.Count > this.comThroughSetting + 20)
             {
                 var first = this.GetFirstComment();
@@ -409,7 +401,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             }
             else
             {
-                return this.Comments.FirstOrDefault(c => includeOwnerComment || (c.Chat?.UserId != null || c.Chat?.Deleted == null))?.Chat;
+                return this.Comments.LastOrDefault(c => includeOwnerComment || (c.Chat?.UserId != null || c.Chat?.Deleted == null))?.Chat;
             }
         }
 

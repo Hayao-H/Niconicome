@@ -9,8 +9,6 @@ namespace Niconicome.Models.Playlist
 {
     public interface IVideoHandler
     {
-        int AddVideo(IListVideoInfo video, int playlidtId);
-        void RemoveVideo(int videoID, int playlistID);
         void Update(IListVideoInfo video);
         bool Exist(int id);
         IEnumerable<IListVideoInfo> GetAllVideos();

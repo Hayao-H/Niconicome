@@ -97,18 +97,21 @@ namespace Niconicome.Models.Network.Download
 
             if (this.current.SelectedPlaylist.Value is null) throw new InvalidOperationException("");
 
-            var replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
-            var overrideVideoDT = this.settingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT);
-            var resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
-            var unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
+            bool replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
+            bool overrideVideoDT = this.settingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT);
+            bool resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
+            bool unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
             string folderPath = this.current.SelectedPlaylist.Value.Folderpath.IsNullOrEmpty() ? this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? "downloaded" : this.current.SelectedPlaylist.Value.Folderpath;
-            var fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.FIleFormat;
+            string fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.FIleFormat;
 
-            var videoInfoT = this.enumSettingsHandler.GetSetting<VideoInfoTypeSettings>();
-            var videoInfoExt = videoInfoT == VideoInfoTypeSettings.Json ? ".json" : videoInfoT == VideoInfoTypeSettings.Xml ? ".xml" : ".txt";
+            VideoInfoTypeSettings videoInfoT = this.enumSettingsHandler.GetSetting<VideoInfoTypeSettings>();
+            string videoInfoExt = videoInfoT == VideoInfoTypeSettings.Json ? ".json" : videoInfoT == VideoInfoTypeSettings.Xml ? ".xml" : ".txt";
 
-            var ichibaInfoT = this.enumSettingsHandler.GetSetting<IchibaInfoTypeSettings>();
-            var ichibaInfoExt = ichibaInfoT == IchibaInfoTypeSettings.Json ? ".json" : ichibaInfoT == IchibaInfoTypeSettings.Xml ? ".xml" : ".html";
+            IchibaInfoTypeSettings ichibaInfoT = this.enumSettingsHandler.GetSetting<IchibaInfoTypeSettings>();
+            string? htmlExt = this.settingHandler.GetStringSetting(SettingsEnum.HtmlExt);
+            string ichibaInfoExt = ichibaInfoT == IchibaInfoTypeSettings.Json ? ".json" : ichibaInfoT == IchibaInfoTypeSettings.Xml ? ".xml" : htmlExt ?? ".html";
+
+            string thumbExt = this.settingHandler.GetStringSetting(SettingsEnum.JpegExt) ?? FileFolder.DefaultJpegFileExt;
 
             return new DownloadSettings
             {
@@ -136,6 +139,7 @@ namespace Niconicome.Models.Network.Download
                 IchibaInfoExt = ichibaInfoExt,
                 DownloadIchibaInfo = this.IsDownloadingIchibaInfoEnable.Value,
                 IchibaInfoType = ichibaInfoT,
+                ThumbnailExt = thumbExt,
             };
         }
 

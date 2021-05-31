@@ -5,6 +5,7 @@ using System.Windows;
 using Niconicome.Models.Playlist;
 using WS=Niconicome.Workspaces;
 using MsApi = Microsoft.WindowsAPICodePack;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows
 {
@@ -31,7 +32,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     var newPlaylist = oldPlaylist.Clone();
                     newPlaylist.Name = this.PlaylistName;
                     newPlaylist.Folderpath = this.FolderPath;
-                    WS::Mainpage.PlaylistTree.Update(newPlaylist);
+                    WS::Mainpage.PlaylistHandler.Update(newPlaylist);
                     WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = newPlaylist;
                 }
 

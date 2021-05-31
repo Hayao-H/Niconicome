@@ -40,6 +40,8 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
+using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
+using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -75,8 +77,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<DataBase::IDataBase, DataBase::DataBase>();
             services.AddTransient<Store::IPlaylistStoreHandler, Store::PlaylistStoreHandler>();
             services.AddTransient<Store::IVideoStoreHandler, Store::VideoStoreHandler>();
-            services.AddSingleton<Playlist::IPlaylistHandler, Playlist::PlaylistHandler>();
-            services.AddTransient<Playlist::IPlaylistTreeConstructor, Playlist::PlaylistTreeConstructor>();
+            services.AddTransient<PlaylistPlaylist::IPlaylistHandler, PlaylistPlaylist::PlaylistHandler>();
+            services.AddSingleton<PlaylistPlaylist::IPlaylistTreeHandler, PlaylistPlaylist::PlaylistTreeHandler>();
+            services.AddSingleton<PlaylistPlaylist::ISortInfoHandler, PlaylistPlaylist::SortInfoHandler>();
             services.AddTransient<DomainWatch::IWatchPageHtmlParser, DomainWatch::WatchPageHtmlParser>();
             services.AddTransient<DomainWatch::IWatchInfohandler, DomainWatch::WatchInfohandler>();
             services.AddTransient<Watch::IWatch, Watch::Watch>();
@@ -152,6 +155,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
             services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
             services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
+            services.AddTransient<Auth::IFirefoxSharedLogin, Auth::FirefoxSharedLogin>();
             services.AddTransient<LocalFile::ILocalDirectoryHandler, LocalFile::LocalDirectoryHandler>();
             services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
             services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();
@@ -171,6 +175,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Ichiba::INiconicoIchibaHandler, Ichiba::NiconicoIchibaHandler>();
             services.AddTransient<Utils::IPathOrganizer, Utils::PathOrganizer>();
             services.AddTransient<DlIchiba::IIchibaInfoDownloader, DlIchiba::IchibaInfoDownloader>();
+            services.AddTransient<FF::IFirefoxProfileManager, FF::FirefoxProfileManager>();
+            services.AddTransient<Cookies::IFirefoxCookieManager, Cookies::FirefoxCookieManager>();
 
             return services.BuildServiceProvider();
         }

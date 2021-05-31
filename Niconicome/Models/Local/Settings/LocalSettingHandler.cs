@@ -174,6 +174,10 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.DlWithoutEncode => STypes::SettingNames.DownloadVideoWithoutEncodeEnable,
                 SettingsEnum.IchibaInfoType => STypes::SettingNames.IchibaInfoType,
                 SettingsEnum.DlIchiba => STypes::SettingNames.IsDownloadingIchibaInfoEnable,
+                SettingsEnum.NoRestoreClumnWIdth => STypes::SettingNames.IsRestoringColumnWidthDisabled,
+                SettingsEnum.FFProfileName => STypes::SettingNames.FirefoxProfileName,
+                SettingsEnum.HtmlExt => STypes::SettingNames.HtmlFileExtension,
+                SettingsEnum.JpegExt => STypes::SettingNames.JpegFileExtension,
                 _ => null
             };
         }
@@ -238,5 +242,9 @@ namespace Niconicome.Models.Local.Settings
         DlWithoutEncode,
         IchibaInfoType,
         DlIchiba,
+        NoRestoreClumnWIdth,
+        FFProfileName,
+        HtmlExt,
+        JpegExt,
     }
 }

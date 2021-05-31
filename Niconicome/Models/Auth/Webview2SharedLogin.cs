@@ -12,15 +12,12 @@ namespace Niconicome.Models.Auth
         Task<bool> TryLogin();
     }
 
-    class Webview2SharedLogin : IWebview2SharedLogin
+    class Webview2SharedLogin : SharedLoginBase, IWebview2SharedLogin
     {
-        public Webview2SharedLogin(IWebview2LocalCookieManager webview2LocalCookieManager, ILogger logger, INicoHttp http, ICookieManager cookieManager,INiconicoContext context)
+        public Webview2SharedLogin(IWebview2LocalCookieManager webview2LocalCookieManager, ILogger logger, INicoHttp http, ICookieManager cookieManager, INiconicoContext context) : base(http, cookieManager, context)
         {
             this.webview2LocalCookieManager = webview2LocalCookieManager;
             this.logger = logger;
-            this.http = http;
-            this.cookieManager = cookieManager;
-            this.context = context;
 
         }
 
@@ -28,11 +25,6 @@ namespace Niconicome.Models.Auth
 
         private readonly ILogger logger;
 
-        private readonly INicoHttp http;
-
-        private readonly ICookieManager cookieManager;
-
-        private readonly INiconicoContext context;
 
         /// <summary>
         /// ログインを試行する
@@ -66,22 +58,6 @@ namespace Niconicome.Models.Auth
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// ログインに成功したかどうかを確かめる
-        /// </summary>
-        /// <returns></returns>
-        private async Task<bool> CheckIfLoginSucceeded()
-        {
-            var result = await this.http.GetAsync(new Uri(@"https://www.nicovideo.jp/my"));
-
-            if (result.Headers.Contains("Location"))
-            {
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>

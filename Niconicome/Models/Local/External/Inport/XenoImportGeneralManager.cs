@@ -11,6 +11,7 @@ using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Reactive.Bindings;
 using Xeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 
@@ -257,7 +258,7 @@ namespace Niconicome.Models.Local.External.Import
                 {
                     foreach (var video in videos)
                     {
-                        this.videoHandler.AddVideo(video, id);
+                        this.playlistStoreHandler.AddVideo(video, id);
                     }
                     result.SucceededVideoCount += videos.Count;
                 }

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
@@ -33,6 +35,12 @@ namespace Niconicome.ViewModels.Setting.Pages
                 VideodbClickSettings.Download => download,
                 _ => none,
             };
+
+            this.IsRestoreingColumnWidthDisabled = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth));
+            this.IsRestoreingColumnWidthDisabled.Subscribe(value =>
+            {
+                this.SaveSetting(value, SettingsEnum.NoRestoreClumnWIdth);
+            });
             #endregion
         }
 
@@ -49,6 +57,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// ダブルクリックアクション
         /// </summary>
         public ComboboxItem<VideodbClickSettings> VideodbClickAction { get => this.videodbClickActionField; set => this.SaveEnumSetting(ref this.videodbClickActionField, value); }
+
+        /// <summary>
+        /// 幅を継承しない
+        /// </summary>
+        public ReactiveProperty<bool> IsRestoreingColumnWidthDisabled { get; init; }
+
     }
 
     class VideoListSettingsPageViewModelD
@@ -71,5 +85,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public List<ComboboxItem<VideodbClickSettings>> SelectableVideodbClickAction { get; init; }
 
         public ComboboxItem<VideodbClickSettings> VideodbClickAction { get; set; }
+
+        public ReactiveProperty<bool> IsRestoreingColumnWidthDisabled { get; init; } = new(false);
     }
 }

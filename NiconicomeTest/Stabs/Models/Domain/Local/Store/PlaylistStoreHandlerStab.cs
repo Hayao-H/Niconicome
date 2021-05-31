@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace NiconicomeTest.Stabs.Models.Domain.Local.Store
@@ -44,20 +46,32 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Store
         public void Update(ITreePlaylistInfo newplaylist)
         {
         }
-        public IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
+        public List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
         {
             return new List<STypes::Playlist>() { this.GetRootPlaylist() };
         }
 
-        public IEnumerable<STypes::Playlist> GetChildPlaylists(int id)
+        public List<STypes::Playlist> GetChildPlaylists(int id)
         {
             return new List<STypes::Playlist>() { this.GetRootPlaylist() };
 
         }
 
-        public IEnumerable<STypes::Playlist> GetAllPlaylists()
+        public List<STypes::Playlist> GetAllPlaylists()
         {
             return new List<STypes::Playlist>() { this.GetRootPlaylist() };
+        }
+
+
+        public IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex)
+        {
+            return new AttemptResult() { IsSucceeded = true };
+        }
+
+        public IAttemptResult MoveVideoToForward(int playlistID, int videoIndex)
+        {
+            return new AttemptResult() { IsSucceeded = true };
+
         }
 
         public void RemoveChildPlaylist(int selfId)

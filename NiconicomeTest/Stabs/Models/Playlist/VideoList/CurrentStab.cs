@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VList = Niconicome.Models.Playlist.VideoList;
-using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Reactive.Bindings;
 
 namespace NiconicomeTest.Stabs.Models.Playlist.VideoList
@@ -14,8 +14,9 @@ namespace NiconicomeTest.Stabs.Models.Playlist.VideoList
         public ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; init; } = new();
 
         public int PrevSelectedPlaylistID { get; set; }
+        public ReactiveProperty<int> CurrentSelectedIndex { get; init; } = new();
 
+        public string PlaylistFolderPath { get; init; } = string.Empty;
 
-        public event EventHandler? SelectedPlaylistChanged;
     }
 }

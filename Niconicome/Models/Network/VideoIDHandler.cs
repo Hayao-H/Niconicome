@@ -7,6 +7,7 @@ using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Reactive.Bindings;
 using Search = Niconicome.Models.Domain.Niconico.Search;
 

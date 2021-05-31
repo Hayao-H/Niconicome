@@ -1,8 +1,11 @@
 ﻿using System.Linq;
+using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 using NiconicomeTest.Stabs.Models.Domain.Local.Store;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NiconicomeTest.Stabs.Models.Playlist;
 using NiconicomeTest.Stabs.Models.Playlist.VideoList;
 using NUnit.Framework;
@@ -24,10 +27,10 @@ namespace NiconicomeTest.Local.Playlist.Videos
         public void SetUp()
         {
             this.playlistStoreHandler = new PlaylistStoreHandlerStab();
-            var p = new NonBindableTreePlaylistInfo() { Id=1};
+            ITreePlaylistInfo? p = new NonBindableTreePlaylistInfo() { Id = 1 };
             var cStab = new CurrentStab();
             cStab.SelectedPlaylist.Value = p;
-            this.videoListContainer = new VideoListContainer(this.playlistStoreHandler, new VideoHandlerStab(), new VideoListRefresherStab(), cStab);
+            this.videoListContainer = new VideoListContainer(this.playlistStoreHandler, new VideoHandlerStab(), new VideoListRefresherStab(), cStab, new LoggerStab());
             this.lastVIdeoNicoID = null;
             this.videoListContainer.ListChanged += (_, e) =>
             {
@@ -85,7 +88,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         [Test]
         public void 存在しない動画を削除する()
         {
-            var video = new NonBindableListVideoInfo() ;
+            var video = new NonBindableListVideoInfo();
             video.NiconicoId.Value = "sm9";
             var result = this.videoListContainer!.Remove(video);
 
@@ -107,7 +110,54 @@ namespace NiconicomeTest.Local.Playlist.Videos
             {
                 Assert.That(video.IsSelected.Value, Is.True);
             }
-            
+
+
+        }
+
+        [TestCase(VideoSortType.Register, 1)]
+        [TestCase(VideoSortType.Title, 3)]
+        [TestCase(VideoSortType.NiconicoID, 3)]
+        public void 動画を並び替える(VideoSortType sortType, int expectedID)
+        {
+            var video1 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(1), Title = new Reactive.Bindings.ReactiveProperty<string>("3"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("3") };
+            var video2 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(2), Title = new Reactive.Bindings.ReactiveProperty<string>("2"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("2") };
+            var video3 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(3), Title = new Reactive.Bindings.ReactiveProperty<string>("1"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
+            this.videoListContainer!.AddRange(new IListVideoInfo[] { video1, video2, video3 });
+            this.videoListContainer!.Sort(sortType, false);
+
+            Assert.That(this.videoListContainer!.Videos.First().Id.Value, Is.EqualTo(expectedID));
+        }
+
+        [TestCase(0, false, "1")]
+        [TestCase(1, true, "2")]
+        [TestCase(2, true, "1")]
+        public void 動画をひとつ前に挿入する(int index, bool expectedResult, int initialID)
+        {
+            var video1 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(1), Title = new Reactive.Bindings.ReactiveProperty<string>("3"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
+            var video2 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(2), Title = new Reactive.Bindings.ReactiveProperty<string>("2"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("2") };
+            var video3 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(3), Title = new Reactive.Bindings.ReactiveProperty<string>("1"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("3") };
+            this.videoListContainer!.AddRange(new IListVideoInfo[] { video1, video2, video3 });
+
+            var result = this.videoListContainer.MovevideotoPrev(index);
+
+            Assert.That(result.IsSucceeded, Is.EqualTo(expectedResult));
+            Assert.That(this.videoListContainer.Videos[0].Id.Value, Is.EqualTo(initialID));
+        }
+
+        [TestCase(0, true, "3")]
+        [TestCase(1, true, "2")]
+        [TestCase(2, false, "3")]
+        public void 動画をひとつ後ろに挿入する(int index, bool expectedResult, int lastID)
+        {
+            var video1 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(1), Title = new Reactive.Bindings.ReactiveProperty<string>("3"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
+            var video2 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(2), Title = new Reactive.Bindings.ReactiveProperty<string>("2"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("2") };
+            var video3 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(3), Title = new Reactive.Bindings.ReactiveProperty<string>("1"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("3") };
+            this.videoListContainer!.AddRange(new IListVideoInfo[] { video1, video2, video3 });
+
+            var result = this.videoListContainer.MovevideotoForward(index);
+
+            Assert.That(result.IsSucceeded, Is.EqualTo(expectedResult));
+            Assert.That(this.videoListContainer.Videos[2].Id.Value, Is.EqualTo(lastID));
 
         }
 

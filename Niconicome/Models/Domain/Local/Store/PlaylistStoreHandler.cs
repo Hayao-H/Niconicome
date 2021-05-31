@@ -4,6 +4,9 @@ using System.Linq;
 using Niconicome.Models.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Helper.Result;
+using System.Data.Common;
 
 namespace Niconicome.Models.Domain.Local.Store
 {
@@ -15,9 +18,11 @@ namespace Niconicome.Models.Domain.Local.Store
         public int AddVideo(IListVideoInfo video, int playlistId);
         public void RemoveVideo(int id, int playlistId);
         public void Update(ITreePlaylistInfo newplaylist);
-        IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self);
-        IEnumerable<STypes::Playlist> GetChildPlaylists(int id);
-        IEnumerable<STypes::Playlist> GetAllPlaylists();
+        List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self);
+        List<STypes::Playlist> GetChildPlaylists(int id);
+        List<STypes::Playlist> GetAllPlaylists();
+        IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex);
+        IAttemptResult MoveVideoToForward(int playlistID, int videoIndex);
         void RemoveChildPlaylist(int selfId);
         void DeletePlaylist(int id);
         bool Exists(int id);
@@ -52,9 +57,20 @@ namespace Niconicome.Models.Domain.Local.Store
         public STypes::Playlist? GetPlaylist(int id)
         {
 
-            return this.databaseInstance.GetCollection<STypes::Playlist>(STypes::Playlist.TableName)
+            var playlist = this.databaseInstance.GetCollection<STypes::Playlist>(STypes::Playlist.TableName)
                     .Include(p => p.Videos)
                     .FindById(id);
+
+            if (playlist is null) return null;
+
+            if (playlist.Videos.Count > 0 && playlist.CustomVideoSequence.Count != playlist.Videos.Count)
+            {
+                var ids = playlist.Videos.Select(v => v.Id).Where(id => !playlist.CustomVideoSequence.Contains(id));
+                playlist.CustomVideoSequence.AddRange(ids);
+            }
+
+            return playlist;
+
         }
 
         /// <summary>
@@ -110,7 +126,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="self"></param>
         /// <returns></returns>
-        public IEnumerable<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
+        public List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
         {
             return this.GetChildPlaylists(self.Id);
         }
@@ -120,7 +136,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IEnumerable<STypes::Playlist> GetChildPlaylists(int id)
+        public List<STypes::Playlist> GetChildPlaylists(int id)
         {
             return this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName).FindAll(p => p.ParentPlaylist?.Id == id);
 
@@ -130,9 +146,73 @@ namespace Niconicome.Models.Domain.Local.Store
         /// 全てのプレイリストを取得する
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<STypes::Playlist> GetAllPlaylists()
+        public List<STypes::Playlist> GetAllPlaylists()
         {
             return this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName);
+        }
+
+        /// <summary>
+        /// 動画を後ろに挿入する
+        /// </summary>
+        /// <param name="playlistID"></param>
+        /// <param name="videoIndex"></param>
+        /// <returns></returns>
+        public IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex)
+        {
+            if (!this.Exists(playlistID)) return new AttemptResult() { Message = $"指定されたプレイリストは存在しません。(id={playlistID})" };
+
+            var playlist = this.GetPlaylist(playlistID)!;
+
+            if (playlist.Videos.Count < videoIndex + 1) return new AttemptResult() { Message = $"指定されたインデックスは範囲外です。(index={videoIndex}, actual={playlist.Videos.Count})" };
+
+            if (videoIndex == 0) return new AttemptResult() { Message = $"指定されたインデックスは最初の動画です。(index={videoIndex})" };
+
+            try
+            {
+                playlist.CustomVideoSequence.InsertIntoPrev(videoIndex);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult() { Message = $"挿入操作に失敗しました。", Exception = e };
+            }
+
+            playlist.SortType = STypes.VideoSortType.Custom;
+
+            this.Update(playlist);
+
+            return new AttemptResult() { IsSucceeded = true };
+        }
+
+        /// <summary>
+        /// 動画をうしろに挿入する
+        /// </summary>
+        /// <param name="playlistID"></param>
+        /// <param name="videoIndex"></param>
+        /// <returns></returns>
+        public IAttemptResult MoveVideoToForward(int playlistID, int videoIndex)
+        {
+            if (!this.Exists(playlistID)) return new AttemptResult() { Message = $"指定されたプレイリストは存在しません。(id={playlistID})" };
+
+            var playlist = this.GetPlaylist(playlistID)!;
+
+            if (playlist.Videos.Count < videoIndex + 1) return new AttemptResult() { Message = $"指定されたインデックスは範囲外です。(index={videoIndex}, actual={playlist.Videos.Count})" };
+
+            if (videoIndex + 1 == playlist.Videos.Count) return new AttemptResult() { Message = $"指定されたインデックスは最後の動画です。(index={videoIndex})" };
+
+            try
+            {
+                playlist.CustomVideoSequence.InsertIntoForward(videoIndex);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult() { Message = $"挿入操作に失敗しました。", Exception = e };
+            }
+
+            playlist.SortType = STypes.VideoSortType.Custom;
+
+            this.Update(playlist);
+
+            return new AttemptResult() { IsSucceeded = true };
         }
 
         /// <summary>
@@ -416,6 +496,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (playlist.Videos.Any(v => v.NiconicoId == videoData.NiconicoId.Value)) return -1;
 
             playlist.Videos.Add(video);
+            playlist.CustomVideoSequence.Add(video.Id);
 
             this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
 
@@ -437,6 +518,8 @@ namespace Niconicome.Models.Domain.Local.Store
 
             this.videoHandler.RemoveVideo(videoId, playlistId);
             playlist!.Videos.RemoveAll(v => v.Id == videoId);
+            playlist!.CustomVideoSequence.RemoveAll(v => v == videoId);
+
             this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
         }
 
@@ -462,6 +545,10 @@ namespace Niconicome.Models.Domain.Local.Store
             dbPlaylist.PlaylistName = playlistInfo.Name;
             dbPlaylist.FolderPath = playlistInfo.Folderpath;
             dbPlaylist.IsExpanded = playlistInfo.IsExpanded;
+            dbPlaylist.CustomVideoSequence.Clear();
+            dbPlaylist.CustomVideoSequence.AddRange(playlistInfo.CustomSortSequence);
+            dbPlaylist.SortType = playlistInfo.VideoSortType;
+            dbPlaylist.IsVideoDescending = playlistInfo.IsVideoDescending;
         }
     }
 }
