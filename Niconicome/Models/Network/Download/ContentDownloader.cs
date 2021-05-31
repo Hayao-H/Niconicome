@@ -436,6 +436,7 @@ namespace Niconicome.Models.Network.Download
                 FileNameFormat = this.FileNameFormat,
                 IsOverwriteEnable = this.Overwrite,
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
+                Extension = this.ThumbnailExt,
             };
         }
 
