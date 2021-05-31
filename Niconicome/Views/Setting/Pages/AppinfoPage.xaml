@@ -64,7 +64,7 @@
                 </StackPanel>
                 <TextBlock Padding="20 0">
                 <Hyperlink NavigateUri="https://github.com/Hayao-H/Niconicome"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>プロジェクトページ</Hyperlink><LineBreak/>
-                <Hyperlink NavigateUri="https://join.slack.com/t/niconicome/shared_invite/zt-m6lkfs8x-FOFfXexhB0JlhnUVps0qEA"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Slack</Hyperlink><LineBreak/>
+                <Hyperlink NavigateUri="https://niconicome.slack.com/join/shared_invite/zt-ob8ff84w-ffXrVh1TDEokbsgahkVAIw#/shared-invite/email"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Slack</Hyperlink><LineBreak/>
                 <Hyperlink NavigateUri="https://twitter.com/NiconicomeD"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>Twitter</Hyperlink><LineBreak/>
                 <Hyperlink NavigateUri="https://github.com/Hayao-H/Niconicome/wiki"><i:Interaction.Behaviors><mainvm:HyperlinkBehavior/></i:Interaction.Behaviors>wiki</Hyperlink>
                 </TextBlock>
@@ -80,7 +80,6 @@
                             <TextBlock Text="ライセンス情報"/>
                         </StackPanel>
                     </Expander.Header>
-                    <ScrollViewer VerticalScrollBarVisibility="Visible" Height="430">
                         <StackPanel>
                             <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="http://materialdesigninxaml.net/">
@@ -183,9 +182,42 @@
                             Read license on github.com
                         </Hyperlink>
                             </TextBlock>
+
+                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <Hyperlink NavigateUri="https://github.com/PrismLibrary/Prism">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Prism
+                        </Hyperlink>
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        <Hyperlink NavigateUri="https://github.com/PrismLibrary/Prism/blob/master/LICENSE">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Read license on github.com
+                        </Hyperlink>
+                            </TextBlock>
+
+                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <Hyperlink NavigateUri="https://github.com/runceel/ReactiveProperty">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            ReactiveProperty
+                        </Hyperlink>
+                            </TextBlock>
+                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        <Hyperlink NavigateUri="https://github.com/runceel/ReactiveProperty/blob/main/LICENSE.txt">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Read license on github.com
+                        </Hyperlink>
+                            </TextBlock>
                             
                         </StackPanel>
-                    </ScrollViewer>
                 </Expander>
             </StackPanel>
         </ScrollViewer>
