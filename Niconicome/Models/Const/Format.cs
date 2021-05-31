@@ -11,5 +11,7 @@ namespace Niconicome.Models.Const
         public const string ISO8601 = "yyyy-MM-ddTHH:mm:ssK";
 
         public const string FIleFormat = "[<id>]<title>";
+
+        public const string FileExtRegExp = @"^\..+$";
     }
 }

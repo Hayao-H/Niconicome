@@ -49,6 +49,7 @@ namespace Niconicome.Models.Network.Download
         string FileNameFormat { get; }
         string VideoInfoExt { get; }
         string IchibaInfoExt { get; }
+        string ThumbnailExt { get; }
         uint VerticalResolution { get; }
         int PlaylistID { get; }
         int MaxCommentsCount { get; }
@@ -404,6 +405,7 @@ namespace Niconicome.Models.Network.Download
         public string VideoInfoExt { get; set; } = string.Empty;
 
         public string IchibaInfoExt { get; set; } = string.Empty;
+        public string ThumbnailExt { get; set; } = string.Empty;
 
         public IchibaInfoTypeSettings IchibaInfoType { get; set; }
 
@@ -434,6 +436,7 @@ namespace Niconicome.Models.Network.Download
                 FileNameFormat = this.FileNameFormat,
                 IsOverwriteEnable = this.Overwrite,
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
+                Extension = this.ThumbnailExt,
             };
         }
 
