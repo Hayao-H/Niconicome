@@ -178,6 +178,8 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.FFProfileName => STypes::SettingNames.FirefoxProfileName,
                 SettingsEnum.HtmlExt => STypes::SettingNames.HtmlFileExtension,
                 SettingsEnum.JpegExt => STypes::SettingNames.JpegFileExtension,
+                SettingsEnum.VideoinfoSuffix => STypes::SettingNames.VideoInfoSuffix,
+                SettingsEnum.IchibaSuffic => STypes::SettingNames.IchibaSuffix,
                 _ => null
             };
         }
@@ -246,5 +248,7 @@ namespace Niconicome.Models.Local.Settings
         FFProfileName,
         HtmlExt,
         JpegExt,
+        VideoinfoSuffix,
+        IchibaSuffic,
     }
 }
