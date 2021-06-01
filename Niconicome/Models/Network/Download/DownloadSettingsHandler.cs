@@ -113,6 +113,9 @@ namespace Niconicome.Models.Network.Download
 
             string thumbExt = this.settingHandler.GetStringSetting(SettingsEnum.JpegExt) ?? FileFolder.DefaultJpegFileExt;
 
+            string videoInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.VideoinfoSuffix) ?? Format.DefaultVideoInfoSuffix;
+            string ichibaInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.IchibaInfoSuffix) ?? Format.DefaultIchibaSuffix;
+
             return new DownloadSettings
             {
                 Video = this.IsDownloadingVideoEnable.Value,
@@ -140,6 +143,8 @@ namespace Niconicome.Models.Network.Download
                 DownloadIchibaInfo = this.IsDownloadingIchibaInfoEnable.Value,
                 IchibaInfoType = ichibaInfoT,
                 ThumbnailExt = thumbExt,
+                VideoInfoSuffix = videoInfoSuffix,
+                IchibaInfoSuffix = ichibaInfoSuffix,
             };
         }
 

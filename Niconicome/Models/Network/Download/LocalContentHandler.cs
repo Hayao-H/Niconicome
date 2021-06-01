@@ -12,7 +12,7 @@ namespace Niconicome.Models.Network.Download
 {
     public interface ILocalContentHandler
     {
-        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, string videoInfoExt, string ichibaInfoExt, string thumbnailExt);
+        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, string videoInfoExt, string ichibaInfoExt, string thumbnailExt, string ichibaSuffix, string videoInfosuffix);
         IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath);
     }
 
@@ -52,13 +52,13 @@ namespace Niconicome.Models.Network.Download
         /// <param name="format"></param>
         /// <param name="dmcInfo"></param>
         /// <returns></returns>
-        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, string videoInfoExt, string ichibaInfoExt, string thumbnailExt)
+        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, string videoInfoExt, string ichibaInfoExt, string thumbnailExt, string ichibaSuffix, string videoInfosuffix)
         {
             string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4", replaceStricted);
             string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml", replaceStricted);
             string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, thumbnailExt, replaceStricted);
-            string videoInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, videoInfoExt, replaceStricted);
-            string ichibaInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, ichibaInfoExt, replaceStricted);
+            string videoInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, videoInfoExt, replaceStricted, videoInfosuffix);
+            string ichibaInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, ichibaInfoExt, replaceStricted, ichibaSuffix);
             bool videoExist = this.videoFileStorehandler.Exists(dmcInfo.Id);
             string? localPath = null;
 

@@ -21,6 +21,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
     {
         string FolderName { get; set; }
         string Format { get; set; }
+        string Suffix { get; }
         bool IsOverwriteEnable { get; set; }
         bool IsReplaceRestrictedEnable { get; set; }
         bool IsSaveInJsonEnabled { get; set; }
@@ -44,6 +45,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         public string FolderName { get; set; } = string.Empty;
 
         public string Format { get; set; } = string.Empty;
+
+        public string Suffix { get; set; } = string.Empty;
 
         public bool IsOverwriteEnable { get; set; }
 
@@ -97,15 +100,15 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
 
             if (setting.IsSaveInJsonEnabled)
             {
-                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".json", setting.IsReplaceRestrictedEnable);
+                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".json", setting.IsReplaceRestrictedEnable, setting.Suffix);
             }
             else if (setting.IsSaveInXmlEnabled)
             {
-                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".xml", setting.IsReplaceRestrictedEnable);
+                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".xml", setting.IsReplaceRestrictedEnable, setting.Suffix);
             }
             else
             {
-                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".txt", setting.IsReplaceRestrictedEnable);
+                fileName = this.utils.GetFileName(setting.Format, session.Video.DmcInfo, ".txt", setting.IsReplaceRestrictedEnable, setting.Suffix);
             }
 
             var filePath = Path.Combine(setting.FolderName, fileName);

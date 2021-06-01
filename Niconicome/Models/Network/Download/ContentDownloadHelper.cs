@@ -103,7 +103,7 @@ namespace Niconicome.Models.Network.Download
             if (setting.Skip)
             {
                 string fileNameFormat = setting.FileNameFormat;
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt);
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix);
             }
 
             if (!Directory.Exists(setting.FolderPath))
@@ -399,7 +399,7 @@ namespace Niconicome.Models.Network.Download
         private async Task<IAttemptResult> DownloadIchibaInfoAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context)
         {
             var iSettings = settings.ConvertToIchibaInfoDownloadSettings();
-            var filePath = this.pathOrganizer.GetFIlePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.IchibaInfoExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, "[ichiba]");
+            var filePath = this.pathOrganizer.GetFIlePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.IchibaInfoExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, settings.IchibaInfoSuffix);
             IOUtils.CreateDirectoryIfNotExist(filePath);
             iSettings.FilePath = filePath;
 
