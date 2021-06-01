@@ -13,5 +13,9 @@ namespace Niconicome.Models.Const
         public const string FIleFormat = "[<id>]<title>";
 
         public const string FileExtRegExp = @"^\..+$";
+
+        public const string DefaultIchibaSuffix = "[ichiba]";
+
+        public const string DefaultVideoInfoSuffix = "[info]";
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using AngleSharp.Attributes;
 using Niconicome.Models.Const;
 using Niconicome.Models.Local.Settings;
 using Reactive.Bindings;
@@ -23,6 +24,8 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.IsReplaceSBToSBEnable = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB));
             this.HtmlFileExt = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.HtmlExt) ?? FileFolder.DefaultHtmlFileExt).SetValidateAttribute(() => this.HtmlFileExt);
             this.JpegFileExt = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.JpegExt) ?? FileFolder.DefaultJpegFileExt).SetValidateAttribute(() => this.JpegFileExt);
+            this.VideoInfoSuffix = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.VideoinfoSuffix) ?? Format.DefaultVideoInfoSuffix);
+            this.IchibaSuffix = new ReactiveProperty<string>(WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.IchibaInfoSuffix) ?? Format.DefaultIchibaSuffix);
 
             this.FileFormat.Subscribe(value => this.SaveSetting(value, SettingsEnum.FileNameFormat)).AddTo(this.disposables);
             this.DefaultFolder.Subscribe(value => this.SaveSetting(value, SettingsEnum.DefaultFolder)).AddTo(this.disposables);
@@ -37,6 +40,8 @@ namespace Niconicome.ViewModels.Setting.Pages
                 if (this.JpegFileExt.HasErrors) return;
                 this.SaveSetting(value, SettingsEnum.JpegExt);
             }).AddTo(this.disposables);
+            this.VideoInfoSuffix.Subscribe(value => this.SaveSetting(value, SettingsEnum.VideoinfoSuffix)).AddTo(this.disposables);
+            this.IchibaSuffix.Subscribe(value => this.SaveSetting(value, SettingsEnum.IchibaInfoSuffix)).AddTo(this.disposables);
         }
 
         /// <summary>
@@ -66,6 +71,15 @@ namespace Niconicome.ViewModels.Setting.Pages
         [RegularExpression(Format.FileExtRegExp, ErrorMessage = "正しい形式で指定してください。")]
         public ReactiveProperty<string> JpegFileExt { get; init; }
 
+        /// <summary>
+        /// 動画情報の接尾子
+        /// </summary>
+        public ReactiveProperty<string> VideoInfoSuffix { get; init; }
+
+        /// <summary>
+        /// 市場情報の接尾子
+        /// </summary>
+        public ReactiveProperty<string> IchibaSuffix { get; init; } 
 
     }
 
@@ -83,6 +97,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactiveProperty<string> HtmlFileExt { get; init; } = new(".html");
 
         public ReactiveProperty<string> JpegFileExt { get; init; } = new(".jpg");
+
+        public ReactiveProperty<string> VideoInfoSuffix { get; init; } = new(Format.DefaultVideoInfoSuffix);
+
+        public ReactiveProperty<string> IchibaSuffix { get; init; } = new(Format.DefaultIchibaSuffix);
 
 
     }
