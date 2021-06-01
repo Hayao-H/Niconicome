@@ -347,8 +347,8 @@ namespace Niconicome.ViewModels.Mainpage
                     }
                     int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
 
-                    var sourceVideos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value);
-                    int sourceVideosCount = sourceVideos.Count();
+                    var sourceVideos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).ToList();
+                    int sourceVideosCount = sourceVideos.Count;
 
                     if (sourceVideosCount < 1) return;
 
