@@ -179,7 +179,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.HtmlExt => STypes::SettingNames.HtmlFileExtension,
                 SettingsEnum.JpegExt => STypes::SettingNames.JpegFileExtension,
                 SettingsEnum.VideoinfoSuffix => STypes::SettingNames.VideoInfoSuffix,
-                SettingsEnum.IchibaSuffic => STypes::SettingNames.IchibaSuffix,
+                SettingsEnum.IchibaInfoSuffix => STypes::SettingNames.IchibaSuffix,
                 _ => null
             };
         }
@@ -249,6 +249,6 @@ namespace Niconicome.Models.Local.Settings
         HtmlExt,
         JpegExt,
         VideoinfoSuffix,
-        IchibaSuffic,
+        IchibaInfoSuffix,
     }
 }
