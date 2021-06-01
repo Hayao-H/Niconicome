@@ -5,7 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>0.6.0.*</AssemblyVersion>
+    <AssemblyVersion>0.6.1.*</AssemblyVersion>
     <FileVersion>0.0.0.0</FileVersion>
     <StartupObject>Niconicome.App</StartupObject>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -15,7 +15,7 @@
     <PublishTrimmed>false</PublishTrimmed>
     <Deterministic>false</Deterministic>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <Version>0.6.0</Version>
+    <Version>0.6.1</Version>
     <PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
     <Copyright>c2021 Hayao-H</Copyright>
     <Authors>Hayao-H</Authors>
