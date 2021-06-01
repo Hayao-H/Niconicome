@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Niconicome.Models.Domain.Local.Store.Types;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
@@ -28,11 +29,12 @@ namespace Niconicome.Models.Playlist.Playlist
     /// </summary>
     class SortInfoHandler : BindableBase, ISortInfoHandler
     {
-        public SortInfoHandler(IPlaylistHandler playlistHandler, ICurrent current, IVideoListContainer container)
+        public SortInfoHandler(IPlaylistHandler playlistHandler, ICurrent current, IVideoListContainer container, ILogger logger)
         {
             this.playlistHandler = playlistHandler;
             this.current = current;
             this.container = container;
+            this.logger = logger;
 
             this.SortType = new ReactiveProperty<VideoSortType>(current.SelectedPlaylist.Value?.VideoSortType ?? VideoSortType.Register);
             this.IsDescending = new ReactiveProperty<bool>(current.SelectedPlaylist.Value?.IsVideoDescending ?? false);
@@ -72,10 +74,28 @@ namespace Niconicome.Models.Playlist.Playlist
 
                 var playlist = this.current.SelectedPlaylist.Value;
                 if (playlist is null) return;
+                bool isZero = this.container.Count <= 0;
 
                 playlist.VideoSortType = value;
                 this.playlistHandler.Update(playlist);
-                this.container.Sort(value, this.IsDescending.Value, this.current.SelectedPlaylist.Value?.CustomSortSequence);
+
+                var result = this.container.Sort(value, this.IsDescending.Value, this.current.SelectedPlaylist.Value?.CustomSortSequence);
+
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error($"動画の並び替えに失敗しました。(type:{value}, Message:{result.Message})", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error($"動画の並び替えに失敗しました。(type:{value}, Message:{result.Message})");
+                    }
+                }
+                if (!isZero && this.container.Count <= 0)
+                {
+                    this.logger.Error($"動画リストの動画数が0です。(type:{value})");
+                }
             }).AddTo(this.disposables);
 
             this.IsDescending.Subscribe(value =>
@@ -85,10 +105,28 @@ namespace Niconicome.Models.Playlist.Playlist
 
                 var playlist = this.current.SelectedPlaylist.Value;
                 if (playlist is null) return;
+                bool isZero = this.container.Count <= 0;
 
                 playlist.IsVideoDescending = value;
                 this.playlistHandler.Update(playlist);
-                this.container.Sort(this.SortType.Value, value, this.current.SelectedPlaylist.Value?.CustomSortSequence);
+
+                var result = this.container.Sort(this.SortType.Value, value, this.current.SelectedPlaylist.Value?.CustomSortSequence);
+
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error($"動画の並び替えに失敗しました。(isDescending:{value}, Message:{result.Message})", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error($"動画の並び替えに失敗しました。(isDescending:{value}, Message:{result.Message})");
+                    }
+                }
+                if (!isZero && this.container.Count <= 0)
+                {
+                    this.logger.Error($"動画リストの動画数が0です。(type:{value})");
+                }
             }).AddTo(this.disposables);
         }
 
@@ -99,6 +137,8 @@ namespace Niconicome.Models.Playlist.Playlist
         private readonly ICurrent current;
 
         private readonly IVideoListContainer container;
+
+        private readonly ILogger logger;
 
         #endregion
 
