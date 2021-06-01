@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Unity.Storage;
 
 namespace Niconicome.Models.Domain.Local.Store.Types
 {
@@ -167,5 +167,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string FirefoxProfileName { get; private set; } = "firefoxprofilename";
         public static string HtmlFileExtension { get; private set; } = "htmlfileextension";
         public static string JpegFileExtension { get; private set; } = "jpegfileextension";
+        public static string VideoInfoSuffix { get; private set; } = "videoinfosuffix";
+        public static string IchibaSuffix { get; private set; } = "ichibainfosuffix";
     }
 }

@@ -15,7 +15,7 @@
         Background="{DynamicResource MaterialDesignBackground}"
         FontFamily="Yu Gothic"
         d:DataContext="{d:DesignInstance {x:Type vm:FileSettingsViewModelD},IsDesignTimeCreatable=True}"
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="800"
       Title="ファイル設定">
     <Grid>
         <Grid.RowDefinitions>
@@ -25,26 +25,27 @@
         <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
             <TextBlock Text="ファイル設定" Margin="16 0 0 0" FontSize="24" VerticalAlignment="Bottom"/>
         </Border>
-        <StackPanel Margin="8" Grid.Row="1">
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="ContentSave" Foreground="SkyBlue">
-                        <materialDesign:PackIcon.RenderTransform>
-                            <TranslateTransform Y="7"/>
-                        </materialDesign:PackIcon.RenderTransform>
-                    </materialDesign:PackIcon>
-                    <Label Content="ファイル名のフォーマット(_F)" Target="{Binding ElementName=fileformat}"/>
-                </StackPanel>
-                <TextBox Margin="10 0 0 0" Text="{Binding FileFormat.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="fileformat"/>
-                <StackPanel Margin="15 5 0 0" Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="InfoCircle" Foreground="SkyBlue">
-                        <materialDesign:PackIcon.RenderTransform>
-                            <TranslateTransform Y="7"/>
-                        </materialDesign:PackIcon.RenderTransform>
-                    </materialDesign:PackIcon>
-                    <Label Content="使用可能なフォーマット"/>
-                </StackPanel>
-                <TextBlock Margin="25 0 5 0" TextWrapping="Wrap" Foreground="#324772">
+        <ScrollViewer Grid.Row="1" Height="auto">
+            <StackPanel Margin="8">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ContentSave" Foreground="SkyBlue">
+                            <materialDesign:PackIcon.RenderTransform>
+                                <TranslateTransform Y="7"/>
+                            </materialDesign:PackIcon.RenderTransform>
+                        </materialDesign:PackIcon>
+                        <Label Content="ファイル名のフォーマット(_F)" Target="{Binding ElementName=fileformat}"/>
+                    </StackPanel>
+                    <TextBox Margin="10 0 0 0" Text="{Binding FileFormat.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="fileformat"/>
+                    <StackPanel Margin="15 5 0 0" Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="InfoCircle" Foreground="SkyBlue">
+                            <materialDesign:PackIcon.RenderTransform>
+                                <TranslateTransform Y="7"/>
+                            </materialDesign:PackIcon.RenderTransform>
+                        </materialDesign:PackIcon>
+                        <Label Content="使用可能なフォーマット"/>
+                    </StackPanel>
+                    <TextBlock Margin="25 0 5 0" TextWrapping="Wrap" Foreground="#324772">
                     &lt;title&gt; :動画タイトル,
                     &lt;id&gt; :動画ID,
                     &lt;uploadedon&gt; :投稿日時,<LineBreak/>
@@ -52,59 +53,88 @@
                     &lt;owner&gt; :投稿者のニックネーム<LineBreak/>
                     ※カスタム書式を利用できます。詳しくはwikiをご覧ください。<LineBreak/>
                     ※「\」でフォルダーを作成します。[&lt;id&gt;]&lt;title&gt;でxenoのデフォルトと同じフォーマットになります。
-                </TextBlock>
-            </StackPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="ContentSave" Foreground="SkyBlue">
+                    </TextBlock>
+                </StackPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ContentSave" Foreground="SkyBlue">
+                            <materialDesign:PackIcon.RenderTransform>
+                                <TranslateTransform Y="7"/>
+                            </materialDesign:PackIcon.RenderTransform>
+                        </materialDesign:PackIcon>
+                        <Label Content="保存フォルダーが指定されていなかった場合に使用するフォルダー(_D)" Target="{Binding ElementName=fileformat}"/>
+                    </StackPanel>
+                    <TextBox Margin="10 0 0 0" Text="{Binding DefaultFolder.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="defaultfolder"/>
+                </StackPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="FileDocument" Foreground="SkyBlue">
                         <materialDesign:PackIcon.RenderTransform>
                             <TranslateTransform Y="7"/>
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
-                    <Label Content="保存フォルダーが指定されていなかった場合に使用するフォルダー(_D)" Target="{Binding ElementName=fileformat}"/>
-                </StackPanel>
-                <TextBox Margin="10 0 0 0" Text="{Binding DefaultFolder.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="defaultfolder"/>
-            </StackPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-            <DockPanel>
-                <materialDesign:PackIcon Kind="FileDocument" Foreground="SkyBlue">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <TranslateTransform Y="7"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
-                <Label Content="htmlファイルの拡張子（ピリオド付き）" ToolTip="市場情報ファイルなど"/>
-                <TextBox
+                    <Label Content="htmlファイルの拡張子（ピリオド付き）" ToolTip="市場情報ファイルなど"/>
+                    <TextBox
                     HorizontalAlignment="Right" 
                     Margin="10 0 0 0" 
                     Width="200"
                     Text="{Binding HtmlFileExt.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-            </DockPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-            <DockPanel>
-                <materialDesign:PackIcon Kind="FileImage" Foreground="SkyBlue">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <TranslateTransform Y="7"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
-                <Label Content="jpegファイルの拡張子（ピリオド付き）" ToolTip="サムネイルファイルなど"/>
-                <TextBox
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="FileImage" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="jpegファイルの拡張子（ピリオド付き）" ToolTip="サムネイルファイルなど"/>
+                    <TextBox
                     HorizontalAlignment="Right" 
                     Margin="10 0 0 0" 
                     Width="200"
                     Text="{Binding JpegFileExt.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-            </DockPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-            <DockPanel>
-                <materialDesign:PackIcon Kind="FindReplace" Foreground="SkyBlue">
-                    <materialDesign:PackIcon.RenderTransform>
-                        <TranslateTransform Y="7"/>
-                    </materialDesign:PackIcon.RenderTransform>
-                </materialDesign:PackIcon>
-                <Label Content="禁則文字をマルチバイト文字に置き換える" />
-                <ToggleButton IsChecked="{Binding IsReplaceSBToSBEnable.Value,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"/>
-            </DockPanel>
-            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-        </StackPanel>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="ShoppingBasket" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="市場情報ファイルの接尾子"/>
+                    <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding IchibaSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="Movie" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="動画情報ファイルの接尾子"/>
+                    <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding VideoInfoSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="FindReplace" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="禁則文字をマルチバイト文字に置き換える" />
+                    <ToggleButton IsChecked="{Binding IsReplaceSBToSBEnable.Value,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

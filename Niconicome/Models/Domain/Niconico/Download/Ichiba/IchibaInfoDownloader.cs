@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using Niconicome.Extensions;
-using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Net.Xml;
 using Niconicome.Models.Domain.Niconico.Video.Ichiba;
@@ -40,6 +37,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
         public bool IsReplacingStrictedEnabled { get; set; }
 
         public string FilePath { get; set; } = string.Empty;
+
     }
 
     class IchibaInfoDownloader : IIchibaInfoDownloader
