@@ -151,6 +151,8 @@ namespace Niconicome.Models.Network
                     IsFailed = true
                 };
 
+                this.IsProcessing.Value = false;
+
                 return result;
             }
 
