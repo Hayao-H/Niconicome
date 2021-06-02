@@ -151,9 +151,10 @@ namespace Niconicome.ViewModels.Mainpage
 
                   WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
 
-                  WS::Mainpage.PlaylistHandler.Refresh();
+                  WS::Mainpage.VideoListContainer.Refresh();
 
                   this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
+                  WS::Mainpage.Messagehandler.AppendMessage ($"{videos.Count}件の動画を追加しました");
 
                   if (!videos.First().ChannelID.Value.IsNullOrEmpty())
                   {
