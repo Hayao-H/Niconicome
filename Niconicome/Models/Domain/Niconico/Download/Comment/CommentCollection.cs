@@ -17,7 +17,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         long Thread { get; }
         int Fork { get; }
         bool IsDefaultPostTarget { get; }
-        void Add(Response::Comment comment, bool sort = true);
+        void Add(Response::Comment comment);
         void Add(List<Response::Comment> comments, bool addSafe = true);
         void Clear();
         void Distinct();
@@ -187,7 +187,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// </summary>
         /// <param name="comment"></param>
         /// <param name="sort"></param>
-        public void Add(Response::Comment comment, bool sort = true)
+        public void Add(Response::Comment comment)
         {
             if (this.isRoot)
             {
@@ -230,10 +230,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 {
                     this.commentsfield.AddFirst(comment);
                     this.isSorted = false;
-                    if (!this.unsafeHandle)
-                    {
-                        this.Distinct();
-                    }
                 }
                 else
                 {
@@ -286,7 +282,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             foreach (var item in chats)
             {
-                this.Add(item, false);
+                this.Add(item);
             }
 
             if (!this.unsafeHandle)
@@ -297,7 +293,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             var thread = comments.FirstOrDefault(c => c.Thread is not null);
             if (thread is not null)
             {
-                this.Add(thread, false);
+                this.Add(thread);
             }
         }
 
