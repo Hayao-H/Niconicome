@@ -280,13 +280,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
                 foreach (var _ in Enumerable.Range(0, this.comThroughSetting))
                 {
-                    chats.RemoveLast();
+                    chats.RemoveFirst();
                 }
             }
 
             foreach (var item in chats)
             {
                 this.Add(item, false);
+            }
+
+            if (!this.unsafeHandle)
+            {
+                this.Distinct();
             }
 
             var thread = comments.FirstOrDefault(c => c.Thread is not null);
