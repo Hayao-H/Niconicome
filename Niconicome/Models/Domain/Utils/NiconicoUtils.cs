@@ -178,7 +178,7 @@ namespace Niconicome.Models.Domain.Utils
             {
                 return RemoteType.UserVideos;
             }
-            else if (Regex.IsMatch(url, @"^https?://(www\.)?nicovideo\.jp/watch/(sm|nm|so)\d+.*"))
+            else if (Regex.IsMatch(url, @"^https?://(www\.)?nicovideo\.jp/watch/(sm|nm|so)?\d+.*"))
             {
                 return RemoteType.WatchPage;
             }
