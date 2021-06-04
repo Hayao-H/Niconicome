@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "CA1822:メンバーを static に設定します")]
+[assembly: SuppressMessage("Interoperability", "CA1416:プラットフォームの互換性を検証")]

@@ -111,6 +111,14 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                 </Button>
+
+                <Button Margin="5,0" Grid.Column="5" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="{Binding ClipboardMonitoringToolTip.Value}" Command="{Binding MonitorClipbordCommand}">
+                    <materialDesign:PackIcon Kind="{Binding ClipbordMonitorIcon.Value}">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
