@@ -34,6 +34,9 @@ using Playlist = Niconicome.Models.Domain.Local.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Utils;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
+using System.Media;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -100,6 +103,37 @@ namespace Niconicome.ViewModels.Mainpage
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
+            #region クリップボード監視
+
+            this.isClipbordMonitoring = new ReactiveProperty<bool>();
+
+            this.ClipbordMonitorIcon = this.isClipbordMonitoring
+                .Select(value => value ? MaterialDesign::PackIconKind.ClipboardRemove : MaterialDesign::PackIconKind.ClipboardPulse)
+                .ToReactiveProperty()
+                .AddTo(this.disposables);
+
+            this.isClipbordMonitoring
+                .Skip(1)
+                .Subscribe(value =>
+            {
+                if (value)
+                {
+
+                    WS::Mainpage.SnaclbarHandler.Enqueue("クリップボードの監視を開始します。");
+                    WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を開始します。");
+                } else
+                {
+                    WS::Mainpage.SnaclbarHandler.Enqueue("クリップボードの監視を終了します。");
+                    WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を終了します。");
+                }
+            }).AddTo(this.disposables);
+
+            this.ClipboardMonitoringToolTip = this.isClipbordMonitoring
+                .Select(value => value ? "クリップボードの監視を終了する" : "クリップボードを監視する")
+                .ToReadOnlyReactiveProperty();
+
+            #endregion
+
             #region コマンドの初期化
             this.AddVideoCommand = new[] {
             WS::Mainpage.CurrentPlaylist.SelectedPlaylist
@@ -154,7 +188,7 @@ namespace Niconicome.ViewModels.Mainpage
                   WS::Mainpage.VideoListContainer.Refresh();
 
                   this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
-                  WS::Mainpage.Messagehandler.AppendMessage ($"{videos.Count}件の動画を追加しました");
+                  WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を追加しました");
 
                   if (!videos.First().ChannelID.Value.IsNullOrEmpty())
                   {
@@ -280,6 +314,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(ids)).ToList();
                 var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
+                WS::Mainpage.VideoListContainer.Refresh();
 
                 if (result.IsSucceeded)
                 {
@@ -755,6 +790,33 @@ namespace Niconicome.ViewModels.Mainpage
                 }).AddTo(this.disposables)
             .AddTo(this.disposables);
 
+            this.MonitorClipbordCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(value => value is not null)
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    if (!this.isClipbordMonitoring.Value)
+                    {
+                        if (!Compatibility.IsOsVersionLargerThan(10, 0, 10240))
+                        {
+                            WS::Mainpage.SnaclbarHandler.Enqueue("この機能はOSでサポートされていません。");
+                            WS::Mainpage.Messagehandler.AppendMessage("この機能は'Windows10 1507'以降のOSでのみ利用可能です。");
+                            return;
+                        }
+
+                        Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged += this.OnContextMenuChange;
+                        this.isClipbordMonitoring.Value = true;
+
+                    }
+                    else
+                    {
+                        if (!Compatibility.IsOsVersionLargerThan(10, 0, 10240)) return;
+                        Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged -= this.OnContextMenuChange;
+                        this.isClipbordMonitoring.Value = false;
+
+                    }
+                }).AddTo(this.disposables);
+
             #endregion
 
             #region Width系プロパティー
@@ -936,6 +998,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// ダブルクリック
         /// </summary>
         public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; }
+
+        /// <summary>
+        /// クリップボード監視コマンド
+        /// </summary>
+        public ReactiveCommand MonitorClipbordCommand { get; init; }
+
         #endregion
 
         /// <summary>
@@ -983,6 +1051,17 @@ namespace Niconicome.ViewModels.Mainpage
         /// すべて選択
         /// </summary>
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; }
+
+        /// <summary>
+        /// クリップボード監視アイコン
+        /// </summary>
+        public ReactiveProperty<MaterialDesign::PackIconKind> ClipbordMonitorIcon { get; init; } = new(MaterialDesign::PackIconKind.ClipboardPulse);
+
+        /// <summary>
+        /// クリップボード監視
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> ClipboardMonitoringToolTip { get; init; }
+
 
         #region カラムタイトル
         /// <summary>
@@ -1088,6 +1167,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isFiltered;
 
+        private ReactiveProperty<bool> isClipbordMonitoring;
+
         private readonly IEventAggregator ea;
 
         /// <summary>
@@ -1119,6 +1200,17 @@ namespace Niconicome.ViewModels.Mainpage
                 var count = WS::Mainpage.VideoListContainer.Count;
                 this.PlaylistTitle.Value = $"{name}({count}件)";
             }
+        }
+
+        /// <summary>
+        /// コンテキストメニュー監視
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnContextMenuChange(object? sender, object? e)
+        {
+            SystemSounds.Asterisk.Play();
+            this.AddVideoFromClipboardCommand.Execute();
         }
 
         #endregion
@@ -1192,6 +1284,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveCommand SearchCommand { get; init; } = new();
 
+        public ReactiveCommand MonitorClipbordCommand { get; init; } = new();
+
         public CommandBase<string> CreatePlaylistCommand { get; init; } = new(_ => true, _ => { });
 
         public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; } = new ReactiveCommand<MouseEventArgs>();
@@ -1209,6 +1303,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<string> PlaylistTitle { get; set; } = new("空白のプレイリスト");
 
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; } = new();
+
+        public ReactiveProperty<MaterialDesign::PackIconKind> ClipbordMonitorIcon { get; init; } = new(MaterialDesign::PackIconKind.ClipboardPulse);
 
         public ReactivePropertySlim<int> SelectColumnWidth { get; set; } = new();
 
@@ -1237,6 +1333,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<string> ViewCountColumnTitle { get; init; } = new("再生回数");
 
         public ReactivePropertySlim<string> DlFlagColumnTitle { get; init; } = new("DL済み");
+
+        public ReactiveProperty<string> ClipboardMonitoringToolTip { get; init; } = new("クリップボードを監視する");
 
     }
 
