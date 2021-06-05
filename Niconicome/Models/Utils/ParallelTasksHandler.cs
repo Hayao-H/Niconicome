@@ -22,15 +22,16 @@ namespace Niconicome.Models.Utils
     class ParallelTasksHandler<T> where T : IParallelTask<T>
     {
 
-        public ParallelTasksHandler(int maxPallarelTasksCount, int waitInterval, int waitSeconds, bool createThread = true)
+        public ParallelTasksHandler(int maxPallarelTasksCount, int waitInterval, int waitSeconds, bool createThread = true, bool untilEmpty = false)
         {
             this.maxPallarelTasksCount = maxPallarelTasksCount;
             this.waitInterval = waitInterval;
             this.waitSeconds = waitSeconds;
             this.createThread = createThread;
+            this.processUntilEmpty = untilEmpty;
         }
 
-        public ParallelTasksHandler(int maxPallarelTasksCount, bool createThread = true) : this(maxPallarelTasksCount, -1, -1, createThread) { }
+        public ParallelTasksHandler(int maxPallarelTasksCount, bool createThread = true, bool untilEmpty = false) : this(maxPallarelTasksCount, -1, -1, createThread, untilEmpty) { }
 
         /// <summary>
         /// 最大動機実行数
@@ -61,6 +62,11 @@ namespace Niconicome.Models.Utils
         /// 別スレッド化フラグ
         /// </summary>
         private readonly bool createThread;
+
+        /// <summary>
+        /// タスクが空になるまで続ける
+        /// </summary>
+        private readonly bool processUntilEmpty;
 
         /// <summary>
         /// 全ての並列タスク
@@ -210,6 +216,11 @@ namespace Niconicome.Models.Utils
             }
 
             await tasks.WhenAll();
+
+            if (this.processUntilEmpty && this.PallarelTasks.Count > 0)
+            {
+                await this.ProcessTasksAsync(preAction, onCancelled, ct);
+            }
 
             lock (this.lockobj)
             {
