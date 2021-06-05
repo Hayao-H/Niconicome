@@ -105,7 +105,7 @@ namespace Niconicome.Models.Network.Download
             {
                 sleepInterval = 5;
             }
-            this.parallelTasksHandler = new ParallelTasksHandler<DownloadTaskParallel>(maxParallel, sleepInterval, 15);
+            this.parallelTasksHandler = new ParallelTasksHandler<DownloadTaskParallel>(maxParallel, sleepInterval, 15, untilEmpty: true);
             this.downloadTasksHandler.DownloadTaskPool.TaskPoolChange += this.DownloadTaskPoolChangedEventHandler;
         }
 
