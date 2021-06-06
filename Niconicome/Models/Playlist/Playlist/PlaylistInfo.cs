@@ -25,6 +25,9 @@ namespace Niconicome.Models.Playlist.Playlist
         bool IsRoot { get; set; }
         bool IsConcrete { get; }
         bool IsVideoDescending { get; set; }
+        bool IsDownloadSucceededHistory { get; set; }
+        bool IsDownloadFailedHistory { get; set; }
+        bool IsTemporary { get; set; }
         Brush BackgroundColor { get; set; }
         Visibility BeforeSeparatorVisibility { get; set; }
         Visibility AfterSeparatorVisibility { get; set; }
@@ -117,6 +120,20 @@ namespace Niconicome.Models.Playlist.Playlist
         /// </summary>
         public bool IsVideoDescending { get; set; }
 
+        /// <summary>
+        /// DL成功履歴
+        /// </summary>
+        public bool IsDownloadSucceededHistory { get; set; }
+
+        /// <summary>
+        /// DL失敗履歴
+        /// </summary>
+        public bool IsDownloadFailedHistory { get; set; }
+
+        /// <summary>
+        /// 一時プレイリスト
+        /// </summary>
+        public bool IsTemporary { get; set; }
 
         /// <summary>
         /// リモート設定
@@ -221,6 +238,9 @@ namespace Niconicome.Models.Playlist.Playlist
             playlistInfo.VideoSortType = dbPlaylist.SortType;
             playlistInfo.CustomSortSequence.AddRange(dbPlaylist.CustomVideoSequence);
             playlistInfo.IsVideoDescending = dbPlaylist.IsVideoDescending;
+            playlistInfo.IsDownloadFailedHistory = dbPlaylist.IsDownloadFailedHistory;
+            playlistInfo.IsDownloadSucceededHistory = dbPlaylist.IsDownloadSucceededHistory;
+            playlistInfo.IsTemporary = dbPlaylist.IsTemporary;
         }
 
         /// <summary>

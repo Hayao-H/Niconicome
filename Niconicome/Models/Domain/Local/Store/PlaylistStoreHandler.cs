@@ -549,6 +549,9 @@ namespace Niconicome.Models.Domain.Local.Store
             dbPlaylist.CustomVideoSequence.AddRange(playlistInfo.CustomSortSequence);
             dbPlaylist.SortType = playlistInfo.VideoSortType;
             dbPlaylist.IsVideoDescending = playlistInfo.IsVideoDescending;
+            dbPlaylist.IsTemporary = playlistInfo.IsTemporary;
+            dbPlaylist.IsDownloadSucceededHistory = playlistInfo.IsDownloadSucceededHistory;
+            dbPlaylist.IsDownloadFailedHistory = playlistInfo.IsDownloadFailedHistory;
         }
     }
 }
