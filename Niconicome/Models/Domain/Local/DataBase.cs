@@ -33,6 +33,8 @@ namespace Niconicome.Models.Domain.Local
         IAttemptResult<int> GetRecordCount(string tableName);
         IAttemptResult<T> GetRecord<T>(string tablename, Expression<Func<T, bool>> predicate) where T : IStorable;
         IAttemptResult<T> GetRecord<T>(string tableName, int id) where T : IStorable;
+        IAttemptResult<T> GetRecord<T, MemberT>(string tableName, int id, Expression<Func<T, MemberT>> factory) where T : IStorable;
+
         bool Exists<T>(string tablename, int id) where T : IStorable;
         bool Exists<T>(string tablename, Expression<Func<T, bool>> predicate) where T : IStorable;
         IAttemptResult<int> Store<T>(T data, string tableName) where T : IStorable;
@@ -214,6 +216,39 @@ namespace Niconicome.Models.Domain.Local
 
             return new AttemptResult<T>() { Data = data, IsSucceeded = true };
         }
+
+        /// <summary>
+        /// 関連付けこみでレコードを取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TMem"></typeparam>
+        /// <param name="tablename"></param>
+        /// <param name="id"></param>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        public IAttemptResult<T> GetRecord<T, TMem>(string tablename, int id, Expression<Func<T, TMem>> factory) where T : IStorable
+        {
+            var result = this.GetCollectionInternal(tablename, factory);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return new AttemptResult<T>() { Message = $"テーブル「{tablename}」の取得に失敗しました。", Exception = result.Exception };
+            }
+
+            T data;
+
+            try
+            {
+                data = result.Data.FindById(id);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<T>() { Message = $"テーブル「{tablename}」からのレコード取得に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<T>() { Data = data, IsSucceeded = true };
+        }
+
 
         /// <summary>
         /// レコードが存在するかどうかをチェックする(ID)
@@ -479,6 +514,31 @@ namespace Niconicome.Models.Domain.Local
             try
             {
                 col = this.DbInstance!.GetCollection<T>(tableName);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<ILiteCollection<T>>() { Exception = e };
+            }
+
+            return new AttemptResult<ILiteCollection<T>>() { Data = col, IsSucceeded = true };
+        }
+
+        /// <summary>
+        /// コレクションを取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        private IAttemptResult<ILiteCollection<T>> GetCollectionInternal<T, TMem>(string tableName, Expression<Func<T, TMem>> factory)
+        {
+            this.CheckIfDbInstabseIsNull();
+
+            ILiteCollection<T> col;
+
+            try
+            {
+                col = this.DbInstance!.GetCollection<T>(tableName)
+                    .Include(factory);
             }
             catch (Exception e)
             {

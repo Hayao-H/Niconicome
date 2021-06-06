@@ -745,7 +745,7 @@ namespace Niconicome.ViewModels.Mainpage
                 var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
                 if (!videos.Any()) return;
 
-                var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name, folderPath, type);
+                var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value, folderPath, type);
 
                 if (result)
                 {
@@ -1181,7 +1181,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Children.Count == 0)
             {
                 WS::Mainpage.Messagehandler.ClearMessage();
-                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
+                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
                 WS::Mainpage.SnaclbarHandler.Enqueue($"プレイリスト:{name}");
                 WS::Mainpage.VideoListContainer.Refresh();
@@ -1196,7 +1196,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
             {
-                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
+                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value;
                 var count = WS::Mainpage.VideoListContainer.Count;
                 this.PlaylistTitle.Value = $"{name}({count}件)";
             }

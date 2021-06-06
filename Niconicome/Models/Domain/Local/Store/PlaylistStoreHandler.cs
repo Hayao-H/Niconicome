@@ -67,7 +67,7 @@ namespace Niconicome.Models.Domain.Local.Store
         public STypes::Playlist? GetPlaylist(int id)
         {
 
-            var result = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, id);
+            var result = this.databaseInstance.GetRecord<STypes::Playlist, List<STypes::Video>>(STypes::Playlist.TableName, id, p => p.Videos);
 
             if (!result.IsSucceeded || result.Data is null)
             {
@@ -564,9 +564,9 @@ namespace Niconicome.Models.Domain.Local.Store
             var result = this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
 
             if (!result.IsSucceeded)
-{
+            {
                 if (result.Exception is not null)
-{
+                {
                     this.logger.Error($"{playlist.PlaylistName}からの動画({videoId})の削除に失敗しました。", result.Exception);
                 }
                 else
@@ -657,7 +657,7 @@ namespace Niconicome.Models.Domain.Local.Store
         private bool JustifyPlaylists(int Id)
         {
             var playlist = this.GetPlaylist(Id);
-        
+
             if (playlist is null)
             {
                 return false;
@@ -684,7 +684,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 }
                 return true;
             }
-        
+
         }
 
         /// <summary>
@@ -762,7 +762,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="playlistInfo"></param>
         private void SetData(STypes::Playlist dbPlaylist, ITreePlaylistInfo playlistInfo)
         {
-            dbPlaylist.PlaylistName = playlistInfo.Name;
+            dbPlaylist.PlaylistName = playlistInfo.Name.Value;
             dbPlaylist.FolderPath = playlistInfo.Folderpath;
             dbPlaylist.IsExpanded = playlistInfo.IsExpanded;
             dbPlaylist.CustomVideoSequence.Clear();

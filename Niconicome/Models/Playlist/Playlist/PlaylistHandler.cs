@@ -178,7 +178,7 @@ namespace Niconicome.Models.Playlist.Playlist
 
                     if (playlist is not null)
                     {
-                        playlist.Name = playlistName;
+                        playlist.Name.Value = playlistName;
                         this.Update(playlist);
                     }
                 }

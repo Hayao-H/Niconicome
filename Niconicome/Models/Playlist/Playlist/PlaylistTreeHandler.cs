@@ -82,14 +82,15 @@ namespace Niconicome.Models.Playlist.Playlist
             {
                 ITreePlaylistInfo after = source[i];
 
-                //重複があった場合はプロパティーを引き継いでから削除する
+                //重複があった場合は更新する
                 ITreePlaylistInfo? before = this.GetPlaylist(after.Id);
                 if (before is not null)
                 {
                     after.BeforeSeparatorVisibility = before.BeforeSeparatorVisibility;
                     after.AfterSeparatorVisibility = before.AfterSeparatorVisibility;
                     after.IsExpanded = before.IsExpanded;
-                    this.Remove(before.Id);
+                    before.UpdateData(after);
+                    continue;
                 }
 
                 if (!noAssociate)
