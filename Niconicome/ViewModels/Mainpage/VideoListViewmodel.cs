@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,12 +16,12 @@ using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
-using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Utils;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
@@ -31,12 +32,9 @@ using EnumSettings = Niconicome.Models.Local.Settings.EnumSettingsValue;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 using Net = Niconicome.Models.Domain.Network;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
+using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
-using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
-using Niconicome.Models.Utils;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
-using System.Media;
 
 namespace Niconicome.ViewModels.Mainpage
 {

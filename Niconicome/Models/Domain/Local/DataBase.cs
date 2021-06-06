@@ -62,16 +62,6 @@ namespace Niconicome.Models.Domain.Local
                 this.logger.Error("データベースファイルのオープンに失敗しました。", result.Exception!);
                 return;
             }
-
-            try
-            {
-                this.SetUp();
-            }
-            catch (Exception e)
-            {
-                this.logger.Error("データベースの初期化中にエラーが発生しました。", e);
-                return;
-            }
         }
 
         public DataBase(ILiteDatabase liteInstance, ILogger logger, bool autoDispose = true)
@@ -79,7 +69,6 @@ namespace Niconicome.Models.Domain.Local
             this.DbInstance = liteInstance;
             this.logger = logger;
             this.autoDispose = autoDispose;
-            this.SetUp();
         }
 
         ~DataBase()
@@ -546,23 +535,6 @@ namespace Niconicome.Models.Domain.Local
             }
 
             return new AttemptResult<ILiteCollection<T>>() { Data = col, IsSucceeded = true };
-        }
-
-        /// <summary>
-        /// データベースのセットアップ
-        /// </summary>
-        private void SetUp()
-        {
-
-            if (!this.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot))
-            {
-                var root = new STypes::Playlist()
-                {
-                    IsRoot = true,
-                    PlaylistName = "プレイリスト一覧",
-                };
-                this.Store(root, STypes::Playlist.TableName);
-            }
         }
 
         /// <summary>

@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Niconicome.Models.Playlist;
-using STypes = Niconicome.Models.Domain.Local.Store.Types;
+using System.Linq.Expressions;
 using Niconicome.Extensions.System.List;
-using Niconicome.Models.Playlist.Playlist;
-using Niconicome.Models.Helper.Result;
-using System.Data.Common;
 using Niconicome.Models.Domain.Utils;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
-using Niconicome.Extensions;
-using System.Windows;
-using Niconicome.Models.Network.Watch;
-using MS.WindowsAPICodePack.Internal;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
+using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Domain.Local.Store
 {
@@ -31,6 +26,7 @@ namespace Niconicome.Models.Domain.Local.Store
         IAttemptResult MoveVideoToForward(int playlistID, int videoIndex);
         void DeletePlaylist(int id);
         bool Exists(int id);
+        bool Exists(Expression<Func<STypes::Playlist, bool>> predicate);
         bool JustifyPlaylists(IEnumerable<int> Id);
         bool ContainsVideo(string niconicoId, int playlistId);
         void Move(int id, int destId);
@@ -39,6 +35,7 @@ namespace Niconicome.Models.Domain.Local.Store
         void SetAsLocalPlaylist(int id);
         int GetPlaylistsCount();
         void Refresh();
+        IAttemptResult Initialize();
     }
 
     public class PlaylistStoreHandler : IPlaylistStoreHandler
@@ -337,6 +334,17 @@ namespace Niconicome.Models.Domain.Local.Store
             return this.databaseInstance.Exists<STypes::Playlist>(STypes::Playlist.TableName, id);
         }
 
+        /// <summary>
+        ///関数でプレイリストの存在をチェックする
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public bool Exists(Expression<Func<STypes::Playlist, bool>> predicate)
+        {
+            return this.databaseInstance.Exists(STypes::Playlist.TableName, predicate);
+        }
+
+
 
         /// <summary>
         /// データベース上のプレイリスト数を取得
@@ -462,20 +470,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         public void Refresh()
         {
-            int records = this.GetPlaylistsCount();
-            if (records == 0)
-            {
-                var playlist = new STypes::Playlist()
-                {
-                    PlaylistName = "プレイリスト一覧",
-                    IsRoot = true
-                };
-                this.databaseInstance.Store(playlist, STypes::Playlist.TableName);
-                this.logger.Log("ルートプレイリストが存在しなかったので追加しました。");
-            }
-
             this.logger.Log("プレイリストがリフレッシュされました。");
-
         }
 
         /// <summary>
@@ -487,6 +482,113 @@ namespace Niconicome.Models.Domain.Local.Store
         {
             return !ids.Select(id => this.JustifyPlaylists(id)).Any(ok => ok == false);
         }
+
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        /// <returns></returns>
+        public IAttemptResult Initialize()
+        {
+            if (!this.Exists(p => p.IsRoot))
+            {
+                var root = new STypes::Playlist()
+                {
+                    IsRoot = true,
+                    PlaylistName = "プレイリスト一覧",
+                };
+                var result = this.databaseInstance.Store(root, STypes::Playlist.TableName);
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error($"ルートプレイリストの保存に失敗しました。({result.Message})", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error($"ルートプレイリストの保存に失敗しました。({result.Message})");
+                    }
+                    return new AttemptResult() { Message = "ルートプレイリストの保存に失敗しました。", Exception = result.Exception };
+                }
+
+                this.logger.Log("ルートプレイリストが存在しなかったので作成しました。");
+            }
+
+            if (!this.Exists(p => p.IsDownloadSucceededHistory))
+            {
+                var succeeded = new STypes::Playlist()
+                {
+                    IsDownloadSucceededHistory = true,
+                    PlaylistName = "最近ダウンロードした動画",
+                };
+                var result = this.databaseInstance.Store(succeeded, STypes::Playlist.TableName);
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error($"DL成功履歴の保存に失敗しました。({result.Message})", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error($"DL成功履歴の保存に失敗しました。({result.Message})");
+                    }
+                    return new AttemptResult() { Message = "DL成功履歴の保存に失敗しました。", Exception = result.Exception };
+                }
+
+                this.logger.Log("DL成功履歴が存在しなかったので作成しました。");
+            }
+
+
+            if (!this.Exists(p => p.IsDownloadFailedHistory))
+            {
+                var failed = new STypes::Playlist()
+                {
+                    IsDownloadFailedHistory = true,
+                    PlaylistName = "最近ダウンロードに失敗した動画",
+                };
+                var result = this.databaseInstance.Store(failed, STypes::Playlist.TableName);
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error($"DL失敗履歴の保存に失敗しました。({result.Message})", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error($"DL失敗履歴の保存に失敗しました。({result.Message})");
+                    }
+                    return new AttemptResult() { Message = "DL失敗履歴の保存に失敗しました。", Exception = result.Exception };
+                }
+
+                this.logger.Log("DL失敗履歴が存在しなかったので作成しました。");
+            }
+
+            if (!this.Exists(p => p.IsTemporary))
+            {
+                var failed = new STypes::Playlist()
+                {
+                    IsTemporary = true,
+                    PlaylistName = "一時プレイリスト",
+                };
+                var result = this.databaseInstance.Store(failed, STypes::Playlist.TableName);
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error($"一時プレイリストの保存に失敗しました。({result.Message})", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error($"一時プレイリストの保存に失敗しました。({result.Message})");
+                    }
+                    return new AttemptResult() { Message = "一時プレイリストの保存に失敗しました。", Exception = result.Exception };
+                }
+
+                this.logger.Log("一時プレイリストが存在しなかったので作成しました。");
+            }
+
+            return new AttemptResult() { IsSucceeded = true };
+        }
+
 
         #region 動画操作系メソッド
 
