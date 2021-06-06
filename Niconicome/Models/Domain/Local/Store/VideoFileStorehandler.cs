@@ -29,12 +29,17 @@ namespace Niconicome.Models.Domain.Local.Store
     public class VideoFileStorehandler : IVideoFileStorehandler
     {
 
-        public VideoFileStorehandler(IDataBase dataBase)
+        public VideoFileStorehandler(IDataBase dataBase,ILogger logger)
         {
             this.dataBase = dataBase;
+            this.logger = logger;
         }
 
+        #region field
         private readonly IDataBase dataBase;
+
+        private readonly ILogger logger;
+        #endregion
 
         /// <summary>
         /// 設定を取得する
@@ -43,7 +48,23 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <returns></returns>
         private Types.VideoFile? GetFileData(string niconicoId)
         {
-            return this.dataBase.GetRecord<Types.VideoFile>(Types.VideoFile.TableName, v => v.NiconicoId == niconicoId);
+            var result = this.dataBase.GetRecord<Types.VideoFile>(Types.VideoFile.TableName, v => v.NiconicoId == niconicoId);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error($"動画ファイル情報({niconicoId})の取得に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error($"動画ファイル情報({niconicoId})の取得に失敗しました。");
+                }
+
+                return null;
+            }
+
+            return result.Data;
         }
 
         /// <summary>
@@ -127,9 +148,24 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         public void Clean()
         {
-            var allData = this.dataBase.GetAllRecords<Types.VideoFile>(Types.VideoFile.TableName);
+            var result = this.dataBase.GetAllRecords<Types.VideoFile>(Types.VideoFile.TableName);
 
-            foreach (var data in allData)
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error($"動画ファイル情報の取得に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error($"動画ファイル情報の取得に失敗しました。");
+                }
+
+                return;
+            }
+
+
+            foreach (var data in result.Data)
             {
                 var paths = data.FilePaths.Select(p => IOUtils.GetRootedPath(p)).Where(p =>
                 {

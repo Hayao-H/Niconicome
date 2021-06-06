@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
@@ -23,12 +25,18 @@ namespace Niconicome.Models.Domain.Local.Store
     public class VideoStoreHandler : IVideoStoreHandler
     {
 
-        public VideoStoreHandler(IDataBase dataBase)
+        public VideoStoreHandler(IDataBase dataBase, ILogger logger)
         {
             this.databaseInstance = dataBase;
+            this.logger = logger;
         }
 
+        #region field
+
         private readonly IDataBase databaseInstance;
+
+        private readonly ILogger logger;
+        #endregion
 
 
         /// <summary>
@@ -38,7 +46,23 @@ namespace Niconicome.Models.Domain.Local.Store
         public IEnumerable<STypes::Video> GetAllVideos()
         {
 
-            return this.databaseInstance.GetAllRecords<STypes::Video>(STypes::Video.TableName);
+            var result = this.databaseInstance.GetAllRecords<STypes::Video>(STypes::Video.TableName);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error("全動画の取得に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error("全動画の取得に失敗しました。");
+                }
+
+                return Enumerable.Empty<STypes::Video>();
+            }
+
+            return result.Data;
         }
 
 
@@ -75,8 +99,23 @@ namespace Niconicome.Models.Domain.Local.Store
 
                 this.SetData(video, videoData);
 
-                videoId = this.databaseInstance.Store(video, STypes::Video.TableName);
+                var result = this.databaseInstance.Store(video, STypes::Video.TableName);
 
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error($"動画({videoData.NiconicoId})の追加に失敗しました。", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error($"動画({videoData.NiconicoId})の追加に失敗しました。");
+                    }
+
+                    return -1;
+                }
+
+                videoId = result.Data;
             }
 
             return videoId;
@@ -110,7 +149,23 @@ namespace Niconicome.Models.Domain.Local.Store
                     }
                 }
 
-                this.databaseInstance.DeleteAll<STypes::Video>(STypes::Video.TableName, video => video.Id == videoID);
+                var result = this.databaseInstance.DeleteAll<STypes::Video>(STypes::Video.TableName, video => video.Id == videoID);
+
+                if (!result.IsSucceeded)
+                {
+                    if (result.Exception is not null)
+                    {
+                        this.logger.Error($"動画({videoID})の{playlistID}からの削除に失敗しました。", result.Exception);
+                    }
+                    else
+                    {
+                        this.logger.Error($"動画({videoID})の{playlistID}からの削除に失敗しました。");
+                    }
+
+                }
+
+                this.logger.Log($"動画({videoID})を{playlistID}から削除しました。");
+
             }
         }
 
@@ -153,8 +208,24 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <returns></returns>
         public STypes::Video? GetVideo(int id)
         {
-            var video = this.databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, id);
-            return video;
+            var result = this.databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, id);
+
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error($"動画({id})の取得に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error($"動画({id})の取得に失敗しました。");
+                }
+
+                return null;
+            }
+
+            return result.Data;
         }
 
         /// <summary>
@@ -164,8 +235,22 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <returns></returns>
         public STypes::Video? GetVideo(string niconicoId)
         {
-            var video = this.databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, video => video.NiconicoId == niconicoId);
-            return video;
+            var result = this.databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, video => video.NiconicoId == niconicoId);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error($"動画({niconicoId})の取得に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error($"動画({niconicoId})の取得に失敗しました。");
+                }
+
+                return null;
+            }
+            return result.Data;
         }
 
         /// <summary>
@@ -226,7 +311,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 {
                     bool exists = this.databaseInstance.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlistId);
                     if (!exists) return false;
-                    var playlist = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlistId)!;
+                    var playlist = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlistId).Data!;
                     bool contains = playlist.Videos.Select(v => v.Id).Contains(video.Id);
                     return contains;
                 }).Distinct().ToList();

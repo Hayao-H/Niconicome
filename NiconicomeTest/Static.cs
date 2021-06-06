@@ -3,6 +3,7 @@ using System.Net.Http;
 using Niconicome.Models.Domain.Local;
 using LiteDB;
 using Niconicome.Models.Domain.Niconico;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
 
 namespace NiconicomeTest
 {
@@ -22,12 +23,13 @@ namespace NiconicomeTest
 
         private static ILiteDatabase? innerLiteDataBaseInstance;
 
-        public static IDataBase DataBaseInstance {
+        public static IDataBase DataBaseInstance
+        {
             get
             {
                 if (Static.innerDataBaseInstance == null)
                 {
-                    Static.innerDataBaseInstance = new DataBase(Static.LiteDataBaseInstance,false);
+                    Static.innerDataBaseInstance = new DataBase(Static.LiteDataBaseInstance, new LoggerStab(), false);
                 }
                 return Static.innerDataBaseInstance;
             }

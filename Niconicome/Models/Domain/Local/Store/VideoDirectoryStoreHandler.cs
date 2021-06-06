@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Utils;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Domain.Local.Store
@@ -16,12 +17,17 @@ namespace Niconicome.Models.Domain.Local.Store
 
     public class VideoDirectoryStoreHandler : IVideoDirectoryStoreHandler
     {
-        public VideoDirectoryStoreHandler(IDataBase dataBase)
+        public VideoDirectoryStoreHandler(IDataBase dataBase, ILogger logger)
         {
             this.database = dataBase;
+            this.logger = logger;
         }
 
+        #region private
         private readonly IDataBase database;
+
+        private readonly ILogger logger;
+        #endregion
 
         /// <summary>
         /// 全てのディレクトリーを取得する
@@ -29,7 +35,23 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <returns></returns>
         public List<STypes::VideoDirectory> GetVideoDirectories()
         {
-            return this.database.GetAllRecords<STypes::VideoDirectory>(STypes::VideoDirectory.TableName);
+            var result = this.database.GetAllRecords<STypes::VideoDirectory>(STypes::VideoDirectory.TableName);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error("動画ディレクトリの取得に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error("動画ディレクトリの取得に失敗しました。");
+                }
+
+                return new List<STypes::VideoDirectory>();
+            }
+
+            return result.Data;
         }
 
         /// <summary>
@@ -38,7 +60,19 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="path"></param>
         public void DeleteDirectory(string path)
         {
-            this.database.DeleteAll<STypes::VideoDirectory>(STypes::VideoDirectory.TableName, d => d.Path == path);
+            var result = this.database.DeleteAll<STypes::VideoDirectory>(STypes::VideoDirectory.TableName, d => d.Path == path);
+
+            if (!result.IsSucceeded)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error("動画ディレクトリのDBからの削除に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error("動画ディレクトリのDBからの削除に失敗しました。");
+                }
+            }
         }
 
         /// <summary>
@@ -53,9 +87,23 @@ namespace Niconicome.Models.Domain.Local.Store
                 Path = path
             };
 
-            var id = this.database.Store(data, STypes::VideoDirectory.TableName);
+            var result = this.database.Store(data, STypes::VideoDirectory.TableName);
 
-            return id;
+            if (!result.IsSucceeded)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error("動画ディレクトリの取得に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error("動画ディレクトリの取得に失敗しました。");
+                }
+
+                return -1;
+            }
+
+            return result.Data;
         }
     }
 }

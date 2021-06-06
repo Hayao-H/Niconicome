@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Domain.Local.Store;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
 
 namespace NiconicomeTest.Local.Video
 {
@@ -31,10 +32,10 @@ namespace NiconicomeTest.Local.Video
             this.databaseInstance.Clear(STypes::Video.TableName);
 
             //動画を操作する為のハンドラを作成する
-            this.handler = new VideoStoreHandler(this.databaseInstance);
+            this.handler = new VideoStoreHandler(this.databaseInstance, new LoggerStab());
 
             //プレイリストを操作する為のハンドラを作成する
-            this.playlistHandler = new PlaylistStoreHandler(this.databaseInstance, this.handler);
+            this.playlistHandler = new PlaylistStoreHandler(this.databaseInstance, this.handler, new LoggerStab());
 
             ///ルート直下にテスト用のプレイリストを作成する
             int rootId = this.playlistHandler.GetRootPlaylist().Id;
