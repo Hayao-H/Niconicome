@@ -65,8 +65,8 @@
                 </materialDesign:DrawerHost.LeftDrawerContent>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="17*"/>
+                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column= "0" Background="{DynamicResource  MaterialDesignSnackbarBackground}">
                         <Grid.DataContext>

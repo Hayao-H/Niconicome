@@ -296,9 +296,9 @@ namespace Niconicome.Models.Domain.Local.Store
 
 
             //ルートプレイリストは削除禁止
-            if (playlist!.IsRoot || playlist.Layer == 1)
+            if (playlist!.IsRoot || playlist.Layer == 1 || playlist!.IsTemporary || playlist!.IsDownloadFailedHistory || playlist!.IsDownloadSucceededHistory)
             {
-                this.logger.Log($"削除できないプレイリストに対する削除が試行されました。(isRoot:{playlist.IsRoot}, layer:{playlist.Layer})");
+                this.logger.Log($"削除できないプレイリストに対する削除が試行されました。(isRoot:{playlist.IsRoot}, layer:{playlist.Layer}, isTmp:{playlist.IsTemporary}, isFailed:{ playlist.IsDownloadFailedHistory}, IsSucceeeded:{playlist.IsDownloadSucceededHistory})");
                 return;
             }
 
@@ -470,7 +470,22 @@ namespace Niconicome.Models.Domain.Local.Store
         /// </summary>
         public void Refresh()
         {
-            this.logger.Log("プレイリストがリフレッシュされました。");
+            IAttemptResult result = this.Initialize();
+            if (!result.IsSucceeded)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error($"プレイリストのリフレッシュに失敗しました。({result.Message})", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error($"プレイリストのリフレッシュに失敗しました。({result.Message})");
+                }
+            }
+            else
+            {
+                this.logger.Log("プレイリストがリフレッシュされました。");
+            }
         }
 
         /// <summary>

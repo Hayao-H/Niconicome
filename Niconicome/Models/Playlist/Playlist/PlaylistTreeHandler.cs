@@ -129,13 +129,38 @@ namespace Niconicome.Models.Playlist.Playlist
         /// ツリーを取得する
         /// </summary>
         /// <returns></returns>
-        public ITreePlaylistInfo GetTree()
+        private List<ITreePlaylistInfo> GetTree()
         {
-            var root = this.GetRoot();
+            var list = new List<ITreePlaylistInfo>();
+
+            ITreePlaylistInfo? root = this.GetRoot();
+
             //ルートプレイリストがnullの場合はエラーを返す
             if (root == null) throw new InvalidOperationException("ルートプレイリストが存在しません。");
 
-            return this.ConstructPlaylistInfo(root.Id);
+            ITreePlaylistInfo? tmp = this.GetPlaylist(p => p.IsTemporary);
+            ITreePlaylistInfo? succeeded = this.GetPlaylist(p => p.IsDownloadSucceededHistory);
+            ITreePlaylistInfo? failed = this.GetPlaylist(p => p.IsDownloadFailedHistory);
+
+            if (tmp is null)
+            {
+                throw new InvalidOperationException("一時プレイリストが存在しません。");
+            }
+            else if (succeeded is null)
+            {
+                throw new InvalidOperationException("DL成功履歴プレイリストが存在しません。");
+            }
+            else if (failed is null)
+            {
+                throw new InvalidOperationException("DL失敗履歴プレイリストが存在しません。");
+            }
+
+            list.Add(this.ConstructPlaylistInfo(root.Id));
+            list.Add(tmp);
+            list.Add(succeeded);
+            list.Add(failed);
+
+            return list;
 
         }
 
@@ -196,7 +221,7 @@ namespace Niconicome.Models.Playlist.Playlist
 
             var tree = this.GetTree();
             this.Playlists.Clear();
-            this.Playlists.Add(tree);
+            this.Playlists.Addrange(tree);
         }
 
         #region private
@@ -209,6 +234,15 @@ namespace Niconicome.Models.Playlist.Playlist
             return this.GetAllPlaylists().FirstOrDefault(p => p.IsRoot);
         }
 
+        /// <summary>
+        /// 条件を指定してプレイリストを取得する
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        private ITreePlaylistInfo? GetPlaylist(Func<ITreePlaylistInfo, bool> predicate)
+        {
+            return this.innertPlaylists.FirstOrDefault(kv => predicate(kv.Value)).Value;
+        }
 
         /// <summary>
         /// 完全なプレイリストツリーを構築する
