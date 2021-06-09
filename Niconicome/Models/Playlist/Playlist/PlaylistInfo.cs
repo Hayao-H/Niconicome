@@ -7,6 +7,7 @@ using System.Windows.Media;
 using LiteDB;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.ViewModels;
+using Reactive.Bindings;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Playlist.Playlist
@@ -14,7 +15,7 @@ namespace Niconicome.Models.Playlist.Playlist
     public interface ITreePlaylistInfo : IClonable<ITreePlaylistInfo>
     {
         int Id { get; set; }
-        string Name { get; set; }
+        ReactiveProperty<string> Name { get;  }
         string RemoteId { get; set; }
         string Folderpath { get; set; }
         ObservableCollection<ITreePlaylistInfo> Children { get; }
@@ -25,6 +26,9 @@ namespace Niconicome.Models.Playlist.Playlist
         bool IsRoot { get; set; }
         bool IsConcrete { get; }
         bool IsVideoDescending { get; set; }
+        bool IsDownloadSucceededHistory { get; set; }
+        bool IsDownloadFailedHistory { get; set; }
+        bool IsTemporary { get; set; }
         Brush BackgroundColor { get; set; }
         Visibility BeforeSeparatorVisibility { get; set; }
         Visibility AfterSeparatorVisibility { get; set; }
@@ -34,6 +38,7 @@ namespace Niconicome.Models.Playlist.Playlist
         RemoteType RemoteType { get; set; }
         int GetLayer(IPlaylistTreeHandler handler);
         VideoSortType VideoSortType { get; set; }
+        void UpdateData(ITreePlaylistInfo newPlaylist);
 
     }
 
@@ -51,7 +56,7 @@ namespace Niconicome.Models.Playlist.Playlist
         /// <summary>
         /// プレイリスト名
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public ReactiveProperty<string> Name { get; init; } = new(string.Empty);
 
         /// <summary>
         /// リモートID
@@ -117,6 +122,20 @@ namespace Niconicome.Models.Playlist.Playlist
         /// </summary>
         public bool IsVideoDescending { get; set; }
 
+        /// <summary>
+        /// DL成功履歴
+        /// </summary>
+        public bool IsDownloadSucceededHistory { get; set; }
+
+        /// <summary>
+        /// DL失敗履歴
+        /// </summary>
+        public bool IsDownloadFailedHistory { get; set; }
+
+        /// <summary>
+        /// 一時プレイリスト
+        /// </summary>
+        public bool IsTemporary { get; set; }
 
         /// <summary>
         /// リモート設定
@@ -203,6 +222,27 @@ namespace Niconicome.Models.Playlist.Playlist
         }
 
         /// <summary>
+        /// 別のプレイリストのデータを移行する
+        /// </summary>
+        /// <param name="newPlaylist"></param>
+        public void UpdateData(ITreePlaylistInfo newPlaylist)
+        {
+            this.Name.Value= newPlaylist.Name.Value;
+            this.IsRemotePlaylist= newPlaylist.IsRemotePlaylist;
+            this.RemoteType= newPlaylist.RemoteType;
+            this.RemoteId= newPlaylist.RemoteId;
+            this.Folderpath= newPlaylist.Folderpath;
+            this.IsExpanded= newPlaylist.IsExpanded;
+            this.VideoSortType= newPlaylist.VideoSortType;
+            this.CustomSortSequence.Clear();
+            this.CustomSortSequence.AddRange(newPlaylist.CustomSortSequence);
+            this.IsVideoDescending= newPlaylist.IsVideoDescending;
+            this.IsDownloadFailedHistory= newPlaylist.IsDownloadFailedHistory;
+            this.IsDownloadSucceededHistory= newPlaylist.IsDownloadSucceededHistory;
+            this.IsTemporary= newPlaylist.IsTemporary; 
+        }
+
+        /// <summary>
         /// データをセットする
         /// </summary>
         /// <param name="dbPlaylist"></param>
@@ -212,7 +252,7 @@ namespace Niconicome.Models.Playlist.Playlist
             playlistInfo.Id = dbPlaylist.Id;
             playlistInfo.ParentId = dbPlaylist.ParentPlaylist?.Id ?? -1;
             playlistInfo.IsRoot = dbPlaylist.IsRoot;
-            playlistInfo.Name = dbPlaylist.PlaylistName ?? string.Empty;
+            playlistInfo.Name.Value = dbPlaylist.PlaylistName ?? string.Empty;
             playlistInfo.IsRemotePlaylist = dbPlaylist.IsRemotePlaylist;
             playlistInfo.RemoteType = dbPlaylist.IsMylist ? RemoteType.Mylist : dbPlaylist.IsUserVideos ? RemoteType.UserVideos : dbPlaylist.IsWatchLater ? RemoteType.WatchLater : dbPlaylist.IsChannel ? RemoteType.Channel : RemoteType.None;
             playlistInfo.RemoteId = dbPlaylist.RemoteId ?? string.Empty;
@@ -221,6 +261,9 @@ namespace Niconicome.Models.Playlist.Playlist
             playlistInfo.VideoSortType = dbPlaylist.SortType;
             playlistInfo.CustomSortSequence.AddRange(dbPlaylist.CustomVideoSequence);
             playlistInfo.IsVideoDescending = dbPlaylist.IsVideoDescending;
+            playlistInfo.IsDownloadFailedHistory = dbPlaylist.IsDownloadFailedHistory;
+            playlistInfo.IsDownloadSucceededHistory = dbPlaylist.IsDownloadSucceededHistory;
+            playlistInfo.IsTemporary = dbPlaylist.IsTemporary;
         }
 
         /// <summary>

@@ -169,5 +169,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string JpegFileExtension { get; private set; } = "jpegfileextension";
         public static string VideoInfoSuffix { get; private set; } = "videoinfosuffix";
         public static string IchibaSuffix { get; private set; } = "ichibainfosuffix";
+        public static string DisableDownloadSucceededHistory { get; private set; } = "disabledownloadsucceededhistory";
+        public static string DisableDownloadFailedHistory { get; private set; } = "disabledownloadfailedhistory";
     }
 }

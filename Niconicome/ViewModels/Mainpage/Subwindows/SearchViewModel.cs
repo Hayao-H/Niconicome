@@ -151,12 +151,13 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                      return;
                  }
 
-                 var videos = this.SearchResult.Where(v => v.IsSelected.Value).Select(v=> {
+                 var videos = this.SearchResult.Where(v => v.IsSelected.Value).Select(v =>
+                 {
                      v.IsSelected.Value = false;
                      return v;
                  }).Copy();
 
-                 if (videos.Count() <= 0)
+                 if (!videos.Any())
                  {
 
                      this.MessageQueue.Enqueue("動画が選択されていません");
@@ -164,7 +165,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                      return;
                  }
 
-                 var result = WS::SettingPage.VideoListContainer.AddRange(videos);
+                 var result = WS::SettingPage.VideoListContainer.AddRange(videos, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
 
                  if (!result.IsSucceeded)
                  {
@@ -177,9 +178,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                      this.Message = $"{videos.Count()}件の動画を登録しました。(詳細:{result.Message})";
                      this.MessageQueue.Enqueue("登録しました");
                      this.SearchResult.Clear();
+                     WS::Mainpage.VideoListContainer.Refresh();
                  }
-
-
 
              });
 

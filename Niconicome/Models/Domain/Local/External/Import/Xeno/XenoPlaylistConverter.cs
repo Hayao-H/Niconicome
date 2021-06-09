@@ -2,6 +2,7 @@
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Local.External.Import.Xeno
 {
@@ -22,7 +23,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
         {
             var converted = new NonBindableTreePlaylistInfo()
             {
-                Name = playlist.Name,
+                Name = new ReactiveProperty<string>(playlist.Name),
                 IsRemotePlaylist = playlist.IsChannel,
                 RemoteType = playlist.IsChannel ? RemoteType.Channel : RemoteType.None,
                 RemoteId = playlist.ChannelId??string.Empty,

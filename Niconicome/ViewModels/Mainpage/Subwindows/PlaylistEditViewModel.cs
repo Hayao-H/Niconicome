@@ -21,16 +21,16 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public PlaylistEditViewModel(ITreePlaylistInfo playlist)
         {
             this.playlist = playlist; 
-            this.PlaylistName = this.playlist.Name ?? string.Empty;
+            this.PlaylistName = this.playlist.Name.Value ?? string.Empty;
             this.FolderPath = this.playlist.Folderpath ?? string.Empty;
 
             this.OnExit = new CommandBase<Window>(arg => true, arg =>
             {
                 var oldPlaylist =this.playlist;
-                if (oldPlaylist is not null && (oldPlaylist.Name != this.PlaylistName || oldPlaylist.Folderpath != this.FolderPath))
+                if (oldPlaylist is not null && (oldPlaylist.Name.Value != this.PlaylistName || oldPlaylist.Folderpath != this.FolderPath))
                 {
                     var newPlaylist = oldPlaylist.Clone();
-                    newPlaylist.Name = this.PlaylistName;
+                    newPlaylist.Name.Value = this.PlaylistName;
                     newPlaylist.Folderpath = this.FolderPath;
                     WS::Mainpage.PlaylistHandler.Update(newPlaylist);
                     WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = newPlaylist;

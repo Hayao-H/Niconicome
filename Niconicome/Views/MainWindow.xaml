@@ -65,8 +65,8 @@
                 </materialDesign:DrawerHost.LeftDrawerContent>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="17*"/>
+                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column= "0" Background="{DynamicResource  MaterialDesignSnackbarBackground}">
                         <Grid.DataContext>
@@ -93,7 +93,7 @@
                                                 <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
                                             </Grid.ToolTip>
                                             <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                            <TextBlock Foreground="{DynamicResource MaterialDesignSnackbarRipple}" Text="{Binding Name}"/>
+                                            <TextBlock Foreground="{DynamicResource MaterialDesignSnackbarRipple}" Text="{Binding Name.Value}"/>
                                             <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
                                         </Grid>
                                     </StackPanel>

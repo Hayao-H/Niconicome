@@ -226,7 +226,7 @@ namespace Niconicome.Models.Local.External.Import
                 return;
             }
 
-            var id = this.playlistStoreHandler.AddPlaylist(parentId, playlistInfo.Name);
+            var id = this.playlistStoreHandler.AddPlaylist(parentId, playlistInfo.Name.Value);
             var playlist = this.playlistStoreHandler.GetPlaylist(id);
             var sleepInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
 

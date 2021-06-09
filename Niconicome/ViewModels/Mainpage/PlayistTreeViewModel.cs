@@ -247,6 +247,12 @@ namespace Niconicome.ViewModels.Mainpage
             //ルートは禁止
             if (sourceInfo.IsRoot) return;
 
+            //特殊プレイリストも禁止
+            if (sourceInfo.IsTemporary || sourceInfo.IsDownloadSucceededHistory || sourceInfo.IsDownloadFailedHistory)
+            {
+                return;
+            }
+
             //自分自身には挿入できない
             if (sourceInfo.Id == targetInfo.Id) return;
 

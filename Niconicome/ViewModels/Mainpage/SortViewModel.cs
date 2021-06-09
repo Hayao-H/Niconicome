@@ -133,7 +133,7 @@ namespace Niconicome.ViewModels.Mainpage
                 .WithSubscribe(() =>
                 {
                     var index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
-                    var result = WS::Mainpage.VideoListContainer.MovevideotoPrev(index);
+                    var result = WS::Mainpage.VideoListContainer.MovevideotoPrev(index, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
                     if (!result.IsSucceeded)
                     {
                         WS::Mainpage.SnaclbarHandler.Enqueue("動画の並び替えに失敗しました。");
@@ -156,7 +156,7 @@ namespace Niconicome.ViewModels.Mainpage
                 .WithSubscribe(() =>
                 {
                     var index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
-                    var result = WS::Mainpage.VideoListContainer.MovevideotoForward(index);
+                    var result = WS::Mainpage.VideoListContainer.MovevideotoForward(index, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
                     if (!result.IsSucceeded)
                     {
                         WS::Mainpage.SnaclbarHandler.Enqueue("動画の並び替えに失敗しました。");

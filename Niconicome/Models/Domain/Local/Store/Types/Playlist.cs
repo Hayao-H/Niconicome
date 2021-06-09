@@ -49,6 +49,12 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public  bool IsVideoDescending { get; set; }
 
+        public bool IsDownloadSucceededHistory { get; set; }
+
+        public bool IsDownloadFailedHistory { get; set; }
+
+        public bool IsTemporary { get; set; }
+
         public List<int> CustomVideoSequence { get; set; } = new();
 
         public VideoSortType SortType { get; set; }

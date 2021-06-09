@@ -100,7 +100,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
                     if (videos.Count > 0)
                     {
-                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistID);
+                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistID, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
                         WS::Mainpage.VideoListContainer.Refresh();
                     }
 

@@ -6,6 +6,8 @@ using Niconicome.Models.Domain.Local.Store;
 using Playlist = Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist;
 using Reactive.Bindings;
+using System.Linq;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
 
 namespace NiconicomeTest
 {
@@ -26,7 +28,7 @@ namespace NiconicomeTest
                     this.database = Static.DataBaseInstance;
                     //プレイリストテーブルをクリア
                     this.database.Clear(STypes::Playlist.TableName);
-                    this.playlistStorehandler = new PlaylistStoreHandler(this.database, new VideoStoreHandler(this.database));
+                    this.playlistStorehandler = new PlaylistStoreHandler(this.database, new VideoStoreHandler(this.database, new LoggerStab()), new LoggerStab());
                     this.playlistStorehandler.Refresh();
                 }
 
@@ -45,7 +47,7 @@ namespace NiconicomeTest
                     int childId = this.playlistStorehandler?.AddPlaylist(rootId, "子プレイリスト") ?? -1;
                     Assert.Greater(rootId, -1);
                     Assert.Greater(childId, -1);
-                    STypes::Playlist? child = this.database?.GetCollection<STypes::Playlist>(STypes::Playlist.TableName).Include(x => x.ParentPlaylist).FindById(childId);
+                    STypes::Playlist? child = this.database?.GetCollection<STypes::Playlist>(STypes::Playlist.TableName).Data!.FirstOrDefault(p => p.Id == childId);
                     Assert.IsNotNull(child);
                     Assert.IsNotNull(child?.ParentPlaylist);
                     Assert.AreEqual(rootId, child?.ParentPlaylist?.Id);
@@ -86,7 +88,7 @@ namespace NiconicomeTest
                     this.playlistStorehandler?.Move(targetId, playlistBId);
 
                     //移動したプレイリストを取得
-                    STypes::Playlist? target = this.database?.GetCollection<STypes::Playlist>(STypes::Playlist.TableName).FindById(targetId);
+                    STypes::Playlist? target = this.database?.GetCollection<STypes::Playlist>(STypes::Playlist.TableName).Data!.FirstOrDefault(p => p.Id == targetId);
 
                     //nullチェック
                     Assert.IsNotNull(target);

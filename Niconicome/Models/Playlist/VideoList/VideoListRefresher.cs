@@ -18,7 +18,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public interface IVideoListRefresher
     {
-        IAttemptResult Refresh(ObservableCollection<IListVideoInfo> videos);
+        IAttemptResult Refresh(IEnumerable<IListVideoInfo> videos, Action<IListVideoInfo> addFunc, bool disableDBRetrieving = false);
     }
 
     public class VideoListRefresher : IVideoListRefresher
@@ -54,7 +54,7 @@ namespace Niconicome.Models.Playlist.VideoList
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public IAttemptResult Refresh(ObservableCollection<IListVideoInfo> videos)
+        public IAttemptResult Refresh(IEnumerable<IListVideoInfo> videos, Action<IListVideoInfo> addFunc, bool disableDBRetrieving = false)
         {
             var playlistID = this.current.SelectedPlaylist.Value?.Id ?? -1;
 
@@ -65,18 +65,27 @@ namespace Niconicome.Models.Playlist.VideoList
                     Message = $"プレイストが選択されていません。",
                 };
             }
-            var playlist = this.playlistStoreHandler.GetPlaylist(playlistID);
-            var originVideos = playlist?.Videos;
 
-            if (playlist is null)
+            IEnumerable<IListVideoInfo> originalVideos;
+            if (disableDBRetrieving)
             {
-                return new AttemptResult()
+                originalVideos = videos;
+            }
+            else
+            {
+                var playlist = this.playlistStoreHandler.GetPlaylist(playlistID);
+
+                if (playlist is null)
                 {
-                    Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
-                };
+                    return new AttemptResult()
+                    {
+                        Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
+                    };
+                }
+                originalVideos = playlist.Videos.Select(v => new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(v.Id) });
             }
 
-            if (originVideos is null)
+            if (originalVideos is null)
             {
                 return new AttemptResult()
                 {
@@ -90,7 +99,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
 
-            foreach (var originVideo in originVideos)
+            foreach (var originVideo in originalVideos)
             {
                 if (playlistID != (this.current.SelectedPlaylist.Value?.Id ?? -1))
                 {
@@ -100,10 +109,18 @@ namespace Niconicome.Models.Playlist.VideoList
                     };
                 }
 
-                var video = this.videoHandler.GetVideo(originVideo.Id);
+                IListVideoInfo video;
+                if (disableDBRetrieving)
+                {
+                    video = originVideo;
+                }
+                else
+                {
+                    video = this.videoHandler.GetVideo(originVideo.Id.Value);
+                }
 
                 //保持されている動画情報があれば引き継ぐ
-                var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(originVideo.Id, playlistID);
+                var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(originVideo.Id.Value, playlistID);
 
                 if (lightVideo is not null)
                 {
@@ -147,23 +164,23 @@ namespace Niconicome.Models.Playlist.VideoList
                     });
                     video.IsThumbDownloading.Value = true;
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath("0");
-                    videos.Add(video);
+                    addFunc(video);
                 }
                 else if (!IsValidPath && hasCache)
                 {
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId.Value);
                     this.videoHandler.Update(video);
-                    videos.Add(video);
+                    addFunc(video);
                 }
                 else if (!hasCache)
                 {
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath("0");
-                    videos.Add(video);
+                    addFunc(video);
                 }
                 else
                 {
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId.Value);
-                    videos.Add(video);
+                    addFunc(video);
                 }
             }
 
