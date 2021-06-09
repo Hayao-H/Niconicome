@@ -23,7 +23,7 @@ namespace NiconicomeTest.Local.External.Inport.Xeno
         public void TreePlaylistInfoに変換する()
         {
             var converted = this.converter!.ConvertToTreePlaylistInfo(this.playlist!);
-            Assert.That(converted.Name, Is.EqualTo("Root"));
+            Assert.That(converted.Name.Value, Is.EqualTo("Root"));
             Assert.That(converted.Children.Count, Is.EqualTo(3));
         }
     }

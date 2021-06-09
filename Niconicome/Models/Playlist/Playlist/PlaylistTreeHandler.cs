@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Local.Settings;
 using Reactive.Bindings.ObjectExtensions;
 
 namespace Niconicome.Models.Playlist.Playlist
@@ -32,9 +33,16 @@ namespace Niconicome.Models.Playlist.Playlist
     /// </summary>
     public class PlaylistTreeHandler : IPlaylistTreeHandler
     {
+        /// <summary>
+        /// 内部プレイリスト(辞書で管理)
+        /// </summary>
         private readonly Dictionary<int, ITreePlaylistInfo> innertPlaylists = new();
 
+        /// <summary>
+        /// プレイリスト
+        /// </summary>
         public ObservableCollection<ITreePlaylistInfo> Playlists { get; init; } = new();
+
 
         #region CRUD系メソッド
 

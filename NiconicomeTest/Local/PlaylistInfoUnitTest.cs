@@ -50,9 +50,9 @@ namespace NiconicomeTest.Local.Playlist
             ///親(1)─子(2)─子(4)─子(5)
             ///     └子(3)       ┠子(6)
             ///                   └子(7)
-            var first = new STypes::Playlist() { Id = 1, IsRoot = true, PlaylistName = "一" };
-            var second = new STypes::Playlist() { Id = 2, PlaylistName = "二" };
-            var third = new STypes::Playlist() { Id = 3, PlaylistName = "三" };
+            var first = new STypes::Playlist() { Id = 1, IsRoot = true, PlaylistName = "一", IsTemporary = true };
+            var second = new STypes::Playlist() { Id = 2, PlaylistName = "二", IsDownloadFailedHistory = true };
+            var third = new STypes::Playlist() { Id = 3, PlaylistName = "三", IsDownloadSucceededHistory = true };
             var fourth = new STypes::Playlist() { Id = 4, PlaylistName = "四" };
             var fifth = new STypes::Playlist() { Id = 5, PlaylistName = "五" };
             var sixth = new STypes::Playlist() { Id = 6, PlaylistName = "六" };
@@ -101,9 +101,9 @@ namespace NiconicomeTest.Local.Playlist
         public void プレイリストを取得する(int id, string name)
         {
             ITreePlaylistInfo? playist = this.handler.GetPlaylist(id);
-            Assert.IsNotNull(playist);
-            Assert.AreEqual(id, playist?.Id);
-            Assert.AreEqual(name, playist?.Name);
+            Assert.That(playist, Is.Not.Null);
+            Assert.That(playist!.Id, Is.EqualTo(id));
+            Assert.That(playist.Name.Value, Is.EqualTo(name));
         }
 
         [Test]

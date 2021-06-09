@@ -78,6 +78,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
             this.videoListContainer!.Add(video);
             var result = this.videoListContainer!.Remove(video, 1);
 
+            Assert.That(result.IsSucceeded, Is.True);
             Assert.That(this.lastChangeType, Is.EqualTo(ChangeType.Remove));
             Assert.That(this.lastVIdeoNicoID, Is.EqualTo("sm9"));
             Assert.That(this.videoListContainer.Videos.Count, Is.EqualTo(0));

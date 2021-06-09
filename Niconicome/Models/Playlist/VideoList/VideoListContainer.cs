@@ -211,7 +211,7 @@ namespace Niconicome.Models.Playlist.VideoList
         {
 
             int id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
-            bool isSame = playlistID == (this.current.SelectedPlaylist.Value?.Id ?? -1);
+            bool isSame = id == (this.current.SelectedPlaylist.Value?.Id ?? -1);
 
             if (isSame)
             {
