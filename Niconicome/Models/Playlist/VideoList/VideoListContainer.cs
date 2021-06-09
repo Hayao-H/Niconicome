@@ -210,27 +210,31 @@ namespace Niconicome.Models.Playlist.VideoList
         public IAttemptResult Add(IListVideoInfo video, int? playlistID = null, bool commit = true)
         {
 
-            var id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
+            int id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
+            bool isSame = playlistID == (this.current.SelectedPlaylist.Value?.Id ?? -1);
 
-            if (this.Videos.Any(v => v.NiconicoId.Value == video.NiconicoId.Value))
+            if (isSame)
             {
-                return new AttemptResult()
+                if (this.Videos.Any(v => v.NiconicoId.Value == video.NiconicoId.Value))
                 {
-                    Message = $"{video.NiconicoId}は既に現在のプレイリストに存在します。",
-                };
-            }
+                    return new AttemptResult()
+                    {
+                        Message = $"{video.NiconicoId}は既に現在のプレイリストに存在します。",
+                    };
+                }
 
-            try
-            {
-                this.Videos.Add(video);
-            }
-            catch (Exception e)
-            {
-                return new AttemptResult()
+                try
                 {
-                    Message = $"メモリ上のプレイリストへの追加に失敗しました。({video.NiconicoId})",
-                    Exception = e,
-                };
+                    this.Videos.Add(video);
+                }
+                catch (Exception e)
+                {
+                    return new AttemptResult()
+                    {
+                        Message = $"メモリ上のプレイリストへの追加に失敗しました。({video.NiconicoId})",
+                        Exception = e,
+                    };
+                }
             }
 
 

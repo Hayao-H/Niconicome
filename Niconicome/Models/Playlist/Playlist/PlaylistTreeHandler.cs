@@ -259,7 +259,10 @@ namespace Niconicome.Models.Playlist.Playlist
                     var parent = this.GetPlaylist(parentID);
                     if (parent is not null)
                     {
-                        parent.Children.Add(self.Value);
+                        if (!parent.Children.Any(p => p.Id == self.Value.Id))
+                        {
+                            parent.Children.Add(self.Value);
+                        }
                     }
                 }
             }

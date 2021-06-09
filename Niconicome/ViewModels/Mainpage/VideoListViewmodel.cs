@@ -18,6 +18,8 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
@@ -57,6 +59,8 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.VideoListContainer.ListChanged += (_, _) => this.VideoListUpdated();
 
             this.Videos = WS::Mainpage.VideoListContainer.Videos.ToReadOnlyReactiveCollection(v => new VideoInfoViewModel(v)).AddTo(this.disposables);
+
+            this.IsTemporaryPlaylist = WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.ToReadOnlyReactiveProperty();
 
             this.showMessageBox = showMessageBox;
 
@@ -182,7 +186,7 @@ namespace Niconicome.ViewModels.Mainpage
                       return;
                   }
 
-                  WS::Mainpage.VideoListContainer.AddRange(videos, playlistId,!WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
+                  WS::Mainpage.VideoListContainer.AddRange(videos, playlistId, !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
 
                   WS::Mainpage.VideoListContainer.Refresh();
 
@@ -312,7 +316,7 @@ namespace Niconicome.ViewModels.Mainpage
                 var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistHandler.ContainsVideo(i, playlistId)).ToList();
 
                 var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(ids)).ToList();
-                var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId,!WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
+                var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId, !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
                 WS::Mainpage.VideoListContainer.Refresh();
 
                 if (result.IsSucceeded)
@@ -817,6 +821,33 @@ namespace Niconicome.ViewModels.Mainpage
                     }
                 }).AddTo(this.disposables);
 
+            this.SavePlaylistCommand = this.IsTemporaryPlaylist
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    WS::Mainpage.SnaclbarHandler.Enqueue("一時プレイリストの内容を保存します。");
+                    List<IListVideoInfo> videos = this.Videos.Select(v => v.VideoInfo).ToList();
+                    IAttemptResult<int> result = WS::Mainpage.PlaylistHandler.AddPlaylistToRoot();
+
+                    if (!result.IsSucceeded)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage("プレイリストの新規作成に失敗しました。");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                        return;
+                    }
+
+                    IAttemptResult vResult = WS::Mainpage.VideoListContainer.AddRange(videos, result.Data);
+
+                    if (!vResult.IsSucceeded)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage($"動画の保存に失敗しました。(詳細:{result.Message})");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                        return;
+                    }
+
+                    WS::Mainpage.Messagehandler.AppendMessage($"一時プレイリストの内容しました。");
+                    WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                });
             #endregion
 
             #region Width系プロパティー
@@ -1004,6 +1035,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveCommand MonitorClipbordCommand { get; init; }
 
+        /// <summary>
+        /// 一時プレイリストを保存するコマンド
+        /// </summary>
+        public ReactiveCommand SavePlaylistCommand { get; init; }
+
+
         #endregion
 
         /// <summary>
@@ -1051,6 +1088,12 @@ namespace Niconicome.ViewModels.Mainpage
         /// すべて選択
         /// </summary>
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; }
+
+        /// <summary>
+        /// 一時プレイリスト
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; init; }
+
 
         /// <summary>
         /// クリップボード監視アイコン
@@ -1286,6 +1329,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveCommand MonitorClipbordCommand { get; init; } = new();
 
+        public ReactiveCommand SavePlaylistCommand { get; init; } = new();
+
         public CommandBase<string> CreatePlaylistCommand { get; init; } = new(_ => true, _ => { });
 
         public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; } = new ReactiveCommand<MouseEventArgs>();
@@ -1303,6 +1348,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<string> PlaylistTitle { get; set; } = new("空白のプレイリスト");
 
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; } = new();
+
+        public ReactiveProperty<bool> IsTemporaryPlaylist { get; init; } = new(true);
 
         public ReactiveProperty<MaterialDesign::PackIconKind> ClipbordMonitorIcon { get; init; } = new(MaterialDesign::PackIconKind.ClipboardPulse);
 
