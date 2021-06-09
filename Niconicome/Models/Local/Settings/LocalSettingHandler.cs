@@ -182,6 +182,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.IchibaInfoSuffix => STypes::SettingNames.IchibaSuffix,
                 SettingsEnum.DisableDLFailedHistory => STypes::SettingNames.DisableDownloadFailedHistory,
                 SettingsEnum.DisableDLSucceededHistory => STypes::SettingNames.DisableDownloadSucceededHistory,
+                SettingsEnum.SingletonWindows => STypes::SettingNames.LimitWindowsToSingleton,
                 _ => null
             };
         }
@@ -254,5 +255,6 @@ namespace Niconicome.Models.Local.Settings
         IchibaInfoSuffix,
         DisableDLFailedHistory,
         DisableDLSucceededHistory,
+        SingletonWindows,
     }
 }
