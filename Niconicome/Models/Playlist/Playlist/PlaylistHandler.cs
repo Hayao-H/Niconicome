@@ -19,6 +19,7 @@ namespace Niconicome.Models.Playlist.Playlist
     public interface IPlaylistHandler
     {
         int AddPlaylist(int parentId);
+        IAttemptResult<int> AddPlaylistToRoot();
         void DeletePlaylist(int playlistID);
         void Update(ITreePlaylistInfo newpaylist);
         IAttemptResult<int> AddVideo(IListVideoInfo video, int playlistID);
@@ -91,9 +92,33 @@ namespace Niconicome.Models.Playlist.Playlist
             //ありえないけどエラー処理
             if (playlist is null) return -1;
 
-            this.treeHandler.MergeRange(new List<ITreePlaylistInfo>(){ playlist });
+            this.treeHandler.MergeRange(new List<ITreePlaylistInfo>() { playlist });
             return id;
         }
+
+        /// <summary>
+        /// プレイリストをルートに追加する
+        /// </summary>
+        /// <returns></returns>
+        public IAttemptResult<int> AddPlaylistToRoot()
+        {
+            ITreePlaylistInfo? root = this.GetRootPlaylist();
+
+            if (root is null)
+            {
+                return new AttemptResult<int>() { Message = "ルートプレイリストを取得できませんでした。" };
+            }
+
+            int result = this.AddPlaylist(root.Id);
+            if (result < 0)
+            {
+                return new AttemptResult<int>() { Message = "プレイリストの追加に失敗しました。" };
+            }
+
+            return new AttemptResult<int>() { IsSucceeded = true, Data = result };
+
+        }
+
 
         /// <summary>
         /// プレイリストを削除する
@@ -327,7 +352,7 @@ namespace Niconicome.Models.Playlist.Playlist
             if (this.playlistStoreHandler.Exists(newpaylist.Id))
             {
                 this.playlistStoreHandler.Update(newpaylist);
-                this.treeHandler.MergeRange(new List<ITreePlaylistInfo>{ newpaylist });
+                this.treeHandler.MergeRange(new List<ITreePlaylistInfo> { newpaylist });
             }
         }
 
