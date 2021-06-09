@@ -13,6 +13,7 @@ using Niconicome.Models.Local.Settings;
 using State = Niconicome.Models.Local.State;
 using Utils = Niconicome.Models.Domain.Utils;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
+using System.Linq.Expressions;
 
 namespace Niconicome.Models.Playlist.Playlist
 {
@@ -35,6 +36,7 @@ namespace Niconicome.Models.Playlist.Playlist
         bool IsLastChild(int id);
         bool ContainsVideo(string niconicoId, int playlistId);
         ITreePlaylistInfo? GetPlaylist(int id);
+        ITreePlaylistInfo? GetSpecialPlaylist(SpecialPlaylistTypes types);
         ITreePlaylistInfo? GetParent(ITreePlaylistInfo child);
         ITreePlaylistInfo? GetRootPlaylist();
         IEnumerable<ITreePlaylistInfo> GetAllPlaylists();
@@ -301,6 +303,22 @@ namespace Niconicome.Models.Playlist.Playlist
         }
 
         /// <summary>
+        /// 特殊なプレイリストを取得する
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        public ITreePlaylistInfo? GetSpecialPlaylist(SpecialPlaylistTypes types)
+        {
+            var p = types switch
+            {
+                SpecialPlaylistTypes.DLFailedHistory => this.playlistStoreHandler.GetPlaylist(p => p.IsDownloadFailedHistory),
+                _ => this.playlistStoreHandler.GetPlaylist(p => p.IsDownloadSucceededHistory),
+            };
+            return p is null ? null : BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p);
+        }
+
+
+        /// <summary>
         /// 親プレイリストを取得する
         /// </summary>
         public ITreePlaylistInfo? GetParent(ITreePlaylistInfo child)
@@ -408,5 +426,11 @@ namespace Niconicome.Models.Playlist.Playlist
             this.treeHandler.Initialize(list);
         }
 
+    }
+
+    public enum SpecialPlaylistTypes
+    {
+        DLSucceedeeHistory,
+        DLFailedHistory,
     }
 }

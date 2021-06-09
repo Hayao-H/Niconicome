@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
+using NiconicomeTest.Local.Playlist.Playlist;
 
 namespace NiconicomeTest.Local.Playlist
 {
@@ -39,7 +40,7 @@ namespace NiconicomeTest.Local.Playlist
     [TestFixture]
     class PlaylistInfoHandlerUnitTest
     {
-        private IPlaylistTreeHandler handler = new PlaylistTreeHandler();
+        private IPlaylistTreeHandler handler = new PlaylistTreeHandler(new PlaylistSettingsHandlerStab());
 
         [SetUp]
         public void SetUp()
@@ -68,7 +69,7 @@ namespace NiconicomeTest.Local.Playlist
 
             //全て追加
             var playlists = new List<STypes::Playlist>() { first, second, third, fourth, fifth, sixth, seventh };
-            this.handler = new PlaylistTreeHandler();
+            this.handler = new PlaylistTreeHandler(new PlaylistSettingsHandlerStab());
             this.handler.Initialize(playlists.Select(p => NonBindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p)).ToList());
         }
 

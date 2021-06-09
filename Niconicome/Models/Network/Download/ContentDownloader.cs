@@ -6,6 +6,7 @@ using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
 using Niconicome.ViewModels;
@@ -85,7 +86,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : BindableBase, IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -94,6 +95,7 @@ namespace Niconicome.Models.Network.Download
             this.downloadTasksHandler = downloadTasksHandler;
             this.videoListContainer = videoListContainer;
             this.downloadHelper = downloadHelper;
+            this.playlistHandler = playlistHandler;
 
             int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelDL);
             var sleepInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
@@ -123,6 +125,8 @@ namespace Niconicome.Models.Network.Download
         private readonly IVideoListContainer videoListContainer;
 
         private readonly IContentDownloadHelper downloadHelper;
+
+        private readonly IPlaylistHandler playlistHandler;
 
         private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
         #endregion
@@ -267,19 +271,33 @@ namespace Niconicome.Models.Network.Download
                     bool skippedFlag = false;
                     e.Task.IsProcessing = true;
 
-                    var downloadResult = await this.downloadHelper.TryDownloadContentAsync(setting with { NiconicoId = task.NiconicoID, Video = !skippedFlag && setting.Video }, msg => task.Message = msg, e.Task.CancellationToken);
+                    IDownloadResult downloadResult = await this.downloadHelper.TryDownloadContentAsync(setting with { NiconicoId = task.NiconicoID, Video = !skippedFlag && setting.Video }, msg => task.Message = msg, e.Task.CancellationToken);
 
-                    if (downloadResult.IsCanceled)
+
+                    if (downloadResult.IsCanceled || !downloadResult.IsSucceeded)
                     {
-                        this.CurrentResult.FailedCount++;
-                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードがキャンセルされました。");
-                        task.Message = "ダウンロードをキャンセル";
-                    }
-                    else if (!downloadResult.IsSucceeded)
-                    {
-                        this.CurrentResult.FailedCount++;
-                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに失敗しました。");
-                        this.messageHandler.AppendMessage($"詳細: {downloadResult.Message}");
+                        if (downloadResult.IsCanceled)
+                        {
+                            this.CurrentResult.FailedCount++;
+                            this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードがキャンセルされました。");
+                            task.Message = "ダウンロードをキャンセル";
+                        }
+                        else
+                        {
+                            this.CurrentResult.FailedCount++;
+                            this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに失敗しました。");
+                            this.messageHandler.AppendMessage($"詳細: {downloadResult.Message}");
+                        }
+
+                        bool isFailedHIstoryDisabled = this.settingHandler.GetBoolSetting(SettingsEnum.DisableDLFailedHistory);
+                        if (video is not null && !isFailedHIstoryDisabled)
+                        {
+                            ITreePlaylistInfo? playlist = this.playlistHandler.GetSpecialPlaylist(SpecialPlaylistTypes.DLFailedHistory);
+                            if (playlist is not null)
+                            {
+                                this.playlistHandler.AddVideo(video, playlist.Id);
+                            }
+                        }
                     }
                     else
                     {
@@ -298,6 +316,16 @@ namespace Niconicome.Models.Network.Download
                         }
                         this.videoListContainer.Uncheck(task.VideoID, task.PlaylistID);
                         this.CurrentResult.SucceededCount++;
+
+                        bool isSucceededHIstoryDisabled = this.settingHandler.GetBoolSetting(SettingsEnum.DisableDLSucceededHistory);
+                        if (video is not null && !isSucceededHIstoryDisabled)
+                        {
+                            ITreePlaylistInfo? playlist = this.playlistHandler.GetSpecialPlaylist(SpecialPlaylistTypes.DLSucceedeeHistory);
+                            if (playlist is not null)
+                            {
+                                this.playlistHandler.AddVideo(video, playlist.Id);
+                            }
+                        }
                     }
 
                     if (this.CurrentResult.FirstVideo is null)

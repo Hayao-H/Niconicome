@@ -33,6 +33,11 @@ namespace Niconicome.Models.Playlist.Playlist
     /// </summary>
     public class PlaylistTreeHandler : IPlaylistTreeHandler
     {
+        public PlaylistTreeHandler(IPlaylistSettingsHandler playlistSettingsHandler)
+        {
+            this.playlistSettingsHandler = playlistSettingsHandler;
+        }
+
         /// <summary>
         /// 内部プレイリスト(辞書で管理)
         /// </summary>
@@ -43,6 +48,11 @@ namespace Niconicome.Models.Playlist.Playlist
         /// </summary>
         public ObservableCollection<ITreePlaylistInfo> Playlists { get; init; } = new();
 
+        #region field
+
+        private readonly IPlaylistSettingsHandler playlistSettingsHandler;
+
+        #endregion
 
         #region CRUD系メソッド
 
@@ -150,23 +160,33 @@ namespace Niconicome.Models.Playlist.Playlist
             ITreePlaylistInfo? succeeded = this.GetPlaylist(p => p.IsDownloadSucceededHistory);
             ITreePlaylistInfo? failed = this.GetPlaylist(p => p.IsDownloadFailedHistory);
 
+            bool succeededDisable = this.playlistSettingsHandler.IsDownloadSucceededHistoryDisabled;
+            bool failedDisable = this.playlistSettingsHandler.IsDownloadFailedHistoryDisabled;
+
             if (tmp is null)
             {
                 throw new InvalidOperationException("一時プレイリストが存在しません。");
             }
-            else if (succeeded is null)
+            else if (!succeededDisable && succeeded is null)
             {
                 throw new InvalidOperationException("DL成功履歴プレイリストが存在しません。");
             }
-            else if (failed is null)
+            else if (!failedDisable && failed is null)
             {
                 throw new InvalidOperationException("DL失敗履歴プレイリストが存在しません。");
             }
 
             list.Add(this.ConstructPlaylistInfo(root.Id));
             list.Add(tmp);
-            list.Add(succeeded);
-            list.Add(failed);
+            
+            if (!failedDisable)
+            {
+                list.Add(failed!);
+            } 
+            if (!succeededDisable)
+            {
+                list.Add(succeeded!);
+            }
 
             return list;
 

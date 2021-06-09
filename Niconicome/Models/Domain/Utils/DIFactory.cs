@@ -177,6 +177,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlIchiba::IIchibaInfoDownloader, DlIchiba::IchibaInfoDownloader>();
             services.AddTransient<FF::IFirefoxProfileManager, FF::FirefoxProfileManager>();
             services.AddTransient<Cookies::IFirefoxCookieManager, Cookies::FirefoxCookieManager>();
+            services.AddTransient<PlaylistPlaylist::IPlaylistSettingsHandler, PlaylistPlaylist::PlaylistSettingsHandler>();
 
             return services.BuildServiceProvider();
         }

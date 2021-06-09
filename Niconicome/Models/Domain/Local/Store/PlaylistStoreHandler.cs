@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
@@ -15,6 +16,7 @@ namespace Niconicome.Models.Domain.Local.Store
     {
         STypes::Playlist GetRootPlaylist();
         STypes::Playlist? GetPlaylist(int id);
+        STypes::Playlist? GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate);
         public int AddPlaylist(int parentID, string name);
         public int AddVideo(IListVideoInfo video, int playlistId);
         public void RemoveVideo(int id, int playlistId);
@@ -91,6 +93,42 @@ namespace Niconicome.Models.Domain.Local.Store
             return result.Data;
 
         }
+
+        /// <summary>
+        /// 指定した条件でプレイリストを取得する
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public STypes::Playlist? GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate)
+        {
+
+            IAttemptResult<STypes::Playlist> result = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, predicate);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error("プレイリストの取得に失敗しました。", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error("プレイリストの取得に失敗しました。");
+                }
+
+                return null;
+            }
+
+
+            if (result.Data.Videos.Count > 0 && result.Data.CustomVideoSequence.Count != result.Data.Videos.Count)
+            {
+                var ids = result.Data.Videos.Select(v => v.Id).Where(id => !result.Data.CustomVideoSequence.Contains(id));
+                result.Data.CustomVideoSequence.AddRange(ids);
+            }
+
+            this.logger.Log($"プレイリスト(name:{result.Data.PlaylistName}, ID:{result.Data.Id})を取得しました。");
+            return result.Data;
+        }
+
 
         /// <summary>
         /// ルートレベルプレイリストを取得する
