@@ -354,10 +354,6 @@ namespace Niconicome.Models.Network.Download
             });
 
             this.parallelTasksHandler.AddTaskToQueue(t);
-
-            if (!this.parallelTasksHandler.IsProcessing)
-            {
-            }
         }
 
         #endregion

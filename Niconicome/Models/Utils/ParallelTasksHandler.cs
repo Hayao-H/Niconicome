@@ -217,15 +217,16 @@ namespace Niconicome.Models.Utils
 
             await tasks.WhenAll();
 
+            lock (this.lockobj)
+            {
+                this.IsProcessing = false;
+            }
+
             if (this.processUntilEmpty && this.PallarelTasks.Count > 0)
             {
                 await this.ProcessTasksAsync(preAction, onCancelled, ct);
             }
 
-            lock (this.lockobj)
-            {
-                this.IsProcessing = false;
-            }
         }
 
     }
