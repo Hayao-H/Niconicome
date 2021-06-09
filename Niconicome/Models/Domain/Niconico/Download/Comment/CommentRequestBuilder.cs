@@ -161,6 +161,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         {
             var data = new List<Request::Comment>();
             var initialIndex = this.commandIndex;
+            var leavesIndex = 0;
 
             data.Add(this.GetPingContent(PingType.StartRequest, this.requestIndex));
             foreach (var thread in dmcInfo.CommentThreads)
@@ -181,7 +182,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 if (!options.OwnerComment && thread.IsOwnerThread) continue;
 
                 data.Add(this.GetPingContent(PingType.StartContent, this.commandIndex));
-                var itemThread = new Request::Comment() { Thread =this.GetThread(thread, dmcInfo, options) };
+                var itemThread = new Request::Comment() { Thread = this.GetThread(thread, dmcInfo, options) };
                 data.Add(itemThread);
                 data.Add(this.GetPingContent(PingType.EndContent, this.commandIndex));
                 ++this.commandIndex;
@@ -190,10 +191,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 if (thread.IsLeafRequired)
                 {
                     data.Add(this.GetPingContent(PingType.StartContent, this.commandIndex));
-                    var itemLeaf = new Request::Comment() { ThreadLeaves = this.GetThreadLeaves(thread, dmcInfo, options, thread.Label == "easy") };
+                    var itemLeaf = new Request::Comment() { ThreadLeaves = this.GetThreadLeaves(thread, dmcInfo, options) };
                     data.Add(itemLeaf);
                     data.Add(this.GetPingContent(PingType.EndContent, this.commandIndex));
                     ++this.commandIndex;
+                    ++leavesIndex;
                     //leave_second_flag = true;
                 }
 
@@ -276,19 +278,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private Request::ThreadLeaves GetThreadLeaves(WathJson::Thread thread, IDmcInfo dmcInfo, ICommentOptions options, bool isEasy)
+        private Request::ThreadLeaves GetThreadLeaves(WathJson::Thread thread, IDmcInfo dmcInfo, ICommentOptions options)
         {
             double divided = dmcInfo.Duration / 60d;
             double min = Math.Ceiling(divided);
-            string humOrQuarter = isEasy ? "25" : options.When == default ? "100,1000" : "0,1000";
-            string nicoru = isEasy || options.When == default ? ",nicoru:100" : "";
 
             var data = new ThreadLeaves
             {
                 Thread = thread.Id.ToString(),
                 Language = 0,
                 UserId = dmcInfo.UserId,
-                Content = $"0-{min}:{humOrQuarter}{nicoru}",
+                Content = $"0-{min}:0,500",
                 Scores = 1,
                 Nicoru = 3,
                 Fork = thread.Fork

@@ -99,8 +99,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             do
             {
-                if (index > 0) messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目)");
-                long? when = comments.Count == 0 ? 0 : first?.Date - 1;
+                int count = comments.Count;
+                if (index > 0) messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目・{count}コメ)");
+                long? when = count == 0 ? 0 : first?.Date - 1;
                 List<Response::Comment> retlieved = await this.GetCommentsAsync(dmcInfo, settings, when);
 
                 comments.Add(retlieved);
