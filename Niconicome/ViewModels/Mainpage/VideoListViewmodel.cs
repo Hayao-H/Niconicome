@@ -119,7 +119,8 @@ namespace Niconicome.ViewModels.Mainpage
 
                     WS::Mainpage.SnaclbarHandler.Enqueue("クリップボードの監視を開始します。");
                     WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を開始します。");
-                } else
+                }
+                else
                 {
                     WS::Mainpage.SnaclbarHandler.Enqueue("クリップボードの監視を終了します。");
                     WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を終了します。");
@@ -181,7 +182,7 @@ namespace Niconicome.ViewModels.Mainpage
                       return;
                   }
 
-                  WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
+                  WS::Mainpage.VideoListContainer.AddRange(videos, playlistId,!WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
 
                   WS::Mainpage.VideoListContainer.Refresh();
 
@@ -232,7 +233,7 @@ namespace Niconicome.ViewModels.Mainpage
                      }
                      else
                      {
-                         WS::Mainpage.VideoListContainer.Remove(video);
+                         WS::Mainpage.VideoListContainer.Remove(video, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
                      }
                  }
 
@@ -311,7 +312,7 @@ namespace Niconicome.ViewModels.Mainpage
                 var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistHandler.ContainsVideo(i, playlistId)).ToList();
 
                 var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(ids)).ToList();
-                var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
+                var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId,!WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
                 WS::Mainpage.VideoListContainer.Refresh();
 
                 if (result.IsSucceeded)
@@ -459,12 +460,13 @@ namespace Niconicome.ViewModels.Mainpage
                             return;
                         }
 
-                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
+                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistId, !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
 
                         if (videos.Count > 1)
                         {
                             WS::Mainpage.Messagehandler.AppendMessage($"{videos[0].NiconicoId.Value}ほか{videos.Count - 1}件の動画を追加しました。");
                             this.SnackbarMessageQueue.Enqueue($"{videos[0].NiconicoId.Value}ほか{videos.Count - 1}件の動画を追加しました。");
+                            WS::Mainpage.VideoListContainer.Refresh();
                         }
                         else
                         {

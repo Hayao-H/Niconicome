@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist;
@@ -8,7 +9,7 @@ namespace NiconicomeTest.Stabs.Models.Playlist.VideoList
 {
     class VideoListRefresherStab : IVideoListRefresher
     {
-        public IAttemptResult Refresh(ObservableCollection<IListVideoInfo> videos)
+        public IAttemptResult Refresh(IEnumerable<IListVideoInfo> videos, Action<IListVideoInfo> addFunc, bool isTemporary = false)
         {
             return new AttemptResult() { IsSucceeded = true };
         }

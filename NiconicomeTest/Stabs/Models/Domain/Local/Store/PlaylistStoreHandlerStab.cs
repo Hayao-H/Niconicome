@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store;
@@ -88,6 +89,12 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Store
             return true;
         }
 
+        public bool Exists(Expression<Func<STypes::Playlist, bool>> predicate)
+        {
+            return true;
+        }
+
+
         public bool JustifyPlaylists(int Id)
         {
             return true;
@@ -130,5 +137,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Store
         public void Refresh()
         {
         }
+
+        public IAttemptResult Initialize()
+        {
+            return new AttemptResult() { IsSucceeded = true };
+        }
+
     }
 }

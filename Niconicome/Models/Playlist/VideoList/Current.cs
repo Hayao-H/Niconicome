@@ -17,6 +17,7 @@ namespace Niconicome.Models.Playlist.VideoList
     {
         ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; }
         ReactiveProperty<int> CurrentSelectedIndex { get; }
+        ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; }
         string PlaylistFolderPath { get; }
         int PrevSelectedPlaylistID { get; }
     }
@@ -28,6 +29,10 @@ namespace Niconicome.Models.Playlist.VideoList
             this.settingHandler = settingHandler;
 
             this.SelectedPlaylist = new ReactiveProperty<ITreePlaylistInfo?>();
+            this.IsTemporaryPlaylist = this.SelectedPlaylist
+                .Select(p => p?.IsTemporary ?? false)
+                .ToReadOnlyReactiveProperty();
+
             this.SelectedPlaylist.Subscribe(value =>
             {
                 if (value is not null)
@@ -63,6 +68,12 @@ namespace Niconicome.Models.Playlist.VideoList
         /// 選択された動画のインデックス
         /// </summary>
         public ReactiveProperty<int> CurrentSelectedIndex { get; init; }
+
+        /// <summary>
+        /// 一時プレイリストフラグ
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; init; }
+
 
         /// <summary>
         /// ひとつまえに選択していたプレイリスト

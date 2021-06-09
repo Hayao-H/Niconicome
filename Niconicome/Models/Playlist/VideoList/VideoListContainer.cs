@@ -417,8 +417,20 @@ namespace Niconicome.Models.Playlist.VideoList
         public IAttemptResult Refresh()
         {
             this.SavePrevPlaylistVideos();
-            this.Clear();
-            var result = this.refresher.Refresh(this.Videos);
+
+            IAttemptResult result;
+
+            if (this.current.IsTemporaryPlaylist.Value)
+            {
+                var videos = this.Videos.Copy();
+                this.Clear();
+                result = this.refresher.Refresh(videos, v => this.Videos.Add(v), true);
+            }
+            else
+            {
+                this.Clear();
+                result = this.refresher.Refresh(this.Videos, v => this.Videos.Add(v));
+            }
 
             this.Sort(this.current.SelectedPlaylist.Value!.VideoSortType, this.current.SelectedPlaylist.Value!.IsVideoDescending, this.current.SelectedPlaylist.Value!.CustomSortSequence);
 
