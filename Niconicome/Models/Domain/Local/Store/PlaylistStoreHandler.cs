@@ -213,6 +213,9 @@ namespace Niconicome.Models.Domain.Local.Store
                 //5階層よりも深い場合はキャンセル
                 if (parent.Data.Layer > 5) return -1;
 
+                //特殊なプレイリストの場合はキャンセル
+                if (parent.Data.IsTemporary || parent.Data.IsDownloadFailedHistory || parent.Data.IsDownloadSucceededHistory) return -1;
+
                 var playlist = new STypes::Playlist(parent.Data)
                 {
                     PlaylistName = name
