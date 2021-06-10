@@ -108,8 +108,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
                 {
-                    var windows = new DownloadTasksWindows();
-                    windows.Show();
+                    WS::Mainpage.WindowsHelper.OpenWindow<DownloadTasksWindows>();
                 });
             })
             .AddTo(this.disposables);

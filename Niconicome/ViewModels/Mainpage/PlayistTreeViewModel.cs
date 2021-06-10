@@ -65,12 +65,11 @@ namespace Niconicome.ViewModels.Mainpage
             this.EditPlaylistCommand = new CommandBase<object>(_ => true, arg =>
             {
                 if (arg is null || arg.AsNullable<ITreePlaylistInfo>() is not ITreePlaylistInfo playlist || playlist is null) return;
-                var window = new EditPlaylist
+                WS::Mainpage.WindowsHelper.OpenWindow(() => new EditPlaylist
                 {
                     Owner = Application.Current.MainWindow,
                     DataContext = new PlaylistEditViewModel(playlist)
-                };
-                window.Show();
+                });
             });
         }
 
