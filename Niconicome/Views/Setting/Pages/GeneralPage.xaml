@@ -18,7 +18,7 @@
         Background="{DynamicResource MaterialDesignBackground}"
         d:DataContext="{d:DesignInstance {x:Type vm:GeneralSettingsPageViewModelD},IsDesignTimeCreatable=True}"
         FontFamily="Yu Gothic"
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="600" d:DesignWidth="800"
       Title="GeneralPage">
     <Page.Resources>
         <cn:BooleanInverseConverter x:Key="booleanInverseconverter"/>
@@ -31,7 +31,9 @@
         <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
             <TextBlock Text="一般設定" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
         </Border>
-        <StackPanel Margin="8" Grid.Row="1">
+        <StackPanel 
+            Margin="8" 
+            Grid.Row="1" >
             <DockPanel>
                 <materialDesign:PackIcon Kind="AccountArrowLeftOutline" Foreground="SkyBlue">
                     <materialDesign:PackIcon.RenderTransform>
@@ -132,7 +134,17 @@
                 <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsAutoRenamingRemotePlaylistEnable}"/>
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="Rename" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="複数ウィンドウを許可しない" ToolTip="複数起動禁止ではありません。" />
+                <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsSingletonWindowsEnable.Value}" />
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
-        
+
     </Grid>
 </Page>
