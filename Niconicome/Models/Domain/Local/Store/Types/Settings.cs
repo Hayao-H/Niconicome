@@ -171,5 +171,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string IchibaSuffix { get; private set; } = "ichibainfosuffix";
         public static string DisableDownloadSucceededHistory { get; private set; } = "disabledownloadsucceededhistory";
         public static string DisableDownloadFailedHistory { get; private set; } = "disabledownloadfailedhistory";
+        public static string LimitWindowsToSingleton { get; private set; } = "limitwindowstosingleton";
     }
 }

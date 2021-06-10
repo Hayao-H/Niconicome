@@ -35,11 +35,10 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenLogWindowCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    var window = new LogWindow()
+                    WS::Mainpage.WindowsHelper.OpenWindow(() => new LogWindow()
                     {
                         Owner = Application.Current.MainWindow,
-                    };
-                    window.Show();
+                    });
                 });
 
         }

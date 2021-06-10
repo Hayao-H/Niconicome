@@ -21,7 +21,7 @@ namespace Niconicome.Views
     {
         public Loginxaml()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

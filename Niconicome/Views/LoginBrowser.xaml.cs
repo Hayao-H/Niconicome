@@ -21,7 +21,7 @@ namespace Niconicome.Views
     {
         public LoginBrowser()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

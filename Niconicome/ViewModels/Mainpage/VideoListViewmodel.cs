@@ -25,6 +25,7 @@ using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Utils;
 using Niconicome.ViewModels.Controls;
+using Niconicome.ViewModels.Mainpage.Subwindows;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
 using Prism.Events;
@@ -286,11 +287,11 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、プレイリスト情報を編集できません");
                     return;
                 }
-                var window = new EditPlaylist
+
+                WS::Mainpage.WindowsHelper.OpenWindow(() => new EditPlaylist
                 {
                     Owner = Application.Current.MainWindow
-                };
-                window.Show();
+                });
             })
                 .AddTo(this.disposables);
 
@@ -351,11 +352,10 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                var window = new NetworkVideoSettings()
+                WS::Mainpage.WindowsHelper.OpenWindow(() => new NetworkVideoSettings()
                 {
                     Owner = Application.Current.MainWindow
-                };
-                window.Show();
+                });
             })
             .AddTo(this.disposables);
 

@@ -39,12 +39,11 @@ namespace Niconicome.ViewModels.Mainpage
 
                     if (!WS::Mainpage.Session.IsLogin.Value)
                     {
-                        Window loginpage = new Loginxaml
+                        WS::Mainpage.WindowsHelper.OpenWindow(() => new Loginxaml
                         {
                             Owner = Application.Current.MainWindow,
                             ShowInTaskbar = true
-                        };
-                        loginpage.Show();
+                        });
                     }
                     else
                     {
@@ -61,18 +60,16 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenSettingCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
             {
-                var window = new SettingWindow()
+                WS::Mainpage.WindowsHelper.OpenWindow(() => new SettingWindow()
                 {
                     Owner = Application.Current.MainWindow,
-                };
-                window.Show();
+                });
             });
 
             this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
                 .WithSubscribe(()=>
              {
-                 var windows = new DownloadTasksWindows();
-                 windows.Show();
+                 WS::Mainpage.WindowsHelper.OpenWindow<DownloadTasksWindows>();
              });
 
             regionManager.RegisterViewWithRegion("VideoListRegion", typeof(VideoList));

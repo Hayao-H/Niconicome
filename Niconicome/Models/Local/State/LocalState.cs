@@ -1,4 +1,6 @@
-﻿namespace Niconicome.Models.Local.State
+﻿using Niconicome.Models.Local.Settings;
+
+namespace Niconicome.Models.Local.State
 {
 
     public interface ILocalState

@@ -12,6 +12,7 @@ using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Ext = Niconicome.Models.Local.External;
 using VideoList = Niconicome.Models.Playlist.VideoList;
+using Niconicome.Models.Utils;
 
 namespace Niconicome.Workspaces
 {
@@ -41,5 +42,6 @@ namespace Niconicome.Workspaces
         public static IDownloadSettingsHandler DownloadSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IDownloadSettingsHandler>();
         public static ISortInfoHandler SortInfoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ISortInfoHandler>();
         public static IPlaylistTreeHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistTreeHandler>();
+        public static IWindowsHelper WindowsHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowsHelper>();
     }
 }

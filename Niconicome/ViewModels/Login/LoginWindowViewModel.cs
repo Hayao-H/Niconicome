@@ -10,6 +10,8 @@ using System.Diagnostics;
 using Niconicome.Views;
 using Utils = Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.ViewModels.Mainpage.Subwindows;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Login
 {
@@ -213,11 +215,11 @@ namespace Niconicome.ViewModels.Login
         {
             get
             {
-                return (Window)GetValue(WindowProperty);
+                return (Window)this.GetValue(WindowProperty);
             }
             set
             {
-                SetValue(WindowProperty, value);
+                this.SetValue(WindowProperty, value);
             }
         }
 
@@ -231,15 +233,15 @@ namespace Niconicome.ViewModels.Login
         private void Onclick(object sender, EventArgs e)
         {
             Debug.WriteLine(sender.GetType());
-            Window window = new LoginBrowser()
-            {
-                Owner = Application.Current.MainWindow
-            };
 
-#pragma warning disable CS8602
-            (window.DataContext as LoginBrowserViewModel).LoginSucceeded += (_,_)=>{ (this.AssociatedObject.DataContext as LoginWindowViewModel)?.RaiseLoginSucceeded(); };
-#pragma warning restore CS8602
-            window.Show();
+            var context = new LoginBrowserViewModel();
+            context.LoginSucceeded += (_, _) => { (this.AssociatedObject.DataContext as LoginWindowViewModel)?.RaiseLoginSucceeded(); };
+
+            WS::Mainpage.WindowsHelper.OpenWindow(() => new LoginBrowser()
+            {
+                Owner = Application.Current.MainWindow,
+                DataContext = context
+            });
 
             this.Window?.Close();
         }
