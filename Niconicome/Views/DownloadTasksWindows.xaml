@@ -13,7 +13,6 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource Window_Style}"
         d:DataContext="{d:DesignInstance {x:Type vm:DownloadTasksWindowViewModelD}, IsDesignTimeCreatable=True}"
