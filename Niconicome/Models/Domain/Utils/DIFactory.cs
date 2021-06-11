@@ -179,6 +179,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Cookies::IFirefoxCookieManager, Cookies::FirefoxCookieManager>();
             services.AddTransient<PlaylistPlaylist::IPlaylistSettingsHandler, PlaylistPlaylist::PlaylistSettingsHandler>();
             services.AddSingleton<Utils::IWindowsHelper, Utils::WindowsHelper>();
+            services.AddSingleton<MyApplication::IThemehandler, MyApplication::ThemeHandler>();
 
             return services.BuildServiceProvider();
         }
