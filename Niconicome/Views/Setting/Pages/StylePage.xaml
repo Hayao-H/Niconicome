@@ -25,8 +25,8 @@
         <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
             <TextBlock Text="スタイル設定" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
         </Border>
-        <ScrollViewer Grid.Row="1" Margin="8">
-            <StackPanel >
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="8">
                 <StackPanel>
                     <DockPanel>
                         <materialDesign:PackIcon Kind="InvertColors" Foreground="SkyBlue">
