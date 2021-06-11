@@ -198,7 +198,10 @@ namespace Niconicome.ViewModels.Mainpage
             //if (mw.videolist.DataContext is not VideoListViewModel listVM) return;
             //
             //listVM.SaveColumnWidth();
-            WS::Mainpage.Shutdown.ShutdownApp();
+            if (!WS::Mainpage.Shutdown.IsShutdowned)
+            {
+                WS::Mainpage.Shutdown.ShutdownApp();
+            }
         }
     }
 }

@@ -180,6 +180,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<PlaylistPlaylist::IPlaylistSettingsHandler, PlaylistPlaylist::PlaylistSettingsHandler>();
             services.AddSingleton<Utils::IWindowsHelper, Utils::WindowsHelper>();
             services.AddSingleton<MyApplication::IThemehandler, MyApplication::ThemeHandler>();
+            services.AddTransient<MyApplication::IApplicationPowerManager, MyApplication::ApplicationPowerManager>();
 
             return services.BuildServiceProvider();
         }
