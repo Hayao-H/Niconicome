@@ -15,7 +15,7 @@ namespace Niconicome.Models.Local.Application
 
     public class ThemeHandler : IThemehandler
     {
-        public ThemeHandler (IEnumSettingsHandler settingsHandler,ILogger logger)
+        public ThemeHandler(IEnumSettingsHandler settingsHandler, ILogger logger)
         {
             this.settingsHandler = settingsHandler;
             this.logger = logger;
@@ -47,7 +47,16 @@ namespace Niconicome.Models.Local.Application
             this.settingsHandler.SaveSetting(setting);
 
             var paletteHelper = new PaletteHelper();
-            ITheme theme = paletteHelper.GetTheme();
+            ITheme theme;
+            try
+            {
+                theme = paletteHelper.GetTheme();
+            }
+            catch (Exception e)
+            {
+                this.logger.Error($"IThemeの取得に失敗しました。（{setting}）", e);
+                return;
+            }
 
             if (setting == ApplicationThemeSettings.Inherit)
             {
@@ -58,7 +67,9 @@ namespace Niconicome.Models.Local.Application
                 try
                 {
                     theme.SetBaseTheme(Theme.Light);
-                } catch (Exception e)
+                    paletteHelper.SetTheme(theme);
+                }
+                catch (Exception e)
                 {
                     this.logger.Error($"テーマの変更に失敗しました。（{setting}）", e);
                 }
@@ -68,6 +79,7 @@ namespace Niconicome.Models.Local.Application
                 try
                 {
                     theme.SetBaseTheme(Theme.Dark);
+                    paletteHelper.SetTheme(theme);
                 }
                 catch (Exception e)
                 {
