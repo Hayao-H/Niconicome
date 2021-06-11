@@ -172,5 +172,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string DisableDownloadSucceededHistory { get; private set; } = "disabledownloadsucceededhistory";
         public static string DisableDownloadFailedHistory { get; private set; } = "disabledownloadfailedhistory";
         public static string LimitWindowsToSingleton { get; private set; } = "limitwindowstosingleton";
+        public static string ApplicationTheme { get; private set; } = "applicationtheme";
     }
 }

@@ -39,6 +39,7 @@
     <None Remove="Views\Mainpage\Region\Output.xaml" />
     <None Remove="Views\Mainpage\Region\VideoList.xaml" />
     <None Remove="Views\Mainpage\Region\VideoSortSetting.xaml" />
+    <None Remove="Views\Setting\Pages\StylePage.xaml" />
     <Page Remove="App.xaml" />
     <ApplicationDefinition Include="App.xaml" />
     <None Include="src\icon.png">

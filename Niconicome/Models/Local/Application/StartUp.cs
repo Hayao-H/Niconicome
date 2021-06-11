@@ -127,6 +127,10 @@ namespace Niconicome.Models.Local.Application
             this.backuphandler.Clean();
         }
 
+        /// <summary>
+        /// 自動ログインを試行
+        /// </summary>
+        /// <returns></returns>
         private async Task Autologin()
         {
             if (!this.autoLogin.IsAUtologinEnable) return;
@@ -161,6 +165,9 @@ namespace Niconicome.Models.Local.Application
             }
         }
 
+        /// <summary>
+        /// ログイン成功時
+        /// </summary>
         private void RaiseLoginSucceeded()
         {
             this.AutoLoginSucceeded?.Invoke(this, EventArgs.Empty);

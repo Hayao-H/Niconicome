@@ -10,12 +10,12 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              mc:Ignorable="d"
-             TextElement.Foreground="{DynamicResource MaterialDesignLightForeground}"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              TextElement.FontWeight="Regular"
              TextElement.FontSize="13"
              TextOptions.TextFormattingMode="Ideal"
              TextOptions.TextRenderingMode="Auto"
-             Background="{DynamicResource MaterialDesignBackground}"
+             Background="{DynamicResource MaterialDesignPaper}"
              FontFamily="Yu Gothic"
              d:Width="1300"
              d:Height="600"
@@ -40,7 +40,15 @@
                     <ColumnDefinition Width="17*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Text="{Binding InputString.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignTextBox}" FontSize="20" Margin="5,0" VerticalContentAlignment="Bottom" materialDesign:HintAssist.Hint="ID・検索キーワード入力窓" Padding="5 0"/>
+                <TextBox 
+                    Text="{Binding InputString.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                    Style="{DynamicResource MaterialDesignTextBox}" 
+                    FontSize="20" 
+                    Margin="5,0" 
+                    VerticalContentAlignment="Bottom" 
+                    materialDesign:HintAssist.Hint="ID・検索キーワード入力窓"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    Padding="5 0"/>
                 <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する（インテリインプット）" Command="{Binding AddVideoCommand}"/>
             </Grid>
             <StackPanel Grid.Column="1" Orientation="Horizontal">

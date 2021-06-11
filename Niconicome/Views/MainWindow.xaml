@@ -15,7 +15,7 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
+        Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="Yu Gothic"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource Window_Style}"
@@ -68,7 +68,8 @@
                         <ColumnDefinition Width="250"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Column= "0" Background="{DynamicResource  MaterialDesignSnackbarBackground}">
+                    <Grid Grid.Column= "0" 
+                          Background="#323232">
                         <Grid.DataContext>
                             <vm:PlaylistTreeViewModel/>
                         </Grid.DataContext>
@@ -81,19 +82,19 @@
                                 <materialDesign:PackIcon Kind="Refresh" />
                             </Button>
                         </DockPanel>
-                        <TreeView Foreground="{DynamicResource MaterialDesignBody}" ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
+                        <TreeView ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
                             <i:Interaction.Behaviors>
                                 <vm:PlaylistTreeBehavior/>
                             </i:Interaction.Behaviors>
                             <TreeView.ItemTemplate>
                                 <HierarchicalDataTemplate DataType="tree:ITreePlaylistInfo" ItemsSource="{Binding Children}">
                                     <StackPanel>
-                                        <Grid Background="{Binding BackgroundColor}">
+                                        <Grid>
                                             <Grid.ToolTip>
                                                 <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
                                             </Grid.ToolTip>
                                             <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                            <TextBlock Foreground="{DynamicResource MaterialDesignSnackbarRipple}" Text="{Binding Name.Value}"/>
+                                            <TextBlock Foreground="#FAFAFA" Text="{Binding Name.Value}"/>
                                             <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
                                         </Grid>
                                     </StackPanel>
@@ -108,31 +109,31 @@
                                                 <MenuItem Header="プレイリストを追加する"
                                                   Command="{Binding AddPlaylist}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Plus"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem Header="このプレイリストを削除する"
+                                                        <MenuItem.Icon>
+                                                            <materialDesign:PackIcon Kind="Plus"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="このプレイリストを削除する"
                                                   Command="{Binding RemovePlaylist}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Delete"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem Header="このプレイリストを編集する"
+                                                        <MenuItem.Icon>
+                                                            <materialDesign:PackIcon Kind="Delete"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="このプレイリストを編集する"
                                                   Command="{Binding EditPlaylistCommand}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Edit"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                            </ContextMenu>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                </Style>
-                            </TreeView.ItemContainerStyle>
-                        </TreeView>
+                                                        <MenuItem.Icon>
+                                                            <materialDesign:PackIcon Kind="Edit"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                    </Style>
+                                </TreeView.ItemContainerStyle>
+                            </TreeView>
                     </Grid>
                     <Grid Grid.Column="1">
                         <Grid.RowDefinitions>

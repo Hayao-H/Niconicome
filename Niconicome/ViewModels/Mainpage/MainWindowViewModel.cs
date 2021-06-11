@@ -26,6 +26,7 @@ namespace Niconicome.ViewModels.Mainpage
         public MainWindowViewModel(IRegionManager regionManager)
         {
 
+            WS::Mainpage.Themehandler.Initialize();
             WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
             this.LoginBtnVal= new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Windows.Media;
-using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Helper.Result;
 using Value = Niconicome.Models.Local.Settings.EnumSettingsValue;
 
@@ -73,6 +71,9 @@ namespace Niconicome.Models.Local.Settings
             }　else if (typeof(T) == typeof(Value::IchibaInfoTypeSettings))
             {
                 return SettingsEnum.IchibaInfoType;
+            } else if (typeof(T) == typeof(Value::ApplicationThemeSettings))
+            {
+                return SettingsEnum.AppTheme;
             }
             else
             {

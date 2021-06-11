@@ -12,7 +12,7 @@
              TextElement.FontSize="13"
              TextOptions.TextFormattingMode="Ideal"
              TextOptions.TextRenderingMode="Auto"
-             Background="{DynamicResource MaterialDesignBackground}"
+             Background="{DynamicResource MaterialDesignPaper}"
              FontFamily="Yu Gothic"
              d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingsViewModelD},IsDesignTimeCreatable=True}"
              d:Width="1200"

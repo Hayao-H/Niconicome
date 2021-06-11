@@ -15,7 +15,6 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
         d:DataContext="{d:DesignInstance {x:Type vm:GeneralSettingsPageViewModelD},IsDesignTimeCreatable=True}"
         FontFamily="Yu Gothic"
       d:DesignHeight="600" d:DesignWidth="800"
