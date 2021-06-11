@@ -25,7 +25,10 @@
             <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0" BorderThickness="0 0 1 0" BorderBrush="#e7e7e7">
-            <StackPanel Background="{DynamicResource MaterialDesignPaper}">
+            <StackPanel 
+                Background="#323232"
+                TextElement.Foreground="#E7E7E7"
+                >
                 <i:Interaction.Behaviors>
                     <vm:SettingNavigationBehavior/>
                 </i:Interaction.Behaviors>
