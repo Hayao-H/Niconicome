@@ -8,6 +8,7 @@ using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
@@ -74,8 +75,12 @@ namespace Niconicome.ViewModels.Mainpage
              });
 
             this.Restart = new ReactiveCommand()
-                .WithSubscribe(() =>
+                .WithSubscribe(async () =>
                 {
+                    var cResult = await MaterialMessageBox.Show("再起動しますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+
+                    if (cResult != MaterialMessageBoxResult.Yes) return;
+
                     var result = WS::Mainpage.ApplicationPower.Restart();
                     if (!result.IsSucceeded)
                     {
@@ -85,8 +90,12 @@ namespace Niconicome.ViewModels.Mainpage
                 });
 
             this.ShutDown = new ReactiveCommand()
-                .WithSubscribe(() =>
+                .WithSubscribe(async () =>
                 {
+                    var cResult = await MaterialMessageBox.Show("終了しますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+
+                    if (cResult != MaterialMessageBoxResult.Yes) return;
+
                     WS::Mainpage.ApplicationPower.ShutDown();
                 });
 
