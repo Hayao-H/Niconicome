@@ -43,5 +43,6 @@ namespace Niconicome.Workspaces
         public static ISortInfoHandler SortInfoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ISortInfoHandler>();
         public static IPlaylistTreeHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistTreeHandler>();
         public static IWindowsHelper WindowsHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowsHelper>();
+        public static IThemehandler Themehandler { get; private set; } = DIFactory.Provider.GetRequiredService<IThemehandler>();
     }
 }

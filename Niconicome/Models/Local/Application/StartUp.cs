@@ -23,7 +23,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer,NicoIO::INicoDirectoryIO nicoDirectoryIO,IThemehandler themehandler)
+        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer,NicoIO::INicoDirectoryIO nicoDirectoryIO)
         {
 
             this.videoStoreHandler = videoStoreHandler;
@@ -36,7 +36,6 @@ namespace Niconicome.Models.Local.Application
             this.settingHandler = settingHandler;
             this.streamResumer = streamResumer;
             this.nicoDirectoryIO = nicoDirectoryIO;
-            this.themehandler = themehandler;
             this.DeleteInvalidbackup();
         }
 
@@ -60,8 +59,6 @@ namespace Niconicome.Models.Local.Application
 
         private readonly NicoIO::INicoDirectoryIO nicoDirectoryIO;
 
-        private readonly IThemehandler themehandler;
-
         /// <summary>
         /// 自動ログイン成功時
         /// </summary>
@@ -74,7 +71,6 @@ namespace Niconicome.Models.Local.Application
         {
             Task.Run(async () =>
             {
-                this.InitializeTheme();
                 this.RemoveTmpFolder();
                 this.JustifyData();
                 this.DeleteInvalidFilePath();
@@ -167,14 +163,6 @@ namespace Niconicome.Models.Local.Application
                 this.snackbarHandler.Enqueue("自動ログインに成功しました。");
                 this.RaiseLoginSucceeded();
             }
-        }
-
-        /// <summary>
-        /// テーマ初期化
-        /// </summary>
-        private void InitializeTheme()
-        {
-            this.themehandler.Initialize();
         }
 
         /// <summary>
