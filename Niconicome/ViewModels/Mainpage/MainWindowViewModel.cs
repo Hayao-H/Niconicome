@@ -73,6 +73,23 @@ namespace Niconicome.ViewModels.Mainpage
                  WS::Mainpage.WindowsHelper.OpenWindow<DownloadTasksWindows>();
              });
 
+            this.Restart = new ReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    var result = WS::Mainpage.ApplicationPower.Restart();
+                    if (!result.IsSucceeded)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage("再起動に失敗しました。");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("再起動できませんでした。");
+                    }
+                });
+
+            this.ShutDown = new ReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    WS::Mainpage.ApplicationPower.ShutDown();
+                });
+
             regionManager.RegisterViewWithRegion("VideoListRegion", typeof(VideoList));
             regionManager.RegisterViewWithRegion("DownloadSettingsRegion", typeof(DownloadSettings));
             regionManager.RegisterViewWithRegion("OutputRegion", typeof(Output));
@@ -114,25 +131,14 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveCommand OpenDownloadTaskWindowsCommand { get; init; }
 
         /// <summary>
-        /// メッセージ(フィールド)
+        /// シャットダウン
         /// </summary>
-        private readonly StringBuilder message = new();
+        public ReactiveCommand ShutDown { get; init; }
 
         /// <summary>
-        /// メッセージ
+        /// 再起動
         /// </summary>
-        public string Message
-        {
-            get
-            {
-                return this.message.ToString();
-            }
-            set
-            {
-                this.message.AppendLine(value);
-                this.OnPropertyChanged(nameof(this.message));
-            }
-        }
+        public ReactiveCommand Restart { get; init; }
 
         /// <summary>
         /// ログイン成功時

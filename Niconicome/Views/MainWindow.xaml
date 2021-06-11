@@ -50,15 +50,26 @@
                             </StackPanel>
                         </materialDesign:ColorZone>
                         <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">
-                            <MenuItem Header="設定" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenSettingCommand}" >
+                            <MenuItem Header="設定" Height="40" Command="{Binding OpenSettingCommand}" >
                                 <MenuItem.Icon>
                                     <materialDesign:PackIcon Kind="CogOutline"/>
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="ダウンロード" HorizontalContentAlignment="Left"  Height="40"   Command="{Binding OpenDownloadTaskWindowsCommand}">
+                            <MenuItem Header="ダウンロード" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenDownloadTaskWindowsCommand}">
                                 <MenuItem.Icon>
                                     <materialDesign:PackIcon Kind="Download"/>
                                 </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="再起動" Command="{Binding Restart}" Height="40">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="Restart"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="終了" Command="{Binding ShutDown}"  Height="40">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="Power"/>
+                                </MenuItem.Icon>
+
                             </MenuItem>
                         </StackPanel>
                     </Grid>
