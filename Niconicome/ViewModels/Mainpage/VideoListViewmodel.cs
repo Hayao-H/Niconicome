@@ -208,55 +208,47 @@ namespace Niconicome.ViewModels.Mainpage
               })
             .AddTo(this.disposables);
 
-            this.RemoveVideoCommand = new CommandBase<VideoInfoViewModel>(_ => true, async arg =>
-             {
-                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
-                 {
-                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
-                     return;
-                 }
+            this.RemoveVideoCommand = new ReactiveCommand()
+            .WithSubscribe(async () =>
+            {
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
+                {
+                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
+                    return;
+                }
 
-                 var targetVideos = new List<IListVideoInfo>();
+                List<IListVideoInfo> targetVideos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).ToList();
 
-                 if (arg is not null && arg is VideoInfoViewModel videoVM) targetVideos.Add(videoVM.VideoInfo);
-
-                 targetVideos.AddRange(WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value));
-                 targetVideos = targetVideos.Distinct(v => v.Id).ToList();
-
-                 string confirmMessage = targetVideos.Count == 1
-                 ? $"本当に「[{targetVideos[0].NiconicoId.Value}]{targetVideos[0].Title.Value}」を削除しますか？"
-                 : $"本当に「[{targetVideos[0].NiconicoId.Value}]{targetVideos[0].Title.Value}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
+                if (targetVideos.Count == 0)
+                {
+                    int index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
+                    if (index < 0 || WS::Mainpage.VideoListContainer.Count <= index) return;
+                    targetVideos.Add(WS::Mainpage.VideoListContainer.Videos[index]);
+                }
 
 
-                 var confirm = await this.showMessageBox(confirmMessage, MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
-                 if (confirm != MaterialMessageBoxResult.Yes) return;
+                string confirmMessage = targetVideos.Count == 1
+                ? $"本当に「[{targetVideos[0]}」を削除しますか？"
+                : $"本当に「[{targetVideos[0]}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
 
-                 foreach (var video in targetVideos)
-                 {
-                     //取得失敗動画の場合
-                     if (video.Title.Value == "取得失敗")
-                     {
-                         WS::Mainpage.VideoListContainer.Remove(video, null, false);
-                     }
-                     else
-                     {
-                         WS::Mainpage.VideoListContainer.Remove(video, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
-                     }
-                 }
 
-                 if (targetVideos.Count > 1)
-                 {
+                var confirm = await this.showMessageBox(confirmMessage, MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+                if (confirm != MaterialMessageBoxResult.Yes) return;
 
-                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                 }
-                 else
-                 {
-                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}を削除しました。");
-                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}を削除しました。");
-                 }
+                WS::Mainpage.VideoListContainer.RemoveRange(targetVideos, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
 
-             });
+                if (targetVideos.Count > 1)
+                {
+                    WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                }
+                else
+                {
+                    WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}を削除しました。");
+                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}を削除しました。");
+                }
+
+            });
 
             this.WatchOnNiconicoCommand = new CommandBase<VideoInfoViewModel>(_ => true, arg =>
             {
@@ -866,7 +858,7 @@ namespace Niconicome.ViewModels.Mainpage
                     }
                     else if (type == VideoProperties.Title)
                     {
-                       source = video.Title.Value;
+                        source = video.Title.Value;
                     }
                     else
                     {
@@ -1000,7 +992,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画を削除する
         /// </summary>
-        public CommandBase<VideoInfoViewModel> RemoveVideoCommand { get; init; }
+        public ReactiveCommand RemoveVideoCommand { get; init; }
 
         /// <summary>
         /// ニコニコ動画で開く
@@ -1374,7 +1366,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<object> AddVideoCommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<VideoInfoViewModel> RemoveVideoCommand { get; init; } = new(_ => true, _ => { });
+        public ReactiveCommand RemoveVideoCommand { get; init; } = new();
 
         public CommandBase<IListVideoInfo> WatchOnNiconicoCommand { get; init; } = new(_ => true, _ => { });
 
