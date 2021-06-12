@@ -27,6 +27,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Store
             return new STypes::Playlist();
         }
 
+        public STypes::Playlist? GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate)
+        {
+            return new STypes::Playlist();
+        }
+
         public int AddPlaylist(int parentID, string name)
         {
             this.PlayilistCount++;
