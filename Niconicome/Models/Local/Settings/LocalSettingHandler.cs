@@ -184,6 +184,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.DisableDLSucceededHistory => STypes::SettingNames.DisableDownloadSucceededHistory,
                 SettingsEnum.SingletonWindows => STypes::SettingNames.LimitWindowsToSingleton,
                 SettingsEnum.AppTheme => STypes::SettingNames.ApplicationTheme,
+                SettingsEnum.ConfirmIfDownloading => STypes::SettingNames.ConfirmIfDownloading,
                 _ => null
             };
         }
@@ -258,5 +259,6 @@ namespace Niconicome.Models.Local.Settings
         DisableDLSucceededHistory,
         SingletonWindows,
         AppTheme,
+        ConfirmIfDownloading,
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Reactive.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,6 +17,7 @@ using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
@@ -848,6 +850,81 @@ namespace Niconicome.ViewModels.Mainpage
                     WS::Mainpage.Messagehandler.AppendMessage($"一時プレイリストの内容しました。");
                     WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
                 });
+
+            this.CopyOne = new ReactiveCommand<VideoProperties>()
+                .WithSubscribe(type =>
+                {
+                    int index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
+                    if (index < 0 || WS::Mainpage.VideoListContainer.Count <= index) return;
+
+                    IListVideoInfo video = WS::Mainpage.VideoListContainer.Videos[index];
+                    string source;
+
+                    if (type == VideoProperties.NiconicoId)
+                    {
+                        source = video.NiconicoId.Value;
+                    }
+                    else if (type == VideoProperties.Title)
+                    {
+                       source = video.Title.Value;
+                    }
+                    else
+                    {
+                        source = Niconicome.Models.Const.Net.NiconicoShortUrl + video.NiconicoId.Value;
+                    }
+
+                    try
+                    {
+                        Clipboard.SetText(source);
+                    }
+                    catch (Exception e)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage($"情報のコピーに失敗しました。(詳細:{e.Message})");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("情報のコピーに失敗しました。");
+                    }
+                    WS::Mainpage.SnaclbarHandler.Enqueue("情報をコピーしました。");
+                });
+
+            this.CopyAll = new ReactiveCommand<VideoProperties>()
+                .WithSubscribe(type =>
+                {
+                    List<IListVideoInfo> videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).ToList();
+                    var builder = new StringBuilder();
+
+                    if (type == VideoProperties.NiconicoId)
+                    {
+                        foreach (IListVideoInfo video in videos)
+                        {
+                            builder.AppendLine(video.NiconicoId.Value);
+                        }
+                    }
+                    else if (type == VideoProperties.Title)
+                    {
+                        foreach (IListVideoInfo video in videos)
+                        {
+                            builder.AppendLine(video.Title.Value);
+                        }
+                    }
+                    else
+                    {
+                        foreach (IListVideoInfo video in videos)
+                        {
+                            builder.AppendLine(Niconicome.Models.Const.Net.NiconicoShortUrl + video.NiconicoId.Value);
+                        }
+                    }
+
+                    try
+                    {
+                        Clipboard.SetText(builder.ToString());
+                    }
+                    catch (Exception e)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage($"情報のコピーに失敗しました。(詳細:{e.Message})");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("情報のコピーに失敗しました。");
+                    }
+
+                    WS::Mainpage.SnaclbarHandler.Enqueue("情報をコピーしました。");
+                });
             #endregion
 
             #region Width系プロパティー
@@ -1039,6 +1116,16 @@ namespace Niconicome.ViewModels.Mainpage
         /// 一時プレイリストを保存するコマンド
         /// </summary>
         public ReactiveCommand SavePlaylistCommand { get; init; }
+
+        /// <summary>
+        /// 動画情報をコピー
+        /// </summary>
+        public ReactiveCommand<VideoProperties> CopyOne { get; init; }
+
+        /// <summary>
+        /// 選択した動画情報をコピー
+        /// </summary>
+        public ReactiveCommand<VideoProperties> CopyAll { get; init; }
 
 
         #endregion
@@ -1335,6 +1422,10 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; } = new ReactiveCommand<MouseEventArgs>();
 
+        public ReactiveCommand<VideoProperties> CopyOne { get; init; } = new();
+
+        public ReactiveCommand<VideoProperties> CopyAll { get; init; } = new();
+
         public ReactiveCollection<VideoInfoViewModel> Videos { get; init; }
 
         public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
@@ -1595,4 +1686,10 @@ namespace Niconicome.ViewModels.Mainpage
         None
     }
 
+    enum VideoProperties
+    {
+        NiconicoId,
+        Title,
+        Url,
+    }
 }

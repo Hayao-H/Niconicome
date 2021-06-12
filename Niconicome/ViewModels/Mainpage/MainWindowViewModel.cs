@@ -8,6 +8,8 @@ using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.Models.Local.Settings;
+using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
@@ -28,7 +30,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.Themehandler.Initialize();
             WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
-            this.LoginBtnVal= new ReactiveProperty<string>("ログイン");
+            this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");
             this.LoginBtnTooltip = new ReactiveProperty<string>("ログイン画面を表示する");
             this.UserImage = new ReactiveProperty<Uri>(new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg"));
@@ -68,10 +70,35 @@ namespace Niconicome.ViewModels.Mainpage
             });
 
             this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
-                .WithSubscribe(()=>
+                .WithSubscribe(() =>
              {
                  WS::Mainpage.WindowsHelper.OpenWindow<DownloadTasksWindows>();
              });
+
+            this.Restart = new ReactiveCommand()
+                .WithSubscribe(async () =>
+                {
+                    var cResult = await MaterialMessageBox.Show("再起動しますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+
+                    if (cResult != MaterialMessageBoxResult.Yes) return;
+
+                    var result = WS::Mainpage.ApplicationPower.Restart();
+                    if (!result.IsSucceeded)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage("再起動に失敗しました。");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("再起動できませんでした。");
+                    }
+                });
+
+            this.ShutDown = new ReactiveCommand()
+                .WithSubscribe(async () =>
+                {
+                    var cResult = await MaterialMessageBox.Show("終了しますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+
+                    if (cResult != MaterialMessageBoxResult.Yes) return;
+
+                    WS::Mainpage.ApplicationPower.ShutDown();
+                });
 
             regionManager.RegisterViewWithRegion("VideoListRegion", typeof(VideoList));
             regionManager.RegisterViewWithRegion("DownloadSettingsRegion", typeof(DownloadSettings));
@@ -114,25 +141,14 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveCommand OpenDownloadTaskWindowsCommand { get; init; }
 
         /// <summary>
-        /// メッセージ(フィールド)
+        /// シャットダウン
         /// </summary>
-        private readonly StringBuilder message = new();
+        public ReactiveCommand ShutDown { get; init; }
 
         /// <summary>
-        /// メッセージ
+        /// 再起動
         /// </summary>
-        public string Message
-        {
-            get
-            {
-                return this.message.ToString();
-            }
-            set
-            {
-                this.message.AppendLine(value);
-                this.OnPropertyChanged(nameof(this.message));
-            }
-        }
+        public ReactiveCommand Restart { get; init; }
 
         /// <summary>
         /// ログイン成功時
@@ -141,7 +157,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="e"></param>
         private void OnLogin()
         {
-            if (WS::Mainpage.Session.User.Value is null) return; 
+            if (WS::Mainpage.Session.User.Value is null) return;
             this.user = WS::Mainpage.Session.User.Value;
             this.LoginBtnVal.Value = "ログアウト";
             this.LoginBtnTooltip.Value = "ログアウトする";
@@ -195,10 +211,21 @@ namespace Niconicome.ViewModels.Mainpage
             if (sender is null || sender.AsNullable<Window>() is not Window window) return;
             if (window != Application.Current.MainWindow) return;
             if (window is not MainWindow mw) return;
-            //if (mw.videolist.DataContext is not VideoListViewModel listVM) return;
-            //
-            //listVM.SaveColumnWidth();
-            WS::Mainpage.Shutdown.ShutdownApp();
+
+            if (!WS::Mainpage.Shutdown.IsShutdowned)
+            {
+                bool confirm = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ConfirmIfDownloading);
+                if (!WS::Mainpage.Videodownloader.CanDownload.Value && confirm)
+                {
+                    var cResult = MessageBox.Show("ダウンロードが進行中ですが、本当に終了しますか？","アプリケーションを終了", MessageBoxButton.YesNo,MessageBoxImage.Question);
+                    if (cResult != MessageBoxResult.Yes)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                }
+                WS::Mainpage.Shutdown.ShutdownApp();
+            }
         }
     }
 }

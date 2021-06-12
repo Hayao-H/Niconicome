@@ -126,7 +126,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::IBackuphandler, Local::BackupHandler>();
             services.AddTransient<DomainPlaylist::IPlaylistFileFactory, DomainPlaylist::PlaylistFileFactory>();
             services.AddTransient<Local::IPlaylistCreator, Local::PlaylistCreator>();
-            services.AddTransient<MyApplication::IShutdown, MyApplication::Shutdown>();
+            services.AddSingleton<MyApplication::IShutdown, MyApplication::Shutdown>();
             services.AddTransient<DlComment::ICommentDownloader, DlComment::CommentDownloader>();
             services.AddTransient<DlComment::ICommentConverter, DlComment::CommentConverter>();
             services.AddTransient<DlComment::ICommentClient, DlComment::CommentClient>();
@@ -180,6 +180,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<PlaylistPlaylist::IPlaylistSettingsHandler, PlaylistPlaylist::PlaylistSettingsHandler>();
             services.AddSingleton<Utils::IWindowsHelper, Utils::WindowsHelper>();
             services.AddSingleton<MyApplication::IThemehandler, MyApplication::ThemeHandler>();
+            services.AddTransient<MyApplication::IApplicationPowerManager, MyApplication::ApplicationPowerManager>();
 
             return services.BuildServiceProvider();
         }

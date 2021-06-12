@@ -194,7 +194,7 @@
                         <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}, Mode=FindAncestor}, Path=DataContext}"/>
                         <Setter Property="ContextMenu">
                             <Setter.Value>
-                                <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag,RelativeSource={RelativeSource Self}}">
+                                <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag,RelativeSource={RelativeSource Self}}" d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD}, IsDesignTimeCreatable=True}">
                                     <MenuItem Header="動画を削除する" Command="{Binding RemoveVideoCommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                         <MenuItem.Icon>
@@ -235,6 +235,28 @@
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                         <MenuItem Header="アプリに送る(B)" Command="{Binding SendToappBCommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    </MenuItem>
+                                    <MenuItem Header="コピー">
+                                        <MenuItem Header="ID" 
+                                                  Command="{Binding CopyOne}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.NiconicoId}"/>
+                                        <MenuItem Header="タイトル" 
+                                                  Command="{Binding CopyOne}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.Title}"/>
+                                        <MenuItem Header="URL" 
+                                                  Command="{Binding CopyOne}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.Url}"/>
+                                    </MenuItem>
+                                    <MenuItem Header="すべてコピー">
+                                        <MenuItem Header="ID" 
+                                                  Command="{Binding CopyAll}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.NiconicoId}"/>
+                                        <MenuItem Header="タイトル" 
+                                                  Command="{Binding CopyAll}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.Title}"/>
+                                        <MenuItem Header="URL" 
+                                                  Command="{Binding CopyAll}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.Url}"/>
                                     </MenuItem>
                                     <MenuItem Header="プレイリストを作成">
                                         <MenuItem Header=".aimppl4形式のファイルを作成する" Command="{Binding CreatePlaylistCommand}" CommandParameter="aimp"/>

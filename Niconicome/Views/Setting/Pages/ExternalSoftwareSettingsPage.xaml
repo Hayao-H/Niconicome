@@ -26,8 +26,8 @@
         <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
             <TextBlock Text="外部ソフト設定" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
         </Border>
-        <ScrollViewer Grid.Row="1" Margin="8">
-            <StackPanel >
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="8">
                 <TextBlock Padding="8" TextWrapping="Wrap">
                 実行ファイルパスは実行ファイルの絶対パスを指定してください。(例: C:\video\player.exe)<LineBreak/>
                 ただし、実行ファイルのパスが通っている場合は、ファイル名を利用することが出来ます。<LineBreak/>
