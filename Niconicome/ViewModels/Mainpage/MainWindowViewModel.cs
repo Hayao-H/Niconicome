@@ -104,6 +104,7 @@ namespace Niconicome.ViewModels.Mainpage
             regionManager.RegisterViewWithRegion("DownloadSettingsRegion", typeof(DownloadSettings));
             regionManager.RegisterViewWithRegion("OutputRegion", typeof(Output));
             regionManager.RegisterViewWithRegion("VideoSortSetting", typeof(VideoSortSetting));
+            regionManager.RegisterViewWithRegion("VideolistState", typeof(VideoListState));
         }
 
         /// <summary>

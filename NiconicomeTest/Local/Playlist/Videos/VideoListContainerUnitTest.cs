@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reactive.Linq;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Playlist;
@@ -44,6 +45,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         {
             var video = new NonBindableListVideoInfo();
             video.NiconicoId.Value = "sm9";
+            video.IsSelected.Value = true;
             var result = this.videoListContainer!.Add(video, 1);
 
             Assert.That(this.lastChangeType, Is.EqualTo(ChangeType.Add));
@@ -51,6 +53,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
             Assert.That(this.videoListContainer.Videos.Count, Is.EqualTo(1));
             Assert.That(result.IsSucceeded, Is.True);
             Assert.That(this.playlistStoreHandler!.VideoCount, Is.EqualTo(1));
+            Assert.That(this.videoListContainer.SelectedVideos.Value, Is.EqualTo(1));
         }
 
         [Test]
@@ -75,6 +78,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         {
             var video = new NonBindableListVideoInfo();
             video.NiconicoId.Value = "sm9";
+            video.IsSelected.Value = true;
             this.videoListContainer!.Add(video);
             var result = this.videoListContainer!.Remove(video, 1);
 
@@ -84,6 +88,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
             Assert.That(this.videoListContainer.Videos.Count, Is.EqualTo(0));
             Assert.That(result.IsSucceeded, Is.True);
             Assert.That(this.playlistStoreHandler!.VideoCount, Is.EqualTo(0));
+            Assert.That(this.videoListContainer.SelectedVideos.Value, Is.Zero);
         }
 
         [Test]
@@ -101,9 +106,9 @@ namespace NiconicomeTest.Local.Playlist.Videos
         [Test]
         public void すべての動画にチェックを入れる()
         {
-            var video1 = new NonBindableListVideoInfo();
-            var video2 = new NonBindableListVideoInfo();
-            var video3 = new NonBindableListVideoInfo();
+            var video1 = new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
+            var video2 = new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("2") };
+            var video3 = new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("3") };
             this.videoListContainer!.AddRange(new IListVideoInfo[] { video1, video2, video3 });
             this.videoListContainer!.ForEach(v => v.IsSelected.Value = true);
 
@@ -111,6 +116,8 @@ namespace NiconicomeTest.Local.Playlist.Videos
             {
                 Assert.That(video.IsSelected.Value, Is.True);
             }
+
+            Assert.That(this.videoListContainer.SelectedVideos.Value, Is.EqualTo(3));
 
 
         }

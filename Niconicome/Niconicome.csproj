@@ -38,6 +38,7 @@
     <None Remove="Views\Mainpage\Region\DownloadSettings.xaml" />
     <None Remove="Views\Mainpage\Region\Output.xaml" />
     <None Remove="Views\Mainpage\Region\VideoList.xaml" />
+    <None Remove="Views\Mainpage\Region\VideolistState.xaml" />
     <None Remove="Views\Mainpage\Region\VideoSortSetting.xaml" />
     <None Remove="Views\Setting\Pages\StylePage.xaml" />
     <Page Remove="App.xaml" />
@@ -78,6 +79,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Update="Views\Mainpage\Region\VideolistState.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -88,6 +92,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Views\Mainpage\Region\VideolistState.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\Setting\Pages\StylePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

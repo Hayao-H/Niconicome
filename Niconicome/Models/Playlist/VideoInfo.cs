@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System;
@@ -259,5 +261,4 @@ namespace Niconicome.Models.Playlist
             }
         }
     }
-
 }

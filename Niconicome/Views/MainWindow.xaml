@@ -184,6 +184,9 @@
                                 <TabItem Header="並び替え">
                                     <UserControl prism:RegionManager.RegionName="VideoSortSetting"/>
                                 </TabItem>
+                                <TabItem Header="状態">
+                                    <UserControl prism:RegionManager.RegionName="VideolistState"/>
+                                </TabItem>
                             </TabControl >
                         </Grid>
                     </Grid>
