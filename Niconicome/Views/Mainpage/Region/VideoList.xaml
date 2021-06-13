@@ -25,7 +25,7 @@
     </UserControl.Resources>
     <Grid d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD},IsDesignTimeCreatable=True}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="{Binding TitleHeight.va}"/>
+            <RowDefinition Height="{Binding TitleHeight.Value}"/>
             <RowDefinition Height="{Binding ButtonsHeight.Value}"/>
             <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
