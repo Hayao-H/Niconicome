@@ -22,5 +22,7 @@ namespace Niconicome.Models.Const
         public const string DefaultJpegFileExt = ".jpg";
 
         public const string UserChromePath = @"chrome\userChrome.json";
+
+        public const string UserChromeFileName = @"userChrome.json";
     }
 }

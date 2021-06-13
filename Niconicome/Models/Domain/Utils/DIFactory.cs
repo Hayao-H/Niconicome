@@ -164,6 +164,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::ILocalVideoUtils, Local::LocalVideoUtils>();
             services.AddTransient<IO::INicoDirectoryIO, IO::NicoDirectoryIO>();
             services.AddTransient<IO::INicoFileIO, IO::NicoFileIO>();
+            services.AddTransient<IO::IFileWatcher, IO::FileWatcher>();
             services.AddTransient<Resume::ISegmentsDirectoryHandler, Resume::SegmentsDirectoryHandler>();
             services.AddTransient<Resume::IStreamResumer, Resume::StreamResumer>();
             services.AddSingleton<VList::ICurrent, VList::Current>();

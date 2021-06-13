@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -9,6 +10,8 @@ using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.ViewModels;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Local.Style
 {
@@ -16,14 +19,37 @@ namespace Niconicome.Models.Domain.Local.Style
     {
         IAttemptResult<UserChrome> GetUserChrome();
         IAttemptResult SaveStyle(UserChrome chrome);
+        ReactiveProperty<UserChrome> UserChrome { get; }
     }
 
-    public class UserChromeHandler : IUserChromeHandler
+    public class UserChromeHandler : BindableBase, IUserChromeHandler
     {
-        public UserChromeHandler(INicoFileIO fileIO, ILogger logger)
+        public UserChromeHandler(INicoFileIO fileIO, ILogger logger, IFileWatcher fileWatcher)
         {
             this.fileIO = fileIO;
             this.logger = logger;
+            this.fileWatcher = fileWatcher;
+
+            IAttemptResult<UserChrome> result = this.GetUserChrome();
+            this.UserChrome = new ReactiveProperty<UserChrome>(result.Data ?? new UserChrome());
+
+            this.fileWatcher.Watch(
+                Path.Combine(AppContext.BaseDirectory, FileFolder.UserChromePath),
+                NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size,
+                e =>
+                {
+                    if (e.Name == FileFolder.UserChromeFileName)
+                    {
+                        IAttemptResult<UserChrome> result = this.GetUserChrome();
+                        if (result.IsSucceeded && result.Data is not null)
+                            this.UserChrome.Value = result.Data;
+                    }
+                });
+        }
+
+        ~UserChromeHandler()
+        {
+            this.fileWatcher.UnWatch();
         }
 
         #region field
@@ -32,7 +58,15 @@ namespace Niconicome.Models.Domain.Local.Style
 
         private readonly ILogger logger;
 
+        private readonly IFileWatcher fileWatcher;
+
         #endregion
+
+        /// <summary>
+        /// UserChrome
+        /// </summary>
+        public ReactiveProperty<UserChrome> UserChrome { get; init; }
+
 
         /// <summary>
         /// userChromeを取得する

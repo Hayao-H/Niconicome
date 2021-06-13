@@ -1,12 +1,13 @@
 ﻿using Niconicome.Models.Domain.Local.Style;
-using Niconicome.Models.Domain.Local.Style.Type;
+using Types = Niconicome.Models.Domain.Local.Style.Type;
 using Niconicome.Models.Helper.Result;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Local.State
 {
     interface IStyleHandler
     {
-        UserChrome UserChrome { get; }
+        ReadOnlyReactiveProperty<Types::UserChrome?> UserChrome { get; }
         IAttemptResult SaveUserChrome();
     }
 
@@ -15,31 +16,19 @@ namespace Niconicome.Models.Local.State
         public StyleHandler(IUserChromeHandler userChromeHandler)
         {
             this.userChromeHandler = userChromeHandler;
+            this.UserChrome = this.userChromeHandler.UserChrome.ToReadOnlyReactiveProperty();
         }
 
         #region field
 
         private readonly IUserChromeHandler userChromeHandler;
 
-        private UserChrome? userChrome;
-
         #endregion
 
         /// <summary>
         /// userChrome
         /// </summary>
-        public UserChrome UserChrome
-        {
-            get
-            {
-                if (this.userChrome is null)
-                {
-                    this.userChrome = this.userChromeHandler.GetUserChrome().Data;
-                }
-
-                return this.userChrome ?? new UserChrome();
-            }
-        }
+        public ReadOnlyReactiveProperty<Types::UserChrome?> UserChrome { get; init; }
 
         /// <summary>
         /// userChrome.jsonを書き込む
@@ -47,7 +36,10 @@ namespace Niconicome.Models.Local.State
         /// <returns></returns>
         public IAttemptResult SaveUserChrome()
         {
-            return this.userChromeHandler.SaveStyle(this.UserChrome);
+            Types::UserChrome userChrome = this.UserChrome.Value ?? new Types::UserChrome();
+
+            return this.userChromeHandler.SaveStyle(userChrome);
         }
+
     }
 }

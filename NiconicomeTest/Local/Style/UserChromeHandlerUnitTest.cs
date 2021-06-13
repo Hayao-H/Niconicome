@@ -20,7 +20,7 @@ namespace NiconicomeTest.Local.Style
         [SetUp]
         public void SetUp()
         {
-            this.chromeHandler = new UserChromeHandler(new NicoFileIOMock(() => true, () => Properties.Resources.userChrome), new LoggerStab());
+            this.chromeHandler = new UserChromeHandler(new NicoFileIOMock(() => true, () => Properties.Resources.userChrome), new LoggerStab(), new FileWatcherStab());
         }
 
         [Test]
