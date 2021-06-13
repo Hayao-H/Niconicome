@@ -27,22 +27,33 @@
         </Border>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="8">
-                <StackPanel>
-                    <DockPanel>
-                        <materialDesign:PackIcon Kind="InvertColors" Foreground="SkyBlue">
-                            <materialDesign:PackIcon.RenderTransform>
-                                <TranslateTransform Y="7"/>
-                            </materialDesign:PackIcon.RenderTransform>
-                        </materialDesign:PackIcon>
-                        <Label Content="テーマ"/>
-                        <ComboBox
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="InvertColors" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="テーマ"/>
+                    <ComboBox
                             HorizontalAlignment="Right"
                             ItemsSource="{Binding SelectableThemes}"
                             DisplayMemberPath="DisplayValue"
                             SelectedItem="{Binding SelectedTheme.Value}"
                             />
-                    </DockPanel>
-                </StackPanel>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="CodeJson" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="スタイルファイルの書き出し"/>
+                    <Button Content="実行"
+                            Command="{Binding SaveStyleCommand}"
+                            Width="auto"
+                            HorizontalAlignment="Right"/>
+                </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             </StackPanel>
         </ScrollViewer>
