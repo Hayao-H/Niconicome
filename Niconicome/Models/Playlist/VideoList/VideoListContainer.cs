@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
-using Microsoft.Win32;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
@@ -13,6 +11,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Playlist.VideoList
 {
@@ -33,6 +32,7 @@ namespace Niconicome.Models.Playlist.VideoList
         IAttemptResult MovevideotoPrev(int videoIndex, int? playlistID = null, bool commit = true);
         IAttemptResult MovevideotoForward(int videoIndex, int? playlistID = null, bool commit = true);
         int Count { get; }
+        ReactiveProperty<int> SelectedVideos { get; }
         ObservableCollection<IListVideoInfo> Videos { get; }
         event EventHandler<ListChangedEventArgs<IListVideoInfo>>? ListChanged;
     }
@@ -140,6 +140,11 @@ namespace Niconicome.Models.Playlist.VideoList
                 };
             }
 
+            if (video.IsSelected.Value)
+            {
+                this.SelectedVideos.Value--;
+            }
+
 
             if (!commit)
             {
@@ -213,6 +218,7 @@ namespace Niconicome.Models.Playlist.VideoList
             int id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
             bool isSame = id == (this.current.SelectedPlaylist.Value?.Id ?? -1);
 
+
             if (isSame)
             {
                 if (this.Videos.Any(v => v.NiconicoId.Value == video.NiconicoId.Value))
@@ -237,6 +243,21 @@ namespace Niconicome.Models.Playlist.VideoList
                 }
             }
 
+            if (video.IsSelected.Value)
+            {
+                this.SelectedVideos.Value++;
+            }
+            video.IsSelected.Skip(1).Subscribe(value =>
+            {
+                if (value)
+                {
+                    this.SelectedVideos.Value++;
+                }
+                else
+                {
+                    this.SelectedVideos.Value--;
+                }
+            });
 
             if (!commit)
             {
@@ -424,16 +445,48 @@ namespace Niconicome.Models.Playlist.VideoList
 
             IAttemptResult result;
 
+            this.SelectedVideos.Value = 0;
+
             if (this.current.IsTemporaryPlaylist.Value)
             {
                 var videos = this.Videos.Copy();
                 this.Clear();
-                result = this.refresher.Refresh(videos, v => this.Videos.Add(v), true);
+                result = this.refresher.Refresh(videos, v =>
+                {
+                    this.Videos.Add(v);
+                    if (v.IsSelected.Value) this.SelectedVideos.Value++;
+                    v.IsSelected.Skip(1).Subscribe(value =>
+                    {
+                        if (value)
+                        {
+                            this.SelectedVideos.Value++;
+                        }
+                        else
+                        {
+                            this.SelectedVideos.Value--;
+                        }
+                    });
+                }, true);
             }
             else
             {
                 this.Clear();
-                result = this.refresher.Refresh(this.Videos, v => this.Videos.Add(v));
+                result = this.refresher.Refresh(this.Videos, v =>
+                {
+                    this.Videos.Add(v);
+                    if (v.IsSelected.Value) this.SelectedVideos.Value++;
+                    v.IsSelected.Skip(1).Subscribe(value =>
+                    {
+                        if (value)
+                        {
+                            this.SelectedVideos.Value++;
+                        }
+                        else
+                        {
+                            this.SelectedVideos.Value--;
+                        }
+                    });
+                });
             }
 
             this.Sort(this.current.SelectedPlaylist.Value!.VideoSortType, this.current.SelectedPlaylist.Value!.IsVideoDescending, this.current.SelectedPlaylist.Value!.CustomSortSequence);
@@ -649,6 +702,10 @@ namespace Niconicome.Models.Playlist.VideoList
             return new AttemptResult() { IsSucceeded = true };
         }
 
+        /// <summary>
+        /// 選択された動画数
+        /// </summary>
+        public ReactiveProperty<int> SelectedVideos { get; init; } = new();
 
         /// <summary>
         /// 動画一覧

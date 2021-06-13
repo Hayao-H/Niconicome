@@ -195,8 +195,7 @@
                         <Setter Property="ContextMenu">
                             <Setter.Value>
                                 <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag,RelativeSource={RelativeSource Self}}" d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD}, IsDesignTimeCreatable=True}">
-                                    <MenuItem Header="動画を削除する" Command="{Binding RemoveVideoCommand}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                    <MenuItem Header="動画を削除する" Command="{Binding RemoveVideoCommand}">
                                         <MenuItem.Icon>
                                             <materialDesign:PackIcon Kind="Delete"/>
                                         </MenuItem.Icon>
