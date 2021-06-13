@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Windows.Automation;
+using System.Windows.Input;
 using Windows.Foundation;
 
 namespace Niconicome.Models.Domain.Local.IO
@@ -72,8 +74,9 @@ namespace Niconicome.Models.Domain.Local.IO
                 }
             }
 
-            using var fs = new StreamWriter(path, append);
-            fs.Write(content);
+            using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write);
+            using var writer = new StreamWriter(fs);
+            writer.Write(content);
         }
     }
 }
