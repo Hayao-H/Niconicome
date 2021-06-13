@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -100,6 +101,13 @@ namespace Niconicome.ViewModels.Mainpage
                     WS::Mainpage.ApplicationPower.ShutDown();
                 });
 
+            #region UI系の設定
+
+            this.TreeWidth = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.Tree.Width ?? 250).ToReadOnlyReactiveProperty();
+            this.TabsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TabsHeight ?? 260).ToReadOnlyReactiveProperty();
+
+            #endregion
+
             regionManager.RegisterViewWithRegion("VideoListRegion", typeof(VideoList));
             regionManager.RegisterViewWithRegion("DownloadSettingsRegion", typeof(DownloadSettings));
             regionManager.RegisterViewWithRegion("OutputRegion", typeof(Output));
@@ -166,6 +174,20 @@ namespace Niconicome.ViewModels.Mainpage
             this.UserImage.Value = this.user.UserImage;
         }
 
+        #region UI系
+
+        /// <summary>
+        /// ツリーの幅
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> TreeWidth { get; init; }
+
+        /// <summary>
+        /// タブの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> TabsHeight { get; init; }
+
+        #endregion
+
 
     }
 
@@ -218,7 +240,7 @@ namespace Niconicome.ViewModels.Mainpage
                 bool confirm = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ConfirmIfDownloading);
                 if (!WS::Mainpage.Videodownloader.CanDownload.Value && confirm)
                 {
-                    var cResult = MessageBox.Show("ダウンロードが進行中ですが、本当に終了しますか？","アプリケーションを終了", MessageBoxButton.YesNo,MessageBoxImage.Question);
+                    var cResult = MessageBox.Show("ダウンロードが進行中ですが、本当に終了しますか？", "アプリケーションを終了", MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (cResult != MessageBoxResult.Yes)
                     {
                         e.Cancel = true;

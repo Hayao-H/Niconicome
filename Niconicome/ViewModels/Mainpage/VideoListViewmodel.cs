@@ -15,9 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.Diagnostics;
-using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
-using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
@@ -27,7 +25,6 @@ using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Utils;
 using Niconicome.ViewModels.Controls;
-using Niconicome.ViewModels.Mainpage.Subwindows;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
 using Prism.Events;
@@ -107,6 +104,12 @@ namespace Niconicome.ViewModels.Mainpage
             this.UploadColumnTitle = WS::Mainpage.SortInfoHandler.UploadColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+
+            this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 100).ToReadOnlyReactiveProperty();
+            this.TitleHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TitleHeight ?? 40).ToReadOnlyReactiveProperty();
+            this.ButtonsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ButtonsHeight ?? 50).ToReadOnlyReactiveProperty();
+
+
 
             #region クリップボード監視
 
@@ -1184,6 +1187,25 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReadOnlyReactiveProperty<string?> ClipboardMonitoringToolTip { get; init; }
 
+        #region UI系
+
+        /// <summary>
+        /// リストアイテムの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> ListItemHeight { get; init; }
+
+        /// <summary>
+        /// タイトルの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> TitleHeight { get; init; }
+
+        /// <summary>
+        /// ボタンの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> ButtonsHeight { get; init; }
+
+
+        #endregion
 
         #region カラムタイトル
         /// <summary>
@@ -1451,6 +1473,12 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new();
 
         public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
+
+        public ReactiveProperty<int> ListItemHeight { get; init; } = new(100);
+
+        public ReactiveProperty<int> TitleHeight { get; init; } = new(40);
+
+        public ReactiveProperty<int> ButtonsHeight { get; init; } = new(50);
 
         public ReactiveProperty<int> SelectedIndex { get; init; } = new();
 

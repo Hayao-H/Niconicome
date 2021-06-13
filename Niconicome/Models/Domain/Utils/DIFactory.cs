@@ -42,6 +42,7 @@ using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
+using Style = Niconicome.Models.Domain.Local.Style;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -163,6 +164,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::ILocalVideoUtils, Local::LocalVideoUtils>();
             services.AddTransient<IO::INicoDirectoryIO, IO::NicoDirectoryIO>();
             services.AddTransient<IO::INicoFileIO, IO::NicoFileIO>();
+            services.AddTransient<IO::IFileWatcher, IO::FileWatcher>();
             services.AddTransient<Resume::ISegmentsDirectoryHandler, Resume::SegmentsDirectoryHandler>();
             services.AddTransient<Resume::IStreamResumer, Resume::StreamResumer>();
             services.AddSingleton<VList::ICurrent, VList::Current>();
@@ -181,6 +183,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Utils::IWindowsHelper, Utils::WindowsHelper>();
             services.AddSingleton<MyApplication::IThemehandler, MyApplication::ThemeHandler>();
             services.AddTransient<MyApplication::IApplicationPowerManager, MyApplication::ApplicationPowerManager>();
+            services.AddTransient<Style::IUserChromeHandler, Style::UserChromeHandler>();
+            services.AddSingleton<State::IStyleHandler, State::StyleHandler>();
 
             return services.BuildServiceProvider();
         }
