@@ -53,8 +53,9 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <returns></returns>
         public string OpenRead(string path)
         {
-            using var fs = new StreamReader(path);
-            return fs.ReadToEnd();
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var reader = new StreamReader(fs);
+            return reader.ReadToEnd();
         }
 
         /// <summary>
