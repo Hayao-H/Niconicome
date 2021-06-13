@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
+using System.Reactive.Linq;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.ViewModels.Mainpage.Utils;
@@ -27,7 +28,14 @@ namespace Niconicome.ViewModels.Setting.Pages
                 _ => new ReactiveProperty<ComboboxItem<ApplicationThemeSettings>>(inherit)
             };
 
-            this.SelectedTheme.Subscribe(value => WS::SettingPage.Themehandler.SetTheme(value.Value)).AddTo(this.disposables);
+            this.SelectedTheme.Skip(1).Subscribe(value =>
+            {
+                WS::SettingPage.Themehandler.SetTheme(value.Value);
+                if (value.Value == ApplicationThemeSettings.Inherit)
+                {
+                    WS::SettingPage.SnackbarMessageQueue.Enqueue("システムテーマを適用するには、再起動する必要があります。", "再起動", () => WS::SettingPage.PowerManager.Restart());
+                }
+            }).AddTo(this.disposables);
 
             this.SaveStyleCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
@@ -37,7 +45,8 @@ namespace Niconicome.ViewModels.Setting.Pages
                     {
                         WS::SettingPage.MessageHandler.AppendMessage($"スタイルファイルの書き出しに失敗しました。(詳細:{result.Exception?.Message ?? "None"})");
                         WS::SettingPage.SnackbarMessageQueue.Enqueue("スタイルファイルの書き出しに失敗しました。");
-                    } else
+                    }
+                    else
                     {
                         WS::SettingPage.MessageHandler.AppendMessage("スタイルファイルを書き出しにました");
                         WS::SettingPage.SnackbarMessageQueue.Enqueue("スタイルファイルを書き出しました。");

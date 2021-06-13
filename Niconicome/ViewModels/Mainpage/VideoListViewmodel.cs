@@ -19,6 +19,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.Types;
+using Niconicome.Models.Domain.Local.Style.Type;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
@@ -107,6 +108,9 @@ namespace Niconicome.ViewModels.Mainpage
             this.UploadColumnTitle = WS::Mainpage.SortInfoHandler.UploadColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+
+            UserChrome chrome = WS::Mainpage.StyleHandler.UserChrome;
+            this.ListItemHeight = new ReactiveProperty<int>(chrome.MainPage.VideoList.ItemHeight);
 
             #region クリップボード監視
 
@@ -1184,6 +1188,14 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReadOnlyReactiveProperty<string?> ClipboardMonitoringToolTip { get; init; }
 
+        #region UI系
+
+        /// <summary>
+        /// リストアイテムの高さ
+        /// </summary>
+        public ReactiveProperty<int> ListItemHeight { get; init; }
+
+        #endregion
 
         #region カラムタイトル
         /// <summary>
@@ -1451,6 +1463,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new();
 
         public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
+
+        public ReactiveProperty<int> ListItemHeight { get; init; } = new(100);
 
         public ReactiveProperty<int> SelectedIndex { get; init; } = new();
 

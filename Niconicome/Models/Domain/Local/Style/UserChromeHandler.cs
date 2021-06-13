@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Local.Style.Type;
@@ -79,9 +82,14 @@ namespace Niconicome.Models.Domain.Local.Style
         public IAttemptResult SaveStyle(UserChrome chrome)
         {
             string content;
+            var options = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+            };
+
             try
             {
-                content = JsonParser.Serialize(chrome);
+                content = JsonParser.Serialize(chrome, options);
             }
             catch (Exception e)
             {
