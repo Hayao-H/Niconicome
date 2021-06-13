@@ -13,7 +13,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
     /// <summary>
     /// Json関係の機能を提供するクラス
     /// </summary>
-    static class JsonParser
+    public static class JsonParser
     {
         /// <summary>
         /// json文字列をデシリアライズする

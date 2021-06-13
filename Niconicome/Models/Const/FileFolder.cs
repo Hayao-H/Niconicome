@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.AI.MachineLearning;
 
 namespace Niconicome.Models.Const
 {
@@ -19,5 +20,7 @@ namespace Niconicome.Models.Const
         public const string DefaultHtmlFileExt = ".html";
 
         public const string DefaultJpegFileExt = ".jpg";
+
+        public const string UserChromePath = @"chrome\userChrome.json";
     }
 }

@@ -226,6 +226,15 @@ namespace NiconicomeTest.Properties {
         }
         
         /// <summary>
+        ///   {&quot;mainPage&quot;:{&quot;videoList&quot;:{&quot;videoListItemHeight&quot;:200}}} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string userChrome {
+            get {
+                return ResourceManager.GetString("userChrome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   1	32		履歴
         ///2	0		最近再生した動画	&lt;最近再生した動画の一覧&gt;
         ///2	0		最近ダウンロードした動画	&lt;最近何かのDLを試みた一覧&gt;
