@@ -45,5 +45,6 @@ namespace Niconicome.Workspaces
         public static IWindowsHelper WindowsHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowsHelper>();
         public static IThemehandler Themehandler { get; private set; } = DIFactory.Provider.GetRequiredService<IThemehandler>();
         public static IApplicationPowerManager ApplicationPower { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
+        public static IStyleHandler StyleHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IStyleHandler>();
     }
 }

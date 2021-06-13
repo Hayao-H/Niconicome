@@ -183,6 +183,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<MyApplication::IThemehandler, MyApplication::ThemeHandler>();
             services.AddTransient<MyApplication::IApplicationPowerManager, MyApplication::ApplicationPowerManager>();
             services.AddTransient<Style::IUserChromeHandler, Style::UserChromeHandler>();
+            services.AddSingleton<State::IStyleHandler, State::StyleHandler>();
 
             return services.BuildServiceProvider();
         }
