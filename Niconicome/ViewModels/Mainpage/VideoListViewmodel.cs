@@ -109,7 +109,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
-            this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 80).ToReactiveProperty();
+            this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 100).ToReactiveProperty();
 
             #region クリップボード監視
 

@@ -53,7 +53,7 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <returns></returns>
         public string OpenRead(string path)
         {
-            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var reader = new StreamReader(fs);
             return reader.ReadToEnd();
         }
@@ -75,7 +75,7 @@ namespace Niconicome.Models.Domain.Local.IO
                 }
             }
 
-            using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write);
+            using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
             using var writer = new StreamWriter(fs);
             writer.Write(content);
         }
