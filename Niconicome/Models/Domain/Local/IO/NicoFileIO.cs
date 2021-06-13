@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows.Automation;
+using Windows.Foundation;
 
 namespace Niconicome.Models.Domain.Local.IO
 {
@@ -13,6 +14,16 @@ namespace Niconicome.Models.Domain.Local.IO
 
     public class NicoFileIO : INicoFileIO
     {
+        public NicoFileIO(INicoDirectoryIO directoryIO)
+        {
+            this.directoryIO = directoryIO;
+        }
+
+        #region field
+
+        private readonly INicoDirectoryIO directoryIO;
+
+        #endregion
 
         /// <summary>
         /// ファイルの存在をチェックする
@@ -51,6 +62,16 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <param name="append"></param>
         public void Write(string path, string content, bool append = false)
         {
+            string? dirPath = Path.GetDirectoryName(path);
+            if (dirPath is not null)
+            {
+                bool exists = this.directoryIO.Exists(dirPath);
+                if (!exists)
+                {
+                    this.directoryIO.Create(dirPath);
+                }
+            }
+
             using var fs = new StreamWriter(path, append);
             fs.Write(content);
         }
