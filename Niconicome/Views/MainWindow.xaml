@@ -76,7 +76,7 @@
                 </materialDesign:DrawerHost.LeftDrawerContent>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="{Binding TreeWidth.Value}"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column= "0" 
@@ -163,10 +163,10 @@
                                 </Button>
                             </DockPanel>
                         </DockPanel>
-                        <Grid Grid.Row="1" x:Name="videoList" d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD},IsDesignTimeCreatable=True}">
+                        <Grid Grid.Row="1" x:Name="videoList">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="2*"/>
-                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="{Binding TabsHeight.Value}"/>
                             </Grid.RowDefinitions>
                             <UserControl prism:RegionManager.RegionName="VideoListRegion"/>
                             <TabControl Background="{DynamicResource MaterialDesignBackground}" Grid.Row="1" Margin="8">

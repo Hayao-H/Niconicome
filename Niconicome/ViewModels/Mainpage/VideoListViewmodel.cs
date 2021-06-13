@@ -6,11 +6,13 @@ using System.Linq;
 using System.Media;
 using System.Reactive.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions.System;
@@ -109,7 +111,11 @@ namespace Niconicome.ViewModels.Mainpage
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
-            this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 100).ToReactiveProperty();
+            this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 100).ToReadOnlyReactiveProperty();
+            this.TitleHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TitleHeight ?? 40).ToReadOnlyReactiveProperty();
+            this.ButtonsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ButtonsHeight ?? 50).ToReadOnlyReactiveProperty();
+
+
 
             #region クリップボード監視
 
@@ -1192,7 +1198,18 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// リストアイテムの高さ
         /// </summary>
-        public ReactiveProperty<int> ListItemHeight { get; init; }
+        public ReadOnlyReactiveProperty<int> ListItemHeight { get; init; }
+
+        /// <summary>
+        /// タイトルの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> TitleHeight { get; init; }
+
+        /// <summary>
+        /// ボタンの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> ButtonsHeight { get; init; }
+
 
         #endregion
 
@@ -1464,6 +1481,10 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
 
         public ReactiveProperty<int> ListItemHeight { get; init; } = new(100);
+
+        public ReactiveProperty<int> TitleHeight { get; init; } = new(40);
+
+        public ReactiveProperty<int> ButtonsHeight { get; init; } = new(50);
 
         public ReactiveProperty<int> SelectedIndex { get; init; } = new();
 
