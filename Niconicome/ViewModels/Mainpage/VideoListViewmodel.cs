@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions.System;
@@ -75,14 +76,15 @@ namespace Niconicome.ViewModels.Mainpage
             this.FilterIcon = new ReactivePropertySlim<MaterialDesign.PackIconKind>(MaterialDesign::PackIconKind.Filter);
 
             //幅
-            var scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
-            var idWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWIDColumnWid);
-            var titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWTitleColumnWid);
-            var uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWUploadColumnWid);
-            var vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWViewCountColumnWid);
-            var dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWDownloadedFlagColumnWid);
-            var stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
-            var tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
+            int scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
+            int idWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWIDColumnWid);
+            int titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWTitleColumnWid);
+            int uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWUploadColumnWid);
+            int vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWViewCountColumnWid);
+            int dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWDownloadedFlagColumnWid);
+            int stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
+            int tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
+            int bmWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWBookMarkColumnWid);
 
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
@@ -106,9 +108,148 @@ namespace Niconicome.ViewModels.Mainpage
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
+            #region Width系プロパティー
+
+            var isRestoreEnable = !WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth);
+            const int defaultWidth = 150;
+
+            this.SelectColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? scWidth <= 0 ? defaultWidth : scWidth : defaultWidth);
+            this.IDColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? idWidth <= 0 ? defaultWidth : idWidth : defaultWidth);
+            this.TitleColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? titleWIdth <= 0 ? defaultWidth : titleWIdth : defaultWidth);
+            this.UploadColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? uploadWidth <= 0 ? defaultWidth : uploadWidth : defaultWidth);
+            this.ViewCountColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? vctWidth <= 0 ? defaultWidth : vctWidth : defaultWidth);
+            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? dlfWidth <= 0 ? defaultWidth : dlfWidth : defaultWidth);
+            this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
+            this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
+            this.BookMarkColumnWidth = new ReactivePropertySlim<int>(isRestoreEnable ? bmWidth < 0 ? defaultWidth : bmWidth : defaultWidth);
+
+            this.SelectColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWSelectColumnWid))
+                .AddTo(this.disposables);
+            this.IDColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWIDColumnWid))
+                .AddTo(this.disposables);
+            this.TitleColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWTitleColumnWid))
+                .AddTo(this.disposables);
+            this.UploadColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWUploadColumnWid))
+                .AddTo(this.disposables);
+            this.ViewCountColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWViewCountColumnWid))
+                .AddTo(this.disposables);
+            this.DownloadedFlagColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWDownloadedFlagColumnWid))
+                .AddTo(this.disposables);
+            this.StateColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWStateColumnWid))
+                .AddTo(this.disposables);
+            this.ThumbColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
+                .AddTo(this.disposables);
+            this.BookMarkColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWBookMarkColumnWid))
+                .AddTo(this.disposables);
+            #endregion
+
+            #region UI系要素
             this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 100).ToReadOnlyReactiveProperty();
             this.TitleHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TitleHeight ?? 40).ToReadOnlyReactiveProperty();
             this.ButtonsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ButtonsHeight ?? 50).ToReadOnlyReactiveProperty();
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.Thumbnail ?? true))
+                {
+                    this.ThumbColumnWidth.Value = 0;
+                }
+                else if (this.ThumbColumnWidth.Value == 0)
+                {
+                    this.ThumbColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.NiconicoID ?? true))
+                {
+                    this.IDColumnWidth.Value = 0;
+                }
+                else if (this.IDColumnWidth.Value == 0)
+                {
+                    this.IDColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.Title ?? true))
+                {
+                    this.TitleColumnWidth.Value = 0;
+                }
+                else if (this.TitleColumnWidth.Value == 0)
+                {
+                    this.TitleColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.UploadedDT ?? true))
+                {
+                    this.ThumbColumnWidth.Value = 0;
+                }
+                else if (this.ThumbColumnWidth.Value == 0)
+                {
+                    this.ThumbColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.ViewCount ?? true))
+                {
+                    this.ViewCountColumnWidth.Value = 0;
+                }
+                else if (this.ViewCountColumnWidth.Value == 0)
+                {
+                    this.ViewCountColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.DLFlag ?? true))
+                {
+                    this.DownloadedFlagColumnWidth.Value = 0;
+                }
+                else if (this.DownloadedFlagColumnWidth.Value == 0)
+                {
+                    this.DownloadedFlagColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.BookMark ?? true))
+                {
+                    this.BookMarkColumnWidth.Value = 0;
+                }
+                else if (this.BookMarkColumnWidth.Value == 0)
+                {
+                    this.BookMarkColumnWidth.Value = defaultWidth;
+                }
+            });
+            #endregion
 
 
 
@@ -923,53 +1064,6 @@ namespace Niconicome.ViewModels.Mainpage
                 });
             #endregion
 
-            #region Width系プロパティー
-
-            var isRestoreEnable = !WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth);
-            const int defaultWidth = 150;
-
-            this.SelectColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? scWidth <= 0 ? defaultWidth : scWidth : defaultWidth);
-            this.IDColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? idWidth <= 0 ? defaultWidth : idWidth : defaultWidth);
-            this.TitleColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? titleWIdth <= 0 ? defaultWidth : titleWIdth : defaultWidth);
-            this.UploadColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? uploadWidth <= 0 ? defaultWidth : uploadWidth : defaultWidth);
-            this.ViewCountColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? vctWidth <= 0 ? defaultWidth : vctWidth : defaultWidth);
-            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? dlfWidth <= 0 ? defaultWidth : dlfWidth : defaultWidth);
-            this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
-            this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
-
-            this.SelectColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWSelectColumnWid))
-                .AddTo(this.disposables);
-            this.IDColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWIDColumnWid))
-                .AddTo(this.disposables);
-            this.TitleColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWTitleColumnWid))
-                .AddTo(this.disposables);
-            this.UploadColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWUploadColumnWid))
-                .AddTo(this.disposables);
-            this.ViewCountColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWViewCountColumnWid))
-                .AddTo(this.disposables);
-            this.DownloadedFlagColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWDownloadedFlagColumnWid))
-                .AddTo(this.disposables);
-            this.StateColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWStateColumnWid))
-                .AddTo(this.disposables);
-            this.ThumbColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
-                .AddTo(this.disposables);
-            #endregion
         }
 
         ~VideoListViewModel()
@@ -1275,6 +1369,10 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveProperty<int> ThumbColumnWidth { get; init; }
 
+        /// <summary>
+        /// ブックマーク
+        /// </summary>
+        public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; } = new(150);
         #endregion
 
         /// <summary>
@@ -1368,17 +1466,10 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public VideoListViewModelD()
         {
-            var v1 = new NonBindableListVideoInfo();
-            v1.Title.Value = "レッツゴー!陰陽師";
-            v1.NiconicoId.Value = "sm9";
-            v1.IsDownloaded.Value = true;
+            var v1 = new VideoInfoViewModel("レッツゴー!陰陽師", "sm9", @"https://nicovideo.cdn.nimg.jp/thumbnails/9/9");
+            var v2 = new VideoInfoViewModel("Bad Apple!! feat.nomico", "sm8628149", @"https://nicovideo.cdn.nimg.jp/thumbnails/8628149/8628149");
 
-            var v2 = new NonBindableListVideoInfo();
-            v2.Title.Value = "Bad Apple!! feat. nomico";
-            v2.NiconicoId.Value = "sm8628149";
-            v2.IsDownloaded.Value = false;
-
-            this.Videos = new ReactiveCollection<VideoInfoViewModel>();
+            this.Videos = new ReactiveCollection<VideoInfoViewModel>() { v1, v2 };
 
         }
 
@@ -1460,27 +1551,43 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveProperty<MaterialDesign::PackIconKind> ClipbordMonitorIcon { get; init; } = new(MaterialDesign::PackIconKind.ClipboardPulse);
 
-        public ReactivePropertySlim<int> SelectColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> SelectColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> IDColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> IDColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> TitleColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> TitleColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> UploadColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> UploadColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> ViewCountColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> ViewCountColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> DownloadedFlagColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> DownloadedFlagColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new(150);
+
+        public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; } = new(150);
 
         public ReactiveProperty<int> ListItemHeight { get; init; } = new(100);
 
         public ReactiveProperty<int> TitleHeight { get; init; } = new(40);
 
         public ReactiveProperty<int> ButtonsHeight { get; init; } = new(50);
+
+        public ReactiveProperty<bool> ThumbnailVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> NiconicoIDVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> TitleVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> UploadedDTVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> ViewCountVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> DLFlagVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> BookMarkVisibility { get; init; } = new(true);
 
         public ReactiveProperty<int> SelectedIndex { get; init; } = new();
 
@@ -1675,7 +1782,7 @@ namespace Niconicome.ViewModels.Mainpage
                     int index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
                     ITreePlaylistInfo? playlist = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value;
 
-                    if (index < 0 || playlist is null ) return;
+                    if (index < 0 || playlist is null) return;
                     IListVideoInfo video = WS::Mainpage.VideoListContainer.Videos[index];
                     int videoID = video.Id.Value;
 
@@ -1689,6 +1796,24 @@ namespace Niconicome.ViewModels.Mainpage
                 })
                 .AddTo(this.disposables);
 
+        }
+
+        public VideoInfoViewModel(string title, string ID, string thumbUrl)
+        {
+            this.Id = new ReactiveProperty<int>();
+            this.ViewCount = new ReactiveProperty<int>();
+            this.NiconicoId = new ReactiveProperty<string>(ID);
+            this.Title = new ReactiveProperty<string>(title);
+            this.Message = new ReactiveProperty<string>("テスト");
+            this.ThumbPath = new ReactiveProperty<string>(thumbUrl);
+            this.IsSelected = new ReactiveProperty<bool>(true);
+            this.IsDownloaded = new ReactiveProperty<string>("〇");
+            this.UploadedOn = new ReactiveProperty<DateTime>(DateTime.Now);
+            this.IsThumbDownloading = new ReactiveProperty<bool>();
+            this.BookMarkColor = new ReactiveProperty<System.Windows.Media.Brush>(Models.Domain.Utils.Utils.ConvertToBrush("#E2EFFC"));
+            this.VideoInfo = new NonBindableListVideoInfo();
+
+            this.BookMark = new ReactiveCommand();
         }
 
         ~VideoInfoViewModel()
