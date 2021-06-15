@@ -206,11 +206,11 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (!(value?.MainPage.VideoList.Column.UploadedDT ?? true))
                 {
-                    this.ThumbColumnWidth.Value = 0;
+                    this.UploadColumnWidth.Value = 0;
                 }
-                else if (this.ThumbColumnWidth.Value == 0)
+                else if (this.UploadColumnWidth.Value == 0)
                 {
-                    this.ThumbColumnWidth.Value = defaultWidth;
+                    this.UploadColumnWidth.Value = defaultWidth;
                 }
             });
 
