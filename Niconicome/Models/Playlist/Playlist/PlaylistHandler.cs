@@ -30,6 +30,7 @@ namespace Niconicome.Models.Playlist.Playlist
         void Move(int id, int targetId);
         void SetAsRemotePlaylist(int playlistId, string Id, string name, RemoteType type);
         void SetAsLocalPlaylist(int playlistId);
+        IAttemptResult BookMark(int videoID, int playlistID);
         IAttemptResult MoveVideoToPrev(int videoIndex, int playlistID);
         IAttemptResult MoveVideoToForward(int videoIndex, int playlistID);
         void SaveAllPlaylists();
@@ -219,6 +220,27 @@ namespace Niconicome.Models.Playlist.Playlist
         public void SetAsLocalPlaylist(int playlistId)
         {
             this.playlistStoreHandler.SetAsLocalPlaylist(playlistId);
+        }
+
+        /// <summary>
+        /// ブックマークする
+        /// </summary>
+        /// <param name="videoID"></param>
+        /// <param name="playlistID"></param>
+        /// <returns></returns>
+        public IAttemptResult BookMark(int videoID, int playlistID)
+        {
+            ITreePlaylistInfo? playlist = this.GetPlaylist(playlistID);
+            if (playlist is null)
+            {
+                return new AttemptResult() { Message = $"存在しないプレイリストに対してブックマークが試行されました。(id:{playlistID})" };
+            }
+
+            playlist.BookMarkedVideoID = videoID;
+            this.Update(playlist);
+
+            return new AttemptResult() { IsSucceeded = true };
+
         }
 
 

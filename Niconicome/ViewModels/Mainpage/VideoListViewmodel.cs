@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -58,7 +59,7 @@ namespace Niconicome.ViewModels.Mainpage
             //プレイリスト内容更新のイベントを購読する
             WS::Mainpage.VideoListContainer.ListChanged += (_, _) => this.VideoListUpdated();
 
-            this.Videos = WS::Mainpage.VideoListContainer.Videos.ToReadOnlyReactiveCollection(v => new VideoInfoViewModel(v)).AddTo(this.disposables);
+            this.Videos = WS::Mainpage.VideoListContainer.Videos.ToReadOnlyReactiveCollection(v => new VideoInfoViewModel(v, (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value?.BookMarkedVideoID ?? -1) == v.Id.Value)).AddTo(this.disposables);
 
             this.IsTemporaryPlaylist = WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.ToReadOnlyReactiveProperty();
 
@@ -1122,7 +1123,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveCommand<VideoProperties> CopyAll { get; init; }
 
-
         #endregion
 
         /// <summary>
@@ -1432,6 +1432,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveCommand SavePlaylistCommand { get; init; } = new();
 
+        public ReactiveCommand BookMark { get; init; } = new();
+
         public CommandBase<string> CreatePlaylistCommand { get; init; } = new(_ => true, _ => { });
 
         public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; } = new ReactiveCommand<MouseEventArgs>();
@@ -1637,7 +1639,7 @@ namespace Niconicome.ViewModels.Mainpage
     /// </summary>
     class VideoInfoViewModel : BindableBase, IDisposable
     {
-        public VideoInfoViewModel(IListVideoInfo video)
+        public VideoInfoViewModel(IListVideoInfo video, bool isBookMarked)
         {
             this.VideoInfo = video;
             this.Id = video.Id.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
@@ -1663,6 +1665,29 @@ namespace Niconicome.ViewModels.Mainpage
             this.IsDownloaded = video.IsDownloaded.ToReactivePropertyAsSynchronized(p => p.Value, p => p ? "○" : "×", x => x == "○").AddTo(this.disposables);
             this.UploadedOn = video.UploadedOn.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
             this.IsThumbDownloading = video.IsThumbDownloading.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.BookMarkColor = new ReactiveProperty<System.Windows.Media.Brush>(isBookMarked ? Models.Domain.Utils.Utils.ConvertToBrush("#4580BC") : Models.Domain.Utils.Utils.ConvertToBrush("#E2EFFC"));
+
+            this.BookMark = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(value => value is not null)
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    int index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
+                    ITreePlaylistInfo? playlist = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value;
+
+                    if (index < 0 || playlist is null ) return;
+                    IListVideoInfo video = WS::Mainpage.VideoListContainer.Videos[index];
+                    int videoID = video.Id.Value;
+
+                    if (video.Id.Value == playlist.BookMarkedVideoID)
+                    {
+                        videoID = -1;
+                    }
+
+                    WS::Mainpage.PlaylistHandler.BookMark(videoID, playlist.Id);
+                    WS::Mainpage.VideoListContainer.Refresh();
+                })
+                .AddTo(this.disposables);
 
         }
 
@@ -1692,6 +1717,13 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<bool> IsThumbDownloading { get; init; }
 
         public ReactiveProperty<DateTime> UploadedOn { get; init; }
+
+        public ReactiveProperty<System.Windows.Media.Brush> BookMarkColor { get; init; }
+
+        /// <summary>
+        /// ブックマークする
+        /// </summary>
+        public ReactiveCommand BookMark { get; init; }
 
     }
 

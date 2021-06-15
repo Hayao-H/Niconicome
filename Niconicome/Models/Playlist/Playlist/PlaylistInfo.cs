@@ -22,6 +22,7 @@ namespace Niconicome.Models.Playlist.Playlist
         List<IListVideoInfo> Videos { get; }
         List<int> CustomSortSequence { get; }
         int ParentId { get; set; }
+        int BookMarkedVideoID { get; set; }
         bool IsExpanded { get; set; }
         bool IsRoot { get; set; }
         bool IsConcrete { get; }
@@ -88,6 +89,11 @@ namespace Niconicome.Models.Playlist.Playlist
         /// 親プレイリストのID
         /// </summary>
         public int ParentId { get; set; } = -1;
+
+        /// <summary>
+        /// ブックマークされた動画
+        /// </summary>
+        public int BookMarkedVideoID { get; set; }
 
         /// <summary>
         /// 開閉状態
@@ -239,7 +245,8 @@ namespace Niconicome.Models.Playlist.Playlist
             this.IsVideoDescending= newPlaylist.IsVideoDescending;
             this.IsDownloadFailedHistory= newPlaylist.IsDownloadFailedHistory;
             this.IsDownloadSucceededHistory= newPlaylist.IsDownloadSucceededHistory;
-            this.IsTemporary= newPlaylist.IsTemporary; 
+            this.IsTemporary= newPlaylist.IsTemporary;
+            this.BookMarkedVideoID = newPlaylist.BookMarkedVideoID;
         }
 
         /// <summary>
@@ -264,6 +271,7 @@ namespace Niconicome.Models.Playlist.Playlist
             playlistInfo.IsDownloadFailedHistory = dbPlaylist.IsDownloadFailedHistory;
             playlistInfo.IsDownloadSucceededHistory = dbPlaylist.IsDownloadSucceededHistory;
             playlistInfo.IsTemporary = dbPlaylist.IsTemporary;
+            playlistInfo.BookMarkedVideoID = dbPlaylist.BookMarkedVideoID;
         }
 
         /// <summary>

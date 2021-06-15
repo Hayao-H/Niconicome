@@ -25,6 +25,8 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public int Sequence { get; set; }
 
+        public int BookMarkedVideoID { get; set; } = -1;
+
         public string? PlaylistName { get; set; }
 
         public string? FolderPath { get; set; }

@@ -930,6 +930,7 @@ namespace Niconicome.Models.Domain.Local.Store
             dbPlaylist.IsTemporary = playlistInfo.IsTemporary;
             dbPlaylist.IsDownloadSucceededHistory = playlistInfo.IsDownloadSucceededHistory;
             dbPlaylist.IsDownloadFailedHistory = playlistInfo.IsDownloadFailedHistory;
+            dbPlaylist.BookMarkedVideoID = playlistInfo.BookMarkedVideoID;
         }
 
         #endregion
