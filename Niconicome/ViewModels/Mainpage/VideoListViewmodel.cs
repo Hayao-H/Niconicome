@@ -7,6 +7,7 @@ using System.Linq;
 using System.Media;
 using System.Reactive.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -106,9 +107,18 @@ namespace Niconicome.ViewModels.Mainpage
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
+            #region UI系要素
             this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 100).ToReadOnlyReactiveProperty();
             this.TitleHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TitleHeight ?? 40).ToReadOnlyReactiveProperty();
             this.ButtonsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ButtonsHeight ?? 50).ToReadOnlyReactiveProperty();
+            this.ThumbnailVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.Thumbnail ?? true).ToReadOnlyReactiveProperty();
+            this.NiconicoIDVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.NiconicoID ?? true).ToReadOnlyReactiveProperty();
+            this.TitleVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.Title ?? true).ToReadOnlyReactiveProperty();
+            this.UploadedDTVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.UploadedDT ?? true).ToReadOnlyReactiveProperty();
+            this.ViewCountVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.ViewCount ?? true).ToReadOnlyReactiveProperty();
+            this.DLFlagVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.DLFlag ?? true).ToReadOnlyReactiveProperty();
+            this.BookMarkVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.BookMark ?? true).ToReadOnlyReactiveProperty();
+            #endregion
 
 
 
@@ -1204,6 +1214,41 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReadOnlyReactiveProperty<int> ButtonsHeight { get; init; }
 
+        /// <summary>
+        /// サムネ
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> ThumbnailVisibility { get; init; }
+
+        /// <summary>
+        /// ID
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> NiconicoIDVisibility { get; init; }
+
+        /// <summary>
+        /// タイトル
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> TitleVisibility { get; init; }
+
+        /// <summary>
+        /// 投稿日時
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> UploadedDTVisibility { get; init; }
+
+        /// <summary>
+        /// 再生回数
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> ViewCountVisibility { get; init; }
+
+        /// <summary>
+        /// DLフラグ
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> DLFlagVisibility { get; init; }
+
+        /// <summary>
+        /// ブックマーク
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> BookMarkVisibility { get; init; }
+
 
         #endregion
 
@@ -1482,6 +1527,20 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveProperty<int> ButtonsHeight { get; init; } = new(50);
 
+        public ReactiveProperty<bool> ThumbnailVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> NiconicoIDVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> TitleVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> UploadedDTVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> ViewCountVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> DLFlagVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> BookMarkVisibility { get; init; } = new(true);
+
         public ReactiveProperty<int> SelectedIndex { get; init; } = new();
 
         public ReactivePropertySlim<string> IdColumnTitle { get; init; } = new("ID");
@@ -1675,7 +1734,7 @@ namespace Niconicome.ViewModels.Mainpage
                     int index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
                     ITreePlaylistInfo? playlist = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value;
 
-                    if (index < 0 || playlist is null ) return;
+                    if (index < 0 || playlist is null) return;
                     IListVideoInfo video = WS::Mainpage.VideoListContainer.Videos[index];
                     int videoID = video.Id.Value;
 
@@ -1689,6 +1748,24 @@ namespace Niconicome.ViewModels.Mainpage
                 })
                 .AddTo(this.disposables);
 
+        }
+
+        public VideoInfoViewModel(string title, string ID, string uploadedDT)
+        {
+            this.Id = new ReactiveProperty<int>();
+            this.ViewCount = new ReactiveProperty<int>();
+            this.NiconicoId = new ReactiveProperty<string>(ID);
+            this.Title = new ReactiveProperty<string>("title");
+            this.Message = new ReactiveProperty<string>("テスト");
+            this.ThumbPath = new ReactiveProperty<string>(@"https://www.nicovideo.jp/watch/sm9");
+            this.IsSelected = new ReactiveProperty<bool>(true);
+            this.IsDownloaded = new ReactiveProperty<string>("〇");
+            this.UploadedOn = new ReactiveProperty<DateTime>(DateTime.Now);
+            this.IsThumbDownloading = new ReactiveProperty<bool>();
+            this.BookMarkColor = new ReactiveProperty<System.Windows.Media.Brush>(Models.Domain.Utils.Utils.ConvertToBrush("#E2EFFC"));
+            this.VideoInfo = new NonBindableListVideoInfo();
+
+            this.BookMark = new ReactiveCommand();
         }
 
         ~VideoInfoViewModel()
