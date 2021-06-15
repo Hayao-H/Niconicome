@@ -185,6 +185,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.SingletonWindows => STypes::SettingNames.LimitWindowsToSingleton,
                 SettingsEnum.AppTheme => STypes::SettingNames.ApplicationTheme,
                 SettingsEnum.ConfirmIfDownloading => STypes::SettingNames.ConfirmIfDownloading,
+                SettingsEnum.MWBookMarkColumnWid => STypes::SettingNames.MainWindowBookMarkColumnWidth,
                 _ => null
             };
         }
@@ -242,6 +243,7 @@ namespace Niconicome.Models.Local.Settings
         MWDownloadedFlagColumnWid,
         MWStateColumnWid,
         MWThumbColumnWid,
+        MWBookMarkColumnWid,
         ReAllocateCommands,
         VListItemdbClick,
         AutoRenameNetPlaylist,
