@@ -163,7 +163,7 @@
                                 <CheckBox IsChecked="{Binding IsSelectedAll.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </GridViewColumn.Header>
                         </GridViewColumn>
-                        <GridViewColumn Width="{Binding ThumbColumnWidth.Value}">
+                        <GridViewColumn Width="{Binding ThumbColumnWidth.Value,Mode=TwoWay}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Vertical">

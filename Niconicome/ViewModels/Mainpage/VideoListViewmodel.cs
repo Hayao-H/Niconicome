@@ -205,7 +205,7 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     this.ThumbColumnWidth.Value = defaultWidth;
                 }
-            });.
+            });
 
             WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
             {
@@ -1282,41 +1282,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// ボタンの高さ
         /// </summary>
         public ReadOnlyReactiveProperty<int> ButtonsHeight { get; init; }
-
-        /// <summary>
-        /// サムネ
-        /// </summary>
-        public ReadOnlyReactiveProperty<bool> ThumbnailVisibility { get; init; }
-
-        /// <summary>
-        /// ID
-        /// </summary>
-        public ReadOnlyReactiveProperty<bool> NiconicoIDVisibility { get; init; }
-
-        /// <summary>
-        /// タイトル
-        /// </summary>
-        public ReadOnlyReactiveProperty<bool> TitleVisibility { get; init; }
-
-        /// <summary>
-        /// 投稿日時
-        /// </summary>
-        public ReadOnlyReactiveProperty<bool> UploadedDTVisibility { get; init; }
-
-        /// <summary>
-        /// 再生回数
-        /// </summary>
-        public ReadOnlyReactiveProperty<bool> ViewCountVisibility { get; init; }
-
-        /// <summary>
-        /// DLフラグ
-        /// </summary>
-        public ReadOnlyReactiveProperty<bool> DLFlagVisibility { get; init; }
-
-        /// <summary>
-        /// ブックマーク
-        /// </summary>
-        public ReadOnlyReactiveProperty<bool> BookMarkVisibility { get; init; }
 
 
         #endregion
