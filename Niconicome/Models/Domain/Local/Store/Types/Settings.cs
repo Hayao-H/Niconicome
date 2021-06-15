@@ -175,5 +175,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string LimitWindowsToSingleton { get; private set; } = "limitwindowstosingleton";
         public static string ApplicationTheme { get; private set; } = "applicationtheme";
         public static string ConfirmIfDownloading { get; private set; } = "confirmifdownloading";
+        public static string FFmpegFormat { get; private set; } = "ffmpegformat";
     }
 }

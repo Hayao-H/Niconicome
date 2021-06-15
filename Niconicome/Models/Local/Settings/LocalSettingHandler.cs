@@ -186,6 +186,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.AppTheme => STypes::SettingNames.ApplicationTheme,
                 SettingsEnum.ConfirmIfDownloading => STypes::SettingNames.ConfirmIfDownloading,
                 SettingsEnum.MWBookMarkColumnWid => STypes::SettingNames.MainWindowBookMarkColumnWidth,
+                SettingsEnum.FFmpegFormat => STypes::SettingNames.FFmpegFormat,
                 _ => null
             };
         }
@@ -262,5 +263,6 @@ namespace Niconicome.Models.Local.Settings
         SingletonWindows,
         AppTheme,
         ConfirmIfDownloading,
+        FFmpegFormat,
     }
 }
