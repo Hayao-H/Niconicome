@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions.System;
@@ -105,17 +106,134 @@ namespace Niconicome.ViewModels.Mainpage
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
+            #region Width系プロパティー
+
+            var isRestoreEnable = !WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth);
+            const int defaultWidth = 150;
+
+            this.SelectColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? scWidth <= 0 ? defaultWidth : scWidth : defaultWidth);
+            this.IDColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? idWidth <= 0 ? defaultWidth : idWidth : defaultWidth);
+            this.TitleColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? titleWIdth <= 0 ? defaultWidth : titleWIdth : defaultWidth);
+            this.UploadColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? uploadWidth <= 0 ? defaultWidth : uploadWidth : defaultWidth);
+            this.ViewCountColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? vctWidth <= 0 ? defaultWidth : vctWidth : defaultWidth);
+            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? dlfWidth <= 0 ? defaultWidth : dlfWidth : defaultWidth);
+            this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
+            this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
+
+            this.SelectColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWSelectColumnWid))
+                .AddTo(this.disposables);
+            this.IDColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWIDColumnWid))
+                .AddTo(this.disposables);
+            this.TitleColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWTitleColumnWid))
+                .AddTo(this.disposables);
+            this.UploadColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWUploadColumnWid))
+                .AddTo(this.disposables);
+            this.ViewCountColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWViewCountColumnWid))
+                .AddTo(this.disposables);
+            this.DownloadedFlagColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWDownloadedFlagColumnWid))
+                .AddTo(this.disposables);
+            this.StateColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWStateColumnWid))
+                .AddTo(this.disposables);
+            this.ThumbColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
+                .AddTo(this.disposables);
+            #endregion
+
             #region UI系要素
             this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 100).ToReadOnlyReactiveProperty();
             this.TitleHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TitleHeight ?? 40).ToReadOnlyReactiveProperty();
             this.ButtonsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ButtonsHeight ?? 50).ToReadOnlyReactiveProperty();
-            this.ThumbnailVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.Thumbnail ?? true).ToReadOnlyReactiveProperty();
-            this.NiconicoIDVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.NiconicoID ?? true).ToReadOnlyReactiveProperty();
-            this.TitleVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.Title ?? true).ToReadOnlyReactiveProperty();
-            this.UploadedDTVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.UploadedDT ?? true).ToReadOnlyReactiveProperty();
-            this.ViewCountVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.ViewCount ?? true).ToReadOnlyReactiveProperty();
-            this.DLFlagVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.DLFlag ?? true).ToReadOnlyReactiveProperty();
-            this.BookMarkVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.BookMark ?? true).ToReadOnlyReactiveProperty();
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.Thumbnail ?? true))
+                {
+                    this.ThumbColumnWidth.Value = 0;
+                }
+                else if (this.ThumbColumnWidth.Value == 0)
+                {
+                    this.ThumbColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.NiconicoID ?? true))
+                {
+                    this.IDColumnWidth.Value = 0;
+                }
+                else if (this.IDColumnWidth.Value == 0)
+                {
+                    this.IDColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.Title ?? true))
+                {
+                    this.TitleColumnWidth.Value = 0;
+                }
+                else if (this.TitleColumnWidth.Value == 0)
+                {
+                    this.TitleColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.UploadedDT ?? true))
+                {
+                    this.ThumbColumnWidth.Value = 0;
+                }
+                else if (this.ThumbColumnWidth.Value == 0)
+                {
+                    this.ThumbColumnWidth.Value = defaultWidth;
+                }
+            });.
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.ViewCount ?? true))
+                {
+                    this.ViewCountColumnWidth.Value = 0;
+                }
+                else if (this.ViewCountColumnWidth.Value == 0)
+                {
+                    this.ViewCountColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.DLFlag ?? true))
+                {
+                    this.DownloadedFlagColumnWidth.Value = 0;
+                }
+                else if (this.DownloadedFlagColumnWidth.Value == 0)
+                {
+                    this.DownloadedFlagColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+            });
             #endregion
 
 
@@ -931,53 +1049,6 @@ namespace Niconicome.ViewModels.Mainpage
                 });
             #endregion
 
-            #region Width系プロパティー
-
-            var isRestoreEnable = !WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth);
-            const int defaultWidth = 150;
-
-            this.SelectColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? scWidth <= 0 ? defaultWidth : scWidth : defaultWidth);
-            this.IDColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? idWidth <= 0 ? defaultWidth : idWidth : defaultWidth);
-            this.TitleColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? titleWIdth <= 0 ? defaultWidth : titleWIdth : defaultWidth);
-            this.UploadColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? uploadWidth <= 0 ? defaultWidth : uploadWidth : defaultWidth);
-            this.ViewCountColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? vctWidth <= 0 ? defaultWidth : vctWidth : defaultWidth);
-            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? dlfWidth <= 0 ? defaultWidth : dlfWidth : defaultWidth);
-            this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
-            this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
-
-            this.SelectColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWSelectColumnWid))
-                .AddTo(this.disposables);
-            this.IDColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWIDColumnWid))
-                .AddTo(this.disposables);
-            this.TitleColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWTitleColumnWid))
-                .AddTo(this.disposables);
-            this.UploadColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWUploadColumnWid))
-                .AddTo(this.disposables);
-            this.ViewCountColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWViewCountColumnWid))
-                .AddTo(this.disposables);
-            this.DownloadedFlagColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWDownloadedFlagColumnWid))
-                .AddTo(this.disposables);
-            this.StateColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWStateColumnWid))
-                .AddTo(this.disposables);
-            this.ThumbColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
-                .AddTo(this.disposables);
-            #endregion
         }
 
         ~VideoListViewModel()
