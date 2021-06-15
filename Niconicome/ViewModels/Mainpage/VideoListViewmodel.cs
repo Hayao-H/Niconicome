@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
 using System.Reactive.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -112,12 +110,12 @@ namespace Niconicome.ViewModels.Mainpage
             this.TitleHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TitleHeight ?? 40).ToReadOnlyReactiveProperty();
             this.ButtonsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ButtonsHeight ?? 50).ToReadOnlyReactiveProperty();
             this.ThumbnailVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.Thumbnail ?? true).ToReadOnlyReactiveProperty();
-            this.NiconicoIDVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.NiconicoID ?? true).ToReadOnlyReactiveProperty();
-            this.TitleVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.Title ?? true).ToReadOnlyReactiveProperty();
-            this.UploadedDTVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.UploadedDT ?? true).ToReadOnlyReactiveProperty();
-            this.ViewCountVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.ViewCount ?? true).ToReadOnlyReactiveProperty();
+            this.NiconicoIDVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.NiconicoID ?? true).ToReadOnlyReactiveProperty();
+            this.TitleVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.Title ?? true).ToReadOnlyReactiveProperty();
+            this.UploadedDTVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.UploadedDT ?? true).ToReadOnlyReactiveProperty();
+            this.ViewCountVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.ViewCount ?? true).ToReadOnlyReactiveProperty();
             this.DLFlagVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.DLFlag ?? true).ToReadOnlyReactiveProperty();
-            this.BookMarkVisibility= WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.BookMark ?? true).ToReadOnlyReactiveProperty();
+            this.BookMarkVisibility = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.Column.BookMark ?? true).ToReadOnlyReactiveProperty();
             #endregion
 
 
@@ -1413,17 +1411,10 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public VideoListViewModelD()
         {
-            var v1 = new NonBindableListVideoInfo();
-            v1.Title.Value = "レッツゴー!陰陽師";
-            v1.NiconicoId.Value = "sm9";
-            v1.IsDownloaded.Value = true;
+            var v1 = new VideoInfoViewModel("レッツゴー!陰陽師", "sm9", @"https://nicovideo.cdn.nimg.jp/thumbnails/9/9");
+            var v2 = new VideoInfoViewModel("Bad Apple!! feat.nomico", "sm8628149", @"https://nicovideo.cdn.nimg.jp/thumbnails/8628149/8628149");
 
-            var v2 = new NonBindableListVideoInfo();
-            v2.Title.Value = "Bad Apple!! feat. nomico";
-            v2.NiconicoId.Value = "sm8628149";
-            v2.IsDownloaded.Value = false;
-
-            this.Videos = new ReactiveCollection<VideoInfoViewModel>();
+            this.Videos = new ReactiveCollection<VideoInfoViewModel>() { v1, v2 };
 
         }
 
@@ -1505,21 +1496,21 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveProperty<MaterialDesign::PackIconKind> ClipbordMonitorIcon { get; init; } = new(MaterialDesign::PackIconKind.ClipboardPulse);
 
-        public ReactivePropertySlim<int> SelectColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> SelectColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> IDColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> IDColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> TitleColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> TitleColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> UploadColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> UploadColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> ViewCountColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> ViewCountColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> DownloadedFlagColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> DownloadedFlagColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new(150);
 
         public ReactiveProperty<int> ListItemHeight { get; init; } = new(100);
 
@@ -1750,14 +1741,14 @@ namespace Niconicome.ViewModels.Mainpage
 
         }
 
-        public VideoInfoViewModel(string title, string ID, string uploadedDT)
+        public VideoInfoViewModel(string title, string ID, string thumbUrl)
         {
             this.Id = new ReactiveProperty<int>();
             this.ViewCount = new ReactiveProperty<int>();
             this.NiconicoId = new ReactiveProperty<string>(ID);
-            this.Title = new ReactiveProperty<string>("title");
+            this.Title = new ReactiveProperty<string>(title);
             this.Message = new ReactiveProperty<string>("テスト");
-            this.ThumbPath = new ReactiveProperty<string>(@"https://www.nicovideo.jp/watch/sm9");
+            this.ThumbPath = new ReactiveProperty<string>(thumbUrl);
             this.IsSelected = new ReactiveProperty<bool>(true);
             this.IsDownloaded = new ReactiveProperty<string>("〇");
             this.UploadedOn = new ReactiveProperty<DateTime>(DateTime.Now);
