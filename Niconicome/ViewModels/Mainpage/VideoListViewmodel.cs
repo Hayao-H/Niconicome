@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -75,14 +76,15 @@ namespace Niconicome.ViewModels.Mainpage
             this.FilterIcon = new ReactivePropertySlim<MaterialDesign.PackIconKind>(MaterialDesign::PackIconKind.Filter);
 
             //幅
-            var scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
-            var idWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWIDColumnWid);
-            var titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWTitleColumnWid);
-            var uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWUploadColumnWid);
-            var vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWViewCountColumnWid);
-            var dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWDownloadedFlagColumnWid);
-            var stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
-            var tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
+            int scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
+            int idWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWIDColumnWid);
+            int titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWTitleColumnWid);
+            int uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWUploadColumnWid);
+            int vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWViewCountColumnWid);
+            int dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWDownloadedFlagColumnWid);
+            int stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
+            int tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
+            int bmWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWBookMarkColumnWid);
 
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
@@ -119,6 +121,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? dlfWidth <= 0 ? defaultWidth : dlfWidth : defaultWidth);
             this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
             this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
+            this.BookMarkColumnWidth = new ReactivePropertySlim<int>(isRestoreEnable ? bmWidth < 0 ? defaultWidth : bmWidth : defaultWidth);
 
             this.SelectColumnWidth
                 .Throttle(TimeSpan.FromSeconds(3))
@@ -151,6 +154,10 @@ namespace Niconicome.ViewModels.Mainpage
             this.ThumbColumnWidth
                 .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
+                .AddTo(this.disposables);
+            this.BookMarkColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWBookMarkColumnWid))
                 .AddTo(this.disposables);
             #endregion
 
@@ -233,6 +240,14 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
             {
+                if (!(value?.MainPage.VideoList.Column.BookMark ?? true))
+                {
+                    this.BookMarkColumnWidth.Value = 0;
+                }
+                else if (this.BookMarkColumnWidth.Value == 0)
+                {
+                    this.BookMarkColumnWidth.Value = defaultWidth;
+                }
             });
             #endregion
 
@@ -1354,6 +1369,10 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveProperty<int> ThumbColumnWidth { get; init; }
 
+        /// <summary>
+        /// ブックマーク
+        /// </summary>
+        public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; } = new(150);
         #endregion
 
         /// <summary>
@@ -1547,6 +1566,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new(150);
 
         public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new(150);
+
+        public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; } = new(150);
 
         public ReactiveProperty<int> ListItemHeight { get; init; } = new(100);
 
