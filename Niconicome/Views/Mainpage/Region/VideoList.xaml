@@ -8,6 +8,7 @@
              xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
              xmlns:cv="clr-namespace:Niconicome.Views.Converter"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:rp="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              mc:Ignorable="d"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -183,6 +184,24 @@
                         <GridViewColumn Width="{Binding UploadColumnWidth.Value,Mode=TwoWay}" Header="{Binding UploadColumnTitle.Value}" DisplayMemberBinding="{Binding UploadedOn.Value, StringFormat=yyyy年MM月dd日 HH:mm}"/>
                         <GridViewColumn Width="{Binding ViewCountColumnWidth.Value,Mode=TwoWay}" Header="{Binding ViewCountColumnTitle.Value}" DisplayMemberBinding="{Binding ViewCount.Value}"/>
                         <GridViewColumn Width="{Binding DownloadedFlagColumnWidth.Value,Mode=TwoWay}" Header="{Binding DlFlagColumnTitle.Value}" DisplayMemberBinding="{Binding IsDownloaded.Value}"/>
+                        <GridViewColumn  Header="BM">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <materialDesign:PackIcon Kind="Bookmark" Foreground="{Binding BookMarkColor.Value}">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseDown">
+                                                <rp:EventToReactiveCommand Command="{Binding BookMark}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Width="{Binding StateColumnWidth.Value,Mode=TwoWay}" Header="状態" DisplayMemberBinding="{Binding Message.Value}"/>
                     </GridView>
                 </ListView.View>
