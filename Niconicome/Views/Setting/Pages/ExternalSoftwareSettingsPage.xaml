@@ -46,9 +46,9 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="「アプリで開く(A)」のパス(_A)" Target="{Binding ElementName=videoappa}"/>
+                        <Label Content="「アプリで開く(A)」のパス"/>
                     </StackPanel>
-                    <TextBox Margin="10 0 0 0" Text="{Binding PlayerAPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="videoappa"/>
+                    <TextBox Margin="10 0 0 0" Text="{Binding PlayerAPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <StackPanel>
@@ -58,9 +58,9 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="「アプリで開く(B)」のパス(_B)" Target="{Binding ElementName=videoappb}"/>
+                        <Label Content="「アプリで開く(B)」のパス"/>
                     </StackPanel>
-                    <TextBox Margin="10 0 0 0" Text="{Binding PlayerBPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="videoappb"/>
+                    <TextBox Margin="10 0 0 0" Text="{Binding PlayerBPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <StackPanel>
@@ -70,12 +70,12 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="「アプリに送る(A)」のパス(_U)" Target="{Binding ElementName=appurl}"/>
+                        <Label Content="「アプリに送る(A)」のパス" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppAPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="appurl"/>
+                        <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppAPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" />
                         <Label Content="パラメーター"/>
-                        <TextBox Text="{Binding AppAParam,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
+                        <TextBox Text="{Binding AppAParam.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
                     </StackPanel>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
@@ -86,12 +86,12 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="「アプリに送る(B)」のパス(_I)" Target="{Binding ElementName=appid}"/>
+                        <Label Content="「アプリに送る(B)」のパス"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppBPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="appid"/>
+                        <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppBPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                         <Label Content="パラメーター"/>
-                        <TextBox Text="{Binding AppBParam,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
+                        <TextBox Text="{Binding AppBParam.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
                     </StackPanel>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
@@ -102,9 +102,9 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="ffmpegのパス(_F)" Target="{Binding ElementName=ffmpegpath}"/>
+                        <Label Content="ffmpegのパス"/>
                     </StackPanel>
-                    <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="ffmpegpath"/>
+                    <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                     <DockPanel Margin="6">
                         <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
                             <materialDesign:PackIcon.RenderTransform>
