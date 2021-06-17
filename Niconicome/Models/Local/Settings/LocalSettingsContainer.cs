@@ -10,7 +10,7 @@ namespace Niconicome.Models.Local.Settings
     {
         ReactiveProperty<bool> GetReactiveBoolSetting(SettingsEnum settingType);
         ReactiveProperty<int> GetReactiveIntSetting(SettingsEnum settingType, Func<int, bool>? whereFunc = null, Func<int, int>? selectFunc = null);
-        ReactiveProperty<string> GetReactiveStringSetting(SettingsEnum settingType, string defaultValue = "");
+        ReactiveProperty<string> GetReactiveStringSetting(SettingsEnum settingType, string defaultValue = "", bool disAllowEmpty = false);
     }
 
     class LocalSettingsContainer : BindableBase, ILocalSettingsContainer
@@ -98,19 +98,47 @@ namespace Niconicome.Models.Local.Settings
         /// <param name="settingType"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public ReactiveProperty<string> GetReactiveStringSetting(SettingsEnum settingType, string defaultValue = "")
+        public ReactiveProperty<string> GetReactiveStringSetting(SettingsEnum settingType, string defaultValue = "", bool disAllowEmpty = false)
         {
+            if (disAllowEmpty && string.IsNullOrEmpty(defaultValue))
+            {
+                throw new InvalidOperationException($"{nameof(disAllowEmpty)}は{disAllowEmpty}ですが{nameof(defaultValue)}がemptyです。");
+            }
+
+            bool isEmpty(string value)
+            {
+                return disAllowEmpty && string.IsNullOrEmpty(value);
+            }
+
             this.stringSettingsContainer.TryGetValue(settingType, out ReactiveProperty<string>? setting);
 
             if (setting is null)
             {
-                var newSetting = new ReactiveProperty<string>(this.settingHandler.GetStringSetting(settingType) ?? defaultValue);
+                string settingValue = this.settingHandler.GetStringSetting(settingType) ?? defaultValue;
+
+                if (isEmpty(settingValue))
+                {
+                    settingValue = defaultValue;
+                }
+
+                var newSetting = new ReactiveProperty<string>(settingValue);
                 this.stringSettingsContainer.Add(settingType, newSetting);
-                newSetting.Subscribe(value => this.settingHandler.SaveSetting(value, settingType)).AddTo(this.disposables);
+                newSetting.Subscribe(value =>
+                {
+                    if (isEmpty(value))
+                    {
+                        value = defaultValue;
+                    }
+                    this.settingHandler.SaveSetting(value, settingType);
+                }).AddTo(this.disposables);
                 return newSetting;
             }
             else
             {
+                if (isEmpty(setting.Value))
+                {
+                    setting.Value = defaultValue;
+                }
                 return setting;
             }
 
