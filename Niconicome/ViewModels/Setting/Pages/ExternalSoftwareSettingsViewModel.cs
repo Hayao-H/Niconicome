@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Const;
 using Niconicome.Models.Local.Settings;
 using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
@@ -23,7 +24,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.FfmpegPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FfmpegPath);
             this.useShellWhenLaunchingFFmpegFIeld = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.FFmpegShell);
             this.reAllocateCommandsField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
-            this.FFmpegFormat = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FFmpegFormat);
+            this.FFmpegFormat = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FFmpegFormat, Format.DefaultFFmpegFormat, true);
         }
 
         private bool useShellWhenLaunchingFFmpegFIeld;

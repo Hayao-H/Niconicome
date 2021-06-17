@@ -105,15 +105,26 @@
                         <Label Content="ffmpegのパス"/>
                     </StackPanel>
                     <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
-                    <DockPanel Margin="6">
-                        <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
-                            <materialDesign:PackIcon.RenderTransform>
-                                <TranslateTransform Y="7"/>
-                            </materialDesign:PackIcon.RenderTransform>
-                        </materialDesign:PackIcon>
-                        <Label Content="FFmpegの起動にシェルを利用する"/>
-                        <ToggleButton IsChecked="{Binding   UseShellWhenLaunchingFFmpeg,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Right"/>
-                    </DockPanel>
+                    <StackPanel Margin="6">
+                        <DockPanel>
+                            <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
+                                <materialDesign:PackIcon.RenderTransform>
+                                    <TranslateTransform Y="7"/>
+                                </materialDesign:PackIcon.RenderTransform>
+                            </materialDesign:PackIcon>
+                            <Label Content="FFmpegの起動にシェルを利用する"/>
+                            <ToggleButton IsChecked="{Binding   UseShellWhenLaunchingFFmpeg,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
+                                <materialDesign:PackIcon.RenderTransform>
+                                    <TranslateTransform Y="7"/>
+                                </materialDesign:PackIcon.RenderTransform>
+                            </materialDesign:PackIcon>
+                            <Label Content="FFmpegのフォーマット"/>
+                            <TextBox  Margin="10 0 0 0" Text="{Binding FFmpegFormat.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+                    </StackPanel>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
