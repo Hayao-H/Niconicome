@@ -192,16 +192,13 @@ namespace Niconicome.Models.Utils
 
                     var token = new ParallelTaskToken();
 
-                    await Task.Run(async () =>
+                    try
                     {
-                        try
-                        {
-                            await task.TaskFunction(task, lockobj, token);
-                        } catch
-                        {
-                            return;
-                        }
-                    });
+                        await task.TaskFunction(task, lockobj, token);
+                    }
+                    catch
+                    {
+                    }
 
                     lock (this.lockobj)
                     {
@@ -224,7 +221,18 @@ namespace Niconicome.Models.Utils
 
             }
 
-            await tasks.WhenAll();
+            try
+            {
+                await tasks.WhenAll();
+            }
+            catch
+            {
+                lock (this.lockobj)
+                {
+                    this.IsProcessing = false;
+                }
+                return;
+            }
 
             lock (this.lockobj)
             {
