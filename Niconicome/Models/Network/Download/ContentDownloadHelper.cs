@@ -289,10 +289,6 @@ namespace Niconicome.Models.Network.Download
             {
                 maxParallel = 1;
             }
-            else if (maxParallel > 5)
-            {
-                maxParallel = 5;
-            }
 
             var vSettings = settings.ConvertToVideoDownloadSettings(false, maxParallel);
             var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::IVideoDownloader>();

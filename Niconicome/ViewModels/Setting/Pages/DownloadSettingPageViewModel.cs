@@ -64,8 +64,14 @@ namespace Niconicome.ViewModels.Setting.Pages
             var n2 = new ComboboxItem<int>(2, "2");
             var n3 = new ComboboxItem<int>(3, "3");
             var n4 = new ComboboxItem<int>(4, "4");
+            var nq = new ComboboxItem<int>(maxSP, maxSP.ToString());
 
             this.SelectableMaxParallelDownloadCount = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
+            if (maxSP > 4)
+            {
+                this.SelectableMaxParallelDownloadCount.Add(nq);
+            }
+
             this.MaxParallelDownloadCount = maxP switch
             {
                 1 => new ReactivePropertySlim<ComboboxItem<int>>(n1),
@@ -76,15 +82,17 @@ namespace Niconicome.ViewModels.Setting.Pages
             };
             this.MaxParallelDownloadCount.Subscribe(value => this.SaveSetting(value, SettingsEnum.MaxParallelDL)).AddTo(this.disposables);
 
-            this.MaxParallelSegmentDownloadCount = maxSP switch
-            {
-                1 => new ReactivePropertySlim<ComboboxItem<int>>(n1),
-                2 => new ReactivePropertySlim<ComboboxItem<int>>(n2),
-                3 => new ReactivePropertySlim<ComboboxItem<int>>(n3),
-                4 => new ReactivePropertySlim<ComboboxItem<int>>(n4),
-                _ => new ReactivePropertySlim<ComboboxItem<int>>(n4),
-            };
-            this.MaxParallelSegmentDownloadCount.Subscribe(value => this.SaveSetting(value, SettingsEnum.MaxParallelSegDl)).AddTo(this.disposables);
+            this.MaxParallelSegmentDownloadCount = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.MaxParallelSegDl)
+                .ToReactivePropertySlimAsSynchronized(value => value.Value, value =>
+                    value switch
+                    {
+                        1 => n1,
+                        2 => n2,
+                        3 => n3,
+                        4 => n4,
+                        _ => nq,
+
+                    }, value => value.Value);
 
             var maxTmp = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
             this.MaxTmpDirCount = new ReactiveProperty<int>(maxTmp < 0 ? 20 : maxTmp).AddTo(this.disposables);
@@ -110,7 +118,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.SelectableIchibaInfoType = new List<ComboboxItem<IchibaInfoTypeSettings>>() { i1, i2, i3 };
             this.IchibaInfoType = WS::SettingPage.EnumSettingsHandler.GetSetting<IchibaInfoTypeSettings>() switch
             {
-                IchibaInfoTypeSettings.Xml => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i3) ,
+                IchibaInfoTypeSettings.Xml => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i3),
                 IchibaInfoTypeSettings.Json => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i2),
                 _ => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i1),
             };
