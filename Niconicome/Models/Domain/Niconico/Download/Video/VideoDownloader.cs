@@ -376,7 +376,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
                 try
                 {
-                    data = await this.DownloadInternalAsync(self.Url, self.Context);
+                    data = await this.DownloadInternalAsync(self.Url, self.Context, token);
                 }
                 catch (Exception e)
                 {
@@ -406,7 +406,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 completed++;
                 messenger.SendMessage($"完了: {completed}/{all}{resolution}");
 
-                await Task.Delay(1 * 1000);
+                await Task.Delay(1 * 1000, token);
 
 
             }, context, url.AbsoluteUrl, url.SequenceZero, url.FileName));
@@ -445,7 +445,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <param name="context"></param>
         /// <param name="retryAttempt"></param>
         /// <returns></returns>
-        private async Task<byte[]> DownloadInternalAsync(string url, IDownloadContext context, int retryAttempt = 0)
+        private async Task<byte[]> DownloadInternalAsync(string url, IDownloadContext context, CancellationToken token, int retryAttempt = 0)
         {
             var res = await this.http.GetAsync(new Uri(url));
             if (!res.IsSuccessStatusCode)
@@ -454,8 +454,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 if (retryAttempt < 3)
                 {
                     retryAttempt++;
-                    await Task.Delay(10 * 1000);
-                    return await this.DownloadInternalAsync(url, context, retryAttempt);
+                    await Task.Delay(10 * 1000, token);
+                    return await this.DownloadInternalAsync(url, context, token, retryAttempt);
                 }
                 else
                 {

@@ -144,6 +144,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = vResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -171,6 +172,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = tResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -201,6 +203,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = cResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -230,6 +233,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = iResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -255,6 +259,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = iResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
