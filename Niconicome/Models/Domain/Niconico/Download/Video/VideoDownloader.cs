@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Dmc;
 using Niconicome.Models.Domain.Niconico.Download.Video.Resume;
@@ -58,6 +59,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         string NiconicoId { get; }
         string FolderName { get; }
         string FileNameFormat { get; }
+        string CommandFormat { get; }
         bool IsOverwriteEnable { get; }
         bool IsAutoDisposingEnable { get; }
         bool IsReplaceStrictedEnable { get; }
@@ -217,6 +219,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             {
                 FileName = fileName,
                 FolderName = settings.FolderName,
+                CommandFormat = settings.CommandFormat,
                 TsFilePaths = segmentFilePaths,
                 IsOverwriteEnable = settings.IsOverwriteEnable,
                 IsOverrideDTEnable = settings.IsOvwrridingFileDTEnable,
@@ -519,6 +522,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public string FolderName { get; set; } = string.Empty;
 
         public string FileNameFormat { get; set; } = string.Empty;
+
+        public string CommandFormat { get; set; } = Format.DefaultFFmpegFormat;
 
         public bool IsOverwriteEnable { get; set; }
 

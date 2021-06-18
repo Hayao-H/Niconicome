@@ -115,6 +115,11 @@ namespace Niconicome.Models.Network.Download
 
             string videoInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.VideoinfoSuffix) ?? Format.DefaultVideoInfoSuffix;
             string ichibaInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.IchibaInfoSuffix) ?? Format.DefaultIchibaSuffix;
+            string commandFormat = this.settingHandler.GetStringSetting(SettingsEnum.FFmpegFormat) ?? Format.DefaultFFmpegFormat;
+            if (commandFormat.IsNullOrEmpty())
+            {
+                commandFormat = Format.DefaultFFmpegFormat;
+            }
 
             return new DownloadSettings
             {
@@ -145,6 +150,7 @@ namespace Niconicome.Models.Network.Download
                 ThumbnailExt = thumbExt,
                 VideoInfoSuffix = videoInfoSuffix,
                 IchibaInfoSuffix = ichibaInfoSuffix,
+                CommandFormat = commandFormat,
             };
         }
 
