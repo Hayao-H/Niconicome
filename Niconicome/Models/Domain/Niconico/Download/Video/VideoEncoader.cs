@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Utils;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 
@@ -27,6 +28,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     {
         string FileName { get; }
         string FolderName { get; }
+        string CommandFormat { get; }
         bool IsOverwriteEnable { get; }
         bool IsOverrideDTEnable { get; }
         bool IsNoEncodeEnable { get; }
@@ -105,7 +107,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             else
             {
                 messenger.SendMessage("ffmpegで変換を開始(.ts=>.mp4)");
-                await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, token, LocalFile::EncodeOptions.Copy);
+                await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, settings.CommandFormat, token, LocalFile::EncodeOptions.Copy);
                 messenger.SendMessage("ffmpegの変換が完了");
             }
 
@@ -189,6 +191,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public string FileName { get; set; } = string.Empty;
 
         public string FolderName { get; set; } = string.Empty;
+
+        public string CommandFormat { get; set; } = Format.DefaultFFmpegFormat;
+
 
         public bool IsOverwriteEnable { get; set; }
 

@@ -234,6 +234,7 @@ namespace Niconicome.Models.Network.Download
         {
             this.cts.Cancel();
             this.IsCanceled = true;
+            this.Message = "DLをキャンセル";
             this.IsProcessing = false;
             this.RaiseCancel();
         }

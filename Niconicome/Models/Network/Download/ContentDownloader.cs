@@ -438,6 +438,8 @@ namespace Niconicome.Models.Network.Download
 
         public string VideoInfoSuffix { get; set; } = string.Empty;
 
+        public string CommandFormat { get; set; } = string.Empty;
+
         public IchibaInfoTypeSettings IchibaInfoType { get; set; }
 
         public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(bool autodispose, int maxParallelDLCount)
@@ -455,6 +457,7 @@ namespace Niconicome.Models.Network.Download
                 IsOvwrridingFileDTEnable = this.OverrideVideoFileDateToUploadedDT,
                 IsResumeEnable = this.ResumeEnable,
                 IsNoEncodeEnable = this.SaveWithoutEncode,
+                CommandFormat = this.CommandFormat,
             };
         }
 
