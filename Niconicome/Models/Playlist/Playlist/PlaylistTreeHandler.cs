@@ -8,6 +8,7 @@ using AngleSharp.Dom;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Local.Settings;
 using Reactive.Bindings.ObjectExtensions;
+using Windows.ApplicationModel.Payments;
 
 namespace Niconicome.Models.Playlist.Playlist
 {
@@ -24,6 +25,7 @@ namespace Niconicome.Models.Playlist.Playlist
         bool IsLastChild(int id);
         ITreePlaylistInfo? GetParent(int id);
         IEnumerable<ITreePlaylistInfo> GetAllPlaylists();
+        List<string> GetListOfAncestor(int id);
         ObservableCollection<ITreePlaylistInfo> Playlists { get; }
     }
 
@@ -144,55 +146,6 @@ namespace Niconicome.Models.Playlist.Playlist
         }
 
         /// <summary>
-        /// ツリーを取得する
-        /// </summary>
-        /// <returns></returns>
-        private List<ITreePlaylistInfo> GetTree()
-        {
-            var list = new List<ITreePlaylistInfo>();
-
-            ITreePlaylistInfo? root = this.GetRoot();
-
-            //ルートプレイリストがnullの場合はエラーを返す
-            if (root == null) throw new InvalidOperationException("ルートプレイリストが存在しません。");
-
-            ITreePlaylistInfo? tmp = this.GetPlaylist(p => p.IsTemporary);
-            ITreePlaylistInfo? succeeded = this.GetPlaylist(p => p.IsDownloadSucceededHistory);
-            ITreePlaylistInfo? failed = this.GetPlaylist(p => p.IsDownloadFailedHistory);
-
-            bool succeededDisable = this.playlistSettingsHandler.IsDownloadSucceededHistoryDisabled;
-            bool failedDisable = this.playlistSettingsHandler.IsDownloadFailedHistoryDisabled;
-
-            if (tmp is null)
-            {
-                throw new InvalidOperationException("一時プレイリストが存在しません。");
-            }
-            else if (!succeededDisable && succeeded is null)
-            {
-                throw new InvalidOperationException("DL成功履歴プレイリストが存在しません。");
-            }
-            else if (!failedDisable && failed is null)
-            {
-                throw new InvalidOperationException("DL失敗履歴プレイリストが存在しません。");
-            }
-
-            list.Add(this.ConstructPlaylistInfo(root.Id));
-            list.Add(tmp);
-            
-            if (!failedDisable)
-            {
-                list.Add(failed!);
-            } 
-            if (!succeededDisable)
-            {
-                list.Add(succeeded!);
-            }
-
-            return list;
-
-        }
-
-        /// <summary>
         /// すべてのプレイリストを取得する
         /// </summary>
         /// <returns></returns>
@@ -202,6 +155,34 @@ namespace Niconicome.Models.Playlist.Playlist
         }
 
         #endregion
+
+        /// <summary>
+        /// 親プレイリストのリストを取得する
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public List<string> GetListOfAncestor(int id)
+        {
+            ITreePlaylistInfo? playlist = this.GetPlaylist(id);
+
+            if (playlist is null)
+            {
+                return new List<string>();
+            }
+
+            var ancester = new LinkedList<string>();
+            ancester.AddFirst(playlist.Name.Value);
+
+            ITreePlaylistInfo? parent = this.GetParent(playlist.Id);
+
+            while (parent is not null)
+            {
+                ancester.AddFirst(parent.Name.Value);
+                parent = this.GetParent(parent.Id);
+            }
+
+            return ancester.ToList();
+        }
 
         /// <summary>
         /// 指定されたIDのプレイリストを含むかどうかを返す
@@ -253,6 +234,56 @@ namespace Niconicome.Models.Playlist.Playlist
         }
 
         #region private
+
+        /// <summary>
+        /// ツリーを取得する
+        /// </summary>
+        /// <returns></returns>
+        private List<ITreePlaylistInfo> GetTree()
+        {
+            var list = new List<ITreePlaylistInfo>();
+
+            ITreePlaylistInfo? root = this.GetRoot();
+
+            //ルートプレイリストがnullの場合はエラーを返す
+            if (root == null) throw new InvalidOperationException("ルートプレイリストが存在しません。");
+
+            ITreePlaylistInfo? tmp = this.GetPlaylist(p => p.IsTemporary);
+            ITreePlaylistInfo? succeeded = this.GetPlaylist(p => p.IsDownloadSucceededHistory);
+            ITreePlaylistInfo? failed = this.GetPlaylist(p => p.IsDownloadFailedHistory);
+
+            bool succeededDisable = this.playlistSettingsHandler.IsDownloadSucceededHistoryDisabled;
+            bool failedDisable = this.playlistSettingsHandler.IsDownloadFailedHistoryDisabled;
+
+            if (tmp is null)
+            {
+                throw new InvalidOperationException("一時プレイリストが存在しません。");
+            }
+            else if (!succeededDisable && succeeded is null)
+            {
+                throw new InvalidOperationException("DL成功履歴プレイリストが存在しません。");
+            }
+            else if (!failedDisable && failed is null)
+            {
+                throw new InvalidOperationException("DL失敗履歴プレイリストが存在しません。");
+            }
+
+            list.Add(this.ConstructPlaylistInfo(root.Id));
+            list.Add(tmp);
+
+            if (!failedDisable)
+            {
+                list.Add(failed!);
+            }
+            if (!succeededDisable)
+            {
+                list.Add(succeeded!);
+            }
+
+            return list;
+
+        }
+
         /// <summary>
         /// ルートプレイリストを取得する
         /// </summary>
