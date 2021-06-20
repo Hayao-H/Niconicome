@@ -55,6 +55,7 @@ namespace Niconicome.Models.Domain.Utils
                 NiconicoID = dmcInfo.Id,
                 UploadedOn = dmcInfo.UploadedOn,
                 DownloadStartedOn = dmcInfo.DownloadStartedOn,
+                OwnerID = dmcInfo.OwnerID.ToString(),
             };
 
             return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
@@ -78,6 +79,7 @@ namespace Niconicome.Models.Domain.Utils
                 NiconicoID = video.NiconicoId.Value,
                 UploadedOn = video.UploadedOn.Value,
                 DownloadStartedOn = DateTime.Now,
+                OwnerID = video.OwnerID.Value.ToString(),
             };
 
             return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
@@ -318,6 +320,7 @@ namespace Niconicome.Models.Domain.Utils
             string filename = format.Replace("<id>", info.NiconicoID)
              .Replace("<title>", info.Title)
              .Replace("<owner>", info.OwnerName)
+             .Replace("<ownerId>", info.OwnerID)
              + suffix
              + extension;
 
@@ -358,5 +361,7 @@ namespace Niconicome.Models.Domain.Utils
         public string OwnerName { get; set; } = string.Empty;
 
         public string NiconicoID { get; set; } = string.Empty;
+
+        public string OwnerID { get; set; } = string.Empty;
     }
 }

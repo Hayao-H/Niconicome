@@ -106,6 +106,7 @@ namespace NiconicomeTest.Utils
 
         [TestCase("[<id>]<title>", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師")]
         [TestCase("[<id>]<title>（<owner>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（中の）")]
+        [TestCase("[<id>]<title>（<ownerId>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（1）")]
         [TestCase("[<id>]<title>（<uploadedon>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2007-03-06 00-33-00）")]
         [TestCase("[<id>]<title>（<downloadon>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2021-03-26 20-30-00）")]
         [TestCase("[<id>]<title>（<uploadedon:yyyy年MM月dd日 HH時mm分ss秒>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2007年03月06日 00時33分00秒）")]
@@ -121,6 +122,7 @@ namespace NiconicomeTest.Utils
                 Title = "新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師",
                 Owner = "中の",
                 Id = "sm9",
+                OwnerID = 1,
             };
 
             var result = this.utils!.GetFileName(format, dmc, string.Empty, true);
