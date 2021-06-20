@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.ViewModels;
@@ -24,9 +25,10 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public class Current : BindableBase, ICurrent
     {
-        public Current(ILocalSettingHandler settingHandler)
+        public Current(ILocalSettingHandler settingHandler,IPlaylistTreeHandler treeHandler)
         {
             this.settingHandler = settingHandler;
+            this.treeHandler = treeHandler;
 
             this.SelectedPlaylist = new ReactiveProperty<ITreePlaylistInfo?>();
             this.IsTemporaryPlaylist = this.SelectedPlaylist
@@ -37,7 +39,23 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 if (value is not null)
                 {
-                    this.PlaylistFolderPath = value.Folderpath.IsNullOrEmpty() ? this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir : value.Folderpath;
+                    string? defaultFolder = this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder);
+
+                    if (string.IsNullOrEmpty(defaultFolder))
+                    {
+                        defaultFolder = FileFolder.DefaultDownloadDir;
+                    } else if (defaultFolder.Contains("<autoMap>"))
+                    {
+                        List<string> ancesnter = this.treeHandler.GetListOfAncestor(value.Id);
+                        if (ancesnter.Count > 1)
+                        {
+                            ancesnter = ancesnter.GetRange(1, ancesnter.Count - 1);
+                        }
+                        string path = string.Join('\\', ancesnter);
+                        defaultFolder = defaultFolder.Replace("<autoMap>", path);
+                    }
+
+                    this.PlaylistFolderPath = value.Folderpath.IsNullOrEmpty() ?  defaultFolder : value.Folderpath;
                 }
                 else
                 {
@@ -56,6 +74,8 @@ namespace Niconicome.Models.Playlist.VideoList
         #region DI
 
         private readonly ILocalSettingHandler settingHandler;
+
+        private readonly IPlaylistTreeHandler treeHandler;
 
         #endregion
 

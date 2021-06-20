@@ -52,8 +52,11 @@ namespace Niconicome.Models.Local
             if (this.cachedFiles is null)
             {
                 this.cachedFiles = new List<string>();
-                this.cachedFiles.AddRange(this.directoryIO.GetFiles(folderPath,$"*{FileFolder.Mp4FileExt}",true).Select(p => Path.Combine(folderPath, p)).ToList());
-                this.cachedFiles.AddRange(this.directoryIO.GetFiles(folderPath,$"*{FileFolder.TsFileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
+                if (this.directoryIO.Exists(folderPath))
+                {
+                    this.cachedFiles.AddRange(this.directoryIO.GetFiles(folderPath, $"*{FileFolder.Mp4FileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
+                    this.cachedFiles.AddRange(this.directoryIO.GetFiles(folderPath, $"*{FileFolder.TsFileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
+                }
                 
             }
 
