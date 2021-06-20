@@ -6,14 +6,14 @@ using Reactive.Bindings.Extensions;
 
 namespace Niconicome.Models.Local.Settings
 {
-    interface ILocalSettingsContainer
+    public interface ILocalSettingsContainer
     {
         ReactiveProperty<bool> GetReactiveBoolSetting(SettingsEnum settingType);
         ReactiveProperty<int> GetReactiveIntSetting(SettingsEnum settingType, Func<int, bool>? whereFunc = null, Func<int, int>? selectFunc = null);
         ReactiveProperty<string> GetReactiveStringSetting(SettingsEnum settingType, string defaultValue = "", bool disAllowEmpty = false);
     }
 
-    class LocalSettingsContainer : BindableBase, ILocalSettingsContainer
+    public class LocalSettingsContainer : BindableBase, ILocalSettingsContainer
     {
         public LocalSettingsContainer(ILocalSettingHandler settingHandler)
         {
