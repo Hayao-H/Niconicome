@@ -96,6 +96,7 @@ namespace Niconicome.Models.Playlist.VideoList
             var format = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
             var replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
             var folderPath = this.current.PlaylistFolderPath;
+            bool searchByID = this.settingHandler.GetBoolSetting(SettingsEnum.SearchFileByID);
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
 
@@ -127,7 +128,7 @@ namespace Niconicome.Models.Playlist.VideoList
                     video.MessageGuid = lightVideo.MessageGuid;
                     video.IsSelected.Value = lightVideo.IsSelected;
                     video.Message.Value = VideoMessenger.GetMessage(lightVideo.MessageGuid);
-                    video.FileName.Value = lightVideo.FileName;
+                    //video.FileName.Value = lightVideo.FileName;
                 }
                 else
                 {
@@ -135,7 +136,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 }
 
 
-                var filename = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted);
+                var filename = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted, searchByID);
                 if (filename.EndsWith(FileFolder.Mp4FileExt) || filename.EndsWith(FileFolder.TsFileExt))
                 {
                     video.FileName.Value = filename;
