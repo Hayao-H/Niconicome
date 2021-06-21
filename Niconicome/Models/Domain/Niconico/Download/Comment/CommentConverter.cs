@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xml = Niconicome.Models.Domain.Niconico.Net.Xml.Comment;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
 using Utils = Niconicome.Models.Domain.Utils;
+using Xml = Niconicome.Models.Domain.Niconico.Net.Xml.Comment;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment
 {
@@ -56,7 +52,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 Chats = this.ConvertToXmlData(comments)
             };
 
-            if (settings.IsDownloadingLogEnable)
+            if (settings.IsDownloadingOwnerCommentEnable)
             {
                 this.GetOwnerComment(copy);
                 if (copy.Count > 0)
