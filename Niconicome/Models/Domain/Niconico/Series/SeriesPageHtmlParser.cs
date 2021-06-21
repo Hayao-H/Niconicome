@@ -1,0 +1,97 @@
+﻿using System;
+using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
+using System.Linq;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
+using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Niconico.Net.Html;
+using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Helper.Result.Generic;
+using Windows.Devices.Sensors;
+
+namespace Niconicome.Models.Domain.Niconico.Series
+{
+    public interface ISeriesPageHtmlParser
+    {
+        IAttemptResult<SeriesInfo> GetSeriesInfo(string source);
+    }
+
+    public class SeriesPageHtmlParser : ISeriesPageHtmlParser
+    {
+        /// <summary>
+        /// シリーズページを解析して情報を取得
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public IAttemptResult<SeriesInfo> GetSeriesInfo(string source)
+        {
+
+            SeriesInfo info;
+
+            try
+            {
+                info = this.AnalyzePage(source);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<SeriesInfo>() { Exception = e, Message = $"シリーズページ情報の解析に失敗しました。(詳細：{e.Message})" };
+            }
+
+            return new AttemptResult<SeriesInfo>() { IsSucceeded = true, Data = info };
+
+        }
+
+        /// <summary>
+        /// ページを解析してJSONを取得する
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        private SeriesInfo AnalyzePage(string source)
+        {
+            var series = new SeriesInfo();
+
+            IHtmlDocument document = HtmlParser.ParseDocument(source);
+            IHtmlCollection<IElement> videos = document.QuerySelectorAll(".SeriesVideoListContainer-video");
+
+            IElement? ownerElm = document.QuerySelector(".SeriesAdditionalContainer-ownerName");
+            string ownerName = ownerElm?.InnerHtml ?? string.Empty;
+            int ownerID = int.Parse((ownerElm?.GetAttribute("href").Split("/")[^1]) ?? "0");
+
+            string seriesName = document.QuerySelector(".SeriesDetailContainer-bodyTitle")?.InnerHtml ?? string.Empty;
+            series.SeriesName = seriesName;
+
+            foreach (var videoElm in videos)
+            {
+                string id = videoElm.GetAttribute("data-video-itemdata-video-id");
+
+                if (string.IsNullOrEmpty(id)) continue;
+
+                string title = videoElm.QuerySelector(".VideoMediaObject-title a")?.InnerHtml.Trim() ?? string.Empty;
+
+                DateTime uploadedDT = DateTime.ParseExact(videoElm.QuerySelector(".SeriesVideoListContainer-videoRegisteredAt")?.InnerHtml.Trim() ?? "2000/01/01 00:00 投稿", "yyyy/MM/dd HH:mm 投稿", null);
+
+                long.TryParse(videoElm.QuerySelector(".VideoMetaCount-view")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long viewCount);
+                long.TryParse(videoElm.QuerySelector(".VideoMetaCount-mylist")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long mylistCount);
+                long.TryParse(videoElm.QuerySelector(".VideoMetaCount-comment")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long commentCount);
+
+                var videoinfo = new SeriesVideoInfo()
+                {
+                    Title = title,
+                    ID = id,
+                    UserID = ownerID,
+                    UserName = ownerName,
+                    UploadedDT = uploadedDT,
+                    ViewCount = viewCount,
+                    CommentCount = commentCount,
+                    MylistCount = mylistCount,
+                };
+
+                series.SeriesVideos.Add(videoinfo);
+
+            }
+
+            return series;
+        }
+    }
+}
