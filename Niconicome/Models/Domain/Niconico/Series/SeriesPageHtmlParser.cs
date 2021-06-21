@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Diagnostics.Eventing.Reader;
 using System.Globalization;
-using System.Linq;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Net.Html;
-using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Helper.Result.Generic;
-using Windows.Devices.Sensors;
 
 namespace Niconicome.Models.Domain.Niconico.Series
 {
