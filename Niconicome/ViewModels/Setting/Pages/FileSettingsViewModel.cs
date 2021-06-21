@@ -42,6 +42,8 @@ namespace Niconicome.ViewModels.Setting.Pages
             }).AddTo(this.disposables);
             this.VideoInfoSuffix.Subscribe(value => this.SaveSetting(value, SettingsEnum.VideoinfoSuffix)).AddTo(this.disposables);
             this.IchibaSuffix.Subscribe(value => this.SaveSetting(value, SettingsEnum.IchibaInfoSuffix)).AddTo(this.disposables);
+
+            this.IsSearchingVideosByIDEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.SearchFileByID);
         }
 
         /// <summary>
@@ -79,7 +81,13 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// 市場情報の接尾子
         /// </summary>
-        public ReactiveProperty<string> IchibaSuffix { get; init; } 
+        public ReactiveProperty<string> IchibaSuffix { get; init; }
+
+        /// <summary>
+        /// 動画をIDで探索する
+        /// </summary>
+        public ReactiveProperty<bool> IsSearchingVideosByIDEnable { get; init; }
+
 
     }
 
@@ -102,6 +110,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public ReactiveProperty<string> IchibaSuffix { get; init; } = new(Format.DefaultIchibaSuffix);
 
+        public ReactiveProperty<bool> IsSearchingVideosByIDEnable { get; init; } = new(true);
 
     }
 }

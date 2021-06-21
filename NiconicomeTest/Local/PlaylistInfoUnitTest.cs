@@ -149,6 +149,17 @@ namespace NiconicomeTest.Local.Playlist
             Assert.AreEqual(result, isLastChild);
 
         }
+
+        [Test]
+        public void 親プレイリストのリストを取得する()
+        {
+            List<string> ancester = this.handler!.GetListOfAncestor(5);
+
+            Assert.That(ancester[0], Is.EqualTo("一"));
+            Assert.That(ancester[1], Is.EqualTo("二"));
+            Assert.That(ancester[2], Is.EqualTo("四"));
+            Assert.That(ancester[3], Is.EqualTo("五"));
+        }
     }
 
     class VideoFilterUnitTest
