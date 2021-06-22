@@ -15,7 +15,7 @@ namespace Niconicome.Models.Playlist.Playlist
     public interface ITreePlaylistInfo : IClonable<ITreePlaylistInfo>
     {
         int Id { get; set; }
-        ReactiveProperty<string> Name { get;  }
+        ReactiveProperty<string> Name { get; }
         string RemoteId { get; set; }
         string Folderpath { get; set; }
         ObservableCollection<ITreePlaylistInfo> Children { get; }
@@ -233,19 +233,19 @@ namespace Niconicome.Models.Playlist.Playlist
         /// <param name="newPlaylist"></param>
         public void UpdateData(ITreePlaylistInfo newPlaylist)
         {
-            this.Name.Value= newPlaylist.Name.Value;
-            this.IsRemotePlaylist= newPlaylist.IsRemotePlaylist;
-            this.RemoteType= newPlaylist.RemoteType;
-            this.RemoteId= newPlaylist.RemoteId;
-            this.Folderpath= newPlaylist.Folderpath;
-            this.IsExpanded= newPlaylist.IsExpanded;
-            this.VideoSortType= newPlaylist.VideoSortType;
+            this.Name.Value = newPlaylist.Name.Value;
+            this.IsRemotePlaylist = newPlaylist.IsRemotePlaylist;
+            this.RemoteType = newPlaylist.RemoteType;
+            this.RemoteId = newPlaylist.RemoteId;
+            this.Folderpath = newPlaylist.Folderpath;
+            this.IsExpanded = newPlaylist.IsExpanded;
+            this.VideoSortType = newPlaylist.VideoSortType;
             this.CustomSortSequence.Clear();
             this.CustomSortSequence.AddRange(newPlaylist.CustomSortSequence);
-            this.IsVideoDescending= newPlaylist.IsVideoDescending;
-            this.IsDownloadFailedHistory= newPlaylist.IsDownloadFailedHistory;
-            this.IsDownloadSucceededHistory= newPlaylist.IsDownloadSucceededHistory;
-            this.IsTemporary= newPlaylist.IsTemporary;
+            this.IsVideoDescending = newPlaylist.IsVideoDescending;
+            this.IsDownloadFailedHistory = newPlaylist.IsDownloadFailedHistory;
+            this.IsDownloadSucceededHistory = newPlaylist.IsDownloadSucceededHistory;
+            this.IsTemporary = newPlaylist.IsTemporary;
             this.BookMarkedVideoID = newPlaylist.BookMarkedVideoID;
         }
 
@@ -261,7 +261,7 @@ namespace Niconicome.Models.Playlist.Playlist
             playlistInfo.IsRoot = dbPlaylist.IsRoot;
             playlistInfo.Name.Value = dbPlaylist.PlaylistName ?? string.Empty;
             playlistInfo.IsRemotePlaylist = dbPlaylist.IsRemotePlaylist;
-            playlistInfo.RemoteType = dbPlaylist.IsMylist ? RemoteType.Mylist : dbPlaylist.IsUserVideos ? RemoteType.UserVideos : dbPlaylist.IsWatchLater ? RemoteType.WatchLater : dbPlaylist.IsChannel ? RemoteType.Channel : RemoteType.None;
+            playlistInfo.RemoteType = dbPlaylist.IsMylist ? RemoteType.Mylist : dbPlaylist.IsUserVideos ? RemoteType.UserVideos : dbPlaylist.IsWatchLater ? RemoteType.WatchLater : dbPlaylist.IsChannel ? RemoteType.Channel : dbPlaylist.IsSeries ? RemoteType.Series : RemoteType.None;
             playlistInfo.RemoteId = dbPlaylist.RemoteId ?? string.Empty;
             playlistInfo.Folderpath = dbPlaylist.FolderPath ?? string.Empty;
             playlistInfo.IsExpanded = dbPlaylist.IsExpanded;

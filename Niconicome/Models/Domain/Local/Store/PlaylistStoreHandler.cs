@@ -434,24 +434,35 @@ namespace Niconicome.Models.Domain.Local.Store
                         playlist.IsUserVideos = false;
                         playlist.IsWatchLater = false;
                         playlist.IsChannel = false;
+                        playlist.IsSeries = false;
                         break;
                     case RemoteType.UserVideos:
                         playlist.IsUserVideos = true;
                         playlist.IsMylist = false;
                         playlist.IsWatchLater = false;
                         playlist.IsChannel = false;
+                        playlist.IsSeries = false;
                         break;
                     case RemoteType.WatchLater:
                         playlist.IsUserVideos = false;
                         playlist.IsMylist = false;
                         playlist.IsWatchLater = true;
                         playlist.IsChannel = false;
+                        playlist.IsSeries = false;
                         break;
                     case RemoteType.Channel:
                         playlist.IsUserVideos = false;
                         playlist.IsMylist = false;
                         playlist.IsWatchLater = false;
                         playlist.IsChannel = true;
+                        playlist.IsSeries = false;
+                        break;
+                    case RemoteType.Series:
+                        playlist.IsUserVideos = false;
+                        playlist.IsMylist = false;
+                        playlist.IsWatchLater = false;
+                        playlist.IsChannel = false;
+                        playlist.IsSeries = true;
                         break;
                 }
                 this.Update(playlist);
@@ -476,6 +487,8 @@ namespace Niconicome.Models.Domain.Local.Store
                 playlist.IsMylist = false;
                 playlist.IsUserVideos = false;
                 playlist.IsWatchLater = false;
+                playlist.IsChannel = false;
+                playlist.IsSeries = false;
                 this.Update(playlist);
                 this.logger.Log($"{playlistId}をローカルプレイリストに設定しました。");
             }

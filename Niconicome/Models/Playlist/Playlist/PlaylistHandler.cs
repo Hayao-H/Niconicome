@@ -197,6 +197,7 @@ namespace Niconicome.Models.Playlist.Playlist
                     RemoteType.UserVideos => $"{name}さんの投稿動画",
                     RemoteType.WatchLater => "あとで見る",
                     RemoteType.Channel => name,
+                    RemoteType.Series => name,
                     _ => name,
                 };
 

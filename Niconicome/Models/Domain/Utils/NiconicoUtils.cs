@@ -183,6 +183,10 @@ namespace Niconicome.Models.Domain.Utils
             {
                 return RemoteType.WatchPage;
             }
+            else if (Regex.IsMatch(url, @"https?://(www\.)?nicovideo\.jp/series/\d+.*"))
+            {
+                return RemoteType.Series;
+            }
 
             throw new InvalidOperationException("ニコニコ動画のURLではありません。");
         }
@@ -200,7 +204,7 @@ namespace Niconicome.Models.Domain.Utils
                 url = url[0..li];
             }
 
-            if (type is RemoteType.Channel or RemoteType.Mylist or RemoteType.WatchPage)
+            if (type is RemoteType.Channel or RemoteType.Mylist or RemoteType.WatchPage or RemoteType.Series)
             {
                 var splited = url.Split("/");
                 if (!splited[^1].IsNullOrEmpty())

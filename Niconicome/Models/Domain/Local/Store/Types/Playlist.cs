@@ -47,6 +47,8 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public bool IsChannel { get; set; }
 
+        public bool IsSeries { get; set; }
+
         public bool IsExpanded { get; set; }
 
         public  bool IsVideoDescending { get; set; }
