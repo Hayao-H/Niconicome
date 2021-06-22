@@ -6,18 +6,17 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
-using Playlist = Niconicome.Models.Playlist;
-using Watch = Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Domain.Utils
 {
     public interface INiconicoUtils
     {
         List<string> GetNiconicoIdsFromText(string source);
-        string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null);
-        string GetFileName(string format, Playlist::IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null);
+        string GetFileName(string format, IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null);
+        string GetFileName(string format, IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null);
         string GetIdFromFIleName(string format, string filenameWithExt);
         string GetIdFromFIleName(string filenameWithExt);
         bool IsNiconicoID(string testString);
@@ -46,7 +45,7 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="format"></param>
         /// <param name="session"></param>
         /// <returns></returns>
-        public string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null)
+        public string GetFileName(string format, IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null)
         {
             var info = new VideoInfoForPath()
             {
@@ -70,7 +69,7 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="replaceStricted"></param>
         /// <param name="suffix"></param>
         /// <returns></returns>
-        public string GetFileName(string format, Playlist::IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null)
+        public string GetFileName(string format, IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null)
         {
             var info = new VideoInfoForPath()
             {

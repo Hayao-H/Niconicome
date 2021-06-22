@@ -1,10 +1,10 @@
-using NUnit.Framework;
-using Niconicome.Models.Domain.Niconico.Download.Comment;
-using Niconicome.Models.Domain.Niconico.Watch;
 using System.Net.Http;
-using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using System.Threading.Tasks;
-using System;
+using Niconicome.Models.Domain.Niconico.Download.Comment;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
+using Niconicome.Models.Domain.Niconico.Watch;
+using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
+using NUnit.Framework;
 
 namespace NiconicomeTest.NetWork.Download.Comment
 {

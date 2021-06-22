@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Api = Niconicome.Models.Domain.Niconico.Net.Json.API.Search;

@@ -1,18 +1,12 @@
-using NUnit.Framework;
 using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Niconicome.Models.Domain.Niconico.Watch;
-using Microsoft.Extensions.DependencyInjection;
-using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Domain.Niconico.Download.Video;
-using Niconicome.Models.Domain.Niconico;
-using Niconicome.Extensions.System.List;
-using Niconicome.Models.Playlist;
-using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using System.Net.Http;
-using NiconicomeTest.Stabs.Models.Domain.Utils;
+using System.Threading.Tasks;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
+using Niconicome.Models.Domain.Niconico.Watch;
 using NiconicomeTest.Stabs.Models.Domain.Niconico;
+using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
+using NUnit.Framework;
 
 namespace NiconicomeTest.NetWork
 {

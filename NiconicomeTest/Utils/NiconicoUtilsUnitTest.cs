@@ -4,6 +4,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace NiconicomeTest.Utils
 {
