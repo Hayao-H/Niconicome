@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Niconicome.Models.Domain.Niconico.Series
+namespace Niconicome.Models.Domain.Niconico.Remote.Series
 {
     public class SeriesInfo
     {

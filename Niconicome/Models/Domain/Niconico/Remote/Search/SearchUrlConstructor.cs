@@ -10,8 +10,9 @@ using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Const;
 using System.Web;
+using Niconicome.Models.Domain.Niconico.Search;
 
-namespace Niconicome.Models.Domain.Niconico.Search
+namespace Niconicome.Models.Domain.Niconico.Remote.Search
 {
 
     public interface ISearchUrlConstructor
@@ -51,7 +52,8 @@ namespace Niconicome.Models.Domain.Niconico.Search
             if (!query.SortOption.IsAscending)
             {
                 sort = "-" + sort;
-            } else
+            }
+            else
             {
                 sort = HttpUtility.UrlEncode("+") + sort;
             }

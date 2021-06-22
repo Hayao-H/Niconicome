@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Niconicome.Models.Domain.Niconico.Video.Channel
+namespace Niconicome.Models.Domain.Niconico.Remote.Channel
 {
     public interface IChannelPageInfo
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Niconico.Series;
+using Niconicome.Models.Domain.Niconico.Remote.Series;
 using Niconicome.Models.Helper.Result.Generic;
 using NUnit.Framework;
 

@@ -5,7 +5,7 @@ using AngleSharp.Html.Dom;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Helper.Result.Generic;
 
-namespace Niconicome.Models.Domain.Niconico.Series
+namespace Niconicome.Models.Domain.Niconico.Remote.Series
 {
     public interface ISeriesPageHtmlParser
     {

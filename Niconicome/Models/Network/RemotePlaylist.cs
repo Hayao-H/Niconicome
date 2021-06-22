@@ -2,18 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Local.Playlist;
+using Niconicome.Models.Domain.Niconico.Remote.Channel;
+using Niconicome.Models.Domain.Niconico.Remote.Search;
 using Niconicome.Models.Domain.Niconico.Search;
-using Niconicome.Models.Domain.Niconico.Video.Channel;
 using Niconicome.Models.Helper.Result.Generic;
-using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
-using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
-using Playlist = Niconicome.Models.Playlist;
-using Search = Niconicome.Models.Domain.Niconico.Search;
+using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 
 namespace Niconicome.Models.Network
@@ -21,13 +17,13 @@ namespace Niconicome.Models.Network
 
     public interface IRemotePlaylistHandler
     {
-        Task<IAttemptResult<string>> TryGetRemotePlaylistAsync(string id, List<Playlist::IListVideoInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage);
+        Task<IAttemptResult<string>> TryGetRemotePlaylistAsync(string id, List<IListVideoInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage);
         Task<IAttemptResult<IEnumerable<IListVideoInfo>>> TrySearchVideosAsync(ISearchQuery query);
     }
 
     public class RemotePlaylistHandler : IRemotePlaylistHandler
     {
-        public RemotePlaylistHandler(Mylist::IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Search::ISearch search, Mylist::IWatchLaterHandler watchLaterHandler, IChannelVideoHandler channelVideoHandler, INetworkVideoHandler networkVideoHandler, IDomainModelConverter converter)
+        public RemotePlaylistHandler(Mylist::IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, ISearch search, Mylist::IWatchLaterHandler watchLaterHandler, IChannelVideoHandler channelVideoHandler, INetworkVideoHandler networkVideoHandler, IDomainModelConverter converter)
         {
             this.mylistHandler = mylistHandler;
             this.userHandler = userHandler;
@@ -52,7 +48,7 @@ namespace Niconicome.Models.Network
         /// <summary>
         /// 検索
         /// </summary>
-        private readonly Search::ISearch searchClient;
+        private readonly ISearch searchClient;
 
         /// <summary>
         /// 「後で見る」のハンドラ
@@ -84,7 +80,7 @@ namespace Niconicome.Models.Network
         /// <param name="registeredVideo"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<string>> TryGetRemotePlaylistAsync(string id, List<Playlist::IListVideoInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        public async Task<IAttemptResult<string>> TryGetRemotePlaylistAsync(string id, List<IListVideoInfo> videos, RemoteType remoteType, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
             var result = remoteType switch
             {
@@ -104,7 +100,7 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<string>> TryGetMylistVideosAsync(string id, List<Playlist::IListVideoInfo> videos)
+        public async Task<IAttemptResult<string>> TryGetMylistVideosAsync(string id, List<IListVideoInfo> videos)
         {
             IAttemptResult<string> result;
 
@@ -127,7 +123,7 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<string>> TryGetUserVideosAsync(string id, List<Playlist::IListVideoInfo> videos)
+        public async Task<IAttemptResult<string>> TryGetUserVideosAsync(string id, List<IListVideoInfo> videos)
         {
             IAttemptResult<string> result;
 
@@ -152,7 +148,7 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> TrySearchVideosAsync(ISearchQuery query)
         {
-            Search::ISearchResult searchResult;
+            ISearchResult searchResult;
             try
             {
                 searchResult = await this.searchClient.SearchAsync(query);
@@ -187,7 +183,7 @@ namespace Niconicome.Models.Network
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<string>> TryGetWatchLaterAsync(List<Playlist::IListVideoInfo> videos)
+        public async Task<IAttemptResult<string>> TryGetWatchLaterAsync(List<IListVideoInfo> videos)
         {
             IAttemptResult<string> result;
 
@@ -210,7 +206,7 @@ namespace Niconicome.Models.Network
         /// <param name="id"></param>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<string>> TryGetChannelVideosAsync(string id, List<Playlist::IListVideoInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        public async Task<IAttemptResult<string>> TryGetChannelVideosAsync(string id, List<IListVideoInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
 
             var ids = new List<string>();
