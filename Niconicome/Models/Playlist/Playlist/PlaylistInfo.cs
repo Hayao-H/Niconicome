@@ -331,6 +331,7 @@ namespace Niconicome.Models.Playlist.Playlist
         UserVideos,
         WatchLater,
         Channel,
-        WatchPage
+        WatchPage,
+        Series,
     }
 }
