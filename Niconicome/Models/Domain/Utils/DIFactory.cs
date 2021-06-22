@@ -43,6 +43,7 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using Style = Niconicome.Models.Domain.Local.Style;
+using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -186,7 +187,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Style::IUserChromeHandler, Style::UserChromeHandler>();
             services.AddSingleton<State::IStyleHandler, State::StyleHandler>();
             services.AddSingleton<Settings::ILocalSettingsContainer, Settings::LocalSettingsContainer>();
-
+            services.AddTransient<Series::ISeriesHandler, Series::SeriesHandler>();
+            services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
             return services.BuildServiceProvider();
         }
 

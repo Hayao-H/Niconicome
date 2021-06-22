@@ -22,7 +22,7 @@ namespace Niconicome.Models.Network
 
     public class RemotePlaylistHandler : IRemotePlaylistHandler
     {
-        public RemotePlaylistHandler(Remote::Mylist.MylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Remote::Search.ISearch search, Remote::Mylist.IWatchLaterHandler watchLaterHandler, Remote::Channel.IChannelVideoHandler channelVideoHandler, INetworkVideoHandler networkVideoHandler, IDomainModelConverter converter, Remote::Series.ISeriesHandler seriesHandler,ILogger logger)
+        public RemotePlaylistHandler(Remote::Mylist.IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Remote::Search.ISearch search, Remote::Mylist.IWatchLaterHandler watchLaterHandler, Remote::Channel.IChannelVideoHandler channelVideoHandler, INetworkVideoHandler networkVideoHandler, IDomainModelConverter converter, Remote::Series.ISeriesHandler seriesHandler,ILogger logger)
         {
             this.mylistHandler = mylistHandler;
             this.userHandler = userHandler;
