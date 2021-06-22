@@ -63,6 +63,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
                 if (string.IsNullOrEmpty(id)) continue;
 
                 string title = videoElm.QuerySelector(".VideoMediaObject-title a")?.InnerHtml.Trim() ?? string.Empty;
+                string thumb = videoElm.QuerySelector(".Thumbnail-image")?.GetAttribute("data-background-image") ?? string.Empty;
 
                 DateTime uploadedDT = DateTime.ParseExact(videoElm.QuerySelector(".SeriesVideoListContainer-videoRegisteredAt")?.InnerHtml.Trim() ?? "2000/01/01 00:00 投稿", "yyyy/MM/dd HH:mm 投稿", null);
 
@@ -80,6 +81,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
                     ViewCount = viewCount,
                     CommentCount = commentCount,
                     MylistCount = mylistCount,
+                    ThumbUrl = thumb
                 };
 
                 series.Videos.Add(videoinfo);

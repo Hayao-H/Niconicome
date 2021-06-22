@@ -91,6 +91,7 @@ namespace Niconicome.Models.Network.Watch
             listVideoInfo.ViewCount.Value = (int)remoteVideoInfo.ViewCount;
             listVideoInfo.CommentCount.Value = (int)remoteVideoInfo.CommentCount;
             listVideoInfo.MylistCount.Value = (int)remoteVideoInfo.MylistCount;
+            listVideoInfo.ThumbUrl.Value = remoteVideoInfo.ThumbUrl;
         }
 
     }

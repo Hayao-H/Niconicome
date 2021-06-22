@@ -41,6 +41,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     Playlist::RemoteType.UserVideos => userVideo,
                     Playlist::RemoteType.WatchLater => watchLater,
                     Playlist::RemoteType.Channel => channel,
+                    Playlist::RemoteType.Series => series,
                     _ => none
                 };
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace Niconicome.Models.Domain.Niconico.Remote
 {
@@ -20,6 +21,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote
         public string Title { get; set; } = string.Empty;
 
         public string OwnerName { get; set; } = string.Empty;
+
+        public string ThumbUrl { get; set; } = string.Empty;
 
         public DateTime UploadedDT { get; set; } = DateTime.Now;
 
