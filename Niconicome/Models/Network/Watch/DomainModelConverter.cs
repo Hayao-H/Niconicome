@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Niconico.Remote;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Playlist;
@@ -13,6 +14,8 @@ namespace Niconicome.Models.Network.Watch
     public interface IDomainModelConverter
     {
         void ConvertDomainVideoInfoToListVideoInfo(IListVideoInfo info, IDomainVideoInfo domainVideoInfo);
+
+        void ConvertRemoteVideoInfoToListVideoInfo(VideoInfo remoteVideoInfo, IListVideoInfo listVideoInfo);
     }
 
     public class DomainModelConverter : IDomainModelConverter
@@ -72,5 +75,23 @@ namespace Niconicome.Models.Network.Watch
             }
 
         }
+
+        /// <summary>
+        /// リモートプレイリストの動画情報を変換する
+        /// </summary>
+        /// <param name="remoteVideoInfo"></param>
+        /// <param name="listVideoInfo"></param>
+        public void ConvertRemoteVideoInfoToListVideoInfo(VideoInfo remoteVideoInfo, IListVideoInfo listVideoInfo)
+        {
+            listVideoInfo.NiconicoId.Value = remoteVideoInfo.ID;
+            listVideoInfo.Title.Value = remoteVideoInfo.Title;
+            listVideoInfo.OwnerName.Value = remoteVideoInfo.OwnerName;
+            listVideoInfo.OwnerID.Value = remoteVideoInfo.OwnerID;
+            listVideoInfo.UploadedOn.Value = remoteVideoInfo.UploadedDT;
+            listVideoInfo.ViewCount.Value = (int)remoteVideoInfo.ViewCount;
+            listVideoInfo.CommentCount.Value = (int)remoteVideoInfo.CommentCount;
+            listVideoInfo.MylistCount.Value = (int)remoteVideoInfo.MylistCount;
+        }
+
     }
 }

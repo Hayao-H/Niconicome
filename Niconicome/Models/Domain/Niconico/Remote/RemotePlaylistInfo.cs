@@ -19,11 +19,11 @@ namespace Niconicome.Models.Domain.Niconico.Remote
 
         public string Title { get; set; } = string.Empty;
 
-        public string UserName { get; set; } = string.Empty;
+        public string OwnerName { get; set; } = string.Empty;
 
         public DateTime UploadedDT { get; set; } = DateTime.Now;
 
-        public int UserID { get; set; }
+        public int OwnerID { get; set; }
 
         public long ViewCount { get; set; }
 

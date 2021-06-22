@@ -74,8 +74,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
                 {
                     Title = title,
                     ID = id,
-                    UserID = ownerID,
-                    UserName = ownerName,
+                    OwnerID = ownerID,
+                    OwnerName = ownerName,
                     UploadedDT = uploadedDT,
                     ViewCount = viewCount,
                     CommentCount = commentCount,
