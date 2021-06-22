@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DmcRequest = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request;
 
-namespace Niconicome.Models.Domain.Niconico.Video.Infomations
+namespace Niconicome.Models.Domain.Niconico.Watch
 {
 
     public interface ISessionInfo
