@@ -9,7 +9,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
 {
     public interface ISeriesHandler
     {
-        Task<IAttemptResult<SeriesInfo>> GetSeries(string id);
+        Task<IAttemptResult<RemotePlaylistInfo>> GetSeries(string id);
     }
 
     public class SeriesHandler : ISeriesHandler
@@ -36,7 +36,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<SeriesInfo>> GetSeries(string id)
+        public async Task<IAttemptResult<RemotePlaylistInfo>> GetSeries(string id)
         {
             IAttemptResult<string> netresult;
 
@@ -46,15 +46,15 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
             }
             catch (Exception e)
             {
-                return new AttemptResult<SeriesInfo>() { Message = $"シリーズページの取得に失敗しました。(詳細:{e.Message})" };
+                return new AttemptResult<RemotePlaylistInfo>() { Message = $"シリーズページの取得に失敗しました。(詳細:{e.Message})" };
             }
 
             if (!netresult.IsSucceeded || netresult.Data is null)
             {
-                return new AttemptResult<SeriesInfo>() { Message = netresult.Message, Exception = netresult.Exception };
+                return new AttemptResult<RemotePlaylistInfo>() { Message = netresult.Message, Exception = netresult.Exception };
             }
 
-            IAttemptResult<SeriesInfo> infoResult;
+            IAttemptResult<RemotePlaylistInfo> infoResult;
 
             try
             {
@@ -62,7 +62,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
             }
             catch (Exception e)
             {
-                return new AttemptResult<SeriesInfo>() { Message = $"シリーズページの解析に失敗しました。(詳細:{e.Message})" };
+                return new AttemptResult<RemotePlaylistInfo>() { Message = $"シリーズページの解析に失敗しました。(詳細:{e.Message})" };
             }
 
             return infoResult;

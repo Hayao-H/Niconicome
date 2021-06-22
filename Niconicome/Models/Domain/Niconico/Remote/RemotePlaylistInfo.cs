@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Domain.Niconico.Remote
 {
-    class RemotePlaylistInfo
+    public class RemotePlaylistInfo
     {
+        public List<VideoInfo> Videos { get; init; } = new();
+
+        public string PlaylistName { get; set; } = string.Empty;
     }
 
     public class VideoInfo

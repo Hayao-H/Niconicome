@@ -9,7 +9,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
 {
     public interface ISeriesPageHtmlParser
     {
-        IAttemptResult<SeriesInfo> GetSeriesInfo(string source);
+        IAttemptResult<RemotePlaylistInfo> GetSeriesInfo(string source);
     }
 
     public class SeriesPageHtmlParser : ISeriesPageHtmlParser
@@ -19,10 +19,10 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public IAttemptResult<SeriesInfo> GetSeriesInfo(string source)
+        public IAttemptResult<RemotePlaylistInfo> GetSeriesInfo(string source)
         {
 
-            SeriesInfo info;
+            RemotePlaylistInfo info;
 
             try
             {
@@ -30,10 +30,10 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
             }
             catch (Exception e)
             {
-                return new AttemptResult<SeriesInfo>() { Exception = e, Message = $"シリーズページ情報の解析に失敗しました。(詳細：{e.Message})" };
+                return new AttemptResult<RemotePlaylistInfo>() { Exception = e, Message = $"シリーズページ情報の解析に失敗しました。(詳細：{e.Message})" };
             }
 
-            return new AttemptResult<SeriesInfo>() { IsSucceeded = true, Data = info };
+            return new AttemptResult<RemotePlaylistInfo>() { IsSucceeded = true, Data = info };
 
         }
 
@@ -42,9 +42,9 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        private SeriesInfo AnalyzePage(string source)
+        private RemotePlaylistInfo AnalyzePage(string source)
         {
-            var series = new SeriesInfo();
+            var series = new RemotePlaylistInfo();
 
             IHtmlDocument document = HtmlParser.ParseDocument(source);
             IHtmlCollection<IElement> videos = document.QuerySelectorAll(".SeriesVideoListContainer-video");
@@ -54,7 +54,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
             int ownerID = int.Parse((ownerElm?.GetAttribute("href").Split("/")[^1]) ?? "0");
 
             string seriesName = document.QuerySelector(".SeriesDetailContainer-bodyTitle")?.InnerHtml ?? string.Empty;
-            series.SeriesName = seriesName;
+            series.PlaylistName = seriesName;
 
             foreach (var videoElm in videos)
             {
@@ -70,7 +70,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
                 long.TryParse(videoElm.QuerySelector(".VideoMetaCount-mylist")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long mylistCount);
                 long.TryParse(videoElm.QuerySelector(".VideoMetaCount-comment")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long commentCount);
 
-                var videoinfo = new SeriesVideoInfo()
+                var videoinfo = new VideoInfo()
                 {
                     Title = title,
                     ID = id,
@@ -82,7 +82,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
                     MylistCount = mylistCount,
                 };
 
-                series.SeriesVideos.Add(videoinfo);
+                series.Videos.Add(videoinfo);
 
             }
 
