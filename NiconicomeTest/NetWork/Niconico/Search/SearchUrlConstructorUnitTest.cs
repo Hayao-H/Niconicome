@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Niconico.Remote.Search;
 using Niconicome.Models.Domain.Niconico.Search;
 using NUnit.Framework;
 

@@ -2,7 +2,7 @@
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Auth = Niconicome.Models.Auth;
-using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
+using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
 using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
 using DlComment = Niconicome.Models.Domain.Niconico.Download.Comment;
@@ -27,13 +27,13 @@ using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 using MyApplication = Niconicome.Models.Local.Application;
-using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
+using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
-using Search = Niconicome.Models.Domain.Niconico.Search;
+using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
 using Settings = Niconicome.Models.Local.Settings;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
@@ -43,6 +43,7 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using Style = Niconicome.Models.Domain.Local.Style;
+using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -186,7 +187,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Style::IUserChromeHandler, Style::UserChromeHandler>();
             services.AddSingleton<State::IStyleHandler, State::StyleHandler>();
             services.AddSingleton<Settings::ILocalSettingsContainer, Settings::LocalSettingsContainer>();
-
+            services.AddTransient<Series::ISeriesHandler, Series::SeriesHandler>();
+            services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
             return services.BuildServiceProvider();
         }
 

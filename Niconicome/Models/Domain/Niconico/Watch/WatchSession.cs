@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
 using DmcRequest = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request;
 using DmcResponse = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Response;

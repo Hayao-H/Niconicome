@@ -4,6 +4,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace NiconicomeTest.Utils
 {
@@ -82,6 +83,7 @@ namespace NiconicomeTest.Utils
         [TestCase("https://www.nicovideo.jp/user/000/video?ref=pc_userpage_menud", RemoteType.UserVideos)]
         [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage)]
         [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage)]
+        [TestCase("https://www.nicovideo.jp/series/123", RemoteType.Series)]
         public void リモートプレイリストの種別を取得する(string url, RemoteType expectedType)
         {
             var type = this.utils!.GetRemoteType(url);
@@ -97,6 +99,7 @@ namespace NiconicomeTest.Utils
         [TestCase("https://www.nicovideo.jp/user/000/video/?ref=pc_userpage_menud", RemoteType.UserVideos, "000")]
         [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage, "sm9")]
         [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage, "sm9")]
+        [TestCase("https://www.nicovideo.jp/series/123", RemoteType.Series,"123")]
         public void リモートプレイリストのIDを取得する(string url, RemoteType type, string id)
         {
             var result = this.utils!.GetID(url, type);

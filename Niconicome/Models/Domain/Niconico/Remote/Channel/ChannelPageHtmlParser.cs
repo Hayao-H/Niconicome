@@ -6,7 +6,7 @@ using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Utils;
 
-namespace Niconicome.Models.Domain.Niconico.Video.Channel
+namespace Niconicome.Models.Domain.Niconico.Remote.Channel
 {
 
     public interface IChannelPageHtmlParser

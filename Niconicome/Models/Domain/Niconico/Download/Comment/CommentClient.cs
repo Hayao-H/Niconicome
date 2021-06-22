@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Net.Json;
-using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
 

@@ -14,7 +14,7 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
+        Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="Yu Gothic"
         x:Name="window"
         WindowStartupLocation="CenterOwner"
@@ -30,9 +30,19 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-            <ComboBox Margin="5 0" ItemsSource="{Binding NetworkSettings}" SelectedValue="{Binding CurrentSetting,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" Height="45" VerticalContentAlignment="Bottom" />
-            <TextBox Width="250" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding Id,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                    materialDesign:HintAssist.Hint="ID(「あとで見る」の場合は不要)"/>
+            <ComboBox Margin="5 0" 
+                      ItemsSource="{Binding NetworkSettings}"
+                      SelectedItem="{Binding RemoteType.Value}"
+                      DisplayMemberPath="DisplayValue" 
+                      Height="45" 
+                      VerticalContentAlignment="Bottom" />
+            <TextBox 
+                Width="250"
+                Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                Text="{Binding Id.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                materialDesign:HintAssist.Hint="ID(「あとで見る」の場合は不要)"
+                materialDesign:TextFieldAssist.HasClearButton="True"
+                />
         </StackPanel>
         <ScrollViewer Grid.Row="1">
             <TextBlock Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="8" FontSize="14" TextWrapping="Wrap" />

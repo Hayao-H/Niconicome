@@ -6,7 +6,7 @@ using Niconicome.Models.Playlist;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;
-using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
+using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 
 namespace NiconicomeTest.NetWork
 {

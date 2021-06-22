@@ -12,7 +12,7 @@ using Utils = Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Helper.Result.Generic;
 
-namespace Niconicome.Models.Domain.Niconico.Mylist
+namespace Niconicome.Models.Domain.Niconico.Remote.Mylist
 {
     public interface IMylistHandler
     {

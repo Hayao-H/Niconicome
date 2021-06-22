@@ -82,7 +82,7 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public bool IsValidThumbnailUrl(IListVideoInfo video)
         {
-            string deletedVideoUrl = VIdeoInfo.DeletedVideoThumb;
+            string deletedVideoUrl = Net.NiconicoDeletedVideothumb;
             return !(video.ThumbUrl.Value.IsNullOrEmpty() || video.ThumbUrl.Value == deletedVideoUrl);
         }
 

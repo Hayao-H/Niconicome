@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Request = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request;
 using WathJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
