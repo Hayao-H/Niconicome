@@ -6,7 +6,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
     public interface IResolution
     {
-        uint Vertical { get;  }
+        uint Vertical { get; }
         uint Horizontal { get; }
         static IResolution Default { get; } = new Resolution("480x360");
     }
@@ -14,7 +14,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
     /// <summary>
     /// 解像度クラス
     /// </summary>
-    public class Resolution:IResolution
+    public class Resolution : IResolution
     {
         /// <summary>
         /// 高さ
