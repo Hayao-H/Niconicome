@@ -62,6 +62,28 @@ namespace Niconicome.ViewModels.Mainpage
                 }, x => x.Value)
                 .AddTo(this.disposables);
 
+            #region サムネ
+
+            var t1 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Large, "大");
+            var t2 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Middle, "中");
+            var t3 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Normal, "普通");
+            var t4 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Player, "プレーヤー");
+
+            this.ThumbSizes = new List<ComboboxItem<VideoInfo.ThumbSize>>() { t1, t2, t3, t4 };
+            this.SelectedThumbSize = WS::Mainpage.DownloadSettingsHandler.ThumbnailSize
+                .ToReactivePropertyAsSynchronized(
+                x => x.Value,
+                x => x switch
+                {
+                    VideoInfo::ThumbSize.Large => t1,
+                    VideoInfo::ThumbSize.Middle => t2,
+                    VideoInfo::ThumbSize.Normal => t3,
+                    _ => t4
+                }, x => x.Value)
+                .AddTo(this.disposables);
+
+            #endregion
+
             this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
 
             this.IsDownloading = WS::Mainpage.Videodownloader.CanDownload
@@ -228,9 +250,19 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<ComboboxItem<VideoInfo::IResolution>> SelectedResolution { get; init; }
 
         /// <summary>
+        /// サムネイルサイズ
+        /// </summary>
+        public ReactiveProperty<ComboboxItem<VideoInfo::ThumbSize>> SelectedThumbSize { get; init; }
+
+        /// <summary>
         /// 解像度一覧
         /// </summary>
         public List<ComboboxItem<VideoInfo::IResolution>> Resolutions { get; init; }
+
+        /// <summary>
+        /// サムネイルサイズ一覧
+        /// </summary>
+        public List<ComboboxItem<VideoInfo::ThumbSize>> ThumbSizes { get; init; }
 
         /// <summary>
         /// スナックバー
@@ -318,6 +350,14 @@ namespace Niconicome.ViewModels.Mainpage
             this.Resolutions = new List<ComboboxItem<VideoInfo::IResolution>>() { s1, s2, s3, s4, s5 };
 
             this.SelectedResolution = new ReactiveProperty<ComboboxItem<VideoInfo::IResolution>>(s1);
+
+            var t1 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Large, "大");
+            var t2 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Middle, "中");
+            var t3 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Normal, "普通");
+            var t4 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Player, "プレーヤー");
+
+            this.ThumbSizes = new List<ComboboxItem<VideoInfo.ThumbSize>>() { t1, t2, t3, t4 };
+            this.SelectedThumbSize = new ReactiveProperty<ComboboxItem<VideoInfo::ThumbSize>>(t1);
         }
 
         public ReactiveProperty<bool> IsDownloading { get; init; } = new();
@@ -359,6 +399,10 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<ComboboxItem<VideoInfo::IResolution>> SelectedResolution { get; set; }
 
         public List<ComboboxItem<VideoInfo::IResolution>> Resolutions { get; init; }
+
+        public ReactiveProperty<ComboboxItem<VideoInfo::ThumbSize>> SelectedThumbSize { get; init; }
+
+        public List<ComboboxItem<VideoInfo::ThumbSize>> ThumbSizes { get; init; }
 
         public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
     }
