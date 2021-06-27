@@ -188,6 +188,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.MWBookMarkColumnWid => STypes::SettingNames.MainWindowBookMarkColumnWidth,
                 SettingsEnum.FFmpegFormat => STypes::SettingNames.FFmpegFormat,
                 SettingsEnum.SearchFileByID => STypes::SettingNames.SearchVideosByID,
+                SettingsEnum.ThumbSize => STypes::SettingNames.ThumbnailSize,
                 _ => null
             };
         }
@@ -266,5 +267,6 @@ namespace Niconicome.Models.Local.Settings
         ConfirmIfDownloading,
         FFmpegFormat,
         SearchFileByID,
+        ThumbSize,
     }
 }

@@ -177,5 +177,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string ConfirmIfDownloading { get; private set; } = "confirmifdownloading";
         public static string FFmpegFormat { get; private set; } = "ffmpegformat";
         public static string SearchVideosByID { get; private set; } = "searchvideosbyid";
+        public static string ThumbnailSize { get; private set; } = "thumbnailsize";
     }
 }

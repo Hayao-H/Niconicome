@@ -29,7 +29,7 @@ namespace Niconicome.Models.Network.Download
         ReactiveProperty<bool> IsNoEncodeEnable { get; }
         ReactiveProperty<int> MaxCommentsCount { get; }
         ReactiveProperty<VideoInfo::IResolution> Resolution { get; }
-
+        ReactiveProperty<VideoInfo::ThumbSize> ThumbnailSize { get; }
         DownloadSettings CreateDownloadSettings();
     }
 
@@ -56,6 +56,7 @@ namespace Niconicome.Models.Network.Download
             this.MaxCommentsCount = new ReactiveProperty<int>(this.settingHandler.GetIntSetting(SettingsEnum.MaxCommentsCount)).AddTo(this.disposables);
             this.IsNoEncodeEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlWithoutEncode)).AddTo(this.disposables);
             this.IsDownloadingIchibaInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlIchiba)).AddTo(this.disposables);
+            this.ThumbnailSize = new ReactiveProperty<VideoInfo::ThumbSize>(this.enumSettingsHandler.GetSetting<VideoInfo::ThumbSize>());
 
             this.IsDownloadingVideoInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideoInfo));
             this.IsDownloadingVideoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideo));
@@ -71,6 +72,7 @@ namespace Niconicome.Models.Network.Download
             this.MaxCommentsCount.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.MaxCommentsCount));
             this.IsNoEncodeEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DlWithoutEncode));
             this.IsDownloadingIchibaInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DlIchiba));
+            this.ThumbnailSize.Subscribe(value => this.enumSettingsHandler.SaveSetting(value));
 
             this.Resolution = new ReactiveProperty<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"));
         }
@@ -229,5 +231,10 @@ namespace Niconicome.Models.Network.Download
         /// 解像度
         /// </summary>
         public ReactiveProperty<VideoInfo::IResolution> Resolution { get; init; }
+
+        /// <summary>
+        /// サムネイルサイズ
+        /// </summary>
+        public ReactiveProperty<VideoInfo::ThumbSize> ThumbnailSize { get; init; }
     }
 }
