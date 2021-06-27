@@ -27,15 +27,9 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         bool IsOfficial { get; set; }
         DateTime UploadedOn { get; set; }
         DateTime DownloadStartedOn { get; set; }
-        IThumbInfo ThumbInfo { get; }
+        IThumbInfo ThumbInfo { get; set; }
         ISessionInfo SessionInfo { get; }
         List<WatchJson::Thread> CommentThreads { get; }
-    }
-
-    public interface IThumbInfo
-    {
-        string? Large { get; set; }
-        string? Normal { get; set; }
     }
 
 
@@ -105,7 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// <summary>
         /// サムネイル
         /// </summary>
-        public IThumbInfo ThumbInfo { get; private set; } = new ThumbInfo();
+        public IThumbInfo ThumbInfo { get; set; } = new ThumbInfo();
 
         /// <summary>
         /// セッション情報
@@ -116,22 +110,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// コメントスレッド
         /// </summary>
         public List<WatchJson::Thread> CommentThreads { get; set; } = new();
-    }
-
-    /// <summary>
-    /// サムネイル情報
-    /// </summary>
-    public class ThumbInfo : IThumbInfo
-    {
-        /// <summary>
-        /// 大サムネイル
-        /// </summary>
-        public string? Large { get; set; }
-
-        /// <summary>
-        /// 通常
-        /// </summary>
-        public string? Normal { get; set; }
     }
 
 }

@@ -197,6 +197,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             }
 
             //サムネイル
+            if (original?.Video?.Thumbnail is not null)
+            {
+                info.ThumbInfo = new ThumbInfo(original.Video.Thumbnail);
+            }
             info.ThumbInfo.Large = original?.Video?.Thumbnail?.LargeUrl ?? (original?.Video?.Thumbnail?.Url ?? string.Empty);
             info.ThumbInfo.Normal = original?.Video?.Thumbnail?.MiddleUrl ?? (original?.Video?.Thumbnail?.Url ?? string.Empty);
 
