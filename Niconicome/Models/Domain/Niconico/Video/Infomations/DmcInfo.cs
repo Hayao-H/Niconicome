@@ -32,6 +32,12 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         List<WatchJson::Thread> CommentThreads { get; }
     }
 
+    public interface IThumbInfo
+    {
+        string? Large { get; set; }
+        string? Normal { get; set; }
+    }
+
 
     /// <summary>
     /// APi等へのアクセスに必要な情報を格納する
@@ -110,6 +116,22 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// コメントスレッド
         /// </summary>
         public List<WatchJson::Thread> CommentThreads { get; set; } = new();
+    }
+
+    /// <summary>
+    /// サムネイル情報
+    /// </summary>
+    public class ThumbInfo : IThumbInfo
+    {
+        /// <summary>
+        /// 大サムネイル
+        /// </summary>
+        public string? Large { get; set; }
+
+        /// <summary>
+        /// 通常
+        /// </summary>
+        public string? Normal { get; set; }
     }
 
 }
