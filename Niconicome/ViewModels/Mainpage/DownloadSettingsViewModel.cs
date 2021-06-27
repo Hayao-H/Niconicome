@@ -67,7 +67,7 @@ namespace Niconicome.ViewModels.Mainpage
             var t1 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Large, "大");
             var t2 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Middle, "中");
             var t3 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Normal, "普通");
-            var t4 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Player, "プレーヤー");
+            var t4 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Player, "プレイヤー");
 
             this.ThumbSizes = new List<ComboboxItem<VideoInfo.ThumbSize>>() { t1, t2, t3, t4 };
             this.SelectedThumbSize = WS::Mainpage.DownloadSettingsHandler.ThumbnailSize
@@ -354,7 +354,7 @@ namespace Niconicome.ViewModels.Mainpage
             var t1 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Large, "大");
             var t2 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Middle, "中");
             var t3 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Normal, "普通");
-            var t4 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Player, "プレーヤー");
+            var t4 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Player, "プレイヤー");
 
             this.ThumbSizes = new List<ComboboxItem<VideoInfo.ThumbSize>>() { t1, t2, t3, t4 };
             this.SelectedThumbSize = new ReactiveProperty<ComboboxItem<VideoInfo::ThumbSize>>(t1);
