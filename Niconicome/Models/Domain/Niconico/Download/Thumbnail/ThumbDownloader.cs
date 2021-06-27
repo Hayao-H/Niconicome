@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
+using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 {
@@ -31,6 +32,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         string Extension { get; }
         bool IsOverwriteEnable { get; }
         bool IsReplaceStrictedEnable { get; }
+        VideoInfo::ThumbSize ThumbSize { get; }
     }
 
     /// <summary>
@@ -63,16 +65,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 
 
             string? thumbUrl;
-            if (!(session.Video!.DmcInfo.ThumbInfo.Large?.IsNullOrEmpty() ?? true))
+            try
             {
-                thumbUrl = session.Video!.DmcInfo.ThumbInfo.Large;
+                thumbUrl = session.Video!.DmcInfo.ThumbInfo.GetSpecifiedThumbnail(settings.ThumbSize);
             }
-            else if (!(session.Video!.DmcInfo.ThumbInfo.Normal?.IsNullOrEmpty() ?? true))
+            catch (Exception e)
             {
-                thumbUrl = session.Video!.DmcInfo.ThumbInfo.Normal;
-            }
-            else
-            {
+                this.logger.Error($"サムネイルURLの取得に失敗しました。", e);
                 return new DownloadResult() { Issucceeded = false, Message = "サムネイルのURLを取得できませんでした。" };
             }
 
@@ -201,6 +200,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 
         public bool IsReplaceStrictedEnable { get; set; }
 
+        public VideoInfo::ThumbSize ThumbSize { get; set; }
 
     }
 

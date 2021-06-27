@@ -99,6 +99,7 @@ namespace Niconicome.Models.Playlist.VideoList
             bool searchByID = this.settingHandler.GetBoolSetting(SettingsEnum.SearchFileByID);
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
+            this.localVideoUtils.ClearCache();
 
             foreach (var originVideo in originalVideos)
             {

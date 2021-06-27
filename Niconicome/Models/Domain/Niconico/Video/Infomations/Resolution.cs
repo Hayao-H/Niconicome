@@ -8,7 +8,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
     {
         uint Vertical { get; }
         uint Horizontal { get; }
-        static IResolution Default { get; } = new Resolution("480x360");
     }
 
     /// <summary>

@@ -27,7 +27,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         bool IsOfficial { get; set; }
         DateTime UploadedOn { get; set; }
         DateTime DownloadStartedOn { get; set; }
-        IThumbInfo ThumbInfo { get; }
+        IThumbInfo ThumbInfo { get; set; }
         ISessionInfo SessionInfo { get; }
         List<WatchJson::Thread> CommentThreads { get; }
     }
@@ -99,7 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// <summary>
         /// サムネイル
         /// </summary>
-        public IThumbInfo ThumbInfo { get; private set; } = new ThumbInfo();
+        public IThumbInfo ThumbInfo { get; set; } = new ThumbInfo();
 
         /// <summary>
         /// セッション情報

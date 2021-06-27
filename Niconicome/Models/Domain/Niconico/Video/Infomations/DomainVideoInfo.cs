@@ -19,12 +19,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         IDmcInfo DmcInfo { get; set; }
     }
 
-    public interface IThumbInfo
-    {
-        string? Large { get; set; }
-        string? Normal { get; set; }
-    }
-
 
     /// <summary>
     /// 動画情報(ルート)
@@ -101,21 +95,5 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// DMC情報
         /// </summary>
         public IDmcInfo DmcInfo { get; set; } = new DmcInfo();
-    }
-
-    /// <summary>
-    /// サムネイル情報
-    /// </summary>
-    public class ThumbInfo : IThumbInfo
-    {
-        /// <summary>
-        /// 大サムネイル
-        /// </summary>
-        public string? Large { get; set; }
-
-        /// <summary>
-        /// 通常
-        /// </summary>
-        public string? Normal { get; set; }
     }
 }

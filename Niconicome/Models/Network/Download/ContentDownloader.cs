@@ -16,6 +16,7 @@ using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using IDl = Niconicome.Models.Domain.Niconico.Download.Ichiba;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
+using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -57,6 +58,7 @@ namespace Niconicome.Models.Network.Download
         int PlaylistID { get; }
         int MaxCommentsCount { get; }
         IchibaInfoTypeSettings IchibaInfoType { get; }
+        VideoInfo::ThumbSize ThumbSize { get; }
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(bool autodispose, int maxParallelDLCount);
         Tdl::IThumbDownloadSettings ConvertToThumbDownloadSetting();
         Cdl::ICommentDownloadSettings ConvertToCommentDownloadSetting(int commentOffset);
@@ -442,6 +444,8 @@ namespace Niconicome.Models.Network.Download
 
         public IchibaInfoTypeSettings IchibaInfoType { get; set; }
 
+        public VideoInfo::ThumbSize ThumbSize { get; set; }
+
         public Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(bool autodispose, int maxParallelDLCount)
         {
             return new Vdl::VideoDownloadSettings()
@@ -471,6 +475,7 @@ namespace Niconicome.Models.Network.Download
                 IsOverwriteEnable = this.Overwrite,
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
                 Extension = this.ThumbnailExt,
+                ThumbSize = this.ThumbSize,
             };
         }
 
