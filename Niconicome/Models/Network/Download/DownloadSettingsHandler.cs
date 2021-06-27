@@ -153,6 +153,7 @@ namespace Niconicome.Models.Network.Download
                 VideoInfoSuffix = videoInfoSuffix,
                 IchibaInfoSuffix = ichibaInfoSuffix,
                 CommandFormat = commandFormat,
+                ThumbSize = this.ThumbnailSize.Value,
             };
         }
 
