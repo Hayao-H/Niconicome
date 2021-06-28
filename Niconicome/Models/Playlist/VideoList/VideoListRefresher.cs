@@ -108,7 +108,7 @@ namespace Niconicome.Models.Playlist.VideoList
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
             this.localVideoUtils.ClearCache();
 
-            foreach (var originVideo in originalVideos)
+            foreach (var video in originalVideos)
             {
                 if (playlistID != (this.current.SelectedPlaylist.Value?.Id ?? -1))
                 {
@@ -116,16 +116,6 @@ namespace Niconicome.Models.Playlist.VideoList
                     {
                         Message = $"動画リスト更新中にプレイリストが変更されました。",
                     };
-                }
-
-                IListVideoInfo video;
-                if (disableDBRetrieving)
-                {
-                    video = originVideo;
-                }
-                else
-                {
-                    video = this.videoHandler.GetVideo(originVideo.Id.Value);
                 }
 
 
