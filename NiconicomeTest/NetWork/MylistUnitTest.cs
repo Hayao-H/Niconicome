@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Playlist;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
+using NiconicomeTest.Stabs.Models.Playlist;
 using NUnit.Framework;
 using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 
@@ -21,7 +22,7 @@ namespace NiconicomeTest.NetWork
         {
             var content = new StringContent(Properties.Resources.API_Mylist_Get);
             var http = new NicoHttpStab(content,content);
-            this.handler = new Mylist::MylistHandler(http,new LoggerStab());
+            this.handler = new Mylist::MylistHandler(http,new LoggerStab(),new VideoInfoContainerStab());
         }
 
         [Test]

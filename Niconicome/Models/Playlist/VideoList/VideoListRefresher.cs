@@ -82,7 +82,11 @@ namespace Niconicome.Models.Playlist.VideoList
                         Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
                     };
                 }
-                originalVideos = playlist.Videos.Select(v => new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(v.Id) });
+                originalVideos = playlist.Videos.Select(v => {
+                    IListVideoInfo video = VideoInfoContainer.New();
+                    video.Id.Value = v.Id;
+                    return video;
+                });
             }
 
             if (originalVideos is null)
@@ -100,8 +104,9 @@ namespace Niconicome.Models.Playlist.VideoList
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
             this.localVideoUtils.ClearCache();
+            LightVideoListinfoHandler.AddPlaylist(playlistID);
 
-            foreach (var originVideo in originalVideos)
+            foreach (var originalVideo in originalVideos)
             {
                 if (playlistID != (this.current.SelectedPlaylist.Value?.Id ?? -1))
                 {
@@ -114,27 +119,16 @@ namespace Niconicome.Models.Playlist.VideoList
                 IListVideoInfo video;
                 if (disableDBRetrieving)
                 {
-                    video = originVideo;
+                    video = originalVideo;
                 }
                 else
                 {
-                    video = this.videoHandler.GetVideo(originVideo.Id.Value);
+                    video = this.videoHandler.GetVideo(originalVideo.Id.Value);
                 }
 
-                //保持されている動画情報があれば引き継ぐ
-                var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(originVideo.Id.Value, playlistID);
-
-                if (lightVideo is not null)
-                {
-                    video.MessageGuid = lightVideo.MessageGuid;
-                    video.IsSelected.Value = lightVideo.IsSelected;
-                    video.Message.Value = VideoMessenger.GetMessage(lightVideo.MessageGuid);
-                    //video.FileName.Value = lightVideo.FileName;
-                }
-                else
-                {
-                    video.FileName.Value = string.Empty;
-                }
+                ILightVideoListInfo light = LightVideoListinfoHandler.GetLightVideoListInfo(video.Id.Value, playlistID);
+                video.Message = light.Message;
+                video.IsSelected = light.IsSelected;
 
 
                 var filename = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted, searchByID);

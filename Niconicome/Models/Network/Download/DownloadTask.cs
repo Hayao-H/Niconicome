@@ -2,6 +2,7 @@
 using System.Threading;
 using Niconicome.Models.Playlist;
 using Niconicome.ViewModels;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -10,28 +11,18 @@ namespace Niconicome.Models.Network.Download
     {
         Guid ID { get; }
         string DirectoryPath { get; }
-        string Message { get; set; }
         string NiconicoID { get; }
         string Title { get; }
         int PlaylistID { get; }
         int VideoID { get; }
-        bool IsCanceled { get; set; }
-        bool IsProcessing { get; set; }
-        bool IsDone { get; set; }
+        ReactiveProperty<string> Message { get;  }
+        ReactiveProperty<bool> IsCanceled { get; }
+        ReactiveProperty<bool> IsProcessing { get; }
+        ReactiveProperty<bool> IsDone { get; }
         uint VerticalResolution { get; }
         DownloadSettings DownloadSettings { get; }
         CancellationToken CancellationToken { get; }
-        event EventHandler<DownloadTaskMessageChangedEventArgs>? MessageChange;
-        event EventHandler? ProcessingEnd;
-        event EventHandler? ProcessStart;
-        event EventHandler? Done;
-        event EventHandler? TaskCancel;
         void Cancel();
-    }
-
-    public class DownloadTaskMessageChangedEventArgs : EventArgs
-    {
-        public string? Message { get; set; }
     }
 
     /// <summary>
@@ -43,7 +34,10 @@ namespace Niconicome.Models.Network.Download
         {
             this.DirectoryPath = downloadSettings.FolderPath;
             this.VerticalResolution = downloadSettings.VerticalResolution;
-            this.messageFIeld = string.Empty;
+            this.Message = new ReactiveProperty<string>();
+            this.IsCanceled = new ReactiveProperty<bool>();
+            this.IsProcessing = new ReactiveProperty<bool>();
+            this.IsDone = new ReactiveProperty<bool>();
             this.ID = Guid.NewGuid();
             this.PlaylistID = downloadSettings.PlaylistID;
             this.DownloadSettings = downloadSettings;
@@ -54,53 +48,8 @@ namespace Niconicome.Models.Network.Download
             this.CancellationToken = this.cts.Token;
         }
 
-        protected string messageFIeld;
 
         protected readonly CancellationTokenSource cts;
-
-        protected bool isProcessingField;
-
-        protected bool isDoneField;
-
-        /// <summary>
-        /// メッセージ変更イベントを発火させる
-        /// </summary>
-        protected void RaiseMessageChanged()
-        {
-            this.MessageChange?.Invoke(this, new DownloadTaskMessageChangedEventArgs() { Message = this.Message });
-        }
-
-        /// <summary>
-        /// 終了イベントを発火させる
-        /// </summary>
-        protected void RaiseProcessingEnd()
-        {
-            this.ProcessingEnd?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// 開始イベントを発火させる
-        /// </summary>
-        protected void RaiseProcessingStart()
-        {
-            this.ProcessStart?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// 終了イベントを発火させる
-        /// </summary>
-        protected void RaiseDone()
-        {
-            this.Done?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// キャンセルイベントを発火させる
-        /// </summary>
-        protected void RaiseCancel()
-        {
-            this.TaskCancel?.Invoke(this, EventArgs.Empty);
-        }
 
         /// <summary>
         /// ダウンロードタスクID
@@ -125,15 +74,7 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// メッセージ
         /// </summary>
-        public virtual string Message
-        {
-            get => this.messageFIeld;
-            set
-            {
-                this.messageFIeld = value;
-                this.RaiseMessageChanged();
-            }
-        }
+        public ReactiveProperty<string> Message { get; init; }
 
         /// <summary>
         /// プレイリストID
@@ -148,43 +89,17 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// キャンセルフラグ
         /// </summary>
-        public virtual bool IsCanceled { get; set; }
+        public ReactiveProperty<bool> IsCanceled { get; init; }
 
         /// <summary>
         /// 実行中フラグ
         /// </summary>
-        public virtual bool IsProcessing
-        {
-            get => this.isProcessingField;
-            set
-            {
-                this.isProcessingField = value;
-                if (!value)
-                {
-                    this.RaiseProcessingEnd();
-                }
-                else
-                {
-                    this.RaiseProcessingStart();
-                }
-            }
-        }
+        public ReactiveProperty<bool> IsProcessing { get; init; }
 
         /// <summary>
         /// 完了フラグ
         /// </summary>
-        public virtual bool IsDone
-        {
-            get => this.isDoneField;
-            set
-            {
-                this.isDoneField = value;
-                if (value)
-                {
-                    this.RaiseDone();
-                }
-            }
-        }
+        public ReactiveProperty<bool> IsDone { get; init; }
 
         /// <summary>
         /// /垂直解像度
@@ -196,32 +111,6 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         public DownloadSettings DownloadSettings { get; init; }
 
-
-        /// <summary>
-        /// メッセージ変更イベント
-        /// </summary>
-        public event EventHandler<DownloadTaskMessageChangedEventArgs>? MessageChange;
-
-        /// <summary>
-        /// 終了イベント
-        /// </summary>
-        public event EventHandler? ProcessingEnd;
-
-        /// <summary>
-        /// 開始イベント
-        /// </summary>
-        public event EventHandler? ProcessStart;
-
-        /// <summary>
-        /// 完了イベント
-        /// </summary>
-        public event EventHandler? Done;
-
-        /// <summary>
-        /// キャンセルイベント
-        /// </summary>
-        public event EventHandler? TaskCancel;
-
         /// <summary>
         /// トークン
         /// </summary>
@@ -232,55 +121,12 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         public void Cancel()
         {
+            if (this.IsDone.Value) return;
             this.cts.Cancel();
-            this.IsCanceled = true;
-            this.Message = "DLをキャンセル";
-            this.IsProcessing = false;
-            this.RaiseCancel();
+            this.IsCanceled.Value = true;
+            this.Message.Value = "DLをキャンセル";
+            this.IsProcessing.Value = false;
         }
 
-    }
-
-    /// <summary>
-    /// バインド可能なタスク
-    /// </summary>
-    public record BindableDownloadTask : DownloadTask
-    {
-        public BindableDownloadTask(string niconicpoID, string title, int videoID, DownloadSettings downloadSettings) : base(niconicpoID, title, videoID, downloadSettings)
-        {
-        }
-
-        private bool isCanceledField;
-
-        public override string Message
-        {
-            get => this.messageFIeld;
-            set
-            {
-                this.SetProperty(ref this.messageFIeld, value);
-                this.RaiseMessageChanged();
-            }
-        }
-
-        public override bool IsCanceled { get => this.isCanceledField; set => this.SetProperty(ref this.isCanceledField, value); }
-
-        public override bool IsProcessing
-        {
-            get => this.isProcessingField;
-            set
-            {
-                this.SetProperty(ref this.isProcessingField, value);
-                if (!value)
-                {
-                    this.RaiseProcessingEnd();
-                }
-                else
-                {
-                    this.RaiseProcessingStart();
-                }
-            }
-        }
-
-        public override bool IsDone { get => this.isDoneField; set => this.SetProperty(ref this.isDoneField, value); }
     }
 }

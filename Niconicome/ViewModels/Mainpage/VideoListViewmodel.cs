@@ -1798,6 +1798,12 @@ namespace Niconicome.ViewModels.Mainpage
 
         }
 
+        /// <summary>
+        /// テスト用のコンストラクタ
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="ID"></param>
+        /// <param name="thumbUrl"></param>
         public VideoInfoViewModel(string title, string ID, string thumbUrl)
         {
             this.Id = new ReactiveProperty<int>();

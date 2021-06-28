@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Playlist.VideoList;
+using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Playlist
 {
@@ -19,21 +21,22 @@ namespace Niconicome.Models.Playlist
     public class VideoHandler : IVideoHandler
     {
 
-        public VideoHandler(IVideoStoreHandler storeHandler,IPlaylistStoreHandler playlistStoreHandler)
+        public VideoHandler(IVideoStoreHandler storeHandler, IPlaylistStoreHandler playlistStoreHandler, IVideoInfoContainer videoInfoContainer)
         {
             this.videoStoreHandler = storeHandler;
             this.playlistStoreHandler = playlistStoreHandler;
+            this.videoInfoContainer = videoInfoContainer;
         }
 
-        /// <summary>
-        /// DBにデータを保存
-        /// </summary>
+        #region DI
+
+        private readonly IVideoInfoContainer videoInfoContainer;
+
         private readonly IVideoStoreHandler videoStoreHandler;
 
-        /// <summary>
-        /// DB上のプレイリストにアクセスする
-        /// </summary>
         private readonly IPlaylistStoreHandler playlistStoreHandler;
+
+        #endregion
 
         /// <summary>
         /// 動画を追加する
@@ -73,7 +76,13 @@ namespace Niconicome.Models.Playlist
         /// <returns></returns>
         public IEnumerable<IListVideoInfo> GetAllVideos()
         {
-            return this.videoStoreHandler.GetAllVideos().Select(v => NonBindableListVideoInfo.ConvertDbDataToVideoListInfo(v));
+            return this.videoStoreHandler.GetAllVideos().Select(v =>
+            {
+
+                IListVideoInfo video = this.videoInfoContainer.GetVideo(v.NiconicoId);
+                video.SetDataBaseData(v);
+                return video;
+            });
         }
 
         /// <summary>
@@ -84,7 +93,12 @@ namespace Niconicome.Models.Playlist
         public IListVideoInfo GetVideo(int id)
         {
             if (!this.videoStoreHandler.Exists(id)) throw new InvalidOperationException($"動画({id})はデータベースに存在しません。");
-            return NonBindableListVideoInfo.ConvertDbDataToVideoListInfo(this.videoStoreHandler.GetVideo(id)!);
+
+            STypes::Video dbVideo = this.videoStoreHandler.GetVideo(id)!;
+
+            IListVideoInfo video = this.videoInfoContainer.GetVideo(dbVideo.NiconicoId);
+            video.SetDataBaseData(dbVideo);
+            return video;
         }
 
         /// <summary>

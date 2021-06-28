@@ -8,6 +8,7 @@ using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
+using Windows.Graphics.Printing.PrintTicket;
 using Remote = Niconicome.Models.Domain.Niconico.Remote;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 
@@ -22,7 +23,7 @@ namespace Niconicome.Models.Network
 
     public class RemotePlaylistHandler : IRemotePlaylistHandler
     {
-        public RemotePlaylistHandler(Remote::Mylist.IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Remote::Search.ISearch search, Remote::Mylist.IWatchLaterHandler watchLaterHandler, Remote::Channel.IChannelVideoHandler channelVideoHandler, INetworkVideoHandler networkVideoHandler, IDomainModelConverter converter, Remote::Series.ISeriesHandler seriesHandler,ILogger logger)
+        public RemotePlaylistHandler(Remote::Mylist.IMylistHandler mylistHandler, UVideo::IUserVideoHandler userHandler, Remote::Search.ISearch search, Remote::Mylist.IWatchLaterHandler watchLaterHandler, Remote::Channel.IChannelVideoHandler channelVideoHandler, INetworkVideoHandler networkVideoHandler, IDomainModelConverter converter, Remote::Series.ISeriesHandler seriesHandler,ILogger logger,IVideoInfoContainer videoInfoContainer)
         {
             this.mylistHandler = mylistHandler;
             this.userHandler = userHandler;
@@ -33,6 +34,7 @@ namespace Niconicome.Models.Network
             this.converter = converter;
             this.seriesHandler = seriesHandler;
             this.logger = logger;
+            this.videoInfoContainer = videoInfoContainer;
         }
 
         #region DIされるコード
@@ -54,6 +56,8 @@ namespace Niconicome.Models.Network
         private readonly Remote::Series.ISeriesHandler seriesHandler;
 
         private readonly ILogger logger;
+
+        private readonly IVideoInfoContainer videoInfoContainer;
         #endregion
 
         /// <summary>
@@ -122,7 +126,7 @@ namespace Niconicome.Models.Network
                 IsSucceeded = true,
                 Data = searchResult.Videos?.Select(v =>
                 {
-                    var lVIdeo = new NonBindableListVideoInfo();
+                    IListVideoInfo lVIdeo = this.videoInfoContainer.GetVideo(v.Id);
                     this.converter.ConvertDomainVideoInfoToListVideoInfo(lVIdeo, v);
                     return lVIdeo;
                 }),
@@ -266,7 +270,7 @@ namespace Niconicome.Models.Network
 
             IEnumerable<IListVideoInfo> convertedVideos = remoteResult.Data.Videos.Select(v =>
             {
-                var video = new NonBindableListVideoInfo();
+                var video = this.videoInfoContainer.GetVideo(v.ID);
                 this.converter.ConvertRemoteVideoInfoToListVideoInfo(v, video);
                 return video;
             });

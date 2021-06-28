@@ -189,6 +189,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Settings::ILocalSettingsContainer, Settings::LocalSettingsContainer>();
             services.AddTransient<Series::ISeriesHandler, Series::SeriesHandler>();
             services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
+            services.AddSingleton<Playlist::IVideoInfoContainer, Playlist::VideoInfoContainer>();
             return services.BuildServiceProvider();
         }
 

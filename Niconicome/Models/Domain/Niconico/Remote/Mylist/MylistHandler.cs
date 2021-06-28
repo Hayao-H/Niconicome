@@ -21,21 +21,22 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Mylist
 
     public class MylistHandler : IMylistHandler
     {
-        public MylistHandler(INicoHttp http, Utils::ILogger logger)
+        public MylistHandler(INicoHttp http, Utils::ILogger logger,IVideoInfoContainer videoInfoContainer)
         {
             this.http = http;
             this.logger = logger;
+            this.videoInfoContainer = videoInfoContainer;
         }
 
-        /// <summary>
-        /// httpクライアント
-        /// </summary>
+        #region DI
+
         protected readonly INicoHttp http;
 
-        /// <summary>
-        /// ロガー
-        /// </summary>
         protected readonly Utils::ILogger logger;
+
+        protected readonly IVideoInfoContainer videoInfoContainer;
+
+        #endregion
 
         /// <summary>
         /// マイリストを取得する
@@ -125,7 +126,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Mylist
 
             converted.AddRange(source.Select(video =>
             {
-                var v = new NonBindableListVideoInfo();
+                var v = this.videoInfoContainer.GetVideo(video.Id);
 
                 v.UploadedOn.Value = video.RegisteredAt;
                 v.NiconicoId.Value = video.Id;

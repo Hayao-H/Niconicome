@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Niconicome.Extensions;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Network.Download;
 using Niconicome.ViewModels.Mainpage.Utils;
@@ -14,7 +15,7 @@ using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows
 {
-    class DownloadTasksWindowViewModel : BindableBase,IDisposable
+    class DownloadTasksWindowViewModel : BindableBase, IDisposable
     {
         public DownloadTasksWindowViewModel()
         {
@@ -180,12 +181,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
             if (!this.DisplayCanceled)
             {
-                tasks = tasks.Where(t => !t.IsCanceled);
+                tasks = tasks.Where(t => !t.IsCanceled.Value);
             }
 
             if (!this.DisplayCompleted)
             {
-                tasks = tasks.Where(t => !t.IsDone);
+                tasks = tasks.Where(t => !t.IsDone.Value);
             }
 
             if (type == TaskPoolType.Download)
@@ -233,8 +234,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         {
             this.StagedTasks = new ObservableCollection<DownloadTaskViewModel>();
             this.Tasks = new ObservableCollection<DownloadTaskViewModel>();
-            this.StagedTasks.Add(new DownloadTaskViewModel(new BindableDownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = true, Message = "初期化完了" }) { IsChecked = true });
-            this.Tasks.Add(new DownloadTaskViewModel(new BindableDownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = true, Message = "初期化完了" }) { IsChecked = true });
+            this.StagedTasks.Add(new DownloadTaskViewModel(new DownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = new ReactiveProperty<bool>(true), Message = new ReactiveProperty<string>("初期化完了") }) { IsChecked = true });
+            this.Tasks.Add(new DownloadTaskViewModel(new DownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = new ReactiveProperty<bool>(true), Message = new ReactiveProperty<string>("初期化完了") }) { IsChecked = true });
         }
 
         public ObservableCollection<DownloadTaskViewModel> StagedTasks { get; init; }
@@ -273,6 +274,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public DownloadTaskViewModel(IDownloadTask task)
         {
             this.associatedTask = task;
+            this.Message = task.Message.ToReadOnlyReactiveProperty<string>();
+            this.IsProcessing = task.IsProcessing.ToReadOnlyReactiveProperty();
+            this.IsCancel = task.IsCanceled.ToReadOnlyReactiveProperty();
+            this.IsEnd = task.IsDone.ToReadOnlyReactiveProperty();
 
             var r1 = new ComboboxItem<int>(1080, "1080p");
             var r2 = new ComboboxItem<int>(720, "720p");
@@ -291,30 +296,17 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             };
 
 
-            this.CancelCommand = new CommandBase<object>(_ => !this.IsCancel, _ =>
-            {
-                this.associatedTask.Cancel();
-            });
+            this.CancelCommand = new[] {
+                    this.IsCancel,
+                    this.IsEnd,
+                }
+                .CombineLatestValuesAreAllFalse()
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    this.associatedTask.Cancel();
+                }).AddTo(this.disposables);
 
-            task.ProcessStart += (_, _) =>
-            {
-                this.OnPropertyChanged(nameof(this.IsProcessing));
-            };
-
-            task.ProcessingEnd += (_, _) =>
-            {
-                this.OnPropertyChanged(nameof(this.IsProcessing));
-            };
-
-            task.TaskCancel += (_, _) =>
-            {
-                this.OnPropertyChanged(nameof(this.IsCancel));
-                this.CancelCommand.RaiseCanExecutechanged();
-            };
-
-            task.MessageChange += (_, _) => this.OnPropertyChanged(nameof(this.Message));
-
-            task.Done += (_, _) => this.OnPropertyChanged(nameof(this.IsEnd));
         }
 
         private readonly IDownloadTask associatedTask;
@@ -356,22 +348,22 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// 処理中フラグ
         /// </summary>
-        public bool IsProcessing { get => this.associatedTask.IsProcessing; }
+        public ReadOnlyReactiveProperty<bool> IsProcessing { get; }
 
         /// <summary>
         /// 終了フラグ
         /// </summary>
-        public bool IsEnd { get => this.associatedTask.IsDone; }
+        public ReadOnlyReactiveProperty<bool> IsEnd { get; init; }
 
         /// <summary>
         /// キャンセルフラグ
         /// </summary>
-        public bool IsCancel { get => this.associatedTask.IsCanceled && !this.IsEnd; }
+        public ReadOnlyReactiveProperty<bool> IsCancel { get; }
 
         /// <summary>
         /// 状態
         /// </summary>
-        public string Message { get => this.associatedTask.Message; }
+        public ReadOnlyReactiveProperty<string> Message { get; }
 
         /// <summary>
         /// 選択フラグ
@@ -381,7 +373,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// 処理をキャンセル
         /// </summary>
-        public CommandBase<object> CancelCommand { get; init; }
+        public ReactiveCommand CancelCommand { get; init; }
 
 
     }

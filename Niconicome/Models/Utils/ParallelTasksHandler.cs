@@ -4,12 +4,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
+using Reactive.Bindings.Extensions;
+using Windows.ApplicationModel.Contacts;
 
 namespace Niconicome.Models.Utils
 {
     public interface IParallelTask<T>
     {
         Guid TaskId { get; }
+        int Index { get; set; }
         Func<T, object, IParallelTaskToken, Task> TaskFunction { get; }
         Action<int> OnWait { get; }
     }
@@ -33,8 +36,10 @@ namespace Niconicome.Models.Utils
 
         public ParallelTasksHandler(int maxPallarelTasksCount, bool createThread = true, bool untilEmpty = false) : this(maxPallarelTasksCount, -1, -1, createThread, untilEmpty) { }
 
+        #region private 
+
         /// <summary>
-        /// 最大動機実行数
+        /// 最大同時実行数
         /// </summary>
         private readonly int maxPallarelTasksCount;
 
@@ -47,11 +52,6 @@ namespace Niconicome.Models.Utils
         /// 待機時間
         /// </summary>
         private readonly int waitSeconds;
-
-        /// <summary>
-        /// 実行フラグ
-        /// </summary>
-        public bool IsProcessing { get; private set; }
 
         /// <summary>
         /// ロックオブジェクト
@@ -69,9 +69,21 @@ namespace Niconicome.Models.Utils
         private readonly bool processUntilEmpty;
 
         /// <summary>
+        /// 最後に追加したタスクのインデックス
+        /// </summary>
+        private int lastTasksIndex = -1;
+
+        #endregion
+
+        /// <summary>
+        /// 実行フラグ
+        /// </summary>
+        public bool IsProcessing { get; private set; }
+
+        /// <summary>
         /// 全ての並列タスク
         /// </summary>
-        public virtual List<T> PallarelTasks { get; init; } = new();
+        public virtual Queue<T> PallarelTasks { get; init; } = new();
 
         /// <summary>
         /// タスクを追加する
@@ -81,19 +93,9 @@ namespace Niconicome.Models.Utils
         {
             lock (this.lockobj)
             {
-                this.PallarelTasks.Add(task);
-            }
-        }
-
-        /// <summary>
-        /// 複数のタスクを追加する
-        /// </summary>
-        /// <param name="tasks"></param>
-        public void AddTasksToQueue(IEnumerable<T> tasks)
-        {
-            foreach (var task in tasks)
-            {
-                this.AddTaskToQueue(task);
+                this.lastTasksIndex++;
+                task.Index = this.lastTasksIndex;
+                this.PallarelTasks.Enqueue(task);
             }
         }
 
@@ -116,11 +118,8 @@ namespace Niconicome.Models.Utils
         {
             lock (this.lockobj)
             {
-                var task = this.PallarelTasks.FirstOrDefault();
-                if (task is not null)
-                {
-                    this.PallarelTasks.RemoveAt(0);
-                }
+                if (this.PallarelTasks.Count <= 0) return default;
+                var task = this.PallarelTasks.Dequeue();
                 return task;
             }
         }
@@ -129,20 +128,20 @@ namespace Niconicome.Models.Utils
         /// 実処理
         /// </summary>
         /// <returns></returns>
-        public async Task ProcessTasksAsync(Action? preAction = null, Action? onCancelled = null, CancellationToken? ct = null)
+        public async Task ProcessTasksAsync(Action? preAction = null, Action? onCancelled = null, CancellationToken ct = default)
         {
             //すでにタスクを実行中の場合はキャンセル
             if (this.IsProcessing) return;
 
-            var semaphore = new SemaphoreSlim(this.maxPallarelTasksCount, this.maxPallarelTasksCount);
-            int index = 0;
-            var mre = new ManualResetEventSlim(true);
+            SemaphoreSlim semaphore = new SemaphoreSlim(this.maxPallarelTasksCount, this.maxPallarelTasksCount);
+            ManualResetEventSlim mre = new ManualResetEventSlim(true);
             var tasks = new List<Task>();
             var lockObj = new object();
 
             lock (this.lockobj)
             {
                 this.IsProcessing = true;
+                this.lastTasksIndex = -1;
             }
 
             if (preAction is not null)
@@ -150,42 +149,66 @@ namespace Niconicome.Models.Utils
                 preAction();
             }
 
+            void OnCancel()
+            {
+                semaphore.Release();
+                mre.Set();
+            }
+
             //スレッドを作成して並列実行する
             while (this.PallarelTasks.Count > 0)
             {
-                var task = this.GetNextTask();
+                T? task = this.GetNextTask();
+
                 //タスクがnullならキャンセル
                 if (task is null)
                 {
                     continue;
                 }
 
+                await Task.Delay(300, CancellationToken.None);
+
                 Func<Task> func = async () =>
                 {
                     await semaphore.WaitAsync();
-                    if (ct?.IsCancellationRequested ?? false)
+                    if (ct.IsCancellationRequested)
                     {
                         onCancelled?.Invoke();
+                        OnCancel();
                         return;
                     }
 
                     //待機処理
-                    if (this.waitInterval != -1 && index > 0 && index % this.waitInterval == 0)
+                    if (this.waitInterval != -1 && task.Index > 0 && task.Index % this.waitInterval == 0)
                     {
                         mre.Reset();
-                        task.OnWait(index);
-                        await Task.Delay(this.waitSeconds * 1000);
-                        mre.Set();
-                        if (ct?.IsCancellationRequested ?? false)
+                        task.OnWait(task.Index);
+
+                        try
                         {
+                            await Task.Delay(this.waitSeconds * 1000, ct);
+                        }
+                        catch
+                        {
+                            OnCancel();
+                            return;
+                        }
+
+                        mre.Set();
+
+                        if (ct.IsCancellationRequested)
+                        {
+                            OnCancel();
                             onCancelled?.Invoke();
                             return;
                         }
                     }
 
                     mre.Wait();
-                    if (ct?.IsCancellationRequested ?? false)
+
+                    if (ct.IsCancellationRequested)
                     {
+                        OnCancel();
                         onCancelled?.Invoke();
                         return;
                     }
@@ -200,17 +223,12 @@ namespace Niconicome.Models.Utils
                     {
                     }
 
-                    lock (this.lockobj)
-                    {
-                        index++;
-                    }
-
                     semaphore.Release();
                 };
 
                 if (this.createThread)
                 {
-                    var t = Task.Run(func);
+                    var t = Task.Run(func, CancellationToken.None);
                     tasks.Add(t);
                 }
                 else
