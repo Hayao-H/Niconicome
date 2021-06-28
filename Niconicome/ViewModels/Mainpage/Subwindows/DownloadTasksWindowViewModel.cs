@@ -296,13 +296,16 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             };
 
 
-            this.CancelCommand = this.IsCancel
-                .Select(value => !value)
+            this.CancelCommand = new[] {
+                    this.IsCancel,
+                    this.IsEnd,
+                }
+                .CombineLatestValuesAreAllFalse()
                 .ToReactiveCommand()
                 .WithSubscribe(() =>
-            {
-                this.associatedTask.Cancel();
-            }).AddTo(this.disposables);
+                {
+                    this.associatedTask.Cancel();
+                }).AddTo(this.disposables);
 
         }
 

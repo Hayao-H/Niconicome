@@ -54,7 +54,7 @@ namespace Niconicome.Models.Network
         private readonly IVideoInfoContainer videoInfoContainer;
 
 
-        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoListContainer videoListContainer,IVideoInfoContainer videoInfoContainer)
+        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoListContainer videoListContainer, IVideoInfoContainer videoInfoContainer)
         {
             this.wacthPagehandler = watchPageHandler;
             this.messageHandler = messageHandler;
@@ -173,7 +173,7 @@ namespace Niconicome.Models.Network
 
             }
 
-            await handler.ProcessTasksAsync(() => { }, () => this.messageHandler.AppendMessage("動画情報の取得処理が中断されました。"), ct);
+            await handler.ProcessTasksAsync(() => { }, () => this.messageHandler.AppendMessage("動画情報の取得処理が中断されました。"), ct ?? CancellationToken.None);
 
 
             return videos;
@@ -227,6 +227,8 @@ namespace Niconicome.Models.Network
         }
 
         public Guid TaskId { get; init; } = Guid.NewGuid();
+
+        public int Index { get; set; }
 
         public Func<NetworkVideoParallelTask, object, IParallelTaskToken, Task> TaskFunction { get; init; }
 

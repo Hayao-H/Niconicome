@@ -505,6 +505,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         public int SequenceZero { get; init; }
 
+        public int Index { get; set; }
+
         public Guid TaskId { get; init; }
 
         public Func<IParallelDownloadTask, object, IParallelTaskToken, Task> TaskFunction { get; init; }

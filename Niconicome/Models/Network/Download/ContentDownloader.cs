@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Primitives;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Settings;
@@ -22,7 +24,6 @@ namespace Niconicome.Models.Network.Download
 {
     public interface IContentDownloader
     {
-        Task<INetworkResult?> DownloadVideos();
         Task<INetworkResult?> DownloadVideosFriendly(Action<string> onMessage, Action<string> onMessageShort);
         ReactiveProperty<bool> CanDownload { get; }
         void Cancel();
@@ -88,7 +89,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : BindableBase, IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler,IVideoInfoContainer videoInfoContainer)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler, IVideoInfoContainer videoInfoContainer)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -134,6 +135,8 @@ namespace Niconicome.Models.Network.Download
         private readonly IVideoInfoContainer videoInfoContainer;
 
         private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
+
+        private CancellationTokenSource? cts;
         #endregion
 
         public INetworkResult? CurrentResult { get; private set; }
@@ -145,7 +148,7 @@ namespace Niconicome.Models.Network.Download
         /// <param name="setting"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<INetworkResult?> DownloadVideos()
+        private async Task<INetworkResult?> DownloadVideos()
         {
             this.CurrentResult = new NetworkResult();
 
@@ -154,7 +157,12 @@ namespace Niconicome.Models.Network.Download
                 return new NetworkResult();
             }
 
-            await this.parallelTasksHandler.ProcessTasksAsync(() => this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing);
+            if (this.cts is null)
+            {
+                this.cts = new CancellationTokenSource();
+            }
+
+            await this.parallelTasksHandler.ProcessTasksAsync(() => this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing, ct: this.cts?.Token ?? CancellationToken.None);
 
             this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
 
@@ -231,6 +239,8 @@ namespace Niconicome.Models.Network.Download
         {
             this.parallelTasksHandler.CancellAllTasks();
             this.downloadTasksHandler.DownloadTaskPool.Clear();
+            this.cts?.Cancel();
+            this.cts = null;
             this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
         }
 
@@ -535,6 +545,8 @@ namespace Niconicome.Models.Network.Download
         }
 
         public Guid TaskId { get; init; }
+
+        public int Index { get; set; }
 
         public Func<DownloadTaskParallel, object, IParallelTaskToken, Task> TaskFunction { get; init; }
 

@@ -11,11 +11,11 @@ namespace Niconicome.Models.Network.Download
     {
         Guid ID { get; }
         string DirectoryPath { get; }
-        ReactiveProperty<string> Message { get;  }
         string NiconicoID { get; }
         string Title { get; }
         int PlaylistID { get; }
         int VideoID { get; }
+        ReactiveProperty<string> Message { get;  }
         ReactiveProperty<bool> IsCanceled { get; }
         ReactiveProperty<bool> IsProcessing { get; }
         ReactiveProperty<bool> IsDone { get; }
@@ -50,42 +50,6 @@ namespace Niconicome.Models.Network.Download
 
 
         protected readonly CancellationTokenSource cts;
-
-        protected bool isProcessingField;
-
-        protected bool isDoneField;
-
-        /// <summary>
-        /// 終了イベントを発火させる
-        /// </summary>
-        protected void RaiseProcessingEnd()
-        {
-            this.ProcessingEnd?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// 開始イベントを発火させる
-        /// </summary>
-        protected void RaiseProcessingStart()
-        {
-            this.ProcessStart?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// 終了イベントを発火させる
-        /// </summary>
-        protected void RaiseDone()
-        {
-            this.Done?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// キャンセルイベントを発火させる
-        /// </summary>
-        protected void RaiseCancel()
-        {
-            this.TaskCancel?.Invoke(this, EventArgs.Empty);
-        }
 
         /// <summary>
         /// ダウンロードタスクID
@@ -148,26 +112,6 @@ namespace Niconicome.Models.Network.Download
         public DownloadSettings DownloadSettings { get; init; }
 
         /// <summary>
-        /// 終了イベント
-        /// </summary>
-        public event EventHandler? ProcessingEnd;
-
-        /// <summary>
-        /// 開始イベント
-        /// </summary>
-        public event EventHandler? ProcessStart;
-
-        /// <summary>
-        /// 完了イベント
-        /// </summary>
-        public event EventHandler? Done;
-
-        /// <summary>
-        /// キャンセルイベント
-        /// </summary>
-        public event EventHandler? TaskCancel;
-
-        /// <summary>
         /// トークン
         /// </summary>
         public CancellationToken CancellationToken { get; init; }
@@ -177,11 +121,11 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         public void Cancel()
         {
+            if (this.IsDone.Value) return;
             this.cts.Cancel();
             this.IsCanceled.Value = true;
             this.Message.Value = "DLをキャンセル";
             this.IsProcessing.Value = false;
-            this.RaiseCancel();
         }
 
     }
