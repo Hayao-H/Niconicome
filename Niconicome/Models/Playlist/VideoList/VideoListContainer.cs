@@ -46,6 +46,14 @@ namespace Niconicome.Models.Playlist.VideoList
             this.current = current;
             this.logger = logger;
             this.Videos = new ObservableCollection<IListVideoInfo>();
+
+            this.current.IsTemporaryPlaylist.Subscribe(value =>
+            {
+                if (value)
+                {
+                    this.Clear();
+                }
+            });
         }
 
         #region DIされるクラス

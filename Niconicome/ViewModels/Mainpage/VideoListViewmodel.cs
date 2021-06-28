@@ -90,6 +90,7 @@ namespace Niconicome.ViewModels.Mainpage
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
             var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
             WS::Mainpage.PlaylistHandler.Refresh(expandAll, inheritExpandedState);
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistTreeHandler.GetTmp();
 
             //インデックス
             this.SelectedIndex = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.ToReactivePropertyAsSynchronized(x => x.Value);

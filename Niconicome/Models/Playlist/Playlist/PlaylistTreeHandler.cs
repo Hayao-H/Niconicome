@@ -24,6 +24,7 @@ namespace Niconicome.Models.Playlist.Playlist
         bool IsLastChild(ITreePlaylistInfo child);
         bool IsLastChild(int id);
         ITreePlaylistInfo? GetParent(int id);
+        ITreePlaylistInfo GetTmp();
         IEnumerable<ITreePlaylistInfo> GetAllPlaylists();
         List<string> GetListOfAncestor(int id);
         ObservableCollection<ITreePlaylistInfo> Playlists { get; }
@@ -144,6 +145,16 @@ namespace Niconicome.Models.Playlist.Playlist
             int parentId = self.ParentId;
             return this.GetPlaylist(parentId);
         }
+
+        /// <summary>
+        /// 一時プレイリストを取得
+        /// </summary>
+        /// <returns></returns>
+        public ITreePlaylistInfo GetTmp()
+        {
+            return this.Playlists.First(p => p.IsTemporary);
+        }
+
 
         /// <summary>
         /// すべてのプレイリストを取得する
