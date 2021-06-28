@@ -11,6 +11,7 @@ namespace Niconicome.Models.Playlist
     public interface IVideoInfoContainer
     {
         IListVideoInfo GetVideo(string id);
+        int Count { get; }
         void Clear();
     }
 
@@ -44,6 +45,12 @@ namespace Niconicome.Models.Playlist
                 return newVideo;
             }
         }
+
+        /// <summary>
+        /// 動画数
+        /// </summary>
+        public int Count { get=>this.videos.Count; }
+
 
         /// <summary>
         /// キャッシュをクリア
