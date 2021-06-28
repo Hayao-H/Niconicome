@@ -86,7 +86,7 @@ namespace Niconicome.Models.Playlist.VideoList
                     };
                 }
                 originalVideos = playlist.Videos.Select(v => {
-                    IListVideoInfo video = this.videoInfoContainer.GetVideo(v.NiconicoId);
+                    IListVideoInfo video = VideoInfoContainer.New();
                     video.Id.Value = v.Id;
                     return video;
                 });
@@ -108,7 +108,7 @@ namespace Niconicome.Models.Playlist.VideoList
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
             this.localVideoUtils.ClearCache();
 
-            foreach (var video in originalVideos)
+            foreach (var originalVideo in originalVideos)
             {
                 if (playlistID != (this.current.SelectedPlaylist.Value?.Id ?? -1))
                 {
@@ -116,6 +116,16 @@ namespace Niconicome.Models.Playlist.VideoList
                     {
                         Message = $"動画リスト更新中にプレイリストが変更されました。",
                     };
+                }
+
+                IListVideoInfo video;
+                if (disableDBRetrieving)
+                {
+                    video = originalVideo;
+                }
+                else
+                {
+                    video = this.videoHandler.GetVideo(originalVideo.Id.Value);
                 }
 
 

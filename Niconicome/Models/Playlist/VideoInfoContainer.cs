@@ -60,6 +60,15 @@ namespace Niconicome.Models.Playlist
             this.videos.Clear();
         }
 
+        /// <summary>
+        /// インスタンス生成
+        /// </summary>
+        /// <returns></returns>
+        public static IListVideoInfo New()
+        {
+            return new NonBindableListVideoInfo();
+        }
+
 
     }
 }
