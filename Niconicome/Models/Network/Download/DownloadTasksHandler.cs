@@ -45,15 +45,10 @@ namespace Niconicome.Models.Network.Download
         public void StageVIdeo(IListVideoInfo video, DownloadSettings settings, bool allowDupe)
         {
             var task = new DownloadTask(video.NiconicoId.Value, video.Title.Value, video.Id.Value, settings);
-            void onMessageChange(object? sender, DownloadTaskMessageChangedEventArgs e)
+            task.Message.Subscribe(value =>
             {
-                if (e.Message is not null) video.Message.Value = e.Message;
-            }
-            task.MessageChange += onMessageChange;
-            task.ProcessingEnd += (_, _) =>
-            {
-                task.MessageChange -= onMessageChange;
-            };
+                if (value is not null) video.Message.Value = value;
+            });
             this.StagedDownloadTaskPool.AddTask(task);
         }
 

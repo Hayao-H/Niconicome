@@ -339,7 +339,7 @@ namespace Niconicome.Models.Playlist.VideoList
             try
             {
                 var targetVIdeo = this.Videos.First(v => v.NiconicoId == video.NiconicoId);
-                NonBindableListVideoInfo.SetData(targetVIdeo, video);
+                targetVIdeo.SetNewData(video);
             }
             catch (Exception e)
             {

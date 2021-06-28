@@ -88,7 +88,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : BindableBase, IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler,IVideoInfoContainer videoInfoContainer)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -98,6 +98,7 @@ namespace Niconicome.Models.Network.Download
             this.videoListContainer = videoListContainer;
             this.downloadHelper = downloadHelper;
             this.playlistHandler = playlistHandler;
+            this.videoInfoContainer = videoInfoContainer;
 
             int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelDL);
             var sleepInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
@@ -129,6 +130,8 @@ namespace Niconicome.Models.Network.Download
         private readonly IContentDownloadHelper downloadHelper;
 
         private readonly IPlaylistHandler playlistHandler;
+
+        private readonly IVideoInfoContainer videoInfoContainer;
 
         private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
         #endregion
@@ -252,28 +255,19 @@ namespace Niconicome.Models.Network.Download
 
             var t = new DownloadTaskParallel(async (parallelTask, lockObj, pToken) =>
             {
-                if (!e.Task.IsCanceled && !e.Task.IsDone)
+                if (!e.Task.IsCanceled.Value && !e.Task.IsDone.Value)
                 {
 
                     var setting = e.Task.DownloadSettings;
-                    var task = e.Task;
-                    IListVideoInfo? video;
-                    if (this.videoHandler.Exist(task.VideoID))
-                    {
-                        video = this.videoHandler.GetVideo(task.VideoID);
-                    }
-                    else
-                    {
-                        video = null;
-                    }
+                    IListVideoInfo video = this.videoInfoContainer.GetVideo(e.Task.NiconicoID);
 
-                    this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロード処理を開始しました。");
+                    this.messageHandler.AppendMessage($"{e.Task.NiconicoID}のダウンロード処理を開始しました。");
 
                     string folderPath = setting.FolderPath;
                     bool skippedFlag = false;
-                    e.Task.IsProcessing = true;
+                    e.Task.IsProcessing.Value = true;
 
-                    IDownloadResult downloadResult = await this.downloadHelper.TryDownloadContentAsync(setting with { NiconicoId = task.NiconicoID, Video = !skippedFlag && setting.Video }, msg => task.Message = msg, e.Task.CancellationToken);
+                    IDownloadResult downloadResult = await this.downloadHelper.TryDownloadContentAsync(setting with { NiconicoId = e.Task.NiconicoID, Video = !skippedFlag && setting.Video }, msg => e.Task.Message.Value = msg, e.Task.CancellationToken);
 
 
                     if (downloadResult.IsCanceled || !downloadResult.IsSucceeded)
@@ -281,13 +275,13 @@ namespace Niconicome.Models.Network.Download
                         if (downloadResult.IsCanceled)
                         {
                             this.CurrentResult.FailedCount++;
-                            this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードがキャンセルされました。");
-                            task.Message = "ダウンロードをキャンセル";
+                            this.messageHandler.AppendMessage($"{e.Task.NiconicoID}のダウンロードがキャンセルされました。");
+                            e.Task.Message.Value = "ダウンロードをキャンセル";
                         }
                         else
                         {
                             this.CurrentResult.FailedCount++;
-                            this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに失敗しました。");
+                            this.messageHandler.AppendMessage($"{e.Task.NiconicoID}のダウンロードに失敗しました。");
                             this.messageHandler.AppendMessage($"詳細: {downloadResult.Message}");
                         }
 
@@ -304,20 +298,22 @@ namespace Niconicome.Models.Network.Download
                     else
                     {
                         string rMessage = downloadResult.VideoVerticalResolution == 0 ? string.Empty : $"(vertical:{downloadResult.VideoVerticalResolution}px)";
-                        this.messageHandler.AppendMessage($"{task.NiconicoID}のダウンロードに成功しました。");
+                        this.messageHandler.AppendMessage($"{e.Task.NiconicoID}のダウンロードに成功しました。");
 
-                        task.Message = $"ダウンロード完了{rMessage}";
                         if (video is not null && downloadResult.VideoInfo is not null)
                         {
                             if (!downloadResult.VideoFileName.IsNullOrEmpty())
                             {
                                 video.FileName.Value = downloadResult.VideoFileName;
                             }
-                            NonBindableListVideoInfo.SetData(video, downloadResult.VideoInfo);
+                            video.SetNewData(downloadResult.VideoInfo);
                             this.videoHandler.Update(video);
                         }
-                        this.videoListContainer.Uncheck(task.VideoID, task.PlaylistID);
+
+                        this.videoListContainer.Uncheck(e.Task.VideoID, e.Task.PlaylistID);
                         this.CurrentResult.SucceededCount++;
+
+                        e.Task.Message.Value = $"ダウンロード完了{rMessage}";
 
                         bool isSucceededHIstoryDisabled = this.settingHandler.GetBoolSetting(SettingsEnum.DisableDLSucceededHistory);
                         if (video is not null && !isSucceededHIstoryDisabled)
@@ -335,10 +331,10 @@ namespace Niconicome.Models.Network.Download
                         this.CurrentResult.FirstVideo = video;
                     }
 
-                    e.Task.IsProcessing = false;
-                    if (!e.Task.IsCanceled)
+                    e.Task.IsProcessing.Value = false;
+                    if (!e.Task.IsCanceled.Value)
                     {
-                        e.Task.IsDone = true;
+                        e.Task.IsDone.Value = true;
                     }
                     //this.downloadTasksHandler.DownloadTaskPool.RemoveTask(e.Task);
 
@@ -350,7 +346,7 @@ namespace Niconicome.Models.Network.Download
                 }
             }, _ =>
             {
-                e.Task.Message = "待機中...(15s)";
+                e.Task.Message.Value = "待機中...(15s)";
                 this.messageHandler.AppendMessage($"待機中...(15s)");
 
             });

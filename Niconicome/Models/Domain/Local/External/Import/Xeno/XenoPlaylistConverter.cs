@@ -13,6 +13,17 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
 
     public class XenoPlaylistConverter : IXenoPlaylistConverter
     {
+        public XenoPlaylistConverter(IVideoInfoContainer videoInfoContainer)
+        {
+            this.videoInfoContainer = videoInfoContainer;
+        }
+
+        #region DI
+
+        private readonly IVideoInfoContainer videoInfoContainer;
+
+        #endregion
+
         /// <summary>
         /// Xenoのプレイリストをアプリケーション側で使えるデータに変換する
         /// </summary>
@@ -30,8 +41,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
             };
 
             converted.Videos.AddRange(playlist.Videos.Select(v => {
-                var video = new NonBindableListVideoInfo();
-                video.NiconicoId.Value = v;
+                var video = this.videoInfoContainer.GetVideo(v);
                 return video;
             }));
 

@@ -25,15 +25,22 @@ namespace Niconicome.Models.Domain.Niconico.Video
     public class UserVideoHandler : IUserVideoHandler
     {
 
-        public UserVideoHandler(INicoHttp http, ILogger logger)
+        public UserVideoHandler(INicoHttp http, ILogger logger,IVideoInfoContainer videoInfoContainer)
         {
             this.http = http;
             this.logger = logger;
+            this.videoInfoContainer = videoInfoContainer;
         }
+
+        #region DI
 
         private readonly INicoHttp http;
 
         private readonly ILogger logger;
+
+        private readonly IVideoInfoContainer videoInfoContainer;
+
+        #endregion
 
 
         /// <summary>
@@ -115,7 +122,7 @@ namespace Niconicome.Models.Domain.Niconico.Video
             var converted = new List<IListVideoInfo>();
             converted.AddRange(videos.Select(v => v.Essential).Select(v =>
             {
-                var video = new NonBindableListVideoInfo();
+                var video = this.videoInfoContainer.GetVideo(v.Id);
                 video.Title.Value = v.Title;
                 video.NiconicoId.Value = v.Id;
                 video.UploadedOn.Value = v.RegisteredAt.DateTime;

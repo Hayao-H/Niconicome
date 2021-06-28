@@ -249,11 +249,6 @@ namespace Niconicome.Models.Local.External.Import
                 var videos = new List<IListVideoInfo>();
                 var rResult = await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(playlistInfo.RemoteId, videos, RemoteType.Channel, new List<string>(), m => this.OnMessageVerbose(m));
 
-                foreach (var video in videos)
-                {
-                    this.playlistStoreHandler.AddVideo(video, id);
-                }
-
                 if (rResult.IsSucceeded)
                 {
                     foreach (var video in videos)

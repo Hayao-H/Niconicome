@@ -51,14 +51,17 @@ namespace Niconicome.Models.Network
 
         private readonly IVideoListContainer videoListContainer;
 
+        private readonly IVideoInfoContainer videoInfoContainer;
 
-        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoListContainer videoListContainer)
+
+        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoListContainer videoListContainer,IVideoInfoContainer videoInfoContainer)
         {
             this.wacthPagehandler = watchPageHandler;
             this.messageHandler = messageHandler;
             this.fileStorehandler = fileStorehandler;
             this.settingHandler = settingHandler;
             this.videoListContainer = videoListContainer;
+            this.videoInfoContainer = videoInfoContainer;
         }
 
 
@@ -75,9 +78,7 @@ namespace Niconicome.Models.Network
         {
             return await this.GetVideoListInfosAsync(ids.Select(i =>
             {
-                var v = new NonBindableListVideoInfo();
-                v.NiconicoId.Value = i;
-                return v;
+                return this.videoInfoContainer.GetVideo(i);
             }), uncheck, playlistID, forceRegister, ct);
         }
 

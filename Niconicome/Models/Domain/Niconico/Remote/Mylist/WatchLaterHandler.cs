@@ -25,7 +25,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Mylist
     /// </summary>
     class WatchLaterHandler : MylistHandler, IWatchLaterHandler
     {
-        public WatchLaterHandler(INicoHttp http, Utils::ILogger logger) : base(http, logger) { }
+        public WatchLaterHandler(INicoHttp http, Utils::ILogger logger, IVideoInfoContainer videoInfoContainer) : base(http, logger, videoInfoContainer) { }
 
         /// <summary>
         /// 「あとで見る」を取得する

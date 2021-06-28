@@ -23,7 +23,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public class VideoListRefresher : IVideoListRefresher
     {
-        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current)
+        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current,IVideoInfoContainer videoInfoContainer)
         {
             this.playlistStoreHandler = playlistStoreHandler;
             this.videoHandler = videoHandler;
@@ -31,6 +31,7 @@ namespace Niconicome.Models.Playlist.VideoList
             this.settingHandler = localSettingHandler;
             this.videoThumnailUtility = videoThumnailUtility;
             this.localVideoUtils = localVideoUtils;
+            this.videoInfoContainer = videoInfoContainer;
         }
 
         #region DIされるクラス
@@ -46,6 +47,8 @@ namespace Niconicome.Models.Playlist.VideoList
         private readonly IVideoThumnailUtility videoThumnailUtility;
 
         private readonly ICurrent current;
+
+        private readonly IVideoInfoContainer videoInfoContainer;
 
         #endregion
 
@@ -82,7 +85,11 @@ namespace Niconicome.Models.Playlist.VideoList
                         Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
                     };
                 }
-                originalVideos = playlist.Videos.Select(v => new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(v.Id) });
+                originalVideos = playlist.Videos.Select(v => {
+                    IListVideoInfo video = this.videoInfoContainer.GetVideo(v.NiconicoId);
+                    video.Id.Value = v.Id;
+                    return video;
+                });
             }
 
             if (originalVideos is null)
@@ -119,21 +126,6 @@ namespace Niconicome.Models.Playlist.VideoList
                 else
                 {
                     video = this.videoHandler.GetVideo(originVideo.Id.Value);
-                }
-
-                //保持されている動画情報があれば引き継ぐ
-                var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(originVideo.Id.Value, playlistID);
-
-                if (lightVideo is not null)
-                {
-                    video.MessageGuid = lightVideo.MessageGuid;
-                    video.IsSelected.Value = lightVideo.IsSelected;
-                    video.Message.Value = VideoMessenger.GetMessage(lightVideo.MessageGuid);
-                    //video.FileName.Value = lightVideo.FileName;
-                }
-                else
-                {
-                    video.FileName.Value = string.Empty;
                 }
 
 
