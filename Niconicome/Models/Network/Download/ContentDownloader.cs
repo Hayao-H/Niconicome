@@ -89,14 +89,13 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : BindableBase, IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IVideoListContainer videoListContainer, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler, IVideoInfoContainer videoInfoContainer)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler, IVideoInfoContainer videoInfoContainer)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
             this.videoHandler = videoHandler;
             this.messageHandler = messageHandler;
             this.downloadTasksHandler = downloadTasksHandler;
-            this.videoListContainer = videoListContainer;
             this.downloadHelper = downloadHelper;
             this.playlistHandler = playlistHandler;
             this.videoInfoContainer = videoInfoContainer;
@@ -125,8 +124,6 @@ namespace Niconicome.Models.Network.Download
         private readonly IMessageHandler messageHandler;
 
         private readonly IDownloadTasksHandler downloadTasksHandler;
-
-        private readonly IVideoListContainer videoListContainer;
 
         private readonly IContentDownloadHelper downloadHelper;
 
@@ -320,7 +317,7 @@ namespace Niconicome.Models.Network.Download
                             this.videoHandler.Update(video);
                         }
 
-                        this.videoListContainer.Uncheck(e.Task.VideoID, e.Task.PlaylistID);
+                        LightVideoListinfoHandler.GetLightVideoListInfo(e.Task.VideoID, e.Task.PlaylistID).IsSelected.Value = false;
                         this.CurrentResult.SucceededCount++;
 
                         e.Task.Message.Value = $"ダウンロード完了{rMessage}";

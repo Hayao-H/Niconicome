@@ -26,7 +26,6 @@ namespace Niconicome.Models.Playlist.VideoList
         IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, bool commit = true);
         IAttemptResult Refresh();
         IAttemptResult Clear();
-        IAttemptResult Uncheck(int videoID, int playlistID);
         IAttemptResult ForEach(Action<IListVideoInfo> foreachFunc);
         IAttemptResult Sort(VideoSortType sortType, bool isDescending, List<int>? customSortSequence = null);
         IAttemptResult MovevideotoPrev(int videoIndex, int? playlistID = null, bool commit = true);
@@ -68,20 +67,6 @@ namespace Niconicome.Models.Playlist.VideoList
         #endregion
 
         #region プライベートメソッド
-
-        /// <summary>
-        /// 選択解除されたプレイリストを保持する
-        /// </summary>
-        private void SavePrevPlaylistVideos()
-        {
-            if (this.current.SelectedPlaylist is null) return;
-
-            foreach (var video in this.Videos)
-            {
-                var info = new LightVideoListInfo(video.MessageGuid, video.FileName.Value, this.current.PrevSelectedPlaylistID, video.Id.Value, video.IsSelected.Value);
-                LightVideoListinfoHandler.AddVideo(info);
-            }
-        }
 
         /// <summary>
         /// 変更イベントを通知する
@@ -401,39 +386,6 @@ namespace Niconicome.Models.Playlist.VideoList
             };
         }
 
-        /// <summary>
-        /// チャックを外す
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistID"></param>
-        /// <returns></returns>
-        public IAttemptResult Uncheck(int videoID, int playlistID)
-        {
-            if (this.Videos.Any(v => v.Id.Value == videoID))
-            {
-                var target = this.Videos.First(v => v.Id.Value == videoID);
-                target.IsSelected.Value = false;
-            }
-            else if (LightVideoListinfoHandler.Contains(videoID, playlistID))
-            {
-                var target = LightVideoListinfoHandler.GetLightVideoListInfo(videoID, playlistID)!;
-                var light = new LightVideoListInfo(target.MessageGuid, target.FileName, target.PlaylistId, target.VideoId, false);
-                LightVideoListinfoHandler.AddVideo(light);
-            }
-            else
-            {
-                return new AttemptResult()
-                {
-                    Message = $"指定された動画は存在しません。(videoID:{videoID}, playlistID:{playlistID})",
-                };
-            }
-
-            return new AttemptResult()
-            {
-                IsSucceeded = true,
-            };
-        }
-
 
         /// <summary>
         /// 動画リストを再読み込みする
@@ -441,8 +393,6 @@ namespace Niconicome.Models.Playlist.VideoList
         /// <returns></returns>
         public IAttemptResult Refresh()
         {
-            this.SavePrevPlaylistVideos();
-
             IAttemptResult result;
 
             this.SelectedVideos.Value = 0;

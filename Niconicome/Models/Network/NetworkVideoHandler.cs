@@ -49,18 +49,15 @@ namespace Niconicome.Models.Network
 
         private readonly ILocalSettingHandler settingHandler;
 
-        private readonly IVideoListContainer videoListContainer;
-
         private readonly IVideoInfoContainer videoInfoContainer;
 
 
-        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoListContainer videoListContainer, IVideoInfoContainer videoInfoContainer)
+        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoInfoContainer videoInfoContainer)
         {
             this.wacthPagehandler = watchPageHandler;
             this.messageHandler = messageHandler;
             this.fileStorehandler = fileStorehandler;
             this.settingHandler = settingHandler;
-            this.videoListContainer = videoListContainer;
             this.videoInfoContainer = videoInfoContainer;
         }
 
@@ -160,7 +157,7 @@ namespace Niconicome.Models.Network
                         videos.Add(item.video);
                         if (uncheck)
                         {
-                            this.videoListContainer.Uncheck(item.video.Id.Value, playlistID ?? -1);
+                            LightVideoListinfoHandler.GetLightVideoListInfo(item.video.Id.Value, playlistID ?? -1).IsSelected.Value = false;
                         }
                     }
                     else

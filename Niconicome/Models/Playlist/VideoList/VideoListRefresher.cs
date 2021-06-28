@@ -23,7 +23,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public class VideoListRefresher : IVideoListRefresher
     {
-        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current,IVideoInfoContainer videoInfoContainer)
+        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current)
         {
             this.playlistStoreHandler = playlistStoreHandler;
             this.videoHandler = videoHandler;
@@ -31,7 +31,6 @@ namespace Niconicome.Models.Playlist.VideoList
             this.settingHandler = localSettingHandler;
             this.videoThumnailUtility = videoThumnailUtility;
             this.localVideoUtils = localVideoUtils;
-            this.videoInfoContainer = videoInfoContainer;
         }
 
         #region DIされるクラス
@@ -47,8 +46,6 @@ namespace Niconicome.Models.Playlist.VideoList
         private readonly IVideoThumnailUtility videoThumnailUtility;
 
         private readonly ICurrent current;
-
-        private readonly IVideoInfoContainer videoInfoContainer;
 
         #endregion
 
@@ -107,6 +104,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
             this.localVideoUtils.ClearCache();
+            LightVideoListinfoHandler.AddPlaylist(playlistID);
 
             foreach (var originalVideo in originalVideos)
             {
@@ -127,6 +125,10 @@ namespace Niconicome.Models.Playlist.VideoList
                 {
                     video = this.videoHandler.GetVideo(originalVideo.Id.Value);
                 }
+
+                ILightVideoListInfo light = LightVideoListinfoHandler.GetLightVideoListInfo(video.Id.Value, playlistID);
+                video.Message = light.Message;
+                video.IsSelected = light.IsSelected;
 
 
                 var filename = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted, searchByID);
