@@ -24,27 +24,16 @@ namespace Niconicome.Models.Domain.Local.Style
 
     public class UserChromeHandler : BindableBase, IUserChromeHandler
     {
-        public UserChromeHandler(INicoFileIO fileIO, ILogger logger, IFileWatcher fileWatcher)
+        public UserChromeHandler(INicoFileIO fileIO, ILogger logger, IFileWatcher fileWatcher,INicoDirectoryIO directoryIO)
         {
             this.fileIO = fileIO;
             this.logger = logger;
             this.fileWatcher = fileWatcher;
+            this.directoryIO = directoryIO;
 
             IAttemptResult<UserChrome> result = this.GetUserChrome();
             this.UserChrome = new ReactiveProperty<UserChrome>(result.Data ?? new UserChrome());
-
-            this.fileWatcher.Watch(
-                Path.Combine(AppContext.BaseDirectory, FileFolder.UserChromePath),
-                NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size,
-                e =>
-                {
-                    if (e.Name == FileFolder.UserChromeFileName)
-                    {
-                        IAttemptResult<UserChrome> result = this.GetUserChrome();
-                        if (result.IsSucceeded && result.Data is not null)
-                            this.UserChrome.Value = result.Data;
-                    }
-                });
+            this.WatchIfNotWatching();
         }
 
         ~UserChromeHandler()
@@ -59,6 +48,8 @@ namespace Niconicome.Models.Domain.Local.Style
         private readonly ILogger logger;
 
         private readonly IFileWatcher fileWatcher;
+
+        private readonly INicoDirectoryIO directoryIO;
 
         #endregion
 
@@ -145,5 +136,39 @@ namespace Niconicome.Models.Domain.Local.Style
             this.logger.Log("userChrome.jsonへ書き込みにました。");
             return new AttemptResult() { IsSucceeded = true };
         }
+
+        #region private
+
+        /// <summary>
+        /// 監視を開始
+        /// </summary>
+        private void WatchIfNotWatching()
+        {
+            try
+            {
+                if (this.fileWatcher.IsWatching) return;
+
+                string chromeDir = Path.GetDirectoryName(Path.Combine(AppContext.BaseDirectory, FileFolder.UserChromePath)) ?? AppContext.BaseDirectory;
+                if (!this.directoryIO.Exists(chromeDir)) return;
+
+                this.fileWatcher.Watch(
+                    Path.Combine(AppContext.BaseDirectory, FileFolder.UserChromePath),
+                    NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size,
+                    e =>
+                    {
+                        if (e.Name == FileFolder.UserChromeFileName)
+                        {
+                            IAttemptResult<UserChrome> result = this.GetUserChrome();
+                            if (result.IsSucceeded && result.Data is not null)
+                                this.UserChrome.Value = result.Data;
+                        }
+                    });
+            } catch (Exception e)
+            {
+                this.logger.Error("スタイルディレクトリの監視に失敗しました。", e);
+            }
+        }
+
+        #endregion
     }
 }

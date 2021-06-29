@@ -11,6 +11,7 @@ namespace Niconicome.Models.Domain.Local.IO
     {
         void UnWatch();
         void Watch(string filePath, NotifyFilters filters, Action<FileSystemEventArgs> handler);
+        bool IsWatching { get; }
     }
 
     public class FileWatcher : IFileWatcher
@@ -51,5 +52,11 @@ namespace Niconicome.Models.Domain.Local.IO
             this.watcher.Dispose();
             this.watcher = null;
         }
+
+        /// <summary>
+        /// 監視中フラグ
+        /// </summary>
+        public bool IsWatching { get => this.watcher is not null; }
+
     }
 }
