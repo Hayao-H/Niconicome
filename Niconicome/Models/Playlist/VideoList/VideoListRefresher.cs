@@ -23,7 +23,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public class VideoListRefresher : IVideoListRefresher
     {
-        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current)
+        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current, ILightVideoListinfoHandler lightVideoListinfoHandler)
         {
             this.playlistStoreHandler = playlistStoreHandler;
             this.videoHandler = videoHandler;
@@ -31,6 +31,7 @@ namespace Niconicome.Models.Playlist.VideoList
             this.settingHandler = localSettingHandler;
             this.videoThumnailUtility = videoThumnailUtility;
             this.localVideoUtils = localVideoUtils;
+            this.lightVideoListinfoHandler = lightVideoListinfoHandler;
         }
 
         #region DIされるクラス
@@ -47,6 +48,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
         private readonly ICurrent current;
 
+        private ILightVideoListinfoHandler lightVideoListinfoHandler;
         #endregion
 
         /// <summary>
@@ -104,7 +106,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
             this.localVideoUtils.ClearCache();
-            LightVideoListinfoHandler.AddPlaylist(playlistID);
+            this.lightVideoListinfoHandler.AddPlaylist(playlistID);
 
             foreach (var originalVideo in originalVideos)
             {
@@ -126,7 +128,7 @@ namespace Niconicome.Models.Playlist.VideoList
                     video = this.videoHandler.GetVideo(originalVideo.Id.Value);
                 }
 
-                ILightVideoListInfo light = LightVideoListinfoHandler.GetLightVideoListInfo(video.Id.Value, playlistID);
+                ILightVideoListInfo light = this.lightVideoListinfoHandler.GetLightVideoListInfo(video.Id.Value, playlistID);
                 video.Message = light.Message;
                 video.IsSelected = light.IsSelected;
 

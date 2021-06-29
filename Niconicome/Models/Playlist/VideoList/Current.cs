@@ -18,6 +18,7 @@ namespace Niconicome.Models.Playlist.VideoList
     {
         ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; }
         ReactiveProperty<int> CurrentSelectedIndex { get; }
+        ReactiveProperty<int> SelectedVideos { get; }
         ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; }
         string PlaylistFolderPath { get; }
         int PrevSelectedPlaylistID { get; }
@@ -88,6 +89,12 @@ namespace Niconicome.Models.Playlist.VideoList
         /// 選択された動画のインデックス
         /// </summary>
         public ReactiveProperty<int> CurrentSelectedIndex { get; init; }
+
+        /// <summary>
+        /// 選択されている動画数
+        /// </summary>
+        public ReactiveProperty<int> SelectedVideos { get; init; } = new();
+         
 
         /// <summary>
         /// 一時プレイリストフラグ

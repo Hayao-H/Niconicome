@@ -23,6 +23,8 @@ namespace NiconicomeTest.Stabs.Models.Playlist.VideoList
         public int PrevSelectedPlaylistID { get; set; }
         public ReactiveProperty<int> CurrentSelectedIndex { get; init; } = new();
 
+        public ReactiveProperty<int> SelectedVideos { get; init; } = new();
+
         public string PlaylistFolderPath { get; init; } = string.Empty;
 
         public ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; init; }

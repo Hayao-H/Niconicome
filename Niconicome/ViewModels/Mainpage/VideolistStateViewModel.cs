@@ -17,7 +17,7 @@ namespace Niconicome.ViewModels.Mainpage
         public VideolistStateViewModel()
         {
             WS::Mainpage.VideoListContainer.ListChanged += this.OnListChanged;
-            WS::Mainpage.VideoListContainer.SelectedVideos.Subscribe(value => this.SelectedVideosCount.Value = value.ToString());
+            WS::Mainpage.CurrentPlaylist.SelectedVideos.Subscribe(value => this.SelectedVideosCount.Value = value.ToString());
             this.RefreshCommand.Subscribe(() =>
             {
                 this.SelectedVideosCount.Value = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).Count().ToString();

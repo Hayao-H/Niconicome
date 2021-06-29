@@ -91,7 +91,7 @@ namespace Niconicome.Models.Network.Download
     class ContentDownloader : BindableBase, IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler, IVideoInfoContainer videoInfoContainer)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler, IVideoInfoContainer videoInfoContainer,ILightVideoListinfoHandler lightVideoListinfoHandler)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -101,6 +101,7 @@ namespace Niconicome.Models.Network.Download
             this.downloadHelper = downloadHelper;
             this.playlistHandler = playlistHandler;
             this.videoInfoContainer = videoInfoContainer;
+            this.lightVideoListinfoHandler = lightVideoListinfoHandler;
 
             int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelDL);
             var sleepInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
@@ -132,6 +133,8 @@ namespace Niconicome.Models.Network.Download
         private readonly IPlaylistHandler playlistHandler;
 
         private readonly IVideoInfoContainer videoInfoContainer;
+
+        private readonly ILightVideoListinfoHandler lightVideoListinfoHandler;
 
         private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
 
@@ -319,7 +322,7 @@ namespace Niconicome.Models.Network.Download
                             this.videoHandler.Update(video);
                         }
 
-                        LightVideoListinfoHandler.GetLightVideoListInfo(e.Task.VideoID, e.Task.PlaylistID).IsSelected.Value = false;
+                        this.lightVideoListinfoHandler.GetLightVideoListInfo(e.Task.VideoID, e.Task.PlaylistID).IsSelected.Value = false;
                         this.CurrentResult.SucceededCount++;
 
                         e.Task.Message.Value = $"ダウンロード完了{rMessage}";

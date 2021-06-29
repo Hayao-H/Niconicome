@@ -190,6 +190,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Series::ISeriesHandler, Series::SeriesHandler>();
             services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
             services.AddSingleton<Playlist::IVideoInfoContainer, Playlist::VideoInfoContainer>();
+            services.AddSingleton<Playlist::ILightVideoListinfoHandler, Playlist::LightVideoListinfoHandler>();
             return services.BuildServiceProvider();
         }
 
