@@ -190,6 +190,8 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.SearchFileByID => STypes::SettingNames.SearchVideosByID,
                 SettingsEnum.ThumbSize => STypes::SettingNames.ThumbnailSize,
                 SettingsEnum.DisableScrollRestore => STypes::SettingNames.DisableScrollRestore,
+                SettingsEnum.OwnerComSuffix => STypes::SettingNames.OwnerCommentSuffix,
+                SettingsEnum.ThumbSuffix => STypes::SettingNames.ThumbnailSuffix,
                 _ => null
             };
         }
@@ -270,5 +272,7 @@ namespace Niconicome.Models.Local.Settings
         SearchFileByID,
         ThumbSize,
         DisableScrollRestore,
+        OwnerComSuffix,
+        ThumbSuffix,
     }
 }

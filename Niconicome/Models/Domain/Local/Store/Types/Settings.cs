@@ -179,5 +179,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string SearchVideosByID { get; private set; } = "searchvideosbyid";
         public static string ThumbnailSize { get; private set; } = "thumbnailsize";
         public static string DisableScrollRestore { get; private set; } = "disablescrollrestore";
+        public static string ThumbnailSuffix { get; private set; } = "thumbnailsuffix";
+        public static string OwnerCommentSuffix { get; private set; } = "ownercommentsuffix";
     }
 }
