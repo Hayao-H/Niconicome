@@ -47,6 +47,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.IsDownloadSucceededHistoryDisabled.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.DisableDLSucceededHistory)).AddTo(this.disposables);
             this.IsDownloadFailedHistoryDisabled = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.DisableDLFailedHistory));
             this.IsDownloadFailedHistoryDisabled.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.DisableDLFailedHistory)).AddTo(this.disposables);
+            this.IsRestoringScrollPosDisabled = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DisableScrollRestore);
 
             #endregion
         }
@@ -78,7 +79,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// DL失敗履歴を無効にする
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadFailedHistoryDisabled { get; init; } 
+        public ReactiveProperty<bool> IsDownloadFailedHistoryDisabled { get; init; }
+
+        /// <summary>
+        /// スクロール一復元を無効にする
+        /// </summary>
+        public ReactiveProperty<bool> IsRestoringScrollPosDisabled { get; init; }
 
     }
 
@@ -108,6 +114,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactiveProperty<bool> IsDownloadSucceededHistoryDisabled { get; init; } = new(true);
 
         public ReactiveProperty<bool> IsDownloadFailedHistoryDisabled { get; init; } = new(true);
+
+        public ReactiveProperty<bool> IsRestoringScrollPosDisabled { get; init; } = new(true);
 
     }
 }
