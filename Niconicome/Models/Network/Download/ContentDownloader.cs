@@ -55,6 +55,8 @@ namespace Niconicome.Models.Network.Download
         string ThumbnailExt { get; }
         string IchibaInfoSuffix { get; }
         string VideoInfoSuffix { get; }
+        string ThumbSuffix { get; }
+        string OwnerComSuffix { get; }
         uint VerticalResolution { get; }
         int PlaylistID { get; }
         int MaxCommentsCount { get; }
@@ -443,6 +445,10 @@ namespace Niconicome.Models.Network.Download
 
         public string VideoInfoSuffix { get; set; } = string.Empty;
 
+        public string ThumbSuffix { get; set; } = string.Empty;
+
+        public string OwnerComSuffix { get; set; } = string.Empty;
+
         public string CommandFormat { get; set; } = string.Empty;
 
         public IchibaInfoTypeSettings IchibaInfoType { get; set; }
@@ -479,6 +485,7 @@ namespace Niconicome.Models.Network.Download
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
                 Extension = this.ThumbnailExt,
                 ThumbSize = this.ThumbSize,
+                Suffix = this.ThumbSuffix,
             };
         }
 
@@ -497,6 +504,7 @@ namespace Niconicome.Models.Network.Download
                 IsReplaceStrictedEnable = this.IsReplaceStrictedEnable,
                 MaxcommentsCount = this.MaxCommentsCount,
                 IsUnsafeHandleEnable = this.EnableUnsafeCommentHandle,
+                OwnerSuffix = this.OwnerComSuffix,
             };
         }
 
