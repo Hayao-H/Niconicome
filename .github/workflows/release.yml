@@ -80,7 +80,7 @@ jobs:
         mkdir ffmpeg/bin
         cd tmp
         $ProgressPreference = 'SilentlyContinue'
-        Invoke-WebRequest https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2021-05-30-13-01/ffmpeg-n4.4-19-g8d172d9409-win64-gpl-4.4.zip -o ffbin.zip
+        Invoke-WebRequest https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2021-06-29-13-37/ffmpeg-N-102801-gb74beba9a9-win64-gpl.zip -o ffbin.zip
         Expand-Archive ffbin.zip -Force
         $item = Get-Childitem -Recurse -Filter ffmpeg.exe
         cd ..
