@@ -36,12 +36,6 @@ namespace NiconicomeTest.Local.DataBaseTest
         }
 
         [Test]
-        public void ルートプレイリストが存在することを確認する()
-        {
-            Assert.IsTrue(this.dataBase?.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot));
-        }
-
-        [Test]
         public void テストプレイリストを保存する()
         {
 
@@ -55,14 +49,6 @@ namespace NiconicomeTest.Local.DataBaseTest
             Assert.IsTrue(this.dataBase?.Exists<STypes::Playlist>(STypes::Playlist.TableName, id));
 
             this.dataBase?.Delete(STypes::Playlist.TableName, id);
-        }
-
-
-        [Test]
-        public void 全てのレコードを取得する()
-        {
-            List<STypes::Playlist> list = this.dataBase?.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName).Data ?? new();
-            Assert.IsTrue(list.Count > 0);
         }
     }
 
