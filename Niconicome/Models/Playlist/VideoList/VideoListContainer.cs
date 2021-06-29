@@ -31,7 +31,6 @@ namespace Niconicome.Models.Playlist.VideoList
         IAttemptResult MovevideotoPrev(int videoIndex, int? playlistID = null, bool commit = true);
         IAttemptResult MovevideotoForward(int videoIndex, int? playlistID = null, bool commit = true);
         int Count { get; }
-        ReactiveProperty<int> SelectedVideos { get; }
         ObservableCollection<IListVideoInfo> Videos { get; }
         event EventHandler<ListChangedEventArgs<IListVideoInfo>>? ListChanged;
     }
@@ -135,7 +134,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (video.IsSelected.Value)
             {
-                this.SelectedVideos.Value--;
+                this.current.SelectedVideos.Value--;
             }
 
 
@@ -238,19 +237,8 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (video.IsSelected.Value)
             {
-                this.SelectedVideos.Value++;
+                this.current.SelectedVideos.Value++;
             }
-            video.IsSelected.Skip(1).Subscribe(value =>
-            {
-                if (value)
-                {
-                    this.SelectedVideos.Value++;
-                }
-                else
-                {
-                    this.SelectedVideos.Value--;
-                }
-            });
 
             if (!commit)
             {
@@ -403,7 +391,7 @@ namespace Niconicome.Models.Playlist.VideoList
         {
             IAttemptResult result;
 
-            this.SelectedVideos.Value = 0;
+            this.current.SelectedVideos.Value = 0;
 
             if (this.current.IsTemporaryPlaylist.Value)
             {
@@ -412,16 +400,16 @@ namespace Niconicome.Models.Playlist.VideoList
                 result = this.refresher.Refresh(videos, v =>
                 {
                     this.Videos.Add(v);
-                    if (v.IsSelected.Value) this.SelectedVideos.Value++;
+                    if (v.IsSelected.Value) this.current.SelectedVideos.Value++;
                     v.IsSelected.Skip(1).Subscribe(value =>
                     {
                         if (value)
                         {
-                            this.SelectedVideos.Value++;
+                            this.current.SelectedVideos.Value++;
                         }
                         else
                         {
-                            this.SelectedVideos.Value--;
+                            this.current.SelectedVideos.Value--;
                         }
                     });
                 }, true);
@@ -432,16 +420,16 @@ namespace Niconicome.Models.Playlist.VideoList
                 result = this.refresher.Refresh(this.Videos, v =>
                 {
                     this.Videos.Add(v);
-                    if (v.IsSelected.Value) this.SelectedVideos.Value++;
+                    if (v.IsSelected.Value) this.current.SelectedVideos.Value++;
                     v.IsSelected.Skip(1).Subscribe(value =>
                     {
                         if (value)
                         {
-                            this.SelectedVideos.Value++;
+                            this.current.SelectedVideos.Value++;
                         }
                         else
                         {
-                            this.SelectedVideos.Value--;
+                            this.current.SelectedVideos.Value--;
                         }
                     });
                 });
@@ -659,11 +647,6 @@ namespace Niconicome.Models.Playlist.VideoList
 
             return new AttemptResult() { IsSucceeded = true };
         }
-
-        /// <summary>
-        /// 選択された動画数
-        /// </summary>
-        public ReactiveProperty<int> SelectedVideos { get; init; } = new();
 
         /// <summary>
         /// 動画一覧

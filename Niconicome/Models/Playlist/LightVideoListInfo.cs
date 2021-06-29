@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Playlist.VideoList;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Playlist
@@ -17,37 +19,74 @@ namespace Niconicome.Models.Playlist
         ReactiveProperty<string> Message { get; set; }
     }
 
+    public interface ILightVideoListinfoHandler
+    {
+        ILightVideoListInfo GetLightVideoListInfo(int videoId, int playlistId);
+        void AddPlaylist(int playlistID);
+    }
+
     /// <summary>
     /// ハンドラ
     /// </summary>
-    public static class LightVideoListinfoHandler
+    public class LightVideoListinfoHandler : ILightVideoListinfoHandler
     {
-        private static readonly Dictionary<int, List<ILightVideoListInfo>> videoListInfos = new();
-
-
-        public static ILightVideoListInfo GetLightVideoListInfo(int videoId, int playlistId)
+        public LightVideoListinfoHandler(ICurrent current)
         {
-            List<ILightVideoListInfo> list = LightVideoListinfoHandler.videoListInfos[playlistId];
+            this.current = current;
+        }
 
-            ILightVideoListInfo? video = list.Find(v=>v.ID==videoId);
+        #region field
+
+        private readonly Dictionary<int, List<ILightVideoListInfo>> videoListInfos = new();
+
+        private readonly ICurrent current;
+
+        #endregion
+
+        /// <summary>
+        /// 動画譲歩を取得する
+        /// </summary>
+        /// <param name="videoId"></param>
+        /// <param name="playlistId"></param>
+        /// <returns></returns>
+        public ILightVideoListInfo GetLightVideoListInfo(int videoId, int playlistId)
+        {
+            List<ILightVideoListInfo> list = this.videoListInfos[playlistId];
+
+            ILightVideoListInfo? video = list.Find(v => v.ID == videoId);
             if (video is null)
             {
                 video = new LightVideoListInfo() { ID = videoId };
+                video.IsSelected.Skip(1).Subscribe(value =>
+                {
+                    if ((this.current.SelectedPlaylist.Value?.Id ?? -1) == playlistId)
+                    {
+                        if (value)
+                        {
+                            this.current.SelectedVideos.Value++;
+                        }
+                        else
+                        {
+                            this.current.SelectedVideos.Value--;
+                        }
+                    }
+
+                });
                 list.Add(video);
             }
 
             return video;
-         }
+        }
 
         /// <summary>
         /// プレイリストを追加する
         /// </summary>
         /// <param name="playlistID"></param>
-        public static void AddPlaylist(int playlistID)
+        public void AddPlaylist(int playlistID)
         {
-            if (!LightVideoListinfoHandler.videoListInfos.ContainsKey(playlistID))
+            if (!this.videoListInfos.ContainsKey(playlistID))
             {
-                LightVideoListinfoHandler.videoListInfos.Add(playlistID, new List<ILightVideoListInfo>());
+                this.videoListInfos.Add(playlistID, new List<ILightVideoListInfo>());
             }
         }
     }
