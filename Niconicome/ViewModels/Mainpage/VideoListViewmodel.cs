@@ -1619,7 +1619,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 強制的に元のスクロール位置に戻すスクロール変更値の最小値
         /// </summary>
-        private readonly double minimumVerticalOffsetChangeToFourceScroll = 50;
+        private readonly double minimumVerticalOffsetChangeToFourceScroll = 100;
 
         protected override void OnAttached()
         {
@@ -1645,6 +1645,7 @@ namespace Niconicome.ViewModels.Mainpage
         private void OnScroll(object? sender, ScrollChangedEventArgs e)
         {
             if (sender is null || sender is not ScrollViewer scrollViewer) return;
+            if (WS::Mainpage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DisableScrollRestore).Value) return;
 
 
             if (scrollViewer is null) return;

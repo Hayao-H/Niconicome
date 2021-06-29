@@ -189,6 +189,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.FFmpegFormat => STypes::SettingNames.FFmpegFormat,
                 SettingsEnum.SearchFileByID => STypes::SettingNames.SearchVideosByID,
                 SettingsEnum.ThumbSize => STypes::SettingNames.ThumbnailSize,
+                SettingsEnum.DisableScrollRestore => STypes::SettingNames.DisableScrollRestore,
                 _ => null
             };
         }
@@ -268,5 +269,6 @@ namespace Niconicome.Models.Local.Settings
         FFmpegFormat,
         SearchFileByID,
         ThumbSize,
+        DisableScrollRestore,
     }
 }

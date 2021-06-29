@@ -9,6 +9,7 @@
         xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
+        Background="{StaticResource MaterialDesignPaper}"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -74,6 +75,19 @@
                 <Label Content="DL失敗履歴を表示・保持しない"/>
                 <ToggleButton 
                     IsChecked="{Binding IsDownloadFailedHistoryDisabled.Value}"
+                    HorizontalAlignment="Right"
+                    />
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="ArrowVerticalLock" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="スクロール位置の復元を無効にする" ToolTip="プレイリスト更新時などにスクロール位置が毎回リセットされます。"/>
+                <ToggleButton 
+                    IsChecked="{Binding IsRestoringScrollPosDisabled.Value}"
                     HorizontalAlignment="Right"
                     />
             </DockPanel>
