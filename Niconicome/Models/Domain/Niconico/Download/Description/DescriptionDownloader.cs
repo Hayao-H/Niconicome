@@ -246,7 +246,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             data.Thumb.ChName = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelName;
             data.Thumb.ChId = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelID;
 
-            return Xmlparser.Serialize(data, new System.Xml.XmlWriterSettings());
+            return Xmlparser.Serialize(data);
         }
 
 
