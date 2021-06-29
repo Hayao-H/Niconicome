@@ -401,17 +401,6 @@ namespace Niconicome.Models.Playlist.VideoList
                 {
                     this.Videos.Add(v);
                     if (v.IsSelected.Value) this.current.SelectedVideos.Value++;
-                    v.IsSelected.Skip(1).Subscribe(value =>
-                    {
-                        if (value)
-                        {
-                            this.current.SelectedVideos.Value++;
-                        }
-                        else
-                        {
-                            this.current.SelectedVideos.Value--;
-                        }
-                    });
                 }, true);
             }
             else
@@ -421,17 +410,6 @@ namespace Niconicome.Models.Playlist.VideoList
                 {
                     this.Videos.Add(v);
                     if (v.IsSelected.Value) this.current.SelectedVideos.Value++;
-                    v.IsSelected.Skip(1).Subscribe(value =>
-                    {
-                        if (value)
-                        {
-                            this.current.SelectedVideos.Value++;
-                        }
-                        else
-                        {
-                            this.current.SelectedVideos.Value--;
-                        }
-                    });
                 });
             }
 
