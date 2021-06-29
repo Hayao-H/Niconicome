@@ -22,7 +22,7 @@ namespace Niconicome.Views
     {
         public DownloadTasksWindows()
         {
-            InitializeComponent();
+            this.InitializeComponent();
             this.DataContext = new DownloadTasksWindowViewModel();
         }
     }

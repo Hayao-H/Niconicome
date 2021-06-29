@@ -2,11 +2,12 @@
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Auth = Niconicome.Models.Auth;
-using Channel = Niconicome.Models.Domain.Niconico.Video.Channel;
+using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
 using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
 using DlComment = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DlDescription = Niconicome.Models.Domain.Niconico.Download.Description;
+using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
 using DlThumb = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using DlVideo = Niconicome.Models.Domain.Niconico.Download.Video;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
@@ -18,6 +19,7 @@ using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
 using Ext = Niconicome.Models.Local.External;
+using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Ichiba = Niconicome.Models.Domain.Niconico.Video.Ichiba;
 using Import = Niconicome.Models.Local.External.Import;
@@ -25,23 +27,23 @@ using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 using MyApplication = Niconicome.Models.Local.Application;
-using Mylist = Niconicome.Models.Domain.Niconico.Mylist;
+using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using Playlist = Niconicome.Models.Playlist;
+using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
-using Search = Niconicome.Models.Domain.Niconico.Search;
+using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
 using Settings = Niconicome.Models.Local.Settings;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
-using Utils = Niconicome.Models.Domain.Utils;
+using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
-using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
-using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
-using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
+using Style = Niconicome.Models.Domain.Local.Style;
+using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -71,9 +73,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Niconico.IDbUrlHandler, Niconico::DbUrlHandler>();
             services.AddTransient<Auth::ISession, Auth::Session>();
             services.AddSingleton<Niconico::INiconicoContext, Niconico::NiconicoContext>();
-            services.AddTransient<Utils::IErrorHandler, Utils::ErrorHandler>();
-            services.AddSingleton<Utils::ILogStream, Utils::LogStream>();
-            services.AddTransient<Utils::ILogger, Utils::Logger>();
+            services.AddTransient<IErrorHandler, ErrorHandler>();
+            services.AddSingleton<ILogStream, LogStream>();
+            services.AddTransient<ILogger, Logger>();
             services.AddSingleton<DataBase::IDataBase, DataBase::DataBase>();
             services.AddTransient<Store::IPlaylistStoreHandler, Store::PlaylistStoreHandler>();
             services.AddTransient<Store::IVideoStoreHandler, Store::VideoStoreHandler>();
@@ -126,7 +128,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::IBackuphandler, Local::BackupHandler>();
             services.AddTransient<DomainPlaylist::IPlaylistFileFactory, DomainPlaylist::PlaylistFileFactory>();
             services.AddTransient<Local::IPlaylistCreator, Local::PlaylistCreator>();
-            services.AddTransient<MyApplication::IShutdown, MyApplication::Shutdown>();
+            services.AddSingleton<MyApplication::IShutdown, MyApplication::Shutdown>();
             services.AddTransient<DlComment::ICommentDownloader, DlComment::CommentDownloader>();
             services.AddTransient<DlComment::ICommentConverter, DlComment::CommentConverter>();
             services.AddTransient<DlComment::ICommentClient, DlComment::CommentClient>();
@@ -163,6 +165,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::ILocalVideoUtils, Local::LocalVideoUtils>();
             services.AddTransient<IO::INicoDirectoryIO, IO::NicoDirectoryIO>();
             services.AddTransient<IO::INicoFileIO, IO::NicoFileIO>();
+            services.AddTransient<IO::IFileWatcher, IO::FileWatcher>();
             services.AddTransient<Resume::ISegmentsDirectoryHandler, Resume::SegmentsDirectoryHandler>();
             services.AddTransient<Resume::IStreamResumer, Resume::StreamResumer>();
             services.AddSingleton<VList::ICurrent, VList::Current>();
@@ -173,11 +176,21 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainNet::INetWorkHelper, DomainNet::NetWorkHelper>();
             services.AddTransient<Ichiba::IIchibaHtmlParser, Ichiba::IchibaHtmlParser>();
             services.AddTransient<Ichiba::INiconicoIchibaHandler, Ichiba::NiconicoIchibaHandler>();
-            services.AddTransient<Utils::IPathOrganizer, Utils::PathOrganizer>();
+            services.AddTransient<IPathOrganizer, PathOrganizer>();
             services.AddTransient<DlIchiba::IIchibaInfoDownloader, DlIchiba::IchibaInfoDownloader>();
             services.AddTransient<FF::IFirefoxProfileManager, FF::FirefoxProfileManager>();
             services.AddTransient<Cookies::IFirefoxCookieManager, Cookies::FirefoxCookieManager>();
-
+            services.AddTransient<PlaylistPlaylist::IPlaylistSettingsHandler, PlaylistPlaylist::PlaylistSettingsHandler>();
+            services.AddSingleton<Utils::IWindowsHelper, Utils::WindowsHelper>();
+            services.AddSingleton<MyApplication::IThemehandler, MyApplication::ThemeHandler>();
+            services.AddTransient<MyApplication::IApplicationPowerManager, MyApplication::ApplicationPowerManager>();
+            services.AddTransient<Style::IUserChromeHandler, Style::UserChromeHandler>();
+            services.AddSingleton<State::IStyleHandler, State::StyleHandler>();
+            services.AddSingleton<Settings::ILocalSettingsContainer, Settings::LocalSettingsContainer>();
+            services.AddTransient<Series::ISeriesHandler, Series::SeriesHandler>();
+            services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
+            services.AddSingleton<Playlist::IVideoInfoContainer, Playlist::VideoInfoContainer>();
+            services.AddSingleton<Playlist::ILightVideoListinfoHandler, Playlist::LightVideoListinfoHandler>();
             return services.BuildServiceProvider();
         }
 

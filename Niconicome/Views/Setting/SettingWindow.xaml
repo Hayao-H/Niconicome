@@ -12,7 +12,7 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
+        Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="Yu Gothic"
         WindowStartupLocation="CenterScreen"
         Title="設定" Height="600" Width="850">
@@ -25,18 +25,16 @@
             <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0" BorderThickness="0 0 1 0" BorderBrush="#e7e7e7">
-            <StackPanel Background="{DynamicResource MaterialDesignSnackbarBackground}">
-                <StackPanel.Resources>
-                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignBody1TextBlock}">
-                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignSnackbarRipple}"/>
-                    </Style>
-                </StackPanel.Resources>
+            <StackPanel 
+                Background="#323232"
+                TextElement.Foreground="#E7E7E7"
+                >
                 <i:Interaction.Behaviors>
                     <vm:SettingNavigationBehavior/>
                 </i:Interaction.Behaviors>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="CogOutline" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="CogOutline">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>
@@ -46,7 +44,7 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="File" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="File">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>
@@ -56,7 +54,7 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="Download" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="Download">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>
@@ -66,7 +64,7 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="ApplicationExport" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="ApplicationExport">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>
@@ -76,7 +74,7 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="FormatListBulleted" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="FormatListBulleted">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>
@@ -86,7 +84,17 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="RestoreAlert" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="Palette">
+                            <materialDesign:PackIcon.RenderTransform>
+                                <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
+                            </materialDesign:PackIcon.RenderTransform>
+                        </materialDesign:PackIcon>
+                        <TextBlock Padding="8 2 0 0" Text="スタイル設定" FontSize="20" Cursor="Hand"/>
+                    </DockPanel>
+                </Border>
+                <Border BorderThickness="6 0 0 0" Padding="5 4">
+                    <DockPanel>
+                        <materialDesign:PackIcon Kind="RestoreAlert">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>
@@ -96,7 +104,7 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="Import" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="Import">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>
@@ -106,7 +114,7 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="Bug" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="Bug">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>
@@ -116,7 +124,7 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="InfoCircle" Foreground="#898989">
+                        <materialDesign:PackIcon Kind="InfoCircle">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
                             </materialDesign:PackIcon.RenderTransform>

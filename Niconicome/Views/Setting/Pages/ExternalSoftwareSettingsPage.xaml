@@ -14,7 +14,6 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
       d:DataContext="{d:DesignInstance vm:ExternalSoftwareSettingsViewModelD,IsDesignTimeCreatable=True}"
         FontFamily="Yu Gothic"
       d:DesignHeight="800" d:DesignWidth="800"
@@ -27,8 +26,8 @@
         <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
             <TextBlock Text="外部ソフト設定" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
         </Border>
-        <ScrollViewer Grid.Row="1" Margin="8">
-            <StackPanel >
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="8">
                 <TextBlock Padding="8" TextWrapping="Wrap">
                 実行ファイルパスは実行ファイルの絶対パスを指定してください。(例: C:\video\player.exe)<LineBreak/>
                 ただし、実行ファイルのパスが通っている場合は、ファイル名を利用することが出来ます。<LineBreak/>
@@ -47,9 +46,9 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="「アプリで開く(A)」のパス(_A)" Target="{Binding ElementName=videoappa}"/>
+                        <Label Content="「アプリで開く(A)」のパス"/>
                     </StackPanel>
-                    <TextBox Margin="10 0 0 0" Text="{Binding PlayerAPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="videoappa"/>
+                    <TextBox Margin="10 0 0 0" Text="{Binding PlayerAPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <StackPanel>
@@ -59,9 +58,9 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="「アプリで開く(B)」のパス(_B)" Target="{Binding ElementName=videoappb}"/>
+                        <Label Content="「アプリで開く(B)」のパス"/>
                     </StackPanel>
-                    <TextBox Margin="10 0 0 0" Text="{Binding PlayerBPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="videoappb"/>
+                    <TextBox Margin="10 0 0 0" Text="{Binding PlayerBPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <StackPanel>
@@ -71,12 +70,12 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="「アプリに送る(A)」のパス(_U)" Target="{Binding ElementName=appurl}"/>
+                        <Label Content="「アプリに送る(A)」のパス" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppAPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="appurl"/>
+                        <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppAPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" />
                         <Label Content="パラメーター"/>
-                        <TextBox Text="{Binding AppAParam,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
+                        <TextBox Text="{Binding AppAParam.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
                     </StackPanel>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
@@ -87,12 +86,12 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="「アプリに送る(B)」のパス(_I)" Target="{Binding ElementName=appid}"/>
+                        <Label Content="「アプリに送る(B)」のパス"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppBPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="appid"/>
+                        <TextBox Width="350" Margin="10 0 0 0" Text="{Binding AppBPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                         <Label Content="パラメーター"/>
-                        <TextBox Text="{Binding AppBParam,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
+                        <TextBox Text="{Binding AppBParam.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" Width="100"/>
                     </StackPanel>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
@@ -103,18 +102,29 @@
                                 <TranslateTransform Y="7"/>
                             </materialDesign:PackIcon.RenderTransform>
                         </materialDesign:PackIcon>
-                        <Label Content="ffmpegのパス(_F)" Target="{Binding ElementName=ffmpegpath}"/>
+                        <Label Content="ffmpegのパス"/>
                     </StackPanel>
-                    <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath,Mode=TwoWay,UpdateSourceTrigger=LostFocus}" x:Name="ffmpegpath"/>
-                    <DockPanel Margin="6">
-                        <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
-                            <materialDesign:PackIcon.RenderTransform>
-                                <TranslateTransform Y="7"/>
-                            </materialDesign:PackIcon.RenderTransform>
-                        </materialDesign:PackIcon>
-                        <Label Content="FFmpegの起動にシェルを利用する"/>
-                        <ToggleButton IsChecked="{Binding   UseShellWhenLaunchingFFmpeg,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Right"/>
-                    </DockPanel>
+                    <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
+                    <StackPanel Margin="6">
+                        <DockPanel>
+                            <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
+                                <materialDesign:PackIcon.RenderTransform>
+                                    <TranslateTransform Y="7"/>
+                                </materialDesign:PackIcon.RenderTransform>
+                            </materialDesign:PackIcon>
+                            <Label Content="FFmpegの起動にシェルを利用する"/>
+                            <ToggleButton IsChecked="{Binding   UseShellWhenLaunchingFFmpeg,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                        </DockPanel>
+                        <DockPanel>
+                            <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
+                                <materialDesign:PackIcon.RenderTransform>
+                                    <TranslateTransform Y="7"/>
+                                </materialDesign:PackIcon.RenderTransform>
+                            </materialDesign:PackIcon>
+                            <Label Content="FFmpegのフォーマット"/>
+                            <TextBox  Margin="10 0 0 0" Text="{Binding FFmpegFormat.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
+                        </DockPanel>
+                    </StackPanel>
                 </StackPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>

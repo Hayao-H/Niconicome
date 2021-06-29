@@ -72,7 +72,7 @@ namespace Niconicome.Models.Domain.Niconico
             bool exists = this.dataBase.Exists<UrlSetting>(UrlSetting.TableName, setting => setting.SettingName == settingName);
             if (exists)
             {
-                return this.dataBase.GetRecord<UrlSetting>(UrlSetting.TableName, setting => setting.SettingName == settingName)!.GetUrl();
+                return this.dataBase.GetRecord<UrlSetting>(UrlSetting.TableName, setting => setting.SettingName == settingName).Data!.GetUrl();
             }
             else
             {

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.ViewModels;
@@ -17,22 +18,45 @@ namespace Niconicome.Models.Playlist.VideoList
     {
         ReactiveProperty<ITreePlaylistInfo?> SelectedPlaylist { get; }
         ReactiveProperty<int> CurrentSelectedIndex { get; }
+        ReactiveProperty<int> SelectedVideos { get; }
+        ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; }
         string PlaylistFolderPath { get; }
         int PrevSelectedPlaylistID { get; }
     }
 
     public class Current : BindableBase, ICurrent
     {
-        public Current(ILocalSettingHandler settingHandler)
+        public Current(ILocalSettingHandler settingHandler,IPlaylistTreeHandler treeHandler)
         {
             this.settingHandler = settingHandler;
+            this.treeHandler = treeHandler;
 
             this.SelectedPlaylist = new ReactiveProperty<ITreePlaylistInfo?>();
+            this.IsTemporaryPlaylist = this.SelectedPlaylist
+                .Select(p => p?.IsTemporary ?? false)
+                .ToReadOnlyReactiveProperty();
+
             this.SelectedPlaylist.Subscribe(value =>
             {
                 if (value is not null)
                 {
-                    this.PlaylistFolderPath = value.Folderpath.IsNullOrEmpty() ? this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? FileFolder.DefaultDownloadDir : value.Folderpath;
+                    string? defaultFolder = this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder);
+
+                    if (string.IsNullOrEmpty(defaultFolder))
+                    {
+                        defaultFolder = FileFolder.DefaultDownloadDir;
+                    } else if (defaultFolder.Contains("<autoMap>"))
+                    {
+                        List<string> ancesnter = this.treeHandler.GetListOfAncestor(value.Id);
+                        if (ancesnter.Count > 1)
+                        {
+                            ancesnter = ancesnter.GetRange(1, ancesnter.Count - 1);
+                        }
+                        string path = string.Join('\\', ancesnter);
+                        defaultFolder = defaultFolder.Replace("<autoMap>", path);
+                    }
+
+                    this.PlaylistFolderPath = value.Folderpath.IsNullOrEmpty() ?  defaultFolder : value.Folderpath;
                 }
                 else
                 {
@@ -52,6 +76,8 @@ namespace Niconicome.Models.Playlist.VideoList
 
         private readonly ILocalSettingHandler settingHandler;
 
+        private readonly IPlaylistTreeHandler treeHandler;
+
         #endregion
 
         /// <summary>
@@ -63,6 +89,18 @@ namespace Niconicome.Models.Playlist.VideoList
         /// 選択された動画のインデックス
         /// </summary>
         public ReactiveProperty<int> CurrentSelectedIndex { get; init; }
+
+        /// <summary>
+        /// 選択されている動画数
+        /// </summary>
+        public ReactiveProperty<int> SelectedVideos { get; init; } = new();
+         
+
+        /// <summary>
+        /// 一時プレイリストフラグ
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; init; }
+
 
         /// <summary>
         /// ひとつまえに選択していたプレイリスト

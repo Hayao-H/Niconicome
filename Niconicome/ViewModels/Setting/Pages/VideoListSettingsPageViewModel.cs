@@ -8,6 +8,7 @@ using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
@@ -41,6 +42,13 @@ namespace Niconicome.ViewModels.Setting.Pages
             {
                 this.SaveSetting(value, SettingsEnum.NoRestoreClumnWIdth);
             });
+
+            this.IsDownloadSucceededHistoryDisabled = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.DisableDLSucceededHistory));
+            this.IsDownloadSucceededHistoryDisabled.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.DisableDLSucceededHistory)).AddTo(this.disposables);
+            this.IsDownloadFailedHistoryDisabled = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.DisableDLFailedHistory));
+            this.IsDownloadFailedHistoryDisabled.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.DisableDLFailedHistory)).AddTo(this.disposables);
+            this.IsRestoringScrollPosDisabled = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DisableScrollRestore);
+
             #endregion
         }
 
@@ -62,6 +70,21 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// 幅を継承しない
         /// </summary>
         public ReactiveProperty<bool> IsRestoreingColumnWidthDisabled { get; init; }
+
+        /// <summary>
+        /// DL成功履歴を無効にする
+        /// </summary>
+        public ReactiveProperty<bool> IsDownloadSucceededHistoryDisabled { get; init; }
+
+        /// <summary>
+        /// DL失敗履歴を無効にする
+        /// </summary>
+        public ReactiveProperty<bool> IsDownloadFailedHistoryDisabled { get; init; }
+
+        /// <summary>
+        /// スクロール一復元を無効にする
+        /// </summary>
+        public ReactiveProperty<bool> IsRestoringScrollPosDisabled { get; init; }
 
     }
 
@@ -87,5 +110,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ComboboxItem<VideodbClickSettings> VideodbClickAction { get; set; }
 
         public ReactiveProperty<bool> IsRestoreingColumnWidthDisabled { get; init; } = new(false);
+
+        public ReactiveProperty<bool> IsDownloadSucceededHistoryDisabled { get; init; } = new(true);
+
+        public ReactiveProperty<bool> IsDownloadFailedHistoryDisabled { get; init; } = new(true);
+
+        public ReactiveProperty<bool> IsRestoringScrollPosDisabled { get; init; } = new(true);
+
     }
 }

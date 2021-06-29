@@ -2,6 +2,7 @@
 using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local;
+using Niconicome.Models.Local.Application;
 using Niconicome.Models.Local.External.Import;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
@@ -24,5 +25,9 @@ namespace Niconicome.Workspaces
         public static IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoListContainer>();
         public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
         public static IAutoLogin AutoLogin { get; private set; } = DIFactory.Provider.GetRequiredService<IAutoLogin>();
+        public static IThemehandler Themehandler { get; private set; } = DIFactory.Provider.GetRequiredService<IThemehandler>();
+        public static IStyleHandler StyleHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IStyleHandler>();
+        public static IApplicationPowerManager PowerManager { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
+        public static ILocalSettingsContainer SettingsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingsContainer>();
     }
 }

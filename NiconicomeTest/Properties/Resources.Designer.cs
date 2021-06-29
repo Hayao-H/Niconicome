@@ -205,6 +205,25 @@ namespace NiconicomeTest.Properties {
         
         /// <summary>
         ///   &lt;!DOCTYPE html&gt;
+        ///&lt;html lang=&quot;ja-jp&quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///
+        ///    &lt;meta charset=&quot;utf-8&quot;&gt;
+        ///    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+        ///    &lt;meta name=&quot;copyright&quot; content=&quot;&amp;copy; DWANGO Co., Ltd.&quot;&gt;
+        ///    &lt;link rel=&quot;shortcut icon&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/favicon.ico&quot;&gt;
+        ///    &lt;link rel=&quot;icon&quot; type=&quot;image/png&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/32.png&quot; sizes=&quot;32x32&quot;&gt;
+        ///    &lt;link rel=&quot;icon&quot; type=&quot;image/png&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/48 [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Series_Touhou {
+            get {
+                return ResourceManager.GetString("Series_Touhou", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   &lt;!DOCTYPE html&gt;
         ///&lt;html lang=&quot;ja&quot;&gt;
         ///  &lt;head&gt;
         ///    &lt;meta charset=&quot;UTF-8&quot;&gt;
@@ -222,6 +241,15 @@ namespace NiconicomeTest.Properties {
         internal static string User_Video_Response {
             get {
                 return ResourceManager.GetString("User_Video_Response", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   {&quot;mainPage&quot;:{&quot;videoList&quot;:{&quot;videoListItemHeight&quot;:200}}} に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string userChrome {
+            get {
+                return ResourceManager.GetString("userChrome", resourceCulture);
             }
         }
         

@@ -12,7 +12,7 @@
              TextElement.FontSize="13"
              TextOptions.TextFormattingMode="Ideal"
              TextOptions.TextRenderingMode="Auto"
-             Background="{DynamicResource MaterialDesignBackground}"
+             Background="{DynamicResource MaterialDesignPaper}"
              FontFamily="Yu Gothic"
              d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingsViewModelD},IsDesignTimeCreatable=True}"
              d:Width="1200"
@@ -62,7 +62,17 @@
         <Separator/>
         <StackPanel Margin="0 5" Orientation="Horizontal">
             <Label Content="優先解像度:" Margin="0 0 5 0"/>
-            <ComboBox ItemsSource="{Binding Resolutions}" DisplayMemberPath="DisplayValue" SelectedItem="{Binding SelectedResolution.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+            <ComboBox 
+                ItemsSource="{Binding Resolutions}" 
+                DisplayMemberPath="DisplayValue" 
+                SelectedItem="{Binding SelectedResolution.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0 0 5 0"/>
+            <Label Content="サムネサイズ:" Margin="0 0 5 0"/>
+            <ComboBox 
+                ItemsSource="{Binding ThumbSizes}" 
+                DisplayMemberPath="DisplayValue" 
+                SelectedItem="{Binding SelectedThumbSize.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0 0 5 0"/>
         </StackPanel>
         <Separator/>
         <Grid Margin="0 5">

@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Windows.Automation;
+using System.Windows.Input;
+using Windows.Foundation;
 
 namespace Niconicome.Models.Domain.Local.IO
 {
@@ -6,10 +10,22 @@ namespace Niconicome.Models.Domain.Local.IO
     {
         bool Exists(string path);
         void Delete(string path);
+        string OpenRead(string path);
+        void Write(string path, string content, bool append = false);
     }
 
     public class NicoFileIO : INicoFileIO
     {
+        public NicoFileIO(INicoDirectoryIO directoryIO)
+        {
+            this.directoryIO = directoryIO;
+        }
+
+        #region field
+
+        private readonly INicoDirectoryIO directoryIO;
+
+        #endregion
 
         /// <summary>
         /// ファイルの存在をチェックする
@@ -28,6 +44,40 @@ namespace Niconicome.Models.Domain.Local.IO
         public void Delete(string path)
         {
             File.Delete(path);
+        }
+
+        /// <summary>
+        /// ファイルを開いて読み込み
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public string OpenRead(string path)
+        {
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = new StreamReader(fs);
+            return reader.ReadToEnd();
+        }
+
+        /// <summary>
+        /// 文字列を書き込む
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="append"></param>
+        public void Write(string path, string content, bool append = false)
+        {
+            string? dirPath = Path.GetDirectoryName(path);
+            if (dirPath is not null)
+            {
+                bool exists = this.directoryIO.Exists(dirPath);
+                if (!exists)
+                {
+                    this.directoryIO.Create(dirPath);
+                }
+            }
+
+            using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+            using var writer = new StreamWriter(fs);
+            writer.Write(content);
         }
     }
 }

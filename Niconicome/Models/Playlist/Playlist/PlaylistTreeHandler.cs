@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Local.Settings;
 using Reactive.Bindings.ObjectExtensions;
+using Windows.ApplicationModel.Payments;
 
 namespace Niconicome.Models.Playlist.Playlist
 {
@@ -22,7 +24,9 @@ namespace Niconicome.Models.Playlist.Playlist
         bool IsLastChild(ITreePlaylistInfo child);
         bool IsLastChild(int id);
         ITreePlaylistInfo? GetParent(int id);
+        ITreePlaylistInfo GetTmp();
         IEnumerable<ITreePlaylistInfo> GetAllPlaylists();
+        List<string> GetListOfAncestor(int id);
         ObservableCollection<ITreePlaylistInfo> Playlists { get; }
     }
 
@@ -32,9 +36,26 @@ namespace Niconicome.Models.Playlist.Playlist
     /// </summary>
     public class PlaylistTreeHandler : IPlaylistTreeHandler
     {
+        public PlaylistTreeHandler(IPlaylistSettingsHandler playlistSettingsHandler)
+        {
+            this.playlistSettingsHandler = playlistSettingsHandler;
+        }
+
+        /// <summary>
+        /// 内部プレイリスト(辞書で管理)
+        /// </summary>
         private readonly Dictionary<int, ITreePlaylistInfo> innertPlaylists = new();
 
+        /// <summary>
+        /// プレイリスト
+        /// </summary>
         public ObservableCollection<ITreePlaylistInfo> Playlists { get; init; } = new();
+
+        #region field
+
+        private readonly IPlaylistSettingsHandler playlistSettingsHandler;
+
+        #endregion
 
         #region CRUD系メソッド
 
@@ -82,14 +103,15 @@ namespace Niconicome.Models.Playlist.Playlist
             {
                 ITreePlaylistInfo after = source[i];
 
-                //重複があった場合はプロパティーを引き継いでから削除する
+                //重複があった場合は更新する
                 ITreePlaylistInfo? before = this.GetPlaylist(after.Id);
                 if (before is not null)
                 {
                     after.BeforeSeparatorVisibility = before.BeforeSeparatorVisibility;
                     after.AfterSeparatorVisibility = before.AfterSeparatorVisibility;
                     after.IsExpanded = before.IsExpanded;
-                    this.Remove(before.Id);
+                    before.UpdateData(after);
+                    continue;
                 }
 
                 if (!noAssociate)
@@ -125,18 +147,14 @@ namespace Niconicome.Models.Playlist.Playlist
         }
 
         /// <summary>
-        /// ツリーを取得する
+        /// 一時プレイリストを取得
         /// </summary>
         /// <returns></returns>
-        public ITreePlaylistInfo GetTree()
+        public ITreePlaylistInfo GetTmp()
         {
-            var root = this.GetRoot();
-            //ルートプレイリストがnullの場合はエラーを返す
-            if (root == null) throw new InvalidOperationException("ルートプレイリストが存在しません。");
-
-            return this.ConstructPlaylistInfo(root.Id);
-
+            return this.Playlists.First(p => p.IsTemporary);
         }
+
 
         /// <summary>
         /// すべてのプレイリストを取得する
@@ -148,6 +166,34 @@ namespace Niconicome.Models.Playlist.Playlist
         }
 
         #endregion
+
+        /// <summary>
+        /// 親プレイリストのリストを取得する
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public List<string> GetListOfAncestor(int id)
+        {
+            ITreePlaylistInfo? playlist = this.GetPlaylist(id);
+
+            if (playlist is null)
+            {
+                return new List<string>();
+            }
+
+            var ancester = new LinkedList<string>();
+            ancester.AddFirst(playlist.Name.Value);
+
+            ITreePlaylistInfo? parent = this.GetParent(playlist.Id);
+
+            while (parent is not null)
+            {
+                ancester.AddFirst(parent.Name.Value);
+                parent = this.GetParent(parent.Id);
+            }
+
+            return ancester.ToList();
+        }
 
         /// <summary>
         /// 指定されたIDのプレイリストを含むかどうかを返す
@@ -195,10 +241,60 @@ namespace Niconicome.Models.Playlist.Playlist
 
             var tree = this.GetTree();
             this.Playlists.Clear();
-            this.Playlists.Add(tree);
+            this.Playlists.Addrange(tree);
         }
 
         #region private
+
+        /// <summary>
+        /// ツリーを取得する
+        /// </summary>
+        /// <returns></returns>
+        private List<ITreePlaylistInfo> GetTree()
+        {
+            var list = new List<ITreePlaylistInfo>();
+
+            ITreePlaylistInfo? root = this.GetRoot();
+
+            //ルートプレイリストがnullの場合はエラーを返す
+            if (root == null) throw new InvalidOperationException("ルートプレイリストが存在しません。");
+
+            ITreePlaylistInfo? tmp = this.GetPlaylist(p => p.IsTemporary);
+            ITreePlaylistInfo? succeeded = this.GetPlaylist(p => p.IsDownloadSucceededHistory);
+            ITreePlaylistInfo? failed = this.GetPlaylist(p => p.IsDownloadFailedHistory);
+
+            bool succeededDisable = this.playlistSettingsHandler.IsDownloadSucceededHistoryDisabled;
+            bool failedDisable = this.playlistSettingsHandler.IsDownloadFailedHistoryDisabled;
+
+            if (tmp is null)
+            {
+                throw new InvalidOperationException("一時プレイリストが存在しません。");
+            }
+            else if (!succeededDisable && succeeded is null)
+            {
+                throw new InvalidOperationException("DL成功履歴プレイリストが存在しません。");
+            }
+            else if (!failedDisable && failed is null)
+            {
+                throw new InvalidOperationException("DL失敗履歴プレイリストが存在しません。");
+            }
+
+            list.Add(this.ConstructPlaylistInfo(root.Id));
+            list.Add(tmp);
+
+            if (!failedDisable)
+            {
+                list.Add(failed!);
+            }
+            if (!succeededDisable)
+            {
+                list.Add(succeeded!);
+            }
+
+            return list;
+
+        }
+
         /// <summary>
         /// ルートプレイリストを取得する
         /// </summary>
@@ -208,6 +304,15 @@ namespace Niconicome.Models.Playlist.Playlist
             return this.GetAllPlaylists().FirstOrDefault(p => p.IsRoot);
         }
 
+        /// <summary>
+        /// 条件を指定してプレイリストを取得する
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        private ITreePlaylistInfo? GetPlaylist(Func<ITreePlaylistInfo, bool> predicate)
+        {
+            return this.innertPlaylists.FirstOrDefault(kv => predicate(kv.Value)).Value;
+        }
 
         /// <summary>
         /// 完全なプレイリストツリーを構築する
@@ -224,7 +329,10 @@ namespace Niconicome.Models.Playlist.Playlist
                     var parent = this.GetPlaylist(parentID);
                     if (parent is not null)
                     {
-                        parent.Children.Add(self.Value);
+                        if (!parent.Children.Any(p => p.Id == self.Value.Id))
+                        {
+                            parent.Children.Add(self.Value);
+                        }
                     }
                 }
             }

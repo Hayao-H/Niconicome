@@ -13,7 +13,6 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource Window_Style}"
         d:DataContext="{d:DesignInstance {x:Type vm:DownloadTasksWindowViewModelD}, IsDesignTimeCreatable=True}"
@@ -57,7 +56,7 @@
                         <ListView.View>
                             <GridView>
                                 <GridView.Columns>
-                                    <GridViewColumn Header="ID"         DisplayMemberBinding="{Binding NiconicoID}"/>
+                                    <GridViewColumn Header="ID" DisplayMemberBinding="{Binding NiconicoID}"/>
                                     <GridViewColumn Header="タイトル" DisplayMemberBinding="{Binding Title}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
@@ -69,13 +68,13 @@
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <ProgressBar ToolTip="DL中です" Style="{StaticResource MaterialDesignCircularProgressBar}" Value="35" IsIndeterminate="{Binding IsProcessing}" Visibility="{Binding IsProcessing,Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                    <ProgressBar ToolTip="DL中です" Style="{StaticResource MaterialDesignCircularProgressBar}" Value="35" IsIndeterminate="{Binding IsProcessing.Value}" Visibility="{Binding IsProcessing.Value,Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                                     <materialDesign:PackIcon ToolTip="完了しました" Kind="Check" Foreground="Purple" Visibility="{Binding IsEnd,Converter={StaticResource BooleanToVisibilityConverter}}">
                                                         <materialDesign:PackIcon.RenderTransform>
                                                             <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-8"/>
                                                         </materialDesign:PackIcon.RenderTransform>
                                                     </materialDesign:PackIcon>
-                                                    <materialDesign:PackIcon ToolTip="キャンセルされました" Kind="Close" Foreground="Red" Visibility="{Binding IsCancel,Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <materialDesign:PackIcon ToolTip="キャンセルされました" Kind="Close" Foreground="Red" Visibility="{Binding IsCancel.Value,Converter={StaticResource BooleanToVisibilityConverter}}">
                                                         <materialDesign:PackIcon.RenderTransform>
                                                             <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-8"/>
                                                         </materialDesign:PackIcon.RenderTransform>
@@ -84,7 +83,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="メッセージ" DisplayMemberBinding="{Binding Message}"/>
+                                    <GridViewColumn Header="メッセージ" DisplayMemberBinding="{Binding Message.Value}"/>
                                     <GridViewColumn Header="中止">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>

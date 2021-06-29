@@ -25,6 +25,8 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public int Sequence { get; set; }
 
+        public int BookMarkedVideoID { get; set; } = -1;
+
         public string? PlaylistName { get; set; }
 
         public string? FolderPath { get; set; }
@@ -45,9 +47,17 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public bool IsChannel { get; set; }
 
+        public bool IsSeries { get; set; }
+
         public bool IsExpanded { get; set; }
 
         public  bool IsVideoDescending { get; set; }
+
+        public bool IsDownloadSucceededHistory { get; set; }
+
+        public bool IsDownloadFailedHistory { get; set; }
+
+        public bool IsTemporary { get; set; }
 
         public List<int> CustomVideoSequence { get; set; } = new();
 

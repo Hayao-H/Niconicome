@@ -1,5 +1,5 @@
 using System.Linq;
-using Niconicome.Models.Domain.Niconico.Video.Channel;
+using Niconicome.Models.Domain.Niconico.Remote.Channel;
 using Niconicome.Models.Domain.Utils;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;

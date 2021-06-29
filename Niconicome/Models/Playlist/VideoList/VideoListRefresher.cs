@@ -18,12 +18,12 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public interface IVideoListRefresher
     {
-        IAttemptResult Refresh(ObservableCollection<IListVideoInfo> videos);
+        IAttemptResult Refresh(IEnumerable<IListVideoInfo> videos, Action<IListVideoInfo> addFunc, bool disableDBRetrieving = false);
     }
 
     public class VideoListRefresher : IVideoListRefresher
     {
-        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current)
+        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalSettingHandler localSettingHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current, ILightVideoListinfoHandler lightVideoListinfoHandler)
         {
             this.playlistStoreHandler = playlistStoreHandler;
             this.videoHandler = videoHandler;
@@ -31,6 +31,7 @@ namespace Niconicome.Models.Playlist.VideoList
             this.settingHandler = localSettingHandler;
             this.videoThumnailUtility = videoThumnailUtility;
             this.localVideoUtils = localVideoUtils;
+            this.lightVideoListinfoHandler = lightVideoListinfoHandler;
         }
 
         #region DIされるクラス
@@ -47,6 +48,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
         private readonly ICurrent current;
 
+        private ILightVideoListinfoHandler lightVideoListinfoHandler;
         #endregion
 
         /// <summary>
@@ -54,7 +56,7 @@ namespace Niconicome.Models.Playlist.VideoList
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public IAttemptResult Refresh(ObservableCollection<IListVideoInfo> videos)
+        public IAttemptResult Refresh(IEnumerable<IListVideoInfo> videos, Action<IListVideoInfo> addFunc, bool disableDBRetrieving = false)
         {
             var playlistID = this.current.SelectedPlaylist.Value?.Id ?? -1;
 
@@ -65,18 +67,31 @@ namespace Niconicome.Models.Playlist.VideoList
                     Message = $"プレイストが選択されていません。",
                 };
             }
-            var playlist = this.playlistStoreHandler.GetPlaylist(playlistID);
-            var originVideos = playlist?.Videos;
 
-            if (playlist is null)
+            IEnumerable<IListVideoInfo> originalVideos;
+            if (disableDBRetrieving)
             {
-                return new AttemptResult()
+                originalVideos = videos;
+            }
+            else
+            {
+                var playlist = this.playlistStoreHandler.GetPlaylist(playlistID);
+
+                if (playlist is null)
                 {
-                    Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
-                };
+                    return new AttemptResult()
+                    {
+                        Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
+                    };
+                }
+                originalVideos = playlist.Videos.Select(v => {
+                    IListVideoInfo video = VideoInfoContainer.New();
+                    video.Id.Value = v.Id;
+                    return video;
+                });
             }
 
-            if (originVideos is null)
+            if (originalVideos is null)
             {
                 return new AttemptResult()
                 {
@@ -87,10 +102,13 @@ namespace Niconicome.Models.Playlist.VideoList
             var format = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
             var replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
             var folderPath = this.current.PlaylistFolderPath;
+            bool searchByID = this.settingHandler.GetBoolSetting(SettingsEnum.SearchFileByID);
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
+            this.localVideoUtils.ClearCache();
+            this.lightVideoListinfoHandler.AddPlaylist(playlistID);
 
-            foreach (var originVideo in originVideos)
+            foreach (var originalVideo in originalVideos)
             {
                 if (playlistID != (this.current.SelectedPlaylist.Value?.Id ?? -1))
                 {
@@ -100,25 +118,22 @@ namespace Niconicome.Models.Playlist.VideoList
                     };
                 }
 
-                var video = this.videoHandler.GetVideo(originVideo.Id);
-
-                //保持されている動画情報があれば引き継ぐ
-                var lightVideo = LightVideoListinfoHandler.GetLightVideoListInfo(originVideo.Id, playlistID);
-
-                if (lightVideo is not null)
+                IListVideoInfo video;
+                if (disableDBRetrieving)
                 {
-                    video.MessageGuid = lightVideo.MessageGuid;
-                    video.IsSelected.Value = lightVideo.IsSelected;
-                    video.Message.Value = VideoMessenger.GetMessage(lightVideo.MessageGuid);
-                    video.FileName.Value = lightVideo.FileName;
+                    video = originalVideo;
                 }
                 else
                 {
-                    video.FileName.Value = string.Empty;
+                    video = this.videoHandler.GetVideo(originalVideo.Id.Value);
                 }
 
+                ILightVideoListInfo light = this.lightVideoListinfoHandler.GetLightVideoListInfo(video.Id.Value, playlistID);
+                video.Message = light.Message;
+                video.IsSelected = light.IsSelected;
 
-                var filename = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted);
+
+                var filename = this.localVideoUtils.GetFilePath(video, folderPath, format, replaceStricted, searchByID);
                 if (filename.EndsWith(FileFolder.Mp4FileExt) || filename.EndsWith(FileFolder.TsFileExt))
                 {
                     video.FileName.Value = filename;
@@ -147,23 +162,23 @@ namespace Niconicome.Models.Playlist.VideoList
                     });
                     video.IsThumbDownloading.Value = true;
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath("0");
-                    videos.Add(video);
+                    addFunc(video);
                 }
                 else if (!IsValidPath && hasCache)
                 {
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId.Value);
                     this.videoHandler.Update(video);
-                    videos.Add(video);
+                    addFunc(video);
                 }
                 else if (!hasCache)
                 {
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath("0");
-                    videos.Add(video);
+                    addFunc(video);
                 }
                 else
                 {
                     video.ThumbPath.Value = this.videoThumnailUtility.GetThumbFilePath(video.NiconicoId.Value);
-                    videos.Add(video);
+                    addFunc(video);
                 }
             }
 

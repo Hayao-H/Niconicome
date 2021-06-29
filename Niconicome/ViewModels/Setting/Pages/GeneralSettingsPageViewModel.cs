@@ -95,6 +95,12 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.isSavePrevPlaylistExpandedStateEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
             this.isStoreOnlyNiconicoIDEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
             this.isAutoRenamingRemotePlaylistEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.AutoRenameNetPlaylist);
+
+            this.IsSingletonWindowsEnable = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.SingletonWindows));
+            this.IsSingletonWindowsEnable.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.SingletonWindows)).AddTo(this.disposables);
+
+            this.IsConfirmngIfDownloadingEnable = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ConfirmIfDownloading));
+            this.IsConfirmngIfDownloadingEnable.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.ConfirmIfDownloading)).AddTo(this.disposables);
         }
 
         #region field
@@ -197,6 +203,19 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public bool IsAutoRenamingRemotePlaylistEnable { get => this.isAutoRenamingRemotePlaylistEnableField; set => this.Savesetting(ref this.isAutoRenamingRemotePlaylistEnableField, value, SettingsEnum.AutoRenameNetPlaylist); }
 
+        /// <summary>
+        /// DL中は終了時に確認する
+        /// </summary>
+        public ReactiveProperty<bool> IsConfirmngIfDownloadingEnable { get; init; }
+
+
+
+        /// <summary>
+        /// マルチウィンドウ禁止
+        /// </summary>
+        public ReactiveProperty<bool> IsSingletonWindowsEnable { get; init; }
+
+
 
 
     }
@@ -248,6 +267,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactiveProperty<string> SelectedFirefoxProfileName { get; init; }
 
         public ReactiveProperty<bool> DisplayFirefoxPrifile { get; init; } = new(true);
+
+        public ReactiveProperty<bool> IsSingletonWindowsEnable { get; init; } = new(true);
+
+        public ReactiveProperty<bool> IsConfirmngIfDownloadingEnable { get; init; } = new();
 
         public List<ComboboxItem<int>> SelectableMaxParallelFetch { get; init; }
 

@@ -11,13 +11,14 @@ using System.Text.RegularExpressions;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Local.Settings;
+using System.Windows;
 
 namespace Niconicome.Models.Domain.Local.LocalFile
 {
 
     public interface IEncodeutility
     {
-        Task EncodeAsync(string inputFilePath, string outputFileName, CancellationToken token, EncodeOptions options = EncodeOptions.Default);
+        Task EncodeAsync(string inputFilePath, string outputFilePath, string commandFormat, CancellationToken token, EncodeOptions options = EncodeOptions.Default);
     }
 
     class Encodeutility : IEncodeutility
@@ -40,11 +41,11 @@ namespace Niconicome.Models.Domain.Local.LocalFile
         /// 非同期でエンコードする
         /// </summary>
         /// <param name="inputFilePath"></param>
-        /// <param name="outputFileName"></param>
+        /// <param name="outputFilePath"></param>
         /// <param name="token"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        public async Task EncodeAsync(string inputFilePath, string outputFileName, CancellationToken token, EncodeOptions options = EncodeOptions.Default)
+        public async Task EncodeAsync(string inputFilePath, string outputFilePath, string commandFormat, CancellationToken token, EncodeOptions options = EncodeOptions.Default)
         {
             var errorOutput = new StringBuilder();
             var useShell = this.settingHandler.GetBoolSetting(SettingsEnum.FFmpegShell);
@@ -52,10 +53,12 @@ namespace Niconicome.Models.Domain.Local.LocalFile
             using var p = new Process();
             p.StartInfo.FileName = useShell ? Environment.GetEnvironmentVariable("ComSpec") ?? "cmd.exe" : this.GetffmpegPath();
             p.StartInfo.UseShellExecute = false;
-            p.StartInfo.Arguments = this.GetCommand(inputFilePath, outputFileName, options, useShell);
+            p.StartInfo.Arguments = this.GetCommand(inputFilePath, outputFilePath, commandFormat, useShell);
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.CreateNoWindow = true;
+
+            this.logger.Log($"ffmpgegを実行します。(command:{p.StartInfo.Arguments}, filePath:{p.StartInfo.FileName})");
 
             p.ErrorDataReceived += (sender, e) =>
             {
@@ -84,10 +87,10 @@ namespace Niconicome.Models.Domain.Local.LocalFile
         /// コマンドを取得する
         /// </summary>
         /// <param name="inputFilePath"></param>
-        /// <param name="outputFileName"></param>
+        /// <param name="outputFilePath"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private string GetCommand(string inputFilePath, string outputFileName, EncodeOptions options, bool useShell)
+        private string GetCommand(string inputFilePath, string outputFilePath, string commandFormat, bool useShell)
         {
             var args = new List<string>();
             string ffmpegPath = this.GetffmpegPath();
@@ -98,20 +101,11 @@ namespace Niconicome.Models.Domain.Local.LocalFile
                 args.Add(ffmpegPath);
             }
 
-            args.Add($"-i \"{inputFilePath}\"");
-            args.Add("-y");
+            string formatedCommand = commandFormat
+                .Replace("<source>", inputFilePath)
+                .Replace("<output>", outputFilePath);
 
-            if (!this.localState.IsDebugMode)
-            {
-                args.Add("-loglevel error");
-            }
-
-            if (options == EncodeOptions.Copy)
-            {
-                args.Add("-c:a copy -c:v copy");
-            }
-
-            args.Add($"\"{outputFileName}\"");
+            args.Add(formatedCommand);
 
 
             return string.Join(" ", args);

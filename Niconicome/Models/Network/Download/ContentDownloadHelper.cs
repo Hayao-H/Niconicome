@@ -144,6 +144,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = vResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -171,6 +172,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = tResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -201,6 +203,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = cResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -230,6 +233,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = iResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -255,6 +259,7 @@ namespace Niconicome.Models.Network.Download
                     {
                         result.IsSucceeded = false;
                         result.Message = iResult.Message ?? "None";
+                        OnMessage("DL失敗");
                         return result;
                     }
                     else
@@ -288,10 +293,6 @@ namespace Niconicome.Models.Network.Download
             if (maxParallel <= 0)
             {
                 maxParallel = 1;
-            }
-            else if (maxParallel > 5)
-            {
-                maxParallel = 5;
             }
 
             var vSettings = settings.ConvertToVideoDownloadSettings(false, maxParallel);

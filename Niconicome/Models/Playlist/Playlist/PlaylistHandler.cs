@@ -13,12 +13,14 @@ using Niconicome.Models.Local.Settings;
 using State = Niconicome.Models.Local.State;
 using Utils = Niconicome.Models.Domain.Utils;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
+using System.Linq.Expressions;
 
 namespace Niconicome.Models.Playlist.Playlist
 {
     public interface IPlaylistHandler
     {
         int AddPlaylist(int parentId);
+        IAttemptResult<int> AddPlaylistToRoot();
         void DeletePlaylist(int playlistID);
         void Update(ITreePlaylistInfo newpaylist);
         IAttemptResult<int> AddVideo(IListVideoInfo video, int playlistID);
@@ -28,12 +30,14 @@ namespace Niconicome.Models.Playlist.Playlist
         void Move(int id, int targetId);
         void SetAsRemotePlaylist(int playlistId, string Id, string name, RemoteType type);
         void SetAsLocalPlaylist(int playlistId);
+        IAttemptResult BookMark(int videoID, int playlistID);
         IAttemptResult MoveVideoToPrev(int videoIndex, int playlistID);
         IAttemptResult MoveVideoToForward(int videoIndex, int playlistID);
         void SaveAllPlaylists();
         bool IsLastChild(int id);
         bool ContainsVideo(string niconicoId, int playlistId);
         ITreePlaylistInfo? GetPlaylist(int id);
+        ITreePlaylistInfo? GetSpecialPlaylist(SpecialPlaylistTypes types);
         ITreePlaylistInfo? GetParent(ITreePlaylistInfo child);
         ITreePlaylistInfo? GetRootPlaylist();
         IEnumerable<ITreePlaylistInfo> GetAllPlaylists();
@@ -91,9 +95,33 @@ namespace Niconicome.Models.Playlist.Playlist
             //ありえないけどエラー処理
             if (playlist is null) return -1;
 
-            this.treeHandler.MergeRange(new List<ITreePlaylistInfo>(){ playlist });
+            this.treeHandler.MergeRange(new List<ITreePlaylistInfo>() { playlist });
             return id;
         }
+
+        /// <summary>
+        /// プレイリストをルートに追加する
+        /// </summary>
+        /// <returns></returns>
+        public IAttemptResult<int> AddPlaylistToRoot()
+        {
+            ITreePlaylistInfo? root = this.GetRootPlaylist();
+
+            if (root is null)
+            {
+                return new AttemptResult<int>() { Message = "ルートプレイリストを取得できませんでした。" };
+            }
+
+            int result = this.AddPlaylist(root.Id);
+            if (result < 0)
+            {
+                return new AttemptResult<int>() { Message = "プレイリストの追加に失敗しました。" };
+            }
+
+            return new AttemptResult<int>() { IsSucceeded = true, Data = result };
+
+        }
+
 
         /// <summary>
         /// プレイリストを削除する
@@ -169,6 +197,7 @@ namespace Niconicome.Models.Playlist.Playlist
                     RemoteType.UserVideos => $"{name}さんの投稿動画",
                     RemoteType.WatchLater => "あとで見る",
                     RemoteType.Channel => name,
+                    RemoteType.Series => name,
                     _ => name,
                 };
 
@@ -178,7 +207,7 @@ namespace Niconicome.Models.Playlist.Playlist
 
                     if (playlist is not null)
                     {
-                        playlist.Name = playlistName;
+                        playlist.Name.Value = playlistName;
                         this.Update(playlist);
                     }
                 }
@@ -192,6 +221,27 @@ namespace Niconicome.Models.Playlist.Playlist
         public void SetAsLocalPlaylist(int playlistId)
         {
             this.playlistStoreHandler.SetAsLocalPlaylist(playlistId);
+        }
+
+        /// <summary>
+        /// ブックマークする
+        /// </summary>
+        /// <param name="videoID"></param>
+        /// <param name="playlistID"></param>
+        /// <returns></returns>
+        public IAttemptResult BookMark(int videoID, int playlistID)
+        {
+            ITreePlaylistInfo? playlist = this.GetPlaylist(playlistID);
+            if (playlist is null)
+            {
+                return new AttemptResult() { Message = $"存在しないプレイリストに対してブックマークが試行されました。(id:{playlistID})" };
+            }
+
+            playlist.BookMarkedVideoID = videoID;
+            this.Update(playlist);
+
+            return new AttemptResult() { IsSucceeded = true };
+
         }
 
 
@@ -276,6 +326,22 @@ namespace Niconicome.Models.Playlist.Playlist
         }
 
         /// <summary>
+        /// 特殊なプレイリストを取得する
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        public ITreePlaylistInfo? GetSpecialPlaylist(SpecialPlaylistTypes types)
+        {
+            var p = types switch
+            {
+                SpecialPlaylistTypes.DLFailedHistory => this.playlistStoreHandler.GetPlaylist(p => p.IsDownloadFailedHistory),
+                _ => this.playlistStoreHandler.GetPlaylist(p => p.IsDownloadSucceededHistory),
+            };
+            return p is null ? null : BindableTreePlaylistInfo.ConvertToTreePlaylistInfo(p);
+        }
+
+
+        /// <summary>
         /// 親プレイリストを取得する
         /// </summary>
         public ITreePlaylistInfo? GetParent(ITreePlaylistInfo child)
@@ -327,7 +393,7 @@ namespace Niconicome.Models.Playlist.Playlist
             if (this.playlistStoreHandler.Exists(newpaylist.Id))
             {
                 this.playlistStoreHandler.Update(newpaylist);
-                this.treeHandler.MergeRange(new List<ITreePlaylistInfo>{ newpaylist });
+                this.treeHandler.MergeRange(new List<ITreePlaylistInfo> { newpaylist });
             }
         }
 
@@ -383,5 +449,11 @@ namespace Niconicome.Models.Playlist.Playlist
             this.treeHandler.Initialize(list);
         }
 
+    }
+
+    public enum SpecialPlaylistTypes
+    {
+        DLSucceedeeHistory,
+        DLFailedHistory,
     }
 }

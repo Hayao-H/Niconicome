@@ -21,7 +21,7 @@ namespace Niconicome.Views
     {
         public NetworkVideoSettings()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

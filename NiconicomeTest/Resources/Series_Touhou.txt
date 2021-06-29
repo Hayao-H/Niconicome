@@ -1,0 +1,929 @@
+﻿<!DOCTYPE html>
+<html lang="ja-jp">
+<head>
+      
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="copyright" content="&copy; DWANGO Co., Ltd.">
+    <link rel="shortcut icon" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/favicon.ico"><link rel="icon" type="image/png" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/32.png" sizes="32x32"><link rel="icon" type="image/png" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/48.png" sizes="48x48"><link rel="icon" type="image/png" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/96.png" sizes="96x96"><link rel="icon" type="image/png" href="https://nicovideo.cdn.nimg.jp/web/images/favicon/144.png" sizes="144x144">
+
+    
+  <title>「つくった東方メドレー（全12件）」 コケさんのシリーズ - ニコニコ動画</title>
+  <meta name="description" content="コケさんの「つくった東方メドレー（全12件）」シリーズです。" />
+  <meta property="og:title" content="「つくった東方メドレー（全12件）」 コケさんのシリーズ - ニコニコ動画" />
+
+
+    <meta name="msapplication-task" content="name=ニコニコ動画; action-uri=http://www.nicovideo.jp/; icon-uri=https://nicovideo.cdn.nimg.jp/web/img/favicon.ico">
+    <meta property="fb:app_id" content="378853695459932">
+
+    
+
+    
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.nicovideo.jp/series/203356" />
+  <meta property="og:description" content="コケさんの「つくった東方メドレー（全12件）」シリーズです。" />
+  <meta property="og:image" content="https://dcdn.cdn.nimg.jp/nicovideo/series/tmb/0/47552716/203356.1614258825" />
+  <meta property="og:site_name" content="ニコニコ動画" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@nico_nico_info" />
+    <meta property="al:ios:url" content="nico://seriesDetail?seriesId=203356&utm_source=facebook&utm_medium=user_series&utm_content=203356&utm_campaign=facebook_app_links">
+  <meta property="al:ios:app_store_id" content="307764057">
+  <meta property="al:ios:app_name" content="ニコニコ動画">
+  <meta property="al:android:url" content="https://www.nicovideo.jp/series/203356?utm_source=facebook&utm_medium=user_series&utm_content=203356&utm_campaign=facebook_app_links">
+  <meta property="al:android:app_name" content="ニコニコ動画">
+  <meta property="al:android:package" content="jp.nicovideo.android">
+  <meta property="al:web:url" content="nico://seriesDetail?seriesId=203356&utm_source=facebook&utm_medium=user_series&utm_content=203356&utm_campaign=facebook_app_links">
+  <meta property="al:web:url" content="https://www.nicovideo.jp/series/203356">
+  <meta property="al:web:should_fallback" content="true">
+
+
+    
+                    <link rel="alternate" media="only screen and (max-width: 640px)" href="https://sp.nicovideo.jp/series/203356" />
+          
+  <link rel="canonical" href="https://www.nicovideo.jp/series/203356">
+  <link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/styles/pages/watch.css?cf8512b6" as="style"><link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/failover2flash/watch_failover2flash.js?025a757e" crossorigin="anonymous" as="script"><link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/modern/watch_dll_e1720ef8f8fa2a60338f.js" crossorigin="anonymous" as="script"><link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/modern/watch_app_98da6d3617c80f17da10.js" crossorigin="anonymous" as="script">
+
+
+            <script type="text/javascript">
+
+</script>
+<script>
+    
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','NicoGoogleTagManagerDataLayer','GTM-KXT7G5G');
+  
+</script>
+
+
+        <script>
+      window.Ads = { protocol: 'https:' };
+    </script>
+
+    
+  <link href="https://nicovideo.cdn.nimg.jp/web/styles/bundle/pages_series_Series.css?1617690709" rel="stylesheet">
+
+    
+  
+</head>
+<body class="BaseLayout  ja-jp ">
+
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KXT7G5G" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+  <div id="CommonHeader" class="CommonHeader" data-common-header="{&quot;initConfig&quot;:{&quot;frontendId&quot;:6,&quot;frontendVersion&quot;:&quot;0&quot;,&quot;site&quot;:&quot;niconico&quot;,&quot;debug&quot;:{&quot;showAppeal&quot;:false},&quot;baseUrl&quot;:{&quot;accountUrl&quot;:&quot;https:\/\/account.nicovideo.jp&quot;,&quot;channelUrl&quot;:&quot;https:\/\/ch.nicovideo.jp&quot;,&quot;communityUrl&quot;:&quot;https:\/\/com.nicovideo.jp&quot;,&quot;nicoadUrl&quot;:&quot;https:\/\/nicoad.nicovideo.jp&quot;,&quot;niconicoUrl&quot;:&quot;https:\/\/www.nicovideo.jp&quot;},&quot;customization&quot;:{&quot;cmnhdRef&quot;:{&quot;page&quot;:&quot;series&quot;},&quot;nextUrl&quot;:&quot;\/series\/203356&quot;,&quot;logoutNextUrl&quot;:&quot;\/&quot;,&quot;size&quot;:{&quot;hMargin&quot;:&quot;auto&quot;,&quot;maxWidth&quot;:&quot;1024px&quot;,&quot;minWidth&quot;:&quot;1024px&quot;},&quot;userPanelLinks&quot;:[{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/video_top&quot;,&quot;label&quot;:&quot;\u30cb\u30b3\u30cb\u30b3\u52d5\u753bTOP&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/ranking&quot;,&quot;label&quot;:&quot;\u30e9\u30f3\u30ad\u30f3\u30b0&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/my\/watchlater&quot;,&quot;label&quot;:&quot;\u3042\u3068\u3067\u898b\u308b&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/my\/mylist&quot;,&quot;label&quot;:&quot;\u30de\u30a4\u30ea\u30b9\u30c8&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/my\/history\/video&quot;,&quot;label&quot;:&quot;\u8996\u8074\u5c65\u6b74&quot;},{&quot;href&quot;:&quot;https:\/\/www.nicovideo.jp\/my\/follow&quot;,&quot;label&quot;:&quot;\u30d5\u30a9\u30ed\u30fc\u4e2d&quot;},{&quot;href&quot;:&quot;https:\/\/www.upload.nicovideo.jp\/garage\/&quot;,&quot;label&quot;:&quot;\u6295\u7a3f\u52d5\u753b\uff0f\u52d5\u753b\u3092\u6295\u7a3f\u3059\u308b&quot;},{&quot;href&quot;:&quot;https:\/\/blog.nicovideo.jp\/niconews\/category\/videotop\/&quot;,&quot;label&quot;:&quot;\u30cb\u30b3\u30cb\u30b3\u30a4\u30f3\u30d5\u30a9&quot;}]},&quot;user&quot;:{&quot;isLogin&quot;:true,&quot;id&quot;:74537208,&quot;isPremium&quot;:true,&quot;nickname&quot;:&quot;\u30b2\u30b9\u30c8&quot;,&quot;iconUrl&quot;:&quot;https:\/\/secure-dcdn.cdn.nimg.jp\/nicoaccount\/usericon\/7453\/74537208.jpg?1623591019&quot;}},&quot;language&quot;:&quot;ja&quot;,&quot;commonHeaderBaseUrl&quot;:&quot;https:\/\/secure-dcdn.cdn.nimg.jp\/&quot;}"></div>
+  
+  <div class="BaseLayout-header">
+    
+  <div class="HeaderContainer ">
+  <div class="HeaderContainer-logo">
+    <div class="LogoContainer">
+  <span class="Hidariue LogoContainer-hidariue">
+      <a class="Hidariue-link" href="https://www.nicovideo.jp/hidariue">
+    <img class="Hidariue-image" src="https://nicovideo.cdn.nimg.jp/web/img/base/head/icon/nico/429.gif" alt="左上">
+  </a>
+</span>
+
+  <h1 class="NicovideoLogo  LogoContainer-nicovideoLogo" data-color="black">
+  <a href="/video_top" class="NicovideoLogo-link">ニコニコ動画</a>
+</h1>
+</div>
+
+  </div>
+  <div class="HeaderContainer-searchBox">
+    <div class="SearchBoxContainer">
+      <div class="SearchBox SearchBoxContainer-searchBox" data-login="true">
+      <ul class="SearchBox-optionTab">
+          <li class="SearchBox-option" data-type="keyword" data-active="true">キーワード</li>
+          <li class="SearchBox-option" data-type="tag" data-active="false">タグ</li>
+          <li class="SearchBox-option" data-type="mylist" data-active="false">マイリスト</li>
+      </ul>
+      <form class="SearchBox-form" method="get">
+          <input type="text" class="SearchBox-query"  placeholder="動画を検索">
+          <span class="SearchBox-submit"></span>
+      </form>
+  </div>
+</div>
+  </div>
+  <div class="HeaderContainer-ads">
+    <div class="Ads468x60WebPcTop">
+  <div id="ads_468x60_web_pc_top" class="Ads"></div>
+</div>
+
+  </div>
+</div>
+
+
+  </div>
+
+  <div class="BaseLayout-main">
+    
+  
+  <div class="Series">
+    <div class="SeriesAdditionalContainer">
+    <div class="SeriesAdditionalContainer-ownerArea">
+              <span class="UserIcon">
+    <img class="UserIcon-image" src="https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/s/4755/47552716.jpg?1576845922" />
+</span>
+        <a class="SeriesAdditionalContainer-ownerName" href="https://www.nicovideo.jp/user/47552716">コケ</a>
+        <span>さんのシリーズ</span>
+          </div>
+  <div class="SeriesAdditionalContainer-share">
+        <div class="TwitterShareButton"
+  data-text="つくった東方メドレー https://www.nicovideo.jp/series/203356"
+  onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(this.getAttribute('data-text')), '_blank', 'width=500, height=300')"
+></div>
+
+      <div id="fb-root"></div>
+  <script type="text/javascript">
+    window.fbAsyncInit = function() {
+      window.FB.init({
+        appId: '544893972254752',
+        version: 'v3.3'
+      });
+    };
+  </script>
+
+      <script async defer crossorigin="anonymous" src="https://connect.facebook.net/ja_JP/sdk.js"></script>
+  
+  <div class="FacebookShareButton"
+  data-href="https://www.nicovideo.jp/series/203356"
+  onclick="window.FB.ui({ method: 'share', href: 'https://www.nicovideo.jp/series/203356' })"
+></div>
+
+    <div class="LineShareButton"
+  data-href="https://www.nicovideo.jp/series/203356"
+  onclick="window.open('https://lineit.line.me/share/ui?url=' + encodeURIComponent('https://www.nicovideo.jp/series/203356'), '_blank', 'width=500, height=540')"
+></div>
+
+    <button class="ShareButton"></button>
+  </div>
+  <div class="Modal SeriesShareDialog">
+  <div class="Modal-content">
+      <header>    <h1 class="SeriesShareDialog-title">シリーズの共有</h1></header>  <div class="SeriesShareDialog-content"><div class="SeriesShareItem SeriesShareItemUrl">  <h1 class="SeriesShareItem-label">URL</h1>  <div class="SeriesShareItem-share">    <input class="SeriesShareItem-text" type="text" readonly value="https://www.nicovideo.jp/series/203356"></input>    <button class="SeriesShareItem-copy">クリップボードにコピー</button></div></div>
+<div class="SeriesShareItem SeriesShareItemBlogParts">  <h1 class="SeriesShareItem-label">ブログパーツ</h1>  <div class="SeriesShareItem-share">    <input class="SeriesShareItem-text" type="text" readonly value="&lt;iframe width=&quot;312&quot; height=&quot;176&quot; src=&quot;https://ext.nicovideo.jp/thumb_series/203356&quot; scrolling=&quot;no&quot; style=&quot;border:solid 1px #CCC;&quot; frameborder=&quot;0&quot;&gt;&lt;a href=&quot;https://www.nicovideo.jp/series/203356&quot;&gt;つくった東方メドレー&lt;/a&gt;&lt;/iframe&gt;"></input>    <button class="SeriesShareItem-copy">クリップボードにコピー</button></div></div>
+</div>
+    <button class="Modal-close">✕</button>
+  </div>
+</div>
+</div>
+
+    <div class="BaseLayout-block Series-2column">
+      <div class="Series-columnSub">
+        <div class="SeriesMenuContainer">
+  
+  <ul class="SeriesMenuContainer-seriesList">
+          <li class="SeriesMenuContainer-seriesItem  SeriesMenuContainer-currentSeries">
+        <div class="SeriesMenuContainer-seriesItemIconArea">
+          <span class="SeriesMenuContainer-seriesItemIcon"></span>
+        </div>
+        <a class="SeriesMenuContainer-seriesItemLink"href="https://www.nicovideo.jp/series/203356">つくった東方メドレー</a>
+      </li>
+      </ul>
+
+  </div>
+      </div>
+      <div class="Series-columnMain">
+        <div class="SeriesDetailContainer">
+
+  <div class="SeriesDetailContainer-media">
+    <div class="SeriesDetailContainer-figure">
+      <div class="Thumbnail SeriesDetailContainer-thumbnail">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://dcdn.cdn.nimg.jp/nicovideo/series/tmb/0/47552716/203356.1614258825"
+    alt="つくった東方メドレー"  ></div>
+
+  </div>
+    </div>
+
+    <div class="SeriesDetailContainer-body">
+      <div class="SeriesDetailContainer-bodyTitle">つくった東方メドレー</div>
+      <div class="SeriesDetailContainer-bodyMeta">
+        全 12 件
+      </div>
+    </div>
+
+    <div class="SeriesDetailContainer-background">
+      <div class="SeriesDetailContainer-backgroundInner" style="background-image: url(https://dcdn.cdn.nimg.jp/nicovideo/series/tmb/0/47552716/203356.1614258825)">
+        <div class="SeriesDetailContainer-backgroundOverlay"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="SeriesDetailContainer-description">
+    <div class="DescriptionHTML">
+                                
+<div class="ExpandableText"
+  data-expandable-text-id="1"
+  data-initialized="false"
+  data-collapsed-height="0"
+    data-expandable="true"
+  data-expanded="true"
+>
+  <div class="ExpandableText-inner"><div class="ExpandableText-expandedText"><div class="SeriesDetailContainer-expandedDescription"></div></div><div class="ExpandableText-collapsedText"><div class="SeriesDetailContainer-collapsedDescription"></div></div></pre>
+  <div class="ExpandableText-expander" data-expandable-text-id=1>
+    <span class="ExpandableText-expandLabel">もっと見る</span>
+    <span class="ExpandableText-collapseLabel">閉じる</span>
+  </div>
+</div>
+
+    
+</div>
+  </div>
+
+</div>
+        <div class="SeriesVideoListContainer">
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm37838509"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm37838509"
+    data-href="/watch/sm37838509?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm37838509">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/37838509/37838509.78074976.M"
+    alt="東方全ボスメドレー  [靈～鬼]"  ></div>
+
+            <div class="VideoPlaybackIndicator">
+  <div class="VideoPlaybackIndicator-inner" style="transform: scaleX(0);"></div>
+</div>
+
+        <div class="VideoLength">184:51</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">ここ蓬莱人形</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 885ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 885ms;">金閣寺......</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 278ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 278ms;">ちゃんと7面になってるのすき</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1529ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1529ms;">ぴぃ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1018ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1018ms;">なんでお前が陰陽玉使えるの</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2020/11/19 00:05 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm37838509" data-href="/watch/sm37838509?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1">東方全ボスメドレー  [靈～鬼]</a></div><div class="VideoMediaObject-description">いいね！は特に投稿者のすきな曲高画質版 → https://youtu.be/HrLyxwgcTng</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">33,210</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">1,575</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">399</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm34193073"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm34193073"
+    data-href="/watch/sm34193073?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm34193073">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/34193073/34193073.M"
+    alt="【東方自作アレンジ】全1ボスメドレー +α【封～天】"  ></div>
+
+            <div class="VideoPlaybackIndicator">
+  <div class="VideoPlaybackIndicator-inner" style="transform: scaleX(0.28991060025543);"></div>
+</div>
+
+        <div class="VideoLength">13:03</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">yukeの嫁キタコレ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 44ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 44ms;">yukeホイホイ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 326ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 326ms;">なにあそんでるんだ……</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 242ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 242ms;">あれ……?</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 492ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 492ms;">△△△△▽▽▽▽△△△▽▽▽▽▽</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2018/11/18 22:04 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm34193073" data-href="/watch/sm34193073?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1">【東方自作アレンジ】全1ボスメドレー +α【封～天】</a></div><div class="VideoMediaObject-description">こいつのメドレーいっつも旧作から始まってんなつべ→https://youtu.be/-kCkzmYo</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">19,185</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">552</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">229</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm34283684"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm34283684"
+    data-href="/watch/sm34283684?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm34283684">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/34283684/34283684.M"
+    alt="【東方自作アレンジ】全2ボスメドレー +α【封～天】"  ></div>
+
+              <div class="VideoLength">13:28</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">あ、レズだ(風評被害)</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 255ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 255ms;">めいらさん</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 72ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 72ms;">あ、レズだ(風評被害)</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 351ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 351ms;">傘は本体</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 38ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 38ms;">警察</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2018/12/08 11:52 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm34283684" data-href="/watch/sm34283684?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0">【東方自作アレンジ】全2ボスメドレー +α【封～天】</a></div><div class="VideoMediaObject-description">とりあえずつくっときましたつべ→https://youtu.be/oHDWevGbezc今までにつく</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">15,744</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">478</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">161</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm32731739"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm32731739"
+    data-href="/watch/sm32731739?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm32731739">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/32731739/32731739.M"
+    alt="【東方自作アレンジ】全3ボスメドレー +α【靈～天】"  ></div>
+
+              <div class="VideoLength">22:54</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">にーとりー♪</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 770ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 770ms;">←花映塚があったということは・・・?</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 296ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 296ms;">うぽつ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 588ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 588ms;">今日も寝させてくれねぇのか……最高だよなぁ?</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 56ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 56ms;">前方後円墳ktkr</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2018/02/13 17:00 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm32731739" data-href="/watch/sm32731739?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0">【東方自作アレンジ】全3ボスメドレー +α【靈～天】</a></div><div class="VideoMediaObject-description">↓注意!!↓東方作品は基本、1～6+exステージで構成されています。しかしながら靈、夢、花等の一部の</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">29,106</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">817</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">317</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm33948343"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm33948343"
+    data-href="/watch/sm33948343?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm33948343">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/33948343/33948343.M"
+    alt="【東方自作アレンジ】全4ボスメドレー +α【封～天】"  ></div>
+
+              <div class="VideoLength">25:57</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">8888888</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 921ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 921ms;">魔理沙</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 158ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 158ms;">88888888888888888888888888888888888</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1096ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1096ms;">最高!!!!!!!</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 70ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 70ms;">さいこおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおおお</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2018/10/01 11:51 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm33948343" data-href="/watch/sm33948343?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0">【東方自作アレンジ】全4ボスメドレー +α【封～天】</a></div><div class="VideoMediaObject-description">魔理沙が一番好きつべ→ https://youtu.be/pQ9CZVtnRZ8今までにつくったやつ</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">23,873</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">766</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">242</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm33694749"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm33694749"
+    data-href="/watch/sm33694749?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm33694749">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/33694749/33694749.M"
+    alt="【東方自作アレンジ】全5ボスメドレー +α【夢～天】"  ></div>
+
+              <div class="VideoLength">20:22</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">にゃーん</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 924ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 924ms;">イエーイ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 560ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 560ms;">ちゆりぃぃぃぃぃぃ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 926ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 926ms;">めっさ切られた</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1710ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1710ms;">夢子!</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2018/08/15 20:00 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm33694749" data-href="/watch/sm33694749?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0">【東方自作アレンジ】全5ボスメドレー +α【夢～天】</a></div><div class="VideoMediaObject-description">Q.なんかいろいろとガバくね？A.うるせえパイプ椅子ぶつけんぞ(許して亭ゆるして)投稿者は初見時、う</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">31,175</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">879</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">337</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm31037707"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm31037707"
+    data-href="/watch/sm31037707?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm31037707">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/31037707/31037707.M"
+    alt="【東方自作アレンジ】全ラスボスメドレー【靈～紺】"  ></div>
+
+            <div class="VideoPlaybackIndicator">
+  <div class="VideoPlaybackIndicator-inner" style="transform: scaleX(0);"></div>
+</div>
+
+        <div class="VideoLength">47:28</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">しってた</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 224ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 224ms;">レッツマイリス!!!!!!</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 585ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 585ms;">みんなもレッツマイリス</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1157ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1157ms;">セリフ兄貴感謝!!!</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1410ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1410ms;">EDかよ惚れるわ</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2017/04/16 10:00 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm31037707" data-href="/watch/sm31037707?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1">【東方自作アレンジ】全ラスボスメドレー【靈～紺】</a></div><div class="VideoMediaObject-description">圧倒的尺不足おたまじゃくしもよくわからない、リコーダーしか触ったことない、動画編集の勉強をするやる気</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">136,339</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">3,526</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">3,274</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm33101906"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm33101906"
+    data-href="/watch/sm33101906?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm33101906">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/33101906/33101906.M"
+    alt="【東方自作アレンジ】全ラスボスメドレー改【靈～天】"  ></div>
+
+              <div class="VideoLength">54:27</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">←ドゴォ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 105ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 105ms;">最も長く美しい1分間</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 323ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 323ms;">好き</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1496ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1496ms;">今の紅葉かな</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 758ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 758ms;">先程のサリエルの第二形態みたいなものです。</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2018/04/28 10:00 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm33101906" data-href="/watch/sm33101906?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0">【東方自作アレンジ】全ラスボスメドレー改【靈～天】</a></div><div class="VideoMediaObject-description">魅魔様帰ってきて2番目に千年幻想郷、4番目に幽夢（未使用込なら繰り上げ2番目）、5番目に神さびた古戦</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">77,084</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">1,802</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">1,388</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm29680517"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm29680517"
+    data-href="/watch/sm29680517?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm29680517">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/29680517/29680517.M"
+    alt="【東方自作アレンジ】全EXボスメドレー【封～紺】"  ></div>
+
+            <div class="VideoPlaybackIndicator">
+  <div class="VideoPlaybackIndicator-inner" style="transform: scaleX(0.94167852062589);"></div>
+</div>
+
+        <div class="VideoLength">23:26</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">久々の魔法だ。気い入れて「逝き」な</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 220ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 220ms;">諏訪様大好き</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 117ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 117ms;">ぬええええええええええええええええええええええええええええええええええええええええええ!EXボスで一番好きだああああああ!</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 443ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 443ms;">2対1?何を言う。4対1だろ?</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 24ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 24ms;">幻月</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2016/09/19 21:12 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm29680517" data-href="/watch/sm29680517?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1">【東方自作アレンジ】全EXボスメドレー【封～紺】</a></div><div class="VideoMediaObject-description">ネクロファンタジア死ぬほどすき　ラスボスメドレーsm31037707全EXボスメドレー改【封～天】→</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">148,542</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">2,383</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">2,857</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm31975565"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm31975565"
+    data-href="/watch/sm31975565?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm31975565">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/31975565/31975565.M"
+    alt="【東方自作アレンジ】全EXボスメドレー改【封～天】"  ></div>
+
+              <div class="VideoLength">25:26</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">らん</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 296ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 296ms;">乱射間</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 642ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 642ms;">コミケ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 902ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 902ms;">マミさぁぁん</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 102ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 102ms;">ヤバい</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2017/09/23 10:00 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm31975565" data-href="/watch/sm31975565?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0">【東方自作アレンジ】全EXボスメドレー改【封～天】</a></div><div class="VideoMediaObject-description">この動画は以前投稿したEXボスメドレーに東方天空璋、簡単な編集、ちょっとしたアレンジを加えたものです</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">111,280</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">2,021</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">2,042</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm38375953"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm38375953"
+    data-href="/watch/sm38375953?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm38375953">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/38375953/38375953.25533171.M"
+    alt="東方紅魔郷をプレイした気になるメドレー"  ></div>
+
+            <div class="VideoPlaybackIndicator">
+  <div class="VideoPlaybackIndicator-inner" style="transform: scaleX(0.97934087555337);"></div>
+</div>
+
+        <div class="VideoLength">33:53</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">高校生の頃を思い出す</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 187ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 187ms;">原作やったことない…</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 444ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 444ms;">NNNシューター「はいこうやれば最速ですねー」</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1347ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1347ms;">このフレーズ終るまで耐えるのキツい・・</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 396ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 396ms;">妖精ども「姐さんお手伝いするッス!」</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2021/03/06 17:27 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm38375953" data-href="/watch/sm38375953?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=1">東方紅魔郷をプレイした気になるメドレー</a></div><div class="VideoMediaObject-description">いつまで経っても色褪せないんだよねいいね！はこの動画のサイズYoutube → https://yo</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">2,781</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">150</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">45</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+      
+    
+    
+  
+
+<div class="MediaObject VideoMediaObject SeriesVideoListContainer-video" data-video-itemdata-video-id="sm38860341"data-nicoad-video     >
+  
+  <div class="MediaObject-content">
+    <div class="MediaObject-image">
+  <a
+    class="VideoMediaObject-thumbnail"
+    href="/watch/sm38860341"
+    data-href="/watch/sm38860341?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0"
+    data-video-thumbnail-comment-hover   >
+    
+
+
+<div class="Thumbnail VideoThumbnail"   data-watchlater-item-id="sm38860341">
+  <div
+    class="Thumbnail-image"
+    data-thumbnail
+    data-lazy-load
+    data-background-image="https://nicovideo.cdn.nimg.jp/thumbnails/38860341/38860341.78921312.M"
+    alt="東方永夜抄をプレイした気になるメドレー"  ></div>
+
+              <div class="VideoLength">45:53</div>        <div class="VideoThumbnailComment"><span class="VideoThumbnailComment-comment" style="transition-delay: 0ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 0ms;">すこ</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 58ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 58ms;">平安に生きたご先祖様の描いた幻想、竹取物語</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 287ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 287ms;">ざわ・・・</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 79ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 79ms;">演出かっこよすぎて惚れた</span></span><span class="VideoThumbnailComment-comment" style="transition-delay: 1834ms;"><span class="VideoThumbnailComment-inner" style="transition-delay: 1834ms;">リザレクション!!!!</span></span></div>
+    
+
+  </div>
+
+
+
+      </a>
+</div>
+    <div class="MediaObject-body">
+        <div class="SeriesVideoListContainer-videoRegisteredAt">
+          2021/06/09 14:27 投稿
+      </div>
+    <div class="VideoMediaObject-title"><a href="/watch/sm38860341" data-href="/watch/sm38860341?playlist=eyJ0eXBlIjoic2VyaWVzIiwiY29udGV4dCI6eyJzZXJpZXNJZCI6MjAzMzU2fX0&ref=series&rspg=1&rsco=0">東方永夜抄をプレイした気になるメドレー</a></div><div class="VideoMediaObject-description">妹紅は幻想郷で敵に回してはいけない奴top5に入る（妄想）絶対しつこいYoutube → https</div>      <div class="SeriesVideoListContainer-videoMetaCount">
+        <span class="VideoMetaCount VideoMetaCount-view">916</span>
+        <span class="VideoMetaCount VideoMetaCount-comment">60</span>
+        <span class="VideoMetaCount VideoMetaCount-mylist">14</span>
+      </div>
+    </div>
+  </div>
+  
+</div>
+  </div>
+
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <div class="BaseLayout-footer">
+    
+    <footer class="FooterContainer" data-footer-is-login="true">
+
+  <a href="#" class="FooterContainer-pageTop">▲ページトップ</a>
+
+                
+    <div class="FooterContainer-information">
+    <div class="FooterContainer-informationInner">
+      <h1 class="NicovideoLogo  FooterContainer-nicovideoLogo" data-color="white">
+  <a href="/video_top" class="NicovideoLogo-link">ニコニコ動画</a>
+</h1>
+      <div classs="FooterContainer-linksContainer">
+
+                <ul class="FooterContainer-links"  data-footer-watch-links style="display: none;">
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/faq/show/6116?site_domain=default">使い方</a></li>
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/faq/show/195?site_domain=default">動画が視聴できない</a></li>
+          <li class="FooterContainer-link FooterContainer-requiredLoginLink FooterContainer-attentionLink"><a href="#" data-footer-comment-allegation-base-url="https://secure.nicovideo.jp/" data-footer-comment-allegation-link>コメント/タグ通報</a></li>
+          <li class="FooterContainer-link FooterContainer-requiredLoginLink FooterContainer-attentionLink"><a href="#" data-footer-video-allegation-base-url="https://secure.nicovideo.jp/" data-footer-video-allegation-link>動画通報</a></li>
+        </ul>
+
+        <ul class="FooterContainer-links">
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/faq/show/5008?site_domain=default">ご意見・ご要望</a></li>
+          <li class="FooterContainer-link"><a href="https://secure.nicovideo.jp/form/feedback_bugreport">不具合報告</a></li>
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/">ヘルプ</a></li>
+          <li class="FooterContainer-link"><a href="https://qa.nicovideo.jp/faq/show/1112">動作環境</a></li>
+          <li class="FooterContainer-link"><a href="https://account.nicovideo.jp/rules/account">利用規約</a></li>
+          <li class="FooterContainer-link"><a target="_blank" href="https://dwango.co.jp/">運営会社</a></li>
+        </ul>
+
+        <ul class="FooterContainer-links">
+          <li class="FooterContainer-link FooterContainer-breakLink"><a href="https://ex.nicovideo.jp/smile/guideline/">権利侵害に関する動画投稿ガイドライン</a></li>
+          <li class="FooterContainer-link"><a href="https://license-search.nicovideo.jp/">動画に使用できる音源の検索</a></li>
+          <li class="FooterContainer-link"><a href="http://info.nicovideo.jp/base/phishing.html">フィッシング詐欺にご注意ください</a></li>        </ul>
+
+        <ul class="FooterContainer-links">
+          <li class="FooterContainer-link"><a href="https://site.nicovideo.jp/sales_ads">広告出稿に関するお問い合わせ</a></li>
+                  </ul>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="FooterContainer-additionals">
+    <div class="FooterContainer-additionalsInner">
+
+      <div class="FooterContainer-metadata">
+        <div class="FooterContainer-metadataItem">
+          <span class="FooterContainer-metadataLabel">総動画数</span>
+          <span class="FooterContainer-metadataValue">18,702,357</span>
+          <span class="FooterContainer-metadataLinks">
+                      </span>
+        </div>
+        <div class="FooterContainer-metadataItem">
+          <span class="FooterContainer-metadataLabel">総再生数</span>
+          <span class="FooterContainer-metadataValue">117,781,393,884</span>
+        </div>
+        <div class="FooterContainer-metadataItem">
+          <span class="FooterContainer-metadataLabel">総コメント数</span>
+          <span class="FooterContainer-metadataValue">6,005,166,122</span>
+        </div>
+        <address class="FooterContainer-metadataAddress">©DWANGO Co., Ltd.</address>
+      </div>
+
+      
+
+
+    </div>
+  </div>
+
+</footer>
+  </div>
+
+  
+    <script type="text/javascript" charset="utf-8" src="https://res.ads.nicovideo.jp/assets/js/ads2.js?ref=video"></script>
+
+    <script charset="utf-8" src="https://nicovideo.cdn.nimg.jp/web/scripts/bundle/vendor.js?1622535623" ></script>
+
+  
+  
+  <script charset="utf-8" src="https://nicovideo.cdn.nimg.jp/web/scripts/bundle/pages_series_Series.js?1622427968" ></script>
+
+      <script type="application/ld+json">
+      {"@context":"http:\/\/schema.org","@type":"ItemList","itemListElement":[{"@type":"VideoObject","position":1,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm37838509","name":"東方全ボスメドレー  [靈～鬼]","description":"いいね！は特に投稿者のすきな曲高画質版→https:\/\/youtu.be\/HrLyxwgcTng","caption":"いいね！は特に投稿者のすきな曲高画質版→https:\/\/youtu.be\/HrLyxwgcTng","url":"https:\/\/www.nicovideo.jp\/watch\/sm37838509","duration":"PT11091S","uploadDate":"2020-11-19T00:05:03+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm37838509?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":33210},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":399}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/37838509\/37838509.78074976.original\/r1280x720l?key=5540489098dd96e5f38e8b7034cead326c3f1a3bb762ec65a6f1c9a4b4bd7341"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/37838509\/37838509.78074976.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/37838509\/37838509.78074976.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/37838509\/37838509.78074976","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/37838509\/37838509.78074976.original\/r1280x720l?key=5540489098dd96e5f38e8b7034cead326c3f1a3bb762ec65a6f1c9a4b4bd7341","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/37838509\/37838509.78074976.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/37838509\/37838509.78074976.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/37838509\/37838509.78074976"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":2,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm34193073","name":"【東方自作アレンジ】全1ボスメドレー +α【封～天】","description":"こいつのメドレーいっつも旧作から始まってんなつべ→https:\/\/youtu.be\/-kCkzmYo3iI今までにつくったやつ→my","caption":"こいつのメドレーいっつも旧作から始まってんなつべ→https:\/\/youtu.be\/-kCkzmYo3iI今までにつくったやつ→my","url":"https:\/\/www.nicovideo.jp\/watch\/sm34193073","duration":"PT783S","uploadDate":"2018-11-18T22:04:02+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm34193073?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":19185},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":229}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/34193073\/34193073.original\/r1280x720l?key=e4ba566c971ee4c2a95c710cfa414ab7fe6d4f5532547d002448c40e7af57f30"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34193073\/34193073.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34193073\/34193073.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34193073\/34193073","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/34193073\/34193073.original\/r1280x720l?key=e4ba566c971ee4c2a95c710cfa414ab7fe6d4f5532547d002448c40e7af57f30","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34193073\/34193073.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34193073\/34193073.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34193073\/34193073"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":3,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm34283684","name":"【東方自作アレンジ】全2ボスメドレー +α【封～天】","description":"とりあえずつくっときましたつべ→https:\/\/youtu.be\/oHDWevGbezc今までにつくったやつ→mylist\/50190786つべ→","caption":"とりあえずつくっときましたつべ→https:\/\/youtu.be\/oHDWevGbezc今までにつくったやつ→mylist\/50190786つべ→","url":"https:\/\/www.nicovideo.jp\/watch\/sm34283684","duration":"PT808S","uploadDate":"2018-12-08T11:52:16+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm34283684?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":15744},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":161}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/34283684\/34283684.original\/r1280x720l?key=fe372a4fb73895a9cb8f984c34b9c23802833bac326db4801283bcdf18225956"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34283684\/34283684.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34283684\/34283684.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34283684\/34283684","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/34283684\/34283684.original\/r1280x720l?key=fe372a4fb73895a9cb8f984c34b9c23802833bac326db4801283bcdf18225956","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34283684\/34283684.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34283684\/34283684.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/34283684\/34283684"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":4,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm32731739","name":"【東方自作アレンジ】全3ボスメドレー +α【靈～天】","description":"↓注意!!↓東方作品は基本、1～6+exステージで構成されています。しかしながら靈、夢、花等の一部の作品はそ","caption":"↓注意!!↓東方作品は基本、1～6+exステージで構成されています。しかしながら靈、夢、花等の一部の作品はそ","url":"https:\/\/www.nicovideo.jp\/watch\/sm32731739","duration":"PT1374S","uploadDate":"2018-02-13T17:00:00+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm32731739?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":29106},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":317}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/32731739\/32731739.original\/r1280x720l?key=a2820d5fba6442e5af9616efeba7179c040ed73e9ac4d336f2766e1ce43b780f"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/32731739\/32731739.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/32731739\/32731739.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/32731739\/32731739","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/32731739\/32731739.original\/r1280x720l?key=a2820d5fba6442e5af9616efeba7179c040ed73e9ac4d336f2766e1ce43b780f","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/32731739\/32731739.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/32731739\/32731739.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/32731739\/32731739"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":5,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm33948343","name":"【東方自作アレンジ】全4ボスメドレー +α【封～天】","description":"魔理沙が一番好きつべ→https:\/\/youtu.be\/pQ9CZVtnRZ8今までにつくったやつ→mylist\/50190786つべ→https:\/\/","caption":"魔理沙が一番好きつべ→https:\/\/youtu.be\/pQ9CZVtnRZ8今までにつくったやつ→mylist\/50190786つべ→https:\/\/","url":"https:\/\/www.nicovideo.jp\/watch\/sm33948343","duration":"PT1557S","uploadDate":"2018-10-01T11:51:02+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm33948343?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":23873},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":242}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/33948343\/33948343.original\/r1280x720l?key=37f4112c42baa160e192c0b6da5e095fc0048ab32cf76c59d5a8126cc4d26eb0"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33948343\/33948343.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33948343\/33948343.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33948343\/33948343","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/33948343\/33948343.original\/r1280x720l?key=37f4112c42baa160e192c0b6da5e095fc0048ab32cf76c59d5a8126cc4d26eb0","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33948343\/33948343.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33948343\/33948343.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33948343\/33948343"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":6,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm33694749","name":"【東方自作アレンジ】全5ボスメドレー +α【夢～天】","description":"Q.なんかいろいろとガバくね？A.うるせえパイプ椅子ぶつけんぞ(許して亭ゆるして)投稿者は初見時、うどんち","caption":"Q.なんかいろいろとガバくね？A.うるせえパイプ椅子ぶつけんぞ(許して亭ゆるして)投稿者は初見時、うどんち","url":"https:\/\/www.nicovideo.jp\/watch\/sm33694749","duration":"PT1222S","uploadDate":"2018-08-15T20:00:00+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm33694749?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":31175},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":337}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/33694749\/33694749.original\/r1280x720l?key=28631810e5246085caf9c1db961fe8127a2597f05d79442599cb5e833875324f"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33694749\/33694749.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33694749\/33694749.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33694749\/33694749","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/33694749\/33694749.original\/r1280x720l?key=28631810e5246085caf9c1db961fe8127a2597f05d79442599cb5e833875324f","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33694749\/33694749.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33694749\/33694749.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33694749\/33694749"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":7,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm31037707","name":"【東方自作アレンジ】全ラスボスメドレー【靈～紺】","description":"圧倒的尺不足おたまじゃくしもよくわからない、リコーダーしか触ったことない、動画編集の勉強をするやる気","caption":"圧倒的尺不足おたまじゃくしもよくわからない、リコーダーしか触ったことない、動画編集の勉強をするやる気","url":"https:\/\/www.nicovideo.jp\/watch\/sm31037707","duration":"PT2848S","uploadDate":"2017-04-16T10:00:00+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm31037707?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":136339},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":3274}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/31037707\/31037707.original\/r1280x720l?key=bce68390c7c641f604a4706ce45094853f958a6bcafff00fc4725a57f81a5ca8"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31037707\/31037707.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31037707\/31037707.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31037707\/31037707","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/31037707\/31037707.original\/r1280x720l?key=bce68390c7c641f604a4706ce45094853f958a6bcafff00fc4725a57f81a5ca8","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31037707\/31037707.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31037707\/31037707.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31037707\/31037707"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":8,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm33101906","name":"【東方自作アレンジ】全ラスボスメドレー改【靈～天】","description":"魅魔様帰ってきて2番目に千年幻想郷、4番目に幽夢（未使用込なら繰り上げ2番目）、5番目に神さびた古戦場が","caption":"魅魔様帰ってきて2番目に千年幻想郷、4番目に幽夢（未使用込なら繰り上げ2番目）、5番目に神さびた古戦場が","url":"https:\/\/www.nicovideo.jp\/watch\/sm33101906","duration":"PT3267S","uploadDate":"2018-04-28T10:00:00+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm33101906?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":77084},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":1388}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/33101906\/33101906.original\/r1280x720l?key=6c752434de5928bf27bf0c10f655fe86e1a2a48b4d83b6d28ceb77f68a0760a3"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33101906\/33101906.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33101906\/33101906.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33101906\/33101906","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/33101906\/33101906.original\/r1280x720l?key=6c752434de5928bf27bf0c10f655fe86e1a2a48b4d83b6d28ceb77f68a0760a3","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33101906\/33101906.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33101906\/33101906.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/33101906\/33101906"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":9,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm29680517","name":"【東方自作アレンジ】全EXボスメドレー【封～紺】","description":"ネクロファンタジア死ぬほどすきラスボスメドレーsm31037707全EXボスメドレー改【封～天】→sm31975565そ","caption":"ネクロファンタジア死ぬほどすきラスボスメドレーsm31037707全EXボスメドレー改【封～天】→sm31975565そ","url":"https:\/\/www.nicovideo.jp\/watch\/sm29680517","duration":"PT1406S","uploadDate":"2016-09-19T21:12:29+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm29680517?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":148542},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":2857}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/29680517\/29680517.original\/r1280x720l?key=f4ec91c5b921b5491bfd4ad2728ff925e90362f109e493b78b09c00e0c2bc6b1"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/29680517\/29680517.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/29680517\/29680517.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/29680517\/29680517","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/29680517\/29680517.original\/r1280x720l?key=f4ec91c5b921b5491bfd4ad2728ff925e90362f109e493b78b09c00e0c2bc6b1","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/29680517\/29680517.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/29680517\/29680517.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/29680517\/29680517"],"requiresSubscription":false,"isAccessibleForFree":true},{"@type":"VideoObject","position":10,"@id":"https:\/\/www.nicovideo.jp\/watch\/sm31975565","name":"【東方自作アレンジ】全EXボスメドレー改【封～天】","description":"この動画は以前投稿したEXボスメドレーに東方天空璋、簡単な編集、ちょっとしたアレンジを加えたものです。","caption":"この動画は以前投稿したEXボスメドレーに東方天空璋、簡単な編集、ちょっとしたアレンジを加えたものです。","url":"https:\/\/www.nicovideo.jp\/watch\/sm31975565","duration":"PT1526S","uploadDate":"2017-09-23T10:00:00+09:00","embedUrl":"https:\/\/embed.nicovideo.jp\/watch\/sm31975565?autoplay=1","interactionStatistic":[{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WatchAction","userInteractionCount":111280},{"@type":"InteractionCounter","interactionType":"http:\/\/schema.org\/WantAction","userInteractionCount":2042}],"thumbnail":[{"@type":"ImageObject","url":"https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/31975565\/31975565.original\/r1280x720l?key=8f456ae4d44722b1b97cb81a169dad17de766710f3b9c35736f4fe5b9a1f1c73"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31975565\/31975565.L","width":360,"height":270},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31975565\/31975565.M"},{"@type":"ImageObject","url":"https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31975565\/31975565","width":130,"height":100}],"thumbnailUrl":["https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/31975565\/31975565.original\/r1280x720l?key=8f456ae4d44722b1b97cb81a169dad17de766710f3b9c35736f4fe5b9a1f1c73","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31975565\/31975565.L","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31975565\/31975565.M","https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/31975565\/31975565"],"requiresSubscription":false,"isAccessibleForFree":true}]}
+    </script>
+  
+      <script type="application/ld+json">
+      {"@context":"http:\/\/schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"item":{"@id":"https:\/\/www.nicovideo.jp\/video_top","name":"ニコニコ動画"}},{"@type":"ListItem","position":2,"item":{"@id":"https:\/\/www.nicovideo.jp\/series\/203356","name":"シリーズ"}}]}
+    </script>
+  
+
+
+</body>
+</html>

@@ -21,7 +21,7 @@ namespace Niconicome.Views.Setting
     {
         public SettingWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

@@ -9,6 +9,10 @@ using STypes = Niconicome.Models.Domain.Local.Store.Types;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using Utils = Niconicome.Models.Domain.Utils;
 using Local = Niconicome.Models.Local;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Domain.Utils;
+using System.Linq.Expressions;
 
 namespace Niconicome.Models.Domain.Local
 {
@@ -25,60 +29,46 @@ namespace Niconicome.Models.Domain.Local
 
     public interface IDataBase : IDisposable
     {
-        public ILiteCollection<T> GetCollection<T>(string tableName) where T : IStorable;
-        public ILiteCollection<BsonDocument> GetCollection(string tableName);
-        public int GetRecordCount(string tableName);
-        public T? GetRecord<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable;
-        public T? GetRecord<T>(string tableName, int id) where T : IStorable;
-        public T? GetRecord<T>(string tableName, int id, int retry) where T : IStorable;
-        public bool Exists<T>(string tablename, int id) where T : IStorable;
-        public bool Exists<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable;
-        public int Store<T>(T data, string tableName) where T : IStorable;
-        public bool TryStoreUnique<T>(T data, string tableName, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable;
-        public bool TryStoreUnique<T>(T data, string tableName, System.Linq.Expressions.Expression<Func<T, bool>> predicate, out int id) where T : IStorable;
-        public bool DeleteAll<T>(string tableName, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable;
-        public bool Delete(string tableName, BsonValue id);
-        public ILiteCollection<T> Update<T>(T data, string tableName) where T : IStorable;
-        public List<T> GetAllRecords<T>(string tableName) where T : IStorable;
-        public void Clear(string tableName, bool setUpAgain = true);
-        public void Open();
+        IAttemptResult<IEnumerable<T>> GetCollection<T>(string tableName) where T : IStorable;
+        IAttemptResult<int> GetRecordCount(string tableName);
+        IAttemptResult<T> GetRecord<T>(string tablename, Expression<Func<T, bool>> predicate) where T : IStorable;
+        IAttemptResult<T> GetRecord<T>(string tableName, int id) where T : IStorable;
+        IAttemptResult<T> GetRecord<T, MemberT>(string tableName, int id, Expression<Func<T, MemberT>> factory) where T : IStorable;
 
+        bool Exists<T>(string tablename, int id) where T : IStorable;
+        bool Exists<T>(string tablename, Expression<Func<T, bool>> predicate) where T : IStorable;
+        IAttemptResult<int> Store<T>(T data, string tableName) where T : IStorable;
+        IAttemptResult<bool> DeleteAll<T>(string tableName, Expression<Func<T, bool>> predicate) where T : IStorable;
+        IAttemptResult<bool> Delete(string tableName, BsonValue id);
+        IAttemptResult Update<T>(T data, string tableName) where T : IStorable;
+        IAttemptResult<List<T>> GetAllRecords<T>(string tableName) where T : IStorable;
+        IAttemptResult<List<T>> GetAllRecords<T>(string tableName, Func<T, bool> predicate) where T : IStorable;
+        IAttemptResult Clear(string tableName, bool setUpAgain = true);
+        IAttemptResult Open();
     }
 
     public class DataBase : IDataBase
     {
 
-        public DataBase()
+        public DataBase(ILogger logger)
         {
+            this.logger = logger;
 
             this.Configure();
 
-            try
+            var result = this.Open();
+            if (!result.IsSucceeded)
             {
-                this.Open();
-            }
-            catch (Exception e)
-            {
-                Utils::Logger.GetLogger().Error("データベースファイルのオープンに失敗しました。", e);
-                return;
-            }
-
-            try
-            {
-                this.SetUp();
-            }
-            catch (Exception e)
-            {
-                Utils::Logger.GetLogger().Error("データベースの初期化中にエラーが発生しました。", e);
+                this.logger.Error("データベースファイルのオープンに失敗しました。", result.Exception!);
                 return;
             }
         }
 
-        public DataBase(ILiteDatabase liteInstance, bool autoDispose = true)
+        public DataBase(ILiteDatabase liteInstance, ILogger logger, bool autoDispose = true)
         {
             this.DbInstance = liteInstance;
+            this.logger = logger;
             this.autoDispose = autoDispose;
-            this.SetUp();
         }
 
         ~DataBase()
@@ -86,6 +76,7 @@ namespace Niconicome.Models.Domain.Local
             this.Dispose();
         }
 
+        #region field
         /// <summary>
         /// 自動でインスタンス破棄フラグ
         /// </summary>
@@ -97,37 +88,15 @@ namespace Niconicome.Models.Domain.Local
         private readonly string dbFileName = @"niconicome.db";
 
         /// <summary>
+        /// ログ
+        /// </summary>
+        private readonly ILogger logger;
+
+        /// <summary>
         /// データベースのインスタンスを保持
         /// </summary>
         private ILiteDatabase? DbInstance;
-
-        /// <summary>
-        /// データベースのセットアップ
-        /// </summary>
-        private void SetUp()
-        {
-
-            if (!this.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot))
-            {
-                var root = new STypes::Playlist()
-                {
-                    IsRoot = true,
-                    PlaylistName = "プレイリスト一覧",
-                };
-                this.Store(root, STypes::Playlist.TableName);
-            }
-        }
-
-        /// <summary>
-        /// マッパーの設定
-        /// </summary>
-        private void Configure()
-        {
-
-            BsonMapper.Global.Entity<STypes::Playlist>()
-                .DbRef(playlist => playlist.Videos, STypes::Video.TableName);
-            BsonMapper.Global.TrimWhitespace = false;
-        }
+        #endregion
 
         /// <summary>
         /// 指定したテーブルを取得
@@ -135,34 +104,16 @@ namespace Niconicome.Models.Domain.Local
         /// <typeparam name="T"></typeparam>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public ILiteCollection<T> GetCollection<T>(string tableName) where T : IStorable
+        public IAttemptResult<IEnumerable<T>> GetCollection<T>(string tableName) where T : IStorable
         {
-            if (this.DbInstance is not null)
-            {
-                return this.DbInstance.GetCollection<T>(tableName);
-            }
-            else
-            {
-                throw new InvalidOperationException($"データベースファイルの読み込みが完了していない為、テーブル\"{tableName}\"を取得できませんでした。");
-            }
-        }
+            var result = this.GetCollectionInternal<T>(tableName);
 
-        /// <summary>
-        /// 指定したテーブルを取得
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public ILiteCollection<BsonDocument> GetCollection(string tableName)
-        {
-            if (this.DbInstance != null)
+            if (!result.IsSucceeded || result.Data is null)
             {
-                return this.DbInstance.GetCollection(tableName);
+                return new AttemptResult<IEnumerable<T>>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = result.Exception };
             }
-            else
-            {
-                throw new InvalidOperationException($"データベースファイルの読み込みが完了していない為、テーブル\"{tableName}\"を取得できませんでした。");
-            }
+
+            return new AttemptResult<IEnumerable<T>>() { Data = result.Data.FindAll(), IsSucceeded = true };
         }
 
         /// <summary>
@@ -170,9 +121,28 @@ namespace Niconicome.Models.Domain.Local
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public int GetRecordCount(string tableName)
+        public IAttemptResult<int> GetRecordCount(string tableName)
         {
-            return this.DbInstance?.GetCollection(tableName).Count() ?? 0;
+            var result = this.GetCollectionInternal<BsonDocument>(tableName);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return new AttemptResult<int>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = result.Exception };
+            }
+
+            int count;
+
+            try
+            {
+                count = result.Data.Count();
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<int>() { Message = $"テーブル「{tableName}」のレコード数取得に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<int>() { Data = count, IsSucceeded = true };
+
         }
 
         /// <summary>
@@ -182,44 +152,92 @@ namespace Niconicome.Models.Domain.Local
         /// <param name="tablename"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public T? GetRecord<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable
+        public IAttemptResult<T> GetRecord<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable
         {
-            var collections = this.GetCollection<T>(tablename);
-            return collections.FindOne(predicate);
+            var result = this.GetCollectionInternal<T>(tablename);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return new AttemptResult<T>() { Message = $"テーブル「{tablename}」の取得に失敗しました。", Exception = result.Exception };
+            }
+
+            T data;
+
+            try
+            {
+                data = result.Data.FindOne(predicate);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<T>() { Message = $"テーブル「{tablename}」からのレコード取得に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<T>() { Data = data, IsSucceeded = true };
+
         }
 
         /// <summary>
         /// レコードをIDで取得する
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
+        /// <param name="tablename"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public T? GetRecord<T>(string tableName, int id) where T : IStorable
+        public IAttemptResult<T> GetRecord<T>(string tablename, int id) where T : IStorable
         {
-            var collections = this.GetCollection<T>(tableName);
-            return collections.FindById(id);
+            var result = this.GetCollectionInternal<T>(tablename);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return new AttemptResult<T>() { Message = $"テーブル「{tablename}」の取得に失敗しました。", Exception = result.Exception };
+            }
+
+            T data;
+
+            try
+            {
+                data = result.Data.FindById(id);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<T>() { Message = $"テーブル「{tablename}」からのレコード取得に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<T>() { Data = data, IsSucceeded = true };
         }
 
         /// <summary>
-        /// レコードをIDで取得する(リトライ指定)
+        /// 関連付けこみでレコードを取得する
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
+        /// <typeparam name="TMem"></typeparam>
+        /// <param name="tablename"></param>
         /// <param name="id"></param>
+        /// <param name="factory"></param>
         /// <returns></returns>
-        public T? GetRecord<T>(string tableName, int id, int retry) where T : IStorable
+        public IAttemptResult<T> GetRecord<T, TMem>(string tablename, int id, Expression<Func<T, TMem>> factory) where T : IStorable
         {
-            var collections = this.GetCollection<T>(tableName);
-            var retryAttempts = 0;
-            T? recored = collections.FindById(id);
-            while (recored == null && retryAttempts < retry)
+            var result = this.GetCollectionInternal(tablename, factory);
+
+            if (!result.IsSucceeded || result.Data is null)
             {
-                retryAttempts++;
-                recored = this.GetRecord<T>(tableName, id);
+                return new AttemptResult<T>() { Message = $"テーブル「{tablename}」の取得に失敗しました。", Exception = result.Exception };
             }
-            return recored;
+
+            T data;
+
+            try
+            {
+                data = result.Data.FindById(id);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<T>() { Message = $"テーブル「{tablename}」からのレコード取得に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<T>() { Data = data, IsSucceeded = true };
         }
+
 
         /// <summary>
         /// レコードが存在するかどうかをチェックする(ID)
@@ -230,8 +248,11 @@ namespace Niconicome.Models.Domain.Local
         /// <returns></returns>
         public bool Exists<T>(string tablename, int id) where T : IStorable
         {
-            var collections = this.GetCollection<T>(tablename);
-            return collections.Exists(r => r.Id == id);
+            var result = this.GetCollectionInternal<T>(tablename);
+
+            if (!result.IsSucceeded || result.Data is null) return false;
+
+            return result.Data!.Exists(item => item.Id == id);
         }
 
         /// <summary>
@@ -241,10 +262,13 @@ namespace Niconicome.Models.Domain.Local
         /// <param name="tablename"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public bool Exists<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable
+        public bool Exists<T>(string tablename, Expression<Func<T, bool>> predicate) where T : IStorable
         {
-            var collections = this.GetCollection<T>(tablename);
-            return collections.Exists(predicate);
+            var collections = this.GetCollectionInternal<T>(tablename);
+
+            if (!collections.IsSucceeded || collections.Data is null) return false;
+
+            return collections.Data.Exists(predicate);
         }
 
         /// <summary>
@@ -253,61 +277,25 @@ namespace Niconicome.Models.Domain.Local
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
         /// <param name="tableName"></param>
-        public int Store<T>(T data, string tableName) where T : IStorable
+        public IAttemptResult<int> Store<T>(T data, string tableName) where T : IStorable
         {
-            var collections = this.GetCollection<T>(tableName);
+            var colResult = this.GetCollectionInternal<T>(tableName);
+
+            if (!colResult.IsSucceeded || colResult.Data is null) return new AttemptResult<int>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = colResult.Exception };
+
+            BsonValue result;
+
             try
             {
-                BsonValue result = collections.Insert(data);
-                return (int)result.RawValue;
-            }
-            catch
-            {
-                return -1;
-            }
-        }
+                result = colResult.Data!.Insert(data);
 
-        /// <summary>
-        /// ユニークデータを保存する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="tableName"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public bool TryStoreUnique<T>(T data, string tableName, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable
-        {
-            if (this.Exists(tableName, predicate))
-            {
-                return false;
             }
-            else
+            catch (Exception e)
             {
-                this.Store<T>(data, tableName);
-                return true;
+                return new AttemptResult<int>() { Message = $"テーブル「{tableName}」への挿入に失敗しました。", Exception = e };
             }
-        }
 
-        /// <summary>
-        /// ユニークデータを保存する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="tableName"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public bool TryStoreUnique<T>(T data, string tableName, System.Linq.Expressions.Expression<Func<T, bool>> predicate, out int id) where T : IStorable
-        {
-            if (this.Exists(tableName, predicate))
-            {
-                id = -1;
-                return false;
-            }
-            else
-            {
-                id = this.Store<T>(data, tableName);
-                return true;
-            }
+            return new AttemptResult<int>() { IsSucceeded = true, Data = (int)result };
         }
 
         /// <summary>
@@ -317,10 +305,25 @@ namespace Niconicome.Models.Domain.Local
         /// <param name="tableName"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public bool DeleteAll<T>(string tableName, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable
+        public IAttemptResult<bool> DeleteAll<T>(string tableName, Expression<Func<T, bool>> predicate) where T : IStorable
         {
-            var collections = this.GetCollection<T>(tableName);
-            return collections.DeleteMany(predicate) > 0;
+            var colResult = this.GetCollectionInternal<T>(tableName);
+
+            if (!colResult.IsSucceeded || colResult.Data is null) return new AttemptResult<bool>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = colResult.Exception };
+
+            int count;
+
+            try
+            {
+                count = colResult.Data.DeleteMany(predicate);
+
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<bool>() { Message = $"テーブル「{tableName}」からのレコード削除に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<bool>() { IsSucceeded = true, Data = count > 0 };
         }
 
         /// <summary>
@@ -330,10 +333,23 @@ namespace Niconicome.Models.Domain.Local
         /// <param name="tableName"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        public bool Delete(string tableName, BsonValue id)
+        public IAttemptResult<bool> Delete(string tableName, BsonValue id)
         {
-            var collections = this.GetCollection(tableName);
-            return collections.Delete(id);
+            var colResult = this.GetCollectionInternal<BsonDocument>(tableName);
+
+            if (!colResult.IsSucceeded || colResult.Data is null) return new AttemptResult<bool>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = colResult.Exception };
+
+            try
+            {
+                colResult.Data.Delete(id);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<bool>() { Message = $"テーブル「{tableName}」からのレコード削除に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<bool>() { IsSucceeded = true, Data = true };
+
         }
 
         /// <summary>
@@ -343,11 +359,23 @@ namespace Niconicome.Models.Domain.Local
         /// <param name="data"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public ILiteCollection<T> Update<T>(T data, string tableName) where T : IStorable
+        public IAttemptResult Update<T>(T data, string tableName) where T : IStorable
         {
-            var col = this.GetCollection<T>(tableName);
-            col.Update(data);
-            return col;
+            var colResult = this.GetCollectionInternal<T>(tableName);
+
+            if (!colResult.IsSucceeded || colResult.Data is null) return new AttemptResult<bool>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = colResult.Exception };
+
+            try
+            {
+                colResult.Data.Update(data);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult() { Message = $"テーブル「{tableName}」の更新に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult() { IsSucceeded = true };
+
         }
 
         /// <summary>
@@ -366,34 +394,169 @@ namespace Niconicome.Models.Domain.Local
         /// <typeparam name="T"></typeparam>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public List<T> GetAllRecords<T>(string tableName) where T : IStorable
+        public IAttemptResult<List<T>> GetAllRecords<T>(string tableName) where T : IStorable
         {
-            return this.GetCollection<T>(tableName).FindAll().ToList();
+            var colResult = this.GetCollectionInternal<T>(tableName);
+
+            if (!colResult.IsSucceeded || colResult.Data is null) return new AttemptResult<List<T>>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = colResult.Exception };
+
+            List<T> data;
+
+            try
+            {
+                data = colResult.Data.FindAll().ToList();
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<List<T>>() { Message = $"テーブル「{tableName}」からのレコード取得に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<List<T>>() { IsSucceeded = true, Data = data };
         }
+
+        /// <summary>
+        /// 条件を指定してすべてのレコードを取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public IAttemptResult<List<T>> GetAllRecords<T>(string tableName, Func<T, bool> predicate) where T : IStorable
+        {
+            var colResult = this.GetCollectionInternal<T>(tableName);
+
+            if (!colResult.IsSucceeded || colResult.Data is null) return new AttemptResult<List<T>>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = colResult.Exception };
+
+            List<T> data;
+
+            try
+            {
+                data = colResult.Data.FindAll().Where(record => predicate(record)).ToList();
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<List<T>>() { Message = $"テーブル「{tableName}」からのレコード取得に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<List<T>>() { IsSucceeded = true, Data = data };
+        }
+
 
         /// <summary>
         /// 全て削除する
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tableName"></param>
-        public void Clear(string tableName, bool setUpAgain = true)
+        public IAttemptResult Clear(string tableName, bool setUpAgain = true)
         {
-            this.GetCollection(tableName).DeleteAll();
-            if (setUpAgain) this.SetUp();
+            var colResult = this.GetCollectionInternal<BsonDocument>(tableName);
+
+            if (!colResult.IsSucceeded || colResult.Data is null) return new AttemptResult() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = colResult.Exception };
+
+            try
+            {
+                colResult.Data.DeleteAll();
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult() { Message = $"テーブル「{tableName}」のクリアに失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult() { IsSucceeded = true };
         }
 
         /// <summary>
         /// データベースを開く
         /// </summary>
-        public void Open()
+        public IAttemptResult Open()
         {
             if (this.DbInstance is not null)
             {
                 this.DbInstance.Dispose();
                 this.DbInstance = null;
             }
-            this.DbInstance = new LiteDatabase($"Filename={this.dbFileName};Mode=Shared;");
+            try
+            {
+                this.DbInstance = new LiteDatabase($"Filename={this.dbFileName};Mode=Shared;");
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult() { Exception = e, Message = "データベースファイルのオープンに失敗しました。" };
+            }
+
+            return new AttemptResult() { IsSucceeded = true };
         }
+
+        #region private
+        /// <summary>
+        /// コレクションを取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        private IAttemptResult<ILiteCollection<T>> GetCollectionInternal<T>(string tableName)
+        {
+            this.CheckIfDbInstabseIsNull();
+
+            ILiteCollection<T> col;
+
+            try
+            {
+                col = this.DbInstance!.GetCollection<T>(tableName);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<ILiteCollection<T>>() { Exception = e };
+            }
+
+            return new AttemptResult<ILiteCollection<T>>() { Data = col, IsSucceeded = true };
+        }
+
+        /// <summary>
+        /// コレクションを取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        private IAttemptResult<ILiteCollection<T>> GetCollectionInternal<T, TMem>(string tableName, Expression<Func<T, TMem>> factory)
+        {
+            this.CheckIfDbInstabseIsNull();
+
+            ILiteCollection<T> col;
+
+            try
+            {
+                col = this.DbInstance!.GetCollection<T>(tableName)
+                    .Include(factory);
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<ILiteCollection<T>>() { Exception = e };
+            }
+
+            return new AttemptResult<ILiteCollection<T>>() { Data = col, IsSucceeded = true };
+        }
+
+        /// <summary>
+        /// マッパーの設定
+        /// </summary>
+        private void Configure()
+        {
+
+            BsonMapper.Global.Entity<STypes::Playlist>()
+                .DbRef(playlist => playlist.Videos, STypes::Video.TableName);
+            BsonMapper.Global.TrimWhitespace = false;
+        }
+
+        /// <summary>
+        /// DBの読み込み完了状態をチェックする
+        /// </summary>
+        /// <param name="tableName"></param>
+        private void CheckIfDbInstabseIsNull(string tableName = "None")
+        {
+            if (this.DbInstance is null) throw new InvalidOperationException($"データベースの読み込みが完了していないためテーブル「{tableName}」を取得できませんでした。");
+        }
+        #endregion
 
     }
 }

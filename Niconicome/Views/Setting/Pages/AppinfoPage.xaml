@@ -14,7 +14,6 @@
       TextElement.FontSize="13"
       TextOptions.TextFormattingMode="Ideal"
       TextOptions.TextRenderingMode="Auto"
-      Background="{DynamicResource MaterialDesignBackground}"
       FontFamily="Yu Gothic"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="アプリケーション情報">
@@ -27,7 +26,6 @@
             <Setter Property="Padding" Value="4"/>
             <Setter Property="Opacity" Value=".65"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Background" Value="#eeeeee"/>
         </Style>
         <Style BasedOn="{StaticResource MaterialDesignTextBlock}" TargetType="{x:Type TextBlock}" x:Key="LicenseTitle">
             <Setter Property="FontWeight" Value="Bold"/>

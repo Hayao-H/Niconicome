@@ -229,12 +229,16 @@ namespace Niconicome.Models.Domain.Utils
         private void Initialize()
         {
             var systemInfo = new StringBuilder();
+            string is64bit = Environment.Is64BitOperatingSystem ? "64" : "32";
+            string is64bitProcess = Environment.Is64BitProcess ? "64" : "32";
 
             systemInfo.AppendLine("Niconicomeログ");
             systemInfo.AppendLine($"App Version : {Assembly.GetExecutingAssembly().GetName().Version}");
             systemInfo.AppendLine($"App Path : {Process.GetCurrentProcess().MainModule?.FileName}");
             systemInfo.AppendLine($"OS : {this.GetOs()}");
             systemInfo.AppendLine($"OS Version : {this.GetOsVer()}");
+            systemInfo.AppendLine($"OS Architecture : {is64bit}bit Operating System");
+            systemInfo.AppendLine($"Process : {is64bitProcess}bit Process");
             systemInfo.AppendLine($"Date : {DateTime.Now:yy/MM/dd H:mm:ss}");
             systemInfo.AppendLine("-".Repeat(50));
 

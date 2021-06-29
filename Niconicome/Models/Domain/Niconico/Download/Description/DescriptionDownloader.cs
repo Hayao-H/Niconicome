@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices.ComTypes;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Niconico.Net.Xml;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
-using Xml = Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted;
 using Const = Niconicome.Models.Const;
-using System.Linq;
-using Niconicome.Models.Domain.Niconico.Net.Xml;
+using Xml = Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Description
 {
@@ -247,7 +246,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             data.Thumb.ChName = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelName;
             data.Thumb.ChId = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelID;
 
-            return Xmlparser.Serialize(data, new System.Xml.XmlWriterSettings());
+            return Xmlparser.Serialize(data);
         }
 
 

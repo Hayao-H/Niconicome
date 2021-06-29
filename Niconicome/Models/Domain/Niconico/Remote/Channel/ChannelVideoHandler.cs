@@ -13,7 +13,7 @@ using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using WatchInfo = Niconicome.Models.Domain.Niconico.Watch;
 
-namespace Niconicome.Models.Domain.Niconico.Video.Channel
+namespace Niconicome.Models.Domain.Niconico.Remote.Channel
 {
     public interface IChannelResult
     {

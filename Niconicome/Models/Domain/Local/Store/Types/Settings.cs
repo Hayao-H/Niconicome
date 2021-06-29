@@ -157,6 +157,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string MainWindowDownloadedFlagColumnWidth { get; private set; } = "mainwindowdownloadedflagcolumnwidth";
         public static string MainWindowStateColumnWidth { get; private set; } = "mainwindowstatecolumnwidth";
         public static string MainWindowThumbnailColumnWidth { get; private set; } = "mainwindowthumbnailcolumnwidth";
+        public static string MainWindowBookMarkColumnWidth { get; private set; } = "mainwindowbookmarkcolumnwidth";
         public static string ReAllocateIfVideoisNotSaved { get; private set; } = "reallocateifvideoisnotsaved";
         public static string VideoListItemdbClickAction { get; private set; } = "videolistitemdbclickaction";
         public static string AutoRenamingAfterSetNetworkPlaylist { get; private set; } = "autorenamingaftersetnetworkplaylist";
@@ -169,5 +170,16 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string JpegFileExtension { get; private set; } = "jpegfileextension";
         public static string VideoInfoSuffix { get; private set; } = "videoinfosuffix";
         public static string IchibaSuffix { get; private set; } = "ichibainfosuffix";
+        public static string DisableDownloadSucceededHistory { get; private set; } = "disabledownloadsucceededhistory";
+        public static string DisableDownloadFailedHistory { get; private set; } = "disabledownloadfailedhistory";
+        public static string LimitWindowsToSingleton { get; private set; } = "limitwindowstosingleton";
+        public static string ApplicationTheme { get; private set; } = "applicationtheme";
+        public static string ConfirmIfDownloading { get; private set; } = "confirmifdownloading";
+        public static string FFmpegFormat { get; private set; } = "ffmpegformat";
+        public static string SearchVideosByID { get; private set; } = "searchvideosbyid";
+        public static string ThumbnailSize { get; private set; } = "thumbnailsize";
+        public static string DisableScrollRestore { get; private set; } = "disablescrollrestore";
+        public static string ThumbnailSuffix { get; private set; } = "thumbnailsuffix";
+        public static string OwnerCommentSuffix { get; private set; } = "ownercommentsuffix";
     }
 }

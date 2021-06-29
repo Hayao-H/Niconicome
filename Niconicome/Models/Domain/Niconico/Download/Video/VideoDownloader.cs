@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Dmc;
 using Niconicome.Models.Domain.Niconico.Download.Video.Resume;
@@ -58,6 +59,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         string NiconicoId { get; }
         string FolderName { get; }
         string FileNameFormat { get; }
+        string CommandFormat { get; }
         bool IsOverwriteEnable { get; }
         bool IsAutoDisposingEnable { get; }
         bool IsReplaceStrictedEnable { get; }
@@ -217,6 +219,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             {
                 FileName = fileName,
                 FolderName = settings.FolderName,
+                CommandFormat = settings.CommandFormat,
                 TsFilePaths = segmentFilePaths,
                 IsOverwriteEnable = settings.IsOverwriteEnable,
                 IsOverrideDTEnable = settings.IsOvwrridingFileDTEnable,
@@ -373,7 +376,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
                 try
                 {
-                    data = await this.DownloadInternalAsync(self.Url, self.Context);
+                    data = await this.DownloadInternalAsync(self.Url, self.Context, token);
                 }
                 catch (Exception e)
                 {
@@ -403,7 +406,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 completed++;
                 messenger.SendMessage($"完了: {completed}/{all}{resolution}");
 
-                await Task.Delay(1 * 1000);
+                await Task.Delay(1 * 1000, token);
 
 
             }, context, url.AbsoluteUrl, url.SequenceZero, url.FileName));
@@ -442,7 +445,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <param name="context"></param>
         /// <param name="retryAttempt"></param>
         /// <returns></returns>
-        private async Task<byte[]> DownloadInternalAsync(string url, IDownloadContext context, int retryAttempt = 0)
+        private async Task<byte[]> DownloadInternalAsync(string url, IDownloadContext context, CancellationToken token, int retryAttempt = 0)
         {
             var res = await this.http.GetAsync(new Uri(url));
             if (!res.IsSuccessStatusCode)
@@ -451,8 +454,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 if (retryAttempt < 3)
                 {
                     retryAttempt++;
-                    await Task.Delay(10 * 1000);
-                    return await this.DownloadInternalAsync(url, context, retryAttempt);
+                    await Task.Delay(10 * 1000, token);
+                    return await this.DownloadInternalAsync(url, context, token, retryAttempt);
                 }
                 else
                 {
@@ -502,6 +505,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         public int SequenceZero { get; init; }
 
+        public int Index { get; set; }
+
         public Guid TaskId { get; init; }
 
         public Func<IParallelDownloadTask, object, IParallelTaskToken, Task> TaskFunction { get; init; }
@@ -519,6 +524,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public string FolderName { get; set; } = string.Empty;
 
         public string FileNameFormat { get; set; } = string.Empty;
+
+        public string CommandFormat { get; set; } = Format.DefaultFFmpegFormat;
 
         public bool IsOverwriteEnable { get; set; }
 

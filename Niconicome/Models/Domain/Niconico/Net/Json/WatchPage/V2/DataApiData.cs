@@ -14,8 +14,8 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2
         [JsonPropertyName("url")]
         public string? Url { get; set; }
 
-        [JsonPropertyName("smallUrl")]
-        public string? SmallUrl { get; set; }
+        [JsonPropertyName("player")]
+        public string? Player { get; set; }
 
         [JsonPropertyName("middleUrl")]
         public string? MiddleUrl { get; set; }

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Playlist;
@@ -23,14 +25,16 @@ namespace NiconicomeTest.Local.Playlist.Videos
 
         private PlaylistStoreHandlerStab? playlistStoreHandler;
 
+        private ICurrent? cStab;
+
         [SetUp]
         public void SetUp()
         {
             this.playlistStoreHandler = new PlaylistStoreHandlerStab();
             ITreePlaylistInfo? p = new NonBindableTreePlaylistInfo() { Id = 1 };
-            var cStab = new CurrentStab();
+            this.cStab = new CurrentStab();
             cStab.SelectedPlaylist.Value = p;
-            this.videoListContainer = new VideoListContainer(this.playlistStoreHandler, new VideoHandlerStab(), new VideoListRefresherStab(), cStab, new LoggerStab());
+            this.videoListContainer = new VideoListContainer(this.playlistStoreHandler, new VideoHandlerStab(), new VideoListRefresherStab(), this.cStab, new LoggerStab());
             this.lastVIdeoNicoID = null;
             this.videoListContainer.ListChanged += (_, e) =>
             {
@@ -44,6 +48,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
         {
             var video = new NonBindableListVideoInfo();
             video.NiconicoId.Value = "sm9";
+            video.IsSelected.Value = true;
             var result = this.videoListContainer!.Add(video, 1);
 
             Assert.That(this.lastChangeType, Is.EqualTo(ChangeType.Add));
@@ -51,6 +56,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
             Assert.That(this.videoListContainer.Videos.Count, Is.EqualTo(1));
             Assert.That(result.IsSucceeded, Is.True);
             Assert.That(this.playlistStoreHandler!.VideoCount, Is.EqualTo(1));
+            Assert.That(this.cStab!.SelectedVideos.Value, Is.EqualTo(1));
         }
 
         [Test]
@@ -75,14 +81,17 @@ namespace NiconicomeTest.Local.Playlist.Videos
         {
             var video = new NonBindableListVideoInfo();
             video.NiconicoId.Value = "sm9";
+            video.IsSelected.Value = true;
             this.videoListContainer!.Add(video);
             var result = this.videoListContainer!.Remove(video, 1);
 
+            Assert.That(result.IsSucceeded, Is.True);
             Assert.That(this.lastChangeType, Is.EqualTo(ChangeType.Remove));
             Assert.That(this.lastVIdeoNicoID, Is.EqualTo("sm9"));
             Assert.That(this.videoListContainer.Videos.Count, Is.EqualTo(0));
             Assert.That(result.IsSucceeded, Is.True);
             Assert.That(this.playlistStoreHandler!.VideoCount, Is.EqualTo(0));
+            Assert.That(this.cStab!.SelectedVideos.Value, Is.Zero);
         }
 
         [Test]
@@ -100,16 +109,31 @@ namespace NiconicomeTest.Local.Playlist.Videos
         [Test]
         public void すべての動画にチェックを入れる()
         {
-            var video1 = new NonBindableListVideoInfo();
-            var video2 = new NonBindableListVideoInfo();
-            var video3 = new NonBindableListVideoInfo();
+            void check(bool value)
+            {
+                if (value)
+                {
+                    this.cStab!.SelectedVideos.Value++;
+                }
+            }
+
+            var video1 = new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
+            var video2 = new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("2") };
+            var video3 = new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("3") };
+            video1.IsSelected.Subscribe(value => check(value));
+            video2.IsSelected.Subscribe(value => check(value));
+            video3.IsSelected.Subscribe(value => check(value));
+
             this.videoListContainer!.AddRange(new IListVideoInfo[] { video1, video2, video3 });
             this.videoListContainer!.ForEach(v => v.IsSelected.Value = true);
+
 
             foreach (var video in this.videoListContainer!.Videos)
             {
                 Assert.That(video.IsSelected.Value, Is.True);
             }
+
+            Assert.That(this.cStab!.SelectedVideos.Value, Is.EqualTo(3));
 
 
         }

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Niconico.Remote;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
@@ -25,13 +28,13 @@ namespace Niconicome.Models.Playlist
         ReactiveProperty<string> NiconicoId { get; }
         ReactiveProperty<string> Title { get; }
         ReactiveProperty<bool> IsDeleted { get; }
-        ReactiveProperty<bool> IsSelected { get; }
+        ReactiveProperty<bool> IsSelected { get; set; }
         ReactiveProperty<bool> IsDownloaded { get; }
         ReactiveProperty<bool> IsThumbDownloading { get; }
         ReactiveProperty<string> OwnerName { get; }
         ReactiveProperty<string> LargeThumbUrl { get; }
         ReactiveProperty<string> ThumbUrl { get; }
-        ReactiveProperty<string> Message { get; }
+        ReactiveProperty<string> Message { get; set; }
         ReactiveProperty<string> ThumbPath { get; }
         ReactiveProperty<string> FileName { get; }
         ReactiveProperty<string> FolderPath { get; }
@@ -43,11 +46,8 @@ namespace Niconicome.Models.Playlist
         Uri GetNiconicoPageUri();
         bool CheckDownloaded(string folderPath);
         string GetFilePath(string folderPath);
-        static NonBindableListVideoInfo ConvertDbDataToVideoListInfo(STypes::Video video)
-        {
-            video.Void();
-            return new NonBindableListVideoInfo();
-        }
+        void SetDataBaseData(STypes::Video dbVideo);
+        void SetNewData(IListVideoInfo video);
 
     }
 
@@ -59,9 +59,7 @@ namespace Niconicome.Models.Playlist
     {
         public NonBindableListVideoInfo()
         {
-            VideoMessenger.VideoMessageChange += this.OnMessage;
             this.Message = new ReactiveProperty<string>().AddTo(this.disposables);
-            this.Message.Subscribe(m => VideoMessenger.Write(this.MessageGuid, m));
         }
 
         public ReactiveProperty<int> Id { get; init; } = new ReactiveProperty<int>();
@@ -76,7 +74,7 @@ namespace Niconicome.Models.Playlist
         public ReactiveProperty<string> OwnerName { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> LargeThumbUrl { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> ThumbUrl { get; init; } = new ReactiveProperty<string>();
-        public ReactiveProperty<string> Message { get; init; }
+        public ReactiveProperty<string> Message { get; set; }
         public ReactiveProperty<string> ThumbPath { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> FileName { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> FolderPath { get; init; } = new ReactiveProperty<string>();
@@ -84,7 +82,7 @@ namespace Niconicome.Models.Playlist
         public ReactiveProperty<string> ChannelID { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<string> ChannelName { get; init; } = new ReactiveProperty<string>();
         public ReactiveProperty<bool> IsDeleted { get; init; } = new ReactiveProperty<bool>();
-        public ReactiveProperty<bool> IsSelected { get; init; } = new ReactiveProperty<bool>();
+        public ReactiveProperty<bool> IsSelected { get; set; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsDownloaded { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsThumbDownloading { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<DateTime> UploadedOn { get; init; } = new ReactiveProperty<DateTime>();
@@ -164,100 +162,66 @@ namespace Niconicome.Models.Playlist
         }
 
         /// <summary>
-        /// DBのデータをTreeVideoInfo型のインスタンスに変換する
+        /// 文字列化
         /// </summary>
-        /// <param name="dbVideo"></param>
         /// <returns></returns>
-        public static NonBindableListVideoInfo ConvertDbDataToVideoListInfo(STypes::Video dbVideo)
-        {
-            var converted = new NonBindableListVideoInfo();
-            NonBindableListVideoInfo.SetDbData(converted, dbVideo);
-            return converted;
-        }
-
-        /// <summary>
-        /// インスタンスを破棄する
-        /// </summary>
-        public override void Dispose()
-        {
-            VideoMessenger.VideoMessageChange -= this.OnMessage;
-            base.Dispose();
-        }
-
         public override string ToString()
         {
             return $"[{this.NiconicoId.Value}]{this.Title.Value}";
         }
 
         /// <summary>
-        /// 値をセットする(Local=>Locals)
+        /// DBの値をセットする
+        /// </summary>
+        /// <param name="dbVideo"></param>
+        public void SetDataBaseData(STypes::Video dbVideo)
+        {
+            this.Id.Value = dbVideo.Id;
+            this.NiconicoId.Value = dbVideo.NiconicoId;
+            this.Title.Value = dbVideo.Title;
+            this.IsDeleted.Value = dbVideo.IsDeleted;
+            this.OwnerName.Value = dbVideo.OwnerName;
+            this.UploadedOn.Value = dbVideo.UploadedOn;
+            this.LargeThumbUrl.Value = dbVideo.LargeThumbUrl;
+            this.ThumbUrl.Value = dbVideo.ThumbUrl;
+            this.ThumbPath.Value = dbVideo.ThumbPath;
+            this.FileName.Value = dbVideo.FileName;
+            this.Tags = dbVideo.Tags ?? new List<string>();
+            this.ViewCount.Value = dbVideo.ViewCount;
+            this.CommentCount.Value = dbVideo.CommentCount;
+            this.MylistCount.Value = dbVideo.MylistCount;
+            this.LikeCount.Value = dbVideo.LikeCount;
+            this.OwnerID.Value = dbVideo.OwnerID;
+            this.Duration.Value = dbVideo.Duration;
+        }
+
+        /// <summary>
+        /// 別のインスタンスから値をコピーする
         /// </summary>
         /// <param name="newVideo"></param>
-        /// <param name="oldVideo"></param>
-        public static void SetData(IListVideoInfo newVideo, IListVideoInfo oldVideo)
+        public void SetNewData(IListVideoInfo newVideo)
         {
-            newVideo.ViewCount.Value = oldVideo.ViewCount.Value;
-            newVideo.NiconicoId.Value = oldVideo.NiconicoId.Value;
-            newVideo.Title.Value = oldVideo.Title.Value;
-            newVideo.IsDeleted.Value = oldVideo.IsDeleted.Value;
-            newVideo.IsSelected.Value = oldVideo.IsSelected.Value;
-            newVideo.OwnerName.Value = oldVideo.OwnerName.Value;
-            newVideo.LargeThumbUrl.Value = oldVideo.LargeThumbUrl.Value;
-            newVideo.ThumbUrl.Value = oldVideo.ThumbUrl.Value;
-            newVideo.Message.Value = oldVideo.Message.Value;
-            if (!oldVideo.ThumbPath.Value.IsNullOrEmpty()) newVideo.ThumbPath.Value = oldVideo.ThumbPath.Value;
-            newVideo.FileName.Value = oldVideo.FileName.Value;
-            newVideo.MessageGuid = oldVideo.MessageGuid;
-            newVideo.Tags = oldVideo.Tags;
-            newVideo.UploadedOn.Value = oldVideo.UploadedOn.Value;
-            newVideo.CommentCount.Value = oldVideo.CommentCount.Value;
-            newVideo.MylistCount.Value = oldVideo.MylistCount.Value;
-            newVideo.LikeCount.Value = oldVideo.LikeCount.Value;
-            newVideo.Duration.Value = oldVideo.Duration.Value;
-            newVideo.OwnerID.Value = oldVideo.OwnerID.Value;
-            newVideo.IsDownloaded.Value = oldVideo.IsDownloaded.Value;
-        }
 
-        /// <summary>
-        /// データを設定する(DB=>Local)
-        /// </summary>
-        /// <param name="videoInfo"></param>
-        /// <param name="dbVideo"></param>
-        protected static void SetDbData(IListVideoInfo videoInfo, STypes::Video dbVideo)
-        {
-            videoInfo.Id.Value = dbVideo.Id;
-            videoInfo.NiconicoId.Value = dbVideo.NiconicoId;
-            videoInfo.Title.Value = dbVideo.Title;
-            videoInfo.IsDeleted.Value = dbVideo.IsDeleted;
-            videoInfo.OwnerName.Value = dbVideo.OwnerName;
-            videoInfo.UploadedOn.Value = dbVideo.UploadedOn;
-            videoInfo.LargeThumbUrl.Value = dbVideo.LargeThumbUrl;
-            videoInfo.ThumbUrl.Value = dbVideo.ThumbUrl;
-            videoInfo.ThumbPath.Value = dbVideo.ThumbPath;
-            videoInfo.FileName.Value = dbVideo.FileName;
-            //videoInfo.IsSelected.Value = dbVideo.IsSelected;
-            videoInfo.Tags = dbVideo.Tags ?? new List<string>();
-            videoInfo.ViewCount.Value = dbVideo.ViewCount;
-            videoInfo.CommentCount.Value = dbVideo.CommentCount;
-            videoInfo.MylistCount.Value = dbVideo.MylistCount;
-            videoInfo.LikeCount.Value = dbVideo.LikeCount;
-            videoInfo.OwnerID.Value = dbVideo.OwnerID;
-            videoInfo.Duration.Value = dbVideo.Duration;
-        }
-
-
-        /// <summary>
-        /// メッセージ受信
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnMessage(object? sender, VideoMessageChangeEventArgs e)
-        {
-            if (e.ID == this.MessageGuid && e.NewValue != this.Message.Value)
-            {
-                this.Message.Value = e.NewValue;
-            }
+            this.ViewCount.Value = newVideo.ViewCount.Value;
+            this.NiconicoId.Value = newVideo.NiconicoId.Value;
+            this.Title.Value = newVideo.Title.Value;
+            this.IsDeleted.Value = newVideo.IsDeleted.Value;
+            this.IsSelected.Value = newVideo.IsSelected.Value;
+            this.OwnerName.Value = newVideo.OwnerName.Value;
+            this.LargeThumbUrl.Value = newVideo.LargeThumbUrl.Value;
+            this.ThumbUrl.Value = newVideo.ThumbUrl.Value;
+            this.Message.Value = newVideo.Message.Value;
+            if (!newVideo.ThumbPath.Value.IsNullOrEmpty()) this.ThumbPath.Value = newVideo.ThumbPath.Value;
+            this.FileName.Value = newVideo.FileName.Value;
+            this.MessageGuid = newVideo.MessageGuid;
+            this.Tags = newVideo.Tags;
+            this.UploadedOn.Value = newVideo.UploadedOn.Value;
+            this.CommentCount.Value = newVideo.CommentCount.Value;
+            this.MylistCount.Value = newVideo.MylistCount.Value;
+            this.LikeCount.Value = newVideo.LikeCount.Value;
+            this.Duration.Value = newVideo.Duration.Value;
+            this.OwnerID.Value = newVideo.OwnerID.Value;
+            this.IsDownloaded.Value = newVideo.IsDownloaded.Value;
         }
     }
-
 }

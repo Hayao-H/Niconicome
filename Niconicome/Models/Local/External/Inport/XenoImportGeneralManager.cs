@@ -226,7 +226,7 @@ namespace Niconicome.Models.Local.External.Import
                 return;
             }
 
-            var id = this.playlistStoreHandler.AddPlaylist(parentId, playlistInfo.Name);
+            var id = this.playlistStoreHandler.AddPlaylist(parentId, playlistInfo.Name.Value);
             var playlist = this.playlistStoreHandler.GetPlaylist(id);
             var sleepInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
 
@@ -248,11 +248,6 @@ namespace Niconicome.Models.Local.External.Import
 
                 var videos = new List<IListVideoInfo>();
                 var rResult = await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(playlistInfo.RemoteId, videos, RemoteType.Channel, new List<string>(), m => this.OnMessageVerbose(m));
-
-                foreach (var video in videos)
-                {
-                    this.playlistStoreHandler.AddVideo(video, id);
-                }
 
                 if (rResult.IsSucceeded)
                 {

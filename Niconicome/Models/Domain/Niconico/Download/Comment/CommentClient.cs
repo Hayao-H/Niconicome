@@ -4,61 +4,16 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Net.Json;
-using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment
 {
 
-    public interface ICommentDownloadSettings
-    {
-        string NiconicoId { get; }
-        string FolderName { get; }
-        string FileNameFormat { get; }
-        bool IsOverwriteEnable { get; }
-        bool IsAutoDisposingEnable { get; }
-        bool IsDownloadingLogEnable { get; }
-        bool IsDownloadingOwnerCommentEnable { get; }
-        bool IsDownloadingEasyCommentEnable { get; }
-        bool IsReplaceStrictedEnable { get; }
-        bool IsUnsafeHandleEnable { get; }
-        int CommentOffset { get; }
-        int MaxcommentsCount { get; }
-    }
-
     public interface ICommentClient
     {
         Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token);
-    }
-
-    public class CommentDownloadSettings : ICommentDownloadSettings
-    {
-        public string NiconicoId { get; set; } = string.Empty;
-
-        public string FolderName { get; set; } = string.Empty;
-
-        public string FileNameFormat { get; set; } = string.Empty;
-
-        public bool IsOverwriteEnable { get; set; }
-
-        public bool IsAutoDisposingEnable { get; set; }
-
-        public bool IsDownloadingLogEnable { get; set; }
-
-        public bool IsDownloadingOwnerCommentEnable { get; set; }
-
-        public bool IsDownloadingEasyCommentEnable { get; set; }
-
-        public bool IsReplaceStrictedEnable { get; set; }
-
-        public bool IsUnsafeHandleEnable { get; set; }
-
-        public int CommentOffset { get; set; }
-
-        public int MaxcommentsCount { get; set; }
-
-
     }
 
     /// <summary>
@@ -99,8 +54,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             do
             {
-                if (index > 0) messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目)");
-                long? when = comments.Count == 0 ? 0 : first?.Date - 1;
+                int count = comments.Count;
+                if (index > 0) messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目・{count}コメ)");
+                long? when = count == 0 ? 0 : first?.Date - 1;
                 List<Response::Comment> retlieved = await this.GetCommentsAsync(dmcInfo, settings, when);
 
                 comments.Add(retlieved);

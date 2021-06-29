@@ -49,16 +49,18 @@ namespace Niconicome.Models.Network
 
         private readonly ILocalSettingHandler settingHandler;
 
-        private readonly IVideoListContainer videoListContainer;
+        private readonly IVideoInfoContainer videoInfoContainer;
 
+        private readonly ILightVideoListinfoHandler lightVideoListinfoHandler;
 
-        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoListContainer videoListContainer)
+        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoInfoContainer videoInfoContainer, ILightVideoListinfoHandler lightVideoListinfoHandler)
         {
             this.wacthPagehandler = watchPageHandler;
             this.messageHandler = messageHandler;
             this.fileStorehandler = fileStorehandler;
             this.settingHandler = settingHandler;
-            this.videoListContainer = videoListContainer;
+            this.videoInfoContainer = videoInfoContainer;
+            this.lightVideoListinfoHandler = lightVideoListinfoHandler;
         }
 
 
@@ -75,9 +77,7 @@ namespace Niconicome.Models.Network
         {
             return await this.GetVideoListInfosAsync(ids.Select(i =>
             {
-                var v = new NonBindableListVideoInfo();
-                v.NiconicoId.Value = i;
-                return v;
+                return this.videoInfoContainer.GetVideo(i);
             }), uncheck, playlistID, forceRegister, ct);
         }
 
@@ -159,7 +159,7 @@ namespace Niconicome.Models.Network
                         videos.Add(item.video);
                         if (uncheck)
                         {
-                            this.videoListContainer.Uncheck(item.video.Id.Value, playlistID ?? -1);
+                            this.lightVideoListinfoHandler.GetLightVideoListInfo(item.video.Id.Value, playlistID ?? -1).IsSelected.Value = false;
                         }
                     }
                     else
@@ -172,7 +172,7 @@ namespace Niconicome.Models.Network
 
             }
 
-            await handler.ProcessTasksAsync(() => { }, () => this.messageHandler.AppendMessage("動画情報の取得処理が中断されました。"), ct);
+            await handler.ProcessTasksAsync(() => { }, () => this.messageHandler.AppendMessage("動画情報の取得処理が中断されました。"), ct ?? CancellationToken.None);
 
 
             return videos;
@@ -226,6 +226,8 @@ namespace Niconicome.Models.Network
         }
 
         public Guid TaskId { get; init; } = Guid.NewGuid();
+
+        public int Index { get; set; }
 
         public Func<NetworkVideoParallelTask, object, IParallelTaskToken, Task> TaskFunction { get; init; }
 

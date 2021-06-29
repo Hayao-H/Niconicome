@@ -1,26 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Reactive.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.Diagnostics;
-using Niconicome.Extensions.System.List;
 using Niconicome.Extensions.System.Windows;
-using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Utils;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
@@ -31,9 +36,9 @@ using EnumSettings = Niconicome.Models.Local.Settings.EnumSettingsValue;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 using Net = Niconicome.Models.Domain.Network;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
+using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
-using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -55,7 +60,9 @@ namespace Niconicome.ViewModels.Mainpage
             //プレイリスト内容更新のイベントを購読する
             WS::Mainpage.VideoListContainer.ListChanged += (_, _) => this.VideoListUpdated();
 
-            this.Videos = WS::Mainpage.VideoListContainer.Videos.ToReadOnlyReactiveCollection(v => new VideoInfoViewModel(v)).AddTo(this.disposables);
+            this.Videos = WS::Mainpage.VideoListContainer.Videos.ToReadOnlyReactiveCollection(v => new VideoInfoViewModel(v, (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value?.BookMarkedVideoID ?? -1) == v.Id.Value)).AddTo(this.disposables);
+
+            this.IsTemporaryPlaylist = WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.ToReadOnlyReactiveProperty();
 
             this.showMessageBox = showMessageBox;
 
@@ -69,19 +76,21 @@ namespace Niconicome.ViewModels.Mainpage
             this.FilterIcon = new ReactivePropertySlim<MaterialDesign.PackIconKind>(MaterialDesign::PackIconKind.Filter);
 
             //幅
-            var scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
-            var idWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWIDColumnWid);
-            var titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWTitleColumnWid);
-            var uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWUploadColumnWid);
-            var vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWViewCountColumnWid);
-            var dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWDownloadedFlagColumnWid);
-            var stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
-            var tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
+            int scWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWSelectColumnWid);
+            int idWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWIDColumnWid);
+            int titleWIdth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWTitleColumnWid);
+            int uploadWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWUploadColumnWid);
+            int vctWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWViewCountColumnWid);
+            int dlfWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWDownloadedFlagColumnWid);
+            int stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
+            int tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
+            int bmWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWBookMarkColumnWid);
 
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
             var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
             WS::Mainpage.PlaylistHandler.Refresh(expandAll, inheritExpandedState);
+            WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistTreeHandler.GetTmp();
 
             //インデックス
             this.SelectedIndex = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.ToReactivePropertyAsSynchronized(x => x.Value);
@@ -99,6 +108,183 @@ namespace Niconicome.ViewModels.Mainpage
             this.UploadColumnTitle = WS::Mainpage.SortInfoHandler.UploadColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+
+            #region Width系プロパティー
+
+            var isRestoreEnable = !WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth);
+            const int defaultWidth = 150;
+
+            this.SelectColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? scWidth <= 0 ? defaultWidth : scWidth : defaultWidth);
+            this.IDColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? idWidth <= 0 ? defaultWidth : idWidth : defaultWidth);
+            this.TitleColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? titleWIdth <= 0 ? defaultWidth : titleWIdth : defaultWidth);
+            this.UploadColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? uploadWidth <= 0 ? defaultWidth : uploadWidth : defaultWidth);
+            this.ViewCountColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? vctWidth <= 0 ? defaultWidth : vctWidth : defaultWidth);
+            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? dlfWidth <= 0 ? defaultWidth : dlfWidth : defaultWidth);
+            this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
+            this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
+            this.BookMarkColumnWidth = new ReactivePropertySlim<int>(isRestoreEnable ? bmWidth < 0 ? defaultWidth : bmWidth : defaultWidth);
+
+            this.SelectColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWSelectColumnWid))
+                .AddTo(this.disposables);
+            this.IDColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWIDColumnWid))
+                .AddTo(this.disposables);
+            this.TitleColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWTitleColumnWid))
+                .AddTo(this.disposables);
+            this.UploadColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWUploadColumnWid))
+                .AddTo(this.disposables);
+            this.ViewCountColumnWidth
+                .Throttle(TimeSpan.FromSeconds(5))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWViewCountColumnWid))
+                .AddTo(this.disposables);
+            this.DownloadedFlagColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWDownloadedFlagColumnWid))
+                .AddTo(this.disposables);
+            this.StateColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWStateColumnWid))
+                .AddTo(this.disposables);
+            this.ThumbColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
+                .AddTo(this.disposables);
+            this.BookMarkColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWBookMarkColumnWid))
+                .AddTo(this.disposables);
+            #endregion
+
+            #region UI系要素
+            this.ListItemHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ItemHeight ?? 100).ToReadOnlyReactiveProperty();
+            this.TitleHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TitleHeight ?? 40).ToReadOnlyReactiveProperty();
+            this.ButtonsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.ButtonsHeight ?? 50).ToReadOnlyReactiveProperty();
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.Thumbnail ?? true))
+                {
+                    this.ThumbColumnWidth.Value = 0;
+                }
+                else if (this.ThumbColumnWidth.Value == 0)
+                {
+                    this.ThumbColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.NiconicoID ?? true))
+                {
+                    this.IDColumnWidth.Value = 0;
+                }
+                else if (this.IDColumnWidth.Value == 0)
+                {
+                    this.IDColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.Title ?? true))
+                {
+                    this.TitleColumnWidth.Value = 0;
+                }
+                else if (this.TitleColumnWidth.Value == 0)
+                {
+                    this.TitleColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.UploadedDT ?? true))
+                {
+                    this.UploadColumnWidth.Value = 0;
+                }
+                else if (this.UploadColumnWidth.Value == 0)
+                {
+                    this.UploadColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.ViewCount ?? true))
+                {
+                    this.ViewCountColumnWidth.Value = 0;
+                }
+                else if (this.ViewCountColumnWidth.Value == 0)
+                {
+                    this.ViewCountColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.DLFlag ?? true))
+                {
+                    this.DownloadedFlagColumnWidth.Value = 0;
+                }
+                else if (this.DownloadedFlagColumnWidth.Value == 0)
+                {
+                    this.DownloadedFlagColumnWidth.Value = defaultWidth;
+                }
+            });
+
+            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
+            {
+                if (!(value?.MainPage.VideoList.Column.BookMark ?? true))
+                {
+                    this.BookMarkColumnWidth.Value = 0;
+                }
+                else if (this.BookMarkColumnWidth.Value == 0)
+                {
+                    this.BookMarkColumnWidth.Value = defaultWidth;
+                }
+            });
+            #endregion
+
+
+
+            #region クリップボード監視
+
+            this.isClipbordMonitoring = new ReactiveProperty<bool>();
+
+            this.ClipbordMonitorIcon = this.isClipbordMonitoring
+                .Select(value => value ? MaterialDesign::PackIconKind.ClipboardRemove : MaterialDesign::PackIconKind.ClipboardPulse)
+                .ToReactiveProperty()
+                .AddTo(this.disposables);
+
+            this.isClipbordMonitoring
+                .Skip(1)
+                .Subscribe(value =>
+            {
+                if (value)
+                {
+
+                    WS::Mainpage.SnaclbarHandler.Enqueue("クリップボードの監視を開始します。");
+                    WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を開始します。");
+                }
+                else
+                {
+                    WS::Mainpage.SnaclbarHandler.Enqueue("クリップボードの監視を終了します。");
+                    WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を終了します。");
+                }
+            }).AddTo(this.disposables);
+
+            this.ClipboardMonitoringToolTip = this.isClipbordMonitoring
+                .Select(value => value ? "クリップボードの監視を終了する" : "クリップボードを監視する")
+                .ToReadOnlyReactiveProperty();
+
+            #endregion
 
             #region コマンドの初期化
             this.AddVideoCommand = new[] {
@@ -149,12 +335,12 @@ namespace Niconicome.ViewModels.Mainpage
                       return;
                   }
 
-                  WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
+                  WS::Mainpage.VideoListContainer.AddRange(videos, playlistId, !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
 
                   WS::Mainpage.VideoListContainer.Refresh();
 
                   this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
-                  WS::Mainpage.Messagehandler.AppendMessage ($"{videos.Count}件の動画を追加しました");
+                  WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を追加しました");
 
                   if (!videos.First().ChannelID.Value.IsNullOrEmpty())
                   {
@@ -168,55 +354,47 @@ namespace Niconicome.ViewModels.Mainpage
               })
             .AddTo(this.disposables);
 
-            this.RemoveVideoCommand = new CommandBase<VideoInfoViewModel>(_ => true, async arg =>
-             {
-                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
-                 {
-                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
-                     return;
-                 }
+            this.RemoveVideoCommand = new ReactiveCommand()
+            .WithSubscribe(async () =>
+            {
+                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
+                {
+                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
+                    return;
+                }
 
-                 var targetVideos = new List<IListVideoInfo>();
+                List<IListVideoInfo> targetVideos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).ToList();
 
-                 if (arg is not null && arg is VideoInfoViewModel videoVM) targetVideos.Add(videoVM.VideoInfo);
-
-                 targetVideos.AddRange(WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value));
-                 targetVideos = targetVideos.Distinct(v => v.Id).ToList();
-
-                 string confirmMessage = targetVideos.Count == 1
-                 ? $"本当に「[{targetVideos[0].NiconicoId.Value}]{targetVideos[0].Title.Value}」を削除しますか？"
-                 : $"本当に「[{targetVideos[0].NiconicoId.Value}]{targetVideos[0].Title.Value}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
+                if (targetVideos.Count == 0)
+                {
+                    int index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
+                    if (index < 0 || WS::Mainpage.VideoListContainer.Count <= index) return;
+                    targetVideos.Add(WS::Mainpage.VideoListContainer.Videos[index]);
+                }
 
 
-                 var confirm = await this.showMessageBox(confirmMessage, MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
-                 if (confirm != MaterialMessageBoxResult.Yes) return;
+                string confirmMessage = targetVideos.Count == 1
+                ? $"本当に「[{targetVideos[0]}」を削除しますか？"
+                : $"本当に「[{targetVideos[0]}」ほか{targetVideos.Count - 1}件の動画を削除しますか？";
 
-                 foreach (var video in targetVideos)
-                 {
-                     //取得失敗動画の場合
-                     if (video.Title.Value == "取得失敗")
-                     {
-                         WS::Mainpage.VideoListContainer.Remove(video, null, false);
-                     }
-                     else
-                     {
-                         WS::Mainpage.VideoListContainer.Remove(video);
-                     }
-                 }
 
-                 if (targetVideos.Count > 1)
-                 {
+                var confirm = await this.showMessageBox(confirmMessage, MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+                if (confirm != MaterialMessageBoxResult.Yes) return;
 
-                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                 }
-                 else
-                 {
-                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}を削除しました。");
-                     this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}を削除しました。");
-                 }
+                WS::Mainpage.VideoListContainer.RemoveRange(targetVideos, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
 
-             });
+                if (targetVideos.Count > 1)
+                {
+                    WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                }
+                else
+                {
+                    WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}を削除しました。");
+                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}を削除しました。");
+                }
+
+            });
 
             this.WatchOnNiconicoCommand = new CommandBase<VideoInfoViewModel>(_ => true, arg =>
             {
@@ -249,11 +427,11 @@ namespace Niconicome.ViewModels.Mainpage
                     this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、プレイリスト情報を編集できません");
                     return;
                 }
-                var window = new EditPlaylist
+
+                WS::Mainpage.WindowsHelper.OpenWindow(() => new EditPlaylist
                 {
                     Owner = Application.Current.MainWindow
-                };
-                window.Show();
+                });
             })
                 .AddTo(this.disposables);
 
@@ -279,7 +457,8 @@ namespace Niconicome.ViewModels.Mainpage
                 var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistHandler.ContainsVideo(i, playlistId)).ToList();
 
                 var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(ids)).ToList();
-                var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
+                var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId, !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
+                WS::Mainpage.VideoListContainer.Refresh();
 
                 if (result.IsSucceeded)
                 {
@@ -313,11 +492,10 @@ namespace Niconicome.ViewModels.Mainpage
                     return;
                 }
 
-                var window = new NetworkVideoSettings()
+                WS::Mainpage.WindowsHelper.OpenWindow(() => new NetworkVideoSettings()
                 {
                     Owner = Application.Current.MainWindow
-                };
-                window.Show();
+                });
             })
             .AddTo(this.disposables);
 
@@ -426,12 +604,13 @@ namespace Niconicome.ViewModels.Mainpage
                             return;
                         }
 
-                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistId);
+                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistId, !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
 
                         if (videos.Count > 1)
                         {
                             WS::Mainpage.Messagehandler.AppendMessage($"{videos[0].NiconicoId.Value}ほか{videos.Count - 1}件の動画を追加しました。");
                             this.SnackbarMessageQueue.Enqueue($"{videos[0].NiconicoId.Value}ほか{videos.Count - 1}件の動画を追加しました。");
+                            WS::Mainpage.VideoListContainer.Refresh();
                         }
                         else
                         {
@@ -710,7 +889,7 @@ namespace Niconicome.ViewModels.Mainpage
                 var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
                 if (!videos.Any()) return;
 
-                var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name, folderPath, type);
+                var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value, folderPath, type);
 
                 if (result)
                 {
@@ -755,55 +934,137 @@ namespace Niconicome.ViewModels.Mainpage
                 }).AddTo(this.disposables)
             .AddTo(this.disposables);
 
+            this.MonitorClipbordCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(value => value is not null)
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    if (!this.isClipbordMonitoring.Value)
+                    {
+                        if (!Compatibility.IsOsVersionLargerThan(10, 0, 10240))
+                        {
+                            WS::Mainpage.SnaclbarHandler.Enqueue("この機能はOSでサポートされていません。");
+                            WS::Mainpage.Messagehandler.AppendMessage("この機能は'Windows10 1507'以降のOSでのみ利用可能です。");
+                            return;
+                        }
+
+                        Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged += this.OnContextMenuChange;
+                        this.isClipbordMonitoring.Value = true;
+
+                    }
+                    else
+                    {
+                        if (!Compatibility.IsOsVersionLargerThan(10, 0, 10240)) return;
+                        Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged -= this.OnContextMenuChange;
+                        this.isClipbordMonitoring.Value = false;
+
+                    }
+                }).AddTo(this.disposables);
+
+            this.SavePlaylistCommand = this.IsTemporaryPlaylist
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    WS::Mainpage.SnaclbarHandler.Enqueue("一時プレイリストの内容を保存します。");
+                    List<IListVideoInfo> videos = this.Videos.Select(v => v.VideoInfo).ToList();
+                    IAttemptResult<int> result = WS::Mainpage.PlaylistHandler.AddPlaylistToRoot();
+
+                    if (!result.IsSucceeded)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage("プレイリストの新規作成に失敗しました。");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                        return;
+                    }
+
+                    IAttemptResult vResult = WS::Mainpage.VideoListContainer.AddRange(videos, result.Data);
+
+                    if (!vResult.IsSucceeded)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage($"動画の保存に失敗しました。(詳細:{result.Message})");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                        return;
+                    }
+
+                    WS::Mainpage.Messagehandler.AppendMessage($"一時プレイリストの内容しました。");
+                    WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                });
+
+            this.CopyOne = new ReactiveCommand<VideoProperties>()
+                .WithSubscribe(type =>
+                {
+                    int index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
+                    if (index < 0 || WS::Mainpage.VideoListContainer.Count <= index) return;
+
+                    IListVideoInfo video = WS::Mainpage.VideoListContainer.Videos[index];
+                    string source;
+
+                    if (type == VideoProperties.NiconicoId)
+                    {
+                        source = video.NiconicoId.Value;
+                    }
+                    else if (type == VideoProperties.Title)
+                    {
+                        source = video.Title.Value;
+                    }
+                    else
+                    {
+                        source = Niconicome.Models.Const.Net.NiconicoShortUrl + video.NiconicoId.Value;
+                    }
+
+                    try
+                    {
+                        Clipboard.SetText(source);
+                    }
+                    catch (Exception e)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage($"情報のコピーに失敗しました。(詳細:{e.Message})");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("情報のコピーに失敗しました。");
+                    }
+                    WS::Mainpage.SnaclbarHandler.Enqueue("情報をコピーしました。");
+                });
+
+            this.CopyAll = new ReactiveCommand<VideoProperties>()
+                .WithSubscribe(type =>
+                {
+                    List<IListVideoInfo> videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).ToList();
+                    var builder = new StringBuilder();
+
+                    if (type == VideoProperties.NiconicoId)
+                    {
+                        foreach (IListVideoInfo video in videos)
+                        {
+                            builder.AppendLine(video.NiconicoId.Value);
+                        }
+                    }
+                    else if (type == VideoProperties.Title)
+                    {
+                        foreach (IListVideoInfo video in videos)
+                        {
+                            builder.AppendLine(video.Title.Value);
+                        }
+                    }
+                    else
+                    {
+                        foreach (IListVideoInfo video in videos)
+                        {
+                            builder.AppendLine(Niconicome.Models.Const.Net.NiconicoShortUrl + video.NiconicoId.Value);
+                        }
+                    }
+
+                    try
+                    {
+                        Clipboard.SetText(builder.ToString());
+                    }
+                    catch (Exception e)
+                    {
+                        WS::Mainpage.Messagehandler.AppendMessage($"情報のコピーに失敗しました。(詳細:{e.Message})");
+                        WS::Mainpage.SnaclbarHandler.Enqueue("情報のコピーに失敗しました。");
+                    }
+
+                    WS::Mainpage.SnaclbarHandler.Enqueue("情報をコピーしました。");
+                });
             #endregion
 
-            #region Width系プロパティー
-
-            var isRestoreEnable = !WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth);
-            const int defaultWidth = 150;
-
-            this.SelectColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? scWidth <= 0 ? defaultWidth : scWidth : defaultWidth);
-            this.IDColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? idWidth <= 0 ? defaultWidth : idWidth : defaultWidth);
-            this.TitleColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? titleWIdth <= 0 ? defaultWidth : titleWIdth : defaultWidth);
-            this.UploadColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? uploadWidth <= 0 ? defaultWidth : uploadWidth : defaultWidth);
-            this.ViewCountColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? vctWidth <= 0 ? defaultWidth : vctWidth : defaultWidth);
-            this.DownloadedFlagColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? dlfWidth <= 0 ? defaultWidth : dlfWidth : defaultWidth);
-            this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
-            this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
-
-            this.SelectColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWSelectColumnWid))
-                .AddTo(this.disposables);
-            this.IDColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWIDColumnWid))
-                .AddTo(this.disposables);
-            this.TitleColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWTitleColumnWid))
-                .AddTo(this.disposables);
-            this.UploadColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWUploadColumnWid))
-                .AddTo(this.disposables);
-            this.ViewCountColumnWidth
-                .Throttle(TimeSpan.FromSeconds(5))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWViewCountColumnWid))
-                .AddTo(this.disposables);
-            this.DownloadedFlagColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWDownloadedFlagColumnWid))
-                .AddTo(this.disposables);
-            this.StateColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWStateColumnWid))
-                .AddTo(this.disposables);
-            this.ThumbColumnWidth
-                .Throttle(TimeSpan.FromSeconds(3))
-                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWThumbColumnWid))
-                .AddTo(this.disposables);
-            #endregion
         }
 
         ~VideoListViewModel()
@@ -830,7 +1091,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画を削除する
         /// </summary>
-        public CommandBase<VideoInfoViewModel> RemoveVideoCommand { get; init; }
+        public ReactiveCommand RemoveVideoCommand { get; init; }
 
         /// <summary>
         /// ニコニコ動画で開く
@@ -936,6 +1197,27 @@ namespace Niconicome.ViewModels.Mainpage
         /// ダブルクリック
         /// </summary>
         public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; }
+
+        /// <summary>
+        /// クリップボード監視コマンド
+        /// </summary>
+        public ReactiveCommand MonitorClipbordCommand { get; init; }
+
+        /// <summary>
+        /// 一時プレイリストを保存するコマンド
+        /// </summary>
+        public ReactiveCommand SavePlaylistCommand { get; init; }
+
+        /// <summary>
+        /// 動画情報をコピー
+        /// </summary>
+        public ReactiveCommand<VideoProperties> CopyOne { get; init; }
+
+        /// <summary>
+        /// 選択した動画情報をコピー
+        /// </summary>
+        public ReactiveCommand<VideoProperties> CopyAll { get; init; }
+
         #endregion
 
         /// <summary>
@@ -983,6 +1265,42 @@ namespace Niconicome.ViewModels.Mainpage
         /// すべて選択
         /// </summary>
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; }
+
+        /// <summary>
+        /// 一時プレイリスト
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; init; }
+
+
+        /// <summary>
+        /// クリップボード監視アイコン
+        /// </summary>
+        public ReactiveProperty<MaterialDesign::PackIconKind> ClipbordMonitorIcon { get; init; } = new(MaterialDesign::PackIconKind.ClipboardPulse);
+
+        /// <summary>
+        /// クリップボード監視
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> ClipboardMonitoringToolTip { get; init; }
+
+        #region UI系
+
+        /// <summary>
+        /// リストアイテムの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> ListItemHeight { get; init; }
+
+        /// <summary>
+        /// タイトルの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> TitleHeight { get; init; }
+
+        /// <summary>
+        /// ボタンの高さ
+        /// </summary>
+        public ReadOnlyReactiveProperty<int> ButtonsHeight { get; init; }
+
+
+        #endregion
 
         #region カラムタイトル
         /// <summary>
@@ -1052,6 +1370,10 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveProperty<int> ThumbColumnWidth { get; init; }
 
+        /// <summary>
+        /// ブックマーク
+        /// </summary>
+        public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; } = new(150);
         #endregion
 
         /// <summary>
@@ -1088,6 +1410,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isFiltered;
 
+        private ReactiveProperty<bool> isClipbordMonitoring;
+
         private readonly IEventAggregator ea;
 
         /// <summary>
@@ -1100,7 +1424,7 @@ namespace Niconicome.ViewModels.Mainpage
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Children.Count == 0)
             {
                 WS::Mainpage.Messagehandler.ClearMessage();
-                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
+                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
                 WS::Mainpage.SnaclbarHandler.Enqueue($"プレイリスト:{name}");
                 WS::Mainpage.VideoListContainer.Refresh();
@@ -1115,10 +1439,21 @@ namespace Niconicome.ViewModels.Mainpage
 
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
             {
-                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name;
+                string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value;
                 var count = WS::Mainpage.VideoListContainer.Count;
                 this.PlaylistTitle.Value = $"{name}({count}件)";
             }
+        }
+
+        /// <summary>
+        /// コンテキストメニュー監視
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnContextMenuChange(object? sender, object? e)
+        {
+            SystemSounds.Asterisk.Play();
+            this.AddVideoFromClipboardCommand.Execute();
         }
 
         #endregion
@@ -1132,17 +1467,10 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public VideoListViewModelD()
         {
-            var v1 = new NonBindableListVideoInfo();
-            v1.Title.Value = "レッツゴー!陰陽師";
-            v1.NiconicoId.Value = "sm9";
-            v1.IsDownloaded.Value = true;
+            var v1 = new VideoInfoViewModel("レッツゴー!陰陽師", "sm9", @"https://nicovideo.cdn.nimg.jp/thumbnails/9/9");
+            var v2 = new VideoInfoViewModel("Bad Apple!! feat.nomico", "sm8628149", @"https://nicovideo.cdn.nimg.jp/thumbnails/8628149/8628149");
 
-            var v2 = new NonBindableListVideoInfo();
-            v2.Title.Value = "Bad Apple!! feat. nomico";
-            v2.NiconicoId.Value = "sm8628149";
-            v2.IsDownloaded.Value = false;
-
-            this.Videos = new ReactiveCollection<VideoInfoViewModel>();
+            this.Videos = new ReactiveCollection<VideoInfoViewModel>() { v1, v2 };
 
         }
 
@@ -1152,7 +1480,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         public CommandBase<object> AddVideoCommand { get; init; } = new(_ => true, _ => { });
 
-        public CommandBase<VideoInfoViewModel> RemoveVideoCommand { get; init; } = new(_ => true, _ => { });
+        public ReactiveCommand RemoveVideoCommand { get; init; } = new();
 
         public CommandBase<IListVideoInfo> WatchOnNiconicoCommand { get; init; } = new(_ => true, _ => { });
 
@@ -1192,9 +1520,19 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveCommand SearchCommand { get; init; } = new();
 
+        public ReactiveCommand MonitorClipbordCommand { get; init; } = new();
+
+        public ReactiveCommand SavePlaylistCommand { get; init; } = new();
+
+        public ReactiveCommand BookMark { get; init; } = new();
+
         public CommandBase<string> CreatePlaylistCommand { get; init; } = new(_ => true, _ => { });
 
         public ReactiveCommand<MouseEventArgs> VideoDoubleClickCommand { get; init; } = new ReactiveCommand<MouseEventArgs>();
+
+        public ReactiveCommand<VideoProperties> CopyOne { get; init; } = new();
+
+        public ReactiveCommand<VideoProperties> CopyAll { get; init; } = new();
 
         public ReactiveCollection<VideoInfoViewModel> Videos { get; init; }
 
@@ -1210,21 +1548,47 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactivePropertySlim<bool> IsSelectedAll { get; init; } = new();
 
-        public ReactivePropertySlim<int> SelectColumnWidth { get; set; } = new();
+        public ReactiveProperty<bool> IsTemporaryPlaylist { get; init; } = new(true);
 
-        public ReactivePropertySlim<int> IDColumnWidth { get; set; } = new();
+        public ReactiveProperty<MaterialDesign::PackIconKind> ClipbordMonitorIcon { get; init; } = new(MaterialDesign::PackIconKind.ClipboardPulse);
 
-        public ReactivePropertySlim<int> TitleColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> SelectColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> UploadColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> IDColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> ViewCountColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> TitleColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> DownloadedFlagColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> UploadColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> ViewCountColumnWidth { get; set; } = new(150);
 
-        public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new();
+        public ReactivePropertySlim<int> DownloadedFlagColumnWidth { get; set; } = new(150);
+
+        public ReactivePropertySlim<int> StateColumnWidth { get; set; } = new(150);
+
+        public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new(150);
+
+        public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; } = new(150);
+
+        public ReactiveProperty<int> ListItemHeight { get; init; } = new(100);
+
+        public ReactiveProperty<int> TitleHeight { get; init; } = new(40);
+
+        public ReactiveProperty<int> ButtonsHeight { get; init; } = new(50);
+
+        public ReactiveProperty<bool> ThumbnailVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> NiconicoIDVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> TitleVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> UploadedDTVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> ViewCountVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> DLFlagVisibility { get; init; } = new(true);
+
+        public ReactiveProperty<bool> BookMarkVisibility { get; init; } = new(true);
 
         public ReactiveProperty<int> SelectedIndex { get; init; } = new();
 
@@ -1237,6 +1601,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<string> ViewCountColumnTitle { get; init; } = new("再生回数");
 
         public ReactivePropertySlim<string> DlFlagColumnTitle { get; init; } = new("DL済み");
+
+        public ReactiveProperty<string> ClipboardMonitoringToolTip { get; init; } = new("クリップボードを監視する");
 
     }
 
@@ -1253,7 +1619,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 強制的に元のスクロール位置に戻すスクロール変更値の最小値
         /// </summary>
-        private readonly double minimumVerticalOffsetChangeToFourceScroll = 50;
+        private readonly double minimumVerticalOffsetChangeToFourceScroll = 100;
 
         protected override void OnAttached()
         {
@@ -1279,6 +1645,7 @@ namespace Niconicome.ViewModels.Mainpage
         private void OnScroll(object? sender, ScrollChangedEventArgs e)
         {
             if (sender is null || sender is not ScrollViewer scrollViewer) return;
+            if (WS::Mainpage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DisableScrollRestore).Value) return;
 
 
             if (scrollViewer is null) return;
@@ -1381,7 +1748,7 @@ namespace Niconicome.ViewModels.Mainpage
     /// </summary>
     class VideoInfoViewModel : BindableBase, IDisposable
     {
-        public VideoInfoViewModel(IListVideoInfo video)
+        public VideoInfoViewModel(IListVideoInfo video, bool isBookMarked)
         {
             this.VideoInfo = video;
             this.Id = video.Id.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
@@ -1407,7 +1774,54 @@ namespace Niconicome.ViewModels.Mainpage
             this.IsDownloaded = video.IsDownloaded.ToReactivePropertyAsSynchronized(p => p.Value, p => p ? "○" : "×", x => x == "○").AddTo(this.disposables);
             this.UploadedOn = video.UploadedOn.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
             this.IsThumbDownloading = video.IsThumbDownloading.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.BookMarkColor = new ReactiveProperty<System.Windows.Media.Brush>(isBookMarked ? Models.Domain.Utils.Utils.ConvertToBrush("#4580BC") : Models.Domain.Utils.Utils.ConvertToBrush("#E2EFFC"));
 
+            this.BookMark = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(value => value is not null)
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    int index = WS::Mainpage.CurrentPlaylist.CurrentSelectedIndex.Value;
+                    ITreePlaylistInfo? playlist = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value;
+
+                    if (index < 0 || playlist is null) return;
+                    IListVideoInfo video = WS::Mainpage.VideoListContainer.Videos[index];
+                    int videoID = video.Id.Value;
+
+                    if (video.Id.Value == playlist.BookMarkedVideoID)
+                    {
+                        videoID = -1;
+                    }
+
+                    WS::Mainpage.PlaylistHandler.BookMark(videoID, playlist.Id);
+                    WS::Mainpage.VideoListContainer.Refresh();
+                })
+                .AddTo(this.disposables);
+
+        }
+
+        /// <summary>
+        /// テスト用のコンストラクタ
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="ID"></param>
+        /// <param name="thumbUrl"></param>
+        public VideoInfoViewModel(string title, string ID, string thumbUrl)
+        {
+            this.Id = new ReactiveProperty<int>();
+            this.ViewCount = new ReactiveProperty<int>();
+            this.NiconicoId = new ReactiveProperty<string>(ID);
+            this.Title = new ReactiveProperty<string>(title);
+            this.Message = new ReactiveProperty<string>("テスト");
+            this.ThumbPath = new ReactiveProperty<string>(thumbUrl);
+            this.IsSelected = new ReactiveProperty<bool>(true);
+            this.IsDownloaded = new ReactiveProperty<string>("〇");
+            this.UploadedOn = new ReactiveProperty<DateTime>(DateTime.Now);
+            this.IsThumbDownloading = new ReactiveProperty<bool>();
+            this.BookMarkColor = new ReactiveProperty<System.Windows.Media.Brush>(Models.Domain.Utils.Utils.ConvertToBrush("#E2EFFC"));
+            this.VideoInfo = new NonBindableListVideoInfo();
+
+            this.BookMark = new ReactiveCommand();
         }
 
         ~VideoInfoViewModel()
@@ -1437,6 +1851,13 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveProperty<DateTime> UploadedOn { get; init; }
 
+        public ReactiveProperty<System.Windows.Media.Brush> BookMarkColor { get; init; }
+
+        /// <summary>
+        /// ブックマークする
+        /// </summary>
+        public ReactiveCommand BookMark { get; init; }
+
     }
 
     /// <summary>
@@ -1450,4 +1871,10 @@ namespace Niconicome.ViewModels.Mainpage
         None
     }
 
+    enum VideoProperties
+    {
+        NiconicoId,
+        Title,
+        Url,
+    }
 }

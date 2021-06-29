@@ -4,18 +4,18 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Niconicome.Views.Setting.Pages"
-              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
-        mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="13"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
-        FontFamily="Yu Gothic"
-        d:DataContext="{d:DesignInstance {x:Type vm:FileSettingsViewModelD},IsDesignTimeCreatable=True}"
-      d:DesignHeight="600" d:DesignWidth="800"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
+      mc:Ignorable="d"
+      Background="{StaticResource MaterialDesignPaper}"
+      TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+      TextElement.FontWeight="Regular"
+      TextElement.FontSize="13"
+      TextOptions.TextFormattingMode="Ideal"
+      TextOptions.TextRenderingMode="Auto"
+      FontFamily="Yu Gothic"
+      d:DataContext="{d:DesignInstance {x:Type vm:FileSettingsViewModelD},IsDesignTimeCreatable=True}"
+      d:DesignHeight="900" d:DesignWidth="800"
       Title="ファイル設定">
     <Grid>
         <Grid.RowDefinitions>
@@ -51,6 +51,7 @@
                     &lt;uploadedon&gt; :投稿日時,<LineBreak/>
                     &lt;downloadon&gt; :DL日時<LineBreak/>
                     &lt;owner&gt; :投稿者のニックネーム<LineBreak/>
+                    &lt;ownerId&gt; :投稿者のユーザーID<LineBreak/>
                     ※カスタム書式を利用できます。詳しくはwikiをご覧ください。<LineBreak/>
                     ※「\」でフォルダーを作成します。[&lt;id&gt;]&lt;title&gt;でxenoのデフォルトと同じフォーマットになります。
                     </TextBlock>
@@ -102,7 +103,7 @@
                             <TranslateTransform Y="7"/>
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
-                    <Label Content="市場情報ファイルの接尾子"/>
+                    <Label Content="市場情報ファイルの接尾辞"/>
                     <TextBox
                     HorizontalAlignment="Right" 
                     Margin="10 0 0 0" 
@@ -116,12 +117,40 @@
                             <TranslateTransform Y="7"/>
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
-                    <Label Content="動画情報ファイルの接尾子"/>
+                    <Label Content="動画情報ファイルの接尾辞"/>
                     <TextBox
                     HorizontalAlignment="Right" 
                     Margin="10 0 0 0" 
                     Width="200"
                     Text="{Binding VideoInfoSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="ShieldAccount" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="投稿者コメントの接尾辞"/>
+                    <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding OwnerCommentSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="Image" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="サムネイルの接尾辞"/>
+                    <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding ThumbnailSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -132,6 +161,16 @@
                     </materialDesign:PackIcon>
                     <Label Content="禁則文字をマルチバイト文字に置き換える" />
                     <ToggleButton IsChecked="{Binding IsReplaceSBToSBEnable.Value,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="FindReplace" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="保存した動画ファイルををIDで探索する" />
+                    <ToggleButton IsChecked="{Binding IsSearchingVideosByIDEnable.Value,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             </StackPanel>

@@ -4,6 +4,7 @@ using Niconicome.Models.Domain.Local.Store;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Linq;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
 
 namespace NiconicomeTest.Local
 {
@@ -16,7 +17,7 @@ namespace NiconicomeTest.Local
         public void SetUp()
         {
             Static.DataBaseInstance.Clear(Niconicome.Models.Domain.Local.Store.Types.VideoFile.TableName);
-            this.handler = new VideoFileStorehandler(Static.DataBaseInstance);
+            this.handler = new VideoFileStorehandler(Static.DataBaseInstance, new LoggerStab());
         }
 
         [Test]

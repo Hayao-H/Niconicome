@@ -12,7 +12,7 @@ using Niconicome.Extensions.System.List;
 using Utils = Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result.Generic;
 
-namespace Niconicome.Models.Domain.Niconico.Mylist
+namespace Niconicome.Models.Domain.Niconico.Remote.Mylist
 {
 
     public interface IWatchLaterHandler
@@ -25,7 +25,7 @@ namespace Niconicome.Models.Domain.Niconico.Mylist
     /// </summary>
     class WatchLaterHandler : MylistHandler, IWatchLaterHandler
     {
-        public WatchLaterHandler(INicoHttp http, Utils::ILogger logger) : base(http, logger) { }
+        public WatchLaterHandler(INicoHttp http, Utils::ILogger logger, IVideoInfoContainer videoInfoContainer) : base(http, logger, videoInfoContainer) { }
 
         /// <summary>
         /// 「あとで見る」を取得する

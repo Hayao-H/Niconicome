@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Playlist;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
+using NiconicomeTest.Stabs.Models.Playlist;
 using NUnit.Framework;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 
@@ -21,7 +22,7 @@ namespace NiconicomeTest.NetWork
         {
             var content = new StringContent(Properties.Resources.User_Video_Response);
             var http = new NicoHttpStab(content, content);
-            this.handler = new UVideo::UserVideoHandler(http, new LoggerStab());
+            this.handler = new UVideo::UserVideoHandler(http, new LoggerStab(),new VideoInfoContainerStab());
         }
 
         [Test]

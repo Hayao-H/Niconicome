@@ -1,48 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Playlist.VideoList;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Playlist
 {
     public interface ILightVideoListInfo
     {
-        string MessageGuid { get; }
-        string FileName { get; }
-        int PlaylistId { get; }
-        int VideoId { get; }
-        bool IsSelected { get; }
+        int ID { get; }
+        ReactiveProperty<bool> IsSelected { get; set; }
+
+        ReactiveProperty<string> Message { get; set; }
+    }
+
+    public interface ILightVideoListinfoHandler
+    {
+        ILightVideoListInfo GetLightVideoListInfo(int videoId, int playlistId);
+        void AddPlaylist(int playlistID);
     }
 
     /// <summary>
     /// ハンドラ
     /// </summary>
-    public static class LightVideoListinfoHandler
+    public class LightVideoListinfoHandler : ILightVideoListinfoHandler
     {
-        private static readonly List<ILightVideoListInfo> videoListInfos = new();
-
-        public static bool Contains(int videoID, int playlistID)
+        public LightVideoListinfoHandler(ICurrent current)
         {
-            return LightVideoListinfoHandler.videoListInfos.Any(v => v.VideoId == videoID && v.PlaylistId == playlistID);
+            this.current = current;
         }
 
-        public static void AddVideo(ILightVideoListInfo video)
+        #region field
+
+        private readonly Dictionary<int, List<ILightVideoListInfo>> videoListInfos = new();
+
+        private readonly ICurrent current;
+
+        #endregion
+
+        /// <summary>
+        /// 動画譲歩を取得する
+        /// </summary>
+        /// <param name="videoId"></param>
+        /// <param name="playlistId"></param>
+        /// <returns></returns>
+        public ILightVideoListInfo GetLightVideoListInfo(int videoId, int playlistId)
         {
-            if (LightVideoListinfoHandler.Contains(video.VideoId, video.PlaylistId))
+            List<ILightVideoListInfo> list = this.videoListInfos[playlistId];
+
+            ILightVideoListInfo? video = list.Find(v => v.ID == videoId);
+            if (video is null)
             {
-                LightVideoListinfoHandler.videoListInfos.RemoveAll(v => v.PlaylistId == video.PlaylistId && v.VideoId == video.VideoId);
+                video = new LightVideoListInfo() { ID = videoId };
+                video.IsSelected.Skip(1).Subscribe(value =>
+                {
+                    if ((this.current.SelectedPlaylist.Value?.Id ?? -1) == playlistId)
+                    {
+                        if (value)
+                        {
+                            this.current.SelectedVideos.Value++;
+                        }
+                        else
+                        {
+                            this.current.SelectedVideos.Value--;
+                        }
+                    }
+
+                });
+                list.Add(video);
             }
 
-            LightVideoListinfoHandler.videoListInfos.Add(video);
-
+            return video;
         }
 
-        public static ILightVideoListInfo? GetLightVideoListInfo(int videoId, int playlistId)
+        /// <summary>
+        /// プレイリストを追加する
+        /// </summary>
+        /// <param name="playlistID"></param>
+        public void AddPlaylist(int playlistID)
         {
-            return LightVideoListinfoHandler.videoListInfos.FirstOrDefault(v => v.VideoId == videoId && v.PlaylistId == playlistId);
+            if (!this.videoListInfos.ContainsKey(playlistID))
+            {
+                this.videoListInfos.Add(playlistID, new List<ILightVideoListInfo>());
+            }
         }
     }
 
@@ -51,24 +96,12 @@ namespace Niconicome.Models.Playlist
     /// </summary>
     public class LightVideoListInfo : ILightVideoListInfo
     {
-        public LightVideoListInfo(string messageGud, string fileName, int playlistId, int videoId, bool isSelected)
-        {
-            this.MessageGuid = messageGud;
-            this.FileName = fileName;
-            this.VideoId = videoId;
-            this.PlaylistId = playlistId;
-            this.IsSelected = isSelected;
-        }
 
-        public string MessageGuid { get; init; }
+        public int ID { get; init; }
 
-        public int PlaylistId { get; init; }
+        public ReactiveProperty<bool> IsSelected { get; set; } = new();
 
-        public int VideoId { get; init; }
-
-        public bool IsSelected { get; init; }
-
-        public string FileName { get; init; }
+        public ReactiveProperty<string> Message { get; set; } = new();
 
 
     }

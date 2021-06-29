@@ -42,6 +42,10 @@ namespace Niconicome.ViewModels.Setting.Pages
             }).AddTo(this.disposables);
             this.VideoInfoSuffix.Subscribe(value => this.SaveSetting(value, SettingsEnum.VideoinfoSuffix)).AddTo(this.disposables);
             this.IchibaSuffix.Subscribe(value => this.SaveSetting(value, SettingsEnum.IchibaInfoSuffix)).AddTo(this.disposables);
+
+            this.IsSearchingVideosByIDEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.SearchFileByID);
+            this.ThumbnailSuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.ThumbSuffix, Format.DefaultThumbnailSuffix);
+            this.OwnerCommentSuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.OwnerComSuffix, Format.DefaultOwnerCommentSuffix);
         }
 
         /// <summary>
@@ -72,14 +76,30 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactiveProperty<string> JpegFileExt { get; init; }
 
         /// <summary>
-        /// 動画情報の接尾子
+        /// 動画情報の接尾辞
         /// </summary>
         public ReactiveProperty<string> VideoInfoSuffix { get; init; }
 
         /// <summary>
-        /// 市場情報の接尾子
+        /// 市場情報の接尾辞
         /// </summary>
-        public ReactiveProperty<string> IchibaSuffix { get; init; } 
+        public ReactiveProperty<string> IchibaSuffix { get; init; }
+
+        /// <summary>
+        /// 動画をIDで探索する
+        /// </summary>
+        public ReactiveProperty<bool> IsSearchingVideosByIDEnable { get; init; }
+
+        /// <summary>
+        /// サムネイルの接尾辞
+        /// </summary>
+        public ReactiveProperty<string> ThumbnailSuffix { get; init; }
+
+        /// <summary>
+        /// 投コメの接尾辞
+        /// </summary>
+        public ReactiveProperty<string> OwnerCommentSuffix { get; init; }
+
 
     }
 
@@ -102,6 +122,11 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public ReactiveProperty<string> IchibaSuffix { get; init; } = new(Format.DefaultIchibaSuffix);
 
+        public ReactiveProperty<bool> IsSearchingVideosByIDEnable { get; init; } = new(true);
+
+        public ReactiveProperty<string> ThumbnailSuffix { get; init; } = new(Format.DefaultThumbnailSuffix);
+
+        public ReactiveProperty<string> OwnerCommentSuffix { get; init; } = new(Format.DefaultOwnerCommentSuffix);
 
     }
 }

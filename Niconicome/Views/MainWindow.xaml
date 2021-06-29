@@ -15,7 +15,7 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
+        Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="Yu Gothic"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource Window_Style}"
@@ -50,25 +50,37 @@
                             </StackPanel>
                         </materialDesign:ColorZone>
                         <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">
-                            <MenuItem Header="設定" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenSettingCommand}" >
+                            <MenuItem Header="設定" Height="40" Command="{Binding OpenSettingCommand}" >
                                 <MenuItem.Icon>
                                     <materialDesign:PackIcon Kind="CogOutline"/>
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem Header="ダウンロード" HorizontalContentAlignment="Left"  Height="40"   Command="{Binding OpenDownloadTaskWindowsCommand}">
+                            <MenuItem Header="ダウンロード" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenDownloadTaskWindowsCommand}">
                                 <MenuItem.Icon>
                                     <materialDesign:PackIcon Kind="Download"/>
                                 </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="再起動" Command="{Binding Restart}" Height="40">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="Restart"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="終了" Command="{Binding ShutDown}"  Height="40">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="Power"/>
+                                </MenuItem.Icon>
+
                             </MenuItem>
                         </StackPanel>
                     </Grid>
                 </materialDesign:DrawerHost.LeftDrawerContent>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
-                        <ColumnDefinition Width="17*"/>
+                        <ColumnDefinition Width="{Binding TreeWidth.Value}"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Column= "0" Background="{DynamicResource  MaterialDesignSnackbarBackground}">
+                    <Grid Grid.Column= "0" 
+                          Background="#323232">
                         <Grid.DataContext>
                             <vm:PlaylistTreeViewModel/>
                         </Grid.DataContext>
@@ -81,19 +93,19 @@
                                 <materialDesign:PackIcon Kind="Refresh" />
                             </Button>
                         </DockPanel>
-                        <TreeView Foreground="{DynamicResource MaterialDesignBody}" ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
+                        <TreeView ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
                             <i:Interaction.Behaviors>
                                 <vm:PlaylistTreeBehavior/>
                             </i:Interaction.Behaviors>
                             <TreeView.ItemTemplate>
                                 <HierarchicalDataTemplate DataType="tree:ITreePlaylistInfo" ItemsSource="{Binding Children}">
                                     <StackPanel>
-                                        <Grid Background="{Binding BackgroundColor}">
+                                        <Grid>
                                             <Grid.ToolTip>
                                                 <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
                                             </Grid.ToolTip>
                                             <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                            <TextBlock Foreground="{DynamicResource MaterialDesignSnackbarRipple}" Text="{Binding Name}"/>
+                                            <TextBlock Foreground="#FAFAFA" Text="{Binding Name.Value}"/>
                                             <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
                                         </Grid>
                                     </StackPanel>
@@ -108,31 +120,31 @@
                                                 <MenuItem Header="プレイリストを追加する"
                                                   Command="{Binding AddPlaylist}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Plus"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem Header="このプレイリストを削除する"
+                                                        <MenuItem.Icon>
+                                                            <materialDesign:PackIcon Kind="Plus"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="このプレイリストを削除する"
                                                   Command="{Binding RemovePlaylist}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Delete"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem Header="このプレイリストを編集する"
+                                                        <MenuItem.Icon>
+                                                            <materialDesign:PackIcon Kind="Delete"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Header="このプレイリストを編集する"
                                                   Command="{Binding EditPlaylistCommand}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Edit"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                            </ContextMenu>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                </Style>
-                            </TreeView.ItemContainerStyle>
-                        </TreeView>
+                                                        <MenuItem.Icon>
+                                                            <materialDesign:PackIcon Kind="Edit"/>
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                    </Style>
+                                </TreeView.ItemContainerStyle>
+                            </TreeView>
                     </Grid>
                     <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
@@ -151,10 +163,10 @@
                                 </Button>
                             </DockPanel>
                         </DockPanel>
-                        <Grid Grid.Row="1" x:Name="videoList" d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD},IsDesignTimeCreatable=True}">
+                        <Grid Grid.Row="1" x:Name="videoList">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="2*"/>
-                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="{Binding TabsHeight.Value}"/>
                             </Grid.RowDefinitions>
                             <UserControl prism:RegionManager.RegionName="VideoListRegion"/>
                             <TabControl Background="{DynamicResource MaterialDesignBackground}" Grid.Row="1" Margin="8">
@@ -171,6 +183,9 @@
                                 </TabItem>
                                 <TabItem Header="並び替え">
                                     <UserControl prism:RegionManager.RegionName="VideoSortSetting"/>
+                                </TabItem>
+                                <TabItem Header="状態">
+                                    <UserControl prism:RegionManager.RegionName="VideolistState"/>
                                 </TabItem>
                             </TabControl >
                         </Grid>

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Windows.Media;
-using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Helper.Result;
 using Value = Niconicome.Models.Local.Settings.EnumSettingsValue;
+using Info = Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace Niconicome.Models.Local.Settings
 {
@@ -73,6 +72,13 @@ namespace Niconicome.Models.Local.Settings
             }　else if (typeof(T) == typeof(Value::IchibaInfoTypeSettings))
             {
                 return SettingsEnum.IchibaInfoType;
+            } else if (typeof(T) == typeof(Value::ApplicationThemeSettings))
+            {
+                return SettingsEnum.AppTheme;
+            }
+            else if (typeof(T) == typeof(Info::ThumbSize))
+            {
+                return SettingsEnum.ThumbSize;
             }
             else
             {

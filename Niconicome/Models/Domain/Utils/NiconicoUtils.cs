@@ -6,18 +6,17 @@ using System.Text.RegularExpressions;
 using System.Web;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
-using Playlist = Niconicome.Models.Playlist;
-using Watch = Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Domain.Utils
 {
     public interface INiconicoUtils
     {
         List<string> GetNiconicoIdsFromText(string source);
-        string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null);
-        string GetFileName(string format, Playlist::IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null);
+        string GetFileName(string format, IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null);
+        string GetFileName(string format, IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null);
         string GetIdFromFIleName(string format, string filenameWithExt);
         string GetIdFromFIleName(string filenameWithExt);
         bool IsNiconicoID(string testString);
@@ -46,7 +45,7 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="format"></param>
         /// <param name="session"></param>
         /// <returns></returns>
-        public string GetFileName(string format, Watch::IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null)
+        public string GetFileName(string format, IDmcInfo dmcInfo, string extension, bool replaceStricted, string? suffix = null)
         {
             var info = new VideoInfoForPath()
             {
@@ -55,6 +54,7 @@ namespace Niconicome.Models.Domain.Utils
                 NiconicoID = dmcInfo.Id,
                 UploadedOn = dmcInfo.UploadedOn,
                 DownloadStartedOn = dmcInfo.DownloadStartedOn,
+                OwnerID = dmcInfo.OwnerID.ToString(),
             };
 
             return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
@@ -69,7 +69,7 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="replaceStricted"></param>
         /// <param name="suffix"></param>
         /// <returns></returns>
-        public string GetFileName(string format, Playlist::IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null)
+        public string GetFileName(string format, IListVideoInfo video, string extension, bool replaceStricted, string? suffix = null)
         {
             var info = new VideoInfoForPath()
             {
@@ -78,6 +78,7 @@ namespace Niconicome.Models.Domain.Utils
                 NiconicoID = video.NiconicoId.Value,
                 UploadedOn = video.UploadedOn.Value,
                 DownloadStartedOn = DateTime.Now,
+                OwnerID = video.OwnerID.Value.ToString(),
             };
 
             return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
@@ -182,6 +183,10 @@ namespace Niconicome.Models.Domain.Utils
             {
                 return RemoteType.WatchPage;
             }
+            else if (Regex.IsMatch(url, @"https?://(www\.)?nicovideo\.jp/series/\d+.*"))
+            {
+                return RemoteType.Series;
+            }
 
             throw new InvalidOperationException("ニコニコ動画のURLではありません。");
         }
@@ -199,7 +204,7 @@ namespace Niconicome.Models.Domain.Utils
                 url = url[0..li];
             }
 
-            if (type is RemoteType.Channel or RemoteType.Mylist or RemoteType.WatchPage)
+            if (type is RemoteType.Channel or RemoteType.Mylist or RemoteType.WatchPage or RemoteType.Series)
             {
                 var splited = url.Split("/");
                 if (!splited[^1].IsNullOrEmpty())
@@ -318,6 +323,7 @@ namespace Niconicome.Models.Domain.Utils
             string filename = format.Replace("<id>", info.NiconicoID)
              .Replace("<title>", info.Title)
              .Replace("<owner>", info.OwnerName)
+             .Replace("<ownerId>", info.OwnerID)
              + suffix
              + extension;
 
@@ -358,5 +364,7 @@ namespace Niconicome.Models.Domain.Utils
         public string OwnerName { get; set; } = string.Empty;
 
         public string NiconicoID { get; set; } = string.Empty;
+
+        public string OwnerID { get; set; } = string.Empty;
     }
 }

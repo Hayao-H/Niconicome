@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Const;
 using Niconicome.Models.Local.Settings;
+using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
@@ -13,30 +15,17 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public ExternalSoftwareSettingsViewModel()
         {
-            this.playerAPathField = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.PlayerAPath) ?? string.Empty;
-            this.playerBPathField = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.PlayerBPath) ?? string.Empty;
-            this.appAPathField = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.AppAPath) ?? string.Empty;
-            this.appBPathField = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.AppBPath) ?? string.Empty;
-            this.appAParamField = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.AppAParam) ?? string.Empty;
-            this.appBParamField = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.AppBParam) ?? string.Empty;
-            this.ffmpegPathField = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.FfmpegPath) ?? string.Empty;
+            this.PlayerAPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.PlayerAPath);
+            this.PlayerBPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.PlayerBPath);
+            this.AppAPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AppAPath);
+            this.AppBPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AppBPath);
+            this.AppAParam = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AppAParam);
+            this.AppBParam = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AppBParam);
+            this.FfmpegPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FfmpegPath);
             this.useShellWhenLaunchingFFmpegFIeld = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.FFmpegShell);
             this.reAllocateCommandsField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
+            this.FFmpegFormat = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FFmpegFormat, Format.DefaultFFmpegFormat, true);
         }
-
-        private string playerAPathField;
-
-        private string playerBPathField;
-
-        private string appAPathField;
-
-        private string appBPathField;
-
-        private string appAParamField;
-
-        private string appBParamField;
-
-        private string ffmpegPathField;
 
         private bool useShellWhenLaunchingFFmpegFIeld;
 
@@ -45,37 +34,42 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// プレイヤーAのパス
         /// </summary>
-        public string PlayerAPath { get => this.playerAPathField; set => this.Savesetting(ref this.playerAPathField, value, SettingsEnum.PlayerAPath); }
+        public ReactiveProperty<string> PlayerAPath { get; init; }
 
         /// <summary>
         /// プレイヤーBのパス
         /// </summary>
-        public string PlayerBPath { get => this.playerBPathField; set => this.Savesetting(ref this.playerBPathField, value, SettingsEnum.PlayerBPath); }
+        public ReactiveProperty<string> PlayerBPath { get; init; }
 
         /// <summary>
         /// A
         /// </summary>
-        public string AppAPath { get => this.appAPathField; set => this.Savesetting(ref this.appAPathField, value, SettingsEnum.AppAPath); }
+        public ReactiveProperty<string> AppAPath { get; init; }
 
         /// <summary>
         /// B
         /// </summary>
-        public string AppBPath { get => this.appBPathField; set => this.Savesetting(ref this.appBPathField, value, SettingsEnum.AppBPath); }
+        public ReactiveProperty<string> AppBPath { get; init; }
 
         /// <summary>
         /// A
         /// </summary>
-        public string AppAParam { get => this.appAParamField; set => this.Savesetting(ref this.appAParamField, value, SettingsEnum.AppAParam); }
+        public ReactiveProperty<string> AppAParam { get; init; }
 
         /// <summary>
         /// B
         /// </summary>
-        public string AppBParam { get => this.appBParamField; set => this.Savesetting(ref this.appBParamField, value, SettingsEnum.AppBParam); }
+        public ReactiveProperty<string> AppBParam { get; init; }
 
         /// <summary>
         /// ffmpegのパス
         /// </summary>
-        public string FfmpegPath { get => this.ffmpegPathField; set => this.Savesetting(ref this.ffmpegPathField, value, SettingsEnum.FfmpegPath); }
+        public ReactiveProperty<string> FfmpegPath { get; init; }
+
+        /// <summary>
+        /// ffmpegのフォーマット
+        /// </summary>
+        public ReactiveProperty<string> FFmpegFormat { get; init; }
 
         /// <summary>
         /// シェルを利用する
@@ -91,40 +85,14 @@ namespace Niconicome.ViewModels.Setting.Pages
 
     class ExternalSoftwareSettingsViewModelD
     {
-        /// <summary>
-        /// プレイヤーAのパス
-        /// </summary>
-        public string PlayerAPath { get; set; } = "設定値";
-
-        /// <summary>
-        /// プレイヤーBのパス
-        /// </summary>
-        public string PlayerBPath { get; set; } = "設定値";
-
-        /// <summary>
-        /// A
-        /// </summary>
-        public string AppAPath { get; set; } = "設定値";
-
-        /// <summary>
-        /// B
-        /// </summary>
-        public string AppBPath { get; set; } = "設定値";
-
-        /// <summary>
-        /// A
-        /// </summary>
-        public string AppAParam { get; set; } = "設定値";
-
-        /// <summary>
-        /// B
-        /// </summary>
-        public string AppBParam { get; set; } = "設定値";
-
-        /// <summary>
-        /// ffmpegのパス
-        /// </summary>
-        public string FfmpegPath { get; set; } = "設定値";
+        public ReactiveProperty<string> PlayerAPath { get; init; } = new("設定値");
+        public ReactiveProperty<string> PlayerBPath { get; init; } = new("設定値");
+        public ReactiveProperty<string> AppAPath { get; init; } = new("設定値");
+        public ReactiveProperty<string> AppBPath { get; init; } = new("設定値");
+        public ReactiveProperty<string> AppAParam { get; init; } = new("設定値");
+        public ReactiveProperty<string> AppBParam { get; init; } = new("設定値");
+        public ReactiveProperty<string> FfmpegPath { get; init; } = new("設定値");
+        public ReactiveProperty<string> FFmpegFormat { get; init; } = new("設定値");
 
         public bool UseShellWhenLaunchingFFmpeg { get; set; } = true;
 

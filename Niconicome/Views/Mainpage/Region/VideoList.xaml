@@ -8,16 +8,17 @@
              xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
              xmlns:cv="clr-namespace:Niconicome.Views.Converter"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:rp="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              mc:Ignorable="d"
-             TextElement.Foreground="{DynamicResource MaterialDesignLightForeground}"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              TextElement.FontWeight="Regular"
              TextElement.FontSize="13"
              TextOptions.TextFormattingMode="Ideal"
              TextOptions.TextRenderingMode="Auto"
-             Background="{DynamicResource MaterialDesignBackground}"
+             Background="{DynamicResource MaterialDesignPaper}"
              FontFamily="Yu Gothic"
-             d:Width="1200"
+             d:Width="1300"
              d:Height="600"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
@@ -25,8 +26,8 @@
     </UserControl.Resources>
     <Grid d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD},IsDesignTimeCreatable=True}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="{Binding TitleHeight.Value}"/>
+            <RowDefinition Height="{Binding ButtonsHeight.Value}"/>
             <RowDefinition Height="8*"/>
         </Grid.RowDefinitions>
         <TextBlock FontSize="30" Text="{Binding PlaylistTitle.Value,UpdateSourceTrigger=PropertyChanged}" Margin="10 0"/>
@@ -40,7 +41,15 @@
                     <ColumnDefinition Width="17*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Text="{Binding InputString.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource MaterialDesignTextBox}" FontSize="20" Margin="5,0" VerticalContentAlignment="Bottom" materialDesign:HintAssist.Hint="ID・検索キーワード入力窓" Padding="5 0"/>
+                <TextBox 
+                    Text="{Binding InputString.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                    Style="{DynamicResource MaterialDesignTextBox}" 
+                    FontSize="20" 
+                    Margin="5,0" 
+                    VerticalContentAlignment="Bottom" 
+                    materialDesign:HintAssist.Hint="ID・検索キーワード入力窓"
+                    materialDesign:TextFieldAssist.HasClearButton="True"
+                    Padding="5 0"/>
                 <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する（インテリインプット）" Command="{Binding AddVideoCommand}"/>
             </Grid>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
@@ -65,7 +74,7 @@
                     </Button.Style>
                 </Button>
 
-                <Button Margin="5,0" Grid.Column="0" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="クリップボードから一括登録" Command="{Binding AddVideoFromClipboardCommand}">
+                <Button Margin="5,0" Grid.Column="0" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="クリップボードから一括登録" Command="{Binding AddVideoFromClipboardCommand}" Cursor="Hand">
                     <materialDesign:PackIcon Kind="Clipboard">
                         <materialDesign:PackIcon.RenderTransform>
                             <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.8" ScaleY="1.8"/>
@@ -111,6 +120,22 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                 </Button>
+
+                <Button Margin="5,0" Grid.Column="5" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="{Binding ClipboardMonitoringToolTip.Value}" Command="{Binding MonitorClipbordCommand}">
+                    <materialDesign:PackIcon Kind="{Binding ClipbordMonitorIcon.Value}">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </Button>
+
+                <Button Margin="5,0" Grid.Column="5" Width="60" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding SavePlaylistCommand}" Visibility="{Binding IsTemporaryPlaylist.Value,Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <materialDesign:PackIcon Kind="ContentSave">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                </Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2">
@@ -138,11 +163,11 @@
                                 <CheckBox IsChecked="{Binding IsSelectedAll.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             </GridViewColumn.Header>
                         </GridViewColumn>
-                        <GridViewColumn Width="{Binding ThumbColumnWidth.Value}">
+                        <GridViewColumn Width="{Binding ThumbColumnWidth.Value,Mode=TwoWay}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Vertical">
-                                        <Image Source="{Binding ThumbPath.Value,UpdateSourceTrigger=PropertyChanged}" Height="80"/>
+                                        <Image Source="{Binding ThumbPath.Value,UpdateSourceTrigger=PropertyChanged}" />
                                         <ProgressBar IsIndeterminate="{Binding IsThumbDownloading.Value,UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -159,6 +184,24 @@
                         <GridViewColumn Width="{Binding UploadColumnWidth.Value,Mode=TwoWay}" Header="{Binding UploadColumnTitle.Value}" DisplayMemberBinding="{Binding UploadedOn.Value, StringFormat=yyyy年MM月dd日 HH:mm}"/>
                         <GridViewColumn Width="{Binding ViewCountColumnWidth.Value,Mode=TwoWay}" Header="{Binding ViewCountColumnTitle.Value}" DisplayMemberBinding="{Binding ViewCount.Value}"/>
                         <GridViewColumn Width="{Binding DownloadedFlagColumnWidth.Value,Mode=TwoWay}" Header="{Binding DlFlagColumnTitle.Value}" DisplayMemberBinding="{Binding IsDownloaded.Value}"/>
+                        <GridViewColumn  Header="BM" Width="{Binding BookMarkColumnWidth.Value,Mode=TwoWay}">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <materialDesign:PackIcon Kind="Bookmark" Foreground="{Binding BookMarkColor.Value}">
+                                            <materialDesign:PackIcon.RenderTransform>
+                                                <ScaleTransform CenterY="7" CenterX="8" ScaleX="1.7" ScaleY="1.7"/>
+                                            </materialDesign:PackIcon.RenderTransform>
+                                        </materialDesign:PackIcon>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseDown">
+                                                <rp:EventToReactiveCommand Command="{Binding BookMark}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Width="{Binding StateColumnWidth.Value,Mode=TwoWay}" Header="状態" DisplayMemberBinding="{Binding Message.Value}"/>
                     </GridView>
                 </ListView.View>
@@ -167,12 +210,12 @@
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
                         <Setter Property="Padding" Value="10"/>
+                        <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}, Mode=FindAncestor}, Path=DataContext.ListItemHeight.Value}"/>
                         <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}, Mode=FindAncestor}, Path=DataContext}"/>
                         <Setter Property="ContextMenu">
                             <Setter.Value>
-                                <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag,RelativeSource={RelativeSource Self}}">
-                                    <MenuItem Header="動画を削除する" Command="{Binding RemoveVideoCommand}"
-                                                          CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                <ContextMenu DataContext="{Binding Path=PlacementTarget.Tag,RelativeSource={RelativeSource Self}}" d:DataContext="{d:DesignInstance {x:Type vm:VideoListViewModelD}, IsDesignTimeCreatable=True}">
+                                    <MenuItem Header="動画を削除する" Command="{Binding RemoveVideoCommand}">
                                         <MenuItem.Icon>
                                             <materialDesign:PackIcon Kind="Delete"/>
                                         </MenuItem.Icon>
@@ -211,6 +254,28 @@
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                         <MenuItem Header="アプリに送る(B)" Command="{Binding SendToappBCommand}"
                                                           CommandParameter="{Binding PlacementTarget.DataContext,RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                    </MenuItem>
+                                    <MenuItem Header="コピー">
+                                        <MenuItem Header="ID" 
+                                                  Command="{Binding CopyOne}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.NiconicoId}"/>
+                                        <MenuItem Header="タイトル" 
+                                                  Command="{Binding CopyOne}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.Title}"/>
+                                        <MenuItem Header="URL" 
+                                                  Command="{Binding CopyOne}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.Url}"/>
+                                    </MenuItem>
+                                    <MenuItem Header="すべてコピー">
+                                        <MenuItem Header="ID" 
+                                                  Command="{Binding CopyAll}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.NiconicoId}"/>
+                                        <MenuItem Header="タイトル" 
+                                                  Command="{Binding CopyAll}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.Title}"/>
+                                        <MenuItem Header="URL" 
+                                                  Command="{Binding CopyAll}"
+                                                  CommandParameter="{x:Static vm:VideoProperties.Url}"/>
                                     </MenuItem>
                                     <MenuItem Header="プレイリストを作成">
                                         <MenuItem Header=".aimppl4形式のファイルを作成する" Command="{Binding CreatePlaylistCommand}" CommandParameter="aimp"/>

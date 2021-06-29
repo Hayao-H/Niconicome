@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store;
-using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Network.Download

@@ -4,6 +4,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace NiconicomeTest.Utils
 {
@@ -82,6 +83,7 @@ namespace NiconicomeTest.Utils
         [TestCase("https://www.nicovideo.jp/user/000/video?ref=pc_userpage_menud", RemoteType.UserVideos)]
         [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage)]
         [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage)]
+        [TestCase("https://www.nicovideo.jp/series/123", RemoteType.Series)]
         public void リモートプレイリストの種別を取得する(string url, RemoteType expectedType)
         {
             var type = this.utils!.GetRemoteType(url);
@@ -97,6 +99,7 @@ namespace NiconicomeTest.Utils
         [TestCase("https://www.nicovideo.jp/user/000/video/?ref=pc_userpage_menud", RemoteType.UserVideos, "000")]
         [TestCase("https://www.nicovideo.jp/watch/sm9?hello_world", RemoteType.WatchPage, "sm9")]
         [TestCase("https://www.nicovideo.jp/watch/sm9", RemoteType.WatchPage, "sm9")]
+        [TestCase("https://www.nicovideo.jp/series/123", RemoteType.Series,"123")]
         public void リモートプレイリストのIDを取得する(string url, RemoteType type, string id)
         {
             var result = this.utils!.GetID(url, type);
@@ -106,6 +109,7 @@ namespace NiconicomeTest.Utils
 
         [TestCase("[<id>]<title>", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師")]
         [TestCase("[<id>]<title>（<owner>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（中の）")]
+        [TestCase("[<id>]<title>（<ownerId>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（1）")]
         [TestCase("[<id>]<title>（<uploadedon>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2007-03-06 00-33-00）")]
         [TestCase("[<id>]<title>（<downloadon>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2021-03-26 20-30-00）")]
         [TestCase("[<id>]<title>（<uploadedon:yyyy年MM月dd日 HH時mm分ss秒>）", "[sm9]新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師（2007年03月06日 00時33分00秒）")]
@@ -121,6 +125,7 @@ namespace NiconicomeTest.Utils
                 Title = "新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師",
                 Owner = "中の",
                 Id = "sm9",
+                OwnerID = 1,
             };
 
             var result = this.utils!.GetFileName(format, dmc, string.Empty, true);

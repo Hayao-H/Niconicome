@@ -57,7 +57,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 throw new InvalidOperationException($"設定名{settingName}はテーブル{tableName}に存在しません。");
             }
 
-            return new SettingData<bool>(this.database.GetRecord<STypes::AppSettingBool>(tableName, s => s.SettingName == settingName)!.Value, settingName);
+            return new SettingData<bool>(this.database.GetRecord<STypes::AppSettingBool>(tableName, s => s.SettingName == settingName).Data!.Value, settingName);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 throw new InvalidOperationException($"設定名{settingName}はテーブル{tableName}に存在しません。");
             }
 
-            return new SettingData<string>(this.database.GetRecord<STypes::AppSettingString>(tableName, s => s.SettingName == settingName)!.Value ?? string.Empty, settingName);
+            return new SettingData<string>(this.database.GetRecord<STypes::AppSettingString>(tableName, s => s.SettingName == settingName).Data!.Value ?? string.Empty, settingName);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Niconicome.Models.Domain.Local.Store
                 throw new InvalidOperationException($"設定名{settingName}はテーブル{tableName}に存在しません。");
             }
 
-            return new SettingData<int>(this.database.GetRecord<STypes::AppSettingInt>(tableName, s => s.SettingName == settingName)!.Value, settingName);
+            return new SettingData<int>(this.database.GetRecord<STypes::AppSettingInt>(tableName, s => s.SettingName == settingName).Data!.Value, settingName);
         }
 
 
@@ -124,7 +124,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.Exists(settingName, SettingType.boolSetting))
             {
                 var setting = this.database.GetRecord<STypes::AppSettingBool>(tableName, s => s.SettingName == settingName);
-                data.Id = setting!.Id;
+                data.Id = setting.Data!.Id;
                 this.database.Update(data, tableName);
             }
             else
@@ -146,7 +146,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.Exists(settingName, SettingType.stringSetting))
             {
                 var setting = this.database.GetRecord<STypes::AppSettingString>(tableName, s => s.SettingName == settingName);
-                data.Id = setting!.Id;
+                data.Id = setting.Data!.Id;
                 this.database.Update(data, tableName);
             }
             else
@@ -168,7 +168,7 @@ namespace Niconicome.Models.Domain.Local.Store
             if (this.Exists(settingName, SettingType.intSetting))
             {
                 var setting = this.database.GetRecord<STypes::AppSettingInt>(tableName, s => s.SettingName == settingName);
-                data.Id = setting!.Id;
+                data.Id = setting.Data!.Id;
                 this.database.Update(data, tableName);
             }
             else

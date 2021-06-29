@@ -180,6 +180,18 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.JpegExt => STypes::SettingNames.JpegFileExtension,
                 SettingsEnum.VideoinfoSuffix => STypes::SettingNames.VideoInfoSuffix,
                 SettingsEnum.IchibaInfoSuffix => STypes::SettingNames.IchibaSuffix,
+                SettingsEnum.DisableDLFailedHistory => STypes::SettingNames.DisableDownloadFailedHistory,
+                SettingsEnum.DisableDLSucceededHistory => STypes::SettingNames.DisableDownloadSucceededHistory,
+                SettingsEnum.SingletonWindows => STypes::SettingNames.LimitWindowsToSingleton,
+                SettingsEnum.AppTheme => STypes::SettingNames.ApplicationTheme,
+                SettingsEnum.ConfirmIfDownloading => STypes::SettingNames.ConfirmIfDownloading,
+                SettingsEnum.MWBookMarkColumnWid => STypes::SettingNames.MainWindowBookMarkColumnWidth,
+                SettingsEnum.FFmpegFormat => STypes::SettingNames.FFmpegFormat,
+                SettingsEnum.SearchFileByID => STypes::SettingNames.SearchVideosByID,
+                SettingsEnum.ThumbSize => STypes::SettingNames.ThumbnailSize,
+                SettingsEnum.DisableScrollRestore => STypes::SettingNames.DisableScrollRestore,
+                SettingsEnum.OwnerComSuffix => STypes::SettingNames.OwnerCommentSuffix,
+                SettingsEnum.ThumbSuffix => STypes::SettingNames.ThumbnailSuffix,
                 _ => null
             };
         }
@@ -237,6 +249,7 @@ namespace Niconicome.Models.Local.Settings
         MWDownloadedFlagColumnWid,
         MWStateColumnWid,
         MWThumbColumnWid,
+        MWBookMarkColumnWid,
         ReAllocateCommands,
         VListItemdbClick,
         AutoRenameNetPlaylist,
@@ -250,5 +263,16 @@ namespace Niconicome.Models.Local.Settings
         JpegExt,
         VideoinfoSuffix,
         IchibaInfoSuffix,
+        DisableDLFailedHistory,
+        DisableDLSucceededHistory,
+        SingletonWindows,
+        AppTheme,
+        ConfirmIfDownloading,
+        FFmpegFormat,
+        SearchFileByID,
+        ThumbSize,
+        DisableScrollRestore,
+        OwnerComSuffix,
+        ThumbSuffix,
     }
 }

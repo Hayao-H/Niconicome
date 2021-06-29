@@ -29,7 +29,7 @@ namespace Niconicome.Models.Network.Download
         ReactiveProperty<bool> IsNoEncodeEnable { get; }
         ReactiveProperty<int> MaxCommentsCount { get; }
         ReactiveProperty<VideoInfo::IResolution> Resolution { get; }
-
+        ReactiveProperty<VideoInfo::ThumbSize> ThumbnailSize { get; }
         DownloadSettings CreateDownloadSettings();
     }
 
@@ -56,6 +56,7 @@ namespace Niconicome.Models.Network.Download
             this.MaxCommentsCount = new ReactiveProperty<int>(this.settingHandler.GetIntSetting(SettingsEnum.MaxCommentsCount)).AddTo(this.disposables);
             this.IsNoEncodeEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlWithoutEncode)).AddTo(this.disposables);
             this.IsDownloadingIchibaInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlIchiba)).AddTo(this.disposables);
+            this.ThumbnailSize = new ReactiveProperty<VideoInfo::ThumbSize>(this.enumSettingsHandler.GetSetting<VideoInfo::ThumbSize>());
 
             this.IsDownloadingVideoInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideoInfo));
             this.IsDownloadingVideoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideo));
@@ -71,6 +72,7 @@ namespace Niconicome.Models.Network.Download
             this.MaxCommentsCount.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.MaxCommentsCount));
             this.IsNoEncodeEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DlWithoutEncode));
             this.IsDownloadingIchibaInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DlIchiba));
+            this.ThumbnailSize.Subscribe(value => this.enumSettingsHandler.SaveSetting(value));
 
             this.Resolution = new ReactiveProperty<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"));
         }
@@ -101,7 +103,7 @@ namespace Niconicome.Models.Network.Download
             bool overrideVideoDT = this.settingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT);
             bool resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
             bool unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
-            string folderPath = this.current.SelectedPlaylist.Value.Folderpath.IsNullOrEmpty() ? this.settingHandler.GetStringSetting(SettingsEnum.DefaultFolder) ?? "downloaded" : this.current.SelectedPlaylist.Value.Folderpath;
+            string folderPath = this.current.PlaylistFolderPath;
             string fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.FIleFormat;
 
             VideoInfoTypeSettings videoInfoT = this.enumSettingsHandler.GetSetting<VideoInfoTypeSettings>();
@@ -115,6 +117,14 @@ namespace Niconicome.Models.Network.Download
 
             string videoInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.VideoinfoSuffix) ?? Format.DefaultVideoInfoSuffix;
             string ichibaInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.IchibaInfoSuffix) ?? Format.DefaultIchibaSuffix;
+            string thumbSuffix = this.settingHandler.GetStringSetting(SettingsEnum.ThumbSuffix) ?? Format.DefaultThumbnailSuffix;
+            string ownerComSuffix = this.settingHandler.GetStringSetting(SettingsEnum.OwnerComSuffix) ?? Format.DefaultOwnerCommentSuffix;
+
+            string commandFormat = this.settingHandler.GetStringSetting(SettingsEnum.FFmpegFormat) ?? Format.DefaultFFmpegFormat;
+            if (commandFormat.IsNullOrEmpty())
+            {
+                commandFormat = Format.DefaultFFmpegFormat;
+            }
 
             return new DownloadSettings
             {
@@ -145,6 +155,10 @@ namespace Niconicome.Models.Network.Download
                 ThumbnailExt = thumbExt,
                 VideoInfoSuffix = videoInfoSuffix,
                 IchibaInfoSuffix = ichibaInfoSuffix,
+                CommandFormat = commandFormat,
+                ThumbSize = this.ThumbnailSize.Value,
+                ThumbSuffix = thumbSuffix,
+                OwnerComSuffix = ownerComSuffix,
             };
         }
 
@@ -223,5 +237,10 @@ namespace Niconicome.Models.Network.Download
         /// 解像度
         /// </summary>
         public ReactiveProperty<VideoInfo::IResolution> Resolution { get; init; }
+
+        /// <summary>
+        /// サムネイルサイズ
+        /// </summary>
+        public ReactiveProperty<VideoInfo::ThumbSize> ThumbnailSize { get; init; }
     }
 }

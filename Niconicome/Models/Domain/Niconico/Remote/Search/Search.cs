@@ -5,11 +5,13 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Niconico.Search;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Api = Niconicome.Models.Domain.Niconico.Net.Json.API.Search;
 
-namespace Niconicome.Models.Domain.Niconico.Search
+namespace Niconicome.Models.Domain.Niconico.Remote.Search
 {
 
     public interface ISearchVideo
@@ -83,7 +85,7 @@ namespace Niconicome.Models.Domain.Niconico.Search
                 var dmc = new DmcInfo();
                 dmc.ThumbInfo.Normal = v.ThumbnailUrl;
                 dmc.UploadedOn = v.StartTime.DateTime;
-                return new DomainVideoInfo() { Title = v.Title, Id = v.ContentId, ViewCount = v.ViewCounter, CommentCount = v.CommentCounter, MylistCount = v.MylistCounter, DmcInfo = dmc,Tags = v.Tags.Split(" ")};
+                return new DomainVideoInfo() { Title = v.Title, Id = v.ContentId, ViewCount = v.ViewCounter, CommentCount = v.CommentCounter, MylistCount = v.MylistCounter, DmcInfo = dmc, Tags = v.Tags.Split(" ") };
             });
 
             return new SearchResult() { IsSucceeded = true, Videos = videos };

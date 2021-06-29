@@ -22,17 +22,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         Task<IDownloadResult> DownloadThumbnailAsync(IThumbDownloadSettings settings, IWatchSession session);
     }
 
-
-    public interface IThumbDownloadSettings
-    {
-        string NiconicoId { get; }
-        string FolderName { get; }
-        string FileNameFormat { get; }
-        string Extension { get; }
-        bool IsOverwriteEnable { get; }
-        bool IsReplaceStrictedEnable { get; }
-    }
-
     /// <summary>
     /// 外部から触るAPIを提供する
     /// </summary>
@@ -56,23 +45,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
             }
 
 
-            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, settings.Extension, settings.IsReplaceStrictedEnable);
+            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, settings.Extension, settings.IsReplaceStrictedEnable, settings.Suffix);
             string fileName = generatedFIlename.IsNullOrEmpty() ? $"[{session.Video!.Id}]{session.Video!.Title}{settings.Extension}" : generatedFIlename;
 
             IOUtils.CreateDirectoryIfNotExist(settings.FolderName, fileName);
 
 
             string? thumbUrl;
-            if (!(session.Video!.DmcInfo.ThumbInfo.Large?.IsNullOrEmpty() ?? true))
+            try
             {
-                thumbUrl = session.Video!.DmcInfo.ThumbInfo.Large;
+                thumbUrl = session.Video!.DmcInfo.ThumbInfo.GetSpecifiedThumbnail(settings.ThumbSize);
             }
-            else if (!(session.Video!.DmcInfo.ThumbInfo.Normal?.IsNullOrEmpty() ?? true))
+            catch (Exception e)
             {
-                thumbUrl = session.Video!.DmcInfo.ThumbInfo.Normal;
-            }
-            else
-            {
+                this.logger.Error($"サムネイルURLの取得に失敗しました。", e);
                 return new DownloadResult() { Issucceeded = false, Message = "サムネイルのURLを取得できませんでした。" };
             }
 
@@ -184,24 +170,5 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         }
     }
 
-    /// <summary>
-    /// ダウンロード設定
-    /// </summary>
-    public class ThumbDownloadSettings : IThumbDownloadSettings
-    {
-        public string NiconicoId { get; set; } = string.Empty;
-
-        public string FolderName { get; set; } = string.Empty;
-
-        public string FileNameFormat { get; set; } = string.Empty;
-
-        public string Extension { get; set; } = string.Empty;
-
-        public bool IsOverwriteEnable { get; set; }
-
-        public bool IsReplaceStrictedEnable { get; set; }
-
-
-    }
 
 }
