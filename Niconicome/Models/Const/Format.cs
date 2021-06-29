@@ -19,5 +19,9 @@ namespace Niconicome.Models.Const
         public const string DefaultVideoInfoSuffix = "[info]";
 
         public const string DefaultFFmpegFormat = "-i \"<source>\" -y -loglevel error -c:a copy -c:v copy \"<output>\"";
+
+        public const string DefaultOwnerCommentSuffix = "[owner]";
+
+        public const string DefaultThumbnailSuffix = "";
     }
 }

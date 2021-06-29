@@ -15,7 +15,7 @@
       TextOptions.TextRenderingMode="Auto"
       FontFamily="Yu Gothic"
       d:DataContext="{d:DesignInstance {x:Type vm:FileSettingsViewModelD},IsDesignTimeCreatable=True}"
-      d:DesignHeight="600" d:DesignWidth="800"
+      d:DesignHeight="900" d:DesignWidth="800"
       Title="ファイル設定">
     <Grid>
         <Grid.RowDefinitions>
@@ -103,7 +103,7 @@
                             <TranslateTransform Y="7"/>
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
-                    <Label Content="市場情報ファイルの接尾子"/>
+                    <Label Content="市場情報ファイルの接尾辞"/>
                     <TextBox
                     HorizontalAlignment="Right" 
                     Margin="10 0 0 0" 
@@ -117,12 +117,40 @@
                             <TranslateTransform Y="7"/>
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
-                    <Label Content="動画情報ファイルの接尾子"/>
+                    <Label Content="動画情報ファイルの接尾辞"/>
                     <TextBox
                     HorizontalAlignment="Right" 
                     Margin="10 0 0 0" 
                     Width="200"
                     Text="{Binding VideoInfoSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="ShieldAccount" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="投稿者コメントの接尾辞"/>
+                    <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding OwnerCommentSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="Image" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="サムネイルの接尾辞"/>
+                    <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding ThumbnailSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>

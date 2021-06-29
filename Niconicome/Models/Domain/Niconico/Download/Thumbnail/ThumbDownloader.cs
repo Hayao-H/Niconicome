@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
-using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 {
@@ -21,18 +20,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
     {
         Task<IDownloadResult> DownloadThumbnailAsync(IThumbDownloadSettings settings);
         Task<IDownloadResult> DownloadThumbnailAsync(IThumbDownloadSettings settings, IWatchSession session);
-    }
-
-
-    public interface IThumbDownloadSettings
-    {
-        string NiconicoId { get; }
-        string FolderName { get; }
-        string FileNameFormat { get; }
-        string Extension { get; }
-        bool IsOverwriteEnable { get; }
-        bool IsReplaceStrictedEnable { get; }
-        VideoInfo::ThumbSize ThumbSize { get; }
     }
 
     /// <summary>
@@ -58,7 +45,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
             }
 
 
-            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, settings.Extension, settings.IsReplaceStrictedEnable);
+            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, settings.Extension, settings.IsReplaceStrictedEnable, settings.Suffix);
             string fileName = generatedFIlename.IsNullOrEmpty() ? $"[{session.Video!.Id}]{session.Video!.Title}{settings.Extension}" : generatedFIlename;
 
             IOUtils.CreateDirectoryIfNotExist(settings.FolderName, fileName);
@@ -183,25 +170,5 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
         }
     }
 
-    /// <summary>
-    /// ダウンロード設定
-    /// </summary>
-    public class ThumbDownloadSettings : IThumbDownloadSettings
-    {
-        public string NiconicoId { get; set; } = string.Empty;
-
-        public string FolderName { get; set; } = string.Empty;
-
-        public string FileNameFormat { get; set; } = string.Empty;
-
-        public string Extension { get; set; } = string.Empty;
-
-        public bool IsOverwriteEnable { get; set; }
-
-        public bool IsReplaceStrictedEnable { get; set; }
-
-        public VideoInfo::ThumbSize ThumbSize { get; set; }
-
-    }
 
 }

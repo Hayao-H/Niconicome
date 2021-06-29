@@ -117,6 +117,9 @@ namespace Niconicome.Models.Network.Download
 
             string videoInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.VideoinfoSuffix) ?? Format.DefaultVideoInfoSuffix;
             string ichibaInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.IchibaInfoSuffix) ?? Format.DefaultIchibaSuffix;
+            string thumbSuffix = this.settingHandler.GetStringSetting(SettingsEnum.ThumbSuffix) ?? Format.DefaultThumbnailSuffix;
+            string ownerComSuffix = this.settingHandler.GetStringSetting(SettingsEnum.OwnerComSuffix) ?? Format.DefaultOwnerCommentSuffix;
+
             string commandFormat = this.settingHandler.GetStringSetting(SettingsEnum.FFmpegFormat) ?? Format.DefaultFFmpegFormat;
             if (commandFormat.IsNullOrEmpty())
             {
@@ -154,6 +157,8 @@ namespace Niconicome.Models.Network.Download
                 IchibaInfoSuffix = ichibaInfoSuffix,
                 CommandFormat = commandFormat,
                 ThumbSize = this.ThumbnailSize.Value,
+                ThumbSuffix = thumbSuffix,
+                OwnerComSuffix = ownerComSuffix,
             };
         }
 

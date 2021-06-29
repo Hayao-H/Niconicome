@@ -50,13 +50,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         {
             this.messenger.AddHandler(onMessage);
 
-           if (session.Video is null)
+            if (session.Video is null)
             {
                 throw new InvalidOperationException("動画情報が未取得です。");
             }
 
-            string fileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml",settings.IsReplaceStrictedEnable);
-            string ownerFileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml",settings.IsReplaceStrictedEnable, "[owner]");
+            string fileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml", settings.IsReplaceStrictedEnable);
+            string ownerFileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml", settings.IsReplaceStrictedEnable, settings.OwnerSuffix);
 
             if (token.IsCancellationRequested)
             {
@@ -70,8 +70,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             ICommentCollection result;
             try
             {
-                result = await this.client.DownloadCommentAsync(session.Video!.DmcInfo, settings, this.messenger,context, token);
-            } catch (TaskCanceledException)
+                result = await this.client.DownloadCommentAsync(session.Video!.DmcInfo, settings, this.messenger, context, token);
+            }
+            catch (TaskCanceledException)
             {
                 this.messenger.RemoveHandler(onMessage);
                 return new DownloadResult()
