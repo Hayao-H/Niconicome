@@ -19,5 +19,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
         {
 
         }
+
+        public bool IsWatching { get => true; }
     }
 }
