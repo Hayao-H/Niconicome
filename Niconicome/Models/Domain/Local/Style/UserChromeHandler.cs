@@ -153,7 +153,7 @@ namespace Niconicome.Models.Domain.Local.Style
 
                 this.fileWatcher.Watch(
                     Path.Combine(AppContext.BaseDirectory, FileFolder.UserChromePath),
-                    NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size,
+                    NotifyFilters.CreationTime | NotifyFilters.DirectoryName | NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Security | NotifyFilters.Size,
                     e =>
                     {
                         if (e.Name == FileFolder.UserChromeFileName)
