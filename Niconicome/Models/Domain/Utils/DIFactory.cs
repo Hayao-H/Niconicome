@@ -44,6 +44,7 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using Style = Niconicome.Models.Domain.Local.Style;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
+using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -191,6 +192,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
             services.AddSingleton<Playlist::IVideoInfoContainer, Playlist::VideoInfoContainer>();
             services.AddSingleton<Playlist::ILightVideoListinfoHandler, Playlist::LightVideoListinfoHandler>();
+            services.AddTransient<Permissions::IPermissionsHandler, Permissions::PermissionsHandler>();
             return services.BuildServiceProvider();
         }
 
