@@ -141,6 +141,25 @@ namespace NiconicomeTest.Properties {
         }
         
         /// <summary>
+        ///   [
+        ///  {
+        ///    &quot;url&quot;: &quot;https://api.github.com/repos/Hayao-H/Niconicome/releases/45486422&quot;,
+        ///    &quot;assets_url&quot;: &quot;https://api.github.com/repos/Hayao-H/Niconicome/releases/45486422/assets&quot;,
+        ///    &quot;upload_url&quot;: &quot;https://uploads.github.com/repos/Hayao-H/Niconicome/releases/45486422/assets{?name,label}&quot;,
+        ///    &quot;html_url&quot;: &quot;https://github.com/Hayao-H/Niconicome/releases/tag/v0.7.1&quot;,
+        ///    &quot;id&quot;: 45486422,
+        ///    &quot;author&quot;: {
+        ///      &quot;login&quot;: &quot;github-actions[bot]&quot;,
+        ///      &quot;id&quot;: 41898282,
+        ///      &quot;node_id&quot;: &quot;MDM6Qm90NDE4OTgyODI= [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string GithubReleases {
+            get {
+                return ResourceManager.GetString("GithubReleases", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   &lt;!DOCTYPE html&gt;
         ///&lt;div class=&quot;IchibaForWatch&quot;&gt;
         ///    &lt;div class=&quot;IchibaForWatch_Header&quot;&gt;
@@ -206,15 +225,12 @@ namespace NiconicomeTest.Properties {
         /// <summary>
         ///   &lt;!DOCTYPE html&gt;
         ///&lt;html lang=&quot;ja-jp&quot;&gt;
-        ///
         ///&lt;head&gt;
-        ///
+        ///      
         ///    &lt;meta charset=&quot;utf-8&quot;&gt;
         ///    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
         ///    &lt;meta name=&quot;copyright&quot; content=&quot;&amp;copy; DWANGO Co., Ltd.&quot;&gt;
-        ///    &lt;link rel=&quot;shortcut icon&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/favicon.ico&quot;&gt;
-        ///    &lt;link rel=&quot;icon&quot; type=&quot;image/png&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/32.png&quot; sizes=&quot;32x32&quot;&gt;
-        ///    &lt;link rel=&quot;icon&quot; type=&quot;image/png&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/48 [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///    &lt;link rel=&quot;shortcut icon&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/favicon.ico&quot;&gt;&lt;link rel=&quot;icon&quot; type=&quot;image/png&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/32.png&quot; sizes=&quot;32x32&quot;&gt;&lt;link rel=&quot;icon&quot; type=&quot;image/png&quot; href=&quot;https://nicovideo.cdn.nimg.jp/web/images/favicon/48.png&quot; si [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string Series_Touhou {
             get {

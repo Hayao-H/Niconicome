@@ -195,6 +195,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Playlist::ILightVideoListinfoHandler, Playlist::LightVideoListinfoHandler>();
             services.AddTransient<Permissions::IPermissionsHandler, Permissions::PermissionsHandler>();
             services.AddTransient<AddonsCore::IJavaScriptExecuter, AddonsCore::JavaScriptExecuter>();
+            services.AddTransient<AddonsCore::AutoUpdate.Github.IReleaseChecker, AddonsCore::AutoUpdate.Github.ReleaseChecker>();
             return services.BuildServiceProvider();
         }
 
