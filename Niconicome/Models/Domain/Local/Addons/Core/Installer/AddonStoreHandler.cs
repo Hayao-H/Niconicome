@@ -16,7 +16,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
     {
         AddonInfomation? GetAddon(Expression<Func<Addon, bool>> predicate);
         bool IsInstallled(Expression<Func<Addon, bool>> predicate);
-        IAttemptResult StoreAddon(AddonInfomation addon);
+        IAttemptResult<int> StoreAddon(AddonInfomation addon);
     }
 
     public class AddonStoreHandler : IAddonStoreHandler
@@ -72,13 +72,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// </summary>
         /// <param name="addon"></param>
         /// <returns></returns>
-        public IAttemptResult StoreAddon(AddonInfomation addon)
+        public IAttemptResult<int> StoreAddon(AddonInfomation addon)
         {
             if (string.IsNullOrEmpty(addon.Identifier.Value))
             {
                 if (this.IsInstallled(db => db.Name == addon.Name.Value))
                 {
-                    return new AttemptResult() { Message = $"{addon.Name.Value}は既にインストールされています。" };
+                    return new AttemptResult<int>() { Message = $"{addon.Name.Value}は既にインストールされています。" };
                 }
             }
             else
@@ -86,7 +86,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 //任意識別子が指定されている場合
                 if (this.IsInstallled(d => d.Identifier == addon.Identifier.Value))
                 {
-                    return new AttemptResult() { Message = $"{addon.Identifier.Value}は既にインストールされています。" };
+                    return new AttemptResult<int>() { Message = $"{addon.Identifier.Value}は既にインストールされています。" };
                 }
             }
 
@@ -109,7 +109,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 return result;
             }
 
-            return new AttemptResult() { IsSucceeded = true };
+            return new AttemptResult<int>() { IsSucceeded = true, Data = result.Data };
         }
 
         /// <summary>
