@@ -7,25 +7,19 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Domain.Local.Addons.Manifest.V1
 {
-    class Manifest : ManifestBase
+    public class Manifest : ManifestBase
     {
         [JsonPropertyName("manifest_version")]
         public override string ManifestVersion { get; set; } = "1.0";
 
-        public string Name { get; set; } = string.Empty;
-
-        public string Author { get; set; } = string.Empty;
-
-        public string Description { get; set; } = string.Empty;
-
-        public string Version { get; set; } = "1.0.0";
-
+        [JsonPropertyName("auto_update_policy")]
         public AutoUpdatePolicy AutoUpdatePolicy { get; set; } = new();
 
-        public List<string> Permissions { get; set; } = new();
+        public Scripts Scripts { get; set; } = new();
+
     }
 
-    class AutoUpdatePolicy
+    public class AutoUpdatePolicy
     {
         [JsonPropertyName("auto_update")]
         public bool AutoUpdate { get; set; }
@@ -43,7 +37,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Manifest.V1
         public string GithubRepoName { get; set; } = string.Empty;
     }
 
-    class Scripts
+    public class Scripts
     {
         [JsonPropertyName("background_script")]
         public string BackgroundScript { get; set; } = string.Empty;
