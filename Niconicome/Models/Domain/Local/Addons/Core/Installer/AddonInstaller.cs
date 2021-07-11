@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
@@ -11,7 +13,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 {
     public interface IAddonInstaller
     {
-        IAttemptResult<AddonInfomation> Install(string path);
+        IAttemptResult<AddonInfomation> Install(string path, bool isUpdate = false);
     }
 
     public class AddonInstaller : IAddonInstaller
@@ -44,7 +46,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public IAttemptResult<AddonInfomation> Install(string path)
+        public IAttemptResult<AddonInfomation> Install(string path, bool isUpdate = false)
         {
             if (!this.fileIO.Exists(path))
             {
@@ -71,7 +73,16 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             }
 
             //DBに保存
-            IAttemptResult<int> sResult = this.storeHandler.StoreAddon(mResult.Data);
+            IAttemptResult<int> sResult;
+            if (isUpdate)
+            {
+                sResult = this.storeHandler.Update(mResult.Data);
+            }
+            else
+            {
+                sResult = this.storeHandler.StoreAddon(mResult.Data);
+
+            }
             if (!sResult.IsSucceeded)
             {
                 return new AttemptResult<AddonInfomation>() { Message = sResult.Message, Exception = sResult.Exception };
@@ -141,9 +152,27 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// <returns></returns>
         private IAttemptResult MoveAddon(string sourcePath, string targetPath)
         {
+            if (!this.directoryIO.Exists(targetPath))
+            {
+                try
+                {
+                    this.directoryIO.Create(targetPath);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error("アドオンの移動先ディレクトリの作成に失敗しました。", e);
+                    return new AttemptResult() { Message = "アドオンの移動先ディレクトリの作成に失敗しました。", Exception = e };
+                }
+            }
+
             try
             {
-                this.directoryIO.Move(sourcePath, targetPath);
+                List<string> files = this.directoryIO.GetFiles(sourcePath);
+                foreach (string file in files)
+                {
+                    string target = Path.Combine(targetPath, Path.GetFileName(file));
+                    this.fileIO.Move(file, target, true);
+                }
             }
             catch (Exception e)
             {

@@ -39,12 +39,6 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
 
         public void DeleteAll(Predicate<string> predicate, bool recurse = true)
         {
-
-        }
-
-        public void Move(string source,string destination)
-        {
-
         }
 
 

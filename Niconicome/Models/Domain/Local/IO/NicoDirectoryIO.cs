@@ -13,7 +13,6 @@ namespace Niconicome.Models.Domain.Local.IO
         void Create(string path);
         void Delete(string path, bool recurse = true);
         void DeleteAll(Predicate<string> predicate, bool recurse = true);
-        void Move(string source, string destination);
         List<string> GetFiles(string path, string pattern = "*", bool recurse = false);
         List<string> GetDirectorys(string path, string pattern = "*", bool recurse = false);
 
@@ -64,18 +63,6 @@ namespace Niconicome.Models.Domain.Local.IO
                 this.Delete(directory, recurse);
             }
         }
-
-        /// <summary>
-        /// ファイルを移動する
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="destination"></param>
-        public void Move(string source, string destination)
-        {
-            Directory.Move(source, destination);
-        }
-
-
 
         /// <summary>
         /// ディレクトリ内のファイル一覧を取得する

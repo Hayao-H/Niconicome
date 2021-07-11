@@ -10,6 +10,7 @@ namespace Niconicome.Models.Domain.Local.IO
     {
         bool Exists(string path);
         void Delete(string path);
+        void Move(string path, string destPath, bool overwrite = false);
         string OpenRead(string path);
         void Write(string path, string content, bool append = false);
     }
@@ -57,6 +58,12 @@ namespace Niconicome.Models.Domain.Local.IO
             using var reader = new StreamReader(fs);
             return reader.ReadToEnd();
         }
+
+        public void Move(string path, string destPath, bool overwrite = false)
+        {
+            File.Move(path, destPath, overwrite);
+        }
+
 
         /// <summary>
         /// 文字列を書き込む

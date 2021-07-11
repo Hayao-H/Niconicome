@@ -39,5 +39,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
         {
 
         }
+
+        public void Move(string path, string destPath, bool overwrite = false)
+        {
+
+        }
+
     }
 }
