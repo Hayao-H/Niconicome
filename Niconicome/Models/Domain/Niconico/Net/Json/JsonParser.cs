@@ -15,6 +15,18 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
     /// </summary>
     public static class JsonParser
     {
+        public static JsonSerializerOptions DefaultOption
+        {
+            get =>
+                new JsonSerializerOptions()
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = false,
+                    IgnoreNullValues = true,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+                };
+        }
+
         /// <summary>
         /// json文字列をデシリアライズする
         /// </summary>
@@ -23,14 +35,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
         /// <returns></returns>
         public static T DeSerialize<T>(string source)
         {
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                PropertyNameCaseInsensitive = false,
-                IgnoreNullValues = true,
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-            };
+            var options = JsonParser.DefaultOption;
 
             T? instance = JsonSerializer.Deserialize<T>(source, options);
             //nullチェック
@@ -50,14 +55,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
 
             if (options is null)
             {
-                options = new JsonSerializerOptions()
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    PropertyNameCaseInsensitive = false,
-                    IgnoreNullValues = true,
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-                };
+                options = JsonParser.DefaultOption;
             }
 
             string json = JsonSerializer.Serialize<T>(source, options);
