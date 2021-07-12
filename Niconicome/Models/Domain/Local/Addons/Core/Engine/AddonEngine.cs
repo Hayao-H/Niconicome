@@ -12,12 +12,12 @@ using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 {
-    interface IAddonEngine
+    public interface IAddonEngine
     {
         Task<IAttemptResult> InitializeAsync(string packageID);
     }
 
-    class AddonEngine : IAddonEngine
+    public class AddonEngine : IAddonEngine
     {
         public AddonEngine(IManifestLoader manifestLoader, IAddonStoreHandler storeHandler, ILogger logger, IAddonInfomationsContainer container, IAddonContexts contexts, INicoFileIO fileIO, IAddonLogger addonLogger)
         {
@@ -48,6 +48,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 
         #endregion
 
+        /// <summary>
+        /// アドオンを初期化して実行する
+        /// </summary>
+        /// <param name="packageID"></param>
+        /// <returns></returns>
         public async Task<IAttemptResult> InitializeAsync(string packageID)
         {
             if (!this.storeHandler.IsInstallled(addon => addon.PackageID == packageID))

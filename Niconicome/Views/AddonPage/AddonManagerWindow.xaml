@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="Niconicome.Views.AddonPage.AddonManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows.AddonManager"
+        xmlns:cv="clr-namespace:Niconicome.Views.Converter"
+        xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:prism="http://prismlibrary.com/"  
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="Yu Gothic"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        d:DataContext="{d:DesignInstance {x:Type vm:AddonManagerViewModelD},IsDesignTimeCreatable=True}"
+        d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Content="アドオンの管理"
+               FontSize="30"
+               Grid.Row="0"/>
+        <Grid Grid.Row="1">
+            <Label Content="有効" FontSize="20" FontWeight="Bold"/>
+            <ListView ItemsSource="{Binding Addons}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="60">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button>
+                                        <materialDesign:PackIcon Kind="Puzzle"/>
+                                    </Button>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Name.Value}"/>
+                        <GridViewColumn DisplayMemberBinding="{Binding Description.Value}"/>
+                    </GridView>
+                </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="0 5"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </Grid>
+    </Grid>
+</UserControl>

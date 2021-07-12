@@ -2,14 +2,14 @@
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 {
-    interface IAddonContexts
+    public interface IAddonContexts
     {
-        Dictionary<int, IJavaScriptExecuter> Contexts { get;}
+        Dictionary<int, IJavaScriptExecuter> Contexts { get; }
         void Kill(int id);
         void KillAll();
     }
 
-    class AddonContexts : IAddonContexts
+    public class AddonContexts : IAddonContexts
     {
 
         public Dictionary<int, IJavaScriptExecuter> Contexts { get; init; } = new();

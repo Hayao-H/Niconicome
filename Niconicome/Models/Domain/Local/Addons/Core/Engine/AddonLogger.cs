@@ -6,14 +6,14 @@ using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 {
-    interface IAddonLogger
+    public interface IAddonLogger
     {
         ObservableCollection<AddonLogNode> Messages { get; init; }
 
         void Error(string message, string addonName, Exception e);
     }
 
-    class AddonLogger : IAddonLogger
+    public class AddonLogger : IAddonLogger
     {
         #region field
 
