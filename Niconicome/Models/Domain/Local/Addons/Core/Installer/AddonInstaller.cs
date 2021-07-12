@@ -18,13 +18,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
     public class AddonInstaller : IAddonInstaller
     {
-        public AddonInstaller(ILogger logger, IManifestLoader manifestLoader, INicoFileIO fileIO, INicoDirectoryIO directoryIO, IAddonStoreHandler storeHandler)
+        public AddonInstaller(ILogger logger, IManifestLoader manifestLoader, INicoFileIO fileIO, INicoDirectoryIO directoryIO, IAddonStoreHandler storeHandler,IAddonInfomationsContainer container)
         {
             this.logger = logger;
             this.manifestLoader = manifestLoader;
             this.fileIO = fileIO;
             this.directoryIO = directoryIO;
             this.storeHandler = storeHandler;
+            this.container = container;
         }
 
         #region field
@@ -38,6 +39,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         private readonly INicoDirectoryIO directoryIO;
 
         private readonly IAddonStoreHandler storeHandler;
+
+        private readonly IAddonInfomationsContainer container;
 
         #endregion
 
@@ -74,6 +77,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
             //DBに保存
             IAttemptResult<int> sResult;
+            mResult.Data.PackageID.Value = packageID;
+            AddonInfomation addon;
             if (isUpdate)
             {
                 sResult = this.storeHandler.Update(mResult.Data);
@@ -83,9 +88,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 sResult = this.storeHandler.StoreAddon(mResult.Data);
 
             }
+
             if (!sResult.IsSucceeded)
             {
                 return new AttemptResult<AddonInfomation>() { Message = sResult.Message, Exception = sResult.Exception };
+            } else
+            {
+                mResult.Data.ID.Value = sResult.Data;
+                addon = this.container.GetAddon(sResult.Data);
+                addon.SetData(mResult.Data);
             }
 
             //移動
@@ -93,13 +104,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             if (!mvResult.IsSucceeded)
             {
                 return new AttemptResult<AddonInfomation>() { Message = mvResult.Message, Exception = mvResult.Exception };
-            }
-
-            //取得
-            AddonInfomation? addon = this.storeHandler.GetAddon(d => d.Id == sResult.Data);
-            if (addon is null)
-            {
-                return new AttemptResult<AddonInfomation>() { Message = "DBへの登録に失敗しました。" };
             }
 
             return new AttemptResult<AddonInfomation>() { IsSucceeded = true, Data = addon };

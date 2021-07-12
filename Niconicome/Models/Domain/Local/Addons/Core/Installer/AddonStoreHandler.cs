@@ -173,6 +173,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             infomation.Version.Value = Version.Parse(addon.Version);
             infomation.Identifier.Value = addon.Identifier;
             infomation.Permissions.AddRange(addon.Permissions);
+            infomation.TargetAPIVersion.Value = Version.Parse(addon.TargetAPIVersion);
         }
 
         /// <summary>
@@ -190,6 +191,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             addon.Version = infomation.Identifier.Value;
             addon.Permissions = infomation.Permissions;
             addon.PackageID = infomation.PackageID.Value;
+            addon.TargetAPIVersion = infomation.TargetAPIVersion.Value.ToString();
         }
 
         #endregion

@@ -117,6 +117,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 return new AttemptResult() { Message = $"バージョンの形式が不正です。({manifest.Version})" };
             }
 
+            bool aResult = Version.TryParse(manifest.TargetAPIVersion,out Version _);
+            if (!aResult)
+            {
+                return new AttemptResult() { Message = $"APIバージョンの形式が不正です。({manifest.TargetAPIVersion})" };
+            }
+
             foreach (string permission in manifest.Permissions)
             {
                 if (!this.permissionsHandler.IsKnownPermission(permission))
@@ -144,6 +150,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             addon.Permissions.AddRange(manifest.Permissions);
             addon.AutoUpdatePolicy = manifest.AutoUpdatePolicy;
             addon.Scripts = manifest.Scripts;
+            addon.TargetAPIVersion.Value = Version.Parse(manifest.TargetAPIVersion);
 
             return addon;
         }

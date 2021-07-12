@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.Manifest
 {
@@ -19,6 +21,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Manifest
         public string Version { get; set; } = "1.0.0";
 
         public string Identifier { get; set; } = string.Empty;
+
+        [JsonPropertyName("target_api_version")]
+        public string TargetAPIVersion { get; set; } = Const::Adddon.APIVersion.ToString();
 
         public List<string> Permissions { get; set; } = new();
 

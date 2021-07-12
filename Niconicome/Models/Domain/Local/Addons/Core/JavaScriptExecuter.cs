@@ -7,7 +7,7 @@ using Microsoft.ClearScript.V8;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core
 {
-    public interface IJavaScriptExecuter
+    public interface IJavaScriptExecuter : IDisposable
     {
         void AddHostObject(string name, object obj);
         dynamic Evaluate(string code);
@@ -56,6 +56,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         public void AddHostObject(string name, object obj)
         {
             this.engine.AddHostObject(name, obj);
+        }
+
+        /// <summary>
+        /// エンジンを停止する
+        /// </summary>
+        public void Dispose()
+        {
+            this.engine.Dispose();
         }
 
     }
