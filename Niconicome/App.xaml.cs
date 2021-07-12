@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Application;
 using Niconicome.ViewModels;
+using Niconicome.Views.AddonPage;
 using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Unity;
@@ -36,6 +37,7 @@ namespace Niconicome
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterDialog<AddonManagerWindow>(nameof(AddonManagerWindow));
         }
 
         /// <summary>

@@ -29,7 +29,7 @@
     </Window.Resources>
     <materialDesign:DialogHost Identifier="default">
         <DockPanel>
-            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" >
+            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" d:DataContext="{d:DesignInstance {x:Type vm:MainWindowViewModel}}">
                 <materialDesign:DrawerHost.LeftDrawerContent>
                     <Grid Width="250">
                         <Grid.RowDefinitions>
@@ -58,6 +58,11 @@
                             <MenuItem Header="ダウンロード" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenDownloadTaskWindowsCommand}">
                                 <MenuItem.Icon>
                                     <materialDesign:PackIcon Kind="Download"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="アドオン" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenAddonManagerCommand}">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="Puzzle"/>
                                 </MenuItem.Icon>
                             </MenuItem>
                             <MenuItem Header="再起動" Command="{Binding Restart}" Height="40">

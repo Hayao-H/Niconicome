@@ -46,6 +46,7 @@ using Style = Niconicome.Models.Domain.Local.Style;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
 using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
+using Addons = Niconicome.Models.Local.Addon;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -196,6 +197,14 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Permissions::IPermissionsHandler, Permissions::PermissionsHandler>();
             services.AddTransient<AddonsCore::IJavaScriptExecuter, AddonsCore::JavaScriptExecuter>();
             services.AddTransient<AddonsCore::AutoUpdate.Github.IReleaseChecker, AddonsCore::AutoUpdate.Github.ReleaseChecker>();
+            services.AddSingleton<AddonsCore::IAddonInfomationsContainer, AddonsCore::AddonInfomationsContainer>();
+            services.AddSingleton<AddonsCore::Engine.IAddonContexts, AddonsCore::Engine.AddonContexts>();
+            services.AddSingleton<AddonsCore::Engine.IAddonEngine, AddonsCore::Engine.AddonEngine>();
+            services.AddTransient<AddonsCore::Engine.IAddonLogger, AddonsCore::Engine.AddonLogger>();
+            services.AddTransient<AddonsCore::Installer.IAddonStoreHandler, AddonsCore::Installer.AddonStoreHandler>();
+            services.AddTransient<AddonsCore::Installer.IAddonInstaller, AddonsCore::Installer.AddonInstaller>();
+            services.AddTransient<AddonsCore::Installer.IManifestLoader, AddonsCore::Installer.ManifestLoader>();
+            services.AddSingleton<Addons::IAddonHandler, Addons::AddonHandler>();
             return services.BuildServiceProvider();
         }
 

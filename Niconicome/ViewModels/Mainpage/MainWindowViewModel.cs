@@ -12,9 +12,11 @@ using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
+using Niconicome.Views.AddonPage;
 using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
 using Prism.Regions;
+using Prism.Services.Dialogs;
 using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
@@ -23,10 +25,10 @@ namespace Niconicome.ViewModels.Mainpage
     /// <summary>
     /// メイン画面全体のVM
     /// </summary>
-    class MainWindowViewModel : BindableBase
+    public class MainWindowViewModel : BindableBase
     {
 
-        public MainWindowViewModel(IRegionManager regionManager)
+        public MainWindowViewModel(IRegionManager regionManager, IDialogService dialogService)
         {
 
             WS::Mainpage.Themehandler.Initialize();
@@ -101,6 +103,12 @@ namespace Niconicome.ViewModels.Mainpage
                     WS::Mainpage.ApplicationPower.ShutDown();
                 });
 
+            this.OpenAddonManagerCommand = new ReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    dialogService.Show(nameof(AddonManagerWindow));
+                });
+
             #region UI系の設定
 
             this.TreeWidth = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.Tree.Width ?? 250).ToReadOnlyReactiveProperty();
@@ -148,6 +156,11 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveCommand OpenSettingCommand { get; init; }
 
         public ReactiveCommand OpenDownloadTaskWindowsCommand { get; init; }
+
+        /// <summary>
+        /// アドオンマネージャーを開く
+        /// </summary>
+        public ReactiveCommand OpenAddonManagerCommand { get; init; }
 
         /// <summary>
         /// シャットダウン
