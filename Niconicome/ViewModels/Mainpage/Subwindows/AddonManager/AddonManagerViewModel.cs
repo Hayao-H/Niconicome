@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using System.Windows;
 using Niconicome.Models.Domain.Local.Addons.Core;
+using Niconicome.Views.AddonPage.Install;
 using Prism.Services.Dialogs;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
@@ -16,6 +19,14 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.RequestClose += _ => { };
             this.dialogService = dialogService;
             this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value));
+
+            this.InstallCommand = WS::AddonPage.AddonHandler.IsInstalling
+                .Select(value => !value)
+                .ToReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    dialogService.Show(nameof(AddonInstallWindow));
+                }).AddTo(this.disposables);
         }
 
         #region field
@@ -27,6 +38,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         #region Props
 
         public ReadOnlyReactiveCollection<AddonInfomationViewModel> Addons { get; init; }
+
+        #endregion
+
+        #region Command
+
+        public ReactiveCommand InstallCommand { get; init; }
 
         #endregion
 
@@ -71,5 +88,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         }
 
         public ObservableCollection<AddonInfomationViewModel> Addons { get; init; }
+
+        public ReactiveCommand InstallCommand { get; init; } = new();
+
     }
 }

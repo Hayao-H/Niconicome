@@ -13,12 +13,32 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 {
     public interface IAddonInstaller
     {
-        IAttemptResult<AddonInfomation> Install(string path, bool isUpdate = false);
+        /// <summary>
+        /// アドオンをインストールする
+        /// </summary>
+        /// <param name="tmpPath">一時フォルダーのパス</param>
+        /// <param name="isUpdate">アップデートフラグ</param>
+        /// <returns></returns>
+        IAttemptResult<AddonInfomation> Install(string tmpPath, bool isUpdate = false);
+
+        /// <summary>
+        /// アドオンを一時フォルダーに解凍する
+        /// </summary>
+        /// <param name="path">アドオンパス</param>
+        /// <returns></returns>
+        IAttemptResult<string> Extract(string path);
+
+        /// <summary>
+        /// マニフェストを読み込む
+        /// </summary>
+        /// <param name="tmpPath">一時フォルダーのパス</param>
+        /// <returns></returns>
+        IAttemptResult<AddonInfomation> LoadManifest(string tmpPath);
     }
 
     public class AddonInstaller : IAddonInstaller
     {
-        public AddonInstaller(ILogger logger, IManifestLoader manifestLoader, INicoFileIO fileIO, INicoDirectoryIO directoryIO, IAddonStoreHandler storeHandler,IAddonInfomationsContainer container)
+        public AddonInstaller(ILogger logger, IManifestLoader manifestLoader, INicoFileIO fileIO, INicoDirectoryIO directoryIO, IAddonStoreHandler storeHandler, IAddonInfomationsContainer container)
         {
             this.logger = logger;
             this.manifestLoader = manifestLoader;
@@ -47,29 +67,20 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// <summary>
         /// インストールする
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="tempPath"></param>
         /// <returns></returns>
-        public IAttemptResult<AddonInfomation> Install(string path, bool isUpdate = false)
+        public IAttemptResult<AddonInfomation> Install(string tempPath, bool isUpdate = false)
         {
-            if (!this.fileIO.Exists(path))
+            if (!this.fileIO.Exists(tempPath))
             {
-                return new AttemptResult<AddonInfomation>() { Message = "指定したアドオンファイルは存在しません。" };
+                return new AttemptResult<AddonInfomation>() { Message = "指定したア一時フォルダーは存在しません。" };
             }
 
-            string packageID = Guid.NewGuid().ToString("D");
+            string packageID = Path.GetFileName(tempPath);
             string targetPath = Path.Combine("tmp", packageID);
-            string manifestPath = Path.Combine(targetPath, "manifest.json");
-
-
-            //解凍
-            IAttemptResult exResult = this.ExtractAddon(path, targetPath);
-            if (!exResult.IsSucceeded)
-            {
-                return new AttemptResult<AddonInfomation>() { Message = exResult.Message, Exception = exResult.Exception };
-            }
 
             //マニフェスト読み込み
-            IAttemptResult<AddonInfomation> mResult = this.manifestLoader.LoadManifest(manifestPath);
+            IAttemptResult<AddonInfomation> mResult = this.LoadManifest(tempPath);
             if (!mResult.IsSucceeded || mResult.Data is null)
             {
                 return new AttemptResult<AddonInfomation>() { Message = mResult.Message, Exception = mResult.Exception };
@@ -92,7 +103,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             if (!sResult.IsSucceeded)
             {
                 return new AttemptResult<AddonInfomation>() { Message = sResult.Message, Exception = sResult.Exception };
-            } else
+            }
+            else
             {
                 mResult.Data.ID.Value = sResult.Data;
                 addon = this.container.GetAddon(sResult.Data);
@@ -109,6 +121,48 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             return new AttemptResult<AddonInfomation>() { IsSucceeded = true, Data = addon };
 
         }
+
+        /// <summary>
+        /// 解凍する
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public IAttemptResult<string> Extract(string path)
+        {
+
+            if (!this.fileIO.Exists(path))
+            {
+                return new AttemptResult<string>() { Message = "指定したアドオンファイルは存在しません。" };
+            }
+
+            string packageID = Guid.NewGuid().ToString("D");
+            string targetPath = Path.Combine("tmp", packageID);
+
+            //解凍
+            IAttemptResult exResult = this.ExtractAddon(path, targetPath);
+            return new AttemptResult<string>() { Data = targetPath, IsSucceeded = exResult.IsSucceeded, Message = exResult.Message, Exception = exResult.Exception };
+
+        }
+
+        /// <summary>
+        /// マニフェストを読み込む
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public IAttemptResult<AddonInfomation> LoadManifest(string path)
+        {
+            if (!this.fileIO.Exists(path))
+            {
+                return new AttemptResult<AddonInfomation>() { Message = "指定したアドオンファイルは存在しません。" };
+            }
+
+            string manifestPath = Path.Combine(path, "manifest.json");
+
+            //マニフェスト読み込み
+            return this.manifestLoader.LoadManifest(manifestPath);
+        }
+
+
 
         #region private
 

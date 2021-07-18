@@ -18,12 +18,12 @@ using Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install;
 namespace Niconicome.Views.AddonPage.Install
 {
     /// <summary>
-    /// Interaction logic for AddonInstallWindow.xaml
+    /// FileOpenPage.xaml の相互作用ロジック
     /// </summary>
-    [ViewModel(typeof(AddonInstallerViewModel))]
-    public partial class AddonInstallWindow : UserControl
+    [ViewModel(typeof(FileOpenPageViewModel))]
+    public partial class FileOpenPage : UserControl
     {
-        public AddonInstallWindow()
+        public FileOpenPage()
         {
             InitializeComponent();
         }

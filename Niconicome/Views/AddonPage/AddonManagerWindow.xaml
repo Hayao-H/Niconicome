@@ -27,8 +27,14 @@
         <Label Content="アドオンの管理"
                FontSize="30"
                Grid.Row="0"/>
-        <Grid Grid.Row="1">
-            <Label Content="有効" FontSize="20" FontWeight="Bold"/>
+        <StackPanel Orientation="Vertical" Grid.Row="1">
+            <DockPanel>
+                <Label Content="有効" FontSize="20" FontWeight="Bold"/>
+                <Button 
+                    Content="追加"
+                    Command="{Binding InstallCommand}"
+                    HorizontalAlignment="Right"/>
+            </DockPanel>
             <ListView ItemsSource="{Binding Addons}">
                 <ListView.View>
                     <GridView>
@@ -52,6 +58,6 @@
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>
-        </Grid>
+        </StackPanel>
     </Grid>
 </UserControl>
