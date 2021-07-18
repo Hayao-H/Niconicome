@@ -94,7 +94,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Mylist::IWatchLaterHandler, Mylist::WatchLaterHandler>();
             services.AddTransient<UVideo::IUserVideoHandler, UVideo::UserVideoHandler>();
             services.AddTransient<Net::IRemotePlaylistHandler, Net::RemotePlaylistHandler>();
-            services.AddTransient<State::ILocalInfo, State::LocalInfo>();
+            services.AddSingleton<State::ILocalInfo, State::LocalInfo>();
             services.AddTransient<DomainNet::ICacheHandler, DomainNet::CacheHandler>();
             services.AddTransient<DomainNet::ICacheStraem, DomainNet::CacheStream>();
             services.AddSingleton<Net::INetworkVideoHandler, Net::NetworkVideoHandler>();

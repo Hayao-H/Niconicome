@@ -106,6 +106,10 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenAddonManagerCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
+                    if (WS::Mainpage.LocalInfo.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
+                    {
+                        return;
+                    }
                     dialogService.Show(nameof(AddonManagerWindow));
                 });
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Prism.Services.Dialogs;
 using Reactive.Bindings;
@@ -44,12 +46,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 
         public void OnDialogClosed()
         {
-
+            WS::AddonPage.LocalInfo.IsAddonManagerOpen = false;
         }
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
-
+            WS::AddonPage.LocalInfo.IsAddonManagerOpen = true;
         }
 
         #endregion
