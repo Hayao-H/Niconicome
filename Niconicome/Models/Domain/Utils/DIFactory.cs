@@ -198,7 +198,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonsCore::IJavaScriptExecuter, AddonsCore::JavaScriptExecuter>();
             services.AddTransient<AddonsCore::AutoUpdate.Github.IReleaseChecker, AddonsCore::AutoUpdate.Github.ReleaseChecker>();
             services.AddSingleton<AddonsCore::IAddonInfomationsContainer, AddonsCore::AddonInfomationsContainer>();
-            services.AddSingleton<AddonsCore::Engine.IAddonContexts, AddonsCore::Engine.AddonContexts>();
+            services.AddSingleton<AddonsCore::Engine.Context.IAddonContexts, AddonsCore::Engine.Context.AddonContexts>();
+            services.AddSingleton<AddonsCore::Engine.Context.IAddonContext, AddonsCore::Engine.Context.AddonContext>();
             services.AddSingleton<AddonsCore::Engine.IAddonEngine, AddonsCore::Engine.AddonEngine>();
             services.AddTransient<AddonsCore::Engine.IAddonLogger, AddonsCore::Engine.AddonLogger>();
             services.AddTransient<AddonsCore::Installer.IAddonStoreHandler, AddonsCore::Installer.AddonStoreHandler>();

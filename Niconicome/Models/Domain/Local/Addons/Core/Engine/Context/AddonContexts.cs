@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
+namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
 {
     public interface IAddonContexts
     {
-        Dictionary<int, IJavaScriptExecuter> Contexts { get; }
+        Dictionary<int, IAddonContext> Contexts { get; }
         void Kill(int id);
         void KillAll();
     }
@@ -12,7 +12,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
     public class AddonContexts : IAddonContexts
     {
 
-        public Dictionary<int, IJavaScriptExecuter> Contexts { get; init; } = new();
+        public Dictionary<int, IAddonContext> Contexts { get; init; } = new();
 
         /// <summary>
         /// 特定のアドオンを停止する

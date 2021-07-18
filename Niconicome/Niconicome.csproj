@@ -35,14 +35,6 @@
 
   <ItemGroup>
     <None Remove="src\app.ico" />
-    <None Remove="Views\AddonPage\AddonManagerWindow.xaml" />
-    <None Remove="Views\AddonPage\Install\AddonInstallWindow.xaml" />
-    <None Remove="Views\Mainpage\Region\DownloadSettings.xaml" />
-    <None Remove="Views\Mainpage\Region\Output.xaml" />
-    <None Remove="Views\Mainpage\Region\VideoList.xaml" />
-    <None Remove="Views\Mainpage\Region\VideolistState.xaml" />
-    <None Remove="Views\Mainpage\Region\VideoSortSetting.xaml" />
-    <None Remove="Views\Setting\Pages\StylePage.xaml" />
     <Page Remove="App.xaml" />
     <ApplicationDefinition Include="App.xaml" />
     <None Include="src\icon.png">
@@ -82,9 +74,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="Views\Mainpage\Region\VideolistState.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -92,10 +81,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\AddonPage\Install\Pages\" />
   </ItemGroup>
 
 </Project>

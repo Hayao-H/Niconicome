@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Addons.Core.Engine.Context;
 using Niconicome.Models.Domain.Local.Addons.Core.Installer;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
@@ -60,7 +59,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
                 return new AttemptResult() { Message = "インストールされていないアドオンです。アドオンのサイドロードは出来ません。" };
             }
 
-            string manifestPath = Path.Combine(FileFolder.AddonsFolder, packageID, "manifest.json");
+            string manifestPath = Path.Combine(Const::FileFolder.AddonsFolder, packageID, "manifest.json");
 
             IAttemptResult<AddonInfomation> mResult = this.manifestLoader.LoadManifest(manifestPath);
             if (!mResult.IsSucceeded || mResult.Data is null)
@@ -86,36 +85,10 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
             addon.SetData(mResult.Data);
 
             //コンテクストを登録
-            IJavaScriptExecuter context = DIFactory.Provider.GetRequiredService<IJavaScriptExecuter>();
+            IAddonContext context = AddonContext.CreateInstance();
             this.contexts.Contexts.Add(addon.ID.Value, context);
 
-            IAttemptResult<string> rResult = this.ReadCode(Path.Combine(FileFolder.AddonsFolder, packageID, addon.Scripts.BackgroundScript));
-            if (!rResult.IsSucceeded || rResult.Data is null)
-            {
-                return new AttemptResult() { Message = rResult.Message, Exception = rResult.Exception };
-            }
-
-            //実行
-            IAttemptResult eResult = await Task.Run(() =>
-            {
-                try
-                {
-                    context.Evaluate(rResult.Data);
-                    context.Evaluate("main()");
-                }
-                catch (Exception e)
-                {
-                    this.addonLogger.Error("スクリプトの実行に失敗しました。", mResult.Data.Name.Value, e);
-                    return new AttemptResult() { Message = "スクリプトの実行に失敗しました。", Exception = e };
-                }
-
-                return new AttemptResult() { IsSucceeded = true };
-            });
-
-            if (!eResult.IsSucceeded)
-            {
-                return new AttemptResult() { Message = eResult.Message, Exception = eResult.Exception };
-            }
+            await Task.Delay(1);
 
             return new AttemptResult() { IsSucceeded = true };
 
