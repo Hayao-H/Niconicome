@@ -1,5 +1,7 @@
 ﻿using Microsoft.Win32;
+using Niconicome.Models.Domain.Niconico.Watch;
 using Reactive.Bindings;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 {
@@ -16,6 +18,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
                     if (dialog.ShowDialog() == true)
                     {
                         this.AddonPath.Value = dialog.FileName;
+                        WS::AddonPage.InstallManager.Select(dialog.FileName);
                     }
                 });
         }

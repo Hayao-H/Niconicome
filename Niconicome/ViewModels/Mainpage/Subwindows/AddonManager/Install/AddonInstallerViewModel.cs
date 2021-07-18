@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Niconicome.Views.AddonPage.Install;
 using Niconicome.Views.Mainpage.Region;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
@@ -19,10 +22,15 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
             this.RequestClose += _ => { };
             this.RegionManager = new ReactiveProperty<IRegionManager>(regionManager.CreateRegionManager());
 
-            this.TestCommand = new ReactiveCommand()
+            this.ToNext = new[]
+            {
+                WS::AddonPage.InstallManager.IsLoaded.Select(value=>value&&this.currentPage==1)
+            }.CombineLatest(x => x.Any(v => v))
+            .ToReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    this.RegionManager.Value.RequestNavigate(AddonRegionName.Name, nameof(FileOpenPage), result =>
+                    string page = this.GetNextPage();
+                    this.RegionManager.Value.RequestNavigate(AddonRegionName.Name, page, result =>
                      {
                          result.ToString();
                      });
@@ -37,6 +45,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         #region field
 
+        private int currentPage = 0;
 
         #endregion
 
@@ -53,7 +62,30 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         public ReactiveProperty<IRegionManager> RegionManager { get; init; }
 
-        public ReactiveCommand TestCommand { get; init; }
+        public ReactiveCommand ToNext { get; init; }
+
+        #endregion
+
+        #region privae
+
+        private bool CanNavigate()
+        {
+            return this.currentPage switch
+            {
+                0 => true,
+                1 => WS::AddonPage.InstallManager.IsSelected.Value,
+                _ => false
+            };
+        }
+
+        private string GetNextPage()
+        {
+            return this.currentPage switch
+            {
+                0 => nameof(FileOpenPage),
+                _ => nameof(FileOpenPage)
+            };
+        }
 
         #endregion
 
@@ -77,6 +109,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
+            string page = this.GetNextPage();
+            this.RegionManager.Value.RequestNavigate(AddonRegionName.Name, page);
         }
 
         #endregion

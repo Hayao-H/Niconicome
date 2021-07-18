@@ -21,11 +21,16 @@ namespace Niconicome.Models.Local.Addon
     {
 
         /// <summary>
-        /// アドオンを読み込む
+        /// ファイルを選択する
         /// </summary>
         /// <param name="path"></param>
-        /// <returns>アドオン情報,解凍先パス</returns>
-        IAttemptResult LoadAddon(string path);
+        void Select(string path);
+
+        /// <summary>
+        /// アドオンを読み込む
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult LoadAddon();
 
         /// <summary>
         /// アドオンをインストールする
@@ -44,6 +49,11 @@ namespace Niconicome.Models.Local.Addon
         ReactiveProperty<bool> IsLoaded { get; }
 
         /// <summary>
+        /// 選択済みフラグ
+        /// </summary>
+        ReactiveProperty<bool> IsSelected { get; }
+
+        /// <summary>
         /// 読み込んだアドオン情報
         /// </summary>
         ReactiveProperty<AddonInfomation> Infomation { get; }
@@ -51,40 +61,35 @@ namespace Niconicome.Models.Local.Addon
 
     public class AddonInstallManager : IAddonInstallManager
     {
-        public AddonInstallManager(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, IAddonInstaller installer)
+        public AddonInstallManager(IAddonInstaller installer)
         {
-            this.container = container;
-            this.directoryIO = directoryIO;
-            this.logger = logger;
-            this.engine = engine;
             this.installer = installer;
         }
 
         #region field
 
-        private readonly IAddonInfomationsContainer container;
-
-        private readonly IAddonEngine engine;
-
-        private readonly INicoDirectoryIO directoryIO;
-
-        private readonly ILogger logger;
-
         private readonly IAddonInstaller installer;
 
         private string? tempPath;
+
+        private string? addonPath;
 
         #endregion
 
         #region Methods
 
-
-        public IAttemptResult LoadAddon(string path)
+        public void Select(string path)
         {
             this.IsInstalling.Value = true;
+            this.addonPath = path;
+            this.IsSelected.Value = false;
+        }
+
+        public IAttemptResult LoadAddon()
+        {
 
             //解凍
-            IAttemptResult<string> extractResult = this.installer.Extract(path);
+            IAttemptResult<string> extractResult = this.installer.Extract(this.addonPath!);
             if (!extractResult.IsSucceeded || extractResult.Data is null)
             {
                 this.Cancel();
@@ -133,6 +138,8 @@ namespace Niconicome.Models.Local.Addon
 
         public ReactiveProperty<bool> IsLoaded { get; init; } = new();
 
+        public ReactiveProperty<bool> IsSelected { get; init; } = new();
+
         public ReactiveProperty<AddonInfomation> Infomation { get; init; } = new();
 
 
@@ -144,6 +151,7 @@ namespace Niconicome.Models.Local.Addon
         {
             this.IsInstalling.Value = false;
             this.IsLoaded.Value = false;
+            this.IsSelected.Value = false;
             this.tempPath = null;
         }
 
