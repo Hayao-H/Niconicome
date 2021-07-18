@@ -20,7 +20,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.dialogService = dialogService;
             this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value));
 
-            this.InstallCommand = WS::AddonPage.AddonHandler.IsInstalling
+            this.InstallCommand = WS::AddonPage.InstallManager.IsInstalling
                 .Select(value => !value)
                 .ToReactiveCommand()
                 .WithSubscribe(() =>

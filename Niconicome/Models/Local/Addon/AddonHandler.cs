@@ -30,27 +30,17 @@ namespace Niconicome.Models.Local.Addon
         /// <returns></returns>
         Task<IAttemptResult> InitializeAsync();
 
-        /// <summary>
-        /// アドオンを読み込む
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns>アドオン情報,解凍先パス</returns>
-        IAttemptResult<(AddonInfomation, string)> LoadAddon(string path);
-
-        ReactiveProperty<bool> IsInstalling { get; }
-
     }
 
     public class AddonHandler : IAddonHandler
     {
 
-        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, IAddonInstaller installer)
+        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine)
         {
             this.container = container;
             this.directoryIO = directoryIO;
             this.logger = logger;
             this.engine = engine;
-            this.installer = installer;
         }
 
         #region field
@@ -62,8 +52,6 @@ namespace Niconicome.Models.Local.Addon
         private readonly INicoDirectoryIO directoryIO;
 
         private readonly ILogger logger;
-
-        private readonly IAddonInstaller installer;
 
         private bool isInitialized;
 
@@ -106,25 +94,6 @@ namespace Niconicome.Models.Local.Addon
             return new AttemptResult() { IsSucceeded = true };
         }
 
-        public IAttemptResult<(AddonInfomation, string)> LoadAddon(string path)
-        {
-            //解凍
-            IAttemptResult<string> extractResult = this.installer.Extract(path);
-            if (!extractResult.IsSucceeded || extractResult.Data is null)
-            {
-                return new AttemptResult<(AddonInfomation, string)>() { Message = extractResult.Message, Exception = extractResult.Exception };
-            }
-
-            IAttemptResult<AddonInfomation> mResult = this.installer.LoadManifest(extractResult.Data);
-            if (!mResult.IsSucceeded || mResult.Data is null)
-            {
-                return new AttemptResult<(AddonInfomation, string)>() { Message = mResult.Message, Exception = mResult.Exception };
-            }
-
-            return new AttemptResult<(AddonInfomation, string)>() { Data = (mResult.Data, extractResult.Data), IsSucceeded = true };
-
-        }
-
 
         #endregion
 
@@ -134,11 +103,6 @@ namespace Niconicome.Models.Local.Addon
         /// アドオン
         /// </summary>
         public ObservableCollection<AddonInfomation> Addons => this.container.Addons;
-
-        /// <summary>
-        /// インストールフラグ
-        /// </summary>
-        public ReactiveProperty<bool> IsInstalling { get; init; } = new();
 
 
         #endregion

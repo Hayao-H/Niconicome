@@ -15,5 +15,7 @@ namespace Niconicome.Workspaces
         public static IAddonHandler AddonHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonHandler>();
 
         public static ILocalInfo LocalInfo { get; private set; }=DIFactory.Provider.GetRequiredService<ILocalInfo>();
+
+        public static IAddonInstallManager InstallManager { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonInstallManager>();
     }
 }

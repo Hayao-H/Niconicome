@@ -28,7 +28,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
                      });
                 });
 
-            if (WS::AddonPage.AddonHandler.IsInstalling.Value)
+            if (WS::AddonPage.InstallManager.IsInstalling.Value)
             {
                 this.CloseWindow();
                 return;
@@ -68,7 +68,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         public bool CanCloseDialog()
         {
-            return !WS::AddonPage.AddonHandler.IsInstalling.Value;
+            return !WS::AddonPage.InstallManager.IsInstalling.Value;
         }
 
         public void OnDialogClosed()

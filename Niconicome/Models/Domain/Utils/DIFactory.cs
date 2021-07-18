@@ -206,6 +206,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonsCore::Installer.IAddonInstaller, AddonsCore::Installer.AddonInstaller>();
             services.AddTransient<AddonsCore::Installer.IManifestLoader, AddonsCore::Installer.ManifestLoader>();
             services.AddSingleton<Addons::IAddonHandler, Addons::AddonHandler>();
+            services.AddSingleton<Addons::IAddonInstallManager, Addons::AddonInstallManager>();
             return services.BuildServiceProvider();
         }
 
