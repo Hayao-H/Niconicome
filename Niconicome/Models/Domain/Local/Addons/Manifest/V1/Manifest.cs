@@ -10,7 +10,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Manifest.V1
     public class Manifest : ManifestBase
     {
         [JsonPropertyName("manifest_version")]
-        public override string ManifestVersion { get; set; } = "1.0";
+        public string ManifestVersion { get; set; } = "1.0";
 
         [JsonPropertyName("auto_update_policy")]
         public AutoUpdatePolicy AutoUpdatePolicy { get; set; } = new();

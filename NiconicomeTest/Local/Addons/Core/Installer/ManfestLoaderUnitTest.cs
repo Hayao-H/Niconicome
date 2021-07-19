@@ -28,11 +28,21 @@ namespace NiconicomeTest.Local.Addons.Core.Installer
         }
 
         [Test]
+        public void マニフェスト作成()
+        {
+            var manifest = new Manifest();
+            JsonSerializerOptions option = JsonParser.DefaultOption;
+            option.WriteIndented = true;
+            string serialized = JsonParser.Serialize(manifest, option);
+            Console.WriteLine(serialized);
+        }
+
+        [Test]
         public void マニフェストを読み込む()
         {
             IAttemptResult<AddonInfomation> result = this.manifestLoader!.LoadManifest("");
 
-            Assert.That(result.IsSucceeded,Is.True);
+            Assert.That(result.IsSucceeded, Is.True);
             Assert.That(result.Data, Is.Not.Null);
             Assert.That(result.Data!.Name.Value, Is.EqualTo("Test"));
             Assert.That(result.Data!.Author.Value, Is.EqualTo("Test"));

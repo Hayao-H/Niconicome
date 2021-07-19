@@ -93,7 +93,7 @@ namespace Niconicome.Models.Local.Addon
         {
             this.IsInstalling.Value = true;
             this.addonPath = path;
-            this.IsSelected.Value = false;
+            this.IsSelected.Value = true;
         }
 
         public IAttemptResult LoadAddon()
@@ -145,14 +145,15 @@ namespace Niconicome.Models.Local.Addon
 
             AddonInfomation info = this.Infomation.Value;
             var sb = new StringBuilder();
-            sb.AppendLine($"名前:{info.Name.Value}");
-            sb.AppendLine($"作者:{info.Author.Value}");
-            sb.AppendLine($"説明:{info.Description.Value}");
-            sb.AppendLine($"バージョン:{info.Version.Value}");
+            sb.AppendLine($"名前：{info.Name.Value}");
+            sb.AppendLine($"作者：{info.Author.Value}");
+            sb.AppendLine($"説明：{info.Description.Value}");
+            sb.AppendLine($"バージョン：{info.Version.Value}");
+            sb.AppendLine($"識別子：{info.Identifier.Value}");
 
             if (info.Permissions.Count > 0)
             {
-                sb.AppendLine("権限" + "-".Repeat(20));
+                sb.AppendLine("権限一覧 " + "-".Repeat(60));
 
                 foreach (var permission in info.Permissions)
                 {
@@ -160,9 +161,8 @@ namespace Niconicome.Models.Local.Addon
 
                     if (data is null) continue;
 
-                    sb.AppendLine(Environment.NewLine);
-                    sb.AppendLine($"権限:{data.Name}");
-                    sb.AppendLine($"詳細:{data.Description}");
+                    sb.AppendLine($"権限名：{data.Name}");
+                    sb.AppendLine($"説明：{data.Description}");
                 }
             }
 

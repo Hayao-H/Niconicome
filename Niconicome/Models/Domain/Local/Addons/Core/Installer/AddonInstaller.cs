@@ -8,6 +8,7 @@ using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 {
@@ -151,12 +152,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// <returns></returns>
         public IAttemptResult<AddonInfomation> LoadManifest(string path)
         {
-            if (!this.fileIO.Exists(path))
+            string manifestPath = Path.Combine(path, "manifest.json");
+
+            if (!this.fileIO.Exists(manifestPath))
             {
                 return new AttemptResult<AddonInfomation>() { Message = "指定したアドオンファイルは存在しません。" };
             }
-
-            string manifestPath = Path.Combine(path, "manifest.json");
 
             //マニフェスト読み込み
             return this.manifestLoader.LoadManifest(manifestPath);
@@ -179,7 +180,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             {
                 try
                 {
-                    this.directoryIO.Create(path);
+                    this.directoryIO.Create(targetPath);
                 }
                 catch (Exception e)
                 {

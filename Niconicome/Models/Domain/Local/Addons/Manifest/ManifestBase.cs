@@ -10,8 +10,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Manifest
 {
     public abstract class ManifestBase
     {
-        public virtual string ManifestVersion { get; set; } = string.Empty;
-
         public string Name { get; set; } = string.Empty;
 
         public string Author { get; set; } = string.Empty;

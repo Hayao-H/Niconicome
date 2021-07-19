@@ -19,7 +19,7 @@
         <StackPanel>
             <Label
                 FontSize="20"
-                Content="1. アドオン情報を読み込みます。"/>
+                Content="2. アドオン情報を読み込みます。"/>
             <TextBlock Margin="10" Text="{Binding Message.Value}"/>
         </StackPanel>
     </Grid>

@@ -12,12 +12,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Niconicome.ViewModels;
+using Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install;
 
 namespace Niconicome.Views.AddonPage.Install
 {
     /// <summary>
     /// AddonLoadPage.xaml の相互作用ロジック
     /// </summary>
+    [ViewModel(typeof(AddonLoadPageViewModel))]
     public partial class AddonLoadPage : UserControl
     {
         public AddonLoadPage()

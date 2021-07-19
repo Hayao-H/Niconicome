@@ -25,7 +25,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
             this.ToNext = new[]
             {
                 this.currentPage.Select(_=>this.CanNavigate()),
-                WS::AddonPage.InstallManager.IsLoaded.Select(value=>value&&this.currentPage.Value==1)
+                WS::AddonPage.InstallManager.IsSelected.Select(value=>value&&this.currentPage.Value==1),
+                WS::AddonPage.InstallManager.IsLoaded.Select(value=>value&&this.currentPage.Value==2)
             }.CombineLatest(x => x.Any(v => v))
             .ToReactiveCommand()
                 .WithSubscribe(() =>
@@ -82,6 +83,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
             return this.currentPage.Value switch
             {
                 0 => nameof(FileOpenPage),
+                1 => nameof(AddonLoadPage),
                 _ => nameof(FileOpenPage)
             };
         }
