@@ -24,10 +24,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
             }
             else
             {
-                AddonInfomation addon = WS::AddonPage.InstallManager.Infomation.Value!;
-                builder.AppendLine($"名前:{addon.Name.Value}");
-                builder.AppendLine($"説明:{addon.Description.Value}");
-                builder.AppendLine($"作者:{addon.Author.Value}");
+                string data = WS::AddonPage.InstallManager.GetAddonInfomationString();
+                builder.AppendLine(data);
             }
 
             this.Message.Value = builder.ToString();

@@ -24,16 +24,15 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
             this.ToNext = new[]
             {
-                WS::AddonPage.InstallManager.IsLoaded.Select(value=>value&&this.currentPage==1)
+                this.currentPage.Select(_=>this.CanNavigate()),
+                WS::AddonPage.InstallManager.IsLoaded.Select(value=>value&&this.currentPage.Value==1)
             }.CombineLatest(x => x.Any(v => v))
             .ToReactiveCommand()
                 .WithSubscribe(() =>
                 {
                     string page = this.GetNextPage();
-                    this.RegionManager.Value.RequestNavigate(AddonRegionName.Name, page, result =>
-                     {
-                         result.ToString();
-                     });
+                    this.RegionManager.Value.RequestNavigate(AddonRegionName.Name, page);
+                    this.currentPage.Value++;
                 });
 
             if (WS::AddonPage.InstallManager.IsInstalling.Value)
@@ -45,7 +44,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         #region field
 
-        private int currentPage = 0;
+        private ReactiveProperty<int> currentPage = new(0);
 
         #endregion
 
@@ -70,7 +69,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         private bool CanNavigate()
         {
-            return this.currentPage switch
+            return this.currentPage.Value switch
             {
                 0 => true,
                 1 => WS::AddonPage.InstallManager.IsSelected.Value,
@@ -80,7 +79,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         private string GetNextPage()
         {
-            return this.currentPage switch
+            return this.currentPage.Value switch
             {
                 0 => nameof(FileOpenPage),
                 _ => nameof(FileOpenPage)
@@ -111,6 +110,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
         {
             string page = this.GetNextPage();
             this.RegionManager.Value.RequestNavigate(AddonRegionName.Name, page);
+            this.currentPage.Value++;
         }
 
         #endregion

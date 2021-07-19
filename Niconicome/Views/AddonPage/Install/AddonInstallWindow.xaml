@@ -33,6 +33,7 @@
         <Button 
                 ToolTip="次のステップへ"
                 HorizontalAlignment="Right" 
+                Command="{Binding ToNext}"
                 Grid.Row="2">
             <materialDesign:PackIcon Kind="ArrowRightCircle"/>
         </Button>

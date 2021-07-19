@@ -10,6 +10,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
     public interface IPermissionsHandler
     {
         bool IsKnownPermission(string name);
+
+        /// <summary>
+        /// 権限情報を取得する
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Permission? GetPermission(string name);
     }
 
     public class PermissionsHandler : IPermissionsHandler
@@ -17,6 +24,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         #region
 
         private List<string>? permissions;
+
+        private List<Permission>? permissionDetails;
 
         #endregion
 
@@ -27,12 +36,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         /// <returns></returns>
         public bool IsKnownPermission(string name)
         {
-            if (this.permissions is null)
-            {
-                this.permissions = typeof(PermissionNames).GetProperties().Where(p => p.MemberType == MemberTypes.Property).Select(m => (string)(m.GetValue(null) ?? string.Empty)).ToList();
-            }
+            this.SetPermissionsIfNull();
 
-            if (this.permissions.Contains(name))
+            if (this.permissions!.Contains(name))
             {
                 return true;
             }
@@ -41,5 +47,33 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
                 return false;
             }
         }
+
+        public Permission? GetPermission(string name)
+        {
+            this.SetPermissionsIfNull();
+
+            if (!this.IsKnownPermission(name)) return null;
+
+            return this.permissionDetails!.First(p => p.Name == name);
+
+        }
+
+        #region private
+
+        private void SetPermissionsIfNull()
+        {
+            if (this.permissions == null)
+            {
+                this.permissions = typeof(PermissionNames).GetProperties().Where(p => p.MemberType == MemberTypes.Property).Select(m => (string)(m.GetValue(null) ?? string.Empty)).ToList();
+            }
+
+            if (this.permissionDetails == null)
+            {
+                this.permissionDetails = typeof(Permissions).GetProperties().Where(p=>p.MemberType == MemberTypes.Property).Select(m => (Permission?)(m.GetValue(null))??new Permission(string.Empty,string.Empty)).Where(p=>!string.IsNullOrEmpty(p.Name)).ToList();
+            }
+        }
+
+        #endregion
+
     }
 }

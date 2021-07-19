@@ -4,10 +4,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Domain.Local.Addons.Core.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.Installer;
+using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -39,6 +41,12 @@ namespace Niconicome.Models.Local.Addon
         IAttemptResult InstallAddon();
 
         /// <summary>
+        /// アドオンの説明文字列を取得
+        /// </summary>
+        /// <returns></returns>
+        string GetAddonInfomationString();
+
+        /// <summary>
         /// インストールフラグ
         /// </summary>
         ReactiveProperty<bool> IsInstalling { get; }
@@ -61,14 +69,17 @@ namespace Niconicome.Models.Local.Addon
 
     public class AddonInstallManager : IAddonInstallManager
     {
-        public AddonInstallManager(IAddonInstaller installer)
+        public AddonInstallManager(IAddonInstaller installer,IPermissionsHandler permissionsHandler )
         {
             this.installer = installer;
+            this.permissionsHandler = permissionsHandler;
         }
 
         #region field
 
         private readonly IAddonInstaller installer;
+
+        private readonly IPermissionsHandler permissionsHandler;
 
         private string? tempPath;
 
@@ -128,6 +139,35 @@ namespace Niconicome.Models.Local.Addon
 
         }
 
+        public string GetAddonInfomationString()
+        {
+            if (this.Infomation.Value is null) return string.Empty;
+
+            AddonInfomation info = this.Infomation.Value;
+            var sb = new StringBuilder();
+            sb.AppendLine($"名前:{info.Name.Value}");
+            sb.AppendLine($"作者:{info.Author.Value}");
+            sb.AppendLine($"説明:{info.Description.Value}");
+            sb.AppendLine($"バージョン:{info.Version.Value}");
+
+            if (info.Permissions.Count > 0)
+            {
+                sb.AppendLine("権限" + "-".Repeat(20));
+
+                foreach (var permission in info.Permissions)
+                {
+                    Permission? data = this.permissionsHandler.GetPermission(permission);
+
+                    if (data is null) continue;
+
+                    sb.AppendLine(Environment.NewLine);
+                    sb.AppendLine($"権限:{data.Name}");
+                    sb.AppendLine($"詳細:{data.Description}");
+                }
+            }
+
+            return sb.ToString();
+        }
 
 
         #endregion
