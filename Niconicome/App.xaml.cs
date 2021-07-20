@@ -42,6 +42,7 @@ namespace Niconicome
             containerRegistry.RegisterDialog<AddonInstallWindow>(nameof(AddonInstallWindow));
             containerRegistry.RegisterForNavigation<FileOpenPage>();
             containerRegistry.RegisterForNavigation<AddonLoadPage>();
+            containerRegistry.RegisterForNavigation<AddonInstallPage>();
         }
 
         /// <summary>

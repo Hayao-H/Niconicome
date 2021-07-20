@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <None Remove="src\app.ico" />
+    <None Remove="Views\AddonPage\Install\AddonInstallPage.xaml" />
     <None Remove="Views\AddonPage\Install\AddonLoadPage.xaml" />
     <None Remove="Views\AddonPage\Install\FileOpenPage.xaml" />
     <Page Remove="App.xaml" />

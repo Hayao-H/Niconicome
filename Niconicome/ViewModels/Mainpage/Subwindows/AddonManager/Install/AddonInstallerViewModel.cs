@@ -74,6 +74,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
             {
                 0 => true,
                 1 => WS::AddonPage.InstallManager.IsSelected.Value,
+                2 => WS::AddonPage.InstallManager.IsLoaded.Value,
                 _ => false
             };
         }
@@ -84,6 +85,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
             {
                 0 => nameof(FileOpenPage),
                 1 => nameof(AddonLoadPage),
+                2 => nameof(AddonInstallPage),
                 _ => nameof(FileOpenPage)
             };
         }

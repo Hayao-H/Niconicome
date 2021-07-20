@@ -72,9 +72,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// <returns></returns>
         public IAttemptResult<AddonInfomation> Install(string tempPath, bool isUpdate = false)
         {
-            if (!this.fileIO.Exists(tempPath))
+            if (!this.directoryIO.Exists(tempPath))
             {
-                return new AttemptResult<AddonInfomation>() { Message = "指定したア一時フォルダーは存在しません。" };
+                return new AttemptResult<AddonInfomation>() { Message = "指定した一時フォルダーは存在しません。" };
             }
 
             string packageID = Path.GetFileName(tempPath);

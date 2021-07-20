@@ -26,7 +26,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
 
         public ReactiveProperty<string> PackageID { get; init; }
 
-        public ReactiveProperty<Version> TargetAPIVersion { get; init; } = new();
+        public ReactiveProperty<Version> TargetAPIVersion { get; init; } = new(new Version());
 
         public List<string> Permissions { get; init; } = new();
 

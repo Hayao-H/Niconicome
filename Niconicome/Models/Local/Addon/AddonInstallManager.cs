@@ -135,6 +135,7 @@ namespace Niconicome.Models.Local.Addon
                 return new AttemptResult() { Message = result.Message, Exception = result.Exception };
             }
 
+            this.IsInstalling.Value = false;
             return new AttemptResult() { IsSucceeded = true };
 
         }
