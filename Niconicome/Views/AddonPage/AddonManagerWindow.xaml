@@ -48,12 +48,13 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn DisplayMemberBinding="{Binding Name.Value}"/>
+                        <GridViewColumn DisplayMemberBinding="{Binding Version.Value}"/>
                         <GridViewColumn DisplayMemberBinding="{Binding Description.Value}"/>
                     </GridView>
                 </ListView.View>
                 <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
-                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="Margin" Value="0 5"/>
                     </Style>
                 </ListView.ItemContainerStyle>

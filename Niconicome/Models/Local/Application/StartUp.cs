@@ -10,6 +10,7 @@ using Store = Niconicome.Models.Domain.Local.Store;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using NicoIO = Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.Addon;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -23,7 +24,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer,NicoIO::INicoDirectoryIO nicoDirectoryIO)
+        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer,NicoIO::INicoDirectoryIO nicoDirectoryIO,IAddonHandler addonHandler)
         {
 
             this.videoStoreHandler = videoStoreHandler;
@@ -36,6 +37,7 @@ namespace Niconicome.Models.Local.Application
             this.settingHandler = settingHandler;
             this.streamResumer = streamResumer;
             this.nicoDirectoryIO = nicoDirectoryIO;
+            this.addonHandler = addonHandler;
             this.DeleteInvalidbackup();
         }
 
@@ -59,6 +61,8 @@ namespace Niconicome.Models.Local.Application
 
         private readonly NicoIO::INicoDirectoryIO nicoDirectoryIO;
 
+        private readonly IAddonHandler addonHandler;
+
         /// <summary>
         /// 自動ログイン成功時
         /// </summary>
@@ -74,6 +78,7 @@ namespace Niconicome.Models.Local.Application
                 this.RemoveTmpFolder();
                 this.JustifyData();
                 this.DeleteInvalidFilePath();
+                await this.LoadAddonAsync();
                 await this.Autologin();
             });
         }
@@ -171,6 +176,14 @@ namespace Niconicome.Models.Local.Application
         private void RaiseLoginSucceeded()
         {
             this.AutoLoginSucceeded?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// アドオンを読み込む
+        /// </summary>
+        private async Task LoadAddonAsync()
+        {
+            await this.addonHandler.InitializeAsync();
         }
     }
 }

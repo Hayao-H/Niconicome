@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,7 +74,7 @@ namespace Niconicome.Models.Local.Addon
             List<string> packages;
             try
             {
-                packages = this.directoryIO.GetFiles(FileFolder.AddonsFolder);
+                packages = this.directoryIO.GetDirectorys(FileFolder.AddonsFolder);
             }
             catch (Exception e)
             {
@@ -83,7 +84,7 @@ namespace Niconicome.Models.Local.Addon
 
             foreach (var package in packages)
             {
-                IAttemptResult result = await this.engine.InitializeAsync(package);
+                IAttemptResult result = await this.engine.InitializeAsync(Path.GetFileName(package));
                 if (!result.IsSucceeded)
                 {
                     return result;

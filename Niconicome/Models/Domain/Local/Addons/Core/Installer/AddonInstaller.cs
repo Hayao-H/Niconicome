@@ -113,7 +113,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             }
 
             //移動
-            IAttemptResult mvResult = this.MoveAddon(targetPath, FileFolder.AddonsFolder);
+            IAttemptResult mvResult = this.MoveAddon(targetPath, Path.Combine(FileFolder.AddonsFolder, packageID));
             if (!mvResult.IsSucceeded)
             {
                 return new AttemptResult<AddonInfomation>() { Message = mvResult.Message, Exception = mvResult.Exception };

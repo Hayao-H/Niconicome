@@ -188,7 +188,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             addon.Author = infomation.Author.Value;
             addon.Description = infomation.Description.Value;
             addon.Version = infomation.Version.Value.ToString();
-            addon.Version = infomation.Identifier.Value;
+            addon.Identifier = infomation.Identifier.Value;
             addon.Permissions = infomation.Permissions;
             addon.PackageID = infomation.PackageID.Value;
             addon.TargetAPIVersion = infomation.TargetAPIVersion.Value.ToString();
