@@ -20,7 +20,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
 
         public ReactiveProperty<string> Description { get; init; } = new(string.Empty);
 
-        public ReactiveProperty<Version> Version { get; init; } = new();
+        public ReactiveProperty<Version> Version { get; init; } = new(new Version());
 
         public ReactiveProperty<string> Identifier { get; init; } = new();
 

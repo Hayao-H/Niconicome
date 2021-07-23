@@ -74,6 +74,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
             IAttemptResult checkResult = this.CheckSafety(dbData, mResult.Data);
             if (!checkResult.IsSucceeded)
             {
+                this.container.Remove(dbData.ID.Value);
                 return checkResult;
             }
 

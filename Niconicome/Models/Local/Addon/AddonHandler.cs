@@ -26,6 +26,11 @@ namespace Niconicome.Models.Local.Addon
         ObservableCollection<AddonInfomation> Addons { get; }
 
         /// <summary>
+        /// 読み込みに失敗したアドオン
+        /// </summary>
+        ObservableCollection<IAttemptResult<string>> LoadFailedAddons { get; }
+
+        /// <summary>
         /// 初期化する
         /// </summary>
         /// <returns></returns>
@@ -82,12 +87,14 @@ namespace Niconicome.Models.Local.Addon
                 return new AttemptResult() { Message = "アドオンパッケージ一覧の取得に失敗しました。", Exception = e };
             }
 
-            foreach (var package in packages)
+            foreach (var packagePath in packages)
             {
-                IAttemptResult result = await this.engine.InitializeAsync(Path.GetFileName(package));
+                string package = Path.GetFileName(packagePath);
+                IAttemptResult result = await this.engine.InitializeAsync(package);
                 if (!result.IsSucceeded)
                 {
-                    return result;
+                    var failedResult = new AttemptResult<string>() { Message = result.Message, Data = package};
+                    this.LoadFailedAddons.Add(failedResult);
                 }
             }
 
@@ -105,7 +112,9 @@ namespace Niconicome.Models.Local.Addon
         /// </summary>
         public ObservableCollection<AddonInfomation> Addons => this.container.Addons;
 
+        public ObservableCollection<IAttemptResult<string>> LoadFailedAddons { get; init; } = new();
 
         #endregion
+
     }
 }

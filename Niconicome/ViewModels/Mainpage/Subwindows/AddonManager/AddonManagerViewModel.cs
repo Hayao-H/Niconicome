@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows;
 using Niconicome.Models.Domain.Local.Addons.Core;
+using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Views.AddonPage.Install;
 using Prism.Services.Dialogs;
 using Reactive.Bindings;
@@ -19,6 +20,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.RequestClose += _ => { };
             this.dialogService = dialogService;
             this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value));
+            this.FailedAddons = WS::AddonPage.AddonHandler.LoadFailedAddons.ToReadOnlyReactiveCollection(value => new FailedAddonViewModel(value));
 
             this.InstallCommand = WS::AddonPage.InstallManager.IsInstalling
                 .Select(value => !value)
@@ -38,6 +40,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         #region Props
 
         public ReadOnlyReactiveCollection<AddonInfomationViewModel> Addons { get; init; }
+
+        public ReadOnlyReactiveCollection<FailedAddonViewModel> FailedAddons { get; init; }
 
         #endregion
 
@@ -85,9 +89,14 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             addon2.Name.Value = "テスト2";
             addon2.Description.Value = "View用のアドオンです。(ry";
             this.Addons = new ObservableCollection<AddonInfomationViewModel>() { new AddonInfomationViewModel(addon1), new AddonInfomationViewModel(addon2) };
+
+            var result = new AttemptResult<string>() { Data = Guid.NewGuid().ToString("D"), Message = "てすと" };
+            this.FailedAddons = new ObservableCollection<FailedAddonViewModel>() { new FailedAddonViewModel(result) };
         }
 
         public ObservableCollection<AddonInfomationViewModel> Addons { get; init; }
+
+        public ObservableCollection<FailedAddonViewModel> FailedAddons { get; init; }
 
         public ReactiveCommand InstallCommand { get; init; } = new();
 

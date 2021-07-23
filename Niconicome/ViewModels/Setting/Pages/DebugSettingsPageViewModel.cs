@@ -1,16 +1,29 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using Niconicome.Models.Local.Settings;
+using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
-    class DebugSettingsPageViewModel:SettingaBase
+    class DebugSettingsPageViewModel : SettingaBase
     {
 
         public DebugSettingsPageViewModel()
         {
-            this.isDebugModeField = WS::SettingPage.State.IsDebugMode;
+            this.IsDebugMode = new ReactiveProperty<bool>();
+            this.IsDebugMode.Subscribe(value =>
+            {
+                WS::SettingPage.State.IsDebugMode = value;
+                string message = value ? "有効" : "無効";
+                WS::SettingPage.SnackbarMessageQueue.Enqueue($"デバッグモード: {message}");
+            });
+
+            this.IsDevMode = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.IsDevMode);
+
             this.LogFilePath = WS::SettingPage.LocalInfo.LogFileName;
-            this.CopyLogFIlePathCommand = new CommandBase<object>(_ => true, _ =>
+            this.CopyLogFIlePathCommand = new ReactiveCommand()
+                .WithSubscribe(() =>
             {
                 try
                 {
@@ -22,27 +35,34 @@ namespace Niconicome.ViewModels.Setting.Pages
         }
 
 
-        private bool isDebugModeField;
+        public ReactiveCommand CopyLogFIlePathCommand { get; init; }
 
-        public CommandBase<object> CopyLogFIlePathCommand { get; init; }
+        #region Props
 
         /// <summary>
         /// デバッグフラグ
         /// </summary>
-        public bool IsDebugMode
-        {
-            get => this.isDebugModeField;
-            set  {
-                WS::SettingPage.State.IsDebugMode = value;
-                string message = value ? "有効" : "無効";
-                WS::SettingPage.SnackbarMessageQueue.Enqueue($"デバッグモード: {message}");
-                this.SetProperty(ref this.isDebugModeField, value);
-            }
-        }
+        public ReactiveProperty<bool> IsDebugMode { get; init; }
+
+        /// <summary>
+        /// 開発者モード
+        /// </summary>
+        public ReactiveProperty<bool> IsDevMode { get; init; }
 
         /// <summary>
         /// ログファイルパス
         /// </summary>
         public string LogFilePath { get; init; }
+
+        #endregion
+    }
+
+    public class DebugSettingsPageViewModelD
+    {
+        public ReactiveProperty<bool> IsDebugMode { get; init; } = new(true);
+
+        public string LogFilePath { get; init; } = @"path\to\log";
+
+        public ReactiveProperty<bool> IsDevMode { get; init; } = new(true);
     }
 }

@@ -181,5 +181,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string DisableScrollRestore { get; private set; } = "disablescrollrestore";
         public static string ThumbnailSuffix { get; private set; } = "thumbnailsuffix";
         public static string OwnerCommentSuffix { get; private set; } = "ownercommentsuffix";
+        public static string IsDeveloppersMode { get; private set; } = "isdeveloppersmode";
     }
 }

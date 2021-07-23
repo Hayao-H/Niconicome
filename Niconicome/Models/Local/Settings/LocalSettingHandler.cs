@@ -192,6 +192,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.DisableScrollRestore => STypes::SettingNames.DisableScrollRestore,
                 SettingsEnum.OwnerComSuffix => STypes::SettingNames.OwnerCommentSuffix,
                 SettingsEnum.ThumbSuffix => STypes::SettingNames.ThumbnailSuffix,
+                SettingsEnum.IsDevMode => STypes::SettingNames.IsDeveloppersMode,
                 _ => null
             };
         }
@@ -274,5 +275,6 @@ namespace Niconicome.Models.Local.Settings
         DisableScrollRestore,
         OwnerComSuffix,
         ThumbSuffix,
+        IsDevMode,
     }
 }
