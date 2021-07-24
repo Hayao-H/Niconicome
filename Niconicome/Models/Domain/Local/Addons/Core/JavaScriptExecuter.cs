@@ -14,6 +14,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         void Execute(string code);
         dynamic Evaluate(string code);
         T EvaluateAs<T>(string code);
+        dynamic Script { get; }
     }
 
     public class JavaScriptExecuter : IJavaScriptExecuter
@@ -31,6 +32,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         #region field
 
         private readonly V8ScriptEngine engine;
+
+        #endregion
+
+        #region Props
+
+        public dynamic Script { get => this.engine.Script; }
 
         #endregion
 

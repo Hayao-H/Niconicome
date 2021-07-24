@@ -47,6 +47,7 @@ using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
 using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
 using Addons = Niconicome.Models.Local.Addon;
+using AddonAPI = Niconicome.Models.Local.Addon.API;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -207,6 +208,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonsCore::Installer.IManifestLoader, AddonsCore::Installer.ManifestLoader>();
             services.AddSingleton<Addons::IAddonHandler, Addons::AddonHandler>();
             services.AddSingleton<Addons::IAddonInstallManager, Addons::AddonInstallManager>();
+            services.AddTransient<AddonAPI::IOutput, AddonAPI::Output>();
+            services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
             return services.BuildServiceProvider();
         }
 

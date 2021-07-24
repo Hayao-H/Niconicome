@@ -1423,7 +1423,6 @@ namespace Niconicome.ViewModels.Mainpage
         {
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Children.Count == 0)
             {
-                WS::Mainpage.Messagehandler.ClearMessage();
                 string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
                 WS::Mainpage.SnaclbarHandler.Enqueue($"プレイリスト:{name}");

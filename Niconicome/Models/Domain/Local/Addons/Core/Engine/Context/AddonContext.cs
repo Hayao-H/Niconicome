@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ClearScript;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -86,11 +88,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
             }
 
             this.AddonInfomation = infomation;
+            string codePath = Path.Combine(FileFolder.AddonsFolder, infomation.PackageID.Value, infomation.Scripts.BackgroundScript);
             string code;
 
             try
             {
-                code = this.fileIO.OpenRead(infomation.Scripts.BackgroundScript);
+                code = this.fileIO.OpenRead(codePath);
             }
             catch (Exception e)
             {
@@ -106,7 +109,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
                 try
                 {
                     this.Executer.Evaluate(code);
-                    this.Executer.Evaluate(Const::Adddon.EntryPoint);
+                    this.Executer.Script.main();
                 }
                 catch (Exception e)
                 {
