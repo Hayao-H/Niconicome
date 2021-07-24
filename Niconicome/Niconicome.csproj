@@ -22,6 +22,7 @@
     <Authors>Hayao-H</Authors>
     <PackageIcon>icon.png</PackageIcon>
     <ApplicationIcon>app.ico</ApplicationIcon>
+    <MinimumPlatformVersion>7.0</MinimumPlatformVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

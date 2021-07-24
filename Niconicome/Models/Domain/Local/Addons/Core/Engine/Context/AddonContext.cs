@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ClearScript;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -17,16 +20,22 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         bool IsInitialized { get; }
         bool HasError { get; }
         Exception? Exception { get; }
-        IAttemptResult Initialize(AddonInfomation infomation, Action<AddonInfomation, IJavaScriptExecuter> factory);
+        IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory);
     }
 
     public class AddonContext : IAddonContext
     {
-        public AddonContext(INicoFileIO fileIO, IAddonLogger addonLogger, IJavaScriptExecuter executer)
+        public AddonContext(INicoFileIO fileIO, IAddonLogger addonLogger, IJavaScriptExecuter executer, ILogger logger)
         {
             this.fileIO = fileIO;
             this.addonLogger = addonLogger;
             this.Executer = executer;
+            this.logger = logger;
+        }
+
+        ~AddonContext()
+        {
+            this.Dispose();
         }
 
         /// <summary>
@@ -43,6 +52,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         private readonly INicoFileIO fileIO;
 
         private readonly IAddonLogger addonLogger;
+
+        private readonly ILogger logger;
 
         #endregion
 
@@ -65,9 +76,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         /// </summary>
         /// <param name="infomation"></param>
         /// <returns></returns>
-        public IAttemptResult Initialize(AddonInfomation infomation, Action<AddonInfomation, IJavaScriptExecuter> factory)
+        public IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory)
         {
             if (this.IsInitialized) return new AttemptResult() { Message = "既に初期化されています。" };
+
+            if (infomation.Scripts.BackgroundScript.IsNullOrEmpty())
+            {
+                return new AttemptResult() { IsSucceeded = true };
+            }
 
             this.AddonInfomation = infomation;
             string code;
@@ -83,7 +99,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
                 return new AttemptResult() { Message = "コードの読み込みに失敗しました。", Exception = e };
             }
 
-            factory(this.AddonInfomation, this.Executer);
+            factory(this.Executer);
 
             _ = Task.Run(() =>
             {
@@ -108,6 +124,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         public void Dispose()
         {
             this.Executer.Dispose();
+            GC.SuppressFinalize(this);
         }
 
 

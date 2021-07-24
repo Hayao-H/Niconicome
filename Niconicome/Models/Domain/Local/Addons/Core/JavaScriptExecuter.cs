@@ -10,6 +10,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
     public interface IJavaScriptExecuter : IDisposable
     {
         void AddHostObject(string name, object obj);
+        void AddHostType(string name, Type type);
+        void Execute(string code);
         dynamic Evaluate(string code);
         T EvaluateAs<T>(string code);
     }
@@ -19,6 +21,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         public JavaScriptExecuter()
         {
             this.engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
+        }
+
+        ~JavaScriptExecuter()
+        {
+            this.Dispose();
         }
 
         #region field
@@ -49,6 +56,16 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         }
 
         /// <summary>
+        /// 実行する
+        /// </summary>
+        /// <param name="code"></param>
+        public void Execute(string code)
+        {
+            this.engine.Execute(code);
+        }
+
+
+        /// <summary>
         /// ホストのアイテムを追加する
         /// </summary>
         /// <param name="name"></param>
@@ -59,11 +76,23 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         }
 
         /// <summary>
+        /// 型を追加する
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
+        public void AddHostType(string name, Type type)
+        {
+            this.engine.AddHostType(name, type);
+        }
+
+
+        /// <summary>
         /// エンジンを停止する
         /// </summary>
         public void Dispose()
         {
             this.engine.Dispose();
+            GC.SuppressFinalize(this);
         }
 
     }

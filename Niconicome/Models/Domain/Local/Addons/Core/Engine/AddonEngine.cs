@@ -13,20 +13,18 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 {
     public interface IAddonEngine
     {
-        Task<IAttemptResult> InitializeAsync(string packageID);
+        Task<IAttemptResult> InitializeAsync(string packageID, bool isDevMode);
     }
 
     public class AddonEngine : IAddonEngine
     {
-        public AddonEngine(IManifestLoader manifestLoader, IAddonStoreHandler storeHandler, ILogger logger, IAddonInfomationsContainer container, IAddonContexts contexts, INicoFileIO fileIO, IAddonLogger addonLogger)
+        public AddonEngine(IManifestLoader manifestLoader, IAddonStoreHandler storeHandler, ILogger logger, IAddonInfomationsContainer container, IAddonContexts contexts)
         {
             this.manifestLoader = manifestLoader;
             this.storeHandler = storeHandler;
             this.logger = logger;
             this.contexts = contexts;
             this.container = container;
-            this.fileIO = fileIO;
-            this.addonLogger = addonLogger;
         }
 
         #region field
@@ -41,10 +39,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 
         private readonly IAddonContexts contexts;
 
-        private readonly INicoFileIO fileIO;
-
-        private readonly IAddonLogger addonLogger;
-
         #endregion
 
         /// <summary>
@@ -52,7 +46,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
         /// </summary>
         /// <param name="packageID"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult> InitializeAsync(string packageID)
+        public async Task<IAttemptResult> InitializeAsync(string packageID, bool isDevMode)
         {
             if (!this.storeHandler.IsInstallled(addon => addon.PackageID == packageID))
             {
@@ -70,12 +64,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 
             AddonInfomation dbData = this.storeHandler.GetAddon(data => data.PackageID == packageID)!;
 
-            //アドオンを検証
-            IAttemptResult checkResult = this.CheckSafety(dbData, mResult.Data);
-            if (!checkResult.IsSucceeded)
+            if (!isDevMode)
             {
-                this.container.Remove(dbData.ID.Value);
-                return checkResult;
+                //アドオンを検証
+                IAttemptResult checkResult = this.CheckSafety(dbData, mResult.Data);
+                if (!checkResult.IsSucceeded)
+                {
+                    this.container.Remove(dbData.ID.Value);
+                    return checkResult;
+                }
             }
 
             AddonInfomation addon = this.container.GetAddon(dbData.ID.Value);
@@ -139,37 +136,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
             }
 
             return new AttemptResult() { IsSucceeded = true };
-        }
-
-        /// <summary>
-        /// スクリプトを読み込む
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        private IAttemptResult<string> ReadCode(string path)
-        {
-            if (!this.fileIO.Exists(path))
-            {
-                return new AttemptResult<string>() { Message = $"指定したスクリプトが存在しません。({path})" };
-            }
-
-            string content;
-            try
-            {
-                content = this.fileIO.OpenRead(path);
-            }
-            catch (Exception e)
-            {
-                this.logger.Error($"スクリプトの読み込みに失敗しました。({path})");
-                return new AttemptResult<string>() { Message = $"スクリプトの読み込みに失敗しました。({path})", Exception = e };
-            }
-
-            return new AttemptResult<string>() { IsSucceeded = true, Data = content };
-        }
-
-        private void Initialize(IJavaScriptExecuter executer, AddonInfomation addonInfomation)
-        {
-
         }
 
         #endregion
