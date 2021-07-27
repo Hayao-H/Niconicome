@@ -226,12 +226,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
             try
             {
-                List<string> files = this.directoryIO.GetFiles(sourcePath);
-                foreach (string file in files)
-                {
-                    string target = Path.Combine(targetPath, Path.GetFileName(file));
-                    this.fileIO.Move(file, target, true);
-                }
+                this.directoryIO.MoveAllFiles(sourcePath, targetPath);
             }
             catch (Exception e)
             {
