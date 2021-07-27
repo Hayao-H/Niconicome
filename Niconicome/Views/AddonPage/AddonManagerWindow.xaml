@@ -30,11 +30,16 @@
                Grid.Row="0"/>
         <StackPanel Orientation="Vertical" Grid.Row="1">
             <DockPanel>
-                <Label Content="有効" FontSize="20" FontWeight="Bold"/>
-                <Button 
+                <Label Content="有効"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Left"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button 
                     Content="追加"
-                    Command="{Binding InstallCommand}"
-                    HorizontalAlignment="Right"/>
+                    Margin="8 0"
+                    Command="{Binding InstallCommand}"/>
+                </StackPanel>
             </DockPanel>
             <ListView ItemsSource="{Binding Addons}">
                 <ListView.View>
@@ -57,6 +62,7 @@
                                     <materialDesign:PopupBox IsEnabled="True">
                                         <StackPanel Orientation="Vertical">
                                             <Button Content="アンインストール" Command="{Binding UninstallCommand}" CommandParameter="{Binding ID.Value}"/>
+                                            <Button Content="アップデート" Command="{Binding UpdateCommand}"/>
                                         </StackPanel>
                                     </materialDesign:PopupBox>
                                 </DataTemplate>

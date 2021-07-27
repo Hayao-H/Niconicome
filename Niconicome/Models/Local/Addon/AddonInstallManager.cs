@@ -29,6 +29,11 @@ namespace Niconicome.Models.Local.Addon
         void Select(string path);
 
         /// <summary>
+        /// アップデートモードにする
+        /// </summary>
+        void MarkAsUpdate(AddonInfomation infomation);
+
+        /// <summary>
         /// アドオンを読み込む
         /// </summary>
         /// <returns></returns>
@@ -95,6 +100,8 @@ namespace Niconicome.Models.Local.Addon
 
         private string? addonPath;
 
+        private AddonInfomation? updateInfo;
+
         #endregion
 
         #region Methods
@@ -104,6 +111,11 @@ namespace Niconicome.Models.Local.Addon
             this.IsInstalling.Value = true;
             this.addonPath = path;
             this.IsSelected.Value = true;
+        }
+
+        public void MarkAsUpdate(AddonInfomation infomation)
+        {
+            this.updateInfo = infomation;
         }
 
         public IAttemptResult LoadAddon()
@@ -139,13 +151,14 @@ namespace Niconicome.Models.Local.Addon
                 return new AttemptResult() { Message = "アドオンの読み込みが完了していません。" };
             }
 
-            IAttemptResult<AddonInfomation> result = this.installer.Install(this.tempPath!);
+            IAttemptResult<AddonInfomation> result = this.installer.Install(this.tempPath!, this.updateInfo);
             if (!result.IsSucceeded)
             {
                 return new AttemptResult() { Message = result.Message, Exception = result.Exception };
             }
 
             this.IsInstalling.Value = false;
+            this.updateInfo = null;
             return new AttemptResult() { IsSucceeded = true };
 
         }
@@ -154,7 +167,6 @@ namespace Niconicome.Models.Local.Addon
         {
             return this.uninstaller.Uninstall(id);
         }
-
 
         public string GetAddonInfomationString()
         {

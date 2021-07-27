@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -127,7 +128,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// <returns></returns>
         public IAttemptResult<int> Update(AddonInfomation addon)
         {
-            if (!this.IsInstallled(a => a.Id == addon.ID.Value))
+            if (!this.IsInstallled(a => addon.Identifier.Value.IsNullOrEmpty() ? a.Id == addon.ID.Value : a.Identifier == addon.Identifier.Value))
             {
                 return new AttemptResult<int>() { Message = "アドオンがインストールされていません。" };
             }

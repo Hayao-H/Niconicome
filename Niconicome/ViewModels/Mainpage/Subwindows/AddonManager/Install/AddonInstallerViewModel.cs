@@ -48,6 +48,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         private ReactiveProperty<int> currentPage = new(0);
 
+        private bool isUpdate;
+
         #endregion
 
         #region methods
@@ -117,6 +119,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
             string page = this.GetNextPage();
             this.RegionManager.Value.RequestNavigate(AddonRegionName.Name, page);
             this.currentPage.Value++;
+
+            this.isUpdate = parameters.GetValue<bool>("isupdate");
         }
 
         #endregion

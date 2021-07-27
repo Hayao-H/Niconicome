@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Helper.Result;
 using Niconicome.ViewModels.Controls;
+using Niconicome.Views.AddonPage.Install;
+using Prism.Regions;
+using Prism.Services.Dialogs;
 using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
@@ -22,6 +25,32 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.Author = info.Author.ToReadOnlyReactiveProperty();
             this.Description = info.Description.ToReadOnlyReactiveProperty();
             this.ID = info.ID.ToReadOnlyReactiveProperty();
+            this.UpdateCommand = new ReactiveCommand();
+
+            this.UninstallCommand = new AsyncReactiveCommand<int>();
+        }
+
+        public AddonInfomationViewModel(AddonInfomation info, IDialogService dialogService)
+        {
+
+            this.AddonInfomation = info;
+            this.Name = info.Name.ToReadOnlyReactiveProperty();
+            this.Version = info.Version.Select(v => v.ToString()).ToReadOnlyReactiveProperty();
+            this.Author = info.Author.ToReadOnlyReactiveProperty();
+            this.Description = info.Description.ToReadOnlyReactiveProperty();
+            this.ID = info.ID.ToReadOnlyReactiveProperty();
+
+            this.UpdateCommand = new ReactiveCommand()
+                .WithSubscribe(() =>
+                {
+                    if (WS::AddonPage.InstallManager.IsInstalling.Value)
+                    {
+                        WS::AddonPage.Queue.Enqueue("ほかのアドオンをインストール中です。");
+                        return;
+                    }
+                    WS::AddonPage.InstallManager.MarkAsUpdate(this.AddonInfomation);
+                    dialogService.Show(nameof(AddonInstallWindow));
+                });
 
             this.UninstallCommand = new AsyncReactiveCommand<int>()
                 .WithSubscribe(async id =>
@@ -42,6 +71,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
                 });
         }
 
+        #region Props
         public AddonInfomation AddonInfomation { get; init; }
 
         public ReadOnlyReactiveProperty<string?> Name { get; init; }
@@ -54,7 +84,15 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 
         public ReadOnlyReactiveProperty<int> ID { get; init; }
 
+        #endregion
+
+        #region Commands
         public AsyncReactiveCommand<int> UninstallCommand { get; init; }
+
+        public ReactiveCommand UpdateCommand { get; init; }
+
+
+        #endregion
 
     }
 }

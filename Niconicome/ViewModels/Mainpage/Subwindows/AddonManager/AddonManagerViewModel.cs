@@ -22,7 +22,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         {
             this.RequestClose += _ => { };
             this.dialogService = dialogService;
-            this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value));
+            this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value, dialogService));
             this.FailedAddons = WS::AddonPage.AddonHandler.LoadFailedAddons.ToReadOnlyReactiveCollection(value => new FailedAddonViewModel(value));
             this.Queue = WS::AddonPage.Queue;
 
@@ -54,6 +54,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         #region Command
 
         public ReactiveCommand InstallCommand { get; init; }
+
 
         #endregion
 

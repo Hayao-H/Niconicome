@@ -18,9 +18,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// アドオンをインストールする
         /// </summary>
         /// <param name="tmpPath">一時フォルダーのパス</param>
-        /// <param name="isUpdate">アップデートフラグ</param>
+        /// <param name="updateInfomation">アップデートの場合、引数でデータを与える</param>
         /// <returns></returns>
-        IAttemptResult<AddonInfomation> Install(string tmpPath, bool isUpdate = false);
+        IAttemptResult<AddonInfomation> Install(string tmpPath, AddonInfomation? updateInfomation = null);
 
         /// <summary>
         /// アドオンを一時フォルダーに解凍する
@@ -70,15 +70,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// </summary>
         /// <param name="tempPath"></param>
         /// <returns></returns>
-        public IAttemptResult<AddonInfomation> Install(string tempPath, bool isUpdate = false)
+        public IAttemptResult<AddonInfomation> Install(string tempPath, AddonInfomation? updateInfomation = null)
         {
             if (!this.directoryIO.Exists(tempPath))
             {
                 return new AttemptResult<AddonInfomation>() { Message = "指定した一時フォルダーは存在しません。" };
             }
 
-            string packageID = Path.GetFileName(tempPath);
-            string targetPath = Path.Combine("tmp", packageID);
+            string packageID = updateInfomation?.PackageID.Value ?? Path.GetFileName(tempPath);
 
             //マニフェスト読み込み
             IAttemptResult<AddonInfomation> mResult = this.LoadManifest(tempPath);
@@ -91,8 +90,10 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             IAttemptResult<int> sResult;
             mResult.Data.PackageID.Value = packageID;
             AddonInfomation addon;
-            if (isUpdate)
+            if (updateInfomation is not null)
             {
+                mResult.Data.ID.Value = updateInfomation.ID.Value;
+                mResult.Data.Identifier.Value = updateInfomation.Identifier.Value;
                 sResult = this.storeHandler.Update(mResult.Data);
             }
             else
@@ -113,7 +114,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             }
 
             //移動
-            IAttemptResult mvResult = this.MoveAddon(targetPath, Path.Combine(FileFolder.AddonsFolder, packageID));
+            IAttemptResult mvResult = this.MoveAddon(tempPath, Path.Combine(FileFolder.AddonsFolder, packageID));
             if (!mvResult.IsSucceeded)
             {
                 return new AttemptResult<AddonInfomation>() { Message = mvResult.Message, Exception = mvResult.Exception };
