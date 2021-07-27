@@ -41,6 +41,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
         {
         }
 
+        public void MoveAllFiles(string source,string target)
+        {
+
+        }
+
 
         public List<string> GetFiles(string path, string pattern = "*", bool recurse = false)
         {

@@ -41,6 +41,13 @@ namespace Niconicome.Models.Local.Addon
         IAttemptResult InstallAddon();
 
         /// <summary>
+        /// アドオンを削除する
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IAttemptResult UnistallAddon(int id);
+
+        /// <summary>
         /// アドオンの説明文字列を取得
         /// </summary>
         /// <returns></returns>
@@ -69,10 +76,11 @@ namespace Niconicome.Models.Local.Addon
 
     public class AddonInstallManager : IAddonInstallManager
     {
-        public AddonInstallManager(IAddonInstaller installer,IPermissionsHandler permissionsHandler )
+        public AddonInstallManager(IAddonInstaller installer, IPermissionsHandler permissionsHandler, IAddonUninstaller uninstaller)
         {
             this.installer = installer;
             this.permissionsHandler = permissionsHandler;
+            this.uninstaller = uninstaller;
         }
 
         #region field
@@ -80,6 +88,8 @@ namespace Niconicome.Models.Local.Addon
         private readonly IAddonInstaller installer;
 
         private readonly IPermissionsHandler permissionsHandler;
+
+        private readonly IAddonUninstaller uninstaller;
 
         private string? tempPath;
 
@@ -139,6 +149,12 @@ namespace Niconicome.Models.Local.Addon
             return new AttemptResult() { IsSucceeded = true };
 
         }
+
+        public IAttemptResult UnistallAddon(int id)
+        {
+            return this.uninstaller.Uninstall(id);
+        }
+
 
         public string GetAddonInfomationString()
         {

@@ -3,8 +3,11 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reactive.Linq;
 using System.Windows;
+using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Domain.Local.Addons.Core;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.ViewModels.Controls;
 using Niconicome.Views.AddonPage.Install;
 using Prism.Services.Dialogs;
 using Reactive.Bindings;
@@ -21,6 +24,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.dialogService = dialogService;
             this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value));
             this.FailedAddons = WS::AddonPage.AddonHandler.LoadFailedAddons.ToReadOnlyReactiveCollection(value => new FailedAddonViewModel(value));
+            this.Queue = WS::AddonPage.Queue;
 
             this.InstallCommand = WS::AddonPage.InstallManager.IsInstalling
                 .Select(value => !value)
@@ -42,6 +46,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         public ReadOnlyReactiveCollection<AddonInfomationViewModel> Addons { get; init; }
 
         public ReadOnlyReactiveCollection<FailedAddonViewModel> FailedAddons { get; init; }
+
+        public SnackbarMessageQueue Queue { get; init; }
 
         #endregion
 
@@ -99,6 +105,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         public ObservableCollection<FailedAddonViewModel> FailedAddons { get; init; }
 
         public ReactiveCommand InstallCommand { get; init; } = new();
+
+        public ReactiveCommand<int> UninstallCommand { get; init; } = new();
+
+        public SnackbarMessageQueue Queue { get; init; } = new();
 
     }
 }

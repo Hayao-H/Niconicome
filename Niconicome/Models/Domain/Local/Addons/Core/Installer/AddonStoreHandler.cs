@@ -18,6 +18,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         bool IsInstallled(Expression<Func<Addon, bool>> predicate);
         IAttemptResult<int> StoreAddon(AddonInfomation addon);
         IAttemptResult<int> Update(AddonInfomation addon);
+
+        /// <summary>
+        /// 指定した条件でアドオンを削除する
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        IAttemptResult Delete(Expression<Func<Addon, bool>> predicate);
     }
 
     public class AddonStoreHandler : IAddonStoreHandler
@@ -145,6 +152,27 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
             return new AttemptResult<int>() { IsSucceeded = true, Data = addon.ID.Value };
         }
+
+        public IAttemptResult Delete(Expression<Func<Addon, bool>> predicate)
+        {
+            IAttemptResult<bool> result = this.dataBase.DeleteAll(Addon.TableName, predicate);
+
+            if (!result.IsSucceeded)
+            {
+                if (result.Exception is not null)
+                {
+                    this.logger.Error($"アドオンの削除に失敗しました(詳細:{result.Message})", result.Exception);
+                }
+                else
+                {
+                    this.logger.Error($"アドオンの削除に失敗しました(詳細:{result.Message})");
+                }
+            }
+
+            return new AttemptResult() { IsSucceeded = result.Data, Message = result.Message };
+
+        }
+
 
         /// <summary>
         /// IDからインストールされているかどうかをチェックする

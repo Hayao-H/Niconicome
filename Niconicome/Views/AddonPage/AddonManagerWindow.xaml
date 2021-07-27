@@ -23,6 +23,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Label Content="アドオンの管理"
                FontSize="30"
@@ -50,6 +51,17 @@
                         <GridViewColumn DisplayMemberBinding="{Binding Name.Value}"/>
                         <GridViewColumn DisplayMemberBinding="{Binding Version.Value}"/>
                         <GridViewColumn DisplayMemberBinding="{Binding Description.Value}"/>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <materialDesign:PopupBox IsEnabled="True">
+                                        <StackPanel Orientation="Vertical">
+                                            <Button Content="アンインストール" Command="{Binding UninstallCommand}" CommandParameter="{Binding ID.Value}"/>
+                                        </StackPanel>
+                                    </materialDesign:PopupBox>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                     </GridView>
                 </ListView.View>
                 <ListView.ItemContainerStyle>
@@ -86,5 +98,8 @@
                 </ListView.ItemContainerStyle>
             </ListView>
         </StackPanel>
+        <materialDesign:Snackbar 
+            Grid.Row="2"
+            MessageQueue="{Binding Queue}"/>
     </Grid>
 </UserControl>

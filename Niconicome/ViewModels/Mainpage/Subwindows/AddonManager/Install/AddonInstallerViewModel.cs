@@ -31,6 +31,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
             .ToReactiveCommand()
                 .WithSubscribe(() =>
                 {
+                    if (!this.CanNavigate()) return;
                     string page = this.GetNextPage();
                     this.RegionManager.Value.RequestNavigate(AddonRegionName.Name, page);
                     this.currentPage.Value++;
@@ -75,6 +76,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
                 0 => true,
                 1 => WS::AddonPage.InstallManager.IsSelected.Value,
                 2 => WS::AddonPage.InstallManager.IsLoaded.Value,
+                3 => false,
                 _ => false
             };
         }

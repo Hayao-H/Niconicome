@@ -210,6 +210,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Addons::IAddonInstallManager, Addons::AddonInstallManager>();
             services.AddTransient<AddonAPI::IOutput, AddonAPI::Output>();
             services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
+            services.AddTransient<AddonsCore::Installer.IAddonUninstaller, AddonsCore::Installer.AddonUninstaller>();
             return services.BuildServiceProvider();
         }
 

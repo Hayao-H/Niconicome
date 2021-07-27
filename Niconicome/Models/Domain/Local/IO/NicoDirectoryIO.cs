@@ -77,13 +77,19 @@ namespace Niconicome.Models.Domain.Local.IO
 
             foreach (var file in files)
             {
-                var targetPath = new FileInfo(Path.Combine(targetDir, file));
-                if (targetPath.Directory is not null && !targetPath.Directory.Exists)
+                string targetPath = Path.Combine(targetDir, file.Replace($"{sourceDir}\\", ""));
+                if (!Path.IsPathRooted(targetPath))
                 {
-                    targetPath.Directory.Create();
+                    targetPath = Path.Combine(AppContext.BaseDirectory, targetPath);
                 }
 
-                File.Move(file, targetPath.FullName, true);
+                var targetFile = new FileInfo(targetPath);
+                if (targetFile.Directory is not null && !targetFile.Directory.Exists)
+                {
+                    targetFile.Directory.Create();
+                }
+
+                File.Move(file, targetFile.FullName, true);
             }
         }
 
