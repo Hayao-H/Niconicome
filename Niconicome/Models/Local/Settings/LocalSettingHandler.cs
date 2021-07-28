@@ -193,6 +193,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.OwnerComSuffix => STypes::SettingNames.OwnerCommentSuffix,
                 SettingsEnum.ThumbSuffix => STypes::SettingNames.ThumbnailSuffix,
                 SettingsEnum.IsDevMode => STypes::SettingNames.IsDeveloppersMode,
+                SettingsEnum.IsAddonDebugEnable => STypes::SettingNames.IsAddonDebuggingEnable,
                 _ => null
             };
         }
@@ -276,5 +277,6 @@ namespace Niconicome.Models.Local.Settings
         OwnerComSuffix,
         ThumbSuffix,
         IsDevMode,
+        IsAddonDebugEnable,
     }
 }

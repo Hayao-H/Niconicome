@@ -15,13 +15,19 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         dynamic Evaluate(string code);
         T EvaluateAs<T>(string code);
         dynamic Script { get; }
+
+        /// <summary>
+        /// 外部から設定する
+        /// </summary>
+        /// <param name="flags"></param>
+        void Configure(V8ScriptEngineFlags flags);
     }
 
     public class JavaScriptExecuter : IJavaScriptExecuter
     {
         public JavaScriptExecuter()
         {
-            this.engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
+            this.engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
         }
 
         ~JavaScriptExecuter()
@@ -31,7 +37,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
 
         #region field
 
-        private readonly V8ScriptEngine engine;
+        private V8ScriptEngine engine;
 
         #endregion
 
@@ -101,6 +107,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
             this.engine.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        public void Configure(V8ScriptEngineFlags  flags)
+        {
+            this.engine = new V8ScriptEngine(flags);
+        }
+
 
     }
 }

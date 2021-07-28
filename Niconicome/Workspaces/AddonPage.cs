@@ -7,6 +7,7 @@ using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Addon;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 
 namespace Niconicome.Workspaces
@@ -18,6 +19,8 @@ namespace Niconicome.Workspaces
         public static ILocalInfo LocalInfo { get; private set; }=DIFactory.Provider.GetRequiredService<ILocalInfo>();
 
         public static IAddonInstallManager InstallManager { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonInstallManager>();
+
+        public static ILocalSettingsContainer SettingsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingsContainer>();
 
         public static SnackbarMessageQueue Queue { get; private set; } = new();
     }

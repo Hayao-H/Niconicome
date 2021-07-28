@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ClearScript;
+using Microsoft.ClearScript.V8;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.Settings;
 using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
@@ -22,7 +26,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         bool IsInitialized { get; }
         bool HasError { get; }
         Exception? Exception { get; }
-        IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory);
+        IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory,bool isDebuggingEnable);
     }
 
     public class AddonContext : IAddonContext
@@ -77,7 +81,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         /// </summary>
         /// <param name="infomation"></param>
         /// <returns></returns>
-        public IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory)
+        public IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory, bool isDebuggingEnable)
         {
             if (this.IsInitialized) return new AttemptResult() { Message = "既に初期化されています。" };
 
@@ -101,7 +105,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
                 return new AttemptResult() { Message = "コードの読み込みに失敗しました。", Exception = e };
             }
 
+            if (isDebuggingEnable)
+            {
+                this.Executer.Configure(V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
+            }
+
             factory(this.Executer);
+
+            this.InitializeInternal();
 
             _ = Task.Run(() =>
             {
@@ -127,6 +138,20 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
             this.Executer.Dispose();
             GC.SuppressFinalize(this);
         }
+
+        #region private
+
+        private void InitializeInternal()
+        {
+            Action<ScriptObject, int> setTimeout = (function, delay) =>
+             {
+                 var timer = new Timer(_ => function.Invoke(false));
+                 timer.Change(delay, Timeout.Infinite);
+             };
+            this.Executer.AddHostObject("setTimeout", setTimeout);
+        }
+
+        #endregion
 
 
     }

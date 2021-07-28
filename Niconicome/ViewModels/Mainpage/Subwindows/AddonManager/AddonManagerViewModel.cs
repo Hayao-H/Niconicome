@@ -7,11 +7,13 @@ using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views.AddonPage.Install;
 using Prism.Services.Dialogs;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using Windows.Devices.Input;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
@@ -24,6 +26,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.dialogService = dialogService;
             this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value, dialogService));
             this.FailedAddons = WS::AddonPage.AddonHandler.LoadFailedAddons.ToReadOnlyReactiveCollection(value => new FailedAddonViewModel(value));
+            this.IsAddonDebuggingEnable = WS::AddonPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.IsAddonDebugEnable);
             this.Queue = WS::AddonPage.Queue;
 
             this.InstallCommand = WS::AddonPage.InstallManager.IsInstalling
@@ -46,6 +49,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         public ReadOnlyReactiveCollection<AddonInfomationViewModel> Addons { get; init; }
 
         public ReadOnlyReactiveCollection<FailedAddonViewModel> FailedAddons { get; init; }
+
+        public ReactiveProperty<bool> IsAddonDebuggingEnable { get; init; } 
 
         public SnackbarMessageQueue Queue { get; init; }
 
@@ -111,5 +116,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 
         public SnackbarMessageQueue Queue { get; init; } = new();
 
+        public ReactiveProperty<bool> IsAddonDebuggingEnable { get; init; }=new();
     }
 }

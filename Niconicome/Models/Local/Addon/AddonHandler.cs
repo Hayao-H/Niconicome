@@ -45,7 +45,7 @@ namespace Niconicome.Models.Local.Addon
     public class AddonHandler : IAddonHandler
     {
 
-        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler,IAddonContexts contexts)
+        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts)
         {
             this.container = container;
             this.directoryIO = directoryIO;
@@ -98,6 +98,7 @@ namespace Niconicome.Models.Local.Addon
             }
 
             bool isDevMode = this.settingHandler.GetBoolSetting(SettingsEnum.IsDevMode);
+            bool isAddonDebuggingEnable = this.settingHandler.GetBoolSetting(SettingsEnum.IsAddonDebugEnable);
 
             foreach (var packagePath in packages)
             {
@@ -110,15 +111,15 @@ namespace Niconicome.Models.Local.Addon
                 }
             }
 
-            foreach (KeyValuePair<int,IAddonContext> item in this.contexts.Contexts)
+            foreach (KeyValuePair<int, IAddonContext> item in this.contexts.Contexts)
             {
                 AddonInfomation info = this.container.GetAddon(item.Key);
-                IAttemptResult result = item.Value.Initialize(info, engine=>
+                IAttemptResult result = item.Value.Initialize(info, engine =>
                 {
                     IAPIEntryPoint entryPoint = DIFactory.Provider.GetRequiredService<IAPIEntryPoint>();
                     entryPoint.Initialize(info);
                     engine.AddHostObject("application", entryPoint);
-                });
+                }, isAddonDebuggingEnable);
 
                 if (!result.IsSucceeded)
                 {

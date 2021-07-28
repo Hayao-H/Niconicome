@@ -39,6 +39,11 @@
                     Content="追加"
                     Margin="8 0"
                     Command="{Binding InstallCommand}"/>
+                    <materialDesign:PopupBox>
+                        <StackPanel>
+                            <MenuItem IsCheckable="True" Header="デバッグモード" IsChecked="{Binding IsAddonDebuggingEnable.Value}"/>
+                        </StackPanel>
+                    </materialDesign:PopupBox>
                 </StackPanel>
             </DockPanel>
             <ListView ItemsSource="{Binding Addons}">
