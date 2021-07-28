@@ -62,7 +62,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         #region Props
         public IJavaScriptExecuter Executer { get; init; }
 
-
         public AddonInfomation? AddonInfomation { get; private set; }
 
         public bool IsInitialized { get; private set; }
@@ -109,7 +108,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
                 try
                 {
                     this.Executer.Evaluate(code);
-                    this.Executer.Script.main();
                 }
                 catch (Exception e)
                 {

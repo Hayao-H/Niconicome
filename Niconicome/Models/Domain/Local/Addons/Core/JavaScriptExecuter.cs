@@ -21,7 +21,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
     {
         public JavaScriptExecuter()
         {
-            this.engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
+            this.engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
         }
 
         ~JavaScriptExecuter()
