@@ -12,6 +12,7 @@ using Niconicome.Views.Controls.MVVM;
 using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Unity;
+using AM = Niconicome.Views.AddonPage;
 
 namespace Niconicome
 {
@@ -45,6 +46,7 @@ namespace Niconicome
             containerRegistry.RegisterForNavigation<FileOpenPage>();
             containerRegistry.RegisterForNavigation<AddonLoadPage>();
             containerRegistry.RegisterForNavigation<AddonInstallPage>();
+            containerRegistry.RegisterForNavigation<AM::Pages.MainPage>();
         }
 
         /// <summary>

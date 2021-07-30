@@ -1,31 +1,27 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Linq;
-using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Views.AddonPage.Install;
-using Niconicome.Views.AddonPage.Pages;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
-namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
+namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.AddonManagerPages
 {
-    class AddonManagerViewModel : BindableBase, IDialogAware
+    class MainPageViewModel : BindableBase
     {
-        public AddonManagerViewModel(IRegionManager regionManager, IDialogService dialogService)
+        public MainPageViewModel(IRegionManager regionManager, IDialogService dialogService)
         {
-            this.RegionManager = new ReactiveProperty<IRegionManager>(regionManager.CreateRegionManager());
-            this.RequestClose += _ => { };
             this.dialogService = dialogService;
             this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value, dialogService));
             this.FailedAddons = WS::AddonPage.AddonHandler.LoadFailedAddons.ToReadOnlyReactiveCollection(value => new FailedAddonViewModel(value));
             this.IsAddonDebuggingEnable = WS::AddonPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.IsAddonDebugEnable);
-            this.Queue = WS::AddonPage.Queue;
 
             this.InstallCommand = WS::AddonPage.InstallManager.IsInstalling
                 .Select(value => !value)
@@ -50,10 +46,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 
         public ReactiveProperty<bool> IsAddonDebuggingEnable { get; init; }
 
-        public SnackbarMessageQueue Queue { get; init; }
-
-        public ReactiveProperty<IRegionManager> RegionManager { get; init; }
-
         #endregion
 
         #region Command
@@ -62,45 +54,35 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 
 
         #endregion
-
-        #region IDialogAware
-
-        /// <summary>
-        /// タイトル
-        /// </summary>
-        public string Title { get; init; } = "アドオン管理ウィンドウ";
-
-        public event Action<IDialogResult> RequestClose;
-
-        public bool CanCloseDialog()
-        {
-            return true;
-        }
-
-        public void OnDialogClosed()
-        {
-            WS::AddonPage.LocalInfo.IsAddonManagerOpen = false;
-        }
-
-        public void OnDialogOpened(IDialogParameters parameters)
-        {
-            WS::AddonPage.LocalInfo.IsAddonManagerOpen = true;
-            this.RegionManager.Value.RegisterViewWithRegion(AddonManagerRegionName.Name, typeof(MainPage));
-        }
-
-        #endregion
     }
 
-    class AddonManagerViewModelD
+    class MainPageViewModelD
     {
 
-        public SnackbarMessageQueue Queue { get; init; } = new();
+        public MainPageViewModelD()
+        {
+            var addon1 = new AddonInfomation();
+            addon1.Name.Value = "テスト1";
+            addon1.Description.Value = "View用のアドオンです。何もできません。";
+            var addon2 = new AddonInfomation();
+            addon2.Name.Value = "テスト2";
+            addon2.Description.Value = "View用のアドオンです。(ry";
+            this.Addons = new ObservableCollection<AddonInfomationViewModel>() { new AddonInfomationViewModel(addon1), new AddonInfomationViewModel(addon2) };
 
-        public ReactiveProperty<IRegionManager> RegionManager { get; init; } = new();
-    }
+            var result = new AttemptResult<string>() { Data = Guid.NewGuid().ToString("D"), Message = "てすと" };
+            this.FailedAddons = new ObservableCollection<FailedAddonViewModel>() { new FailedAddonViewModel(result) };
+        }
 
-    static class AddonManagerRegionName
-    {
-        public static string Name => "addonPageRegion";
+        public ObservableCollection<AddonInfomationViewModel> Addons { get; init; }
+
+        public ObservableCollection<FailedAddonViewModel> FailedAddons { get; init; }
+
+        public ReactiveCommand<int> UninstallCommand { get; init; } = new();
+
+        public ReactiveProperty<bool> IsAddonDebuggingEnable { get; init; } = new();
+
+        public ReactiveCommand InstallCommand { get; init; } = new();
+
+
     }
 }

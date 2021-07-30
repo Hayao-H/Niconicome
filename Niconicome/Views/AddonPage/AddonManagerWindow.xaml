@@ -21,96 +21,12 @@
         d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="8">
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Label Content="アドオンの管理"
-               FontSize="30"
-               Grid.Row="0"/>
-        <StackPanel Orientation="Vertical" Grid.Row="1">
-            <DockPanel>
-                <Label Content="有効"
-                       FontSize="20"
-                       FontWeight="Bold"
-                       HorizontalAlignment="Left"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button 
-                    Content="追加"
-                    Margin="8 0"
-                    Command="{Binding InstallCommand}"/>
-                    <materialDesign:PopupBox>
-                        <StackPanel>
-                            <MenuItem IsCheckable="True" Header="デバッグモード" IsChecked="{Binding IsAddonDebuggingEnable.Value}"/>
-                        </StackPanel>
-                    </materialDesign:PopupBox>
-                </StackPanel>
-            </DockPanel>
-            <ListView ItemsSource="{Binding Addons}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="60">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button>
-                                        <materialDesign:PackIcon Kind="Puzzle"/>
-                                    </Button>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn DisplayMemberBinding="{Binding Name.Value}"/>
-                        <GridViewColumn DisplayMemberBinding="{Binding Version.Value}"/>
-                        <GridViewColumn DisplayMemberBinding="{Binding Description.Value}"/>
-                        <GridViewColumn>
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <materialDesign:PopupBox IsEnabled="True">
-                                        <StackPanel Orientation="Vertical">
-                                            <Button Content="アンインストール" Command="{Binding UninstallCommand}" CommandParameter="{Binding ID.Value}"/>
-                                            <Button Content="アップデート" Command="{Binding UpdateCommand}"/>
-                                        </StackPanel>
-                                    </materialDesign:PopupBox>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
-                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                        <Setter Property="Margin" Value="0 5"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView>
-            <DockPanel Margin="0 10 0 0">
-                <Label Content="読み込みに失敗" FontSize="20" FontWeight="Bold"/>
-            </DockPanel>
-            <ListView ItemsSource="{Binding FailedAddons}">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="60">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button>
-                                        <materialDesign:PackIcon Kind="Puzzle"/>
-                                    </Button>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn DisplayMemberBinding="{Binding PackageID.Value}"/>
-                        <GridViewColumn DisplayMemberBinding="{Binding Details.Value}"/>
-                    </GridView>
-                </ListView.View>
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
-                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                        <Setter Property="Margin" Value="0 5"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView>
-        </StackPanel>
+        <ContentControl prism:RegionManager.RegionName="addonPageRegion" prism:RegionManager.RegionManager="{Binding RegionManager.Value}"/>
         <materialDesign:Snackbar 
-            Grid.Row="2"
+            Grid.Row="1"
             MessageQueue="{Binding Queue}"/>
     </Grid>
 </UserControl>

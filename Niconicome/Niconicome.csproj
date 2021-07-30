@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <None Remove="src\app.ico" />
+    <None Remove="Views\AddonPage\Pages\MainPage.xaml" />
     <None Remove="Views\Controls\MVVM\CommonMessageBox.xaml" />
     <Page Remove="App.xaml" />
     <ApplicationDefinition Include="App.xaml" />
