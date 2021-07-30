@@ -59,6 +59,11 @@ namespace Niconicome.Models.Local.Addon
         string GetAddonInfomationString();
 
         /// <summary>
+        /// インストールをキャンセルする
+        /// </summary>
+        void Cancel();
+
+        /// <summary>
         /// インストールフラグ
         /// </summary>
         ReactiveProperty<bool> IsInstalling { get; }
@@ -198,6 +203,15 @@ namespace Niconicome.Models.Local.Addon
             return sb.ToString();
         }
 
+        public void Cancel()
+        {
+            this.IsInstalling.Value = false;
+            this.updateInfo = null;
+            this.IsLoaded.Value = false;
+            this.IsSelected.Value = false;
+            this.tempPath = null;
+        }
+
 
         #endregion
 
@@ -215,14 +229,6 @@ namespace Niconicome.Models.Local.Addon
         #endregion
 
         #region private
-
-        private void Cancel()
-        {
-            this.IsInstalling.Value = false;
-            this.IsLoaded.Value = false;
-            this.IsSelected.Value = false;
-            this.tempPath = null;
-        }
 
         #endregion
     }

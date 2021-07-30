@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Niconicome.ViewModels.Controls;
 using Niconicome.Views.AddonPage.Install;
 using Niconicome.Views.Mainpage.Region;
 using Prism.Regions;
@@ -17,10 +18,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 {
     class AddonInstallerViewModel : IDialogAware
     {
-        public AddonInstallerViewModel(IRegionManager regionManager)
+        public AddonInstallerViewModel(IRegionManager regionManager, IDialogService service)
         {
             this.RequestClose += _ => { };
             this.RegionManager = new ReactiveProperty<IRegionManager>(regionManager.CreateRegionManager());
+            this.service = service;
 
             this.ToNext = new[]
             {
@@ -49,6 +51,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
         private ReactiveProperty<int> currentPage = new(0);
 
         private bool isUpdate;
+
+        private readonly IDialogService service;
 
         #endregion
 
@@ -107,7 +111,22 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         public bool CanCloseDialog()
         {
-            return !WS::AddonPage.InstallManager.IsInstalling.Value;
+            if (WS::AddonPage.InstallManager.IsInstalling.Value)
+            {
+                IDialogResult result = CommonMessageBoxAPI.Show(this.service, "インストールを中止しますか？", CommonMessageBoxAPI.MessageType.Warinng, CommonMessageBoxButtons.Yes | CommonMessageBoxButtons.No | CommonMessageBoxButtons.Cancel);
+
+                if (result.Result == ButtonResult.Yes){
+                    WS::AddonPage.InstallManager.Cancel();
+                    return true;
+                } else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public void OnDialogClosed()
