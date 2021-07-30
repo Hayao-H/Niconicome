@@ -117,7 +117,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 return new AttemptResult() { Message = $"バージョンの形式が不正です。({manifest.Version})" };
             }
 
-            bool aResult = Version.TryParse(manifest.TargetAPIVersion,out Version _);
+            bool aResult = Version.TryParse(manifest.TargetAPIVersion, out Version _);
             if (!aResult)
             {
                 return new AttemptResult() { Message = $"APIバージョンの形式が不正です。({manifest.TargetAPIVersion})" };
@@ -156,6 +156,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             addon.Version.Value = Version.Parse(manifest.Version);
             addon.Identifier.Value = manifest.Identifier;
             addon.Permissions.AddRange(manifest.Permissions);
+            addon.HostPermissions.AddRange(manifest.HostPermissions);
             addon.AutoUpdatePolicy = manifest.AutoUpdatePolicy;
             addon.Scripts = manifest.Scripts;
             addon.TargetAPIVersion.Value = Version.Parse(manifest.TargetAPIVersion);

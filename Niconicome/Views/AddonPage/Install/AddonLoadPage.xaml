@@ -11,6 +11,7 @@
              xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install"
              prism:ViewModelLocator.AutoWireViewModel="True"
              Background="{DynamicResource MaterialDesignPaper}"
+             Width="1000"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <cv:BooleanInverseConverter x:Key="BoolInverse"/>
@@ -20,7 +21,10 @@
             <Label
                 FontSize="20"
                 Content="2. アドオン情報を読み込みます。"/>
-            <TextBlock Margin="10" Text="{Binding Message.Value}"/>
+            <TextBlock 
+                Margin="10" 
+                Text="{Binding Message.Value}"
+                TextWrapping="WrapWithOverflow"/>
         </StackPanel>
     </Grid>
 </UserControl>
