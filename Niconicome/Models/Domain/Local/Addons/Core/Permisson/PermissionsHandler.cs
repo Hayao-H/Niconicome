@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
@@ -10,6 +11,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
     public interface IPermissionsHandler
     {
         bool IsKnownPermission(string name);
+
+        /// <summary>
+        /// 指定されたパターンの正当性を検証する
+        /// </summary>
+        /// <param name="urlPattern"></param>
+        /// <returns></returns>
+        bool IsValidUrlPattern(string urlPattern);
 
         /// <summary>
         /// 権限情報を取得する
@@ -58,6 +66,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
 
         }
 
+        public bool IsValidUrlPattern(string urlPattern)
+        {
+            return Regex.IsMatch(urlPattern, @"(https?|ftp|file):/{2,3}(\*|\*\..+|(?!(\*|/)).+)/.*");
+        }
+
+
         #region private
 
         private void SetPermissionsIfNull()
@@ -69,7 +83,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
 
             if (this.permissionDetails == null)
             {
-                this.permissionDetails = typeof(Permissions).GetProperties().Where(p=>p.MemberType == MemberTypes.Property).Select(m => (Permission?)(m.GetValue(null))??new Permission(string.Empty,string.Empty)).Where(p=>!string.IsNullOrEmpty(p.Name)).ToList();
+                this.permissionDetails = typeof(Permissions).GetProperties().Where(p => p.MemberType == MemberTypes.Property).Select(m => (Permission?)(m.GetValue(null)) ?? new Permission(string.Empty, string.Empty)).Where(p => !string.IsNullOrEmpty(p.Name)).ToList();
             }
         }
 

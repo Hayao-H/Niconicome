@@ -131,6 +131,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 }
             }
 
+            foreach (string host in manifest.HostPermissions)
+            {
+                if (!this.permissionsHandler.IsValidUrlPattern(host))
+                {
+                    return new AttemptResult() { Message = $"不正なホストです。({host})" };
+                }
+            }
+
             return new AttemptResult() { IsSucceeded = true };
         }
 

@@ -30,6 +30,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
 
         public List<string> Permissions { get; init; } = new();
 
+        public List<string> HostPermissions { get; init; } = new();
+
         public AutoUpdatePolicy AutoUpdatePolicy { get; set; } = new();
 
         public Scripts Scripts { get; set; } = new();
@@ -45,6 +47,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
             this.PackageID.Value=infomation.PackageID.Value;
             this.Permissions.Clear();
             this.Permissions.AddRange(infomation.Permissions);
+            this.HostPermissions.Clear();
+            this.HostPermissions.AddRange(infomation.HostPermissions);
             this.AutoUpdatePolicy = infomation.AutoUpdatePolicy;
             this.Scripts = infomation.Scripts;
         }

@@ -5,8 +5,8 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +26,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         bool IsInitialized { get; }
         bool HasError { get; }
         Exception? Exception { get; }
-        IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory,bool isDebuggingEnable);
+        IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory, bool isDebuggingEnable);
     }
 
     public class AddonContext : IAddonContext
@@ -145,8 +145,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         {
             Action<ScriptObject, int> setTimeout = (function, delay) =>
              {
-                 var timer = new Timer(_ => function.Invoke(false));
-                 timer.Change(delay, Timeout.Infinite);
+                 var timer = new Timer(delay);
+                 timer.Elapsed += (_, _) =>
+                 {
+                     function.Invoke(false);
+                 };
+                 timer.Enabled = true;
              };
             this.Executer.AddHostObject("setTimeout", setTimeout);
         }

@@ -200,6 +200,17 @@ namespace Niconicome.Models.Local.Addon
                 }
             }
 
+            if (info.HostPermissions.Count > 0)
+            {
+                sb.AppendLine("ホスト権限一覧（アドオンが自由にデータを送受信できるURL）" + "-".Repeat(60));
+                sb.AppendLine("！注意！：悪意のあるアドオンは、これらのURLにあなたの情報を送信することができます。適用範囲が広すぎるもの（たとえば、「http://*/」など）はできるだけ許可しないでください。アプリケーションはこのような攻撃に対する防御機構を持ちません。");
+
+                foreach (var host in info.HostPermissions)
+                {
+                    sb.AppendLine(host);
+                }
+            }
+
             return sb.ToString();
         }
 

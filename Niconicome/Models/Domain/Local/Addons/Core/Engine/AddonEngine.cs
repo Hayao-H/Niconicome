@@ -120,6 +120,22 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
                 }
             }
 
+            if (manifestData.HostPermissions.Count != dbData.HostPermissions.Count)
+            {
+                this.logger.Error($"ホスト権限の不正な書き換えを検知しました。({dbData.Name.Value},{dbData.HostPermissions.Count}=>{manifestData.HostPermissions.Count})");
+                return new AttemptResult() { Message = "ホスト権限が不正に書き換えられました。" };
+            } else {
+
+                foreach (var permission in manifestData.HostPermissions)
+                {
+                    if (!dbData.HostPermissions.Contains(permission))
+                    {
+                        this.logger.Error($"ホスト権限の不正な書き換えを検知しました。({dbData.Name.Value},{permission})");
+                        return new AttemptResult() { Message = $"ホスト権限が不正に書き換えられました。{permission}" };
+                    }
+                }
+            }
+
             //バージョン確認
             if (manifestData.Version.Value.CompareTo(dbData.Version.Value) != 0)
             {

@@ -22,5 +22,17 @@ namespace NiconicomeTest.Local.Addons.Core.Permission
 
             Assert.That(result, Is.EqualTo(expectedResult));
         }
+
+        [TestCase("http://niovideo.jp/*", true)]
+        [TestCase("https://niovideo.jp/*", true)]
+        [TestCase("https://*.niovideo.jp/*", true)]
+        [TestCase("http://www.google.com", false)]
+        [TestCase("https://*hoge/", false)]
+        public void URLパターンを確認する(string pattern, bool expectedResult)
+        {
+            bool result = this.permissionsHandler!.IsValidUrlPattern(pattern);
+
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
     }
 }
