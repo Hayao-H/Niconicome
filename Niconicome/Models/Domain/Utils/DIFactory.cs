@@ -208,7 +208,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonsCore::Installer.IManifestLoader, AddonsCore::Installer.ManifestLoader>();
             services.AddSingleton<Addons::IAddonHandler, Addons::AddonHandler>();
             services.AddSingleton<Addons::IAddonInstallManager, Addons::AddonInstallManager>();
-            services.AddTransient<AddonAPI::IOutput, AddonAPI::Output>();
+            services.AddTransient<AddonAPI.Local.IO.IOutput, AddonAPI.Local.IO.Output>();
+            services.AddTransient<AddonAPI.Net.Http.Fetch.IFetch, AddonAPI.Net.Http.Fetch.Fetch>();
             services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
             services.AddTransient<AddonsCore::Installer.IAddonUninstaller, AddonsCore::Installer.AddonUninstaller>();
             return services.BuildServiceProvider();

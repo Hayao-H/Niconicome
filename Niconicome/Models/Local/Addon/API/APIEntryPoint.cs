@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using Niconicome.Models.Local.Addon.API.Local.IO;
+using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 
 namespace Niconicome.Models.Local.Addon.API
 {

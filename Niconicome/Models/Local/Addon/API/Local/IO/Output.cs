@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Local.State;
 
-namespace Niconicome.Models.Local.Addon.API
+namespace Niconicome.Models.Local.Addon.API.Local.IO
 {
     public interface IOutput : IAPIBase
     {

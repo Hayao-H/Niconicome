@@ -17,6 +17,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Addon.API;
+using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 using Niconicome.Models.Local.Settings;
 using Reactive.Bindings;
 
@@ -119,6 +120,12 @@ namespace Niconicome.Models.Local.Addon
                     IAPIEntryPoint entryPoint = DIFactory.Provider.GetRequiredService<IAPIEntryPoint>();
                     entryPoint.Initialize(info);
                     engine.AddHostObject("application", entryPoint);
+
+                    IFetch fetch = DIFactory.Provider.GetRequiredService<IFetch>();
+                    fetch.Initialize(info.HostPermissions);
+                    Func<string,Task<Response>> fetchFunc = url => fetch.FetchAsync(url);
+                    engine.AddHostObject("fetch", fetchFunc);
+
                 }, isAddonDebuggingEnable);
 
                 if (!result.IsSucceeded)
