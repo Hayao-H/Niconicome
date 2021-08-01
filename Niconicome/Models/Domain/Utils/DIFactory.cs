@@ -46,6 +46,7 @@ using Style = Niconicome.Models.Domain.Local.Style;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
 using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
+using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
 using Addons = Niconicome.Models.Local.Addon;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 
@@ -212,6 +213,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonAPI.Net.Http.Fetch.IFetch, AddonAPI.Net.Http.Fetch.Fetch>();
             services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
             services.AddTransient<AddonsCore::Installer.IAddonUninstaller, AddonsCore::Installer.AddonUninstaller>();
+            services.AddTransient<AddonsDomainAPI::Hooks.IHooksManager, AddonsDomainAPI::Hooks.HooksManager>();
+            services.AddTransient<AddonAPI::Net.Hooks.IHooks, AddonAPI::Net.Hooks.Hooks>();
             return services.BuildServiceProvider();
         }
 

@@ -85,7 +85,12 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Search
                 var dmc = new DmcInfo();
                 dmc.ThumbInfo.Normal = v.ThumbnailUrl;
                 dmc.UploadedOn = v.StartTime.DateTime;
-                return new DomainVideoInfo() { Title = v.Title, Id = v.ContentId, ViewCount = v.ViewCounter, CommentCount = v.CommentCounter, MylistCount = v.MylistCounter, DmcInfo = dmc, Tags = v.Tags.Split(" ") };
+                dmc.Title = v.Title;
+                dmc.ViewCount = v.ViewCounter;
+                dmc.CommentCount = v.CommentCounter;
+                dmc.MylistCount = v.MylistCounter;
+                dmc.Tags = v.Tags.Split(" ");
+                return new DomainVideoInfo() { DmcInfo = dmc };
             });
 
             return new SearchResult() { IsSucceeded = true, Videos = videos };

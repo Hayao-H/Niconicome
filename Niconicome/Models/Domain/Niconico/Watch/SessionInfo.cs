@@ -12,7 +12,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     {
         string? RecipeId { get; set; }
         string? ContentId { get; set; }
-        DmcRequest::Content_Src_Id_Sets ContentSrcIdSets { get; set; }
         int HeartbeatLifetime { get; set; }
         string? Token { get; set; }
         string? Signature { get; set; }
@@ -22,6 +21,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         string? PlayerId { get; set; }
         string? TransferPriset { get; set; }
         double Priority { get; set; }
+        List<string> Videos { get; }
+        List<string> Audios { get; }
     }
 
     /// <summary>
@@ -32,8 +33,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public string? RecipeId { get; set; }
 
         public string? ContentId { get; set; }
-
-        public DmcRequest::Content_Src_Id_Sets ContentSrcIdSets { get; set; } = new();
 
         public int HeartbeatLifetime { get; set; }
 
@@ -52,6 +51,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public string? PlayerId { get; set; }
 
         public double Priority { get; set; }
+
+        public List<string> Videos { get; init; } = new();
+
+        public List<string> Audios { get; init; } = new();
     }
 
 }

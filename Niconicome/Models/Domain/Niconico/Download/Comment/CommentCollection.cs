@@ -42,7 +42,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             this.ThreadInfo = original.ThreadInfo;
         }
 
-        public CommentCollection(int cOffset, long defaultThread, int defaultFork, bool unsafeHandle)
+        public CommentCollection(int cOffset, long defaultThread, long defaultFork, bool unsafeHandle)
         {
             this.comThroughSetting = cOffset;
             this.isRoot = true;
@@ -59,7 +59,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             this.unsafeHandle = unsafeHandle;
         }
 
-        public static ICommentCollection GetInstance(int cOffset, long defaultThread, int defaultFork, bool unsafeHandle)
+        public static ICommentCollection GetInstance(int cOffset, long defaultThread, long defaultFork, bool unsafeHandle)
         {
             return new CommentCollection(cOffset, defaultThread, defaultFork, unsafeHandle);
         }
@@ -82,7 +82,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private readonly long defaultTread;
 
-        private readonly int defaultFork;
+        private readonly long defaultFork;
 
         private bool isSorted;
 

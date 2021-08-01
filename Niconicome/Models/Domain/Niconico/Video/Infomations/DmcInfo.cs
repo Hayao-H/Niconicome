@@ -29,7 +29,25 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; set; }
         ISessionInfo SessionInfo { get; }
-        List<WatchJson::Thread> CommentThreads { get; }
+        List<IThread> CommentThreads { get; }
+    }
+
+    public interface IThread
+    {
+        long ID { get; }
+        long Fork { get; }
+        bool IsActive { get; }
+        bool IsDefaultPostTarget { get; }
+        bool IsEasyCommentPostTarget { get; }
+        bool IsLeafRequired { get; }
+        bool IsOwnerThread { get; }
+        bool IsThreadkeyRequired { get; }
+        string? Threadkey { get; }
+        bool Is184Forced { get; }
+        bool HasNicoscript { get; }
+        string Label { get; }
+        int PostkeyStatus { get; }
+        string Server { get; }
     }
 
 
@@ -53,7 +71,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         public string ChannelName { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
-
 
         public int ViewCount { get; set; }
 
@@ -109,7 +126,37 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// <summary>
         /// コメントスレッド
         /// </summary>
-        public List<WatchJson::Thread> CommentThreads { get; set; } = new();
+        public List<IThread> CommentThreads { get; set; } = new();
     }
 
+    public class Thread : IThread
+    {
+        public long ID { get; init; }
+
+        public long Fork { get; init; }
+
+        public bool IsActive { get; init; }
+
+        public bool IsDefaultPostTarget { get; init; }
+
+        public bool IsEasyCommentPostTarget { get; init; }
+
+        public bool IsLeafRequired { get; init; }
+
+        public bool IsOwnerThread { get; init; }
+
+        public bool IsThreadkeyRequired { get; init; }
+
+        public string? Threadkey { get; init; }
+
+        public bool Is184Forced { get; init; }
+
+        public bool HasNicoscript { get; init; }
+
+        public string Label { get; init; } = string.Empty;
+
+        public int PostkeyStatus { get; init; }
+
+        public string Server { get; init; } = string.Empty;
+    }
 }

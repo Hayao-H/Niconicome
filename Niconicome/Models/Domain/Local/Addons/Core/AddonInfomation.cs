@@ -36,6 +36,16 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
 
         public Scripts Scripts { get; set; } = new();
 
+        /// <summary>
+        /// 権限の有無を確認する
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool HasPermission(string name)
+        {
+            return this.Permissions.Contains(name);
+        }
+
         public void SetData(AddonInfomation infomation)
         {
             this.ID.Value = infomation.ID.Value;

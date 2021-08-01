@@ -4,19 +4,19 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 {
     public interface IDomainVideoInfo
     {
-        string Title { get; set; }
-        string Id { get; set; }
-        string ChannelID { get; set; }
-        string ChannelName { get; set; }
-        string Owner { get; set; }
-        int OwnerID { get; set; }
+        string Title { get; }
+        string Id { get; }
+        string ChannelID { get; }
+        string ChannelName { get; }
+        string Owner { get; }
+        int OwnerID { get; }
         int ViewCount { get; }
         int MylistCount { get; }
         int CommentCount { get; }
-        int LikeCount { get; set; }
-        int Duration { get; set; }
-        IEnumerable<string> Tags { get; set; }
-        IDmcInfo DmcInfo { get; set; }
+        int LikeCount { get; }
+        int Duration { get; }
+        IEnumerable<string> Tags { get; }
+        IDmcInfo DmcInfo { get; }
     }
 
 
@@ -28,68 +28,63 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// <summary>
         /// 動画タイトル
         /// </summary>
-        public string Title { get; set; } = string.Empty;
+        public string Title => this.DmcInfo.Title;
 
         /// <summary>
         /// 動画ID
         /// </summary>
-        public string Id { get; set; } = string.Empty;
-
-        /// <summary>
-        /// ファイル名
-        /// </summary>
-        public string FileName { get; set; } = string.Empty;
+        public string Id => this.DmcInfo.Id;
 
         /// <summary>
         /// チャンネルID
         /// </summary>
-        public string ChannelID { get; set; } = string.Empty;
+        public string ChannelID => this.DmcInfo.ChannelID;
 
         /// <summary>
         /// チャンネル名
         /// </summary>
-        public string ChannelName { get; set; } = string.Empty;
+        public string ChannelName => this.DmcInfo.ChannelName;
 
         /// <summary>
         /// 投稿者名
         /// </summary>
-        public string Owner { get; set; } = string.Empty;
+        public string Owner => this.DmcInfo.Owner;
 
         /// <summary>
         /// 投稿者ユーザーID
         /// </summary>
-        public int OwnerID { get; set; }
+        public int OwnerID => this.DmcInfo.OwnerID;
 
         /// <summary>
         /// 再生回数
         /// </summary>
-        public int ViewCount { get; set; }
+        public int ViewCount => this.DmcInfo.ViewCount;
 
         /// <summary>
         /// マイリス数
         /// </summary>
-        public int MylistCount { get; set; }
+        public int MylistCount => this.DmcInfo.MylistCount;
 
         /// <summary>
         /// コメント数
         /// </summary>
-        public int CommentCount { get; set; }
+        public int CommentCount => this.DmcInfo.CommentCount;
 
         /// <summary>
         /// いいね数
         /// </summary>
-        public int LikeCount { get; set; }
+        public int LikeCount => this.DmcInfo.LikeCount;
 
         /// <summary>
         /// 再生時間
         /// </summary>
-        public int Duration { get; set; }
+        public int Duration => this.DmcInfo.Duration;
 
 
         /// <summary>
         /// タグ
         /// </summary>
-        public IEnumerable<string> Tags { get; set; } = new List<string>();
+        public IEnumerable<string> Tags => this.DmcInfo.Tags;
 
         /// <summary>
         /// DMC情報

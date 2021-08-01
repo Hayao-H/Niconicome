@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Domain.Local.Addons.Core.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.Engine.Context;
-using Niconicome.Models.Domain.Local.Addons.Core.Installer;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -19,7 +15,6 @@ using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Addon.API;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 using Niconicome.Models.Local.Settings;
-using Reactive.Bindings;
 
 namespace Niconicome.Models.Local.Addon
 {
@@ -118,12 +113,12 @@ namespace Niconicome.Models.Local.Addon
                 IAttemptResult result = item.Value.Initialize(info, engine =>
                 {
                     IAPIEntryPoint entryPoint = DIFactory.Provider.GetRequiredService<IAPIEntryPoint>();
-                    entryPoint.Initialize(info);
+                    entryPoint.Initialize(info, engine);
                     engine.AddHostObject("application", entryPoint);
 
                     IFetch fetch = DIFactory.Provider.GetRequiredService<IFetch>();
                     fetch.Initialize(info.HostPermissions);
-                    Func<string,Task<Response>> fetchFunc = url => fetch.FetchAsync(url);
+                    Func<string, Task<Response>> fetchFunc = url => fetch.FetchAsync(url);
                     engine.AddHostObject("fetch", fetchFunc);
 
                 }, isAddonDebuggingEnable);
