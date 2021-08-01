@@ -15,10 +15,9 @@ async function main() {
             res = await fetch("http://nicovideo.jp/");
             content = await res.text();
         } catch (ex) {
-            logger.write(ex.message)
+            logger.write(ex.message);
         }
 
-        logger.write(content);
 
     }
 }

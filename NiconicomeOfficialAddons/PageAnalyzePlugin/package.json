@@ -14,5 +14,8 @@
   },
   "scripts": {
     "build": "node scripts/build.js"
+  },
+  "dependencies": {
+    "typedoc": "^0.21.5"
   }
 }

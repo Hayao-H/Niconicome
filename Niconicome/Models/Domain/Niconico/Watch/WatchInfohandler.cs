@@ -97,10 +97,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 this.State = WatchInfoHandlerState.JsonParsingFailure;
 
                 if (result.Exception is null) {
-                    this.logger.Error($"視聴ページの解析に失敗しました。(id:{id})");
+                    this.logger.Error($"視聴ページの解析に失敗しました。(id:{id}, 詳細:{result.Message})");
                 } else
                 {
-                    this.logger.Error($"視聴ページの解析に失敗しました。(id:{id})", result.Exception);
+                    this.logger.Error($"視聴ページの解析に失敗しました。(id:{id}, 詳細:{result.Message})", result.Exception);
                 }
 
                 throw new InvalidOperationException();

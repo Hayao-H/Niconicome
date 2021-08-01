@@ -14,6 +14,6 @@ export class OutputHandler {
      */
     write(message:string):void{
         if (!this.canUse) return;
-        application.output.write(message);
+        application.output!.write(message);
     }
 }
