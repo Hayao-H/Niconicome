@@ -14,7 +14,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Hooks
         /// ページ解析関数を登録する
         /// </summary>
         /// <param name="function"></param>
-        void RegisterPageAnalyzeFunction(ScriptObject function);
+        void registerPageAnalyzeFunction(ScriptObject function);
     }
 
     class Hooks : IHooks
@@ -32,7 +32,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Hooks
 
         #region Methods
 
-        public void RegisterPageAnalyzeFunction(ScriptObject function)
+        public void registerPageAnalyzeFunction(ScriptObject function)
         {
             this.manager.Register(function, HookType.WatchPageParser);
         }

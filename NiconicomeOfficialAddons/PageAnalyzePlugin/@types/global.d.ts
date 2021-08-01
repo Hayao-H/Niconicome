@@ -1,9 +1,18 @@
+import { isTemplateExpression } from "typescript";
 import { Output } from "./local/io/output";
+import { DmcInfo } from "./net/hooks/types/dmcinfo";
 import { Response } from "./net/http/fetch/Response";
 
 declare global {
 
     const application: Application;
+
+    enum ThumbSize {
+        Large,
+        Middle,
+        Normal,
+        Player
+    };
 
     function fetch(url: string): Promise<Response>;
 }
