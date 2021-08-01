@@ -63,6 +63,8 @@ namespace Niconicome.Models.Local.Addon.API
             {
                 engine.AddHostType(nameof(DmcInfo), typeof(DmcInfo));
                 engine.AddHostType(nameof(SessionInfo), typeof(SessionInfo));
+                engine.AddHostType(nameof(ThumbInfo), typeof(ThumbInfo));
+                engine.AddHostType(nameof(Thread), typeof(Thread));
             }
             else
             {

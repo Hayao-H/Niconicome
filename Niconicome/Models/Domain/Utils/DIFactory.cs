@@ -213,7 +213,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonAPI.Net.Http.Fetch.IFetch, AddonAPI.Net.Http.Fetch.Fetch>();
             services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
             services.AddTransient<AddonsCore::Installer.IAddonUninstaller, AddonsCore::Installer.AddonUninstaller>();
-            services.AddTransient<AddonsDomainAPI::Hooks.IHooksManager, AddonsDomainAPI::Hooks.HooksManager>();
+            services.AddSingleton<AddonsDomainAPI::Hooks.IHooksManager, AddonsDomainAPI::Hooks.HooksManager>();
             services.AddTransient<AddonAPI::Net.Hooks.IHooks, AddonAPI::Net.Hooks.Hooks>();
             return services.BuildServiceProvider();
         }
