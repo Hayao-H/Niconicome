@@ -11,6 +11,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
         ObservableCollection<AddonLogNode> Messages { get; init; }
 
         void Error(string message, string addonName, Exception e);
+
+        /// <summary>
+        /// エラー出力
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="addonName"></param>
+        void Error(string message, string addonName);
+
     }
 
     public class AddonLogger : IAddonLogger
@@ -38,6 +46,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
             this.logger.Error($"({addonName}){message}", e);
         }
 
+        public void Error(string message, string addonName)
+        {
+            var node = new AddonLogNode(message, addonName);
+            this.Messages.Add(node);
+            this.logger.Error($"({addonName}){message}");
+        }
+
+
         /// <summary>
         /// メッセージ
         /// </summary>
@@ -47,17 +63,17 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 
     public class AddonLogNode
     {
-        public AddonLogNode(string message, string addonnName, Exception e)
+        public AddonLogNode(string message, string addonnName, Exception? e = null)
         {
             this.Message = new ReactiveProperty<string>(message);
             this.AddonName = new ReactiveProperty<string>(addonnName);
-            this.Exception = new ReactiveProperty<Exception>(e);
+            this.Exception = new ReactiveProperty<Exception?>(e);
         }
 
         public ReactiveProperty<string> Message { get; init; }
 
         public ReactiveProperty<string> AddonName { get; init; }
 
-        public ReactiveProperty<Exception> Exception { get; init; }
+        public ReactiveProperty<Exception?> Exception { get; init; }
     }
 }

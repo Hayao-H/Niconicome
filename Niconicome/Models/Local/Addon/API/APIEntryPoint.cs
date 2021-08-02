@@ -18,7 +18,7 @@ namespace Niconicome.Models.Local.Addon.API
     public interface IAPIEntryPoint
     {
         /// <summary>
-        /// 出力
+        /// Output API
         /// </summary>
         IOutput? output { get; }
 
@@ -27,15 +27,21 @@ namespace Niconicome.Models.Local.Addon.API
         /// </summary>
         IHooks? hooks { get; }
 
+        /// <summary>
+        /// Log API
+        /// </summary>
+        ILog? log { get; }
+
         void Initialize(AddonInfomation infomation, IJavaScriptExecuter engine);
     }
 
     public class APIEntryPoint : IAPIEntryPoint
     {
-        public APIEntryPoint(IOutput output,IHooks hooks)
+        public APIEntryPoint(IOutput output, IHooks hooks, ILog log)
         {
             this.output = output;
-            this.hooks= hooks;
+            this.hooks = hooks;
+            this.log = log;
         }
 
         #region Props
@@ -43,6 +49,9 @@ namespace Niconicome.Models.Local.Addon.API
         public IOutput? output { get; private set; }
 
         public IHooks? hooks { get; private set; }
+
+        public ILog? log { get; private set; }
+
 
         #endregion
 
@@ -69,6 +78,14 @@ namespace Niconicome.Models.Local.Addon.API
             else
             {
                 this.hooks = null;
+            }
+
+            if (infomation.HasPermission(PermissionNames.Log))
+            {
+                this.log!.Initialize(infomation);
+            } else
+            {
+                this.log = null;
             }
         }
 
