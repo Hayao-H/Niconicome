@@ -7,12 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using AngleSharp.Dom;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
+using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
@@ -155,6 +157,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
                  timer.Enabled = true;
              };
             this.Executer.AddHostObject("setTimeout", setTimeout);
+
+            Func<string, IDocument> parseHtml = source => HtmlParser.ParseDocument(source);
+            this.Executer.AddHostObject("parseHtml", parseHtml);
         }
 
         #endregion

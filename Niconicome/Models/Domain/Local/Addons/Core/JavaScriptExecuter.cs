@@ -20,7 +20,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         /// 外部から設定する
         /// </summary>
         /// <param name="flags"></param>
-        void Configure(V8ScriptEngineFlags flags);
+        void Configure(V8ScriptEngineFlags flags, int debugPort = 2525);
     }
 
     public class JavaScriptExecuter : IJavaScriptExecuter
@@ -108,15 +108,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
             GC.SuppressFinalize(this);
         }
 
-        public void Configure(V8ScriptEngineFlags flags)
+        public void Configure(V8ScriptEngineFlags flags, int debugPort = 2525)
         {
-            this.engine = new V8ScriptEngine(flags);
+            this.engine = new V8ScriptEngine(flags, debugPort);
         }
 
         /// <summary>
         /// デフォルト設定
         /// </summary>
-        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion;
+        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion | V8ScriptEngineFlags.EnableDynamicModuleImports;
 
 
     }
