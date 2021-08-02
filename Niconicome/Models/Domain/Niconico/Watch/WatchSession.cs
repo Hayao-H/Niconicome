@@ -189,7 +189,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             }
 
             //ダウンロード不可能な場合は処理をキャンセル
-            if (!this.Video.DmcInfo?.IsDownloadsble ?? false)
+            if (!this.Video.DmcInfo?.IsDownloadable ?? false)
             {
                 if (this.Video.DmcInfo?.IsEncrypted ?? false)
                 {

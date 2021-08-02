@@ -107,7 +107,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
 
             if (isDebuggingEnable)
             {
-                this.Executer.Configure(V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
+                V8ScriptEngineFlags defaultSettings = JavaScriptExecuter.DefaultFlags;
+                defaultSettings = defaultSettings | V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart;
+                this.Executer.Configure(defaultSettings);
             }
 
             factory(this.Executer);

@@ -89,8 +89,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Search
                 dmc.ViewCount = v.ViewCounter;
                 dmc.CommentCount = v.CommentCounter;
                 dmc.MylistCount = v.MylistCounter;
-                dmc.Tags = v.Tags.Split(" ");
-                return new DomainVideoInfo() { DmcInfo = dmc };
+                dmc.Tags = v.Tags.Split(" ").ToList();
+                return new DomainVideoInfo() { RawDmcInfo = dmc };
             });
 
             return new SearchResult() { IsSucceeded = true, Videos = videos };

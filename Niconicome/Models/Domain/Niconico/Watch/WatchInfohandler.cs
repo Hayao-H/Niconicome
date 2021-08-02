@@ -88,17 +88,19 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 throw new HttpRequestException();
             }
 
-            IAttemptResult<IDmcInfo> result;
+            IAttemptResult<dynamic> result;
 
             result = this.hooksManager.ParseWatchPage(source);
 
-            if (!result.IsSucceeded||result.Data is null)
+            if (!result.IsSucceeded || result.Data is null)
             {
                 this.State = WatchInfoHandlerState.JsonParsingFailure;
 
-                if (result.Exception is null) {
+                if (result.Exception is null)
+                {
                     this.logger.Error($"視聴ページの解析に失敗しました。(id:{id}, 詳細:{result.Message})");
-                } else
+                }
+                else
                 {
                     this.logger.Error($"視聴ページの解析に失敗しました。(id:{id}, 詳細:{result.Message})", result.Exception);
                 }
@@ -123,7 +125,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             return new DomainVideoInfo()
             {
                 //DmcInfo = result,
-                DmcInfo = result.Data,
+                RawDmcInfo = result.Data,
             };
         }
     }
@@ -199,7 +201,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             //サムネイル
             if (original?.Video?.Thumbnail is not null)
             {
-                info.ThumbInfo = new ThumbInfo(original.Video.Thumbnail);
+                var thumb = original.Video.Thumbnail;
+                info.ThumbInfo = new ThumbInfo(thumb.LargeUrl, thumb.MiddleUrl, thumb.Url, thumb.Player);
             }
             info.ThumbInfo.Large = original?.Video?.Thumbnail?.LargeUrl ?? (original?.Video?.Thumbnail?.Url ?? string.Empty);
             info.ThumbInfo.Normal = original?.Video?.Thumbnail?.MiddleUrl ?? (original?.Video?.Thumbnail?.Url ?? string.Empty);
@@ -209,7 +212,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             info.OwnerID = original?.Owner?.Id ?? 0;
 
             //タグ
-            info.Tags = original?.Tag.Items?.Select(t => t.Name ?? string.Empty).Where(t => !t.IsNullOrEmpty()) ?? new List<string>();
+            info.Tags = original?.Tag.Items?.Select(t => t.Name ?? string.Empty).Where(t => !t.IsNullOrEmpty()).ToList() ?? new List<string>();
 
             //再生回数・コメント数・マイリス数・いいね数
             info.ViewCount = original?.Video?.Count?.View ?? 0;
@@ -280,17 +283,17 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 info.SessionInfo.Audios.AddRange(original?.Media.Delivery?.Movie?.Session?.Audios ?? new List<string>());
                 info.SessionInfo.ServiceUserId = original?.Media?.Delivery?.Movie?.Session?.ServiceUserId;
                 info.SessionInfo.TransferPriset = original?.Media?.Delivery?.Movie?.Session?.TransferPrisets?.FirstOrDefault() ?? string.Empty;
-                info.IsDownloadsble = original?.Media?.Delivery?.Encryption == null;
+                info.IsDownloadable = original?.Media?.Delivery?.Encryption == null;
             }
             else
             {
-                info.IsDownloadsble = false;
+                info.IsDownloadable = false;
             }
 
             //暗号化動画の場合はダウンロード不可
             if (original?.Media?.Delivery?.Encryption is not null)
             {
-                info.IsDownloadsble = false;
+                info.IsDownloadable = false;
                 info.IsEncrypted = true;
             }
 

@@ -21,8 +21,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         int MylistCount { get; }
         int LikeCount { get; }
         int Duration { get; }
-        IEnumerable<string> Tags { get; set; }
-        bool IsDownloadsble { get; set; }
+        List<string> Tags { get; set; }
+        bool IsDownloadable { get; set; }
         bool IsEncrypted { get; set; }
         bool IsOfficial { get; set; }
         DateTime UploadedOn { get; set; }
@@ -84,12 +84,12 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public int OwnerID { get; set; }
 
-        public IEnumerable<string> Tags { get; set; } = new List<string>();
+        public List<string> Tags { get; set; } = new List<string>();
 
         /// <summary>
         /// ダウンロード可能フラグ
         /// </summary>
-        public bool IsDownloadsble { get; set; } = true;
+        public bool IsDownloadable { get; set; } = true;
 
         /// <summary>
         /// 暗号化フラグ
@@ -121,7 +121,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// <summary>
         /// セッション情報
         /// </summary>
-        public ISessionInfo SessionInfo { get; private set; } = new SessionInfo();
+        public ISessionInfo SessionInfo { get; init; } = new SessionInfo();
 
         /// <summary>
         /// コメントスレッド

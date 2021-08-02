@@ -27,7 +27,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
     {
         public JavaScriptExecuter()
         {
-            this.engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
+            this.engine = new V8ScriptEngine(DefaultFlags);
         }
 
         ~JavaScriptExecuter()
@@ -108,10 +108,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
             GC.SuppressFinalize(this);
         }
 
-        public void Configure(V8ScriptEngineFlags  flags)
+        public void Configure(V8ScriptEngineFlags flags)
         {
             this.engine = new V8ScriptEngine(flags);
         }
+
+        /// <summary>
+        /// デフォルト設定
+        /// </summary>
+        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion;
 
 
     }

@@ -17,7 +17,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
         /// </summary>
         /// <param name="page"></param>
         /// <returns></returns>
-        IAttemptResult<IDmcInfo> ParseWatchPage(string page);
+        IAttemptResult<dynamic> ParseWatchPage(string page);
 
         /// <summary>
         /// 関数を登録する
@@ -44,13 +44,13 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
 
         #region Method
 
-        public IAttemptResult<IDmcInfo> ParseWatchPage(string page)
+        public IAttemptResult<dynamic> ParseWatchPage(string page)
         {
             this.hooks.TryGetValue(HookType.WatchPageParser, out ScriptObject? function);
 
             if (function is null)
             {
-                return new AttemptResult<IDmcInfo>() { Message = "視聴ページ解析関数が登録されていません。" };
+                return new AttemptResult<dynamic>() { Message = "視聴ページ解析関数が登録されていません。" };
             }
 
             dynamic returnVal;
@@ -61,17 +61,10 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
             catch (Exception e)
             {
                 this.logger.Error("視聴ページ解析に失敗しました。", e);
-                return new AttemptResult<IDmcInfo>() { Message = "視聴ページ解析に失敗しました。", Exception = e };
+                return new AttemptResult<dynamic>() { Message = "視聴ページ解析に失敗しました。", Exception = e };
             }
 
-            if (returnVal is IDmcInfo info)
-            {
-                return new AttemptResult<IDmcInfo>() { IsSucceeded = true, Data = info };
-            }
-            else
-            {
-                return new AttemptResult<IDmcInfo>() { Message = "視聴ページ解析に失敗しました。(返却された値をIDmcinfoにキャストできません。)" };
-            }
+            return new AttemptResult<dynamic>() { IsSucceeded = true, Data = returnVal };
         }
 
         public void Register(ScriptObject function, HookType type)

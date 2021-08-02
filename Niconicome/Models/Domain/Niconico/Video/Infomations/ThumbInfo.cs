@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using V2 = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 
 namespace Niconicome.Models.Domain.Niconico.Video.Infomations
@@ -36,12 +37,12 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         }
 
-        public ThumbInfo(V2::Thumbnail thumbnail)
+        public ThumbInfo(string? large,string? middle,string? url,string? player)
         {
-            this.large = thumbnail.LargeUrl;
-            this.middle = thumbnail.MiddleUrl;
-            this.normal = thumbnail.Url;
-            this.player = thumbnail.Player;
+            this.large = large;
+            this.middle = middle;
+            this.normal = url;
+            this.player = player;
         }
 
         /// <summary>
