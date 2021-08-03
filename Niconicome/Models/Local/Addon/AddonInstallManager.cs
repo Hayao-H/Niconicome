@@ -51,7 +51,7 @@ namespace Niconicome.Models.Local.Addon
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        IAttemptResult UnistallAddon(int id);
+        Task<IAttemptResult> UnistallAddonAsync(int id);
 
         /// <summary>
         /// アドオンの説明文字列を取得
@@ -172,9 +172,10 @@ namespace Niconicome.Models.Local.Addon
 
         }
 
-        public IAttemptResult UnistallAddon(int id)
+        public async Task<IAttemptResult> UnistallAddonAsync(int id)
         {
             this.handler.Addons.RemoveAll(addon => addon.ID.Value == id);
+            await Task.Delay(1000 * 3);
             return this.uninstaller.Uninstall(id);
         }
 

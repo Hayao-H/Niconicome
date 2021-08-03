@@ -44,6 +44,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.ID = info.ID.ToReadOnlyReactiveProperty();
             this.IconPath = info.IconPathRelative.Select(p => Path.Combine(AppContext.BaseDirectory, FileFolder.AddonsFolder, info.PackageID.Value, p)).ToReadOnlyReactiveProperty();
 
+            this.service = dialogService;
+
             this.UpdateCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
@@ -59,11 +61,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.UninstallCommand = new AsyncReactiveCommand<int>()
                 .WithSubscribe(async id =>
                 {
-                    MaterialMessageBoxResult messageBoxResult = await MaterialMessageBox.Show("本当にアンインストールしますか？", MessageBoxButtons.Yes | MessageBoxButtons.No | MessageBoxButtons.Cancel, MessageBoxIcons.Caution);
+                    IDialogResult messageBoxResult = CommonMessageBoxAPI.Show(this.service!, "本当にアンインストールしますか？", CommonMessageBoxAPI.MessageType.Warinng, CommonMessageBoxButtons.Yes | CommonMessageBoxButtons.No | CommonMessageBoxButtons.Cancel);
 
-                    if (messageBoxResult != MaterialMessageBoxResult.Yes) return;
+                    if (messageBoxResult.Result != ButtonResult.Yes) return;
 
-                    IAttemptResult result = WS::AddonPage.InstallManager.UnistallAddon(id);
+                    IAttemptResult result = await WS::AddonPage.InstallManager.UnistallAddonAsync(id);
                     if (!result.IsSucceeded)
                     {
                         WS::AddonPage.Queue.Enqueue("アンインストールに失敗しました。");
@@ -74,6 +76,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
                     }
                 });
         }
+
+        #region field
+
+        private readonly IDialogService? service;
+
+        #endregion
 
         #region Props
         public AddonInfomation AddonInfomation { get; init; }
@@ -96,7 +104,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         public AsyncReactiveCommand<int> UninstallCommand { get; init; }
 
         public ReactiveCommand UpdateCommand { get; init; }
-
 
         #endregion
 

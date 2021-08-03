@@ -26,7 +26,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
 
         public ReactiveProperty<string> PackageID { get; init; }
 
-        public ReactiveProperty<string> IconPathRelative { get; init; } = new();
+        public ReactiveProperty<string> IconPathRelative { get; init; } = new(string.Empty);
 
         public ReactiveProperty<Version> TargetAPIVersion { get; init; } = new(new Version());
 

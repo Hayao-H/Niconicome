@@ -64,7 +64,7 @@ namespace Niconicome.Models.Domain.Utils
         public static DateTime ToLocalDateTime(DateTime rawDatetime)
         {
             TimeZoneInfo tz = TimeZoneInfo.Local;
-            DateTime dt = TimeZoneInfo.ConvertTimeFromUtc(rawDatetime,tz);
+            DateTime dt = TimeZoneInfo.ConvertTimeFromUtc(rawDatetime, tz);
             return dt;
         }
     }

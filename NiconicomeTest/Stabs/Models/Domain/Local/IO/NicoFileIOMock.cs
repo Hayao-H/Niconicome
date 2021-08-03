@@ -10,7 +10,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
     class NicoFileIOMock : INicoFileIO
     {
 
-        public NicoFileIOMock(Func<bool> existsFunc,Func<string> readFunc)
+        public NicoFileIOMock(Func<bool> existsFunc, Func<string> readFunc)
         {
             this.existsFunc = existsFunc;
             this.readFunc = readFunc;
@@ -44,6 +44,12 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
         {
 
         }
+
+        public void AppendText(string path, string text)
+        {
+
+        }
+
 
     }
 }

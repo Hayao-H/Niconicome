@@ -56,5 +56,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
         {
             return this.getdirFunc(path, pattern, recurse);
         }
+
+        public void Move(string source, string destination)
+        {
+
+        }
+
     }
 }

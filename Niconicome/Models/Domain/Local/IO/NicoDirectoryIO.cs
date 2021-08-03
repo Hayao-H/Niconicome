@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Niconicome.Extensions.System;
 
 namespace Niconicome.Models.Domain.Local.IO
 {
@@ -17,7 +21,7 @@ namespace Niconicome.Models.Domain.Local.IO
         /// </summary>
         /// <param name="source">移動元フォルダーパス</param>
         /// <param name="destination">移動先フォルダー名</param>
-        void Move(string source,string destination);
+        void Move(string source, string destination);
 
         /// <summary>
         /// すべてのファイルを移動する
@@ -25,6 +29,16 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <param name="sourceDir">移動元ディレクトリ</param>
         /// <param name="targetDir">移動先ディレクトリ</param>
         void MoveAllFiles(string sourceDir, string targetDir);
+
+        /// <summary>
+        /// すべてのファイルを移動する
+        /// </summary>
+        /// <param name="sourceDir">移動元ディレクトリ</param>
+        /// <param name="targetDir">移動先ディレクトリ</param>
+        /// <param name="excludePattern">除外するファイルを表す正規表現</param>
+        void MoveAllFiles(string sourceDir, string targetDir, string excludePattern);
+
+
         List<string> GetFiles(string path, string pattern = "*", bool recurse = false);
         List<string> GetDirectorys(string path, string pattern = "*", bool recurse = false);
 
@@ -78,10 +92,21 @@ namespace Niconicome.Models.Domain.Local.IO
 
         public void MoveAllFiles(string sourceDir, string targetDir)
         {
+            this.MoveAllFiles(sourceDir, targetDir, string.Empty);
+        }
+
+        public void MoveAllFiles(string sourceDir, string targetDir, string excludePattern)
+        {
+
             List<string> files = this.GetFiles(sourceDir, recurse: true);
 
             foreach (var file in files)
             {
+                if (!excludePattern.IsNullOrEmpty() && Regex.IsMatch(file, excludePattern))
+                {
+                    continue;
+                }
+
                 string targetPath = Path.Combine(targetDir, file.Replace($"{sourceDir}\\", ""));
                 if (!Path.IsPathRooted(targetPath))
                 {
@@ -97,6 +122,7 @@ namespace Niconicome.Models.Domain.Local.IO
                 File.Move(file, targetFile.FullName, true);
             }
         }
+
 
         public void Move(string source, string destination)
         {

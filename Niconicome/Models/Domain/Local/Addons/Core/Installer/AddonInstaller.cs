@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
@@ -113,8 +114,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 addon.SetData(mResult.Data);
             }
 
+            string iconFileName = Path.GetFileName(updateInfomation?.IconPathRelative.Value) ?? string.Empty;
+            string excludePattern = !iconFileName.IsNullOrEmpty() ? $".*{iconFileName}" : "";
+
             //移動
-            IAttemptResult mvResult = this.MoveAddon(tempPath, Path.Combine(FileFolder.AddonsFolder, packageID));
+            IAttemptResult mvResult = this.MoveAddon(tempPath, Path.Combine(FileFolder.AddonsFolder, packageID), excludePattern);
             if (!mvResult.IsSucceeded)
             {
                 return new AttemptResult<AddonInfomation>() { Message = mvResult.Message, Exception = mvResult.Exception };
@@ -217,7 +221,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// <param name="sourcePath"></param>
         /// <param name="targetPath"></param>
         /// <returns></returns>
-        private IAttemptResult MoveAddon(string sourcePath, string targetPath)
+        private IAttemptResult MoveAddon(string sourcePath, string targetPath, string excludePattern)
         {
             if (!this.directoryIO.Exists(targetPath))
             {
@@ -234,7 +238,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
             try
             {
-                this.directoryIO.MoveAllFiles(sourcePath, targetPath);
+                this.directoryIO.MoveAllFiles(sourcePath, targetPath, excludePattern);
             }
             catch (Exception e)
             {
