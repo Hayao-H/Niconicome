@@ -8,6 +8,7 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Domain.Local.Addons.Core.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.Engine.Context;
+using Niconicome.Models.Domain.Local.Addons.Core.Installer;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -41,7 +42,7 @@ namespace Niconicome.Models.Local.Addon
     public class AddonHandler : IAddonHandler
     {
 
-        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts)
+        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller)
         {
             this.container = container;
             this.directoryIO = directoryIO;
@@ -49,6 +50,7 @@ namespace Niconicome.Models.Local.Addon
             this.engine = engine;
             this.contexts = contexts;
             this.settingHandler = settingHandler;
+            this.uninstaller = uninstaller;
         }
 
         #region field
@@ -65,6 +67,8 @@ namespace Niconicome.Models.Local.Addon
 
         private readonly ILocalSettingHandler settingHandler;
 
+        private readonly IAddonUninstaller uninstaller;
+
         private bool isInitialized;
 
         #endregion
@@ -80,6 +84,12 @@ namespace Niconicome.Models.Local.Addon
             if (this.isInitialized)
             {
                 return new AttemptResult() { Message = "既に初期化されています。" };
+            }
+
+            IAttemptResult dResult = this.uninstaller.DeleteListed();
+            if (!dResult.IsSucceeded)
+            {
+                return new AttemptResult() { Message = "アンインストール済みアドオンフォルダーの削除に失敗しました。", Exception = dResult.Exception };
             }
 
             List<string> packages;

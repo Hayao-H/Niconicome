@@ -120,6 +120,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 return new AttemptResult<AddonInfomation>() { Message = mvResult.Message, Exception = mvResult.Exception };
             }
 
+            //一時フォルダーを削除
+            IAttemptResult dResult = this.DeleteTempFolder(tempPath);
+            if (!dResult.IsSucceeded)
+            {
+                return new AttemptResult<AddonInfomation>() { Message = dResult.Message, Exception = dResult.Exception };
+            }
+
             return new AttemptResult<AddonInfomation>() { IsSucceeded = true, Data = addon };
 
         }
@@ -237,6 +244,22 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
             return new AttemptResult() { IsSucceeded = true };
         }
+
+        private IAttemptResult DeleteTempFolder(string tempPath)
+        {
+            try
+            {
+                this.directoryIO.Delete(tempPath);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("アドオン一時フォルダーの削除に失敗しました。", e);
+                return new AttemptResult() { Exception = e, Message = "アドオン一時フォルダーの削除に失敗しました。" };
+            }
+
+            return new AttemptResult() { IsSucceeded = true };
+        }
+
         #endregion
     }
 }

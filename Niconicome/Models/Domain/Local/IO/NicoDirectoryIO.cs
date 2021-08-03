@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Niconicome.Models.Domain.Local.IO
 {
@@ -13,6 +11,13 @@ namespace Niconicome.Models.Domain.Local.IO
         void Create(string path);
         void Delete(string path, bool recurse = true);
         void DeleteAll(Predicate<string> predicate, bool recurse = true);
+
+        /// <summary>
+        /// ファイルを移動する
+        /// </summary>
+        /// <param name="source">移動元フォルダーパス</param>
+        /// <param name="destination">移動先フォルダー名</param>
+        void Move(string source,string destination);
 
         /// <summary>
         /// すべてのファイルを移動する
@@ -92,6 +97,12 @@ namespace Niconicome.Models.Domain.Local.IO
                 File.Move(file, targetFile.FullName, true);
             }
         }
+
+        public void Move(string source, string destination)
+        {
+            Directory.Move(source, destination);
+        }
+
 
 
         /// <summary>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Domain.Local.Addons.Core.Engine;
@@ -86,11 +87,12 @@ namespace Niconicome.Models.Local.Addon
 
     public class AddonInstallManager : IAddonInstallManager
     {
-        public AddonInstallManager(IAddonInstaller installer, IPermissionsHandler permissionsHandler, IAddonUninstaller uninstaller)
+        public AddonInstallManager(IAddonInstaller installer, IPermissionsHandler permissionsHandler, IAddonUninstaller uninstaller, IAddonHandler handler)
         {
             this.installer = installer;
             this.permissionsHandler = permissionsHandler;
             this.uninstaller = uninstaller;
+            this.handler = handler;
         }
 
         #region field
@@ -100,6 +102,8 @@ namespace Niconicome.Models.Local.Addon
         private readonly IPermissionsHandler permissionsHandler;
 
         private readonly IAddonUninstaller uninstaller;
+
+        private readonly IAddonHandler handler;
 
         private string? tempPath;
 
@@ -170,6 +174,7 @@ namespace Niconicome.Models.Local.Addon
 
         public IAttemptResult UnistallAddon(int id)
         {
+            this.handler.Addons.RemoveAll(addon => addon.ID.Value == id);
             return this.uninstaller.Uninstall(id);
         }
 

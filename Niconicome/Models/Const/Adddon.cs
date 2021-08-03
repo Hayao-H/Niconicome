@@ -10,6 +10,6 @@ namespace Niconicome.Models.Const
     {
         public static Version APIVersion { get; private set; } = new("1.0");
 
-        public static string EntryPoint { get; private set; } = "main()";
+        public static string UninstalledAddonsFile { get; private set; } = "uninstalled.dat";
     }
 }
