@@ -30,9 +30,14 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
                     {
                         this.AppendLine("インストールに失敗しました。");
                         this.AppendLine($"詳細：{result.Message}");
-                    } else
+                    }
+                    else
                     {
                         this.AppendLine("インストールが完了しました。");
+                        WS::AddonPage.Queue.Enqueue("インストールを完了するには、再起動が必要です。", "再起動", () =>
+                         {
+                             WS::AddonPage.PowerManager.Restart();
+                         });
                     }
 
                     this.IsInstalling.Value = false;
