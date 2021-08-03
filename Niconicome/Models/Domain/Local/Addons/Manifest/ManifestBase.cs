@@ -28,5 +28,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Manifest
         [JsonPropertyName("host_permissions")]
         public List<string> HostPermissions { get; set; } = new();
 
+        public Dictionary<string, string> Icons { get; set; } = new();
+
     }
 }

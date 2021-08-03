@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Niconico.Net.Json;
@@ -159,6 +161,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             addon.HostPermissions.AddRange(manifest.HostPermissions);
             addon.AutoUpdatePolicy = manifest.AutoUpdatePolicy;
             addon.Scripts = manifest.Scripts;
+
+            if (manifest.Icons.ContainsKey("32"))
+            {
+                addon.IconPathRelative.Value=manifest.Icons["32"];
+            } else
+            {
+                addon.IconPathRelative.Value = manifest.Icons.Select(i => new KeyValuePair<int, string>(int.Parse(i.Key), i.Value)).OrderByDescending(i => i.Key).FirstOrDefault().Value;
+            }
+
             addon.TargetAPIVersion.Value = Version.Parse(manifest.TargetAPIVersion);
 
             return addon;

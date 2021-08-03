@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Helper.Result;
 using Niconicome.ViewModels.Controls;
@@ -26,6 +28,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.Description = info.Description.ToReadOnlyReactiveProperty();
             this.ID = info.ID.ToReadOnlyReactiveProperty();
             this.UpdateCommand = new ReactiveCommand();
+            this.IconPath = info.IconPathRelative.ToReadOnlyReactiveProperty();
 
             this.UninstallCommand = new AsyncReactiveCommand<int>();
         }
@@ -39,6 +42,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
             this.Author = info.Author.ToReadOnlyReactiveProperty();
             this.Description = info.Description.ToReadOnlyReactiveProperty();
             this.ID = info.ID.ToReadOnlyReactiveProperty();
+            this.IconPath = info.IconPathRelative.Select(p => Path.Combine(AppContext.BaseDirectory, FileFolder.AddonsFolder, info.PackageID.Value, p)).ToReadOnlyReactiveProperty();
 
             this.UpdateCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
@@ -83,6 +87,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
         public ReadOnlyReactiveProperty<string?> Description { get; init; }
 
         public ReadOnlyReactiveProperty<int> ID { get; init; }
+
+        public ReadOnlyReactiveProperty<string?> IconPath { get; init; }
 
         #endregion
 

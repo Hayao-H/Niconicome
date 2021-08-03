@@ -51,9 +51,7 @@
                         <GridViewColumn Width="60">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button>
-                                        <materialDesign:PackIcon Kind="Puzzle"/>
-                                    </Button>
+                                    <Image Height="32" Source="{Binding IconPath.Value}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -87,15 +85,6 @@
             <ListView ItemsSource="{Binding FailedAddons}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="60">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button>
-                                        <materialDesign:PackIcon Kind="Puzzle"/>
-                                    </Button>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
                         <GridViewColumn DisplayMemberBinding="{Binding PackageID.Value}"/>
                         <GridViewColumn DisplayMemberBinding="{Binding Details.Value}"/>
                     </GridView>

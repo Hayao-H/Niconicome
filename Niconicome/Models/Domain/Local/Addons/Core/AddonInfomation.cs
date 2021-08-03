@@ -26,6 +26,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
 
         public ReactiveProperty<string> PackageID { get; init; }
 
+        public ReactiveProperty<string> IconPathRelative { get; init; } = new();
+
         public ReactiveProperty<Version> TargetAPIVersion { get; init; } = new(new Version());
 
         public List<string> Permissions { get; init; } = new();
@@ -54,7 +56,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
             this.Description.Value = infomation.Description.Value;
             this.Version.Value = infomation.Version.Value;
             this.Identifier.Value = infomation.Identifier.Value;
-            this.PackageID.Value=infomation.PackageID.Value;
+            this.PackageID.Value = infomation.PackageID.Value;
+            this.IconPathRelative.Value = infomation.IconPathRelative.Value;
             this.Permissions.Clear();
             this.Permissions.AddRange(infomation.Permissions);
             this.HostPermissions.Clear();
