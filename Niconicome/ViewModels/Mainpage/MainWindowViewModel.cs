@@ -17,6 +17,8 @@ using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
 using Prism.Regions;
 using Prism.Services.Dialogs;
+using Prism.Unity;
+using Prism.Ioc;
 using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
@@ -248,23 +250,19 @@ namespace Niconicome.ViewModels.Mainpage
 
         private void OnClosing(object? sender, CancelEventArgs e)
         {
-            if (sender is null || sender.AsNullable<Window>() is not Window window) return;
-            if (window != Application.Current.MainWindow) return;
-            if (window is not MainWindow mw) return;
-
             if (!WS::Mainpage.Shutdown.IsShutdowned)
             {
+                IDialogService service = Application.Current.As<PrismApplication>().Container.Resolve<IDialogService>();
                 bool confirm = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ConfirmIfDownloading);
                 if (!WS::Mainpage.Videodownloader.CanDownload.Value && confirm)
                 {
-                    var cResult = MessageBox.Show("ダウンロードが進行中ですが、本当に終了しますか？", "アプリケーションを終了", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (cResult != MessageBoxResult.Yes)
+                    var cResult = CommonMessageBoxAPI.Show(service, "ダウンロードが進行中ですが、本当に終了しますか？", CommonMessageBoxAPI.MessageType.Warinng, CommonMessageBoxButtons.Yes | CommonMessageBoxButtons.No);
+                    if (cResult.Result !=ButtonResult.Yes)
                     {
                         e.Cancel = true;
                         return;
                     }
                 }
-                WS::Mainpage.Shutdown.ShutdownApp();
             }
         }
     }

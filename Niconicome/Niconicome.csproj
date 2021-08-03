@@ -36,9 +36,6 @@
 
   <ItemGroup>
     <None Remove="src\app.ico" />
-    <None Remove="Views\AddonPage\Pages\MainPage.xaml" />
-    <None Remove="Views\Controls\MVVM\CommonMessageBox.xaml" />
-    <Page Remove="App.xaml" />
     <ApplicationDefinition Include="App.xaml" />
     <None Include="src\icon.png">
       <Pack>True</Pack>
@@ -59,7 +56,7 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.774.44" />
     <PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
     <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
-    <PackageReference Include="Prism.Unity" Version="8.0.0.1909" />
+    <PackageReference Include="Prism.Unity" Version="8.1.97" />
     <PackageReference Include="ReactiveProperty" Version="7.10.0" />
     <PackageReference Include="ReactiveProperty.WPF" Version="7.10.0" />
     <PackageReference Include="System.Security.Permissions" Version="5.0.0" />
