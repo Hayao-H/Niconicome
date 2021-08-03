@@ -10,9 +10,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
     {
         public static Permission Hooks { get; private set; } = new(PermissionNames.Hooks, "Hooks API。この権限を持つ拡張機能はアプリの処理を代替することができます。");
 
-        public static Permission Output { get; private set; } = new(PermissionNames.Output, "Output API。アプリケーションの出力画面に文字列を書き込みます。");
+        public static Permission Output { get; private set; } = new(PermissionNames.Output, "Output API。この権限を持つ拡張機能はアプリケーションの出力画面に文字列を書き込むことが出来ます。");
 
-        public static Permission Log { get; private set; } = new(PermissionNames.Log, "Log API。アプリケーションのログに文字列を書き込みます。");
+        public static Permission Log { get; private set; } = new(PermissionNames.Log, "Log API。この権限を持つ拡張機能はアプリケーションのログに文字列を書き込むことが出来ます。");
     }
 
     public static class PermissionNames
