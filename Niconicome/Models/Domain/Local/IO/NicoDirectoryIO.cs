@@ -35,8 +35,8 @@ namespace Niconicome.Models.Domain.Local.IO
         /// </summary>
         /// <param name="sourceDir">移動元ディレクトリ</param>
         /// <param name="targetDir">移動先ディレクトリ</param>
-        /// <param name="excludePattern">除外するファイルを表す正規表現</param>
-        void MoveAllFiles(string sourceDir, string targetDir, string excludePattern);
+        /// <param name="excludePattern">パス解決関数(null返却時には移動キャンセル)</param>
+        void MoveAllFiles(string sourceDir, string targetDir, Func<string, string?> resolver);
 
 
         List<string> GetFiles(string path, string pattern = "*", bool recurse = false);
@@ -92,20 +92,16 @@ namespace Niconicome.Models.Domain.Local.IO
 
         public void MoveAllFiles(string sourceDir, string targetDir)
         {
-            this.MoveAllFiles(sourceDir, targetDir, string.Empty);
+            this.MoveAllFiles(sourceDir, targetDir, p => p);
         }
 
-        public void MoveAllFiles(string sourceDir, string targetDir, string excludePattern)
+        public void MoveAllFiles(string sourceDir, string targetDir, Func<string, string?> resolver)
         {
 
             List<string> files = this.GetFiles(sourceDir, recurse: true);
 
             foreach (var file in files)
             {
-                if (!excludePattern.IsNullOrEmpty() && Regex.IsMatch(file, excludePattern))
-                {
-                    continue;
-                }
 
                 string targetPath = Path.Combine(targetDir, file.Replace($"{sourceDir}\\", ""));
                 if (!Path.IsPathRooted(targetPath))
@@ -113,7 +109,10 @@ namespace Niconicome.Models.Domain.Local.IO
                     targetPath = Path.Combine(AppContext.BaseDirectory, targetPath);
                 }
 
-                var targetFile = new FileInfo(targetPath);
+                string? resolvedPath = resolver(targetPath);
+                if (resolvedPath is null) continue;
+
+                var targetFile = new FileInfo(resolvedPath);
                 if (targetFile.Directory is not null && !targetFile.Directory.Exists)
                 {
                     targetFile.Directory.Create();

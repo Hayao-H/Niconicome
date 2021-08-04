@@ -46,6 +46,12 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
 
         }
 
+        public void MoveAllFiles(string sourceDir, string targetDir, Func<string, string?> resolver)
+        {
+
+        }
+
+
 
         public List<string> GetFiles(string path, string pattern = "*", bool recurse = false)
         {

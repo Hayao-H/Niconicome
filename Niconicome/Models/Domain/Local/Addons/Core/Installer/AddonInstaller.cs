@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Text.RegularExpressions;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
@@ -36,6 +37,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// <param name="tmpPath">一時フォルダーのパス</param>
         /// <returns></returns>
         IAttemptResult<AddonInfomation> LoadManifest(string tmpPath);
+
+        /// <summary>
+        /// インストール時に作成された一時ファイルを書き換える
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult ReplaceTemporaryFiles();
     }
 
     public class AddonInstaller : IAddonInstaller
@@ -114,11 +121,10 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 addon.SetData(mResult.Data);
             }
 
-            string iconFileName = Path.GetFileName(updateInfomation?.IconPathRelative.Value) ?? string.Empty;
-            string excludePattern = !iconFileName.IsNullOrEmpty() ? $".*{iconFileName}" : "";
+            string? iconFileName = Path.GetFileName(updateInfomation?.IconPathRelative.Value);
 
             //移動
-            IAttemptResult mvResult = this.MoveAddon(tempPath, Path.Combine(FileFolder.AddonsFolder, packageID), excludePattern);
+            IAttemptResult mvResult = this.MoveAddon(tempPath, Path.Combine(FileFolder.AddonsFolder, packageID), iconFileName);
             if (!mvResult.IsSucceeded)
             {
                 return new AttemptResult<AddonInfomation>() { Message = mvResult.Message, Exception = mvResult.Exception };
@@ -175,6 +181,40 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             return this.manifestLoader.LoadManifest(manifestPath);
         }
 
+        public IAttemptResult ReplaceTemporaryFiles()
+        {
+            List<string> files;
+            try
+            {
+                files = this.directoryIO.GetFiles(FileFolder.AddonsFolder, "*.tmp", true);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("一時ファイルの一覧を取得できませんでした。", e);
+                return new AttemptResult<string>() { Message = "一時ファイルの一覧を取得できませんでした。", Exception = e };
+            }
+
+            foreach (string file in files)
+            {
+                if (!file.EndsWith(".tmp")) continue;
+
+                string newPath = Regex.Replace(file, @"\.tmp$", "");
+
+                try
+                {
+                    this.fileIO.Move(file, newPath, true);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error($"一時ファイルの移動に失敗しました。(旧:{file}, 新:{newPath})", e);
+                    return new AttemptResult<string>() { Message = $"一時ファイルの移動に失敗しました。(旧:{file}, 新:{newPath})", Exception = e };
+                }
+            }
+
+            return new AttemptResult<string>() { IsSucceeded = true };
+        }
+
+
 
 
         #region private
@@ -221,7 +261,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         /// <param name="sourcePath"></param>
         /// <param name="targetPath"></param>
         /// <returns></returns>
-        private IAttemptResult MoveAddon(string sourcePath, string targetPath, string excludePattern)
+        private IAttemptResult MoveAddon(string sourcePath, string targetPath, string? iconFileName)
         {
             if (!this.directoryIO.Exists(targetPath))
             {
@@ -236,9 +276,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
                 }
             }
 
+            bool isIconUsed = iconFileName is not null;
+
             try
             {
-                this.directoryIO.MoveAllFiles(sourcePath, targetPath, excludePattern);
+                this.directoryIO.MoveAllFiles(sourcePath, targetPath, p =>
+                {
+                    if (!isIconUsed) return p;
+                    return Regex.IsMatch(p, $"^.*{iconFileName}$") ? p + ".tmp" : p;
+                });
             }
             catch (Exception e)
             {

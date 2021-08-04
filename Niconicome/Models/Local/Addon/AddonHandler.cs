@@ -42,7 +42,7 @@ namespace Niconicome.Models.Local.Addon
     public class AddonHandler : IAddonHandler
     {
 
-        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller)
+        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller,IAddonInstaller installer)
         {
             this.container = container;
             this.directoryIO = directoryIO;
@@ -51,6 +51,7 @@ namespace Niconicome.Models.Local.Addon
             this.contexts = contexts;
             this.settingHandler = settingHandler;
             this.uninstaller = uninstaller;
+            this.installer = installer;
         }
 
         #region field
@@ -68,6 +69,8 @@ namespace Niconicome.Models.Local.Addon
         private readonly ILocalSettingHandler settingHandler;
 
         private readonly IAddonUninstaller uninstaller;
+
+        private readonly IAddonInstaller installer;
 
         private bool isInitialized;
 
@@ -90,6 +93,12 @@ namespace Niconicome.Models.Local.Addon
             if (!dResult.IsSucceeded)
             {
                 return new AttemptResult() { Message = "アンインストール済みアドオンフォルダーの削除に失敗しました。", Exception = dResult.Exception };
+            }
+
+            IAttemptResult mResult = this.installer.ReplaceTemporaryFiles();
+            if (!mResult.IsSucceeded)
+            {
+                return new AttemptResult() { Message = mResult.Message, Exception = mResult.Exception };
             }
 
             List<string> packages;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -90,6 +91,11 @@ namespace Niconicome.ViewModels.Controls
             if (buttons.HasFlag(CommonMessageBoxButtons.Cancel))
             {
                 this.CancelVisibility.Value = true;
+            }
+
+            if (parameters.GetValue<CommonMessageBoxAPI.MessageType>(CommonMessageBoxAPI.TypeKey) == CommonMessageBoxAPI.MessageType.Warinng)
+            {
+                SystemSounds.Exclamation.Play();
             }
         }
 
