@@ -14,7 +14,7 @@ namespace NiconicomeTest.Local.Addons.Core.Permission
             this.permissionsHandler = new PermissionsHandler();
         }
 
-        [TestCase("hook", true)]
+        [TestCase("hooks", true)]
         [TestCase("fuga", false)]
         public void 権限を確認する(string name, bool expectedResult)
         {
