@@ -6,9 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Application;
 using Niconicome.ViewModels;
+using Niconicome.Views.AddonPage;
+using Niconicome.Views.AddonPage.Install;
+using Niconicome.Views.Controls.MVVM;
 using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Unity;
+using AM = Niconicome.Views.AddonPage;
 
 namespace Niconicome
 {
@@ -36,6 +40,13 @@ namespace Niconicome
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterDialog<AddonManagerWindow>(nameof(AddonManagerWindow));
+            containerRegistry.RegisterDialog<AddonInstallWindow>(nameof(AddonInstallWindow));
+            containerRegistry.RegisterDialog<CommonMessageBox>(nameof(CommonMessageBox));
+            containerRegistry.RegisterForNavigation<FileOpenPage>();
+            containerRegistry.RegisterForNavigation<AddonLoadPage>();
+            containerRegistry.RegisterForNavigation<AddonInstallPage>();
+            containerRegistry.RegisterForNavigation<AM::Pages.MainPage>();
         }
 
         /// <summary>

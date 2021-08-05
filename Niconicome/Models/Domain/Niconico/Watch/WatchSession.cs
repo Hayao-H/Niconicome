@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
@@ -188,7 +189,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             }
 
             //ダウンロード不可能な場合は処理をキャンセル
-            if (!this.Video.DmcInfo?.IsDownloadsble ?? false)
+            if (!this.Video.DmcInfo?.IsDownloadable ?? false)
             {
                 if (this.Video.DmcInfo?.IsEncrypted ?? false)
                 {
@@ -391,7 +392,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             data.Session.Recipe_id = sessionIfnfo.RecipeId;
             data.Session.Content_id = sessionIfnfo.ContentId;
             data.Session.Content_type = "movie";
-            data.Session.Content_src_id_sets.Add(sessionIfnfo.ContentSrcIdSets);
+            data.Session.Content_src_id_sets.Add(this.GetContentSrcIdSets(sessionIfnfo));
             data.Session.Timing_constraint = "unlimited";
             data.Session.Keep_method.Heartbeat.Lifetime = sessionIfnfo.HeartbeatLifetime;
             data.Session.Protocol.Name = "http";
@@ -459,6 +460,54 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             var postData = this.GetPostData(videoinfo);
             return this.GetSessionInfoAsync(postData);
         }
+
+        #region private
+
+
+        /// <summary>
+        /// Content_Src_Id_Setsを構成する
+        /// </summary>
+        /// <param name="sessionInfo"></param>
+        /// <returns></returns>
+        private DmcRequest::Content_Src_Id_Sets GetContentSrcIdSets(ISessionInfo sessionInfo)
+        {
+
+            sessionInfo.Videos.Sort((a, b) =>
+            {
+                if (a.EndsWith("_low")) return -1;
+                if (b.EndsWith("_low")) return 1;
+                return string.Compare(a, b);
+            });
+            var videoSrc = sessionInfo.Videos.Select((value, index) => new { value, index }).ToList();
+            string audio = sessionInfo.Audios[0];
+            var sets = new DmcRequest::Content_Src_Id_Sets();
+
+            foreach (var video in videoSrc)
+            {
+                var idsData = new DmcRequest::Content_Src_Ids();
+                idsData.Src_id_to_mux.Audio_src_ids.Add(audio);
+                int videosCount = videoSrc.Count - video.index;
+
+                foreach (var i in Enumerable.Range(0, videosCount))
+                {
+                    idsData.Src_id_to_mux.Video_src_ids.Add(videoSrc[i].value);
+                }
+
+                //idsData.Src_id_to_mux.Video_src_ids = idsData.Src_id_to_mux.Video_src_ids.OrderByDescending(s => s).ToList();
+                idsData.Src_id_to_mux.Video_src_ids.Sort((a, b) =>
+                {
+                    if (a.EndsWith("_low")) return 1;
+                    if (b.EndsWith("_low")) return -1;
+                    return string.Compare(b, a);
+                });
+
+                sets.Content_src_ids.Add(idsData);
+
+            }
+
+            return sets;
+        }
+        #endregion
     }
 
 }

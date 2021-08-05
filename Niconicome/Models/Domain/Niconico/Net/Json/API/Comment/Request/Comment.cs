@@ -29,7 +29,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request
         public string Version { get; set; } = string.Empty;
 
         [JsonPropertyName("fork")]
-        public int Fork { get; set; }
+        public long Fork { get; set; }
 
         [JsonPropertyName("language")]
         public int Language { get; set; }
@@ -71,7 +71,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Request
         public string Thread { get; set; } = string.Empty;
 
         [JsonPropertyName("fork")]
-        public int Fork { get; set; }
+        public long Fork { get; set; }
 
         [JsonPropertyName("language")]
         public int Language { get; set; }

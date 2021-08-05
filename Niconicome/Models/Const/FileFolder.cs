@@ -24,5 +24,7 @@ namespace Niconicome.Models.Const
         public const string UserChromePath = @"chrome\userChrome.json";
 
         public const string UserChromeFileName = @"userChrome.json";
+
+        public const string AddonsFolder = @"addons";
     }
 }

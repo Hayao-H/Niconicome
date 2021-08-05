@@ -8,6 +8,7 @@
         xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
         xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        Background="{StaticResource MaterialDesignPaper}"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -16,10 +17,8 @@
         TextOptions.TextRenderingMode="Auto"
         FontFamily="Yu Gothic"
       d:DesignHeight="450" d:DesignWidth="800"
+      d:DataContext="{d:DesignInstance {x:Type vm:DebugSettingsPageViewModelD},IsDesignTimeCreatable=True}"
       Title="デバッグ設定">
-    <Page.DataContext>
-        <vm:DebugSettingsPageViewModel/>
-    </Page.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -46,15 +45,25 @@
                 <TextBlock Margin="3 0" Text="{Binding LogFilePath}" VerticalAlignment="Center" TextWrapping="Wrap"/>
             </StackPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
-            <StackPanel Orientation="Horizontal">
+            <DockPanel>
                 <materialDesign:PackIcon Kind="Bug" Foreground="SkyBlue">
                     <materialDesign:PackIcon.RenderTransform>
                         <TranslateTransform Y="7"/>
                     </materialDesign:PackIcon.RenderTransform>
                 </materialDesign:PackIcon>
                 <Label Content="デバッグモード"/>
-                <ToggleButton Margin="4 0" IsChecked="{Binding IsDebugMode}"/>
-            </StackPanel>
+                <ToggleButton HorizontalAlignment="Right" Margin="4 0" IsChecked="{Binding IsDebugMode.Value}"/>
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
+                <materialDesign:PackIcon Kind="Wrench" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="開発者モード"/>
+                <ToggleButton HorizontalAlignment="Right" Margin="4 0" IsChecked="{Binding IsDevMode.Value}"/>
+            </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
         </StackPanel>
     </Grid>

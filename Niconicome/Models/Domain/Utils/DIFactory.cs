@@ -44,6 +44,11 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using Style = Niconicome.Models.Domain.Local.Style;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
+using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
+using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
+using Addons = Niconicome.Models.Local.Addon;
+using AddonAPI = Niconicome.Models.Local.Addon.API;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -91,7 +96,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Mylist::IWatchLaterHandler, Mylist::WatchLaterHandler>();
             services.AddTransient<UVideo::IUserVideoHandler, UVideo::UserVideoHandler>();
             services.AddTransient<Net::IRemotePlaylistHandler, Net::RemotePlaylistHandler>();
-            services.AddTransient<State::ILocalInfo, State::LocalInfo>();
+            services.AddSingleton<State::ILocalInfo, State::LocalInfo>();
             services.AddTransient<DomainNet::ICacheHandler, DomainNet::CacheHandler>();
             services.AddTransient<DomainNet::ICacheStraem, DomainNet::CacheStream>();
             services.AddSingleton<Net::INetworkVideoHandler, Net::NetworkVideoHandler>();
@@ -191,6 +196,26 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
             services.AddSingleton<Playlist::IVideoInfoContainer, Playlist::VideoInfoContainer>();
             services.AddSingleton<Playlist::ILightVideoListinfoHandler, Playlist::LightVideoListinfoHandler>();
+            services.AddTransient<Permissions::IPermissionsHandler, Permissions::PermissionsHandler>();
+            services.AddTransient<AddonsCore::IJavaScriptExecuter, AddonsCore::JavaScriptExecuter>();
+            services.AddTransient<AddonsCore::AutoUpdate.Github.IReleaseChecker, AddonsCore::AutoUpdate.Github.ReleaseChecker>();
+            services.AddSingleton<AddonsCore::IAddonInfomationsContainer, AddonsCore::AddonInfomationsContainer>();
+            services.AddSingleton<AddonsCore::Engine.Context.IAddonContexts, AddonsCore::Engine.Context.AddonContexts>();
+            services.AddSingleton<AddonsCore::Engine.Context.IAddonContext, AddonsCore::Engine.Context.AddonContext>();
+            services.AddSingleton<AddonsCore::Engine.IAddonEngine, AddonsCore::Engine.AddonEngine>();
+            services.AddTransient<AddonsCore::Engine.IAddonLogger, AddonsCore::Engine.AddonLogger>();
+            services.AddTransient<AddonsCore::Installer.IAddonStoreHandler, AddonsCore::Installer.AddonStoreHandler>();
+            services.AddTransient<AddonsCore::Installer.IAddonInstaller, AddonsCore::Installer.AddonInstaller>();
+            services.AddTransient<AddonsCore::Installer.IManifestLoader, AddonsCore::Installer.ManifestLoader>();
+            services.AddSingleton<Addons::IAddonHandler, Addons::AddonHandler>();
+            services.AddSingleton<Addons::IAddonInstallManager, Addons::AddonInstallManager>();
+            services.AddTransient<AddonAPI.Local.IO.IOutput, AddonAPI.Local.IO.Output>();
+            services.AddTransient<AddonAPI.Net.Http.Fetch.IFetch, AddonAPI.Net.Http.Fetch.Fetch>();
+            services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
+            services.AddTransient<AddonsCore::Installer.IAddonUninstaller, AddonsCore::Installer.AddonUninstaller>();
+            services.AddSingleton<AddonsDomainAPI::Hooks.IHooksManager, AddonsDomainAPI::Hooks.HooksManager>();
+            services.AddTransient<AddonAPI::Net.Hooks.IHooks, AddonAPI::Net.Hooks.Hooks>();
+            services.AddTransient<AddonAPI::Local.IO.ILog, AddonAPI::Local.IO.Log>();
             return services.BuildServiceProvider();
         }
 

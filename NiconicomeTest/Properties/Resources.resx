@@ -130,11 +130,17 @@
   <data name="Elfenlied_Channel" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Elfenlied_Channel.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
   </data>
+  <data name="GithubReleases" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\GithubReleases.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
+  </data>
   <data name="IchibaHtml" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\IchibaHtml.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
   </data>
   <data name="IchibaResponse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\IchibaResponse.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
+  </data>
+  <data name="ManifestV1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ManifestV1.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
   </data>
   <data name="Niconico_Kakushigoto" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Niconico_Kakushigoto.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>

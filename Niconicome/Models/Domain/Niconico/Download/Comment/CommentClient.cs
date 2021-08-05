@@ -140,13 +140,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             return data;
         }
 
-        private (long, int) GetDefaultPosyTarget(IDmcInfo dmcInfo)
+        private (long, long) GetDefaultPosyTarget(IDmcInfo dmcInfo)
         {
             foreach (var thread in dmcInfo.CommentThreads)
             {
                 if (thread.IsDefaultPostTarget)
                 {
-                    return (thread.Id, thread.Fork);
+                    return (thread.ID, thread.Fork);
                 }
             }
 
