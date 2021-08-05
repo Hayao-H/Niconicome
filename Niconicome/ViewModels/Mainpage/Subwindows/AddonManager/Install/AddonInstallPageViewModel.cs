@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Helper.Result;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
@@ -34,10 +35,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
                     else
                     {
                         this.AppendLine("インストールが完了しました。");
-                        WS::AddonPage.Queue.Enqueue("インストールを完了するには、再起動が必要です。", "再起動", () =>
-                         {
-                             WS::AddonPage.PowerManager.Restart();
-                         });
+                        this.MessageQueue.Enqueue("インストールを完了するには、再起動が必要です。", "再起動", () =>
+                          {
+                              WS::AddonPage.PowerManager.Restart();
+                          });
                     }
 
                     this.IsInstalling.Value = false;
@@ -56,6 +57,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
         public ReactiveProperty<string> Message { get; init; } = new("準備完了。");
 
         public ReactiveProperty<bool> IsInstalling { get; init; } = new();
+
+        public SnackbarMessageQueue MessageQueue { get; init; } = new();
 
         #endregion
 
@@ -96,5 +99,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
         public ReactiveProperty<bool> IsInstalling { get; init; } = new(true);
 
         public ReactiveCommand Install { get; init; } = new();
+
+        public SnackbarMessageQueue MessageQueue { get; init; } = new();
+
     }
 }

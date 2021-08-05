@@ -26,12 +26,13 @@
         <Border Grid.Row="1" Margin="10" BorderThickness="1" BorderBrush="#1E1E1E">
             <TextBlock Margin="3" Text="{Binding Message.Value}"/>
         </Border>
-        <DockPanel Grid.Row="2" Margin="0 5" HorizontalAlignment="Center">
+        <DockPanel Grid.Row="2" Margin="0 5"  HorizontalAlignment="Center">
             <Button Content="インストールする"
                     Command="{Binding Install}"/>
             <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
                          Margin="8 0 0 0"
                          IsIndeterminate="{Binding IsInstalling.Value}"/>
         </DockPanel>
+        <materialDesign:Snackbar Grid.Row="2" MessageQueue="{Binding MessageQueue}"/>
     </Grid>
 </UserControl>
