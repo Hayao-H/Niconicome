@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             if (dThread == -1 || dFork == -1) throw new InvalidOperationException("DefaultPostTargetが見つかりません。");
 
-            var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork,settings.IsUnsafeHandleEnable);
+            var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork, settings.IsUnsafeHandleEnable);
             Response::Chat? first = null;
             int index = 0;
             long lastNo = 0;
@@ -127,8 +128,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 When = when ?? 0
             };
             var request = await this.requestBuilder.GetRequestDataAsync(dmcInfo, option);
+            string server = dmcInfo.CommentThreads.FirstOrDefault()?.Server ?? @"https://nmsg.nicovideo.jp/api.json";
 
-            var res = await this.http.PostAsync(new Uri("https://nmsg.nicovideo.jp/api.json/"), new StringContent(request));
+            if (!server.EndsWith("/api.json"))
+            {
+                server += "/api.json";
+            }
+
+            var res = await this.http.PostAsync(new Uri(server), new StringContent(request));
             if (!res.IsSuccessStatusCode)
             {
                 throw new HttpRequestException($"コメントの取得に失敗しました。(status_code:{(int)res.StatusCode}, reason_phrase:{res.ReasonPhrase})");
