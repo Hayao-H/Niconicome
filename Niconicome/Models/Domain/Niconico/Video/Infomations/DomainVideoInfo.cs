@@ -109,22 +109,33 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                     dynamic rawhumb = this.RawDmcInfo.ThumbInfo;
                     dynamic rawSesison = this.RawDmcInfo.SessionInfo;
 
-                    var sessioninfo = new SessionInfo()
+                    ISessionInfo sessionInfo;
+
+                    if (this.RawDmcInfo.IsDownloadable)
                     {
-                        RecipeId = rawSesison.RecipeId,
-                        ContentId = rawSesison.ContentId,
-                        HeartbeatLifetime = rawSesison.HeartbeatLifetime,
-                        Token = rawSesison.Token,
-                        Signature = rawSesison.Signature,
-                        AuthType = rawSesison.AuthType,
-                        ContentKeyTimeout = rawSesison.ContentKeyTimeout,
-                        ServiceUserId = rawSesison.ServiceUserId,
-                        PlayerId = rawSesison.PlayerId,
-                        TransferPriset = rawSesison.TransferPriset,
-                        Priority = rawSesison.Priority,
-                    };
-                    sessioninfo.Videos.AddRange(JsUtils.ToClrArray<string>(rawSesison.Videos));
-                    sessioninfo.Audios.AddRange(JsUtils.ToClrArray<string>(rawSesison.Audios));
+
+                        sessionInfo = new SessionInfo()
+                        {
+                            RecipeId = rawSesison.RecipeId,
+                            ContentId = rawSesison.ContentId,
+                            HeartbeatLifetime = rawSesison.HeartbeatLifetime,
+                            Token = rawSesison.Token,
+                            Signature = rawSesison.Signature,
+                            AuthType = rawSesison.AuthType,
+                            ContentKeyTimeout = rawSesison.ContentKeyTimeout,
+                            ServiceUserId = rawSesison.ServiceUserId,
+                            PlayerId = rawSesison.PlayerId,
+                            TransferPriset = rawSesison.TransferPriset,
+                            Priority = rawSesison.Priority,
+                        };
+                        sessionInfo.Videos.AddRange(JsUtils.ToClrArray<string>(rawSesison.Videos));
+                        sessionInfo.Audios.AddRange(JsUtils.ToClrArray<string>(rawSesison.Audios));
+                    }
+                    else
+                    {
+                        sessionInfo = new SessionInfo();
+                    }
+
 
                     this.cachedDmcInfo = new DmcInfo()
                     {
@@ -148,9 +159,10 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         UploadedOn = JsUtils.ToLocalDateTime(this.RawDmcInfo.UploadedOn),
                         DownloadStartedOn = JsUtils.ToLocalDateTime(this.RawDmcInfo.DownloadStartedOn),
                         ThumbInfo = new ThumbInfo(rawhumb.large, rawhumb.middle, rawhumb.normal, rawhumb.player),
-                        SessionInfo = sessioninfo,
+                        SessionInfo = sessionInfo,
                     };
                     this.cachedDmcInfo.Tags.AddRange(JsUtils.ToClrArray<string>(this.RawDmcInfo.Tags));
+
 
                     List<dynamic> threads = JsUtils.ToClrArray<dynamic>(this.RawDmcInfo.CommentThreads);
 
