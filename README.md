@@ -14,7 +14,7 @@
 ---
 
 ## 機能
-- 動画・サムネイル・コメントのダウンロード。(コメントサーバー移行に対応@[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0))
+- 動画・サムネイル・コメントのダウンロード。(:new: コメントサーバー移行に対応@[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0))
 - 投稿者コメント、かんたんコメント、過去ログをオプションで取捨可能。
 - 暗号化動画（公式アニメ）のコメント・サムネイルダウンロード。
 - ローカルDBによるデータ管理。
@@ -27,7 +27,7 @@
 - NicomentXenoglossiaからのプレイリストデータ移行。
 - Mozilla Firefoxとのログイン連携。
 ### 今後追加予定の機能
-- Webview2・JavaScriptベースのプラグイン機能(未定・[ClearScript](https://github.com/microsoft/ClearScript)使用予定・[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0)で一部実装)。
+-  :new: Webview2・JavaScriptベースのプラグイン機能([ClearScript](https://github.com/microsoft/ClearScript)を利用・[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0)で一部実装)。
 
 ---
 
