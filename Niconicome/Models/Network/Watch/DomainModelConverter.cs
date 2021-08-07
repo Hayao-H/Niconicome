@@ -63,15 +63,7 @@ namespace Niconicome.Models.Network.Watch
             //サムネイル
             if (domainVideoInfo.DmcInfo is not null && domainVideoInfo.DmcInfo.ThumbInfo is not null)
             {
-                if (!domainVideoInfo.DmcInfo.ThumbInfo.Large.IsNullOrEmpty())
-                {
-                    info.ThumbUrl.Value = domainVideoInfo.DmcInfo.ThumbInfo.Large;
-                }
-
-                if (!domainVideoInfo.DmcInfo.ThumbInfo.Normal.IsNullOrEmpty())
-                {
-                    info.ThumbUrl.Value = domainVideoInfo.DmcInfo.ThumbInfo.Normal;
-                }
+                info.ThumbUrl.Value = domainVideoInfo.DmcInfo.ThumbInfo.GetSpecifiedThumbnail(ThumbSize.Large);
             }
 
         }

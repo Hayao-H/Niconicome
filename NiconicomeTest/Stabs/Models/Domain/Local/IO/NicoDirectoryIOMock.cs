@@ -39,8 +39,18 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
 
         public void DeleteAll(Predicate<string> predicate, bool recurse = true)
         {
+        }
+
+        public void MoveAllFiles(string source,string target)
+        {
 
         }
+
+        public void MoveAllFiles(string sourceDir, string targetDir, Func<string, string?> resolver)
+        {
+
+        }
+
 
 
         public List<string> GetFiles(string path, string pattern = "*", bool recurse = false)
@@ -52,5 +62,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
         {
             return this.getdirFunc(path, pattern, recurse);
         }
+
+        public void Move(string source, string destination)
+        {
+
+        }
+
     }
 }

@@ -1,7 +1,7 @@
 # Niconicome(α)
 [![.Net5 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net5%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net5+CI%2FCD%22) 
 [![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
-[![Github Release](https://img.shields.io/badge/release-v0.7.1-blue)](https://github.com/Hayao-H/Niconicome/releases)
+[![Github Release](https://img.shields.io/badge/release-v0.8.0-blue)](https://github.com/Hayao-H/Niconicome/releases)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
@@ -14,9 +14,9 @@
 ---
 
 ## 機能
-- 動画・サムネイル・コメントのダウンロード。
-- 投稿者コメント、「かんたんコメント」、過去ログをオプションで取捨可能。
-- 暗号化動画(公式アニメ)のコメント・サムネイルダウンロード。
+- 動画・サムネイル・コメントのダウンロード。(:new: コメントサーバー移行に対応@[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0))
+- 投稿者コメント、かんたんコメント、過去ログをオプションで取捨可能。
+- 暗号化動画（公式アニメ）のコメント・サムネイルダウンロード。
 - ローカルDBによるデータ管理。
 - [AIMP](https://www.aimp.ru/)で再生可能な形式のプレイリストを出力。
 - マイリスト、あとで見る(旧:とりあえずマイリスト)、ユーザー・チャンネル投稿動画からの一括登録。
@@ -25,8 +25,9 @@
 - 外部ソフトの起動。
 - データベースファイルのバックアップ・復元。 
 - NicomentXenoglossiaからのプレイリストデータ移行。
+- Mozilla Firefoxとのログイン連携。
 ### 今後追加予定の機能
-- Webview2・JavaScriptベースのプラグイン機能(未定・[ClearScript](https://github.com/microsoft/ClearScript)使用予定)。
+-  :new: Webview2・JavaScriptベースのプラグイン機能([ClearScript](https://github.com/microsoft/ClearScript)を利用・[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0)で一部実装)。
 
 ---
 
@@ -45,7 +46,12 @@
 
 ## 実行する
 #### インストール
-特に設定は必要ありません。実行ファイルを任意のディレクトリに保存して実行してください。
+0. [リリースページ](https://github.com/Hayao-H/Niconicome/releases)の実行ファイルと[アドオン](https://github.com/Hayao-H/PageAnalyzePlugin/releases)を保存してください。
+1. 実行ファイルを任意のディレクトリに保存して実行してください。
+2. 左上のハンバーガーメニューから「アドオン」を選択してください。
+3. 「追加」ボタンを押してください。
+4. 先程DLした「PageAnalyzePlugin」を選択してインストールしてください。
+5. 再起動するとインストール完了です。
 #### アンインストール
 現在、レジストリは使用していませんが、パスワードの保存にWIndowsの資格情報マネージャーの機能を使っています。パスワードを保存している場合は、「コントロールパネル>>資格情報マネージャー>>Windows資格情報」で「https://nicovideo.jp」を削除してください。  
 **※他のアプリケーションがこの項目を使用している可能性があります。資格情報の削除は、影響を充分に理解した上で行ってください。**
@@ -68,15 +74,13 @@ WPFと.NET5を用いて開発しています。したがって、対応OSはそ�
 
 ## 開発環境
 - .NET5 & WPF
-- Visual Studio Community 2019
+- Visual Studio Community 2022 Preview
 - VS Code
 
 ---
 
 ## スクリーンショット
-![img-001](Niconicome/src/doc/img/img-001.jpg)
-![img-002](Niconicome/src/doc/img/img-002.jpg)
-![img-003](Niconicome/src/doc/img/img-003.jpg)
-![img-004](Niconicome/src/doc/img/img-004.jpg)
-![img-005](Niconicome/src/doc/img/img-005.jpg)
+![img-001](Niconicome/src/doc/img/img-001.png)
+![img-002](Niconicome/src/doc/img/img-002.png)
+![img-003](Niconicome/src/doc/img/img-003.png)
 

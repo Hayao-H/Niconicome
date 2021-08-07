@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Niconicome.ViewModels.Setting.Pages;
 
 namespace Niconicome.Views.Setting.Pages
 {
@@ -23,6 +24,7 @@ namespace Niconicome.Views.Setting.Pages
         public DebugSettingsPage()
         {
             this.InitializeComponent();
+            this.DataContext = new DebugSettingsPageViewModel();
         }
     }
 }

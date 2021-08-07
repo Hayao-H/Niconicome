@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Niconicome": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "nativeDebugging": false
     }
   }
 }

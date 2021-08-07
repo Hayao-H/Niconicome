@@ -176,7 +176,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 //過去ログの場合はwaybackkeyを取得
                 if (options.When != default)
                 {
-                    this.wayBackkey = await this.officialVideoUtils.GetWaybackkeyAsync(thread.Id.ToString());
+                    this.wayBackkey = await this.officialVideoUtils.GetWaybackkeyAsync(thread.ID.ToString());
                 }
 
                 //投コメ
@@ -217,11 +217,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private Request::Thread GetThread(WathJson::Thread thread, IDmcInfo dmcInfo, ICommentOptions options)
+        private Request::Thread GetThread(IThread thread, IDmcInfo dmcInfo, ICommentOptions options)
         {
             var data = new Request::Thread
             {
-                Thread_ = thread.Id.ToString(),
+                Thread_ = thread.ID.ToString(),
                 Language = 0,
                 UserId = dmcInfo.UserId,
                 WithGlobal = 1,
@@ -279,14 +279,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private Request::ThreadLeaves GetThreadLeaves(WathJson::Thread thread, IDmcInfo dmcInfo, ICommentOptions options)
+        private Request::ThreadLeaves GetThreadLeaves(IThread thread, IDmcInfo dmcInfo, ICommentOptions options)
         {
             double divided = dmcInfo.Duration / 60d;
             double min = Math.Ceiling(divided);
 
             var data = new ThreadLeaves
             {
-                Thread = thread.Id.ToString(),
+                Thread = thread.ID.ToString(),
                 Language = 0,
                 UserId = dmcInfo.UserId,
                 Content = $"0-{min}:0,500",

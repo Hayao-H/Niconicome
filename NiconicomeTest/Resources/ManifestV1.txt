@@ -1,0 +1,20 @@
+    {
+      "manifest_version": "1.0",
+      "auto_update_policy": {
+        "auto_update": false,
+        "github_release": false,
+        "github_release_filename_pattern": "",
+        "github_owner_name": "",
+        "github_repo_name": ""
+      },
+      "scripts": {
+        "background_script": ""
+      },
+      "manifestVersion": "1.0",
+      "name": "Test",
+      "author": "Test",
+      "description": "Test",
+      "version": "1.0.0",
+      "identifier": "Test_ID",
+      "permissions": []
+    }

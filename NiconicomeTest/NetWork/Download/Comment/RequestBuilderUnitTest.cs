@@ -18,7 +18,7 @@ namespace NiconicomeTest.NetWork.Download.Comment
         public RequestBuilderUnitTest()
         {
             var parser = new WatchPageHtmlParser();
-            this.dmcInfo = parser.GetDmcInfo(Properties.Resources.Niconico_Onmyoji, "sm9", "0", WatchInfoOptions.Default);
+            this.dmcInfo = parser.GetDmcInfo(Properties.Resources.Niconico_Onmyoji, "sm9", "0", WatchInfoOptions.NoDmcData);
         }
 
         [SetUp]

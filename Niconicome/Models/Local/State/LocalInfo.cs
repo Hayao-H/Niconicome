@@ -2,18 +2,33 @@
 using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Models.Local.Settings;
+using Reactive.Bindings;
 using Utils = Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Local.State
 {
     public interface ILocalInfo
     {
-        public string LogFileName { get; }
-        public string ApplicationVersion { get; }
+        string LogFileName { get; }
+        string ApplicationVersion { get; }
+        bool IsAddonManagerOpen { get; set; }
+        bool IsMultiWindowsAllowed { get; }
     }
 
     public class LocalInfo : ILocalInfo
     {
+        public LocalInfo(ILocalSettingsContainer container)
+        {
+            this.settingsContainer = container;
+        }
+
+        #region field
+
+        private ILocalSettingsContainer settingsContainer;
+
+        #endregion
+
         /// <summary>
         /// ログファイル名
         /// </summary>
@@ -38,6 +53,17 @@ namespace Niconicome.Models.Local.State
                 return v?.ToString() ?? "Nan";
             }
         }
+
+        /// <summary>
+        /// アドオンウィンドウ
+        /// </summary>
+        public bool IsAddonManagerOpen { get; set; }
+
+        /// <summary>
+        /// マルチウィンドウ
+        /// </summary>
+        public bool IsMultiWindowsAllowed => !this.settingsContainer.GetReactiveBoolSetting(SettingsEnum.SingletonWindows).Value;
+
 
     }
 }
