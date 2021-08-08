@@ -18,7 +18,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         int Fork { get; }
         bool IsDefaultPostTarget { get; }
         void Add(Response::Comment comment);
-        void Add(List<Response::Comment> comments, bool addSafe = true);
+        void Add(List<Response::Comment> comments);
         void Clear();
         void Distinct();
         void Sort();
@@ -243,9 +243,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// 複数のコメントを追加する
         /// </summary>
         /// <param name="comments"></param>
-        public void Add(List<Response::Comment> comments, bool addSafe = true)
+        public void Add(List<Response::Comment> comments)
         {
             bool nicoruEnded = false;
+            const int commentsBound = 20;
+            int chatCount = this.unsafeHandle ? 0 : comments.Where(c => c.Chat is not null).Count();
 
             var chats = new LinkedList<Response::Comment>();
 
@@ -255,13 +257,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             {
                 if (item.Chat is null) continue;
 
-                if (!nicoruEnded && item.Chat!.Nicoru is not null)
+                if (this.unsafeHandle || chatCount > commentsBound)
                 {
-                    continue;
-                }
-                else if (!nicoruEnded && item.Chat!.Nicoru is null)
-                {
-                    nicoruEnded = true;
+                    if (!nicoruEnded && item.Chat!.Nicoru is not null)
+                    {
+                        continue;
+                    }
+                    else if (!nicoruEnded && item.Chat!.Nicoru is null)
+                    {
+                        nicoruEnded = true;
+                    }
                 }
 
                 chats.AddLast(item);
@@ -269,7 +274,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             //最初の方にある古いコメントを除去する
             //この時点ではすでに昇順
-            if (addSafe && chats.Count > this.comThroughSetting + 20)
+            if (!this.unsafeHandle && chats.Count > this.comThroughSetting + commentsBound)
             {
                 var first = this.GetFirstComment();
                 bool isFirstIsOldEnough = first is null ? false : first.No < this.comThroughSetting + 10;
@@ -326,7 +331,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 {
                     child.Distinct();
                 }
-            } else
+            }
+            else
             {
                 var copy = this.Clone();
                 this.commentsfield.Clear();
