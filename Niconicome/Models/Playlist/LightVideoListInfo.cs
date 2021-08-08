@@ -13,7 +13,7 @@ namespace Niconicome.Models.Playlist
 {
     public interface ILightVideoListInfo
     {
-        int ID { get; }
+        string NiconicoID { get; }
         ReactiveProperty<bool> IsSelected { get; set; }
 
         ReactiveProperty<string> Message { get; set; }
@@ -21,7 +21,7 @@ namespace Niconicome.Models.Playlist
 
     public interface ILightVideoListinfoHandler
     {
-        ILightVideoListInfo GetLightVideoListInfo(int videoId, int playlistId);
+        ILightVideoListInfo GetLightVideoListInfo(string niconicoID, int playlistId);
         void AddPlaylist(int playlistID);
     }
 
@@ -49,14 +49,14 @@ namespace Niconicome.Models.Playlist
         /// <param name="videoId"></param>
         /// <param name="playlistId"></param>
         /// <returns></returns>
-        public ILightVideoListInfo GetLightVideoListInfo(int videoId, int playlistId)
+        public ILightVideoListInfo GetLightVideoListInfo(string niconicoID, int playlistId)
         {
             List<ILightVideoListInfo> list = this.videoListInfos[playlistId];
 
-            ILightVideoListInfo? video = list.Find(v => v.ID == videoId);
+            ILightVideoListInfo? video = list.Find(v => v.NiconicoID == niconicoID);
             if (video is null)
             {
-                video = new LightVideoListInfo() { ID = videoId };
+                video = new LightVideoListInfo() { NiconicoID = niconicoID };
                 video.IsSelected.Skip(1).Subscribe(value =>
                 {
                     if ((this.current.SelectedPlaylist.Value?.Id ?? -1) == playlistId)
@@ -97,7 +97,7 @@ namespace Niconicome.Models.Playlist
     public class LightVideoListInfo : ILightVideoListInfo
     {
 
-        public int ID { get; init; }
+        public string NiconicoID { get; init; } = string.Empty;
 
         public ReactiveProperty<bool> IsSelected { get; set; } = new();
 

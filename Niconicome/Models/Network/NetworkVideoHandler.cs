@@ -159,7 +159,7 @@ namespace Niconicome.Models.Network
                         videos.Add(item.video);
                         if (uncheck)
                         {
-                            this.lightVideoListinfoHandler.GetLightVideoListInfo(item.video.Id.Value, playlistID ?? -1).IsSelected.Value = false;
+                            this.lightVideoListinfoHandler.GetLightVideoListInfo(item.video.NiconicoId.Value, playlistID ?? -1).IsSelected.Value = false;
                         }
                     }
                     else
