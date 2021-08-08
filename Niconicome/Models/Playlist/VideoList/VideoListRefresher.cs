@@ -128,7 +128,7 @@ namespace Niconicome.Models.Playlist.VideoList
                     video = this.videoHandler.GetVideo(originalVideo.Id.Value);
                 }
 
-                ILightVideoListInfo light = this.lightVideoListinfoHandler.GetLightVideoListInfo(video.Id.Value, playlistID);
+                ILightVideoListInfo light = this.lightVideoListinfoHandler.GetLightVideoListInfo(video.NiconicoId.Value, playlistID);
                 video.Message = light.Message;
                 video.IsSelected = light.IsSelected;
 
