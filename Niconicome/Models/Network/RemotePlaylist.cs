@@ -124,12 +124,7 @@ namespace Niconicome.Models.Network
             return new AttemptResult<IEnumerable<IListVideoInfo>>()
             {
                 IsSucceeded = true,
-                Data = searchResult.Videos?.Select(v =>
-                {
-                    IListVideoInfo lVIdeo = this.videoInfoContainer.GetVideo(v.Id);
-                    this.converter.ConvertDomainVideoInfoToListVideoInfo(lVIdeo, v);
-                    return lVIdeo;
-                }),
+                Data = searchResult.Videos,
             };
         }
 
