@@ -19,8 +19,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 {
     public interface IWatchInfohandler
     {
-        Task<IDomainVideoInfo> GetVideoInfoAsync(string id, WatchInfoOptions options);
-        WatchInfoHandlerState State { get; }
+        Task<IAttemptResult<IDomainVideoInfo>> GetVideoInfoAsync(string id, WatchInfoOptions options);
     }
     public interface IWatchPageHtmlParser
     {
@@ -34,6 +33,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         HttpRequestFailure,
         NoJsDataElement,
         JsonParsingFailure,
+        AnalyzerIsNotRegistered,
         OK
     }
 
@@ -42,37 +42,29 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     /// </summary>
     public class WatchInfohandler : IWatchInfohandler
     {
-        public WatchInfohandler(INicoHttp http, IWatchPageHtmlParser parser, ILogger logger, INiconicoContext context, IHooksManager hooksManager)
+        public WatchInfohandler(INicoHttp http, ILogger logger, IHooksManager hooksManager)
         {
             this.http = http;
-            this.parser = parser;
             this.logger = logger;
-            this.context = context;
             this.hooksManager = hooksManager;
         }
 
         #region field
 
-        private readonly IWatchPageHtmlParser parser;
-
         private readonly INicoHttp http;
 
         private readonly ILogger logger;
-
-        private readonly INiconicoContext context;
 
         private readonly IHooksManager hooksManager;
 
         #endregion
 
 
-        public WatchInfoHandlerState State { get; private set; } = WatchInfoHandlerState.RequestHasNotCompleted;
-
         /// <summary>
         /// 動画情報を取得する
         /// </summary>
         /// <returns></returns>
-        public async Task<IDomainVideoInfo> GetVideoInfoAsync(string id, WatchInfoOptions options)
+        public async Task<IAttemptResult<IDomainVideoInfo>> GetVideoInfoAsync(string id, WatchInfoOptions options)
         {
             string source;
             Uri url = NiconicoContext.Context.GetPageUri(id);
@@ -84,8 +76,14 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             catch (Exception e)
             {
                 this.logger.Error($"動画情報の取得に失敗しました(url: {url.AbsoluteUri})", e);
-                this.State = WatchInfoHandlerState.HttpRequestFailure;
-                throw new HttpRequestException();
+                return new AttemptResult<IDomainVideoInfo>() { Message = "httpリクエストに失敗しました。(サーバーエラー・IDの指定間違い)", Exception = e };
+            }
+
+            bool isRegistered = this.hooksManager.IsRegistered(HookType.WatchPageParser);
+            if (!isRegistered)
+            {
+                this.logger.Error($"ページ解析プラグイン、またはそれに相当するアドオンがインストールされていないか、初期化が完了していません。");
+                return new AttemptResult<IDomainVideoInfo>() { Message = "視聴ページの解析に失敗しました。(ページ解析プラグイン未インストール)" };
             }
 
             IAttemptResult<dynamic> result;
@@ -94,7 +92,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 
             if (!result.IsSucceeded || result.Data is null)
             {
-                this.State = WatchInfoHandlerState.JsonParsingFailure;
 
                 if (result.Exception is null)
                 {
@@ -105,28 +102,15 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                     this.logger.Error($"視聴ページの解析に失敗しました。(id:{id}, 詳細:{result.Message})", result.Exception);
                 }
 
-                throw new InvalidOperationException();
+                return new AttemptResult<IDomainVideoInfo>() { Message = "視聴ページの解析に失敗しました。(サーバーエラー・プラグインでエラー)" };
             }
 
-            ///try
-            ///{
-            ///    //htmlをパース
-            ///    result = this.parser.GetDmcInfo(source, id, this.context.User.Value?.ID ?? string.Empty, options);
-            ///}
-            ///catch (Exception e)
-            ///{
-            ///    this.State = WatchInfoHandlerState.JsonParsingFailure;
-            ///    this.logger.Error($"視聴ページの解析に失敗しました。(id:{id})", e);
-            ///    throw new InvalidOperationException();
-            ///
-            ///}
-
-            this.State = WatchInfoHandlerState.OK;
-            return new DomainVideoInfo()
+            var info = new DomainVideoInfo()
             {
-                //DmcInfo = result,
                 RawDmcInfo = result.Data,
             };
+
+            return new AttemptResult<IDomainVideoInfo>() { IsSucceeded = true, Data = info };
         }
     }
 

@@ -5,6 +5,8 @@ using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Network.Watch
@@ -12,7 +14,7 @@ namespace Niconicome.Models.Network.Watch
 
     public interface IWatch
     {
-        Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo outInfo, WatchInfoOptions options = WatchInfoOptions.Default);
+        Task<IAttemptResult<IListVideoInfo>> TryGetVideoInfoAsync(string nicoId, WatchInfoOptions options = WatchInfoOptions.Default);
     }
 
     public interface IResult
@@ -23,11 +25,12 @@ namespace Niconicome.Models.Network.Watch
 
     public class Watch : IWatch
     {
-        public Watch(IWatchInfohandler handler, ILogger logger, IDomainModelConverter converter)
+        public Watch(IWatchInfohandler handler, ILogger logger, IDomainModelConverter converter,IVideoInfoContainer container)
         {
             this.handler = handler;
             this.logger = logger;
             this.converter = converter;
+            this.container = container;
         }
 
         #region DIされるクラス
@@ -36,6 +39,8 @@ namespace Niconicome.Models.Network.Watch
         private readonly ILogger logger;
 
         private readonly IDomainModelConverter converter;
+
+        private readonly IVideoInfoContainer container;
         #endregion
 
         /// <summary>
@@ -44,21 +49,19 @@ namespace Niconicome.Models.Network.Watch
         /// <param name="nicoId"></param>
         /// <param name="info"></param>
         /// <returns></returns>
-        public async Task<IResult> TryGetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfoOptions options = WatchInfoOptions.Default)
+        public async Task<IAttemptResult<IListVideoInfo>> TryGetVideoInfoAsync(string nicoId, WatchInfoOptions options = WatchInfoOptions.Default)
         {
-            IResult result;
+
+            IAttemptResult<IListVideoInfo> result;
 
             try
             {
-                result = await this.GetVideoInfoAsync(nicoId, info, options);
+                result = await this.GetVideoInfoAsync(nicoId, options);
             }
             catch (Exception e)
             {
-                var failedResult = new Result();
-                this.logger.Error($"動画情報の取得中にエラーが発生しました。(id:{nicoId})", e);
-                failedResult.IsSucceeded = false;
-                failedResult.Message = $"動画情報の取得中にエラーが発生しました。(詳細: id:{nicoId}, message: {e.Message})";
-                return failedResult;
+                this.logger.Error($"動画情報の取得中に不明なエラーが発生しました。(id:{nicoId})", e);
+                return new AttemptResult<IListVideoInfo>() { Message = "動画情報の取得中にエラーが発生しました。", Exception = e };
             }
 
             return result;
@@ -72,37 +75,30 @@ namespace Niconicome.Models.Network.Watch
         /// <param name="info"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<IResult> GetVideoInfoAsync(string nicoId, IListVideoInfo info, WatchInfoOptions options = WatchInfoOptions.Default)
+        private async Task<IAttemptResult<IListVideoInfo>> GetVideoInfoAsync(string nicoId, WatchInfoOptions options = WatchInfoOptions.Default)
         {
-            IDomainVideoInfo retrieved;
-            var result = new Result();
+            IAttemptResult<IDomainVideoInfo> result;
 
             try
             {
-                retrieved = await this.handler.GetVideoInfoAsync(nicoId, options);
+                result = await this.handler.GetVideoInfoAsync(nicoId, options);
             }
-            catch
+            catch (Exception e)
             {
-                result.IsSucceeded = false;
-                result.Message = this.handler.State switch
-                {
-                    WatchInfoHandlerState.HttpRequestFailure => "httpリクエストに失敗しました。(サーバーエラー・IDの指定間違い)",
-                    WatchInfoHandlerState.JsonParsingFailure => "視聴ページの解析に失敗しました。(サーバーエラー)",
-                    WatchInfoHandlerState.NoJsDataElement => "視聴ページの解析に失敗しました。(サーバーエラー・権利のない有料動画など)",
-                    WatchInfoHandlerState.OK => "取得完了",
-                    _ => "不明なエラー"
-                };
-
-                return result;
+                this.logger.Error($"動画情報を取得中に不明なエラーが発生しました。(id:{nicoId})", e);
+                return new AttemptResult<IListVideoInfo>() { Message = $"不明なエラーが発生しました。(詳細:{e.Message})" };
             }
 
-            this.converter.ConvertDomainVideoInfoToListVideoInfo(info, retrieved);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return new AttemptResult<IListVideoInfo>() { Message = result.Message, Exception = result.Exception };
+            }
 
-            result.IsSucceeded = true;
-            result.Message = "取得成功";
+            IListVideoInfo info = this.container.GetVideo(nicoId);
+            this.converter.ConvertDomainVideoInfoToListVideoInfo(info, result.Data);
 
 
-            return result;
+            return new AttemptResult<IListVideoInfo>() { IsSucceeded = true, Data = info };
         }
 
     }
