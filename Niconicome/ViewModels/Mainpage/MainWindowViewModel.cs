@@ -33,13 +33,13 @@ namespace Niconicome.ViewModels.Mainpage
         public MainWindowViewModel(IRegionManager regionManager, IDialogService dialogService)
         {
 
-            WS::Mainpage.Themehandler.Initialize();
-            WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
             this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");
             this.LoginBtnTooltip = new ReactiveProperty<string>("ログイン画面を表示する");
             this.UserImage = new ReactiveProperty<Uri>(new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg"));
 
+            WS::Mainpage.Themehandler.Initialize();
+            WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
 
             this.LoginCommand = new ReactiveCommand()
                 .WithSubscribe(async () =>

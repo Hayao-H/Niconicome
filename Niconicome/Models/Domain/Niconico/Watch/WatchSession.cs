@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
+using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Playlist;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
 using DmcRequest = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request;
 using DmcResponse = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Response;
@@ -21,9 +23,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         bool IsSessionEnsured { get; }
         bool IsSessionExipired { get; }
         string PlaylistUrl { get; }
-        WatchSessionState State { get; }
         public IDomainVideoInfo? Video { get; }
-
+        WatchSessionState State { get; }
         Task<Dmc::IStreamsCollection> GetAvailableStreamsAsync();
     }
 
@@ -44,13 +45,11 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     public enum WatchSessionState
     {
         NotInitialized,
-        HttpRequestFailure,
-        PageAnalyzingFailure,
+        HttpRequestOrPageAnalyzingFailure,
         EncryptedVideo,
         AuthenticationFailure,
         PaymentNeeded,
         SessionEnsuringFailure,
-        UnknownError,
         GotPage,
         OK
     }
@@ -74,37 +73,26 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             this.IsSessionEnsured = false;
         }
 
-        /// <summary>
-        /// ロガー
-        /// </summary>
+        #region field
+
         private readonly Utils::ILogger logger;
 
-        /// <summary>
-        /// DMC
-        /// </summary>
         private readonly IDmcDataHandler dmchandler;
 
-        /// <summary>
-        /// 視聴情報取得
-        /// </summary>
         private readonly IWatchInfohandler watchInfo;
 
         private readonly IWatchPlaylisthandler playlisthandler;
 
-        /// <summary>
-        /// httpクライアント
-        /// </summary>
         private readonly INicoHttp http;
+
+        private IWatchSessionInfo? watchSessionInfo;
+
+        #endregion
 
         /// <summary>
         /// 動画情報
         /// </summary>
         public IDomainVideoInfo? Video { get; private set; }
-
-        /// <summary>
-        /// セッション情報
-        /// </summary>
-        private IWatchSessionInfo? watchSessionInfo;
 
         /// <summary>
         /// セッション確立済みフラグ
@@ -142,22 +130,28 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         {
             var options = isVideoDownload ? WatchInfoOptions.Default : WatchInfoOptions.NoDmcData;
 
+            IAttemptResult<IDomainVideoInfo> result;
+
             try
             {
-                this.Video = await this.watchInfo.GetVideoInfoAsync(id, options);
+                result = await this.watchInfo.GetVideoInfoAsync(id, options);
             }
             catch
             {
-                this.State = this.watchInfo.State switch
-                {
-                    WatchInfoHandlerState.NoJsDataElement => WatchSessionState.PaymentNeeded,
-                    WatchInfoHandlerState.HttpRequestFailure => WatchSessionState.HttpRequestFailure,
-                    _ => WatchSessionState.PageAnalyzingFailure
-                };
+                this.State = WatchSessionState.HttpRequestOrPageAnalyzingFailure;
+                this.logger.Error($"動画情報を取得中に不明なエラーが発生しました。(id:{id})");
                 return;
             }
 
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                this.State = WatchSessionState.HttpRequestOrPageAnalyzingFailure;
+                return;
+            }
+
+            this.Video = result.Data;
             this.State = WatchSessionState.GotPage;
+
         }
 
         /// <summary>
@@ -184,14 +178,14 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 
             if (this.Video is null)
             {
-                this.State = WatchSessionState.PageAnalyzingFailure;
+                this.State = WatchSessionState.HttpRequestOrPageAnalyzingFailure;
                 return;
             }
 
             //ダウンロード不可能な場合は処理をキャンセル
-            if (!this.Video.DmcInfo?.IsDownloadable ?? false)
+            if (!this.Video.DmcInfo.IsDownloadable)
             {
-                if (this.Video.DmcInfo?.IsEncrypted ?? false)
+                if (this.Video.DmcInfo.IsEncrypted)
                 {
                     this.State = WatchSessionState.EncryptedVideo;
                 }

@@ -9,6 +9,7 @@ using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Playlist;
 using Api = Niconicome.Models.Domain.Niconico.Net.Json.API.Search;
 
 namespace Niconicome.Models.Domain.Niconico.Remote.Search
@@ -24,7 +25,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Search
     {
         bool IsSucceeded { get; }
         string? Message { get; }
-        IEnumerable<IDomainVideoInfo>? Videos { get; }
+        IEnumerable<IListVideoInfo>? Videos { get; }
     }
 
     public interface ISearch
@@ -42,14 +43,17 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Search
     /// </summary>
     class Search : ISearch
     {
-        public Search(ISearchClient searchClient, ILogger logger, ISearchUrlConstructor urlConstructor)
+        public Search(ISearchClient searchClient, ILogger logger, ISearchUrlConstructor urlConstructor, IVideoInfoContainer container)
         {
             this.client = searchClient;
             this.logger = logger;
             this.urlConstructor = urlConstructor;
+            this.container = container;
         }
 
-        #region DIされるクラス
+        #region field
+
+        private readonly IVideoInfoContainer container;
 
         private readonly ISearchClient client;
 
@@ -82,15 +86,16 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Search
 
             var videos = data.Data.Select(v =>
             {
-                var dmc = new DmcInfo();
-                dmc.ThumbInfo.Normal = v.ThumbnailUrl;
-                dmc.UploadedOn = v.StartTime.DateTime;
-                dmc.Title = v.Title;
-                dmc.ViewCount = v.ViewCounter;
-                dmc.CommentCount = v.CommentCounter;
-                dmc.MylistCount = v.MylistCounter;
-                dmc.Tags = v.Tags.Split(" ").ToList();
-                return new DomainVideoInfo() { RawDmcInfo = dmc };
+                IListVideoInfo videoInfo = this.container.GetVideo(v.ContentId);
+                videoInfo.NiconicoId.Value = v.ContentId;
+                videoInfo.UploadedOn.Value = v.StartTime.Date;
+                videoInfo.Title.Value = v.Title;
+                videoInfo.ViewCount.Value = v.ViewCounter;
+                videoInfo.CommentCount.Value = v.CommentCounter;
+                videoInfo.MylistCount.Value = v.MylistCounter;
+                videoInfo.Tags = v.Tags.Split(" ");
+                videoInfo.ThumbUrl.Value = v.ThumbnailUrl;
+                return videoInfo;
             });
 
             return new SearchResult() { IsSucceeded = true, Videos = videos };
@@ -164,7 +169,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Search
 
         public string? Message { get; set; }
 
-        public IEnumerable<IDomainVideoInfo>? Videos { get; set; } = new List<IDomainVideoInfo>();
+        public IEnumerable<IListVideoInfo>? Videos { get; set; } = new List<IListVideoInfo>();
     }
 
     /// <summary>
