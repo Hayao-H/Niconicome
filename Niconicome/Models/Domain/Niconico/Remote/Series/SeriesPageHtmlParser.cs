@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Niconicome.Models.Domain.Niconico.Net.Html;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result.Generic;
 
 namespace Niconicome.Models.Domain.Niconico.Remote.Series
@@ -14,6 +16,17 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
 
     public class SeriesPageHtmlParser : ISeriesPageHtmlParser
     {
+        public SeriesPageHtmlParser(INiconicoUtils niconicoUtils)
+        {
+            this.niconicoUtils = niconicoUtils;
+        }
+
+        #region field
+
+        private readonly INiconicoUtils niconicoUtils;
+
+        #endregion
+
         /// <summary>
         /// シリーズページを解析して情報を取得
         /// </summary>
@@ -58,18 +71,19 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
 
             foreach (var videoElm in videos)
             {
-                string id = videoElm.GetAttribute("data-video-itemdata-video-id");
+                IElement? link = videoElm.QuerySelector("a.NC-MediaObject-contents");
+                string? id = this.niconicoUtils.GetNiconicoIdsFromText(link?.GetAttribute("href") ?? string.Empty).FirstOrDefault();
 
                 if (string.IsNullOrEmpty(id)) continue;
 
-                string title = videoElm.QuerySelector(".VideoMediaObject-title a")?.InnerHtml.Trim() ?? string.Empty;
-                string thumb = videoElm.QuerySelector(".Thumbnail-image")?.GetAttribute("data-background-image") ?? string.Empty;
+                string title = videoElm.QuerySelector(".NC-VideoMediaObject-title")?.InnerHtml.Trim() ?? string.Empty;
+                string thumb = videoElm.QuerySelector(".NC-Thumbnail-image")?.GetAttribute("data-background-image") ?? string.Empty;
 
-                DateTime uploadedDT = DateTime.ParseExact(videoElm.QuerySelector(".SeriesVideoListContainer-videoRegisteredAt")?.InnerHtml.Trim() ?? "2000/01/01 00:00 投稿", "yyyy/MM/dd HH:mm 投稿", null);
+                DateTime uploadedDT = DateTime.ParseExact(videoElm.QuerySelector(".NC-VideoRegisteredAtText-text")?.InnerHtml.Trim() ?? "2000/1/1 00:00", "yyyy/M/d H:m", null);
 
-                long.TryParse(videoElm.QuerySelector(".VideoMetaCount-view")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long viewCount);
-                long.TryParse(videoElm.QuerySelector(".VideoMetaCount-mylist")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long mylistCount);
-                long.TryParse(videoElm.QuerySelector(".VideoMetaCount-comment")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long commentCount);
+                long.TryParse(videoElm.QuerySelector(".NC-VideoMetaCount_view")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long viewCount);
+                long.TryParse(videoElm.QuerySelector(".NC-VideoMetaCount_mylist")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long mylistCount);
+                long.TryParse(videoElm.QuerySelector(".NC-VideoMetaCount_comment")?.InnerHtml ?? "0", NumberStyles.AllowThousands, null, out long commentCount);
 
                 var videoinfo = new VideoInfo()
                 {

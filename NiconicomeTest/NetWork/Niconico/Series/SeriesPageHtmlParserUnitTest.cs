@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Remote;
 using Niconicome.Models.Domain.Niconico.Remote.Series;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result.Generic;
 using NUnit.Framework;
 
@@ -17,7 +18,7 @@ namespace NiconicomeTest.NetWork.Niconico.Series
         [SetUp]
         public void SetUp()
         {
-            this.seriesPageHtmlParser = new SeriesPageHtmlParser();
+            this.seriesPageHtmlParser = new SeriesPageHtmlParser(new NiconicoUtils());
         }
 
         [Test]
