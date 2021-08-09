@@ -25,6 +25,13 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
         /// <param name="function"></param>
         /// <param name="type"></param>
         void Register(ScriptObject function, HookType type);
+
+        /// <summary>
+        /// 指定したタイプの関数が登録されているかどうかチェックする
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        bool IsRegistered(HookType type);
     }
 
     public class HooksManager : IHooksManager
@@ -78,6 +85,12 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
                 this.hooks.Add(type, function);
             }
         }
+
+        public bool IsRegistered(HookType type)
+        {
+            return this.hooks.ContainsKey(type) && this.hooks[type] is not null;
+        }
+
 
         #endregion
     }

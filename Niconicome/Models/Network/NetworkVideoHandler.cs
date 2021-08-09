@@ -14,6 +14,9 @@ using Niconicome.Models.Utils;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Helper.Result.Generic;
+using System.Reflection;
 
 namespace Niconicome.Models.Network
 {
@@ -151,20 +154,25 @@ namespace Niconicome.Models.Network
                 {
                     this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得を開始します。");
 
-                    IResult result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId.Value, item.video, DWatch::WatchInfoOptions.NoDmcData);
+                    IAttemptResult<IListVideoInfo> result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId.Value, DWatch::WatchInfoOptions.NoDmcData);
 
-                    if (result.IsSucceeded)
+                    if (!result.IsSucceeded || result.Data is null)
+                    {
+                        this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に失敗しました。(詳細:{result.Message})");
+                        if (result.Exception is not null)
+                        {
+                            this.messageHandler.AppendMessage($"技術的詳細情報：{result.Exception.Message}");
+                        }
+                    }
+                    else
                     {
                         this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に成功しました。");
+                        item.video.SetNewData(result.Data);
                         videos.Add(item.video);
                         if (uncheck)
                         {
                             this.lightVideoListinfoHandler.GetLightVideoListInfo(item.video.NiconicoId.Value, playlistID ?? -1).IsSelected.Value = false;
                         }
-                    }
-                    else
-                    {
-                        this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に失敗しました。(詳細:{result.Message})");
                     }
                 }, index => this.messageHandler.AppendMessage("待機中...(15s)"));
 

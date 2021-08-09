@@ -90,8 +90,7 @@ namespace Niconicome.Models.Network.Download
                 result.Message = session.State switch
                 {
                     WatchSessionState.PaymentNeeded => "視聴ページの解析に失敗しました。",
-                    WatchSessionState.HttpRequestFailure => "視聴ページの取得に失敗しました。",
-                    WatchSessionState.PageAnalyzingFailure => "視聴ページの解析に失敗しました。",
+                    WatchSessionState.HttpRequestOrPageAnalyzingFailure => "視聴ページの取得、または視聴ページの解析に失敗しました。",
                     _ => "不明なエラーにより、視聴ページの取得に失敗しました。"
                 };
                 return result;
