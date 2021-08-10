@@ -25,7 +25,7 @@ namespace Niconicome.Models.Domain.Utils.Event
         void CancelAll();
     }
 
-    class EventManager : IEventManager
+    public class EventManager : IEventManager
     {
 
         #region field
