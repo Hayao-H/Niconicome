@@ -11,16 +11,8 @@ namespace Niconicome.Models.Domain.Utils.Event
         /// <summary>
         /// イベントを登録する
         /// </summary>
-        /// <returns></returns>
+        /// <returns>イベントID</returns>
         string Regster(Action eventAction, DateTime eventTtiggeredDT, Action<Exception>? onError = null);
-
-        /// <summary>
-        /// イベントを登録して呼び出し関数を取得する
-        /// </summary>
-        /// <param name="eventAction"></param>
-        /// <param name="onError"></param>
-        /// <returns>呼び出し関数</returns>
-        Action RegisterAndGetCaller(Action eventAction, Action<Exception>? onError = null);
 
         /// <summary>
         /// 指定したイベントをキャンセルする
@@ -54,17 +46,6 @@ namespace Niconicome.Models.Domain.Utils.Event
                 this.events.Add(ev.ID, ev);
 
                 return ev.ID;
-            }
-        }
-
-        public Action RegisterAndGetCaller(Action eventAction, Action<Exception>? onError = null)
-        {
-            lock (this.lockObj)
-            {
-                var ev = new Event(eventAction, id => this.Remove(id), onError: onError);
-                this.events.Add(ev.ID, ev);
-
-                return () => ev.Invoke();
             }
         }
 
