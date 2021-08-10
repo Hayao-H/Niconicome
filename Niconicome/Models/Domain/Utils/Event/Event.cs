@@ -26,7 +26,7 @@ namespace Niconicome.Models.Domain.Utils.Event
         void Invoke();
     }
 
-    class Event : IEvent
+    public class Event : IEvent
     {
         public Event(Action eventAction, Action<string> postTriggered, DateTime eventTiggeredTime = default, Action<Exception>? onError = null)
         {
