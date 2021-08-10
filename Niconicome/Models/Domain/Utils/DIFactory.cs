@@ -1,6 +1,10 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
+using AddonAPI = Niconicome.Models.Local.Addon.API;
+using Addons = Niconicome.Models.Local.Addon;
+using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
+using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
 using Cookies = Niconicome.Models.Domain.Local.Cookies;
@@ -26,29 +30,26 @@ using Import = Niconicome.Models.Local.External.Import;
 using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
+using Machine = Niconicome.Models.Domain.Local.Machine;
 using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
+using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
+using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
 using Settings = Niconicome.Models.Local.Settings;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
+using Style = Niconicome.Models.Domain.Local.Style;
 using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
-using Style = Niconicome.Models.Domain.Local.Style;
-using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
-using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
-using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
-using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
-using Addons = Niconicome.Models.Local.Addon;
-using AddonAPI = Niconicome.Models.Local.Addon.API;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -217,6 +218,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonAPI::Net.Hooks.IHooks, AddonAPI::Net.Hooks.Hooks>();
             services.AddTransient<AddonAPI::Local.IO.ILog, AddonAPI::Local.IO.Log>();
             services.AddSingleton<Event.IEventManager, Event.EventManager>();
+            services.AddTransient<Machine::IComPowerManager, Machine::ComPowerManager>();
             return services.BuildServiceProvider();
         }
 
