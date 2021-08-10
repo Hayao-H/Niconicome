@@ -216,6 +216,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<AddonsDomainAPI::Hooks.IHooksManager, AddonsDomainAPI::Hooks.HooksManager>();
             services.AddTransient<AddonAPI::Net.Hooks.IHooks, AddonAPI::Net.Hooks.Hooks>();
             services.AddTransient<AddonAPI::Local.IO.ILog, AddonAPI::Local.IO.Log>();
+            services.AddSingleton<Event.IEventManager, Event.EventManager>();
             return services.BuildServiceProvider();
         }
 

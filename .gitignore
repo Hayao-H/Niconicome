@@ -350,3 +350,6 @@ NiconicomeTest/bin
 # Database File
 niconicome.db
 niconicome(application).db.lnk
+
+# Umls
+Umls
