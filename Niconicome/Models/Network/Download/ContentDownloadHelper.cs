@@ -17,6 +17,7 @@ using EnumSetting = Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Domain.Niconico.Download.Ichiba;
+using Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -29,7 +30,7 @@ namespace Niconicome.Models.Network.Download
 
     class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter, IEnumSettingsHandler enumSettingsHander, IPathOrganizer pathOrganizer)
+        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter, IEnumSettingsHandler enumSettingsHander, IPathOrganizer pathOrganizer, IVideoInfoContainer container)
         {
             this.localContentHandler = localContentHandler;
             this.settingHandler = localSettingHandler;
@@ -37,6 +38,7 @@ namespace Niconicome.Models.Network.Download
             this.logger = logger;
             this.enumSettingsHandler = enumSettingsHander;
             this.pathOrganizer = pathOrganizer;
+            this.container = container;
         }
 
         #region DI
@@ -51,6 +53,8 @@ namespace Niconicome.Models.Network.Download
         private readonly IEnumSettingsHandler enumSettingsHandler;
 
         private readonly IPathOrganizer pathOrganizer;
+
+        private readonly IVideoInfoContainer container;
 
         #endregion
 
@@ -67,7 +71,7 @@ namespace Niconicome.Models.Network.Download
         /// <returns></returns>
         public async Task<IDownloadResult> TryDownloadContentAsync(IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
         {
-            var result = new DownloadResult();
+            var result = new DownloadResult() { VideoInfo = this.container.GetVideo(setting.NiconicoId) };
             var context = new DownloadContext(setting.NiconicoId);
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
