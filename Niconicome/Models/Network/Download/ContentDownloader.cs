@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Local.Machine;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
@@ -20,23 +21,13 @@ namespace Niconicome.Models.Network.Download
         void Cancel();
     }
 
-    public interface IDownloadResult
-    {
-        bool IsSucceeded { get; }
-        bool IsCanceled { get; }
-        string? Message { get; }
-        string? VideoFileName { get; }
-        IListVideoInfo VideoInfo { get; }
-        uint VideoVerticalResolution { get; }
-    }
-
     /// <summary>
     /// DL実処理
     /// </summary>
     class ContentDownloader : BindableBase, IContentDownloader
     {
 
-        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler, IVideoInfoContainer videoInfoContainer, ILightVideoListinfoHandler lightVideoListinfoHandler)
+        public ContentDownloader(ILocalSettingHandler settingHandler, ILogger logger, IMessageHandler messageHandler, IVideoHandler videoHandler, IDownloadTasksHandler downloadTasksHandler, IContentDownloadHelper downloadHelper, IPlaylistHandler playlistHandler, ILightVideoListinfoHandler lightVideoListinfoHandler)
         {
             this.settingHandler = settingHandler;
             this.logger = logger;
@@ -45,7 +36,6 @@ namespace Niconicome.Models.Network.Download
             this.downloadTasksHandler = downloadTasksHandler;
             this.downloadHelper = downloadHelper;
             this.playlistHandler = playlistHandler;
-            this.videoInfoContainer = videoInfoContainer;
             this.lightVideoListinfoHandler = lightVideoListinfoHandler;
 
             int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelDL);
@@ -77,45 +67,27 @@ namespace Niconicome.Models.Network.Download
 
         private readonly IPlaylistHandler playlistHandler;
 
-        private readonly IVideoInfoContainer videoInfoContainer;
-
         private readonly ILightVideoListinfoHandler lightVideoListinfoHandler;
 
         private readonly ParallelTasksHandler<DownloadTaskParallel> parallelTasksHandler;
 
+        private INetworkResult? currentResult;
+
         private CancellationTokenSource? cts;
         #endregion
 
-        public INetworkResult? CurrentResult { get; private set; }
+        #region Props
 
         /// <summary>
-        /// 動画をダウンロードする
+        /// DL可能フラグ
         /// </summary>
-        /// <param name="videos"></param>
-        /// <param name="setting"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        private async Task<INetworkResult?> DownloadVideos()
-        {
-            this.CurrentResult = new NetworkResult();
+        public ReactiveProperty<bool> CanDownload { get; init; } = new(true);
 
-            if (this.parallelTasksHandler.IsProcessing)
-            {
-                return new NetworkResult();
-            }
+        public ReactiveProperty<PostDownloadActions> PostDownloadAction { get; init; } = new(PostDownloadActions.None);
 
-            if (this.cts is null)
-            {
-                this.cts = new CancellationTokenSource();
-            }
+        #endregion
 
-            await this.parallelTasksHandler.ProcessTasksAsync(() => this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing, ct: this.cts.Token);
-
-            this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
-
-            return this.CurrentResult;
-
-        }
+        #region Methods
 
         /// <summary>
         /// メッセージを表示しながらDL
@@ -175,11 +147,6 @@ namespace Niconicome.Models.Network.Download
         }
 
         /// <summary>
-        /// DL可能フラグ
-        /// </summary>
-        public ReactiveProperty<bool> CanDownload { get; init; } = new(true);
-
-        /// <summary>
         /// ダウンロードをキャンセル
         /// </summary>
         public void Cancel()
@@ -191,7 +158,38 @@ namespace Niconicome.Models.Network.Download
             this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
         }
 
+        #endregion
+
         #region private
+
+        /// <summary>
+        /// 動画をダウンロードする
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="setting"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private async Task<INetworkResult?> DownloadVideos()
+        {
+            this.currentResult = new NetworkResult();
+
+            if (this.parallelTasksHandler.IsProcessing)
+            {
+                return new NetworkResult();
+            }
+
+            if (this.cts is null)
+            {
+                this.cts = new CancellationTokenSource();
+            }
+
+            await this.parallelTasksHandler.ProcessTasksAsync(() => this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing, ct: this.cts.Token);
+
+            this.CanDownload.Value = !this.parallelTasksHandler.IsProcessing;
+
+            return this.currentResult;
+
+        }
 
         /// <summary>
         /// イベントハンドラ
@@ -205,9 +203,9 @@ namespace Niconicome.Models.Network.Download
                 return;
             }
 
-            if (this.CurrentResult is null)
+            if (this.currentResult is null)
             {
-                this.CurrentResult = new NetworkResult();
+                this.currentResult = new NetworkResult();
             }
 
             var t = new DownloadTaskParallel(async (parallelTask, lockObj, pToken) =>
@@ -231,13 +229,13 @@ namespace Niconicome.Models.Network.Download
                     {
                         if (downloadResult.IsCanceled)
                         {
-                            this.CurrentResult.FailedCount++;
+                            this.currentResult.FailedCount++;
                             this.messageHandler.AppendMessage($"{e.Task.NiconicoID}のダウンロードがキャンセルされました。");
                             e.Task.Message.Value = "ダウンロードをキャンセル";
                         }
                         else
                         {
-                            this.CurrentResult.FailedCount++;
+                            this.currentResult.FailedCount++;
                             this.messageHandler.AppendMessage($"{e.Task.NiconicoID}のダウンロードに失敗しました。");
                             this.messageHandler.AppendMessage($"詳細: {downloadResult.Message}");
                         }
@@ -264,7 +262,7 @@ namespace Niconicome.Models.Network.Download
                         this.videoHandler.Update(video);
 
                         this.lightVideoListinfoHandler.GetLightVideoListInfo(e.Task.NiconicoID, e.Task.PlaylistID).IsSelected.Value = false;
-                        this.CurrentResult.SucceededCount++;
+                        this.currentResult.SucceededCount++;
 
                         e.Task.Message.Value = $"ダウンロード完了{rMessage}";
 
@@ -279,9 +277,9 @@ namespace Niconicome.Models.Network.Download
                         }
                     }
 
-                    if (this.CurrentResult.FirstVideo is null)
+                    if (this.currentResult.FirstVideo is null)
                     {
-                        this.CurrentResult.FirstVideo = video;
+                        this.currentResult.FirstVideo = video;
                     }
 
                     e.Task.IsProcessing.Value = false;
@@ -307,27 +305,17 @@ namespace Niconicome.Models.Network.Download
             this.parallelTasksHandler.AddTaskToQueue(t);
         }
 
+
         #endregion
     }
 
-    /// <summary>
-    /// DL結果
-    /// </summary>
-    class DownloadResult : IDownloadResult
+    public enum PostDownloadActions
     {
-        public bool IsSucceeded { get; set; }
-
-        public bool IsCanceled { get; set; }
-
-        public string? Message { get; set; }
-
-        public string? VideoFileName { get; set; }
-
-        public IListVideoInfo VideoInfo { get; set; } = new NonBindableListVideoInfo();
-
-        public uint VideoVerticalResolution { get; set; }
-
-
+        None,
+        Shutdown,
+        Restart,
+        LogOff,
+        Sleep,
     }
 
     /// <summary>
