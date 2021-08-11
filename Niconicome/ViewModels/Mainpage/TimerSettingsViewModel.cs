@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Niconicome.Models.Network.Download.Actions;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -21,7 +23,14 @@ namespace Niconicome.ViewModels.Mainpage
             var logoff = new ComboboxItem<PostDownloadActions>(PostDownloadActions.LogOff, "ログオフ");
             var sleep = new ComboboxItem<PostDownloadActions>(PostDownloadActions.Sleep, "休止状態");
 
-            this.Action = new ReactiveProperty<ComboboxItem<PostDownloadActions>>(none);
+            this.Action = WS::Mainpage.PostDownloadTasksManager.PostDownloadAction.ToReactivePropertyAsSynchronized(x => x.Value, x => x switch
+               {
+                   PostDownloadActions.Shutdown => shutdown,
+                   PostDownloadActions.Restart => restart,
+                   PostDownloadActions.LogOff => logoff,
+                   PostDownloadActions.Sleep => sleep,
+                   _ => none,
+               }, x => x.Value);
             this.SelectableActions = new List<ComboboxItem<PostDownloadActions>>() { none, shutdown, restart, logoff, sleep };
 
             #endregion
