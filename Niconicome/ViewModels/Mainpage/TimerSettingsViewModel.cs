@@ -16,11 +16,6 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public TimerSettingsViewModel()
         {
-            foreach (var resource in Application.Current.Resources)
-            {
-                resource.ToString();
-            }
-
             #region actions
 
             var none = new ComboboxItem<PostDownloadActions>(PostDownloadActions.None, "何もしない");
