@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Niconicome.Models.Network.Download.Actions;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Reactive.Bindings;
@@ -15,6 +16,11 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public TimerSettingsViewModel()
         {
+            foreach (var resource in Application.Current.Resources)
+            {
+                resource.ToString();
+            }
+
             #region actions
 
             var none = new ComboboxItem<PostDownloadActions>(PostDownloadActions.None, "何もしない");
