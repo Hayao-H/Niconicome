@@ -83,8 +83,6 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         public ReactiveProperty<bool> CanDownload { get; init; } = new(true);
 
-        public ReactiveProperty<PostDownloadActions> PostDownloadAction { get; init; } = new(PostDownloadActions.None);
-
         #endregion
 
         #region Methods
@@ -309,14 +307,6 @@ namespace Niconicome.Models.Network.Download
         #endregion
     }
 
-    public enum PostDownloadActions
-    {
-        None,
-        Shutdown,
-        Restart,
-        LogOff,
-        Sleep,
-    }
 
     /// <summary>
     /// DL処理の単位

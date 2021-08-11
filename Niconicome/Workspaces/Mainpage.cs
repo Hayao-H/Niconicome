@@ -14,6 +14,7 @@ using Ext = Niconicome.Models.Local.External;
 using VideoList = Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
 using Niconicome.Models.Local.Addon;
+using Niconicome.Models.Network.Download.Actions;
 
 namespace Niconicome.Workspaces
 {
@@ -49,5 +50,7 @@ namespace Niconicome.Workspaces
         public static IStyleHandler StyleHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IStyleHandler>();
         public static ILocalSettingsContainer SettingsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingsContainer>();
         public static IAddonHandler AddonHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonHandler>();
+
+        public static IPostDownloadActionssManager PostDownloadTasksManager { get; private set; } = DIFactory.Provider.GetRequiredService<IPostDownloadActionssManager>();
     }
 }
