@@ -1,7 +1,7 @@
 # Niconicome(α)
 [![.Net5 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net5%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net5+CI%2FCD%22) 
 [![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
-[![Github Release](https://img.shields.io/badge/release-v0.8.1-blue)](https://github.com/Hayao-H/Niconicome/releases)
+[![Github Release](https://img.shields.io/badge/release-v0.8.2-blue)](https://github.com/Hayao-H/Niconicome/releases)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
@@ -38,7 +38,7 @@
 
 ## 二段階認証及びOAuth(外部ログイン提携)をご利用の方へ【重要】
 - 現在のNiconicomeの標準ログイン機能では二段階認証などに対応できません。
-- 二段階認証・OAuthを利用する場合、ログインウィンドウの「ブルザーでログイン」をクリックして表示されるウィンドウでログインする必要があります。
+- 二段階認証・OAuthを利用する場合、ログインウィンドウの「ブラウザーでログイン」をクリックして表示されるウィンドウでログインする必要があります。
 - この際に[WebView2](#webview2について)が必要になります。
 - 詳しくは[こちら](https://github.com/Hayao-H/Niconicome/wiki/操作#ブラウザーでログイン)をご覧ください。
 
