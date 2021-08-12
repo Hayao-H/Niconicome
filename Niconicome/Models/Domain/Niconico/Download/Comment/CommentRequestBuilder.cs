@@ -289,7 +289,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 Thread = thread.ID.ToString(),
                 Language = 0,
                 UserId = dmcInfo.UserId,
-                Content = $"0-{min}:0,500",
+                Content = $"0-{min}:0,500,nicoru:0",
                 Scores = 1,
                 Nicoru = 3,
                 Fork = thread.Fork

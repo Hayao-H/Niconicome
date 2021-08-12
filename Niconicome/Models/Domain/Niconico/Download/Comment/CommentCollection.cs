@@ -228,7 +228,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else if (comment.Chat is not null)
                 {
-                    this.commentsfield.AddFirst(comment);
+                    this.commentsfield.AddLast(comment);
                     this.isSorted = false;
                 }
                 else
@@ -252,28 +252,31 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             var chats = new LinkedList<Response::Comment>();
 
             //チャットを抽出する
-            //コレクションの実装はAddFirst(降順)なのでこれは昇順になるようにする
+            //コレクションの実装はAddLastなのでこれは降順になるようにする
             foreach (var item in comments)
             {
-                if (item.Chat is null) continue;
-
-                if (this.unsafeHandle || chatCount > commentsBound)
+                if (item.Chat is null)
                 {
-                    if (!nicoruEnded && item.Chat!.Nicoru is not null)
-                    {
-                        continue;
-                    }
-                    else if (!nicoruEnded && item.Chat!.Nicoru is null)
-                    {
-                        nicoruEnded = true;
-                    }
+                    continue;
                 }
 
-                chats.AddLast(item);
+                ///if (this.unsafeHandle || chatCount > commentsBound)
+                ///{
+                ///    if (!nicoruEnded && item.Chat!.Nicoru is not null)
+                ///    {
+                ///        continue;
+                ///    }
+                ///    else if (!nicoruEnded && item.Chat!.Nicoru is null)
+                ///    {
+                ///        nicoruEnded = true;
+                ///    }
+                ///}
+
+                chats.AddFirst(item);
             }
 
             //最初の方にある古いコメントを除去する
-            //この時点ではすでに昇順
+            //この時点ではすでに降順
             if (!this.unsafeHandle && chats.Count > this.comThroughSetting + commentsBound)
             {
                 var first = this.GetFirstComment();
@@ -281,7 +284,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
                 foreach (var _ in Enumerable.Range(0, this.comThroughSetting))
                 {
-                    chats.RemoveFirst();
+                    chats.RemoveLast();
                 }
             }
 
