@@ -13,7 +13,6 @@
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
 		<PublishSingleFile>true</PublishSingleFile>
-		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 		<PublishTrimmed>false</PublishTrimmed>
 		<Deterministic>false</Deterministic>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
