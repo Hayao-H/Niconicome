@@ -51,6 +51,7 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using DLActions = Niconicome.Models.Network.Download.Actions;
+using Timer = Niconicome.Models.Local.Timer;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -221,6 +222,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Event.IEventManager, Event.EventManager>();
             services.AddTransient<Machine::IComPowerManager, Machine::ComPowerManager>();
             services.AddSingleton<DLActions::IPostDownloadActionssManager, DLActions::PostDownloadActionsManager>();
+            services.AddSingleton<Timer::IDlTimer, Timer::DlTimer>();
             return services.BuildServiceProvider();
         }
 
