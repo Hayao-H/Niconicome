@@ -2,6 +2,7 @@
 using Niconicome.Models.Helper.Result;
 using Value = Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Info = Niconicome.Models.Domain.Niconico.Video.Infomations;
+using Niconicome.Models.Network.Download.Actions;
 
 namespace Niconicome.Models.Local.Settings
 {
@@ -79,6 +80,9 @@ namespace Niconicome.Models.Local.Settings
             else if (typeof(T) == typeof(Info::ThumbSize))
             {
                 return SettingsEnum.ThumbSize;
+            } else if (typeof(T) == typeof(PostDownloadActions))
+            {
+                return SettingsEnum.PostDlAction;
             }
             else
             {

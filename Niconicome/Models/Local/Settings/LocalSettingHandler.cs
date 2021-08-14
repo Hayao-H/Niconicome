@@ -195,6 +195,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.IsDevMode => STypes::SettingNames.IsDeveloppersMode,
                 SettingsEnum.IsAddonDebugEnable => STypes::SettingNames.IsAddonDebuggingEnable,
                 SettingsEnum.DlTimerEveryDay => STypes::SettingNames.IsDlTImerEveryDayEnable,
+                SettingsEnum.PostDlAction => STypes::SettingNames.PostDownloadAction,
                 _ => null
             };
         }
@@ -280,5 +281,6 @@ namespace Niconicome.Models.Local.Settings
         IsDevMode,
         IsAddonDebugEnable,
         DlTimerEveryDay,
+        PostDlAction,
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Machine;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Local.Settings;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download.Actions
@@ -24,15 +25,24 @@ namespace Niconicome.Models.Network.Download.Actions
 
     class PostDownloadActionsManager : IPostDownloadActionssManager
     {
-        public PostDownloadActionsManager(IComPowerManager comPowerManager,ILogger logger)
+        public PostDownloadActionsManager(IComPowerManager comPowerManager, ILogger logger, IEnumSettingsHandler settingsHandler)
         {
             this.comPowerManager = comPowerManager;
             this.logger = logger;
+            this.settingsHandler = settingsHandler;
+
+            this.PostDownloadAction = new ReactiveProperty<PostDownloadActions>(this.settingsHandler.GetSetting<PostDownloadActions>());
+            this.PostDownloadAction.Subscribe(value =>
+            {
+                this.settingsHandler.SaveSetting(value);
+            });
         }
 
         #region field
 
         private readonly IComPowerManager comPowerManager;
+
+        private readonly IEnumSettingsHandler settingsHandler;
 
         private readonly ILogger logger;
 
@@ -40,7 +50,7 @@ namespace Niconicome.Models.Network.Download.Actions
 
         #region Props
 
-        public ReactiveProperty<PostDownloadActions> PostDownloadAction { get; init; } = new(PostDownloadActions.None);
+        public ReactiveProperty<PostDownloadActions> PostDownloadAction { get; init; }
 
         #endregion
 
