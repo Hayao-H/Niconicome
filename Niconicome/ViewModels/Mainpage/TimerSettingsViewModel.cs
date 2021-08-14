@@ -75,6 +75,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 WS::Mainpage.DlTimer.Set(value, () =>
                 {
+                    WS::Mainpage.Messagehandler.AppendMessage("タイマー処理を開始します。");
                     this.ea.GetEvent<PubSubEvent<MVVMEvent<VideoInfoViewModel>>>().Publish(new MVVMEvent<VideoInfoViewModel>(null, typeof(DownloadSettingsViewModel), EventType.Download));
                 });
 
