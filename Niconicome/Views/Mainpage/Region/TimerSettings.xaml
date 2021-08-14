@@ -1,0 +1,87 @@
+﻿<UserControl x:Class="Niconicome.Views.Mainpage.Region.TimerSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Niconicome.Views.Mainpage.Region"
+             xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             Background="{StaticResource MaterialDesignPaper}"
+             d:DataContext="{d:DesignInstance {x:Type vm:TimerSettingsViewModelD},IsDesignTimeCreatable=True}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <DockPanel Margin="0 0 0 5">
+                <materialDesign:PackIcon 
+                Foreground="#569CD6"
+                Kind="CalendarCheck"              >
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="DL完了時のアクション"/>
+                <ComboBox
+                      HorizontalAlignment="Right"
+                      ItemsSource="{Binding SelectableActions}"
+                      DisplayMemberPath="DisplayValue"
+                      SelectedItem="{Binding Action.Value}"/>
+            </DockPanel>
+            <DockPanel Margin="0 0 0 5">
+                <materialDesign:PackIcon 
+                Foreground="#569CD6"
+                Kind="Calendar"              >
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="DL開始時刻"/>
+                <materialDesign:TimePicker
+                    HorizontalAlignment="Right"
+                    SelectedTime="{Binding SelectedTime.Value}"
+                    />
+            </DockPanel>
+            <DockPanel Margin="0 0 0 5">
+                <materialDesign:PackIcon 
+                Foreground="#569CD6"
+                Kind="AutoDownload"              >
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="指定時刻にDLを開始する"/>
+                <ToggleButton
+                    HorizontalAlignment="Right"
+                    IsChecked="{Binding IsTImerEnabled.Value}"/>
+            </DockPanel>
+            <DockPanel Margin="0 0 0 5">
+                <materialDesign:PackIcon 
+                Foreground="#569CD6"
+                Kind="Timer"              >
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="タイマー処理を設定した時刻から24時間毎に行う"/>
+                <ToggleButton
+                    HorizontalAlignment="Right"
+                    IsChecked="{Binding IsTimerEveryDayEnable.Value}"/>
+            </DockPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

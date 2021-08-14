@@ -9,7 +9,7 @@ namespace Niconicome.Models.Helper.Event.Generic
 {
     public interface IViewModelEvent<T>
     {
-        T Data { get; }
+        T? Data { get; }
         Type TargetVMType { get; }
         bool CheckTarget(Type receiversType, object? sender = null);
         EventType EventType { get; }
@@ -17,7 +17,7 @@ namespace Niconicome.Models.Helper.Event.Generic
 
     class MVVMEvent<T> : IViewModelEvent<T>
     {
-        public MVVMEvent(T data, Type targetType, EventType eventType = EventType.UnSpecified, Func<object, bool>? additionalChecker = null)
+        public MVVMEvent(T? data, Type targetType, EventType eventType = EventType.UnSpecified, Func<object, bool>? additionalChecker = null)
         {
             this.Data = data;
             this.TargetVMType = targetType;
@@ -28,7 +28,7 @@ namespace Niconicome.Models.Helper.Event.Generic
         /// <summary>
         /// データ
         /// </summary>
-        public T Data { get; init; }
+        public T? Data { get; init; }
 
         /// <summary>
         /// 宛先のVM

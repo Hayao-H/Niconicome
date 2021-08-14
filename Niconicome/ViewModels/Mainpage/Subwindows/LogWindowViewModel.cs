@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Disposables;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Xaml.Behaviors;
@@ -84,9 +85,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
     class LogWindowBehavior : Behavior<TextBox>
     {
 
+        SynchronizationContext? ctx;
+
         protected override void OnAttached()
         {
             base.OnAttached();
+            this.ctx = SynchronizationContext.Current;
             WS::Mainpage.Messagehandler.AddChangeHandler(this.OnMessage);
         }
 
@@ -98,7 +102,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         private void OnMessage()
         {
-            this.AssociatedObject.ScrollToEnd();
+            this.ctx?.Post(_ => this.AssociatedObject.ScrollToEnd(), null);
         }
     }
 }

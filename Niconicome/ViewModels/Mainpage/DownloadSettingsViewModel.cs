@@ -322,6 +322,7 @@ namespace Niconicome.ViewModels.Mainpage
             }
 
             await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
+            WS::Mainpage.PostDownloadTasksManager.HandleAction();
         }
 
         /// <summary>

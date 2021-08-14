@@ -6,17 +6,18 @@
 		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>0.8.2.*</AssemblyVersion>
+		<AssemblyVersion>0.8.1.*</AssemblyVersion>
 		<FileVersion>0.0.0.0</FileVersion>
 		<StartupObject>Niconicome.App</StartupObject>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
 		<PublishSingleFile>true</PublishSingleFile>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 		<PublishTrimmed>false</PublishTrimmed>
 		<Deterministic>false</Deterministic>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<Version>0.8.2</Version>
+		<Version>0.8.1</Version>
 		<PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
 		<Copyright>c2021 Hayao-H</Copyright>
 		<Authors>Hayao-H</Authors>

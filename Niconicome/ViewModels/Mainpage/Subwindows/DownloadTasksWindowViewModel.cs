@@ -38,6 +38,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             .WithSubscribe(async () =>
            {
                await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.Queue.Enqueue(m));
+               WS::Mainpage.PostDownloadTasksManager.HandleAction();
            })
             .AddTo(this.disposables);
 

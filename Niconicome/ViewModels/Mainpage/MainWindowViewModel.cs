@@ -122,11 +122,12 @@ namespace Niconicome.ViewModels.Mainpage
 
             #endregion
 
-            regionManager.RegisterViewWithRegion("VideoListRegion", typeof(VideoList));
-            regionManager.RegisterViewWithRegion("DownloadSettingsRegion", typeof(DownloadSettings));
-            regionManager.RegisterViewWithRegion("OutputRegion", typeof(Output));
-            regionManager.RegisterViewWithRegion("VideoSortSetting", typeof(VideoSortSetting));
-            regionManager.RegisterViewWithRegion("VideolistState", typeof(VideoListState));
+            regionManager.RegisterViewWithRegion<VideoList>("VideoListRegion");
+            regionManager.RegisterViewWithRegion<DownloadSettings>("DownloadSettingsRegion");
+            regionManager.RegisterViewWithRegion<Output>("OutputRegion");
+            regionManager.RegisterViewWithRegion<VideoSortSetting>("VideoSortSetting");
+            regionManager.RegisterViewWithRegion<VideoListState>("VideolistState");
+            regionManager.RegisterViewWithRegion<TimerSettings>("TimerSettings");
         }
 
         /// <summary>
