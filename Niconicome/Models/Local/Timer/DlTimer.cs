@@ -14,6 +14,11 @@ namespace Niconicome.Models.Local.Timer
         ReactiveProperty<bool> IsEnabled { get; }
 
         /// <summary>
+        /// イベント発火時刻
+        /// </summary>
+        DateTime TrigggeredDT { get; }
+
+        /// <summary>
         /// 時間を設定する
         /// </summary>
         /// <param name="dt"></param>
@@ -38,7 +43,7 @@ namespace Niconicome.Models.Local.Timer
 
         private string? eventID;
 
-        private DateTime dt;
+        private DateTime dt = DateTime.Now;
 
         private Action? dlAction;
 
@@ -48,6 +53,8 @@ namespace Niconicome.Models.Local.Timer
 
         public ReactiveProperty<bool> IsEnabled { get; init; } = new();
 
+        public DateTime TrigggeredDT => this.dt;
+
         #endregion
 
         #region Methods
@@ -56,6 +63,8 @@ namespace Niconicome.Models.Local.Timer
         {
             this.dt = dt;
             this.dlAction = dlAction;
+            this.Reset();
+            this.ChangeState(this.IsEnabled.Value);
         }
 
         #endregion
@@ -75,12 +84,27 @@ namespace Niconicome.Models.Local.Timer
 
             if (isEnabled)
             {
+                if (this.dt < DateTime.Now)
+                {
+                    this.dt = DateTime.Now + TimeSpan.FromDays(1);
+                }
                 this.eventID = this.manager.Regster(this.dlAction, this.dt, ex =>
                 {
                     this.logger.Error("タイマーDLに失敗しました。", ex);
                 });
             }
             else if (this.eventID is not null)
+            {
+                this.manager.Cancel(this.eventID);
+            }
+        }
+
+        /// <summary>
+        /// 発行したイベントをキャンセルする
+        /// </summary>
+        private void Reset()
+        {
+            if (this.eventID is not null)
             {
                 this.manager.Cancel(this.eventID);
             }

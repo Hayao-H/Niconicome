@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Network.Download.Actions;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Prism.Events;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
@@ -14,8 +17,10 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class TimerSettingsViewModel : BindableBase
     {
-        public TimerSettingsViewModel()
+        public TimerSettingsViewModel(IEventAggregator ea)
         {
+            this.ea = ea;
+
             #region actions
 
             var none = new ComboboxItem<PostDownloadActions>(PostDownloadActions.None, "何もしない");
@@ -35,13 +40,65 @@ namespace Niconicome.ViewModels.Mainpage
             this.SelectableActions = new List<ComboboxItem<PostDownloadActions>>() { none, shutdown, restart, logoff, sleep };
 
             #endregion
+
+            #region timer
+
+            void log()
+            {
+                if (!WS::Mainpage.DlTimer.IsEnabled.Value) return;
+
+                DateTime dt = WS::Mainpage.DlTimer.TrigggeredDT;
+                double delta = Math.Floor((dt - DateTime.Now).TotalMinutes * 10) / 10;
+                if (delta < 0) return;
+
+                string isEnabled = WS::Mainpage.DlTimer.IsEnabled.Value ? "有効" : "無効";
+                WS::Mainpage.Messagehandler.AppendMessage($"タイマーを「{dt}({delta}分後)」に設定しました。（設定：{isEnabled}）"); ;
+            }
+
+            this.IsTImerEnabled = WS::Mainpage.DlTimer.IsEnabled.ToReactivePropertyAsSynchronized(x => x.Value);
+            this.IsTImerEnabled.Skip(1).Subscribe(value =>
+            {
+                if (value)
+                {
+                    log();
+                }
+                else
+                {
+                    WS::Mainpage.Messagehandler.AppendMessage($"タイマーを解除しました。"); ;
+                }
+            });
+
+            this.SelectedTime.Subscribe(value =>
+            {
+
+                WS::Mainpage.DlTimer.Set(value, () =>
+                {
+                    this.ea.GetEvent<PubSubEvent<MVVMEvent<VideoInfoViewModel>>>().Publish(new MVVMEvent<VideoInfoViewModel>(null, typeof(DownloadSettingsViewModel), EventType.Download));
+                });
+
+                log();
+
+            });
+
+
+            #endregion
         }
+
+        #region field
+
+        private readonly IEventAggregator ea;
+
+        #endregion
 
         #region Props
 
         public ReactiveProperty<ComboboxItem<PostDownloadActions>> Action { get; init; }
 
         public List<ComboboxItem<PostDownloadActions>> SelectableActions { get; init; }
+
+        public ReactiveProperty<DateTime> SelectedTime { get; init; } = new(DateTime.Now);
+
+        public ReactiveProperty<bool> IsTImerEnabled { get; init; }
 
         #endregion
     }
@@ -67,6 +124,10 @@ namespace Niconicome.ViewModels.Mainpage
 
 
         public ReactiveProperty<ComboboxItem<PostDownloadActions>> Action { get; init; }
+
+        public ReactiveProperty<DateTime> SelectedTime { get; init; } = new(DateTime.Now);
+
+        public ReactiveProperty<bool> IsTImerEnabled { get; init; } = new(true);
 
         public List<ComboboxItem<PostDownloadActions>> SelectableActions { get; init; }
 

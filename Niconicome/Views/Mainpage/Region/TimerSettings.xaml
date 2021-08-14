@@ -14,23 +14,58 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <DockPanel VerticalAlignment="Top">
-            <materialDesign:PackIcon 
+        <StackPanel Grid.Row="0">
+            <DockPanel Margin="0 0 0 5">
+                <materialDesign:PackIcon 
                 Foreground="#569CD6"
                 Kind="CalendarCheck"              >
-                <materialDesign:PackIcon.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
-                        <TranslateTransform Y="4"/>
-                    </TransformGroup>
-                </materialDesign:PackIcon.RenderTransform>
-            </materialDesign:PackIcon>
-            <Label Content="DL完了時のアクション"/>
-            <ComboBox Margin="0 0 10 0"
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="DL完了時のアクション"/>
+                <ComboBox
                       HorizontalAlignment="Right"
                       ItemsSource="{Binding SelectableActions}"
                       DisplayMemberPath="DisplayValue"
                       SelectedItem="{Binding Action.Value}"/>
-        </DockPanel>
+            </DockPanel>
+            <DockPanel Margin="0 0 0 5">
+                <materialDesign:PackIcon 
+                Foreground="#569CD6"
+                Kind="Calendar"              >
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="DL開始時刻"/>
+                <materialDesign:TimePicker
+                    HorizontalAlignment="Right"
+                    SelectedTime="{Binding SelectedTime.Value}"
+                    />
+            </DockPanel>
+            <DockPanel Margin="0 0 0 5">
+                <materialDesign:PackIcon 
+                Foreground="#569CD6"
+                Kind="AutoDownload"              >
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="指定時刻にDLを開始する"/>
+                <ToggleButton
+                    HorizontalAlignment="Right"
+                    IsChecked="{Binding IsTImerEnabled.Value}"/>
+            </DockPanel>
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -39,6 +39,7 @@ namespace Niconicome.Models.Domain.Utils.Event
             {
                 this.timer = new Timer((eventTiggeredTime - DateTime.Now).TotalMilliseconds);
                 this.timer.Elapsed += (_, _) => this.Invoke();
+                this.timer.AutoReset = false;
                 this.timer.Enabled = true;
             }
         }
