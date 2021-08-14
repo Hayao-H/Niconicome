@@ -183,5 +183,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string OwnerCommentSuffix { get; private set; } = "ownercommentsuffix";
         public static string IsDeveloppersMode { get; private set; } = "isdeveloppersmode";
         public static string IsAddonDebuggingEnable { get; private set; } = "isaddondebuggingenable";
+        public static string IsDlTImerEveryDayEnable { get; private set; } = "isdltimereverydayenable";
     }
 }

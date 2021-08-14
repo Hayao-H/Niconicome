@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Niconicome.Models.Helper.Event.Generic;
+using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Download.Actions;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Prism.Events;
@@ -20,6 +21,7 @@ namespace Niconicome.ViewModels.Mainpage
         public TimerSettingsViewModel(IEventAggregator ea)
         {
             this.ea = ea;
+            this.IsTimerEveryDayEnable = WS::Mainpage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DlTimerEveryDay);
 
             #region actions
 
@@ -98,6 +100,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveProperty<DateTime> SelectedTime { get; init; } = new(DateTime.Now);
 
+        public ReactiveProperty<bool> IsTimerEveryDayEnable { get; init; }
+
         public ReactiveProperty<bool> IsTImerEnabled { get; init; }
 
         #endregion
@@ -128,6 +132,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<DateTime> SelectedTime { get; init; } = new(DateTime.Now);
 
         public ReactiveProperty<bool> IsTImerEnabled { get; init; } = new(true);
+
+        public ReactiveProperty<bool> IsTimerEveryDayEnable { get; init; } = new(true);
 
         public List<ComboboxItem<PostDownloadActions>> SelectableActions { get; init; }
 

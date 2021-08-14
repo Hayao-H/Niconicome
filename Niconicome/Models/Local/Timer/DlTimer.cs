@@ -1,6 +1,8 @@
 ﻿using System;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.Event;
+using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Network.Download;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 
@@ -27,10 +29,11 @@ namespace Niconicome.Models.Local.Timer
 
     class DlTimer : BindableBase, IDlTimer
     {
-        public DlTimer(IEventManager manager, ILogger logger)
+        public DlTimer(IEventManager manager, ILogger logger, ILocalSettingsContainer settingsContainer)
         {
             this.manager = manager;
             this.logger = logger;
+            this.settingsContainer = settingsContainer;
             this.IsEnabled.Subscribe(value => this.ChangeState(value));
 
         }
@@ -40,6 +43,8 @@ namespace Niconicome.Models.Local.Timer
         private readonly IEventManager manager;
 
         private readonly ILogger logger;
+
+        private readonly ILocalSettingsContainer settingsContainer;
 
         private string? eventID;
 
@@ -88,7 +93,19 @@ namespace Niconicome.Models.Local.Timer
                 {
                     this.dt = DateTime.Now + TimeSpan.FromDays(1);
                 }
-                this.eventID = this.manager.Regster(this.dlAction, this.dt, ex =>
+
+                this.eventID = this.manager.Regster(() =>
+                {
+                    this.dlAction();
+
+                    if (this.settingsContainer.GetReactiveBoolSetting(SettingsEnum.DlTimerEveryDay).Value)
+                    {
+                        this.Set(this.dt + TimeSpan.FromDays(1), this.dlAction);
+                    } else
+                    {
+                        this.IsEnabled.Value = false;
+                    }
+                }, this.dt, ex =>
                 {
                     this.logger.Error("タイマーDLに失敗しました。", ex);
                 });

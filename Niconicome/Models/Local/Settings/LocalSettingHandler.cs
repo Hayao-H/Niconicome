@@ -194,6 +194,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.ThumbSuffix => STypes::SettingNames.ThumbnailSuffix,
                 SettingsEnum.IsDevMode => STypes::SettingNames.IsDeveloppersMode,
                 SettingsEnum.IsAddonDebugEnable => STypes::SettingNames.IsAddonDebuggingEnable,
+                SettingsEnum.DlTimerEveryDay => STypes::SettingNames.IsDlTImerEveryDayEnable,
                 _ => null
             };
         }
@@ -278,5 +279,6 @@ namespace Niconicome.Models.Local.Settings
         ThumbSuffix,
         IsDevMode,
         IsAddonDebugEnable,
+        DlTimerEveryDay,
     }
 }

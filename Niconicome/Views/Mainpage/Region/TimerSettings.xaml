@@ -66,6 +66,22 @@
                     HorizontalAlignment="Right"
                     IsChecked="{Binding IsTImerEnabled.Value}"/>
             </DockPanel>
+            <DockPanel Margin="0 0 0 5">
+                <materialDesign:PackIcon 
+                Foreground="#569CD6"
+                Kind="Timer"              >
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2"/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="タイマー処理を設定した時刻から24時間毎に行う"/>
+                <ToggleButton
+                    HorizontalAlignment="Right"
+                    IsChecked="{Binding IsTimerEveryDayEnable.Value}"/>
+            </DockPanel>
         </StackPanel>
     </Grid>
 </UserControl>
