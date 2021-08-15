@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -19,6 +20,13 @@ namespace Niconicome.Models.Domain.Utils
         void Caution(object message);
         void Error(string message, Exception exception);
         void Error(string message);
+
+        /// <summary>
+        /// 結果をもとにログ出力する
+        /// </summary>
+        /// <param name="message">メッセージ</param>
+        /// <param name="result">結果</param>
+        void Error(string message, IAttemptResult result);
     }
 
     public interface ILogStream
@@ -115,6 +123,18 @@ namespace Niconicome.Models.Domain.Utils
         {
             this.Write($"[Error]{source}", true);
         }
+
+        public void Error(string message,IAttemptResult result)
+        {
+            if (result.Exception is not null)
+            {
+                this.Error(message, result.Exception);
+            } else
+            {
+                this.Error(message);
+            }
+        }
+
 
         /// <summary>
         /// ログファイル・出力に書き込む
