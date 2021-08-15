@@ -46,6 +46,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.IsSearchingVideosByIDEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.SearchFileByID);
             this.ThumbnailSuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.ThumbSuffix, Format.DefaultThumbnailSuffix);
             this.OwnerCommentSuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.OwnerComSuffix, Format.DefaultOwnerCommentSuffix);
+            this.EconomySuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.EconomySuffix);
         }
 
         /// <summary>
