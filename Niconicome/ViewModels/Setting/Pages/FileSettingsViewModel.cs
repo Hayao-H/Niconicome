@@ -101,6 +101,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactiveProperty<string> OwnerCommentSuffix { get; init; }
 
 
+        /// <summary>
+        /// エコノミー動画の接尾辞
+        /// </summary>
+        public ReactiveProperty<string> EconomySuffix { get; init; }
     }
 
     class FileSettingsViewModelD : SettingaBase
@@ -128,5 +132,6 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public ReactiveProperty<string> OwnerCommentSuffix { get; init; } = new(Format.DefaultOwnerCommentSuffix);
 
+        public ReactiveProperty<string> EconomySuffix { get; init; } = new("【エコノミー】");
     }
 }

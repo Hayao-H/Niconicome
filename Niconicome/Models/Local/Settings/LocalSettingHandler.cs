@@ -196,6 +196,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.IsAddonDebugEnable => STypes::SettingNames.IsAddonDebuggingEnable,
                 SettingsEnum.DlTimerEveryDay => STypes::SettingNames.IsDlTImerEveryDayEnable,
                 SettingsEnum.PostDlAction => STypes::SettingNames.PostDownloadAction,
+                SettingsEnum.EconomySuffix => STypes::SettingNames.EnonomyQualitySuffix,
                 _ => null
             };
         }
@@ -282,5 +283,6 @@ namespace Niconicome.Models.Local.Settings
         IsAddonDebugEnable,
         DlTimerEveryDay,
         PostDlAction,
+        EconomySuffix,
     }
 }
