@@ -27,6 +27,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         bool IsOfficial { get; set; }
         bool IsPremium { get; set; }
         bool IsPeakTime { get; set; }
+        bool IsEnonomy { get; }
         DateTime UploadedOn { get; set; }
         DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; set; }
@@ -90,7 +91,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public bool IsDownloadable { get; set; } = true;
 
-       　public bool IsEncrypted { get; set; }
+        public bool IsEncrypted { get; set; }
 
         public bool IsOfficial { get; set; }
 
@@ -98,6 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public bool IsPeakTime { get; set; }
 
+        public bool IsEnonomy => !this.IsPremium && this.IsEnonomy;
 
         /// <summary>
         /// 投稿日時
