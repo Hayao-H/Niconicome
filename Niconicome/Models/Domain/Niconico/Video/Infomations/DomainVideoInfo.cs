@@ -160,6 +160,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         DownloadStartedOn = JsUtils.ToLocalDateTime(this.RawDmcInfo.DownloadStartedOn),
                         ThumbInfo = new ThumbInfo(rawhumb.large, rawhumb.middle, rawhumb.normal, rawhumb.player),
                         SessionInfo = sessionInfo,
+                        IsPremium = this.RawDmcInfo.IsPremium,
+                        IsPeakTime = this.RawDmcInfo.IsPeakTime,
                     };
                     this.cachedDmcInfo.Tags.AddRange(JsUtils.ToClrArray<string>(this.RawDmcInfo.Tags));
 
