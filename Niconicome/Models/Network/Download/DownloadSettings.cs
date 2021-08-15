@@ -37,6 +37,7 @@ namespace Niconicome.Models.Network.Download
         string VideoInfoSuffix { get; }
         string ThumbSuffix { get; }
         string OwnerComSuffix { get; }
+        string? EconomySuffix { get; }
         uint VerticalResolution { get; }
         int PlaylistID { get; }
         int MaxCommentsCount { get; }
@@ -115,6 +116,9 @@ namespace Niconicome.Models.Network.Download
 
         public string CommandFormat { get; set; } = string.Empty;
 
+        public string? EconomySuffix { get; set; }
+
+
         public IchibaInfoTypeSettings IchibaInfoType { get; set; }
 
         public VideoInfo::ThumbSize ThumbSize { get; set; }
@@ -135,6 +139,7 @@ namespace Niconicome.Models.Network.Download
                 IsResumeEnable = this.ResumeEnable,
                 IsNoEncodeEnable = this.SaveWithoutEncode,
                 CommandFormat = this.CommandFormat,
+                EconomySuffix = this.EconomySuffix,
             };
         }
 

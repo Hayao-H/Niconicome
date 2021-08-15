@@ -154,6 +154,20 @@
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
+                    <materialDesign:PackIcon Kind="Image" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="エコノミー動画の接尾辞"/>
+                    <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding EconomySuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
                     <materialDesign:PackIcon Kind="FindReplace" Foreground="SkyBlue">
                         <materialDesign:PackIcon.RenderTransform>
                             <TranslateTransform Y="7"/>

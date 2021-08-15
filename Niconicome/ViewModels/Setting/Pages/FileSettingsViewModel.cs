@@ -46,6 +46,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.IsSearchingVideosByIDEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.SearchFileByID);
             this.ThumbnailSuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.ThumbSuffix, Format.DefaultThumbnailSuffix);
             this.OwnerCommentSuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.OwnerComSuffix, Format.DefaultOwnerCommentSuffix);
+            this.EconomySuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.EconomySuffix);
         }
 
         /// <summary>
@@ -101,6 +102,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactiveProperty<string> OwnerCommentSuffix { get; init; }
 
 
+        /// <summary>
+        /// エコノミー動画の接尾辞
+        /// </summary>
+        public ReactiveProperty<string> EconomySuffix { get; init; }
     }
 
     class FileSettingsViewModelD : SettingaBase
@@ -128,5 +133,6 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public ReactiveProperty<string> OwnerCommentSuffix { get; init; } = new(Format.DefaultOwnerCommentSuffix);
 
+        public ReactiveProperty<string> EconomySuffix { get; init; } = new("【エコノミー】");
     }
 }
