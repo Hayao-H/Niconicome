@@ -60,6 +60,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         string FolderName { get; }
         string FileNameFormat { get; }
         string CommandFormat { get; }
+        string? EconomySuffix { get; }
         bool IsOverwriteEnable { get; }
         bool IsAutoDisposingEnable { get; }
         bool IsReplaceStrictedEnable { get; }
@@ -133,8 +134,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
 
 
+            string? economySuffix = session.Video!.DmcInfo.IsEnonomy ? settings.EconomySuffix : null;
+            string? suffix = economySuffix;
             string ext = settings.IsNoEncodeEnable ? ".ts" : ".mp4";
-            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ext, settings.IsReplaceStrictedEnable)
+            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ext, settings.IsReplaceStrictedEnable, suffix)
                 : $"[{session.Video!.Id}]{session.Video!.Title}{ext}"
                 ;
 
@@ -415,7 +418,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 taskHandler.AddTaskToQueue(task);
             }
 
-            await taskHandler.ProcessTasksAsync();
+            await taskHandler.ProcessTasksAsync(ct: token);
 
             if (ex is not null)
             {
@@ -525,6 +528,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public string FileNameFormat { get; set; } = string.Empty;
 
         public string CommandFormat { get; set; } = Format.DefaultFFmpegFormat;
+
+        public string? EconomySuffix { get; set; }
 
         public bool IsOverwriteEnable { get; set; }
 

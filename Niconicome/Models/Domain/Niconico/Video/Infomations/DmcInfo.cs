@@ -99,7 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public bool IsPeakTime { get; set; }
 
-        public bool IsEnonomy => !this.IsPremium && this.IsEnonomy;
+        public bool IsEnonomy => !this.IsPremium && this.IsPeakTime;
 
         /// <summary>
         /// 投稿日時

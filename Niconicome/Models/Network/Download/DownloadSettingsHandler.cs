@@ -126,6 +126,12 @@ namespace Niconicome.Models.Network.Download
                 commandFormat = Format.DefaultFFmpegFormat;
             }
 
+            string? economySuffix = this.settingHandler.GetStringSetting(SettingsEnum.EconomySuffix);
+            if (economySuffix?.IsNullOrEmpty() ?? true)
+            {
+                economySuffix = null;
+            }
+
             return new DownloadSettings
             {
                 Video = this.IsDownloadingVideoEnable.Value,
@@ -159,6 +165,7 @@ namespace Niconicome.Models.Network.Download
                 ThumbSize = this.ThumbnailSize.Value,
                 ThumbSuffix = thumbSuffix,
                 OwnerComSuffix = ownerComSuffix,
+                EconomySuffix = economySuffix,
             };
         }
 
