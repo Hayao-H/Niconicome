@@ -87,6 +87,19 @@
                     <GridView>
                         <GridViewColumn DisplayMemberBinding="{Binding PackageID.Value}"/>
                         <GridViewColumn DisplayMemberBinding="{Binding Details.Value}"/>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <materialDesign:PopupBox IsEnabled="True">
+                                        <StackPanel Orientation="Vertical">
+                                            <Button 
+                                                Content="アンインストール" 
+                                                Command="{Binding UninstallCommand}"/>
+                                        </StackPanel>
+                                    </materialDesign:PopupBox>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                     </GridView>
                 </ListView.View>
                 <ListView.ItemContainerStyle>

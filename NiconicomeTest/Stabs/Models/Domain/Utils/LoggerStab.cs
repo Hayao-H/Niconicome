@@ -1,5 +1,6 @@
 using System;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 
 namespace NiconicomeTest.Stabs.Models.Domain.Utils
 {
@@ -37,6 +38,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Utils
         }
 
         public void Error(string message)
+        {
+            this.LastMessage = message;
+        }
+
+        public void Error(string message,IAttemptResult result)
         {
             this.LastMessage = message;
         }

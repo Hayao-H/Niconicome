@@ -7,6 +7,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         Dictionary<int, IAddonContext> Contexts { get; }
         void Kill(int id);
         void KillAll();
+
+        /// <summary>
+        /// コンテクストを所有しているかどうかをチェックする
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool Has(int id);
     }
 
     public class AddonContexts : IAddonContexts
@@ -33,6 +40,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
             {
                 addon.Value.Dispose();
             }
+        }
+
+        public bool Has(int id)
+        {
+            return this.Contexts.ContainsKey(id);
         }
 
     }

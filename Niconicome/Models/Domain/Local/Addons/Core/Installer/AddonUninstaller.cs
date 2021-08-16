@@ -64,14 +64,17 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             AddonInfomation addon = this.container.GetAddon(id);
             string addonDir = Path.Combine(FileFolder.AddonsFolder, addon.PackageID.Value);
 
-            try
+            if (this.contexts.Has(id))
             {
-                this.contexts.Kill(id);
-            }
-            catch (Exception e)
-            {
-                this.logger.Error($"アドオンコンテクストの破棄に失敗しました。(name:{addon.Name.Value})", e);
-                return new AttemptResult() { Message = "アドオンコンテクストの破棄に失敗しました。", Exception = e };
+                try
+                {
+                    this.contexts.Kill(id);
+                }
+                catch (Exception e)
+                {
+                    this.logger.Error($"アドオンコンテクストの破棄に失敗しました。(name:{addon.Name.Value})", e);
+                    return new AttemptResult() { Message = "アドオンコンテクストの破棄に失敗しました。", Exception = e };
+                }
             }
 
             IAttemptResult storeResult = this.storeHandler.Delete(addon => addon.Id == id);
