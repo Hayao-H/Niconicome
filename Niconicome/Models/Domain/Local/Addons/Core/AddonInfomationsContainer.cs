@@ -55,6 +55,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         /// <param name="id"></param>
         public void Remove(int id)
         {
+            if (!this.addons.ContainsKey(id)) return;
             AddonInfomation addon = this.addons[id];
             this.Addons.Remove(addon);
             this.addons.Remove(id);

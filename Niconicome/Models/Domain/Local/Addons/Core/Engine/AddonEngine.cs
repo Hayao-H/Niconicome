@@ -13,7 +13,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 {
     public interface IAddonEngine
     {
-        Task<IAttemptResult> InitializeAsync(string packageID, bool isDevMode);
+        /// <summary>
+        /// 非同期に初期化する
+        /// </summary>
+        /// <param name="packageID"></param>
+        /// <param name="isDevMode"></param>
+        /// <returns>Dataプロパティーにはインストール状態</returns>
+        Task<IAttemptResult<bool>> InitializeAsync(string packageID, bool isDevMode);
     }
 
     public class AddonEngine : IAddonEngine
@@ -46,11 +52,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
         /// </summary>
         /// <param name="packageID"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult> InitializeAsync(string packageID, bool isDevMode)
+        public async Task<IAttemptResult<bool>> InitializeAsync(string packageID, bool isDevMode)
         {
             if (!this.storeHandler.IsInstallled(addon => addon.PackageID == packageID))
             {
-                return new AttemptResult() { Message = "インストールされていないアドオンです。アドオンのサイドロードは出来ません。" };
+                return new AttemptResult<bool>() { Data = false, Message = "インストールされていないアドオンです。アドオンのサイドロードは出来ません。" };
             }
 
             string manifestPath = Path.Combine(Const::FileFolder.AddonsFolder, packageID, "manifest.json");
@@ -58,7 +64,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
             IAttemptResult<AddonInfomation> mResult = this.manifestLoader.LoadManifest(manifestPath);
             if (!mResult.IsSucceeded || mResult.Data is null)
             {
-                return new AttemptResult() { Message = "マニフェストファイルの読み込みに失敗しました。", Exception = mResult.Exception };
+                return new AttemptResult<bool>() { Data = true, Message = "マニフェストファイルの読み込みに失敗しました。", Exception = mResult.Exception };
             }
 
 
@@ -71,7 +77,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
                 if (!checkResult.IsSucceeded)
                 {
                     this.container.Remove(dbData.ID.Value);
-                    return checkResult;
+                    return new AttemptResult<bool>() { Data = true, Message = checkResult.Message, Exception = checkResult.Exception };
                 }
             }
 
@@ -88,7 +94,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
 
             await Task.Delay(1);
 
-            return new AttemptResult() { IsSucceeded = true };
+            return new AttemptResult<bool>() { Data = true, IsSucceeded = true };
 
         }
 
@@ -124,7 +130,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
             {
                 this.logger.Error($"ホスト権限の不正な書き換えを検知しました。({dbData.Name.Value},{dbData.HostPermissions.Count}=>{manifestData.HostPermissions.Count})");
                 return new AttemptResult() { Message = "ホスト権限が不正に書き換えられました。" };
-            } else {
+            }
+            else
+            {
 
                 foreach (var permission in manifestData.HostPermissions)
                 {

@@ -21,6 +21,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         IAttemptResult<int> Update(AddonInfomation addon);
 
         /// <summary>
+        /// すべてのアドオンのパッケージIDを取得する
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IEnumerable<string>> GetAllAddonsPackageID();
+
+        /// <summary>
         /// 指定した条件でアドオンを削除する
         /// </summary>
         /// <param name="predicate"></param>
@@ -184,6 +190,23 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         {
             bool result = this.dataBase.Exists<Addon>(Addon.TableName, predicate);
             return result;
+        }
+
+        public IAttemptResult<IEnumerable<string>> GetAllAddonsPackageID()
+        {
+            var ids = new List<string>();
+            IAttemptResult<List<Addon>> addons = this.dataBase.GetAllRecords<Addon>(Addon.TableName);
+
+            if (!addons.IsSucceeded || addons.Data is null)
+            {
+                this.logger.Error($"データベースからのアドオン取得に失敗しました。（詳細:{addons.Message}）", addons);
+                return new AttemptResult<IEnumerable<string>>() { Message = $"データベースからのアドオン取得に失敗しました。（詳細:{addons.Message}）" };
+            }
+            else
+            {
+                ids.AddRange(addons.Data.Select(a => a.PackageID));
+                return new AttemptResult<IEnumerable<string>>() { IsSucceeded = true, Data = ids };
+            }
         }
 
         #region private
