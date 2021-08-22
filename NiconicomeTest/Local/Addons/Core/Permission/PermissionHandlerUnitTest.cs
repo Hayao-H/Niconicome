@@ -16,6 +16,7 @@ namespace NiconicomeTest.Local.Addons.Core.Permission
 
         [TestCase("hooks", true)]
         [TestCase("fuga", false)]
+        [TestCase("session", true)]
         public void 権限を確認する(string name, bool expectedResult)
         {
             bool result = this.permissionsHandler!.IsKnownPermission(name);

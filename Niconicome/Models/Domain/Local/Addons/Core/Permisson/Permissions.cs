@@ -13,6 +13,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static Permission Output { get; private set; } = new(PermissionNames.Output, "Output API。この権限を持つ拡張機能はアプリケーションの出力画面に文字列を書き込むことが出来ます。");
 
         public static Permission Log { get; private set; } = new(PermissionNames.Log, "Log API。この権限を持つ拡張機能はアプリケーションのログに文字列を書き込むことが出来ます。");
+
+        public static Permission Session { get; private set; } = new(PermissionNames.Session, "Session API。この機能を持つ拡張機能はログイン状態でウェブサイトにリクエストを送信することができます。");
     }
 
     public static class PermissionNames
@@ -22,6 +24,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static string Output { get; private set; } = "output";
 
         public static string Log { get; private set; } = "log";
+
+        public static string Session { get; private set; } = "session";
     }
 
     public class Permission
