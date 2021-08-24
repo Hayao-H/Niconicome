@@ -45,7 +45,7 @@ namespace Niconicome.Models.Local.Addon
     public class AddonHandler : IAddonHandler
     {
 
-        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller, IAddonInstaller installer,IAddonStoreHandler storeHandler)
+        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller, IAddonInstaller installer, IAddonStoreHandler storeHandler)
         {
             this.container = container;
             this.directoryIO = directoryIO;
@@ -142,8 +142,18 @@ namespace Niconicome.Models.Local.Addon
                     engine.AddHostObject("application", entryPoint);
 
                     IFetch fetch = DIFactory.Provider.GetRequiredService<IFetch>();
-                    fetch.Initialize(info.HostPermissions);
-                    Func<string, Task<Response>> fetchFunc = url => fetch.FetchAsync(url);
+                    fetch.Initialize(info);
+                    Func<string, dynamic?, Task<Response>> fetchFunc = (url, optionObj) =>
+                    {
+                        var option = new FetchOption()
+                        {
+                            method = optionObj?.method,
+                            body = optionObj?.body,
+                            credentials = optionObj?.credentials,
+                        };
+                    
+                      return fetch.FetchAsync(url, option);
+                    };
                     engine.AddHostObject("fetch", fetchFunc);
 
                 }, isAddonDebuggingEnable);
