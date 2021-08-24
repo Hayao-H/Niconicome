@@ -15,6 +15,12 @@ namespace Niconicome.Models.Local.Addon.API.Net.Hooks
         /// </summary>
         /// <param name="function"></param>
         void registerPageAnalyzeFunction(ScriptObject function);
+
+        /// <summary>
+        /// セッション確立関数を登録する
+        /// </summary>
+        /// <param name="function"></param>
+        void registerSessionEnsuringFunction(ScriptObject function);
     }
 
     class Hooks : IHooks
@@ -36,6 +42,12 @@ namespace Niconicome.Models.Local.Addon.API.Net.Hooks
         {
             this.manager.Register(function, HookType.WatchPageParser);
         }
+
+        public void registerSessionEnsuringFunction(ScriptObject function)
+        {
+            this.manager.Register(function, HookType.SessionEnsuring);
+        }
+
 
         #endregion
     }
