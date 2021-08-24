@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
@@ -91,7 +92,7 @@ namespace Niconicome.Models.Domain.Niconico
 
         public CookieManager()
         {
-            this.niconicoBaseUri = new Uri("http://nicovideo.jp"); 
+            this.niconicoBaseUri = new Uri("http://nicovideo.jp");
         }
 
         private readonly Uri niconicoBaseUri;

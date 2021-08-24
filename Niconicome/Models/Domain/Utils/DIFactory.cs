@@ -214,6 +214,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Addons::IAddonInstallManager, Addons::AddonInstallManager>();
             services.AddTransient<AddonAPI.Local.IO.IOutput, AddonAPI.Local.IO.Output>();
             services.AddTransient<AddonAPI.Net.Http.Fetch.IFetch, AddonAPI.Net.Http.Fetch.Fetch>();
+            services.AddTransient<AddonAPI.Net.Http.Fetch.IAddonHttp, AddonAPI.Net.Http.Fetch.AddonHttp>();
             services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
             services.AddTransient<AddonsCore::Installer.IAddonUninstaller, AddonsCore::Installer.AddonUninstaller>();
             services.AddSingleton<AddonsDomainAPI::Hooks.IHooksManager, AddonsDomainAPI::Hooks.HooksManager>();
