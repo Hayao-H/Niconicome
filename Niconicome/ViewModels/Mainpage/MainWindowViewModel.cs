@@ -264,6 +264,8 @@ namespace Niconicome.ViewModels.Mainpage
                         return;
                     }
                 }
+
+                WS::Mainpage.Shutdown.ShutdownApp();
             }
         }
     }
