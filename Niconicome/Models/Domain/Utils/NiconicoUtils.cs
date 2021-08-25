@@ -55,6 +55,7 @@ namespace Niconicome.Models.Domain.Utils
                 UploadedOn = dmcInfo.UploadedOn,
                 DownloadStartedOn = dmcInfo.DownloadStartedOn,
                 OwnerID = dmcInfo.OwnerID.ToString(),
+                Duration = dmcInfo.Duration,
             };
 
             return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
@@ -79,6 +80,7 @@ namespace Niconicome.Models.Domain.Utils
                 UploadedOn = video.UploadedOn.Value,
                 DownloadStartedOn = DateTime.Now,
                 OwnerID = video.OwnerID.Value.ToString(),
+                Duration = video.Duration.Value,
             };
 
             return this.GetFilenameInternal(format, info, extension, replaceStricted, suffix);
@@ -324,8 +326,22 @@ namespace Niconicome.Models.Domain.Utils
              .Replace("<title>", info.Title)
              .Replace("<owner>", info.OwnerName)
              .Replace("<ownerId>", info.OwnerID)
+             .Replace("<durationS>", info.Duration.ToString())
              + suffix
              + extension;
+
+            if (format.Contains("<duration>"))
+            {
+                TimeSpan span = TimeSpan.FromSeconds(info.Duration);
+                var timespanFormat = @"mm\:ss";
+
+                if (info.Duration > 3600)
+                {
+                    timespanFormat = @"hh\:mm\:ss";
+                }
+
+                filename = filename.Replace("<duration>", span.ToString(timespanFormat));
+            }
 
             filename = this.GetDateReplacedString(filename, info);
 
@@ -366,5 +382,7 @@ namespace Niconicome.Models.Domain.Utils
         public string NiconicoID { get; set; } = string.Empty;
 
         public string OwnerID { get; set; } = string.Empty;
+
+        public int Duration { get; set; }
     }
 }
