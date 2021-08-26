@@ -78,144 +78,161 @@
                             <TextBlock Text="ライセンス情報"/>
                         </StackPanel>
                     </Expander.Header>
-                        <StackPanel>
-                            <TextBlock Style="{StaticResource LicenseTitle}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="http://materialdesigninxaml.net/">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             MaterialDesignInXamlToolkit
                         </Hyperlink>
-                            </TextBlock>
-                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                            </TextBlock>
+                        </TextBlock>
 
-                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://github.com/ilyalozovyy/credentialmanagement">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             credentialmanagement
                         </Hyperlink>
-                            </TextBlock>
-                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/ilyalozovyy/credentialmanagement/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                            </TextBlock>
+                        </TextBlock>
 
-                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://github.com/contre/Windows-API-Code-Pack-1.1">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Windows-API-Code-Pack-1.1
                         </Hyperlink>
-                            </TextBlock>
-                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/aybe/Windows-API-Code-Pack-1.1/blob/master/LICENCE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                            </TextBlock>
+                        </TextBlock>
 
-                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://www.litedb.org/">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             LiteDB
                         </Hyperlink>
-                            </TextBlock>
-                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/mbdavid/LiteDB/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                            </TextBlock>
+                        </TextBlock>
 
-                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://anglesharp.github.io/">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             AngleSharp
                         </Hyperlink>
-                            </TextBlock>
-                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/AngleSharp/AngleSharp/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                            </TextBlock>
+                        </TextBlock>
 
-                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://github.com/dotnet/efcore/">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Microsoft.Data.SQLite
                         </Hyperlink>
-                            </TextBlock>
-                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/dotnet/efcore/blob/main/LICENSE.txt">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                            </TextBlock>
+                        </TextBlock>
 
-                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://github.com/PrismLibrary/Prism">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Prism
                         </Hyperlink>
-                            </TextBlock>
-                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/PrismLibrary/Prism/blob/master/LICENSE">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                            </TextBlock>
+                        </TextBlock>
 
-                            <TextBlock Style="{StaticResource LicenseTitle}">
+                        <TextBlock Style="{StaticResource LicenseTitle}">
                         <Hyperlink NavigateUri="https://github.com/runceel/ReactiveProperty">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             ReactiveProperty
                         </Hyperlink>
-                            </TextBlock>
-                            <TextBlock Style="{StaticResource LicenseBlock}">
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
                         <Hyperlink NavigateUri="https://github.com/runceel/ReactiveProperty/blob/main/LICENSE.txt">
                             <i:Interaction.Behaviors>
                                 <mainvm:HyperlinkBehavior/>
                             </i:Interaction.Behaviors>
                             Read license on github.com
                         </Hyperlink>
-                            </TextBlock>
-                            
-                        </StackPanel>
+                        </TextBlock>
+
+                        <TextBlock Style="{StaticResource LicenseTitle}">
+                        <Hyperlink NavigateUri="https://github.com/microsoft/ClearScript">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            ClearScript
+                        </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
+                        <Hyperlink NavigateUri="https://github.com/microsoft/ClearScript/blob/master/License.txt">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Read license on github.com
+                        </Hyperlink>
+                        </TextBlock>
+
+                    </StackPanel>
                 </Expander>
             </StackPanel>
         </ScrollViewer>

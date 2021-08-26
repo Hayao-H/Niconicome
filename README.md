@@ -1,7 +1,7 @@
 # Niconicome(α)
 [![.Net5 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net5%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net5+CI%2FCD%22) 
 [![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
-[![Github Release](https://img.shields.io/badge/release-v0.8.2-blue)](https://github.com/Hayao-H/Niconicome/releases)
+[![Github Release](https://img.shields.io/badge/release-v0.9.0-blue)](https://github.com/Hayao-H/Niconicome/releases)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
@@ -26,6 +26,7 @@
 - データベースファイルのバックアップ・復元。 
 - NicomentXenoglossiaからのプレイリストデータ移行。
 - Mozilla Firefoxとのログイン連携。
+- タイマー処理。指定時間にDLを開始できます。
 ### 今後追加予定の機能
 -  :new: Webview2・JavaScriptベースのプラグイン機能([ClearScript](https://github.com/microsoft/ClearScript)を利用・[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0)で一部実装)。
 
