@@ -7,13 +7,7 @@
              xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
              xmlns:prism="http://prismlibrary.com/"  
              mc:Ignorable="d"
-             TextElement.Foreground="{DynamicResource MaterialDesignLightForeground}"
-             TextElement.FontWeight="Regular"
-             TextElement.FontSize="13"
-             TextOptions.TextFormattingMode="Ideal"
-             TextOptions.TextRenderingMode="Auto"
              Background="{DynamicResource MaterialDesignPaper}"
-             FontFamily="Yu Gothic"
              d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingsViewModelD},IsDesignTimeCreatable=True}"
              d:Width="1200"
              prism:ViewModelLocator.AutoWireViewModel="True">

@@ -52,6 +52,8 @@
                     &lt;downloadon&gt; :DL日時<LineBreak/>
                     &lt;owner&gt; :投稿者のニックネーム<LineBreak/>
                     &lt;ownerId&gt; :投稿者のユーザーID<LineBreak/>
+                    &lt;duration&gt; :再生時間（hh:mm:ss）<LineBreak/>
+                    &lt;durationS&gt; :再生時間（秒数）<LineBreak/>
                     ※カスタム書式を利用できます。詳しくはwikiをご覧ください。<LineBreak/>
                     ※「\」でフォルダーを作成します。[&lt;id&gt;]&lt;title&gt;でxenoのデフォルトと同じフォーマットになります。
                     </TextBlock>
@@ -151,6 +153,20 @@
                     Margin="10 0 0 0" 
                     Width="200"
                     Text="{Binding ThumbnailSuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="Image" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="エコノミー動画の接尾辞"/>
+                    <TextBox
+                    HorizontalAlignment="Right" 
+                    Margin="10 0 0 0" 
+                    Width="200"
+                    Text="{Binding EconomySuffix.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>

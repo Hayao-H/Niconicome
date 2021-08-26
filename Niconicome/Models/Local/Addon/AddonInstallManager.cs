@@ -54,6 +54,13 @@ namespace Niconicome.Models.Local.Addon
         Task<IAttemptResult> UnistallAddonAsync(int id);
 
         /// <summary>
+        /// アドオンを削除する
+        /// </summary>
+        /// <param name="packageID">パッケージID</param>
+        /// <returns></returns>
+        Task<IAttemptResult> UnistallAddonAsync(string packageID);
+
+        /// <summary>
         /// アドオンの説明文字列を取得
         /// </summary>
         /// <returns></returns>
@@ -87,12 +94,13 @@ namespace Niconicome.Models.Local.Addon
 
     public class AddonInstallManager : IAddonInstallManager
     {
-        public AddonInstallManager(IAddonInstaller installer, IPermissionsHandler permissionsHandler, IAddonUninstaller uninstaller, IAddonHandler handler)
+        public AddonInstallManager(IAddonInstaller installer, IPermissionsHandler permissionsHandler, IAddonUninstaller uninstaller, IAddonHandler handler,IAddonStoreHandler addonStoreHandler)
         {
             this.installer = installer;
             this.permissionsHandler = permissionsHandler;
             this.uninstaller = uninstaller;
             this.handler = handler;
+            this.addonStoreHandler = addonStoreHandler;
         }
 
         #region field
@@ -104,6 +112,8 @@ namespace Niconicome.Models.Local.Addon
         private readonly IAddonUninstaller uninstaller;
 
         private readonly IAddonHandler handler;
+
+        private readonly IAddonStoreHandler addonStoreHandler;
 
         private string? tempPath;
 
@@ -178,6 +188,19 @@ namespace Niconicome.Models.Local.Addon
             await Task.Delay(1000 * 3);
             return this.uninstaller.Uninstall(id);
         }
+
+        public async Task<IAttemptResult> UnistallAddonAsync(string packageID)
+        {
+            AddonInfomation? addon = this.addonStoreHandler.GetAddon(a => a.PackageID == packageID);
+            this.handler.LoadFailedAddons.RemoveAll(addon => addon.PackageID == packageID);
+            if (addon is null)
+            {
+                return new AttemptResult() { Message = $"指定したパッケージID（{packageID}）のアドオンはインストールされていません" };
+            }
+
+            return await this.UnistallAddonAsync(addon.ID.Value);
+        }
+
 
         public string GetAddonInfomationString()
         {

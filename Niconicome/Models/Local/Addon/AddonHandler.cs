@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Const;
@@ -15,7 +16,9 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Addon.API;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
+using Niconicome.Models.Local.Addon.Result;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Network.Watch;
 
 namespace Niconicome.Models.Local.Addon
 {
@@ -29,7 +32,7 @@ namespace Niconicome.Models.Local.Addon
         /// <summary>
         /// 読み込みに失敗したアドオン
         /// </summary>
-        ObservableCollection<IAttemptResult<string>> LoadFailedAddons { get; }
+        ObservableCollection<FailedAddonResult> LoadFailedAddons { get; }
 
         /// <summary>
         /// 初期化する
@@ -42,7 +45,7 @@ namespace Niconicome.Models.Local.Addon
     public class AddonHandler : IAddonHandler
     {
 
-        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller,IAddonInstaller installer)
+        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller, IAddonInstaller installer, IAddonStoreHandler storeHandler)
         {
             this.container = container;
             this.directoryIO = directoryIO;
@@ -52,6 +55,7 @@ namespace Niconicome.Models.Local.Addon
             this.settingHandler = settingHandler;
             this.uninstaller = uninstaller;
             this.installer = installer;
+            this.storeHandler = storeHandler;
         }
 
         #region field
@@ -71,6 +75,8 @@ namespace Niconicome.Models.Local.Addon
         private readonly IAddonUninstaller uninstaller;
 
         private readonly IAddonInstaller installer;
+
+        private readonly IAddonStoreHandler storeHandler;
 
         private bool isInitialized;
 
@@ -118,10 +124,10 @@ namespace Niconicome.Models.Local.Addon
             foreach (var packagePath in packages)
             {
                 string package = Path.GetFileName(packagePath);
-                IAttemptResult result = await this.engine.InitializeAsync(package, isDevMode);
+                IAttemptResult<bool> result = await this.engine.InitializeAsync(package, isDevMode);
                 if (!result.IsSucceeded)
                 {
-                    var failedResult = new AttemptResult<string>() { Message = result.Message, Data = package };
+                    var failedResult = new FailedAddonResult(package, result.Message ?? string.Empty, result.Data);
                     this.LoadFailedAddons.Add(failedResult);
                 }
             }
@@ -136,16 +142,40 @@ namespace Niconicome.Models.Local.Addon
                     engine.AddHostObject("application", entryPoint);
 
                     IFetch fetch = DIFactory.Provider.GetRequiredService<IFetch>();
-                    fetch.Initialize(info.HostPermissions);
-                    Func<string, Task<Response>> fetchFunc = url => fetch.FetchAsync(url);
+                    fetch.Initialize(info);
+                    Func<string, dynamic?, Task<Response>> fetchFunc = (url, optionObj) =>
+                    {
+                        var option = new FetchOption()
+                        {
+                            method = optionObj?.method,
+                            body = optionObj?.body,
+                            credentials = optionObj?.credentials,
+                        };
+                    
+                      return fetch.FetchAsync(url, option);
+                    };
                     engine.AddHostObject("fetch", fetchFunc);
 
                 }, isAddonDebuggingEnable);
 
                 if (!result.IsSucceeded)
                 {
-                    var failedResult = new AttemptResult<string>() { Message = result.Message, Data = info.PackageID.Value };
+                    var failedResult = new FailedAddonResult(info.PackageID.Value, result.Message ?? string.Empty, true);
                     this.LoadFailedAddons.Add(failedResult);
+                }
+            }
+
+            IAttemptResult<IEnumerable<string>> packageIds = this.storeHandler.GetAllAddonsPackageID();
+            if (packageIds.IsSucceeded && packageIds.Data is not null)
+            {
+                List<string> loaded = this.contexts.Contexts.Select(v => v.Value.AddonInfomation!.PackageID.Value).ToList();
+                foreach (var package in packageIds.Data)
+                {
+                    if (!loaded.Contains(package))
+                    {
+                        var failedResult = new FailedAddonResult(package, "インストールされていますが、ファイルが見つかりませんでした。", true);
+                        this.LoadFailedAddons.Add(failedResult);
+                    }
                 }
             }
 
@@ -163,7 +193,7 @@ namespace Niconicome.Models.Local.Addon
         /// </summary>
         public ObservableCollection<AddonInfomation> Addons => this.container.Addons;
 
-        public ObservableCollection<IAttemptResult<string>> LoadFailedAddons { get; init; } = new();
+        public ObservableCollection<FailedAddonResult> LoadFailedAddons { get; init; } = new();
 
         #endregion
 

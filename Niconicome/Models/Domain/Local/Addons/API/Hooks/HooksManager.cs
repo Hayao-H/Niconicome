@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ClearScript;
@@ -18,6 +19,13 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
         /// <param name="page"></param>
         /// <returns></returns>
         IAttemptResult<dynamic> ParseWatchPage(string page);
+
+        /// <summary>
+        /// セッションを確立する
+        /// </summary>
+        /// <param name="dmcInfo"></param>
+        /// <returns></returns>
+        Task<IAttemptResult<dynamic>> EnsureSessionAsync(dynamic dmcInfo);
 
         /// <summary>
         /// 関数を登録する
@@ -72,7 +80,33 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
             }
 
             return new AttemptResult<dynamic>() { IsSucceeded = true, Data = returnVal };
+        
         }
+
+        public async Task<IAttemptResult<dynamic>> EnsureSessionAsync(dynamic dmcInfo)
+        {
+            this.hooks.TryGetValue(HookType.SessionEnsuring, out ScriptObject? function);
+
+            if (function is null)
+            {
+                return new AttemptResult<dynamic>() { Message = "セッション確立関数が登録されていません。" };
+            }
+
+            dynamic returnVal;
+
+            try
+            {
+                returnVal = await function.Invoke(false, dmcInfo);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("セッションの確立に失敗しました。", e);
+                return new AttemptResult<dynamic>() { Message = "セッションの確立に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<dynamic>() { IsSucceeded = true, Data = returnVal };
+        }
+
 
         public void Register(ScriptObject function, HookType type)
         {
@@ -97,6 +131,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
 
     public enum HookType
     {
-        WatchPageParser
+        WatchPageParser,
+        SessionEnsuring,
     }
 }

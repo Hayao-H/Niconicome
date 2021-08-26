@@ -192,6 +192,9 @@
                                 <TabItem Header="状態">
                                     <UserControl prism:RegionManager.RegionName="VideolistState"/>
                                 </TabItem>
+                                <TabItem Header="タイマー">
+                                    <UserControl prism:RegionManager.RegionName="TimerSettings"/>
+                                </TabItem>
                             </TabControl >
                         </Grid>
                     </Grid>

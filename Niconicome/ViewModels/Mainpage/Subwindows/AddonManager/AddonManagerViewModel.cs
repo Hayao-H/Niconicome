@@ -17,38 +17,18 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 {
     class AddonManagerViewModel : BindableBase, IDialogAware
     {
-        public AddonManagerViewModel(IRegionManager regionManager, IDialogService dialogService)
+        public AddonManagerViewModel(IRegionManager regionManager)
         {
             this.RegionManager = new ReactiveProperty<IRegionManager>(regionManager.CreateRegionManager());
             this.RequestClose += _ => { };
-            this.dialogService = dialogService;
-            this.Addons = WS::AddonPage.AddonHandler.Addons.ToReadOnlyReactiveCollection(value => new AddonInfomationViewModel(value, dialogService));
-            this.FailedAddons = WS::AddonPage.AddonHandler.LoadFailedAddons.ToReadOnlyReactiveCollection(value => new FailedAddonViewModel(value));
-            this.IsAddonDebuggingEnable = WS::AddonPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.IsAddonDebugEnable);
             this.Queue = WS::AddonPage.Queue;
-
-            this.InstallCommand = WS::AddonPage.InstallManager.IsInstalling
-                .Select(value => !value)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
-                {
-                    dialogService.Show(nameof(AddonInstallWindow));
-                }).AddTo(this.disposables);
         }
 
         #region field
 
-        private readonly IDialogService dialogService;
-
         #endregion
 
         #region Props
-
-        public ReadOnlyReactiveCollection<AddonInfomationViewModel> Addons { get; init; }
-
-        public ReadOnlyReactiveCollection<FailedAddonViewModel> FailedAddons { get; init; }
-
-        public ReactiveProperty<bool> IsAddonDebuggingEnable { get; init; }
 
         public SnackbarMessageQueue Queue { get; init; }
 
@@ -58,7 +38,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 
         #region Command
 
-        public ReactiveCommand InstallCommand { get; init; }
 
 
         #endregion

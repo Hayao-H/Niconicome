@@ -25,6 +25,9 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         bool IsDownloadable { get; set; }
         bool IsEncrypted { get; set; }
         bool IsOfficial { get; set; }
+        bool IsPremium { get; set; }
+        bool IsPeakTime { get; set; }
+        bool IsEnonomy { get; }
         DateTime UploadedOn { get; set; }
         DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; set; }
@@ -86,21 +89,17 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public List<string> Tags { get; set; } = new List<string>();
 
-        /// <summary>
-        /// ダウンロード可能フラグ
-        /// </summary>
         public bool IsDownloadable { get; set; } = true;
 
-        /// <summary>
-        /// 暗号化フラグ
-        /// </summary>
-       　public bool IsEncrypted { get; set; }
+        public bool IsEncrypted { get; set; }
 
-        /// <summary>
-        /// 公式動画フラグ
-        /// </summary>
         public bool IsOfficial { get; set; }
 
+        public bool IsPremium { get; set; }
+
+        public bool IsPeakTime { get; set; }
+
+        public bool IsEnonomy => !this.IsPremium && this.IsPeakTime;
 
         /// <summary>
         /// 投稿日時

@@ -68,14 +68,7 @@ namespace Niconicome.Models.Local.Addon.API
                 this.output!.SetInfo(infomation);
             }
 
-            if (infomation.HasPermission(PermissionNames.Hooks))
-            {
-                engine.AddHostType(nameof(DmcInfo), typeof(DmcInfo));
-                engine.AddHostType(nameof(SessionInfo), typeof(SessionInfo));
-                engine.AddHostType(nameof(ThumbInfo), typeof(ThumbInfo));
-                engine.AddHostType(nameof(Thread), typeof(Thread));
-            }
-            else
+            if (!infomation.HasPermission(PermissionNames.Hooks))
             {
                 this.hooks = null;
             }
