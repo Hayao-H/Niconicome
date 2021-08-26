@@ -16,7 +16,7 @@
 		<PublishTrimmed>false</PublishTrimmed>
 		<Deterministic>false</Deterministic>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<Version>0.9.0</Version>x
+		<Version>0.9.0</Version>
 		<PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
 		<Copyright>c2021 Hayao-H</Copyright>
 		<Authors>Hayao-H</Authors>
