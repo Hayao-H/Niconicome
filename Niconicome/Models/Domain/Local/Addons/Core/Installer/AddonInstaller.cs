@@ -7,9 +7,11 @@ using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
+using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Helper.Result.Generic;
+using Reactive.Bindings.ObjectExtensions;
 using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
@@ -47,7 +49,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
     public class AddonInstaller : IAddonInstaller
     {
-        public AddonInstaller(ILogger logger, IManifestLoader manifestLoader, INicoFileIO fileIO, INicoDirectoryIO directoryIO, IAddonStoreHandler storeHandler, IAddonInfomationsContainer container)
+        public AddonInstaller(ILogger logger, IManifestLoader manifestLoader, INicoFileIO fileIO, INicoDirectoryIO directoryIO, IAddonStoreHandler storeHandler, IAddonInfomationsContainer container, IAddonUninstaller uninstaller)
         {
             this.logger = logger;
             this.manifestLoader = manifestLoader;
@@ -55,6 +57,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             this.directoryIO = directoryIO;
             this.storeHandler = storeHandler;
             this.container = container;
+            this.uninstaller = uninstaller;
         }
 
         #region field
@@ -70,6 +73,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
         private readonly IAddonStoreHandler storeHandler;
 
         private readonly IAddonInfomationsContainer container;
+
+        private readonly IAddonUninstaller uninstaller;
 
         #endregion
 
@@ -93,6 +98,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             {
                 return new AttemptResult<AddonInfomation>() { Message = mResult.Message, Exception = mResult.Exception };
             }
+
+            this.UninstallIfAble(mResult.Data);
 
             //DBに保存
             IAttemptResult<int> sResult;
@@ -214,9 +221,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             return new AttemptResult<string>() { IsSucceeded = true };
         }
 
-
-
-
         #region private
 
         /// <summary>
@@ -308,6 +312,31 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
             }
 
             return new AttemptResult() { IsSucceeded = true };
+        }
+
+        /// <summary>
+        /// インストール済みで、実体のないアドオンをアンインストールする
+        /// </summary>
+        /// <returns></returns>
+        private void UninstallIfAble(AddonInfomation addon)
+        {
+            var isIdNull = string.IsNullOrEmpty(addon.Identifier.Value);
+
+            if (!this.storeHandler.IsInstallled(db => isIdNull ? db.Name == addon.Name.Value : db.Identifier == addon.Identifier.Value))
+            {
+                return;
+            }
+
+            AddonInfomation? info = this.storeHandler.GetAddon(db
+                => isIdNull ? db.Name == addon.Name.Value : db.Identifier == addon.Identifier.Value);
+            if (info is null)
+            {
+                return;
+            }
+            else
+            {
+                this.uninstaller.Uninstall(info.ID.Value);
+            }
         }
 
         #endregion
