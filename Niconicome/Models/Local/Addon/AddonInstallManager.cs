@@ -14,7 +14,6 @@ using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Reactive.Bindings;
 using Reactive.Bindings.ObjectExtensions;
 

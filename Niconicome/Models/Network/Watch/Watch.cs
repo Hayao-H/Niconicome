@@ -6,7 +6,6 @@ using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Network.Watch

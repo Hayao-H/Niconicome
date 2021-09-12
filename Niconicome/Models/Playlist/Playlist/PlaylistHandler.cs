@@ -8,7 +8,6 @@ using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Settings;
 using State = Niconicome.Models.Local.State;
 using Utils = Niconicome.Models.Domain.Utils;

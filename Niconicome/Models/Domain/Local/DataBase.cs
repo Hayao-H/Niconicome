@@ -10,7 +10,6 @@ using Niconico = Niconicome.Models.Domain.Niconico;
 using Utils = Niconicome.Models.Domain.Utils;
 using Local = Niconicome.Models.Local;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Domain.Utils;
 using System.Linq.Expressions;
 

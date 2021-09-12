@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using Niconicome.Models.Domain.Local.Addons.Core;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Addon.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Views.AddonPage.Install;

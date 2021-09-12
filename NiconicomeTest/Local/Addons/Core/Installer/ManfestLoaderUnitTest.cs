@@ -10,7 +10,6 @@ using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Niconicome.Models.Domain.Local.Addons.Manifest.V1;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using NiconicomeTest.Stabs.Models.Domain.Local.IO;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;
