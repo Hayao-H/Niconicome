@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Addons.API.Hooks;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
 using Utils = Niconicome.Models.Domain.Utils;
 using Video = Niconicome.Models.Domain.Niconico.Video.Infomations;

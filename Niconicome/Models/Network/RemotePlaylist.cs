@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;

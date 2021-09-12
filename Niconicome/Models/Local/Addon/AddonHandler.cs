@@ -13,7 +13,6 @@ using Niconicome.Models.Domain.Local.Addons.Core.Installer;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Addon.API;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 using Niconicome.Models.Local.Addon.Result;

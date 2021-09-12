@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Addon.Result;
 using Niconicome.ViewModels.Controls;
 using Prism.Services.Dialogs;

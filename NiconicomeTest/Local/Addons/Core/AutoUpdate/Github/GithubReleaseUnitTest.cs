@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core.AutoUpdate.Github;
 using Niconicome.Models.Domain.Network;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;

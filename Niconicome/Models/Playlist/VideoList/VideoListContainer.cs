@@ -10,7 +10,6 @@ using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Playlist.VideoList

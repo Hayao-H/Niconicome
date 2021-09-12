@@ -6,7 +6,6 @@ using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using V1 = Niconicome.Models.Domain.Local.Addons.Manifest.V1;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Installer

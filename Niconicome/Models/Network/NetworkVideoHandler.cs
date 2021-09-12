@@ -15,7 +15,6 @@ using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using System.Reflection;
 
 namespace Niconicome.Models.Network

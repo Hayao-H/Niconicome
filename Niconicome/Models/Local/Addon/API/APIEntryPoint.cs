@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Local.Addon.API.Local.IO;
+using Niconicome.Models.Local.Addon.API.Local.Storage;
 using Niconicome.Models.Local.Addon.API.Net.Hooks;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 
@@ -32,16 +33,22 @@ namespace Niconicome.Models.Local.Addon.API
         /// </summary>
         ILog? log { get; }
 
+        /// <summary>
+        /// Storage API
+        /// </summary>
+        IStorage? storage { get; }
+
         void Initialize(AddonInfomation infomation, IJavaScriptExecuter engine);
     }
 
     public class APIEntryPoint : IAPIEntryPoint
     {
-        public APIEntryPoint(IOutput output, IHooks hooks, ILog log)
+        public APIEntryPoint(IOutput output, IHooks hooks, ILog log, IStorage storage)
         {
             this.output = output;
             this.hooks = hooks;
             this.log = log;
+            this.storage = storage;
         }
 
         #region Props
@@ -51,6 +58,8 @@ namespace Niconicome.Models.Local.Addon.API
         public IHooks? hooks { get; private set; }
 
         public ILog? log { get; private set; }
+
+        public IStorage? storage { get; private set; }
 
 
         #endregion
@@ -76,9 +85,18 @@ namespace Niconicome.Models.Local.Addon.API
             if (infomation.HasPermission(PermissionNames.Log))
             {
                 this.log!.Initialize(infomation);
-            } else
+            }
+            else
             {
                 this.log = null;
+            }
+
+            if (infomation.HasPermission(PermissionNames.Storage))
+            {
+                this.storage!.localStorage.Initialize(infomation);
+            } else
+            {
+                this.storage = null;
             }
         }
 

@@ -8,7 +8,7 @@ using Niconicome.Models.Domain.Network;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.AutoUpdate.Github
 {

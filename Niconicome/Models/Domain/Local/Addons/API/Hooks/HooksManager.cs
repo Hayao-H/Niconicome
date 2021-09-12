@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.ClearScript;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
 {

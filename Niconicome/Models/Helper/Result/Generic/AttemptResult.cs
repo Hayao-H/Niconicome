@@ -1,6 +1,6 @@
 ﻿using Result = Niconicome.Models.Helper.Result;
 
-namespace Niconicome.Models.Helper.Result.Generic
+namespace Niconicome.Models.Helper.Result
 {
 
     public interface IAttemptResult<T> : Result::IAttemptResult

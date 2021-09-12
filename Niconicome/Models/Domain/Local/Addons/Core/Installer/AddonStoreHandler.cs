@@ -8,7 +8,6 @@ using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Windows.Devices.Pwm;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Installer

@@ -10,7 +10,7 @@ using Niconicome.Models.Domain.Niconico.Net.Json;
 using Mylist = Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist;
 using Utils = Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Niconico.Remote.Mylist
 {

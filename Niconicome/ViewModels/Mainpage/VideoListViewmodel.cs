@@ -21,7 +21,6 @@ using Niconicome.Extensions.System.Windows;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
