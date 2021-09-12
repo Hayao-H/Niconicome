@@ -138,7 +138,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
             if (!canWrite)
             {
                 this._logger.Error("ストレージオブジェクトを書き込むことができません(サイズオーバー等)。", this._addonName!);
-                return new AttemptResult() { Message = "INTERNAL_ERROR (SERIALIZE_ERR)" };
+                return new AttemptResult() { Message = "QUOTA_EXCEEDED_ERR" };
             }
 
             try
@@ -149,7 +149,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
             {
 
                 this._logger.Error("ストレージファイルへの書き込みに失敗しました。", this._addonName!, e);
-                return new AttemptResult() { Message= "QUOTA_EXCEEDED_ERR" };
+                return new AttemptResult() { Message= "INTERNAL_ERROR (WRITING_ERR)" };
             }
 
             return new AttemptResult() { IsSucceeded = true };
