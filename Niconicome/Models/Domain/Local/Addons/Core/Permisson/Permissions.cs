@@ -14,7 +14,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
 
         public static Permission Log { get; private set; } = new(PermissionNames.Log, "Log API。この権限を持つ拡張機能はアプリケーションのログに文字列を書き込むことが出来ます。");
 
-        public static Permission Session { get; private set; } = new(PermissionNames.Session, "Session API。この機能を持つ拡張機能はログイン状態でウェブサイトにリクエストを送信することができます。");
+        public static Permission Session { get; private set; } = new(PermissionNames.Session, "Session API。この権限を持つ拡張機能はログイン状態でウェブサイトにリクエストを送信することができます。");
+
+        public static Permission Storage { get; private set; } = new(PermissionNames.Storage, "Storage API。この権限を持つ拡張機能はデータをローカルに永続化することができます。（保存されたデータはアンインストール時に削除されます。）");
     }
 
     public static class PermissionNames
@@ -26,6 +28,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static string Log { get; private set; } = "log";
 
         public static string Session { get; private set; } = "session";
+
+        public static string Storage { get; private set; } = "storage";
     }
 
     public class Permission
