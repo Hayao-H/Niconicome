@@ -49,7 +49,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
                     this.GetByte();
                 }
 
-                return this._cachedByte < 100 * 1024 * 1024;
+                return this._cachedByte < 10 * 1024 * 1024;
             }
         }
 

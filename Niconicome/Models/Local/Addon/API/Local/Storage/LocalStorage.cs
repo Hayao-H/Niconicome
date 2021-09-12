@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage;
 using Niconicome.Models.Domain.Local.Addons.Core;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Storage
 {
@@ -36,7 +37,11 @@ namespace Niconicome.Models.Local.Addon.API.Local.Storage
 
         public void setItem(string key, string value)
         {
-            this._handler.SetItem(key, value);
+            IAttemptResult result = this._handler.SetItem(key, value);
+            if (!result.IsSucceeded)
+            {
+                throw new Exception(result.Message);
+            }
         }
 
         public string? getItem(string key)

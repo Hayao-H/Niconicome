@@ -122,27 +122,34 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
             this.CheckIfInitialized();
 
             string path = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, packageID, Const::Adddon.LocalStorageFileName);
-
-            string converted;
-            try
-            {
-                converted = JsonParser.Serialize(store);
-            }
-            catch (Exception e)
-            {
-                this._logger.Error("ストレージオブジェクトのシリアライズに失敗しました。", this._addonName!, e);
-                return new AttemptResult();
-            }
+            bool canWrite;
+            StorageToken token;
 
             try
             {
-                this._fileIO.Write(path, converted);
+                token = new StorageToken(store);
+                canWrite = token.CanWrite;
+            } catch(Exception e)
+            {
+                this._logger.Error("ストレージオブジェクトの解析に失敗しました。", this._addonName!, e);
+                return new AttemptResult() { Message = "INTERNAL_ERROR (SERIALIZE_ERR)" };
+            }
+
+            if (!canWrite)
+            {
+                this._logger.Error("ストレージオブジェクトを書き込むことができません(サイズオーバー等)。", this._addonName!);
+                return new AttemptResult() { Message = "INTERNAL_ERROR (SERIALIZE_ERR)" };
+            }
+
+            try
+            {
+                this._fileIO.Write(path, token.Data);
             }
             catch (Exception e)
             {
 
                 this._logger.Error("ストレージファイルへの書き込みに失敗しました。", this._addonName!, e);
-                return new AttemptResult();
+                return new AttemptResult() { Message= "QUOTA_EXCEEDED_ERR" };
             }
 
             return new AttemptResult() { IsSucceeded = true };
