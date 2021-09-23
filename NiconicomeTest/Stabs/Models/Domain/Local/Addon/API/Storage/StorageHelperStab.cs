@@ -58,5 +58,10 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Addon.API.Storage
                 return null;
             }
         }
+
+        public void Dispose()
+        {
+
+        }
     }
 }

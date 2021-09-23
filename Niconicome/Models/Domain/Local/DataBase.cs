@@ -476,7 +476,7 @@ namespace Niconicome.Models.Domain.Local
             }
             try
             {
-                this.DbInstance = new LiteDatabase($"Filename={this.dbFileName};Mode=Shared;");
+                this.DbInstance = new LiteDatabase($"Filename={this.dbFileName};Mode=shared;");
             }
             catch (Exception e)
             {

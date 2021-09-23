@@ -16,7 +16,7 @@ using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 
 namespace Niconicome.Models.Local.Addon.API
 {
-    public interface IAPIEntryPoint
+    public interface IAPIEntryPoint : IDisposable
     {
         /// <summary>
         /// Output API
@@ -94,12 +94,17 @@ namespace Niconicome.Models.Local.Addon.API
             if (infomation.HasPermission(PermissionNames.Storage))
             {
                 this.storage!.localStorage.Initialize(infomation);
-            } else
+            }
+            else
             {
                 this.storage = null;
             }
         }
 
+        public void Dispose()
+        {
+            this.storage?.Dispose();
+        }
 
         #endregion
     }

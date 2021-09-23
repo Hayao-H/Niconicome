@@ -12,6 +12,6 @@ namespace Niconicome.Models.Const
 
         public static string UninstalledAddonsFile { get; private set; } = "uninstalled.dat";
 
-        public static string LocalStorageFileName { get; private set; } = "locaStorage.json";
+        public static string LocalStorageFileName { get; private set; } = "locaStorage.db";
     }
 }
