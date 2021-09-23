@@ -9,12 +9,13 @@ using Playlist = Niconicome.Models.Playlist;
 using Videolist = Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Playlist;
+using Niconicome.ViewModels.Mainpage.Tabs;
 
 namespace Niconicome.ViewModels.Mainpage
 {
-    class VideolistStateViewModel
+    class VideolistStateViewModel : TabViewModelBase
     {
-        public VideolistStateViewModel()
+        public VideolistStateViewModel() : base("状態")
         {
             WS::Mainpage.VideoListContainer.ListChanged += this.OnListChanged;
             WS::Mainpage.CurrentPlaylist.SelectedVideos.Subscribe(value => this.SelectedVideosCount.Value = value.ToString());

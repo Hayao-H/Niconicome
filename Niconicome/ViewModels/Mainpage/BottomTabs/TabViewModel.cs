@@ -12,9 +12,15 @@ namespace Niconicome.ViewModels.Mainpage.BottomTabs
     {
         public TabViewModel(ITabItem tabItem)
         {
-            this.Title = new ReactiveProperty<string>(tabItem.Title);
+            this._tabItem = tabItem;
         }
 
-        public ReactiveProperty<string> Title { get; init; }
+        public string Title => this._tabItem.Title;
+
+        #region field
+
+        private readonly ITabItem _tabItem;
+
+        #endregion
     }
 }

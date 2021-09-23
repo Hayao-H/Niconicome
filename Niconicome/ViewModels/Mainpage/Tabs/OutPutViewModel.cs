@@ -8,12 +8,13 @@ using System.Windows;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
+using Niconicome.ViewModels.Mainpage.Tabs;
 
 namespace Niconicome.ViewModels.Mainpage
 {
-    class OutPutViewModel : BindableBase
+    class OutPutViewModel : TabViewModelBase
     {
-        public OutPutViewModel()
+        public OutPutViewModel() : base("出力")
         {
             this.Message = WS::Mainpage.Messagehandler.Message.ToReactiveProperty();
 

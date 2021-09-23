@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -11,17 +11,17 @@ using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Controls;
+using Niconicome.ViewModels.Mainpage.BottomTabs;
 using Niconicome.Views;
 using Niconicome.Views.AddonPage;
 using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
+using Prism.Ioc;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using Prism.Unity;
-using Prism.Ioc;
 using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
-using Niconicome.ViewModels.Mainpage.BottomTabs;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -31,7 +31,7 @@ namespace Niconicome.ViewModels.Mainpage
     public class MainWindowViewModel : BindableBase
     {
 
-        public MainWindowViewModel(IRegionManager regionManager, IDialogService dialogService)
+        public MainWindowViewModel(IRegionManager regionManager, IDialogService dialogService, IContainerProvider containerProvider)
         {
 
             this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
@@ -116,7 +116,6 @@ namespace Niconicome.ViewModels.Mainpage
                     dialogService.Show(nameof(AddonManagerWindow));
                 });
 
-            this.BottomTabs = WS::Mainpage.TabsContainer.Tabs.ToReadOnlyReactiveCollection(x => new TabViewModel(x));
 
             #region UI系の設定
 
@@ -126,17 +125,17 @@ namespace Niconicome.ViewModels.Mainpage
             #endregion
 
             regionManager.RegisterViewWithRegion<VideoList>("VideoListRegion");
-            regionManager.RegisterViewWithRegion<DownloadSettings>("DownloadSettingsRegion");
-            regionManager.RegisterViewWithRegion<Output>("OutputRegion");
-            regionManager.RegisterViewWithRegion<VideoSortSetting>("VideoSortSetting");
-            regionManager.RegisterViewWithRegion<VideoListState>("VideolistState");
-            regionManager.RegisterViewWithRegion<TimerSettings>("TimerSettings");
+
+            this.RegionManager = regionManager;
         }
 
         /// <summary>
         /// ユーザー情報(フィールド)
         /// </summary>
         private User? user;
+
+        #region Props
+        public IRegionManager RegionManager { get; init; }
 
         /// <summary>
         /// ユーザー名
@@ -157,6 +156,10 @@ namespace Niconicome.ViewModels.Mainpage
         /// ログインボタンの表示文字
         /// </summary>
         public ReactiveProperty<string> LoginBtnVal { get; init; }
+
+        #endregion
+
+        #region Command
 
         /// <summary>
         /// ログインコマンド
@@ -182,10 +185,10 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveCommand Restart { get; init; }
 
-        /// <summary>
-        /// 下のタブ
-        /// </summary>
-        public ReadOnlyReactiveCollection<TabViewModel> BottomTabs { get; init; }
+        #endregion
+
+        #region private
+
 
         /// <summary>
         /// ログイン成功時
@@ -201,6 +204,9 @@ namespace Niconicome.ViewModels.Mainpage
             this.Username.Value = this.user.Nickname;
             this.UserImage.Value = this.user.UserImage;
         }
+
+        #endregion
+
 
         #region UI系
 
@@ -218,6 +224,8 @@ namespace Niconicome.ViewModels.Mainpage
 
 
     }
+
+    public record TabInfo(string Title, string RegionName, IRegionManager RegionManager);
 
     /// <summary>
     /// ユーザー画像の取得に失敗したときなど
@@ -249,6 +257,7 @@ namespace Niconicome.ViewModels.Mainpage
         {
             base.OnAttached();
             this.AssociatedObject.Closing += this.OnClosing;
+            this.AssociatedObject.Loaded += (_, _) => this.CreateTabs();
         }
 
         protected override void OnDetaching()
@@ -266,7 +275,7 @@ namespace Niconicome.ViewModels.Mainpage
                 if (!WS::Mainpage.Videodownloader.CanDownload.Value && confirm)
                 {
                     var cResult = CommonMessageBoxAPI.Show(service, "ダウンロードが進行中ですが、本当に終了しますか？", CommonMessageBoxAPI.MessageType.Warinng, CommonMessageBoxButtons.Yes | CommonMessageBoxButtons.No);
-                    if (cResult.Result !=ButtonResult.Yes)
+                    if (cResult.Result != ButtonResult.Yes)
                     {
                         e.Cancel = true;
                         return;
@@ -275,6 +284,22 @@ namespace Niconicome.ViewModels.Mainpage
 
                 WS::Mainpage.Shutdown.ShutdownApp();
             }
+        }
+
+        private void CreateTabs()
+        {
+            if (this.AssociatedObject.DataContext is not MainWindowViewModel vm) return;
+            if (Application.Current is not PrismApplication application) return;
+
+            IContainerProvider containerProvider = application.Container;
+            IRegionManager regionManager = vm.RegionManager;
+
+            IRegion tabRegion = regionManager.Regions["TabResion"];
+            tabRegion.Add(containerProvider.Resolve<DownloadSettings>());
+            tabRegion.Add(containerProvider.Resolve<Output>());
+            tabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
+            tabRegion.Add(containerProvider.Resolve<VideoListState>());
+            tabRegion.Add(containerProvider.Resolve<TimerSettings>());
         }
     }
 }

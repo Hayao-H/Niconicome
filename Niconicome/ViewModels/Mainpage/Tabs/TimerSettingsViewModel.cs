@@ -8,6 +8,7 @@ using System.Windows;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Download.Actions;
+using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Prism.Events;
 using Reactive.Bindings;
@@ -16,9 +17,9 @@ using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
 {
-    class TimerSettingsViewModel : BindableBase
+    class TimerSettingsViewModel : TabViewModelBase
     {
-        public TimerSettingsViewModel(IEventAggregator ea)
+        public TimerSettingsViewModel(IEventAggregator ea) : base("タイマー")
         {
             this.ea = ea;
             this.IsTimerEveryDayEnable = WS::Mainpage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DlTimerEveryDay);
