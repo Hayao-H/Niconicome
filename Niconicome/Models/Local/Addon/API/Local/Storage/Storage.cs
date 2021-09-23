@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Storage
 {
-    public interface IStorage
+    public interface IStorage : IDisposable
     {
         ILocalStorage localStorage { get; }
     }
@@ -19,5 +19,10 @@ namespace Niconicome.Models.Local.Addon.API.Local.Storage
         }
 
         public ILocalStorage localStorage { get; init; }
+
+        public void Dispose()
+        {
+            this.localStorage.Dispose();
+        }
     }
 }

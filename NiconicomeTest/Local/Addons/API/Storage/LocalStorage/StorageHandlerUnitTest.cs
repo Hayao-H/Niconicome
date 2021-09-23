@@ -9,23 +9,25 @@ using NUnit.Framework;
 
 namespace NiconicomeTest.Local.Addons.API.Storage.LocalStorage
 {
+
+    [TestFixture]
     class StorageHandlerUnitTest
     {
         private IStorageHandler? handler;
 
-        private StorageData? data;
+        private Dictionary<string, string>? data;
 
         [SetUp]
         public void SetUp()
         {
-            this.data = new StorageData();
+            this.data = new Dictionary<string, string>();
 
-            this.data.Data.Add("greet", "Hello World!");
-            this.data.Data.Add("1", "Niconicome");
-            this.data.Data.Add("2", "Test");
+            this.data.Add("greet", "Hello World!");
+            this.data.Add("1", "Niconicome");
+            this.data.Add("2", "Test");
 
-            var instance = new StorageHandler(new StorageHelperStab());
-            instance.Initialize(this.data);
+            var instance = new StorageHandler(new StorageHelperStab(this.data));
+            instance.Initialize("", "");
             this.handler = instance;
         }
 
@@ -42,22 +44,22 @@ namespace NiconicomeTest.Local.Addons.API.Storage.LocalStorage
         public void データを削除する()
         {
             this.handler!.RemoveItem("greet");
-            Assert.That(this.data!.Data.Count, Is.EqualTo(2));
+            Assert.That(this.data!.Count, Is.EqualTo(2));
         }
 
         [Test]
         public void 全てのアイテムを削除する()
         {
             this.handler!.Clear();
-            Assert.That(this.data!.Data.Count, Is.EqualTo(0));
+            Assert.That(this.data!.Count, Is.EqualTo(0));
         }
 
         [Test]
         public void アイテムをセットする()
         {
             this.handler!.SetItem("key", "value");
-            Assert.That(this.data!.Data["key"], Is.EqualTo("value"));
-            Assert.That(this.data!.Data.Count, Is.EqualTo(4));
+            Assert.That(this.data!["key"], Is.EqualTo("value"));
+            Assert.That(this.data!.Count, Is.EqualTo(4));
         }
     }
 }

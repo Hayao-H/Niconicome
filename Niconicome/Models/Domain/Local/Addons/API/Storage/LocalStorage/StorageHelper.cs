@@ -1,20 +1,25 @@
 ﻿using System;
 using System.IO;
+using System.IO.Packaging;
+using LiteDB;
 using Niconicome.Models.Domain.Local.Addons.Core.Engine;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Reactive.Bindings.ObjectExtensions;
+using Windows.ApplicationModel;
 using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 {
-    public interface IStorageHelper
+    public interface IStorageHelper : IDisposable
     {
         /// <summary>
         /// 初期化する
         /// </summary>
         /// <param name="addonName">アドオン名</param>
-        void Initialize(string addonName);
+        void Initialize(string addonName, string packageID);
 
         /// <summary>
         /// データをセットする
@@ -22,20 +27,20 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="store"></param>
-        void SetItem(string key, string value, StorageData store);
+        IAttemptResult SetItem(string key, string value);
 
         /// <summary>
         /// 指定したデータを削除する
         /// </summary>
         /// <param name="key"></param>
         /// <param name="store"></param>
-        void RemoveItem(string key, StorageData store);
+        void RemoveItem(string key);
 
         /// <summary>
         /// データをクリアする
         /// </summary>
         /// <param name=""></param>
-        void Clear(StorageData store);
+        void Clear();
 
         /// <summary>
         /// データを取得する
@@ -43,154 +48,96 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
         /// <param name="key"></param>
         /// <param name="store"></param>
         /// <returns></returns>
-        string? GetItem(string key, StorageData store);
-
-        /// <summary>
-        /// ローカルのファイルを読み込む
-        /// </summary>
-        /// <param name="packageID"></param>
-        /// <returns></returns>
-        IAttemptResult<StorageData> LoadFile(string packageID);
-
-        /// <summary>
-        /// ローカルに保存する
-        /// </summary>
-        /// <param name="packageID"></param>
-        /// <param name="store"></param>
-        /// <returns></returns>
-        IAttemptResult SaveFile(string packageID, StorageData store);
+        string? GetItem(string key);
 
     }
 
     public class StorageHelper : IStorageHelper
     {
-        public StorageHelper(INicoFileIO fileIO, IAddonLogger logger)
+        public StorageHelper(IAddonLogger logger, ILogger globalLogger)
         {
-            this._fileIO = fileIO;
             this._logger = logger;
+            this._globalLogger = globalLogger;
         }
 
         #region field
 
-        private readonly INicoFileIO _fileIO;
-
         private readonly IAddonLogger _logger;
 
+        private readonly ILogger _globalLogger;
+
+        private IDataBase? _dataBase;
+
         private string? _addonName;
+
+        private bool _isDisposed;
 
         #endregion
 
         #region Method
 
-        public IAttemptResult<StorageData> LoadFile(string packageID)
+        public IAttemptResult SetItem(string key, string value)
         {
             this.CheckIfInitialized();
+            var data = new StorageDataType() { Name = key, Value = value };
 
-            string path = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, packageID, Const::Adddon.LocalStorageFileName);
-            if (!File.Exists(path))
+            if (this._dataBase!.Exists<StorageDataType>(StorageDataType.TableName, d => d.Name == key))
             {
-                return new AttemptResult<StorageData>() { IsSucceeded = true, Data = new StorageData() { PackageID = packageID } };
-            }
-
-            string raw;
-            try
-            {
-                raw = this._fileIO.OpenRead(path);
-            }
-            catch (Exception e)
-            {
-                this._logger.Error("ローカルストレージファイルの展開に失敗しました。", this._addonName!, e);
-                return new AttemptResult<StorageData>();
-            }
-
-            StorageData data;
-            try
-            {
-                data = JsonParser.DeSerialize<StorageData>(raw);
-            }
-            catch (Exception e)
-            {
-                this._logger.Error("ローカルストレージファイルの解析に失敗しました。", this._addonName!, e);
-                return new AttemptResult<StorageData>();
-            }
-
-            return new AttemptResult<StorageData>() { IsSucceeded = true, Data = data };
-        }
-
-        public IAttemptResult SaveFile(string packageID, StorageData store)
-        {
-            this.CheckIfInitialized();
-
-            string path = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, packageID, Const::Adddon.LocalStorageFileName);
-            bool canWrite;
-            StorageToken token;
-
-            try
-            {
-                token = new StorageToken(store);
-                canWrite = token.CanWrite;
-            } catch(Exception e)
-            {
-                this._logger.Error("ストレージオブジェクトの解析に失敗しました。", this._addonName!, e);
-                return new AttemptResult() { Message = "INTERNAL_ERROR (SERIALIZE_ERR)" };
-            }
-
-            if (!canWrite)
-            {
-                this._logger.Error("ストレージオブジェクトを書き込むことができません(サイズオーバー等)。", this._addonName!);
-                return new AttemptResult() { Message = "QUOTA_EXCEEDED_ERR" };
-            }
-
-            try
-            {
-                this._fileIO.Write(path, token.Data);
-            }
-            catch (Exception e)
-            {
-
-                this._logger.Error("ストレージファイルへの書き込みに失敗しました。", this._addonName!, e);
-                return new AttemptResult() { Message= "INTERNAL_ERROR (WRITING_ERR)" };
-            }
-
-            return new AttemptResult() { IsSucceeded = true };
-        }
-
-        public void SetItem(string key, string value, StorageData store)
-        {
-            if (store.Data.ContainsKey(key))
-            {
-                store.Data[key] = value;
+                int Id = this._dataBase.GetRecord<StorageDataType>(StorageDataType.TableName, d => d.Name == key)!.Data!.Id;
+                data.Id = Id;
+                return this._dataBase.Update(data, StorageDataType.TableName);
             }
             else
             {
-                store.Data.Add(key, value);
+                return this._dataBase.Store(data, StorageDataType.TableName);
             }
         }
 
-        public string? GetItem(string key, StorageData store)
+        public string? GetItem(string key)
         {
-            store.Data.TryGetValue(key, out string? value);
-            return value;
-        }
+            this.CheckIfInitialized();
 
-        public void RemoveItem(string key, StorageData store)
-        {
-            if (store.Data.ContainsKey(key))
+            IAttemptResult<StorageDataType> data = this._dataBase!.GetRecord<StorageDataType>(StorageDataType.TableName, d => d.Name == key);
+
+            if (!data.IsSucceeded || data.Data is null)
             {
-                store.Data.Remove(key);
+                return null;
+            }
+            else
+            {
+                return data.Data.Value;
             }
         }
 
-
-        public void Clear(StorageData store)
+        public void RemoveItem(string key)
         {
-            store.Data.Clear();
+            this.CheckIfInitialized();
+            this._dataBase!.DeleteAll<StorageDataType>(StorageDataType.TableName, d => d.Name == key);
         }
 
 
-        public void Initialize(string addonName)
+        public void Clear()
+        {
+            this.CheckIfInitialized();
+            this._dataBase!.Clear(StorageDataType.TableName);
+        }
+
+
+        public void Initialize(string addonName, string packageID)
         {
             this._addonName = addonName;
+            this.OpenDataBase(this._globalLogger, packageID);
+        }
+
+        public void Dispose()
+        {
+            if (this._isDisposed)
+            {
+                return;
+            }
+
+            this._dataBase?.Dispose();
+            this._isDisposed = true;
         }
 
         #endregion
@@ -199,7 +146,25 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 
         private void CheckIfInitialized()
         {
-            if (this._addonName is null) throw new InvalidOperationException("NOT_INITIALIZED");
+            if (this._addonName is null || this._dataBase is null) throw new InvalidOperationException("NOT_INITIALIZED");
+        }
+
+        private void OpenDataBase(ILogger logger, string packageID)
+        {
+            ILiteDatabase db;
+            string path = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, packageID, Const::Adddon.LocalStorageFileName);
+
+            try
+            {
+                db = new LiteDatabase($"Filename={path};");
+            }
+            catch (Exception e)
+            {
+                this._logger.Error("データベースの展開に失敗しました。", this._addonName!, e);
+                return;
+            }
+
+            this._dataBase = new DataBase(db, logger);
         }
 
         #endregion

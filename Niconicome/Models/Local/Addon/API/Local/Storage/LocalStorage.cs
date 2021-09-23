@@ -9,7 +9,7 @@ using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Storage
 {
-    public interface ILocalStorage
+    public interface ILocalStorage : IDisposable
     {
         void clear();
         string? getItem(string key);
@@ -63,6 +63,11 @@ namespace Niconicome.Models.Local.Addon.API.Local.Storage
             if (this._isInitialized) return;
             this._handler.Initialize(info.Name.Value, info.PackageID.Value);
             this._isInitialized = true;
+        }
+
+        public void Dispose()
+        {
+            this._handler.Dispose();
         }
 
         #endregion
