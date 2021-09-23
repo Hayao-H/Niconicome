@@ -1,31 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage;
-using Niconicome.Models.Domain.Local.Addons.Core.Engine;
 using Niconicome.Models.Helper.Result;
-using NiconicomeTest.Stabs.Models.Domain.Local.IO;
-using NiconicomeTest.Stabs.Models.Domain.Utils;
 
 namespace NiconicomeTest.Stabs.Models.Domain.Local.Addon.API.Storage
 {
-    class StorageHelperStab : StorageHelper, IStorageHelper
+    class StorageHelperStab : IStorageHelper
     {
-        public StorageHelperStab() : base(new NicoFileIOMock(() => true, () => ""), new AddonLogger(new LoggerStab()))
+        public StorageHelperStab(Dictionary<string,string> data) {
+            this._data = data;
+        }
+
+
+        #region field
+
+        private readonly Dictionary<string, string> _data;
+
+        #endregion
+
+        public void Initialize(string addonName, string packageID)
         {
 
         }
 
-        public new IAttemptResult<StorageData> LoadFile(string packageID)
+        public IAttemptResult SetItem(string key, string value)
         {
-            return new AttemptResult<StorageData>() { IsSucceeded = true, Data = new StorageData() { PackageID = "" } };
-        }
+            if (this._data.ContainsKey(key))
+            {
+                this._data[key] = value;
+            }
+            else
+            {
+                this._data.Add(key, value);
+            }
 
-        public new IAttemptResult SaveFile(string packageID, StorageData store)
-        {
             return new AttemptResult() { IsSucceeded = true };
+        }
+
+        public void RemoveItem(string key)
+        {
+            this._data.Remove(key);
+        }
+
+        public void Clear()
+        {
+            this._data.Clear();
+        }
+
+        public string? GetItem(string key)
+        {
+            if (this._data.ContainsKey(key))
+            {
+                return this._data[key];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }

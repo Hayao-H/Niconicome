@@ -10,7 +10,7 @@ using Windows.UI.Composition;
 namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 {
 
-    public interface IStorageHandler
+    public interface IStorageHandler : IDisposable
     {
         /// <summary>
         /// 初期化する
@@ -18,7 +18,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
         /// <param name="addonName"></param>
         /// <param name="packageID"></param>
         /// <returns></returns>
-        IAttemptResult Initialize(string addonName, string packageID);
+        void Initialize(string addonName, string packageID);
 
         /// <summary>
         /// 値をセットする
@@ -58,63 +58,45 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 
         private readonly IStorageHelper _helper;
 
-        private StorageData? _data;
-
         private string? _packageID;
 
         #endregion
 
         #region Method
 
-        public IAttemptResult Initialize(string addonName, string packageID)
+        public void Initialize(string addonName, string packageID)
         {
-            this._helper.Initialize(addonName);
+            this._helper.Initialize(addonName, packageID);
             this._packageID = packageID;
-            IAttemptResult<StorageData> result = this._helper.LoadFile(packageID);
-            if (result.IsSucceeded)
-            {
-                this._data = result.Data;
-            }
-            return result;
         }
 
         public IAttemptResult SetItem(string key, string value)
         {
             this.CheckIfInitialized();
-            this._helper.SetItem(key, value, this._data!);
-            return this._helper.SaveFile(this._packageID!, this._data!);
+            return this._helper.SetItem(key, value);
         }
 
         public string? GetItem(string key)
         {
             this.CheckIfInitialized();
-            return this._helper.GetItem(key, this._data!);
+            return this._helper.GetItem(key);
         }
 
         public void Clear()
         {
             this.CheckIfInitialized();
-            this._helper.Clear(this._data!);
-            this._helper.SaveFile(this._packageID!, this._data!);
+            this._helper.Clear();
         }
 
         public void RemoveItem(string key)
         {
             this.CheckIfInitialized();
-            this._helper.RemoveItem(key, this._data!);
-            this._helper.SaveFile(this._packageID!, this._data!);
+            this._helper.RemoveItem(key);
         }
 
-
-        #endregion
-
-        #region Meta
-
-        public void Initialize(StorageData initialData)
+        public void Dispose()
         {
-            this._data = initialData;
-            this._packageID = string.Empty;
-            this._helper.Initialize(string.Empty);
+            this._helper.Dispose();
         }
 
         #endregion
@@ -123,7 +105,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 
         private void CheckIfInitialized()
         {
-            if (this._data is null || this._packageID is null) throw new InvalidOperationException("NOT_INITIALIZED");
+            if (this._packageID is null) throw new InvalidOperationException("NOT_INITIALIZED");
         }
 
         #endregion
