@@ -61,7 +61,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
 
         private readonly IAddonLogger addonLogger;
 
-        private IAPIEntryPoint _entryPoint;
+        private IAPIEntryPoint? _entryPoint;
 
         #endregion
 
