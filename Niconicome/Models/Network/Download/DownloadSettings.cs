@@ -27,6 +27,7 @@ namespace Niconicome.Models.Network.Download
         bool ResumeEnable { get; }
         bool EnableUnsafeCommentHandle { get; }
         bool SaveWithoutEncode { get; }
+        bool EnableExperimentalCommentSafetySystem { get; }
         string NiconicoId { get; }
         string FolderPath { get; }
         string FileNameFormat { get; }
@@ -85,6 +86,8 @@ namespace Niconicome.Models.Network.Download
         public bool ResumeEnable { get; set; }
 
         public bool EnableUnsafeCommentHandle { get; set; }
+
+        public bool EnableExperimentalCommentSafetySystem { get; set; }
 
         public bool SaveWithoutEncode { get; set; }
 
@@ -174,6 +177,7 @@ namespace Niconicome.Models.Network.Download
                 MaxcommentsCount = this.MaxCommentsCount,
                 IsUnsafeHandleEnable = this.EnableUnsafeCommentHandle,
                 OwnerSuffix = this.OwnerComSuffix,
+                IsExperimentalSafetySystemEnable = this.EnableExperimentalCommentSafetySystem,
             };
         }
 

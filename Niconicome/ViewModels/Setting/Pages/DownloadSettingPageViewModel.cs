@@ -124,6 +124,8 @@ namespace Niconicome.ViewModels.Setting.Pages
             };
             this.IchibaInfoType.Subscribe(value => this.SaveEnumSetting(value)).AddTo(this.disposables);
 
+            this.IsExperimentalCommentSafetySystemEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.ExperimentalSafety);
+
         }
 
         #region 設定値のフィールド
@@ -206,6 +208,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public ReactivePropertySlim<bool> IsUnsafeCommentHandleEnable { get; init; }
 
+        /// <summary>
+        /// /試験的な安全システムを有効にする
+        /// </summary>
+        public ReactiveProperty<bool> IsExperimentalCommentSafetySystemEnable { get; set; }
+
 
         /// <summary>
         /// 一時フォルダーの最大保持数
@@ -273,6 +280,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactivePropertySlim<bool> IsDownloadResumingEnable { get; set; } = new(true);
 
         public ReactivePropertySlim<bool> IsUnsafeCommentHandleEnable { get; set; } = new(true);
+
+        public ReactivePropertySlim<bool> IsExperimentalCommentSafetySystemEnable { get; set; } = new(true);
 
         public ReactiveProperty<int> MaxTmpDirCount { get; set; } = new(20);
     }

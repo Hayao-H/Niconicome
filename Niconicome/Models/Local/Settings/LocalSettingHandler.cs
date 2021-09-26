@@ -197,6 +197,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.DlTimerEveryDay => STypes::SettingNames.IsDlTImerEveryDayEnable,
                 SettingsEnum.PostDlAction => STypes::SettingNames.PostDownloadAction,
                 SettingsEnum.EconomySuffix => STypes::SettingNames.EnonomyQualitySuffix,
+                SettingsEnum.ExperimentalSafety => STypes::SettingNames.IsExperimentalCommentSafetySystemEnable,
                 _ => null
             };
         }
@@ -284,5 +285,6 @@ namespace Niconicome.Models.Local.Settings
         DlTimerEveryDay,
         PostDlAction,
         EconomySuffix,
+        ExperimentalSafety,
     }
 }
