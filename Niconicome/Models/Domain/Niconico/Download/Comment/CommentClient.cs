@@ -48,7 +48,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             if (dThread == -1 || dFork == -1) throw new InvalidOperationException("DefaultPostTargetが見つかりません。");
 
-            var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork, settings.IsUnsafeHandleEnable);
+            var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork, settings.IsUnsafeHandleEnable, settings.IsExperimentalSafetySystemEnable);
             Response::Chat? first = null;
             int index = 0;
             long lastNo = 0;
