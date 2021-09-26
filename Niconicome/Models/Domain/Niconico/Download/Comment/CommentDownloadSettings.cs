@@ -19,6 +19,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         bool IsDownloadingEasyCommentEnable { get; }
         bool IsReplaceStrictedEnable { get; }
         bool IsUnsafeHandleEnable { get; }
+
+        bool IsExperimentalSafetySystemEnable { get; }
         int CommentOffset { get; }
         int MaxcommentsCount { get; }
     }
@@ -46,6 +48,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         public bool IsReplaceStrictedEnable { get; set; }
 
         public bool IsUnsafeHandleEnable { get; set; }
+
+        public bool IsExperimentalSafetySystemEnable { get; set; }
 
         public int CommentOffset { get; set; }
 

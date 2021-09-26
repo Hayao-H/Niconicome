@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
@@ -23,6 +24,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         void Distinct();
         void Sort();
         void Where(Func<Response::Comment, bool> predicate);
+
+        /// <summary>
+        /// 飛んでいるコメントを削除する
+        /// </summary>
+        void CleanOld();
+
         int RemoveFor(int count);
         ICommentCollection Clone();
         IEnumerable<Response::Chat> GetAllComments();
@@ -42,31 +49,31 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             this.ThreadInfo = original.ThreadInfo;
         }
 
-        public CommentCollection(int cOffset, long defaultThread, long defaultFork, bool unsafeHandle)
+        public CommentCollection(int cOffset, long defaultThread, long defaultFork, bool unsafeHandle, bool experimental)
         {
             this.comThroughSetting = cOffset;
             this.isRoot = true;
             this.defaultTread = defaultThread;
             this.defaultFork = defaultFork;
             this.unsafeHandle = unsafeHandle;
+            this.isExperimentalSafetySystemEnabled = experimental;
         }
 
-        public CommentCollection(long thread, int fork, bool isDefault, bool unsafeHandle)
+        public CommentCollection(long thread, int fork, bool isDefault, bool unsafeHandle, bool experimental)
         {
             this.Thread = thread;
             this.Fork = fork;
             this.IsDefaultPostTarget = isDefault;
             this.unsafeHandle = unsafeHandle;
+            this.isExperimentalSafetySystemEnabled = experimental;
         }
 
-        public static ICommentCollection GetInstance(int cOffset, long defaultThread, long defaultFork, bool unsafeHandle)
-        {
-            return new CommentCollection(cOffset, defaultThread, defaultFork, unsafeHandle);
-        }
+        #region field
+
 
         /// <summary>
         /// コメントの実体
-        /// 降順で管理
+        /// 昇順で管理
         /// </summary>
         private readonly LinkedList<Response::Comment> commentsfield = new();
 
@@ -84,12 +91,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         private readonly long defaultFork;
 
+        private readonly bool isExperimentalSafetySystemEnabled;
+
         private bool isSorted;
 
-        /// <summary>
-        /// スレッド情報
-        /// </summary>
         private Response::Thread? threadInfoField;
+
+        #endregion
+
+        public static ICommentCollection GetInstance(int cOffset, long defaultThread, long defaultFork, bool unsafeHandle, bool experimental)
+        {
+            return new CommentCollection(cOffset, defaultThread, defaultFork, unsafeHandle, experimental);
+        }
+
 
         /// <summary>
         /// スレッド番号
@@ -121,7 +135,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                     {
                         foreach (var comment in child.Comments)
                         {
-                            comments.AddFirst(comment);
+                            comments.AddLast(comment);
                         }
                     }
 
@@ -228,7 +242,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 }
                 else if (comment.Chat is not null)
                 {
-                    this.commentsfield.AddLast(comment);
+                    this.commentsfield.AddFirst(comment);
                     this.isSorted = false;
                 }
                 else
@@ -242,17 +256,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <summary>
         /// 複数のコメントを追加する
         /// </summary>
-        /// <param name="comments"></param>
+        /// <param name="comments">昇順のコメント</param>
         public void Add(List<Response::Comment> comments)
         {
-            bool nicoruEnded = false;
             const int commentsBound = 20;
             int chatCount = this.unsafeHandle ? 0 : comments.Where(c => c.Chat is not null).Count();
 
             var chats = new LinkedList<Response::Comment>();
+            var debugchats = new LinkedList<Response::Comment>();
 
             //チャットを抽出する
-            //コレクションの実装はAddLastなのでこれは降順になるようにする
+            //コレクションの実装は昇順でAddFirstなのでこれは降順になるようにする
             foreach (var item in comments)
             {
                 if (item.Chat is null)
@@ -260,19 +274,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                     continue;
                 }
 
-                ///if (this.unsafeHandle || chatCount > commentsBound)
-                ///{
-                ///    if (!nicoruEnded && item.Chat!.Nicoru is not null)
-                ///    {
-                ///        continue;
-                ///    }
-                ///    else if (!nicoruEnded && item.Chat!.Nicoru is null)
-                ///    {
-                ///        nicoruEnded = true;
-                ///    }
-                ///}
-
                 chats.AddFirst(item);
+                debugchats.AddLast(item);
             }
 
             //最初の方にある古いコメントを除去する
@@ -280,11 +283,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (!this.unsafeHandle && chats.Count > this.comThroughSetting + commentsBound)
             {
                 var first = this.GetFirstComment();
-                bool isFirstIsOldEnough = first is null ? false : first.No < this.comThroughSetting + 10;
+                bool isFirstIsOldEnough = first is not null && first.No < this.comThroughSetting + 10;
 
                 foreach (var _ in Enumerable.Range(0, this.comThroughSetting))
                 {
-                    chats.RemoveLast();
+                    chats.RemoveFirst();
                 }
             }
 
@@ -296,6 +299,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (!this.unsafeHandle)
             {
                 this.Distinct();
+
+                if (this.isExperimentalSafetySystemEnabled)
+                {
+                    this.CleanOld();
+                }
             }
 
             var thread = comments.FirstOrDefault(c => c.Thread is not null);
@@ -411,7 +419,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             }
             else
             {
-                return this.Comments.LastOrDefault(c => includeOwnerComment || (c.Chat?.UserId != null || c.Chat?.Deleted == null))?.Chat;
+                return this.Comments.FirstOrDefault(c => includeOwnerComment || (c.Chat?.UserId != null || c.Chat?.Deleted == null))?.Chat;
             }
         }
 
@@ -423,7 +431,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             if (this.isRoot) return;
 
             var copy = this.commentsfield.ToList();
-            copy.Sort((a, b) => (int)(b.Chat!.No - a.Chat!.No));
+            copy.Sort((a, b) => (int)(a.Chat!.No - b.Chat!.No));
             this.commentsfield.Clear();
             this.AddRange(copy);
             this.isSorted = true;
@@ -457,6 +465,59 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             }
         }
 
+        public void CleanOld()
+        {
+            if (this.isRoot)
+            {
+                foreach (var child in this.childCollections)
+                {
+                    child.CleanOld();
+                }
+            }
+            else if (this.IsDefaultPostTarget)
+            {
+                int deleteCount = 0;
+                int safeChain = 0;
+                long lastNo = 0;
+
+                const int skipLimit = 5;
+                const int minimumChain = 20;
+
+                foreach (var comment in this.commentsfield)
+                {
+                    if (lastNo > 0)
+                    {
+
+                        if (comment.Chat!.No - lastNo > skipLimit)
+                        {
+                            deleteCount++;
+                            if (safeChain > 0)
+                            {
+                                deleteCount += safeChain;
+                                safeChain = 0;
+                            }
+                        }
+                        else
+                        {
+                            safeChain++;
+                            if (safeChain >= minimumChain)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    lastNo = comment.Chat!.No;
+
+                }
+
+                if (deleteCount > 0)
+                {
+                    this.RemoveFor(deleteCount);
+                }
+            }
+        }
+
         #endregion
 
         #region private
@@ -483,7 +544,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             var isDefault = thread == this.defaultTread && fork == this.defaultFork;
 
-            this.childCollections.Add(new CommentCollection(thread, fork, isDefault, this.unsafeHandle));
+            this.childCollections.Add(new CommentCollection(thread, fork, isDefault, this.unsafeHandle, this.isExperimentalSafetySystemEnabled));
         }
 
         /// <summary>

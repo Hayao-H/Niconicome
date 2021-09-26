@@ -226,7 +226,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 UserId = dmcInfo.UserId,
                 WithGlobal = 1,
                 Scores = 1,
-                Nicoru = 3,
+                Nicoru = 0,
                 Fork = thread.Fork
             };
 
