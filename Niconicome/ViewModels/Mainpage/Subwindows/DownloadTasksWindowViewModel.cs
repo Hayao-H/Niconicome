@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Download;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Reactive.Bindings;
@@ -215,7 +216,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// メッセージキュー
         /// </summary>
-        public Material::SnackbarMessageQueue Queue { get; init; } = new();
+        public ISnackbarHandler Queue { get; init; } = WS::Mainpage.SnackbarHandler.CreateNewHandler();
 
         /// <summary>
         /// インスタンスを破棄する
@@ -261,7 +262,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         public CommandBase<object> MoveTasksToQueue { get; init; } = new CommandBase<object>(_ => true, _ => { });
 
-        public Material::SnackbarMessageQueue Queue { get; init; } = new();
+        public ISnackbarHandler? Queue { get; init; } = null;
     }
 
     enum TaskPoolType

@@ -27,6 +27,6 @@
         <ContentControl prism:RegionManager.RegionName="addonPageRegion" prism:RegionManager.RegionManager="{Binding RegionManager.Value}"/>
         <materialDesign:Snackbar 
             Grid.Row="1"
-            MessageQueue="{Binding Queue}"/>
+            MessageQueue="{Binding Queue.Queue}"/>
     </Grid>
 </UserControl>

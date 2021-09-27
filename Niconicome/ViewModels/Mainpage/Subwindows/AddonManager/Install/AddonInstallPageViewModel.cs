@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.State;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
@@ -58,7 +59,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         public ReactiveProperty<bool> IsInstalling { get; init; } = new();
 
-        public SnackbarMessageQueue MessageQueue { get; init; } = new();
+        public ISnackbarHandler MessageQueue { get; init; } = WS::AddonPage.Queue.CreateNewHandler();
 
         #endregion
 
@@ -100,7 +101,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Install
 
         public ReactiveCommand Install { get; init; } = new();
 
-        public SnackbarMessageQueue MessageQueue { get; init; } = new();
+        public ISnackbarHandler? MessageQueue { get; init; } = null;
 
     }
 }

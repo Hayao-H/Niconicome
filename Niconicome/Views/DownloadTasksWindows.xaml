@@ -166,6 +166,6 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <materialDesign:Snackbar MessageQueue="{Binding Queue}"/>
+        <materialDesign:Snackbar MessageQueue="{Binding Queue.Queue}"/>
     </Grid>
 </Window>

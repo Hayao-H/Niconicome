@@ -33,6 +33,6 @@
                          Margin="8 0 0 0"
                          IsIndeterminate="{Binding IsInstalling.Value}"/>
         </DockPanel>
-        <materialDesign:Snackbar Grid.Row="2" MessageQueue="{Binding MessageQueue}"/>
+        <materialDesign:Snackbar Grid.Row="2" MessageQueue="{Binding MessageQueue.Queue}"/>
     </Grid>
 </UserControl>
