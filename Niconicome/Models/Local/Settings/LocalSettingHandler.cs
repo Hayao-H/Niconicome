@@ -198,6 +198,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.PostDlAction => STypes::SettingNames.PostDownloadAction,
                 SettingsEnum.EconomySuffix => STypes::SettingNames.EnonomyQualitySuffix,
                 SettingsEnum.ExperimentalSafety => STypes::SettingNames.IsExperimentalCommentSafetySystemEnable,
+                SettingsEnum.SnackbarDuration => STypes::SettingNames.SnackbarDuration,
                 _ => null
             };
         }
@@ -286,5 +287,6 @@ namespace Niconicome.Models.Local.Settings
         PostDlAction,
         EconomySuffix,
         ExperimentalSafety,
+        SnackbarDuration,
     }
 }
