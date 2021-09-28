@@ -38,15 +38,15 @@ namespace Niconicome.Models.Local.State
 
     public class SnackbarHandler : ISnackbarHandler
     {
-        public SnackbarHandler(ILocalSettingHandler settingHandler)
+        public SnackbarHandler(ILocalSettingsContainer container)
         {
-            this._settingHandler = settingHandler;
+            this._settingsContainer = container;
             this.Initialize();
         }
 
         #region field
 
-        private readonly ILocalSettingHandler _settingHandler;
+        private readonly ILocalSettingsContainer _settingsContainer;
 
         private bool _isInitialized;
 
@@ -71,7 +71,7 @@ namespace Niconicome.Models.Local.State
 
         public ISnackbarHandler CreateNewHandler()
         {
-            return new SnackbarHandler(this._settingHandler);
+            return new SnackbarHandler(this._settingsContainer);
         }
 
         #region private
@@ -80,14 +80,19 @@ namespace Niconicome.Models.Local.State
         {
             if (this._isInitialized) return;
 
-            int settingVal = this._settingHandler.GetIntSetting(SettingsEnum.SnackbarDuration);
+            this._settingsContainer.GetReactiveIntSetting(SettingsEnum.SnackbarDuration).Subscribe(this.OnDurationChanged);
+
+            this._isInitialized = true;
+        }
+
+        private void OnDurationChanged(int value)
+        {
+            int settingVal = value;
             if (settingVal <= 0)
             {
                 settingVal = 1000;
             }
             this._snackBarduration = settingVal;
-
-            this._isInitialized = true;
         }
 
         #endregion
