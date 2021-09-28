@@ -136,12 +136,12 @@ namespace Niconicome.ViewModels.Mainpage
                     var result = WS::Mainpage.VideoListContainer.MovevideotoPrev(index, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
                     if (!result.IsSucceeded)
                     {
-                        WS::Mainpage.SnaclbarHandler.Enqueue("動画の並び替えに失敗しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("動画の並び替えに失敗しました。");
                         WS::Mainpage.Messagehandler.AppendMessage($"動画の並び替えに失敗しました。(詳細:{result.Message})");
                     }
                     else
                     {
-                        WS::Mainpage.SnaclbarHandler.Enqueue("動画を1つ前に移動しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("動画を1つ前に移動しました。");
                         WS::Mainpage.Messagehandler.AppendMessage($"動画を1つ前に移動しました。({this.SelectedVideoInfo.Value})");
                     }
                 }).AddTo(this.disposables);
@@ -159,12 +159,12 @@ namespace Niconicome.ViewModels.Mainpage
                     var result = WS::Mainpage.VideoListContainer.MovevideotoForward(index, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
                     if (!result.IsSucceeded)
                     {
-                        WS::Mainpage.SnaclbarHandler.Enqueue("動画の並び替えに失敗しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("動画の並び替えに失敗しました。");
                         WS::Mainpage.Messagehandler.AppendMessage($"動画の並び替えに失敗しました。(詳細:{result.Message})");
                     }
                     else
                     {
-                        WS::Mainpage.SnaclbarHandler.Enqueue("動画を1つ後ろに移動しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("動画を1つ後ろに移動しました。");
                         WS::Mainpage.Messagehandler.AppendMessage($"動画を1つ後ろに移動しました。({this.SelectedVideoInfo.Value})");
                     }
                 }).AddTo(this.disposables);
@@ -251,7 +251,7 @@ namespace Niconicome.ViewModels.Mainpage
             var orderStr = this.IsDscending.Value;
 
             WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
-            WS::Mainpage.SnaclbarHandler.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
+            WS::Mainpage.SnackbarHandler.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
         }
     }
 

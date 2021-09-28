@@ -5,6 +5,7 @@ using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.State;
 using Niconicome.Views.AddonPage.Install;
 using Niconicome.Views.AddonPage.Pages;
 using Prism.Regions;
@@ -30,7 +31,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 
         #region Props
 
-        public SnackbarMessageQueue Queue { get; init; }
+        public ISnackbarHandler Queue { get; init; }
 
         public ReactiveProperty<IRegionManager> RegionManager { get; init; }
 
@@ -73,7 +74,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
     class AddonManagerViewModelD
     {
 
-        public SnackbarMessageQueue Queue { get; init; } = new();
+        public ISnackbarHandler? Queue { get; init; } = null;
 
         public ReactiveProperty<IRegionManager> RegionManager { get; init; } = new();
     }

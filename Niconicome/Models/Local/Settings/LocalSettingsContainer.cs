@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
@@ -77,6 +78,7 @@ namespace Niconicome.Models.Local.Settings
             {
                 var newSetting = new ReactiveProperty<int>(this.settingHandler.GetIntSetting(settingType));
                 this.intSettingsContainer.Add(settingType, newSetting);
+                newSetting.Value = selectFunc(newSetting.Value);
                 newSetting.Subscribe(value =>
                 {
                     if (!whereFunc(value)) return;

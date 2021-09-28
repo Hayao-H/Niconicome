@@ -91,7 +91,7 @@ namespace Niconicome.ViewModels.Mainpage
                     if (!result.IsSucceeded)
                     {
                         WS::Mainpage.Messagehandler.AppendMessage("再起動に失敗しました。");
-                        WS::Mainpage.SnaclbarHandler.Enqueue("再起動できませんでした。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("再起動できませんでした。");
                     }
                 });
 

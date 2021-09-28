@@ -186,7 +186,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string IsDlTImerEveryDayEnable { get; private set; } = "isdltimereverydayenable";
         public static string PostDownloadAction { get; private set; } = "postdownloadaction";
         public static string EnonomyQualitySuffix { get; private set; } = "enonomyqualitysuffix";
-
         public static string IsExperimentalCommentSafetySystemEnable { get; private set; } = "isexperimentalcommentsafetysystemenable";
+        public static string SnackbarDuration { get; private set; } = "snackbarduration";
     }
 }

@@ -29,7 +29,7 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     Clipboard.SetText(this.Message.Value);
                     WS::Mainpage.Messagehandler.AppendMessage("出力をクリップボードにコピーしました。");
-                    WS::Mainpage.SnaclbarHandler.Enqueue("出力をクリップボードにコピーしました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("出力をクリップボードにコピーしました。");
                 });
 
             this.OpenLogWindowCommand = new ReactiveCommand()
