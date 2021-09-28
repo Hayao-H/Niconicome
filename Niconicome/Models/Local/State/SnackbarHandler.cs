@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Const;
 using Niconicome.Models.Local.Settings;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 
@@ -90,8 +91,9 @@ namespace Niconicome.Models.Local.State
             int settingVal = value;
             if (settingVal <= 0)
             {
-                settingVal = 1000;
+                settingVal = LocalConstant.DefaultSnackbarDuration;
             }
+
             this._snackBarduration = settingVal;
         }
 
