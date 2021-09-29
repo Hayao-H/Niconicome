@@ -35,7 +35,19 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="コメントのオフセット"/>
-                    <TextBox HorizontalAlignment="Right" Margin="10 0" Width="60" Text="{Binding CommentOffset.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Right"/>
+                    <TextBox HorizontalAlignment="Right"  Width="60" Text="{Binding CommentOffset.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Right"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="BellSleep" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="過去ログ取得時の待機時間（ミリ秒）"/>
+                    <TextBox HorizontalAlignment="Right" 
+                             Width="60" 
+                             Text="{Binding CommentFetchWaitSpan.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Right"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -45,7 +57,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="一時フォルダーの最大保持数" ToolTip="DLをレジュームできる動画の最大数です。" />
-                    <TextBox Text="{Binding MaxTmpDirCount.Value}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                    <TextBox Text="{Binding MaxTmpDirCount.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -55,7 +67,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="最大並列ダウンロード数" ToolTip="大きなすぎる場合、失敗する確率が高くなります"/>
-                    <ComboBox SelectedItem="{Binding MaxParallelDownloadCount.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" ItemsSource="{Binding SelectableMaxParallelDownloadCount}" DisplayMemberPath="DisplayValue"/>
+                    <ComboBox SelectedItem="{Binding MaxParallelDownloadCount.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" ItemsSource="{Binding SelectableMaxParallelDownloadCount}" DisplayMemberPath="DisplayValue"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -65,7 +77,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="HLSセグメントファイルの最大並列ダウンロード数（推奨値：1）" />
-                    <ComboBox SelectedItem="{Binding MaxParallelSegmentDownloadCount.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" ItemsSource="{Binding SelectableMaxParallelDownloadCount}" DisplayMemberPath="DisplayValue" />
+                    <ComboBox SelectedItem="{Binding MaxParallelSegmentDownloadCount.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" ItemsSource="{Binding SelectableMaxParallelDownloadCount}" DisplayMemberPath="DisplayValue" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -78,7 +90,7 @@
                     <ComboBox ItemsSource="{Binding SelectableVideoInfoType}"
                           SelectedItem="{Binding VideoInfoType.Value}"
                           DisplayMemberPath="DisplayValue"
-                          HorizontalAlignment="Right" Margin="10 0"       
+                          HorizontalAlignment="Right"        
                           HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
@@ -92,7 +104,7 @@
                     <ComboBox ItemsSource="{Binding SelectableIchibaInfoType}"
                           SelectedItem="{Binding IchibaInfoType.Value}"
                           DisplayMemberPath="DisplayValue"
-                          HorizontalAlignment="Right" Margin="10 0"       
+                          HorizontalAlignment="Right"        
                           HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
@@ -103,7 +115,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="メインページのダウンロードボタンでキューのタスク全てをDLする" ToolTip="無効にすると現在のプレイリストの動画のみDLします" />
-                    <ToggleButton IsChecked="{Binding IsDownloadFromQueueEnable.Value}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                    <ToggleButton IsChecked="{Binding IsDownloadFromQueueEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -113,7 +125,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="ステージ時の重複（同一プレイリスト内での登録）を許可する（非推奨）" ToolTip="無効にするとひとつのプレイリストから同じ動画を同時にDLすることが出来ません" />
-                    <ToggleButton IsChecked="{Binding IsDupeOnStageAllowed.Value}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                    <ToggleButton IsChecked="{Binding IsDupeOnStageAllowed.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -123,7 +135,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="動画ファイルの更新日時を投稿日時にする" />
-                    <ToggleButton IsChecked="{Binding IsOverrideVideoFileDTToUploadedDT.Value}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                    <ToggleButton IsChecked="{Binding IsOverrideVideoFileDTToUploadedDT.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -133,7 +145,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="可能な場合は動画ファイルのDLをレジュームする" />
-                    <ToggleButton IsChecked="{Binding IsDownloadResumingEnable.Value}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                    <ToggleButton IsChecked="{Binding IsDownloadResumingEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -143,7 +155,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label ToolTip="コメントのDL速度は大きくなりますが、コメント数指定が効かなくなる可能性があります。" Content="安全なコメントのダウンロードを無効にする" />
-                    <ToggleButton IsChecked="{Binding IsUnsafeCommentHandleEnable.Value}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                    <ToggleButton IsChecked="{Binding IsUnsafeCommentHandleEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -153,7 +165,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label ToolTip="コメントのDL速度は多少小さくなりますが、コメントの取りこぼしが少なくなります。" Content="試験的なコメント取得システムを有効にする" />
-                    <ToggleButton IsChecked="{Binding IsExperimentalCommentSafetySystemEnable.Value}" HorizontalAlignment="Right" Margin="10 0" Width="60" HorizontalContentAlignment="Right" />
+                    <ToggleButton IsChecked="{Binding IsExperimentalCommentSafetySystemEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             </StackPanel>

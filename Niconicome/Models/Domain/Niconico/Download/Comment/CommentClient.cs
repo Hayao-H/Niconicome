@@ -59,7 +59,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
                 if (index > 0)
                 {
-                    messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目・{count}コメ)");
                     if (settings.FetchWaitSpan > 0)
                     {
                         messenger.SendMessage($"待機中...({settings.FetchWaitSpan}ms)");
@@ -69,6 +68,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                         }
                         catch { }
                     }
+                    messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目・{count}コメ)");
                 }
 
                 long? when = count == 0 ? 0 : first?.Date - 1;
