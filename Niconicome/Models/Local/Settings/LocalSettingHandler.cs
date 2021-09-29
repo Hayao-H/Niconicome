@@ -199,6 +199,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.EconomySuffix => STypes::SettingNames.EnonomyQualitySuffix,
                 SettingsEnum.ExperimentalSafety => STypes::SettingNames.IsExperimentalCommentSafetySystemEnable,
                 SettingsEnum.SnackbarDuration => STypes::SettingNames.SnackbarDuration,
+                SettingsEnum.CommentWaitSpan => STypes::SettingNames.CommentFetchWaitSpan,
                 _ => null
             };
         }
@@ -288,5 +289,6 @@ namespace Niconicome.Models.Local.Settings
         EconomySuffix,
         ExperimentalSafety,
         SnackbarDuration,
+        CommentWaitSpan,
     }
 }
