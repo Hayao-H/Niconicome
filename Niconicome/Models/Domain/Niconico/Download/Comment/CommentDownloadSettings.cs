@@ -23,6 +23,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         bool IsExperimentalSafetySystemEnable { get; }
         int CommentOffset { get; }
         int MaxcommentsCount { get; }
+
+        /// <summary>
+        /// 過去ログ取得時の待機時間
+        /// </summary>
+        int FetchWaitSpan { get; }
     }
 
     public class CommentDownloadSettings : ICommentDownloadSettings
@@ -55,6 +60,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         public int MaxcommentsCount { get; set; }
 
+        public int FetchWaitSpan { get; set; }
 
     }
 

@@ -133,6 +133,12 @@ namespace Niconicome.Models.Network.Download
                 economySuffix = null;
             }
 
+            int commentFetchWaitSpan = this.settingHandler.GetIntSetting(SettingsEnum.CommentWaitSpan);
+            if (commentFetchWaitSpan < 0)
+            {
+                commentFetchWaitSpan = LocalConstant.DefaultCommetFetchWaitSpan;
+            }
+
             return new DownloadSettings
             {
                 Video = this.IsDownloadingVideoEnable.Value,
@@ -168,6 +174,7 @@ namespace Niconicome.Models.Network.Download
                 OwnerComSuffix = ownerComSuffix,
                 EconomySuffix = economySuffix,
                 EnableExperimentalCommentSafetySystem = experimentalSafety,
+                CommentFetchWaitSpan = commentFetchWaitSpan,
             };
         }
 
