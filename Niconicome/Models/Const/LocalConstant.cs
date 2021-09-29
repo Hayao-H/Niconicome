@@ -9,5 +9,7 @@ namespace Niconicome.Models.Const
     public static class LocalConstant
     {
         public static int DefaultSnackbarDuration = 2000;
+
+        public static int DefaultCommetFetchWaitSpan = 0;
     }
 }

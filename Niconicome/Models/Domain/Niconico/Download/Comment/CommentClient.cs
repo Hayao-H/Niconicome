@@ -56,7 +56,21 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
             do
             {
                 int count = comments.Count;
-                if (index > 0) messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目・{count}コメ)");
+
+                if (index > 0)
+                {
+                    if (settings.FetchWaitSpan > 0)
+                    {
+                        messenger.SendMessage($"待機中...({settings.FetchWaitSpan}ms)");
+                        try
+                        {
+                            await Task.Delay(settings.FetchWaitSpan, token);
+                        }
+                        catch { }
+                    }
+                    messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目・{count}コメ)");
+                }
+
                 long? when = count == 0 ? 0 : first?.Date - 1;
                 List<Response::Comment> retlieved = await this.GetCommentsAsync(dmcInfo, settings, when);
 

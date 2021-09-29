@@ -10,6 +10,8 @@ using Niconicome.Models.Local.Settings;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
+using System.ComponentModel.DataAnnotations;
+using Niconicome.Models.Const;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
@@ -125,6 +127,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.IchibaInfoType.Subscribe(value => this.SaveEnumSetting(value)).AddTo(this.disposables);
 
             this.IsExperimentalCommentSafetySystemEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.ExperimentalSafety);
+            this.CommentFetchWaitSpan = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.CommentWaitSpan, null, value => value < 0 ? LocalConstant.DefaultCommetFetchWaitSpan : value);
 
         }
 
@@ -219,6 +222,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public ReactiveProperty<int> MaxTmpDirCount { get; init; }
 
+        /// <summary>
+        /// コメント取得時の待機時間
+        /// </summary>
+        [RegularExpression(@"^\d$", ErrorMessage = "整数値を入力してください。")]
+        public ReactiveProperty<int> CommentFetchWaitSpan { get; init; }
+
 
     }
 
@@ -284,5 +293,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactivePropertySlim<bool> IsExperimentalCommentSafetySystemEnable { get; set; } = new(true);
 
         public ReactiveProperty<int> MaxTmpDirCount { get; set; } = new(20);
+
+        public ReactiveProperty<int> CommentFetchWaitSpan { get; init; } = new(0);
     }
 }
