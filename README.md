@@ -1,7 +1,7 @@
 # Niconicome(α)
 [![.Net5 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net5%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net5+CI%2FCD%22) 
 [![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
-[![Github Release](https://img.shields.io/badge/release-v0.9.0-blue)](https://github.com/Hayao-H/Niconicome/releases)
+[![Github Release](https://img.shields.io/badge/release-v0.10.0-blue)](https://github.com/Hayao-H/Niconicome/releases)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
@@ -47,12 +47,7 @@
 
 ## 実行する
 #### インストール
-0. [リリースページ](https://github.com/Hayao-H/Niconicome/releases)の実行ファイルと[アドオン](https://github.com/Hayao-H/PageAnalyzePlugin/releases)を保存してください。
-1. 実行ファイルを任意のディレクトリに保存して実行してください。
-2. 左上のハンバーガーメニューから「アドオン」を選択してください。
-3. 「追加」ボタンを押してください。
-4. 先程DLした「PageAnalyzePlugin」を選択してインストールしてください。
-5. 再起動するとインストール完了です。
+[Wiki](https://github.com/Hayao-H/Niconicome/wiki/Niconicome%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B)をご覧ください。
 #### アンインストール
 現在、レジストリは使用していませんが、パスワードの保存にWIndowsの資格情報マネージャーの機能を使っています。パスワードを保存している場合は、「コントロールパネル>>資格情報マネージャー>>Windows資格情報」で「https://nicovideo.jp」を削除してください。  
 **※他のアプリケーションがこの項目を使用している可能性があります。資格情報の削除は、影響を充分に理解した上で行ってください。**
