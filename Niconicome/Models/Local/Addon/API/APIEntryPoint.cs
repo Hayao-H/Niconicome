@@ -36,19 +36,19 @@ namespace Niconicome.Models.Local.Addon.API
         /// <summary>
         /// Storage API
         /// </summary>
-        IStorage? storage { get; }
+        //IStorage? storage { get; }
 
         void Initialize(AddonInfomation infomation, IJavaScriptExecuter engine);
     }
 
     public class APIEntryPoint : IAPIEntryPoint
     {
-        public APIEntryPoint(IOutput output, IHooks hooks, ILog log, IStorage storage)
+        public APIEntryPoint(IOutput output, IHooks hooks, ILog log)//, IStorage storage)
         {
             this.output = output;
             this.hooks = hooks;
             this.log = log;
-            this.storage = storage;
+            //this.storage = storage;
         }
 
         #region Props
@@ -59,7 +59,7 @@ namespace Niconicome.Models.Local.Addon.API
 
         public ILog? log { get; private set; }
 
-        public IStorage? storage { get; private set; }
+        //public IStorage? storage { get; private set; }
 
 
         #endregion
@@ -91,19 +91,19 @@ namespace Niconicome.Models.Local.Addon.API
                 this.log = null;
             }
 
-            if (infomation.HasPermission(PermissionNames.Storage))
-            {
-                this.storage!.localStorage.Initialize(infomation);
-            }
-            else
-            {
-                this.storage = null;
-            }
+            ///if (infomation.HasPermission(PermissionNames.Storage))
+            ///{
+            ///    this.storage!.localStorage.Initialize(infomation);
+            ///}
+            ///else
+            ///{
+            ///    this.storage = null;
+            ///}
         }
 
         public void Dispose()
         {
-            this.storage?.Dispose();
+            //this.storage?.Dispose();
         }
 
         #endregion
