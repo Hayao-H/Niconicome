@@ -13,7 +13,6 @@ using Niconicome.Models.Domain.Local.Addons.Core.Installer;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Addon.API;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 using Niconicome.Models.Local.Addon.Result;
@@ -135,9 +134,11 @@ namespace Niconicome.Models.Local.Addon
             foreach (KeyValuePair<int, IAddonContext> item in this.contexts.Contexts)
             {
                 AddonInfomation info = this.container.GetAddon(item.Key);
+                IAPIEntryPoint entryPoint = DIFactory.Provider.GetRequiredService<IAPIEntryPoint>();
+
                 IAttemptResult result = item.Value.Initialize(info, engine =>
                 {
-                    IAPIEntryPoint entryPoint = DIFactory.Provider.GetRequiredService<IAPIEntryPoint>();
+
                     entryPoint.Initialize(info, engine);
                     engine.AddHostObject("application", entryPoint);
 
@@ -151,12 +152,12 @@ namespace Niconicome.Models.Local.Addon
                             body = optionObj?.body,
                             credentials = optionObj?.credentials,
                         };
-                    
-                      return fetch.FetchAsync(url, option);
+
+                        return fetch.FetchAsync(url, option);
                     };
                     engine.AddHostObject("fetch", fetchFunc);
 
-                }, isAddonDebuggingEnable);
+                }, entryPoint, isAddonDebuggingEnable);
 
                 if (!result.IsSucceeded)
                 {

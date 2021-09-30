@@ -25,6 +25,6 @@ namespace Niconicome.Workspaces
 
         public static IApplicationPowerManager PowerManager { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
 
-        public static SnackbarMessageQueue Queue { get; private set; } = new();
+        public static ISnackbarHandler Queue { get; private set; } = Mainpage.SnackbarHandler.CreateNewHandler();
     }
 }

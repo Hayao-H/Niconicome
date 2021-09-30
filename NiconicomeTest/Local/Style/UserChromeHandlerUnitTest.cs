@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Style;
 using Niconicome.Models.Domain.Local.Style.Type;
 using Niconicome.Models.Domain.Niconico.Net.Json;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using NiconicomeTest.Stabs.Models.Domain.Local.IO;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;

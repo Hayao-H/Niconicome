@@ -11,5 +11,7 @@ namespace Niconicome.Models.Const
         public static Version APIVersion { get; private set; } = new("1.1.0");
 
         public static string UninstalledAddonsFile { get; private set; } = "uninstalled.dat";
+
+        public static string LocalStorageFileName { get; private set; } = "locaStorage.db";
     }
 }

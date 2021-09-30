@@ -224,6 +224,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Machine::IComPowerManager, Machine::ComPowerManager>();
             services.AddSingleton<DLActions::IPostDownloadActionssManager, DLActions::PostDownloadActionsManager>();
             services.AddSingleton<Timer::IDlTimer, Timer::DlTimer>();
+            services.AddTransient<AddonsDomainAPI::Storage.LocalStorage.IStorageHelper, AddonsDomainAPI::Storage.LocalStorage.StorageHelper>();
+            services.AddTransient<AddonsDomainAPI::Storage.LocalStorage.IStorageHandler, AddonsDomainAPI::Storage.LocalStorage.StorageHandler>();
+            services.AddTransient<AddonAPI::Local.Storage.IStorage, AddonAPI::Local.Storage.Storage>();
+            services.AddTransient<AddonAPI::Local.Storage.ILocalStorage, AddonAPI::Local.Storage.LocalStorage>();
             return services.BuildServiceProvider();
         }
 

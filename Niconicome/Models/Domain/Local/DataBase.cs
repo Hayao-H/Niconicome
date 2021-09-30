@@ -10,7 +10,6 @@ using Niconico = Niconicome.Models.Domain.Niconico;
 using Utils = Niconicome.Models.Domain.Utils;
 using Local = Niconicome.Models.Local;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Domain.Utils;
 using System.Linq.Expressions;
 
@@ -477,7 +476,7 @@ namespace Niconicome.Models.Domain.Local
             }
             try
             {
-                this.DbInstance = new LiteDatabase($"Filename={this.dbFileName};Mode=Shared;");
+                this.DbInstance = new LiteDatabase($"Filename={this.dbFileName};Mode=shared;");
             }
             catch (Exception e)
             {

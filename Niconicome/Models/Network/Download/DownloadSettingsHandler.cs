@@ -103,6 +103,7 @@ namespace Niconicome.Models.Network.Download
             bool overrideVideoDT = this.settingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT);
             bool resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
             bool unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
+            bool experimentalSafety = this.settingHandler.GetBoolSetting(SettingsEnum.ExperimentalSafety);
             string folderPath = this.current.PlaylistFolderPath;
             string fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.FIleFormat;
 
@@ -130,6 +131,12 @@ namespace Niconicome.Models.Network.Download
             if (economySuffix?.IsNullOrEmpty() ?? true)
             {
                 economySuffix = null;
+            }
+
+            int commentFetchWaitSpan = this.settingHandler.GetIntSetting(SettingsEnum.CommentWaitSpan);
+            if (commentFetchWaitSpan < 0)
+            {
+                commentFetchWaitSpan = LocalConstant.DefaultCommetFetchWaitSpan;
             }
 
             return new DownloadSettings
@@ -166,6 +173,8 @@ namespace Niconicome.Models.Network.Download
                 ThumbSuffix = thumbSuffix,
                 OwnerComSuffix = ownerComSuffix,
                 EconomySuffix = economySuffix,
+                EnableExperimentalCommentSafetySystem = experimentalSafety,
+                CommentFetchWaitSpan = commentFetchWaitSpan,
             };
         }
 

@@ -84,6 +84,21 @@
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
+                    <materialDesign:PackIcon Kind="Power" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="スナックバーの表示時間（ミリ秒）" />
+                    <TextBox 
+                        HorizontalAlignment="Right"
+                        HorizontalContentAlignment="Right"
+                        Width="100"
+                        ToolTip="整数値を入力してください。"
+                        Text="{Binding SnackbarDuration.Value,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
                     <materialDesign:PackIcon Kind="ShieldOff" Foreground="SkyBlue">
                         <materialDesign:PackIcon.RenderTransform>
                             <TranslateTransform Y="7"/>

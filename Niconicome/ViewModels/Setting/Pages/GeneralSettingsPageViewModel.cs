@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Auth;
+using Niconicome.Models.Const;
 using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Reactive.Bindings;
@@ -101,6 +103,8 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             this.IsConfirmngIfDownloadingEnable = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ConfirmIfDownloading));
             this.IsConfirmngIfDownloadingEnable.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.ConfirmIfDownloading)).AddTo(this.disposables);
+
+            this.SnackbarDuration = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.SnackbarDuration, null, value => value <= 0 ? LocalConstant.DefaultSnackbarDuration : value);
         }
 
         #region field
@@ -215,8 +219,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public ReactiveProperty<bool> IsSingletonWindowsEnable { get; init; }
 
-
-
+        /// <summary>
+        /// スナックバー表示時間
+        /// </summary>
+        [RegularExpression(@"^\d$", ErrorMessage = "整数値を入力してください。")]
+        public ReactiveProperty<int> SnackbarDuration { get; init; }
 
     }
 
@@ -271,6 +278,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactiveProperty<bool> IsSingletonWindowsEnable { get; init; } = new(true);
 
         public ReactiveProperty<bool> IsConfirmngIfDownloadingEnable { get; init; } = new();
+
+        public ReactiveProperty<int> SnackbarDuration { get; init; } = new();
 
         public List<ComboboxItem<int>> SelectableMaxParallelFetch { get; init; }
 

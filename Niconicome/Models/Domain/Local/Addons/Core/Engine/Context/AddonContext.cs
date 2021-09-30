@@ -17,6 +17,7 @@ using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.Addon.API;
 using Niconicome.Models.Local.Settings;
 using Const = Niconicome.Models.Const;
 
@@ -28,17 +29,16 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         bool IsInitialized { get; }
         bool HasError { get; }
         Exception? Exception { get; }
-        IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory, bool isDebuggingEnable);
+        IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory, IAPIEntryPoint entryPoint, bool isDebuggingEnable);
     }
 
     public class AddonContext : IAddonContext
     {
-        public AddonContext(INicoFileIO fileIO, IAddonLogger addonLogger, IJavaScriptExecuter executer, ILogger logger)
+        public AddonContext(INicoFileIO fileIO, IAddonLogger addonLogger, IJavaScriptExecuter executer)
         {
             this.fileIO = fileIO;
             this.addonLogger = addonLogger;
             this.Executer = executer;
-            this.logger = logger;
         }
 
         ~AddonContext()
@@ -61,7 +61,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
 
         private readonly IAddonLogger addonLogger;
 
-        private readonly ILogger logger;
+        private IAPIEntryPoint? _entryPoint;
 
         #endregion
 
@@ -83,9 +83,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         /// </summary>
         /// <param name="infomation"></param>
         /// <returns></returns>
-        public IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory, bool isDebuggingEnable)
+        public IAttemptResult Initialize(AddonInfomation infomation, Action<IJavaScriptExecuter> factory, IAPIEntryPoint entryPoint, bool isDebuggingEnable)
         {
             if (this.IsInitialized) return new AttemptResult() { Message = "既に初期化されています。" };
+
+            this._entryPoint = entryPoint;
 
             if (infomation.Scripts.BackgroundScript.IsNullOrEmpty())
             {
@@ -139,6 +141,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
         /// </summary>
         public void Dispose()
         {
+            this._entryPoint?.Dispose();
             this.Executer.Dispose();
             GC.SuppressFinalize(this);
         }

@@ -11,7 +11,7 @@ using Niconicome.Models.Domain.Niconico.Net.Json;
 using UVideo = Niconicome.Models.Domain.Niconico.Net.Json.API.Video;
 using Utils = Niconicome.Models.Domain.Utils;
 using Microsoft.Xaml.Behaviors;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Domain.Utils;
 using System.Reflection.Metadata.Ecma335;
 

@@ -84,7 +84,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             #endregion
 
-            this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
+            this.SnackbarMessageQueue = WS::Mainpage.SnackbarHandler.Queue;
 
             this.IsDownloading = WS::Mainpage.Videodownloader.CanDownload
                 .ToReactivePropertyAsSynchronized(x => x.Value, x => !x, x => !x)

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AngleSharp.Html.Dom;
 using Niconicome.Models.Domain.Niconico.Net.Html;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
 {

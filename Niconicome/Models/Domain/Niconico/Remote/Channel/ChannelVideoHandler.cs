@@ -8,7 +8,6 @@ using AngleSharp.Attributes;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using WatchInfo = Niconicome.Models.Domain.Niconico.Watch;

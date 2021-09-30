@@ -21,7 +21,6 @@ using Niconicome.Extensions.System.Windows;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
@@ -66,7 +65,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.showMessageBox = showMessageBox;
 
-            this.SnackbarMessageQueue = WS::Mainpage.SnaclbarHandler.Queue;
+            this.SnackbarMessageQueue = WS::Mainpage.SnackbarHandler.Queue;
 
             this.isFetching = new ReactiveProperty<bool>(false);
             this.ea = ea;
@@ -270,12 +269,12 @@ namespace Niconicome.ViewModels.Mainpage
                 if (value)
                 {
 
-                    WS::Mainpage.SnaclbarHandler.Enqueue("クリップボードの監視を開始します。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("クリップボードの監視を開始します。");
                     WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を開始します。");
                 }
                 else
                 {
-                    WS::Mainpage.SnaclbarHandler.Enqueue("クリップボードの監視を終了します。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("クリップボードの監視を終了します。");
                     WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を終了します。");
                 }
             }).AddTo(this.disposables);
@@ -345,10 +344,10 @@ namespace Niconicome.ViewModels.Mainpage
                   if (!videos.First().ChannelID.Value.IsNullOrEmpty())
                   {
                       var video = videos.First();
-                      WS::Mainpage.SnaclbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName.Value}」です", "IDをコピー", () =>
+                      WS::Mainpage.SnackbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName.Value}」です", "IDをコピー", () =>
                       {
                           Clipboard.SetText(video.ChannelID.Value);
-                          WS::Mainpage.SnaclbarHandler.Enqueue("コピーしました");
+                          WS::Mainpage.SnackbarHandler.Enqueue("コピーしました");
                       });
                   }
               })
@@ -943,7 +942,7 @@ namespace Niconicome.ViewModels.Mainpage
                     {
                         if (!Compatibility.IsOsVersionLargerThan(10, 0, 10240))
                         {
-                            WS::Mainpage.SnaclbarHandler.Enqueue("この機能はOSでサポートされていません。");
+                            WS::Mainpage.SnackbarHandler.Enqueue("この機能はOSでサポートされていません。");
                             WS::Mainpage.Messagehandler.AppendMessage("この機能は'Windows10 1507'以降のOSでのみ利用可能です。");
                             return;
                         }
@@ -965,14 +964,14 @@ namespace Niconicome.ViewModels.Mainpage
                 .ToReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    WS::Mainpage.SnaclbarHandler.Enqueue("一時プレイリストの内容を保存します。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("一時プレイリストの内容を保存します。");
                     List<IListVideoInfo> videos = this.Videos.Select(v => v.VideoInfo).ToList();
                     IAttemptResult<int> result = WS::Mainpage.PlaylistHandler.AddPlaylistToRoot();
 
                     if (!result.IsSucceeded)
                     {
                         WS::Mainpage.Messagehandler.AppendMessage("プレイリストの新規作成に失敗しました。");
-                        WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("保存に失敗しました。");
                         return;
                     }
 
@@ -981,12 +980,12 @@ namespace Niconicome.ViewModels.Mainpage
                     if (!vResult.IsSucceeded)
                     {
                         WS::Mainpage.Messagehandler.AppendMessage($"動画の保存に失敗しました。(詳細:{result.Message})");
-                        WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("保存に失敗しました。");
                         return;
                     }
 
                     WS::Mainpage.Messagehandler.AppendMessage($"一時プレイリストの内容しました。");
-                    WS::Mainpage.SnaclbarHandler.Enqueue("保存に失敗しました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("保存に失敗しました。");
                 });
 
             this.CopyOne = new ReactiveCommand<VideoProperties>()
@@ -1018,9 +1017,9 @@ namespace Niconicome.ViewModels.Mainpage
                     catch (Exception e)
                     {
                         WS::Mainpage.Messagehandler.AppendMessage($"情報のコピーに失敗しました。(詳細:{e.Message})");
-                        WS::Mainpage.SnaclbarHandler.Enqueue("情報のコピーに失敗しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("情報のコピーに失敗しました。");
                     }
-                    WS::Mainpage.SnaclbarHandler.Enqueue("情報をコピーしました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("情報をコピーしました。");
                 });
 
             this.CopyAll = new ReactiveCommand<VideoProperties>()
@@ -1058,10 +1057,10 @@ namespace Niconicome.ViewModels.Mainpage
                     catch (Exception e)
                     {
                         WS::Mainpage.Messagehandler.AppendMessage($"情報のコピーに失敗しました。(詳細:{e.Message})");
-                        WS::Mainpage.SnaclbarHandler.Enqueue("情報のコピーに失敗しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("情報のコピーに失敗しました。");
                     }
 
-                    WS::Mainpage.SnaclbarHandler.Enqueue("情報をコピーしました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("情報をコピーしました。");
                 });
             #endregion
 
@@ -1425,7 +1424,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 string name = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value;
                 WS::Mainpage.Messagehandler.AppendMessage($"プレイリスト:{name}");
-                WS::Mainpage.SnaclbarHandler.Enqueue($"プレイリスト:{name}");
+                WS::Mainpage.SnackbarHandler.Enqueue($"プレイリスト:{name}");
                 WS::Mainpage.VideoListContainer.Refresh();
             }
         }

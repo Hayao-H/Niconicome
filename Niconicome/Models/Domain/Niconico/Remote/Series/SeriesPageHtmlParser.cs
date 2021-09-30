@@ -5,7 +5,7 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Niconico.Remote.Series
 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Utils

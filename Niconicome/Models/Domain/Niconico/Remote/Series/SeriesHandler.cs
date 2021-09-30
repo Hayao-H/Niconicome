@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Network;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Niconico.Remote.Series
 {

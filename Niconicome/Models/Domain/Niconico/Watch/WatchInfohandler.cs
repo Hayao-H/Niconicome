@@ -11,7 +11,7 @@ using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using DmcRequest = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request;
 using WatchJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 

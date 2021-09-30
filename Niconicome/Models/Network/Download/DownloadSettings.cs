@@ -27,6 +27,7 @@ namespace Niconicome.Models.Network.Download
         bool ResumeEnable { get; }
         bool EnableUnsafeCommentHandle { get; }
         bool SaveWithoutEncode { get; }
+        bool EnableExperimentalCommentSafetySystem { get; }
         string NiconicoId { get; }
         string FolderPath { get; }
         string FileNameFormat { get; }
@@ -41,6 +42,7 @@ namespace Niconicome.Models.Network.Download
         uint VerticalResolution { get; }
         int PlaylistID { get; }
         int MaxCommentsCount { get; }
+        int CommentFetchWaitSpan { get; }
         IchibaInfoTypeSettings IchibaInfoType { get; }
         VideoInfo::ThumbSize ThumbSize { get; }
         Vdl::IVideoDownloadSettings ConvertToVideoDownloadSettings(bool autodispose, int maxParallelDLCount);
@@ -86,6 +88,8 @@ namespace Niconicome.Models.Network.Download
 
         public bool EnableUnsafeCommentHandle { get; set; }
 
+        public bool EnableExperimentalCommentSafetySystem { get; set; }
+
         public bool SaveWithoutEncode { get; set; }
 
         public uint VerticalResolution { get; set; }
@@ -93,6 +97,8 @@ namespace Niconicome.Models.Network.Download
         public int PlaylistID { get; set; }
 
         public int MaxCommentsCount { get; set; }
+
+        public int CommentFetchWaitSpan { get; set; }
 
         public string NiconicoId { get; set; } = string.Empty;
 
@@ -174,6 +180,8 @@ namespace Niconicome.Models.Network.Download
                 MaxcommentsCount = this.MaxCommentsCount,
                 IsUnsafeHandleEnable = this.EnableUnsafeCommentHandle,
                 OwnerSuffix = this.OwnerComSuffix,
+                IsExperimentalSafetySystemEnable = this.EnableExperimentalCommentSafetySystem,
+                FetchWaitSpan = this.CommentFetchWaitSpan,
             };
         }
 

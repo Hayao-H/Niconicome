@@ -9,7 +9,6 @@ using Niconicome.Models.Domain.Local.Style.Type;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Helper.Result.Generic;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 

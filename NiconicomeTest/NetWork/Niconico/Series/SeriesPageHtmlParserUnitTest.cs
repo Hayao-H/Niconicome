@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Remote;
 using Niconicome.Models.Domain.Niconico.Remote.Series;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using NUnit.Framework;
 
 namespace NiconicomeTest.NetWork.Niconico.Series

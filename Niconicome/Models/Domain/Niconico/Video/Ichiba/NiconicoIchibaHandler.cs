@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Network;
 using Niconicome.Models.Domain.Niconico.Net.Json;
-using Niconicome.Models.Helper.Result.Generic;
+using Niconicome.Models.Helper.Result;
 using V3 = Niconicome.Models.Domain.Niconico.Net.Json.CrossOrigin.V3;
 
 namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
