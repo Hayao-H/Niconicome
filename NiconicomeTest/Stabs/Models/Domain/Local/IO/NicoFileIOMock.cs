@@ -20,6 +20,8 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
 
         private readonly Func<string> readFunc;
 
+        public string? LastOpendFilePath { get; private set; }
+
         public bool Exists(string path)
         {
             return this.existsFunc();
@@ -32,6 +34,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
 
         public string OpenRead(string path)
         {
+            this.LastOpendFilePath = path;
             return this.readFunc();
         }
 
