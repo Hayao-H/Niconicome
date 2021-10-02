@@ -43,7 +43,7 @@ namespace NiconicomeTest.Local.Addons.API.Resource
 
             Assert.That(result.IsSucceeded, Is.True);
             Assert.That(result.Data, Is.EqualTo("resource"));
-            Assert.That(this._nicoFileIOMock!.LastOpendFilePath, Is.EqualTo(Path.Combine(FileFolder.AddonsFolder, "id", path)));
+            Assert.That(this._nicoFileIOMock!.LastOpendFilePath, Is.EqualTo(Path.Combine(FileFolder.AddonsFolder, "id", AdddonConstant.ResourceDirectoryName, path)));
         }
     }
 }

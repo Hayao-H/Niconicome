@@ -16,7 +16,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.Resource
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        string? this[string path] { get; }
+        string? getResource(string relativePath);
 
         /// <summary>
         /// 初期化する
@@ -38,21 +38,19 @@ namespace Niconicome.Models.Local.Addon.API.Local.Resource
 
         #endregion
 
-        public string? this[string path]
+        public string? getResource(string relativePath)
         {
-            get
+            IAttemptResult<string> result = this._handler.GetResource(relativePath);
+            if (!result.IsSucceeded)
             {
-                IAttemptResult<string> result = this._handler.GetResource(path);
-                if (!result.IsSucceeded)
-                {
-                    return null;
-                }
-                else
-                {
-                    return result.Data;
-                }
+                return null;
+            }
+            else
+            {
+                return result.Data;
             }
         }
+
 
         public void Initialize(AddonInfomation info)
         {

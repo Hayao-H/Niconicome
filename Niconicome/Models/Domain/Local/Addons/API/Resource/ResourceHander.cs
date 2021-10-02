@@ -8,6 +8,7 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.Core.Engine;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Helper.Result;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Resource
 {
@@ -30,7 +31,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Resource
 
     public class ResourceHander : IResourceHander
     {
-        public ResourceHander(INicoFileIO fileIO,IAddonLogger logger)
+        public ResourceHander(INicoFileIO fileIO, IAddonLogger logger)
         {
             this._fileIO = fileIO;
             this._logger = logger;
@@ -54,7 +55,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Resource
         {
             this.CheckIfInitialized();
 
-            string path = Path.Combine(FileFolder.AddonsFolder, this._packageID!, relativePath);
+            string path = Path.Combine(FileFolder.AddonsFolder, this._packageID!, Const::AdddonConstant.ResourceDirectoryName, relativePath);
 
             string data;
             try
