@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Pwm;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
 {
@@ -17,6 +18,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static Permission Session { get; private set; } = new(PermissionNames.Session, "Session API。この権限を持つ拡張機能はログイン状態でウェブサイトにリクエストを送信することができます。");
 
         public static Permission Storage { get; private set; } = new(PermissionNames.Storage, "Storage API。この権限を持つ拡張機能はデータをローカルに永続化することができます。（保存されたデータはアンインストール時に削除されます。）");
+
+        public static Permission Resource { get; private set; } = new(PermissionNames.Resource, "Resource API。この権限を持つ拡張機能は拡張機能フォルダー内のresourceディレクトリのファイルを動的に読み込むことができます。");
     }
 
     public static class PermissionNames
@@ -30,6 +33,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static string Session { get; private set; } = "session";
 
         public static string Storage { get; private set; } = "storage";
+
+        public static string Resource { get; private set; } = "resource";
     }
 
     public class Permission
