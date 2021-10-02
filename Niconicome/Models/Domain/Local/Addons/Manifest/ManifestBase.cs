@@ -21,7 +21,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Manifest
         public string Identifier { get; set; } = string.Empty;
 
         [JsonPropertyName("target_api_version")]
-        public string TargetAPIVersion { get; set; } = Const::Adddon.APIVersion.ToString();
+        public string TargetAPIVersion { get; set; } = Const::AdddonConstant.APIVersion.ToString();
 
         public List<string> Permissions { get; set; } = new();
 

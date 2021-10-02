@@ -151,7 +151,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine
             }
 
             //APIバージョン確認
-            Version apiVersioin = Const::Adddon.APIVersion;
+            Version apiVersioin = Const::AdddonConstant.APIVersion;
             if (manifestData.TargetAPIVersion.Value.CompareTo(apiVersioin) > 0)
             {
                 this.logger.Error($"現在の実行環境はターゲットAPIバージョンを満たしていません。(current:{apiVersioin} target:{manifestData.TargetAPIVersion.Value})");

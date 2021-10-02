@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Local.Addon.API.Local.IO;
+using Niconicome.Models.Local.Addon.API.Local.Resource;
 using Niconicome.Models.Local.Addon.API.Local.Storage;
 using Niconicome.Models.Local.Addon.API.Net.Hooks;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
@@ -34,21 +35,27 @@ namespace Niconicome.Models.Local.Addon.API
         ILog? log { get; }
 
         /// <summary>
+        /// Resource API
+        /// </summary>
+        IPublicResourceHandler? resource { get; }
+
+        /// <summary>
         /// Storage API
         /// </summary>
-        //IStorage? storage { get; }
+        IStorage? storage { get; }
 
         void Initialize(AddonInfomation infomation, IJavaScriptExecuter engine);
     }
 
     public class APIEntryPoint : IAPIEntryPoint
     {
-        public APIEntryPoint(IOutput output, IHooks hooks, ILog log)//, IStorage storage)
+        public APIEntryPoint(IOutput output, IHooks hooks, ILog log, IPublicResourceHandler resourceHandler,IStorage storage)
         {
             this.output = output;
             this.hooks = hooks;
             this.log = log;
-            //this.storage = storage;
+            this.resource = resourceHandler;
+            this.storage = storage;
         }
 
         #region Props
@@ -59,7 +66,9 @@ namespace Niconicome.Models.Local.Addon.API
 
         public ILog? log { get; private set; }
 
-        //public IStorage? storage { get; private set; }
+        public IPublicResourceHandler? resource { get; private set; }
+
+        public IStorage? storage { get; private set; }
 
 
         #endregion
@@ -91,19 +100,28 @@ namespace Niconicome.Models.Local.Addon.API
                 this.log = null;
             }
 
-            ///if (infomation.HasPermission(PermissionNames.Storage))
-            ///{
-            ///    this.storage!.localStorage.Initialize(infomation);
-            ///}
-            ///else
-            ///{
-            ///    this.storage = null;
-            ///}
+            if (infomation.HasPermission(PermissionNames.Resource))
+            {
+                this.resource!.Initialize(infomation);
+            }
+            else
+            {
+                this.resource = null;
+            }
+
+            if (infomation.HasPermission(PermissionNames.Storage))
+            {
+                this.storage!.localStorage.Initialize(infomation);
+            }
+            else
+            {
+                this.storage = null;
+            }
         }
 
         public void Dispose()
         {
-            //this.storage?.Dispose();
+            this.storage?.Dispose();
         }
 
         #endregion
