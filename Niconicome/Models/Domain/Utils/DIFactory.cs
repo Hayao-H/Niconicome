@@ -230,6 +230,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonAPI::Local.Storage.ILocalStorage, AddonAPI::Local.Storage.LocalStorage>();
             services.AddTransient<AddonsDomainAPI::Resource.IResourceHander, AddonsDomainAPI::Resource.ResourceHander>();
             services.AddTransient<AddonAPI::Local.Resource.IPublicResourceHandler, AddonAPI::Local.Resource.PublicResourceHandler>();
+            services.AddTransient<AddonsCore::Utils.IHostPermissionsHandler, AddonsCore::Utils.HostPermissionsHandler>();
             return services.BuildServiceProvider();
         }
 

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.ClearScript;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using Niconicome.Models.Domain.Local.Addons.Core.Utils;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Domain.Niconico.Watch;
 
@@ -32,16 +33,17 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
 
     public class Fetch : IFetch
     {
-        public Fetch(IAddonHttp http)
+        public Fetch(IAddonHttp http,IHostPermissionsHandler permissionsHandler)
         {
             this.http = http;
+            this.permissionsHandler = permissionsHandler;
         }
 
         #region field
 
         private readonly IAddonHttp http;
 
-        private readonly List<string> hosts = new();
+        private readonly IHostPermissionsHandler permissionsHandler;
 
         private bool isInitialized;
 
@@ -54,7 +56,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
                 throw new InvalidOperationException("未初期化です。");
             }
 
-            if (!this.hosts.Any(host => Regex.IsMatch(url, host)))
+            if (!this.permissionsHandler.CanAccess(url))
             {
                 throw new InvalidOperationException($"{url}は許可されていないホストです。");
             }
@@ -93,18 +95,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         public void Initialize(AddonInfomation info)
         {
             this.http.Initialize(info);
-            this.hosts.AddRange(info.HostPermissions.Select(host =>
-            {
-                string replaced = host.Replace("*", ".*");
-
-                replaced = Regex.Replace(replaced, @"\.(?!\*)", @"\.");
-                if (replaced.EndsWith("/"))
-                {
-                    replaced += "?";
-                }
-
-                return replaced;
-            }));
+            this.permissionsHandler.Initialize(info.HostPermissions);
             this.isInitialized = true;
         }
 
