@@ -73,7 +73,7 @@ namespace Niconicome.ViewModels.Login
                 return;
             }
 
-            var cookies = await this.handler.GetCookiesAsync(this.AssociatedObject.CoreWebView2, @"https://nicovideo.jp");
+            var cookies = await this.handler.GetCookiesAsync(@"https://nicovideo.jp");
 
 
             if (cookies.Any(cookie => cookie.Name == "user_session"))
@@ -84,7 +84,9 @@ namespace Niconicome.ViewModels.Login
 
         private async void OnInitialized(object? sender, EventArgs e)
         {
-            var cookies = await this.handler.GetCookiesAsync(this.AssociatedObject.CoreWebView2, @"https://nicovideo.jp");
+            this.handler.Initialize(this.AssociatedObject.CoreWebView2);
+
+            var cookies = await this.handler.GetCookiesAsync(@"https://nicovideo.jp");
 
             if (cookies.Any(cookie => cookie.Name == "user_session" && cookie.Expires > DateTime.Now))
             {
@@ -97,7 +99,7 @@ namespace Niconicome.ViewModels.Login
                 }
             }
 
-            await this.handler.DeleteBrowserCookiesAsync(this.AssociatedObject.CoreWebView2, @"https://nicovideo.jp");
+            await this.handler.DeleteBrowserCookiesAsync( @"https://nicovideo.jp");
 
             this.isInitializeCompleted = true;
         }

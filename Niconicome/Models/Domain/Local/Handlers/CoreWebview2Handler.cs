@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Web.WebView2.Core;
 using Niconicome.Models.Domain.Niconico;
@@ -9,83 +11,95 @@ namespace Niconicome.Models.Domain.Local.Handlers
 {
     public interface ICoreWebview2Handler
     {
-        Task GetAndSetCookiesAsync(ICookieManager cookieManager, CoreWebView2 wv2,string domain);
-        Task GetAndSetCookiesAsync(ICookieManager cookieManager, CoreWebView2 wv2,string domain,List<CoreWebView2Cookie> cookies);
-        Task DeleteCookiesAsync(ICookieManager cookieManager, CoreWebView2 wv2, string domain);
-        Task DeleteBrowserCookiesAsync(CoreWebView2 wv2, string domain);
-        Task<List<CoreWebView2Cookie>> GetCookiesAsync(CoreWebView2 wv2, string domain);
+        /// <summary>
+        /// 指定したドメインのCookieを削除する
+        /// </summary>
+        /// <param name="wv2"></param>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        Task DeleteBrowserCookiesAsync(string domain);
+
+        /// <summary>
+        /// Cookieを取得する
+        /// </summary>
+        /// <param name="wv2"></param>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        Task<List<CoreWebView2Cookie>> GetCookiesAsync(string domain);
+
+        /// <summary>
+        /// 初期化する
+        /// </summary>
+        /// <param name="wv2"></param>
+        void Initialize(CoreWebView2 wv2);
+
+        /// <summary>
+        /// URLフィルター関数を登録する
+        /// </summary>
+        /// <param name="func"></param>
+        void RegisterFilterFunc(Func<string, bool> func);
     }
 
-    public class CoreWebview2Handler:ICoreWebview2Handler
+    public class CoreWebview2Handler : ICoreWebview2Handler
     {
         public CoreWebview2Handler(ILogger logger)
         {
             this.logger = logger;
         }
 
+        #region field
+
         private readonly ILogger logger;
 
-        /// <summary>
-        /// WebView2のクッキーをコンテキストに設定する
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="wv2"></param>
-        /// <param name="domain"></param>
-        /// <returns></returns>
-        public async Task GetAndSetCookiesAsync(ICookieManager cookieManager, CoreWebView2 wv2, string domain)
-        {
-            List<CoreWebView2Cookie> cookies = new();
-            await this.InternalGetCookiesAsync(cookies,wv2,domain);
+        private Func<string, bool>? filter;
 
-            foreach (var cookie in cookies)
-            {
-                cookieManager.AddCookie(cookie.Name, cookie.Value);
-            }
+        private bool isInitialized;
+
+        private CoreWebView2? wv2;
+
+        #endregion
+
+        public async Task DeleteBrowserCookiesAsync(string domain)
+        {
+            this.CheckIfInitialized();
+
+            List<CoreWebView2Cookie> cookies = new();
+            await this.InternalGetCookiesAsync(cookies, domain);
+            this.InternalDeleteCookies(cookies);
         }
 
-        /// <summary>
-        /// WebView2のクッキーをコンテキストに設定する
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="wv2"></param>
-        /// <param name="domain"></param>
-        /// <returns></returns>
-        public async Task GetAndSetCookiesAsync(ICookieManager cookieManager, CoreWebView2 wv2, string domain,List<CoreWebView2Cookie> cookies)
+        public async Task<List<CoreWebView2Cookie>> GetCookiesAsync(string domain)
         {
-            await this.InternalGetCookiesAsync(cookies, wv2, domain);
+            this.CheckIfInitialized();
 
-            foreach (var cookie in cookies)
-            {
-                cookieManager.AddCookie(cookie.Name, cookie.Value);
-            }
+            var cookies = new List<CoreWebView2Cookie>();
+
+            await this.InternalGetCookiesAsync(cookies, domain);
+
+            return cookies;
         }
 
-        /// <summary>
-        /// コンテキストのクッキーを削除する
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="wv2"></param>
-        /// <param name="domain"></param>
-        /// <returns></returns>
-        public async Task DeleteCookiesAsync(ICookieManager cookieManager, CoreWebView2 wv2,string domain)
+        public void Initialize(CoreWebView2 wv2)
         {
-            List<CoreWebView2Cookie> cookies = new();
-            await this.InternalGetCookiesAsync(cookies, wv2, domain);
-            this.InternalDeleteCookies(cookies, wv2);
-            cookieManager.DeleteAllCookies();
+            if (this.isInitialized) return;
+
+            this.wv2 = wv2;
+            this.wv2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+            this.wv2.WebResourceRequested += this.OnNavigate;
+            this.isInitialized = true;
         }
 
-        /// <summary>
-        /// ブラウザーのクッキーを削除する
-        /// </summary>
-        /// <param name="wv2"></param>
-        /// <param name="domain"></param>
-        /// <returns></returns>
-        public async Task DeleteBrowserCookiesAsync(CoreWebView2 wv2, string domain)
+        public void RegisterFilterFunc(Func<string, bool> func)
         {
-            List<CoreWebView2Cookie> cookies = new();
-            await this.InternalGetCookiesAsync(cookies, wv2, domain);
-            this.InternalDeleteCookies(cookies, wv2);
+            this.filter = func;
+        }
+
+
+        #region private
+
+        private void CheckIfInitialized()
+        {
+            if (!this.isInitialized) throw new InvalidCastException("ハンドラが初期化されていません。");
         }
 
         /// <summary>
@@ -95,12 +109,12 @@ namespace Niconicome.Models.Domain.Local.Handlers
         /// <param name="wv2"></param>
         /// <param name="domain"></param>
         /// <returns></returns>
-        private async Task InternalGetCookiesAsync(List<CoreWebView2Cookie> cookies, CoreWebView2 wv2, string domain)
+        private async Task InternalGetCookiesAsync(List<CoreWebView2Cookie> cookies, string domain)
         {
 
             try
             {
-                cookies.AddRange(await wv2.CookieManager.GetCookiesAsync(domain));
+                cookies.AddRange(await this.wv2!.CookieManager.GetCookiesAsync(domain));
             }
             catch (ArgumentException ex)
             {
@@ -120,28 +134,24 @@ namespace Niconicome.Models.Domain.Local.Handlers
         /// <param name="wv2"></param>
         /// <param name="domain"></param>
         /// <returns></returns>
-        private void InternalDeleteCookies(List<CoreWebView2Cookie> cookies, CoreWebView2 wv2)
+        private void InternalDeleteCookies(List<CoreWebView2Cookie> cookies)
         {
             foreach (var cookie in cookies)
             {
-                wv2.CookieManager.DeleteCookie(cookie);
+                this.wv2!.CookieManager.DeleteCookie(cookie);
             }
         }
 
-        /// <summary>
-        /// Cookieを取得する
-        /// </summary>
-        /// <param name="wv2"></param>
-        /// <param name="domain"></param>
-        /// <returns></returns>
-        public async Task<List<CoreWebView2Cookie>> GetCookiesAsync(CoreWebView2 wv2, string domain)
+        private void OnNavigate(object? sender, CoreWebView2WebResourceRequestedEventArgs e)
         {
-            var cookies = new List<CoreWebView2Cookie>();
-
-            await this.InternalGetCookiesAsync(cookies, wv2, domain);
-
-            return cookies;
+            var canAccess = this.filter?.Invoke(e.Request.Uri) ?? true;
+            if (!canAccess)
+            {
+                e.Response = this.wv2!.Environment.CreateWebResourceResponse(new MemoryStream(), 0, "Permission Requred", null);
+            }
         }
+
+        #endregion
 
     }
 }
