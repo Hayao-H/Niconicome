@@ -38,6 +38,12 @@ namespace Niconicome.Models.Domain.Local.Handlers
         /// </summary>
         /// <param name="func"></param>
         void RegisterFilterFunc(Func<string, bool> func);
+
+        /// <summary>
+        /// HTMLを表示する
+        /// </summary>
+        /// <param name="html"></param>
+        void NavigateToString(string html);
     }
 
     public class CoreWebview2Handler : ICoreWebview2Handler
@@ -93,6 +99,13 @@ namespace Niconicome.Models.Domain.Local.Handlers
         {
             this.filter = func;
         }
+
+        public void NavigateToString(string html)
+        {
+            this.CheckIfInitialized();
+            this.wv2!.NavigateToString(html);
+        }
+
 
 
         #region private
