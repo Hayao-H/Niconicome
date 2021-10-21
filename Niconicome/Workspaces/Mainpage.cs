@@ -16,6 +16,7 @@ using Niconicome.Models.Utils;
 using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Network.Download.Actions;
 using Niconicome.Models.Local.Timer;
+using Niconicome.Models.Domain.Local.Addons.API.Tab;
 
 namespace Niconicome.Workspaces
 {
@@ -53,5 +54,6 @@ namespace Niconicome.Workspaces
         public static IAddonHandler AddonHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonHandler>();
         public static IPostDownloadActionssManager PostDownloadTasksManager { get; private set; } = DIFactory.Provider.GetRequiredService<IPostDownloadActionssManager>();
         public static IDlTimer DlTimer { get; private set; } = DIFactory.Provider.GetRequiredService<IDlTimer>();
+        public static ITabsContainer TabsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ITabsContainer>();
     }
 }

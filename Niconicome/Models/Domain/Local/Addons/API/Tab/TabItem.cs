@@ -6,7 +6,7 @@ using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Tab
 {
-    internal interface ITabItem
+    public interface ITabItem
     {
         /// <summary>
         /// タブを閉じる
@@ -30,6 +30,11 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         /// ID
         /// </summary>
         string ID { get; init; }
+
+        /// <summary>
+        /// タイトル
+        /// </summary>
+        string Title { get; }
     }
 
     internal class TabItem : ITabItem
@@ -68,5 +73,8 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         }
 
         public string ID { get; init; }
+
+        public string Title => this._tabInfomation.Title;
+
     }
 }

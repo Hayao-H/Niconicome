@@ -21,6 +21,7 @@ using Prism.Unity;
 using Prism.Ioc;
 using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
+using Niconicome.ViewModels.Mainpage.BottomTabs;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -115,6 +116,8 @@ namespace Niconicome.ViewModels.Mainpage
                     dialogService.Show(nameof(AddonManagerWindow));
                 });
 
+            this.BottomTabs = WS::Mainpage.TabsContainer.Tabs.ToReadOnlyReactiveCollection(x => new TabViewModel(x));
+
             #region UI系の設定
 
             this.TreeWidth = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.Tree.Width ?? 250).ToReadOnlyReactiveProperty();
@@ -178,6 +181,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// 再起動
         /// </summary>
         public ReactiveCommand Restart { get; init; }
+
+        /// <summary>
+        /// 下のタブ
+        /// </summary>
+        public ReadOnlyReactiveCollection<TabViewModel> BottomTabs { get; init; }
 
         /// <summary>
         /// ログイン成功時
