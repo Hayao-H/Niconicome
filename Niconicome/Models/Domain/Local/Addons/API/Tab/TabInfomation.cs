@@ -21,6 +21,11 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         string Title { get; }
 
         /// <summary>
+        /// ID
+        /// </summary>
+        string ID { get; }
+
+        /// <summary>
         /// アクセス可能であるかどうかを判断
         /// </summary>
         /// <param name="url"></param>
@@ -54,6 +59,9 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         public AddonInfomation AddonInfomation { get; private set; } = new();
 
         public string Title { get; private set; } = string.Empty;
+
+        public string ID { get; init; } = Guid.NewGuid().ToString("D");
+
 
 
         #endregion

@@ -15,7 +15,7 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class VideolistStateViewModel : TabViewModelBase
     {
-        public VideolistStateViewModel() : base("状態")
+        public VideolistStateViewModel() : base("状態", "")
         {
             WS::Mainpage.VideoListContainer.ListChanged += this.OnListChanged;
             WS::Mainpage.CurrentPlaylist.SelectedVideos.Subscribe(value => this.SelectedVideosCount.Value = value.ToString());

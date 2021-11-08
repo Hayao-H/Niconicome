@@ -22,7 +22,7 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class DownloadSettingsViewModel : TabViewModelBase, IDisposable
     {
-        public DownloadSettingsViewModel(IEventAggregator ea) : base("設定")
+        public DownloadSettingsViewModel(IEventAggregator ea) : base("設定", "")
         {
 
             this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);

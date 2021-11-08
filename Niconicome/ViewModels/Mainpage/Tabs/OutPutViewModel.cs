@@ -14,7 +14,7 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class OutPutViewModel : TabViewModelBase
     {
-        public OutPutViewModel() : base("出力")
+        public OutPutViewModel() : base("出力", "")
         {
             this.Message = WS::Mainpage.Messagehandler.Message.ToReactiveProperty();
 

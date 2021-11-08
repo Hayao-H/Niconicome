@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Niconicome.Models.Domain.Local.Addons.API.Tab;
+using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Niconicome.ViewModels.Mainpage.BottomTabs;
 
 namespace Niconicome.Views.Mainpage.Region

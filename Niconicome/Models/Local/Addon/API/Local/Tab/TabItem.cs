@@ -1,10 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.Core;
+using Niconicome.Models.Domain.Local.Addons.API.Tab;
 using Niconicome.Models.Domain.Local.Handlers;
 using Niconicome.Models.Domain.Utils;
 
-namespace Niconicome.Models.Domain.Local.Addons.API.Tab
+namespace Niconicome.Models.Local.Addon.API.Local.Tab
 {
     public interface ITabItem
     {
@@ -29,7 +30,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         /// <summary>
         /// ID
         /// </summary>
-        string ID { get; init; }
+        string ID { get; }
 
         /// <summary>
         /// タイトル
@@ -37,21 +38,20 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         string Title { get; }
     }
 
-    internal class TabItem : ITabItem
+    public class TabItem : ITabItem
     {
 
-        public TabItem(ITabInfomation infomation, Func<bool> closeFunc, string id)
+        public TabItem(ITabInfomation infomation, Func<ITabItem, bool> closeFunc)
         {
             this._tabInfomation = infomation;
             this._closeFunc = closeFunc;
-            this.ID = id;
         }
 
         #region field
 
         private readonly ITabInfomation _tabInfomation;
 
-        private readonly Func<bool> _closeFunc;
+        private readonly Func<ITabItem, bool> _closeFunc;
 
         private readonly ICoreWebview2Handler _webView2Handler = DIFactory.Provider.GetRequiredService<ICoreWebview2Handler>();
 
@@ -59,7 +59,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
 
         public bool Close()
         {
-            return this._closeFunc();
+            return this._closeFunc(this);
         }
 
         public void NavigateString(string html)
@@ -72,7 +72,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
             this._webView2Handler.Initialize(wv2);
         }
 
-        public string ID { get; init; }
+        public string ID => this._tabInfomation.ID;
 
         public string Title => this._tabInfomation.Title;
 

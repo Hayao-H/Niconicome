@@ -15,7 +15,7 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class SortViewModel : TabViewModelBase
     {
-        public SortViewModel() : base("並び替え")
+        public SortViewModel() : base("並び替え", "")
         {
             this.CurrentSortType = WS::Mainpage.SortInfoHandler.SortTypeStr.ToReactiveProperty().AddTo(this.disposables);
             this.IsDscending = WS::Mainpage.SortInfoHandler.IsDescendingStr.ToReactiveProperty().AddTo(this.disposables);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Local.Addons.API.Tab;
+using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Reactive.Bindings;
 
 namespace Niconicome.ViewModels.Mainpage.BottomTabs

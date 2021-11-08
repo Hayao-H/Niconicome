@@ -19,7 +19,7 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class TimerSettingsViewModel : TabViewModelBase
     {
-        public TimerSettingsViewModel(IEventAggregator ea) : base("タイマー")
+        public TimerSettingsViewModel(IEventAggregator ea) : base("タイマー", "")
         {
             this.ea = ea;
             this.IsTimerEveryDayEnable = WS::Mainpage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DlTimerEveryDay);

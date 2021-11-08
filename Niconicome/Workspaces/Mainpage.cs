@@ -16,7 +16,7 @@ using Niconicome.Models.Utils;
 using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Network.Download.Actions;
 using Niconicome.Models.Local.Timer;
-using Niconicome.Models.Domain.Local.Addons.API.Tab;
+using Niconicome.Models.Local.Addon.API.Local.Tab;
 
 namespace Niconicome.Workspaces
 {
