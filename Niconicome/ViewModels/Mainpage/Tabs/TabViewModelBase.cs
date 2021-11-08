@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs
 {
-    internal class TabViewModelBase : BindableBase
+    public class TabViewModelBase : BindableBase
     {
         public TabViewModelBase(string title, string id)
         {

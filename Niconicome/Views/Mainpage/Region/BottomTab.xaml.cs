@@ -12,8 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Niconicome.Extensions;
 using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Niconicome.ViewModels.Mainpage.BottomTabs;
+using Niconicome.ViewModels.Mainpage.Tabs;
 
 namespace Niconicome.Views.Mainpage.Region
 {
@@ -22,10 +24,11 @@ namespace Niconicome.Views.Mainpage.Region
     /// </summary>
     public partial class BottomTab : UserControl
     {
-        public BottomTab(ITabItem tab)
+        public BottomTab(BottomTabViewModel viewModel)
         {
             InitializeComponent();
-            this.DataContext = new TabViewModel(tab);
+            this.DataContext = viewModel;
+            this.WebView.NavigationCompleted += (_, _) => this.DataContext.As<BottomTabViewModel>().Initialize(this.WebView.CoreWebView2);
         }
     }
 }

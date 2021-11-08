@@ -8,6 +8,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <wv:WebView2 Source="https://google.com"/>
+        <wv:WebView2 x:Name="WebView" Source="about:blank"/>
     </Grid>
 </UserControl>
