@@ -54,6 +54,6 @@ namespace Niconicome.Workspaces
         public static IAddonHandler AddonHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonHandler>();
         public static IPostDownloadActionssManager PostDownloadTasksManager { get; private set; } = DIFactory.Provider.GetRequiredService<IPostDownloadActionssManager>();
         public static IDlTimer DlTimer { get; private set; } = DIFactory.Provider.GetRequiredService<IDlTimer>();
-        public static ITabsContainer TabsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ITabsContainer>();
+        public static ITabHandler TabHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ITabHandler>();
     }
 }

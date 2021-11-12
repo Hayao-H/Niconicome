@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Models.Auth;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Mainpage.BottomTabs;
+using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.Views;
 using Niconicome.Views.AddonPage;
 using Niconicome.Views.Mainpage.Region;
@@ -21,6 +27,7 @@ using Prism.Regions;
 using Prism.Services.Dialogs;
 using Prism.Unity;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
@@ -33,6 +40,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public MainWindowViewModel(IRegionManager regionManager, IDialogService dialogService, IContainerProvider containerProvider)
         {
+
+            this.ctx = SynchronizationContext.Current;
 
             this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");
@@ -127,12 +136,17 @@ namespace Niconicome.ViewModels.Mainpage
             regionManager.RegisterViewWithRegion<VideoList>("VideoListRegion");
 
             this.RegionManager = regionManager;
+
+            this.RegisterTabHandlers();
         }
 
-        /// <summary>
-        /// ユーザー情報(フィールド)
-        /// </summary>
+        #region field
+
         private User? user;
+
+        private readonly SynchronizationContext ctx;
+
+        #endregion
 
         #region Props
         public IRegionManager RegionManager { get; init; }
@@ -203,6 +217,38 @@ namespace Niconicome.ViewModels.Mainpage
             this.LoginBtnTooltip.Value = "ログアウトする";
             this.Username.Value = this.user.Nickname;
             this.UserImage.Value = this.user.UserImage;
+        }
+
+        /// <summary>
+        /// タブハンドラを登録
+        /// </summary>
+        private void RegisterTabHandlers()
+        {
+            WS::Mainpage.TabHandler.RegisterAddHandler(tab =>
+            {
+                this.ctx.Post(_ =>
+                {
+                    var vm = new BottomTabViewModel(tab);
+                    var control = new BottomTab(vm);
+                    this.RegionManager.Regions[LocalConstant.TabRegionName].Add(control);
+                }, null);
+            });
+
+            WS::Mainpage.TabHandler.RegisterRemoveHandler(id =>
+            {
+                IEnumerable<object> viewToRemove = this.RegionManager.Regions[LocalConstant.TabRegionName].Views.Where(v =>
+                {
+                    if (v is not UserControl control) return false; ;
+                    if (control.DataContext is not TabViewModelBase vm) return false;
+                    return vm.ID == id;
+                });
+
+                foreach (var view in viewToRemove)
+                {
+                    this.RegionManager.Regions[LocalConstant.TabRegionName].Remove(view);
+                }
+
+            });
         }
 
         #endregion
@@ -294,7 +340,7 @@ namespace Niconicome.ViewModels.Mainpage
             IContainerProvider containerProvider = application.Container;
             IRegionManager regionManager = vm.RegionManager;
 
-            IRegion tabRegion = regionManager.Regions["TabResion"];
+            IRegion tabRegion = regionManager.Regions[LocalConstant.TabRegionName];
             tabRegion.Add(containerProvider.Resolve<DownloadSettings>());
             tabRegion.Add(containerProvider.Resolve<Output>());
             tabRegion.Add(containerProvider.Resolve<VideoSortSetting>());

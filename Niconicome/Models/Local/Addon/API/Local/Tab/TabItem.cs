@@ -70,6 +70,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         public void Initialize(CoreWebView2 wv2)
         {
             this._webView2Handler.Initialize(wv2);
+            this._webView2Handler.RegisterFilterFunc(url => this._tabInfomation.CanAccess(url));
         }
 
         public string ID => this._tabInfomation.ID;
