@@ -234,6 +234,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonsDomainAPI::Tab.ITabInfomation, AddonsDomainAPI::Tab.TabInfomation>();
             services.AddSingleton<AddonAPI::Local.Tab.ITabsContainer, AddonAPI::Local.Tab.TabsContainer>();
             services.AddTransient<AddonAPI::Local.Tab.ITabItem, AddonAPI::Local.Tab.TabItem>();
+            services.AddSingleton<AddonAPI::Local.Tab.ITabsContainer, AddonAPI::Local.Tab.TabsContainer>();
+            services.AddTransient<AddonAPI::Local.Tab.ITabHandler, AddonAPI::Local.Tab.TabsHandler>();
             return services.BuildServiceProvider();
         }
 
