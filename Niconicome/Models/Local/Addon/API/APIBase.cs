@@ -16,10 +16,10 @@ namespace Niconicome.Models.Local.Addon.API
     {
         public void SetInfo(AddonInfomation infomation)
         {
-            this.AddonInfomation = infomation;
+            this._addonInfomation = infomation;
         }
 
 
-        protected AddonInfomation? AddonInfomation { get; private set; }
+        protected AddonInfomation? _addonInfomation;
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Tab
 {
-    public interface ITabHandler
+    public interface ITabsContainerHandler
     {
         /// <summary>
         /// タブ追加イベントハンドラ
@@ -21,9 +21,9 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         void RegisterRemoveHandler(Action<string> handler);
     }
 
-    public class TabsHandler : ITabHandler
+    public class TabsContainerHandler : ITabsContainerHandler
     {
-        public TabsHandler(ITabsContainer container)
+        public TabsContainerHandler(ITabsContainer container)
         {
             container.Add += (_, tab) => this.addHandler?.Invoke(tab);
             container.Remove += (_, id) => this.removeHandler?.Invoke(id);
