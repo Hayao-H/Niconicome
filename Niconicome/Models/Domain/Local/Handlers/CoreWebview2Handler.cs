@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Web.WebView2.Core;
 using Niconicome.Models.Domain.Niconico;
@@ -63,6 +64,8 @@ namespace Niconicome.Models.Domain.Local.Handlers
 
         private CoreWebView2? wv2;
 
+        private SynchronizationContext? ctx;
+
         #endregion
 
         public async Task DeleteBrowserCookiesAsync(string domain)
@@ -90,6 +93,7 @@ namespace Niconicome.Models.Domain.Local.Handlers
             if (this.isInitialized) return;
 
             this.wv2 = wv2;
+            this.ctx = SynchronizationContext.Current;
             this.wv2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
             this.wv2.WebResourceRequested += this.OnNavigate;
             this.isInitialized = true;
@@ -103,7 +107,7 @@ namespace Niconicome.Models.Domain.Local.Handlers
         public void NavigateToString(string html)
         {
             this.CheckIfInitialized();
-            this.wv2!.NavigateToString(html);
+            this.ctx?.Post(_ => this.wv2!.NavigateToString(html), null);
         }
 
 
