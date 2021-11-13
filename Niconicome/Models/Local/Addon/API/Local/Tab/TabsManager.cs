@@ -9,7 +9,7 @@ using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Tab
 {
-    public interface ITabsManager
+    public interface ITabsManager : IAPIBase
     {
 
         ITabHandler add(string title);

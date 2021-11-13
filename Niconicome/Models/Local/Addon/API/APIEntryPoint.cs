@@ -12,6 +12,7 @@ using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Local.Addon.API.Local.IO;
 using Niconicome.Models.Local.Addon.API.Local.Resource;
 using Niconicome.Models.Local.Addon.API.Local.Storage;
+using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Niconicome.Models.Local.Addon.API.Net.Hooks;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 
@@ -44,18 +45,24 @@ namespace Niconicome.Models.Local.Addon.API
         /// </summary>
         IStorage? storage { get; }
 
+        /// <summary>
+        /// Tab API
+        /// </summary>
+        ITabsManager? tab { get; }
+
         void Initialize(AddonInfomation infomation, IJavaScriptExecuter engine);
     }
 
     public class APIEntryPoint : IAPIEntryPoint
     {
-        public APIEntryPoint(IOutput output, IHooks hooks, ILog log, IPublicResourceHandler resourceHandler,IStorage storage)
+        public APIEntryPoint(IOutput output, IHooks hooks, ILog log, IPublicResourceHandler resourceHandler, IStorage storage,ITabsManager tab)
         {
             this.output = output;
             this.hooks = hooks;
             this.log = log;
             this.resource = resourceHandler;
             this.storage = storage;
+            this.tab = tab;
         }
 
         #region Props
@@ -69,6 +76,8 @@ namespace Niconicome.Models.Local.Addon.API
         public IPublicResourceHandler? resource { get; private set; }
 
         public IStorage? storage { get; private set; }
+
+        public ITabsManager? tab { get; private set; }
 
 
         #endregion
@@ -116,6 +125,15 @@ namespace Niconicome.Models.Local.Addon.API
             else
             {
                 this.storage = null;
+            }
+
+            if (infomation.HasPermission(PermissionNames.Tab))
+            {
+                this.tab!.SetInfo(infomation);
+            }
+            else
+            {
+                this.tab = null;
             }
         }
 
