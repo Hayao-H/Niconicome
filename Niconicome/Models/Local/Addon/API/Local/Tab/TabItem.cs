@@ -70,6 +70,8 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
         private Action? _initializeHandlers;
 
+        private bool _isInitialized;
+
         #endregion
 
         #region private
@@ -98,16 +100,21 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
         public void Initialize(CoreWebView2 wv2)
         {
+            if (this._isInitialized) return;
             this._webView2Handler.Initialize(wv2);
             this._webView2Handler.RegisterFilterFunc(url => this._tabInfomation.CanAccess(url));
             this.OnInitialize();
+            this._isInitialized = true;
         }
 
         public Task WaitUntilInitialize()
         {
             var tsc = new TaskCompletionSource();
 
-            this._initializeHandlers += () => tsc.TrySetResult();
+            if (this._isInitialized)
+                tsc.TrySetResult();
+            else
+                this._initializeHandlers += () => tsc.TrySetResult();
 
             return tsc.Task;
         }

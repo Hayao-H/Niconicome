@@ -12,7 +12,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
     public interface ITabsManager : IAPIBase
     {
 
-        ITabHandler add(string title);
+        Task<ITabHandler> add(string title);
 
     }
 
@@ -32,7 +32,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
         #region Method
 
-        public ITabHandler add(string title)
+        public async Task<ITabHandler> add(string title)
         {
             if (this._addonInfomation is null) throw new InvalidOperationException("Not Initialized!");
 
@@ -41,6 +41,8 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
             ITabItem item = this._container.AddTab(tabInfo);
             var handler = new TabHandler(item);
+
+            await item.WaitUntilInitialize();
 
             return handler;
         }
