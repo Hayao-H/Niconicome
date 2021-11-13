@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.Core;
 using Niconicome.Models.Domain.Local.Addons.API.Tab;
@@ -28,6 +30,12 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         void NavigateString(string html);
 
         /// <summary>
+        /// 初期化処理が完了するまで待機
+        /// </summary>
+        /// <returns></returns>
+        Task WaitUntilInitialize();
+
+        /// <summary>
         /// ID
         /// </summary>
         string ID { get; }
@@ -36,6 +44,11 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         /// タイトル
         /// </summary>
         string Title { get; }
+
+        /// <summary>
+        /// フラグ
+        /// </summary>
+        bool IsClosed { get; }
     }
 
     public class TabItem : ITabItem
@@ -55,11 +68,27 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
         private readonly ICoreWebview2Handler _webView2Handler = DIFactory.Provider.GetRequiredService<ICoreWebview2Handler>();
 
+        private Action? _initializeHandlers;
+
+        #endregion
+
+        #region private
+
+        private void OnInitialize()
+        {
+            try
+            {
+                this._initializeHandlers?.Invoke();
+            }
+            catch { }
+        }
+
         #endregion
 
         public bool Close()
         {
-            return this._closeFunc(this);
+            if (this.IsClosed) return false;
+            return this.IsClosed = this._closeFunc(this);
         }
 
         public void NavigateString(string html)
@@ -71,11 +100,24 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         {
             this._webView2Handler.Initialize(wv2);
             this._webView2Handler.RegisterFilterFunc(url => this._tabInfomation.CanAccess(url));
+            this.OnInitialize();
         }
+
+        public Task WaitUntilInitialize()
+        {
+            var tsc = new TaskCompletionSource();
+
+            this._initializeHandlers += () => tsc.TrySetResult();
+
+            return tsc.Task;
+        }
+
 
         public string ID => this._tabInfomation.ID;
 
         public string Title => this._tabInfomation.Title;
+
+        public bool IsClosed { get; private set; }
 
     }
 }

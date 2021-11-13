@@ -144,7 +144,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         private User? user;
 
-        private readonly SynchronizationContext ctx;
+        private readonly SynchronizationContext? ctx;
 
         #endregion
 
@@ -226,6 +226,9 @@ namespace Niconicome.ViewModels.Mainpage
         {
             WS::Mainpage.TabHandler.RegisterAddHandler(tab =>
             {
+
+                if (this.ctx is null) throw new InvalidOperationException($"{typeof(SynchronizationContext)}がnullのため、タブを追加できません。");
+
                 this.ctx.Post(_ =>
                 {
                     var vm = new BottomTabViewModel(tab);
