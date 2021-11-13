@@ -233,7 +233,9 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     var vm = new BottomTabViewModel(tab);
                     var control = new BottomTab(vm);
-                    this.RegionManager.Regions[LocalConstant.TabRegionName].Add(control);
+                    IRegion region = this.RegionManager.Regions[LocalConstant.TabRegionName];
+                    region.Add(control);
+                    region.Activate(control);
                 }, null);
             });
 

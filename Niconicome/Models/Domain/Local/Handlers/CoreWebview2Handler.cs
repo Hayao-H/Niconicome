@@ -45,6 +45,13 @@ namespace Niconicome.Models.Domain.Local.Handlers
         /// </summary>
         /// <param name="html"></param>
         void NavigateToString(string html);
+
+        /// <summary>
+        /// 仮想ホストを設定
+        /// </summary>
+        /// <param name="virtualHostName"></param>
+        /// <param name="folderName"></param>
+        void SetVirtualHostName(string virtualHostName, string folderName);
     }
 
     public class CoreWebview2Handler : ICoreWebview2Handler
@@ -108,6 +115,13 @@ namespace Niconicome.Models.Domain.Local.Handlers
         {
             this.CheckIfInitialized();
             this.ctx?.Post(_ => this.wv2!.NavigateToString(html), null);
+        }
+
+        public void SetVirtualHostName(string virtualHostName, string folderName)
+        {
+            string version = CoreWebView2Environment.GetAvailableBrowserVersionString();
+            this.CheckIfInitialized();
+            this.ctx?.Post(_ => this.wv2!.SetVirtualHostNameToFolderMapping(virtualHostName, folderName, CoreWebView2HostResourceAccessKind.Allow), null);
         }
 
 

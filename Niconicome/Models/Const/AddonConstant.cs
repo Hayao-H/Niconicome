@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Const
 {
-    public class AdddonConstant
+    public class AddonConstant
     {
         public static Version APIVersion { get; private set; } = new("1.1.0");
 
@@ -15,5 +15,7 @@ namespace Niconicome.Models.Const
         public static string LocalStorageFileName { get; private set; } = "locaStorage.db";
 
         public static string ResourceDirectoryName { get; private set; } = "resource";
+
+        public static string ResourceHost { get; private set; } = "nc-resource.nico";
     }
 }

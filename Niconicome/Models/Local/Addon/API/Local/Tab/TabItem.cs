@@ -36,6 +36,13 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         Task WaitUntilInitialize();
 
         /// <summary>
+        /// 仮想ホストを設定する
+        /// </summary>
+        /// <param name="virtualHostName"></param>
+        /// <param name="folderName"></param>
+        void SetVirtualHostName(string virtualHostName, string folderName);
+
+        /// <summary>
         /// ID
         /// </summary>
         string ID { get; }
@@ -118,6 +125,14 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
             return tsc.Task;
         }
+
+        public void SetVirtualHostName(string virtualHostName, string folderName)
+        {
+            if (!this._isInitialized) throw new InvalidOperationException("Not Initialized");
+
+            this._webView2Handler.SetVirtualHostName(virtualHostName, folderName);
+        }
+
 
 
         public string ID => this._tabInfomation.ID;

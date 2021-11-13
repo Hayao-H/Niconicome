@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.API.Tab;
+using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Tab
@@ -43,6 +47,15 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
             var handler = new TabHandler(item);
 
             await item.WaitUntilInitialize();
+
+            if (this._addonInfomation.HasPermission(PermissionNames.Resource))
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, FileFolder.AddonsFolder, this._addonInfomation.PackageID.Value, AddonConstant.ResourceDirectoryName);
+                if (Directory.Exists(path))
+                {
+                    item.SetVirtualHostName(AddonConstant.ResourceHost, path);
+                }
+            }
 
             return handler;
         }
