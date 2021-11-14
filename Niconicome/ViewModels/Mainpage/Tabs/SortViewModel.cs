@@ -6,15 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Playlist;
+using Niconicome.ViewModels.Mainpage.Tabs;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
 {
-    class SortViewModel : BindableBase
+    class SortViewModel : TabViewModelBase
     {
-        public SortViewModel()
+        public SortViewModel() : base("並び替え", "")
         {
             this.CurrentSortType = WS::Mainpage.SortInfoHandler.SortTypeStr.ToReactiveProperty().AddTo(this.disposables);
             this.IsDscending = WS::Mainpage.SortInfoHandler.IsDescendingStr.ToReactiveProperty().AddTo(this.disposables);

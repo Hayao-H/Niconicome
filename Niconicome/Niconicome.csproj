@@ -36,6 +36,7 @@
 
 	<ItemGroup>
 		<None Remove="src\app.ico" />
+		<None Remove="Views\Mainpage\Region\BottomTab.xaml" />
 		<ApplicationDefinition Include="App.xaml" />
 		<None Include="src\icon.png">
 			<Pack>True</Pack>
@@ -53,7 +54,7 @@
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.4" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.902.49" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1020.30" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
 		<PackageReference Include="Prism.Unity" Version="8.1.97" />

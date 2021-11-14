@@ -11,5 +11,7 @@ namespace Niconicome.Models.Const
         public static int DefaultSnackbarDuration = 2000;
 
         public static int DefaultCommetFetchWaitSpan = 0;
+
+        public static string TabRegionName = "TabResion";
     }
 }

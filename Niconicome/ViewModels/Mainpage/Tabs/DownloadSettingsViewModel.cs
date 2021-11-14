@@ -9,6 +9,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
+using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Niconicome.Views;
 using Prism.Events;
@@ -19,10 +20,11 @@ using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 using WS = Niconicome.Workspaces;
 namespace Niconicome.ViewModels.Mainpage
 {
-    class DownloadSettingsViewModel : ConfigurableBase, IDisposable
+    class DownloadSettingsViewModel : TabViewModelBase, IDisposable
     {
-        public DownloadSettingsViewModel(IEventAggregator ea)
+        public DownloadSettingsViewModel(IEventAggregator ea) : base("設定", "")
         {
+
             this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
             this.IsLimittingCommentCountEnable = WS::Mainpage.DownloadSettingsHandler.IsLimittingCommentCountEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
             this.IsDownloadingVideoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);

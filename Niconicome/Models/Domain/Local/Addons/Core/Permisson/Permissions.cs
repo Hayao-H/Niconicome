@@ -20,6 +20,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static Permission Storage { get; private set; } = new(PermissionNames.Storage, "Storage API。この権限を持つ拡張機能はデータをローカルに永続化することができます。（保存されたデータはアンインストール時に削除されます。）");
 
         public static Permission Resource { get; private set; } = new(PermissionNames.Resource, "Resource API。この権限を持つ拡張機能は拡張機能フォルダー内のresourceディレクトリのファイルを動的に読み込むことができます。");
+
+        public static Permission Tab { get; private set; } = new(PermissionNames.Tab, "Tab API。この権限を持つ拡張機能は画面下部のタブを追加して文書を表示したり、Host権限を持つサイトを表示し、そのサイト上の全てのデータを読み取ったりすることができます。");
     }
 
     public static class PermissionNames
@@ -35,6 +37,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static string Storage { get; private set; } = "storage";
 
         public static string Resource { get; private set; } = "resource";
+
+        public static string Tab { get; private set; } = "tab";
     }
 
     public class Permission

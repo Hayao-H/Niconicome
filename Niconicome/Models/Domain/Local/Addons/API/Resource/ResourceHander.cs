@@ -55,7 +55,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Resource
         {
             this.CheckIfInitialized();
 
-            string path = Path.Combine(FileFolder.AddonsFolder, this._packageID!, Const::AdddonConstant.ResourceDirectoryName, relativePath);
+            string path = Path.Combine(FileFolder.AddonsFolder, this._packageID!, Const::AddonConstant.ResourceDirectoryName, relativePath);
 
             string data;
             try
