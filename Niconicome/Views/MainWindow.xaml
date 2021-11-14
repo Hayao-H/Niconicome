@@ -180,6 +180,42 @@
                                     <Style TargetType="TabItem">
                                         <Setter Property="Foreground" Value="Black"/>
                                         <Setter Property="Header" Value="{Binding DataContext.Title}"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type TabItem}">
+                                                    <Grid>
+                                                        <Border Name="Border" 
+                                                                Margin="2" 
+                                                                Background="#e7e7e7" 
+                                                                BorderThickness="1" 
+                                                                Padding="5"
+                                                                CornerRadius="8">
+                                                            <ContentPresenter VerticalAlignment="Center"
+                                                                              HorizontalAlignment="Center"
+                                                                              Content="{TemplateBinding Header}"
+                                                                              >
+                                                            </ContentPresenter>
+                                                        </Border>
+                                                    </Grid>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter Property="Panel.ZIndex" Value="100" />
+                                                            <Setter TargetName="Border" Property="BorderBrush" Value="#e7e7e7"/>
+                                                            <Setter TargetName="Border" Property="Background" Value="#fff"/>
+                                                        </Trigger>
+                                                        <MultiTrigger>
+                                                            <MultiTrigger.Conditions>
+                                                                <Condition Property="IsMouseOver" Value="True"/>
+                                                                <Condition Property="IsSelected" Value="False"/>
+                                                            </MultiTrigger.Conditions>
+                                                            <MultiTrigger.Setters>
+                                                                <Setter TargetName="Border" Property="Background" Value="#f6f6f6"/>
+                                                            </MultiTrigger.Setters>
+                                                        </MultiTrigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
                                 </TabControl.Resources>
                             </TabControl >
