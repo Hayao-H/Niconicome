@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
-		<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
 		<AssemblyVersion>0.10.0.*</AssemblyVersion>
@@ -23,6 +23,8 @@
 		<PackageIcon>icon.png</PackageIcon>
 		<ApplicationIcon>app.ico</ApplicationIcon>
 		<MinimumPlatformVersion>7.0</MinimumPlatformVersion>
+		<Platforms>AnyCPU</Platforms>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

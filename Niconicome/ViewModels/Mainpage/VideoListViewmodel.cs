@@ -84,6 +84,7 @@ namespace Niconicome.ViewModels.Mainpage
             int stWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWStateColumnWid);
             int tnWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWThumbColumnWid);
             int bmWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWBookMarkColumnWid);
+            int economyWidth = WS::Mainpage.SettingHandler.GetIntSetting(SettingsEnum.MWEconomyColumnWid);
 
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
@@ -111,7 +112,6 @@ namespace Niconicome.ViewModels.Mainpage
             #region Width系プロパティー
 
             var isRestoreEnable = !WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth);
-            const int defaultWidth = 150;
 
             this.SelectColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? scWidth <= 0 ? defaultWidth : scWidth : defaultWidth);
             this.IDColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? idWidth <= 0 ? defaultWidth : idWidth : defaultWidth);
@@ -122,6 +122,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.StateColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? stWidth <= 0 ? defaultWidth : stWidth : defaultWidth);
             this.ThumbColumnWidth = new ReactiveProperty<int>(isRestoreEnable ? tnWidth <= 0 ? defaultWidth : tnWidth : defaultWidth);
             this.BookMarkColumnWidth = new ReactivePropertySlim<int>(isRestoreEnable ? bmWidth < 0 ? defaultWidth : bmWidth : defaultWidth);
+            this.EconomyColumnWidth = new ReactivePropertySlim<int>(isRestoreEnable ? economyWidth < 0 ? defaultWidth : economyWidth : defaultWidth);
 
             this.SelectColumnWidth
                 .Throttle(TimeSpan.FromSeconds(3))
@@ -159,6 +160,10 @@ namespace Niconicome.ViewModels.Mainpage
                 .Throttle(TimeSpan.FromSeconds(3))
                 .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWBookMarkColumnWid))
                 .AddTo(this.disposables);
+            this.EconomyColumnWidth
+                .Throttle(TimeSpan.FromSeconds(3))
+                .Subscribe(value => WS::Mainpage.SettingHandler.SaveSetting(value, SettingsEnum.MWEconomyColumnWid))
+                .AddTo(this.disposables);
             #endregion
 
             #region UI系要素
@@ -168,6 +173,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
             {
+                //サムネ
                 if (!(value?.MainPage.VideoList.Column.Thumbnail ?? true))
                 {
                     this.ThumbColumnWidth.Value = 0;
@@ -176,10 +182,8 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     this.ThumbColumnWidth.Value = defaultWidth;
                 }
-            });
 
-            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
-            {
+                //ID
                 if (!(value?.MainPage.VideoList.Column.NiconicoID ?? true))
                 {
                     this.IDColumnWidth.Value = 0;
@@ -188,10 +192,8 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     this.IDColumnWidth.Value = defaultWidth;
                 }
-            });
 
-            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
-            {
+                //タイトル
                 if (!(value?.MainPage.VideoList.Column.Title ?? true))
                 {
                     this.TitleColumnWidth.Value = 0;
@@ -200,10 +202,8 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     this.TitleColumnWidth.Value = defaultWidth;
                 }
-            });
 
-            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
-            {
+                //投稿日時
                 if (!(value?.MainPage.VideoList.Column.UploadedDT ?? true))
                 {
                     this.UploadColumnWidth.Value = 0;
@@ -212,10 +212,8 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     this.UploadColumnWidth.Value = defaultWidth;
                 }
-            });
 
-            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
-            {
+                //再生回数
                 if (!(value?.MainPage.VideoList.Column.ViewCount ?? true))
                 {
                     this.ViewCountColumnWidth.Value = 0;
@@ -224,10 +222,8 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     this.ViewCountColumnWidth.Value = defaultWidth;
                 }
-            });
 
-            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
-            {
+                //DL済み
                 if (!(value?.MainPage.VideoList.Column.DLFlag ?? true))
                 {
                     this.DownloadedFlagColumnWidth.Value = 0;
@@ -236,10 +232,8 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     this.DownloadedFlagColumnWidth.Value = defaultWidth;
                 }
-            });
 
-            WS::Mainpage.StyleHandler.UserChrome.Subscribe(value =>
-            {
+                //ブックマーク
                 if (!(value?.MainPage.VideoList.Column.BookMark ?? true))
                 {
                     this.BookMarkColumnWidth.Value = 0;
@@ -248,10 +242,17 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     this.BookMarkColumnWidth.Value = defaultWidth;
                 }
+
+                if (!(value?.MainPage.VideoList.Column.Economy ?? true))
+                {
+                    this.EconomyColumnWidth.Value = 0;
+                }
+                else if (this.EconomyColumnWidth.Value == 0)
+                {
+                    this.EconomyColumnWidth.Value = defaultWidth;
+                }
             });
             #endregion
-
-
 
             #region クリップボード監視
 
@@ -1071,15 +1072,6 @@ namespace Niconicome.ViewModels.Mainpage
             this.Dispose();
         }
 
-        /// <summary>
-        /// フィルターアイコン
-        /// </summary>
-        public ReactivePropertySlim<MaterialDesign::PackIconKind> FilterIcon { get; init; }
-
-        /// <summary>
-        /// 更新アイコン
-        /// </summary>
-        public ReactivePropertySlim<MaterialDesign::PackIconKind> RefreshCommandIcon { get; init; }
 
         #region コマンド
         /// <summary>
@@ -1219,6 +1211,18 @@ namespace Niconicome.ViewModels.Mainpage
 
         #endregion
 
+        #region Props
+
+        /// <summary>
+        /// フィルターアイコン
+        /// </summary>
+        public ReactivePropertySlim<MaterialDesign::PackIconKind> FilterIcon { get; init; }
+
+        /// <summary>
+        /// 更新アイコン
+        /// </summary>
+        public ReactivePropertySlim<MaterialDesign::PackIconKind> RefreshCommandIcon { get; init; }
+
         /// <summary>
         /// メッセージボックスを表示するコマンド
         /// </summary>
@@ -1270,7 +1274,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReadOnlyReactiveProperty<bool> IsTemporaryPlaylist { get; init; }
 
-
         /// <summary>
         /// クリップボード監視アイコン
         /// </summary>
@@ -1280,6 +1283,8 @@ namespace Niconicome.ViewModels.Mainpage
         /// クリップボード監視
         /// </summary>
         public ReadOnlyReactiveProperty<string?> ClipboardMonitoringToolTip { get; init; }
+
+        #endregion
 
         #region UI系
 
@@ -1372,7 +1377,13 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// ブックマーク
         /// </summary>
-        public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; } = new(150);
+        public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; }
+
+        /// <summary>
+        /// エコノミー情報
+        /// </summary>
+        public ReactivePropertySlim<int> EconomyColumnWidth { get; set; }
+
         #endregion
 
         /// <summary>
@@ -1397,6 +1408,12 @@ namespace Niconicome.ViewModels.Mainpage
             WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
             this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
         }
+
+        #region field
+
+        private const int defaultWidth = 150;
+
+        #endregion
 
         #region private
 
@@ -1567,6 +1584,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactivePropertySlim<int> ThumbColumnWidth { get; set; } = new(150);
 
         public ReactivePropertySlim<int> BookMarkColumnWidth { get; set; } = new(150);
+
+        public ReactivePropertySlim<int> EconomyColumnWidth { get; set; } = new(150);
 
         public ReactiveProperty<int> ListItemHeight { get; init; } = new(100);
 
@@ -1773,6 +1792,9 @@ namespace Niconicome.ViewModels.Mainpage
             this.UploadedOn = video.UploadedOn.ToReactivePropertyAsSynchronized(p => p.Value).AddTo(this.disposables);
             this.IsThumbDownloading = video.IsThumbDownloading.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
             this.BookMarkColor = new ReactiveProperty<System.Windows.Media.Brush>(isBookMarked ? Models.Domain.Utils.Utils.ConvertToBrush("#4580BC") : Models.Domain.Utils.Utils.ConvertToBrush("#E2EFFC"));
+            this.IsEconomy = video.IsEconomy.CombineLatest(video.IsDownloaded,
+                (isEconomy, isDownloaded) => isDownloaded ? isEconomy ? "エコノミー" : "非エコノミー" : "-")
+                .ToReactiveProperty();
 
             this.BookMark = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
                 .Select(value => value is not null)
@@ -1818,6 +1840,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.IsThumbDownloading = new ReactiveProperty<bool>();
             this.BookMarkColor = new ReactiveProperty<System.Windows.Media.Brush>(Models.Domain.Utils.Utils.ConvertToBrush("#E2EFFC"));
             this.VideoInfo = new NonBindableListVideoInfo();
+            this.IsEconomy = new ReactiveProperty<string?>("○");
 
             this.BookMark = new ReactiveCommand();
         }
@@ -1842,6 +1865,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<string> ThumbPath { get; init; }
 
         public ReactiveProperty<string> IsDownloaded { get; init; }
+
+        public ReactiveProperty<string?> IsEconomy { get; init; }
 
         public ReactiveProperty<bool> IsSelected { get; init; }
 
