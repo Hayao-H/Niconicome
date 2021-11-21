@@ -219,7 +219,7 @@ namespace Niconicome.Models.Network.Download
                     bool skippedFlag = false;
                     e.Task.IsProcessing.Value = true;
 
-                    IDownloadResult downloadResult = await this.downloadHelper.TryDownloadContentAsync(setting with { NiconicoId = e.Task.NiconicoID, Video = !skippedFlag && setting.Video }, msg => e.Task.Message.Value = msg, e.Task.CancellationToken);
+                    IDownloadResult downloadResult = await this.downloadHelper.TryDownloadContentAsync(setting with { NiconicoId = e.Task.NiconicoID, Video = !skippedFlag && setting.Video, FilePath = e.Task.FilePath, IsEconomy = e.Task.IsEconomyFile }, msg => e.Task.Message.Value = msg, e.Task.CancellationToken);
 
                     IListVideoInfo video = downloadResult.VideoInfo;
 

@@ -190,5 +190,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string SnackbarDuration { get; private set; } = "snackbarduration";
         public static string CommentFetchWaitSpan { get; private set; } = "commentfetchwaitspan";
         public static string MainWindowEconomyColumnWidth { get; private set; } = "mainwindoweconomycolumnwidth";
+        public static string DeleteExistingEconomyFile { get; private set; } = "deleteexistingeconomyfile";
     }
 }

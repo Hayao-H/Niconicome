@@ -104,6 +104,7 @@ namespace Niconicome.Models.Network.Download
             bool resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
             bool unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
             bool experimentalSafety = this.settingHandler.GetBoolSetting(SettingsEnum.ExperimentalSafety);
+            bool deleteEconomyFile = this.settingHandler.GetBoolSetting(SettingsEnum.DeleteEcoFile);
             string folderPath = this.current.PlaylistFolderPath;
             string fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.FIleFormat;
 
@@ -175,6 +176,7 @@ namespace Niconicome.Models.Network.Download
                 EconomySuffix = economySuffix,
                 EnableExperimentalCommentSafetySystem = experimentalSafety,
                 CommentFetchWaitSpan = commentFetchWaitSpan,
+                DeleteExistingEconomyFile = deleteEconomyFile,
             };
         }
 

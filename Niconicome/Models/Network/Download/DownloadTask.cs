@@ -13,9 +13,20 @@ namespace Niconicome.Models.Network.Download
         string DirectoryPath { get; }
         string NiconicoID { get; }
         string Title { get; }
+
+        /// <summary>
+        /// 動画ファイルのパス
+        /// </summary>
+        string FilePath { get; }
+
+        /// <summary>
+        /// エコノミーファイルであるかどうか
+        /// </summary>
+        bool IsEconomyFile { get; }
+
         int PlaylistID { get; }
         int VideoID { get; }
-        ReactiveProperty<string> Message { get;  }
+        ReactiveProperty<string> Message { get; }
         ReactiveProperty<bool> IsCanceled { get; }
         ReactiveProperty<bool> IsProcessing { get; }
         ReactiveProperty<bool> IsDone { get; }
@@ -30,7 +41,7 @@ namespace Niconicome.Models.Network.Download
     /// </summary>
     public record DownloadTask : BindableRecordBase, IDownloadTask
     {
-        public DownloadTask(string niconicpoID, string title, int videoID, DownloadSettings downloadSettings)
+        public DownloadTask(string niconicpoID, string title, string filePath, bool isEconomy, int videoID, DownloadSettings downloadSettings)
         {
             this.DirectoryPath = downloadSettings.FolderPath;
             this.VerticalResolution = downloadSettings.VerticalResolution;
@@ -44,6 +55,8 @@ namespace Niconicome.Models.Network.Download
             this.NiconicoID = niconicpoID;
             this.VideoID = videoID;
             this.Title = title;
+            this.FilePath = filePath;
+            this.IsEconomyFile = isEconomy;
             this.cts = new CancellationTokenSource();
             this.CancellationToken = this.cts.Token;
         }
@@ -71,6 +84,8 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         public string Title { get; init; }
 
+        public string FilePath { get; init; }
+
         /// <summary>
         /// メッセージ
         /// </summary>
@@ -85,6 +100,8 @@ namespace Niconicome.Models.Network.Download
         /// 動画ID
         /// </summary>
         public int VideoID { get; init; }
+
+        public bool IsEconomyFile { get; }
 
         /// <summary>
         /// キャンセルフラグ

@@ -201,6 +201,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.SnackbarDuration => STypes::SettingNames.SnackbarDuration,
                 SettingsEnum.CommentWaitSpan => STypes::SettingNames.CommentFetchWaitSpan,
                 SettingsEnum.MWEconomyColumnWid => STypes::SettingNames.MainWindowEconomyColumnWidth,
+                SettingsEnum.DeleteEcoFile => STypes::SettingNames.DeleteExistingEconomyFile,
                 _ => null
             };
         }
@@ -292,5 +293,6 @@ namespace Niconicome.Models.Local.Settings
         SnackbarDuration,
         CommentWaitSpan,
         MWEconomyColumnWid,
+        DeleteEcoFile,
     }
 }
