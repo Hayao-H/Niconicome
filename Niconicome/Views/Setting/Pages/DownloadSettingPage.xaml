@@ -168,6 +168,16 @@
                     <ToggleButton IsChecked="{Binding IsExperimentalCommentSafetySystemEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="Delete" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="非エコノミーファイルをDL後、エコノミーファイルを削除" />
+                    <ToggleButton IsChecked="{Binding IsDeletingExistingEconomyFileEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             </StackPanel>
         </ScrollViewer>
 

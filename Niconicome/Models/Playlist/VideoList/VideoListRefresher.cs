@@ -91,7 +91,8 @@ namespace Niconicome.Models.Playlist.VideoList
                         Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
                     };
                 }
-                originalVideos = playlist.Videos.Select(v => {
+                originalVideos = playlist.Videos.Select(v =>
+                {
                     IListVideoInfo video = VideoInfoContainer.New();
                     video.Id.Value = v.Id;
                     return video;
@@ -154,7 +155,12 @@ namespace Niconicome.Models.Playlist.VideoList
                         {
                             video.IsEconomy.Value = true;
                         }
+                        else
+                        {
+                            video.IsEconomy.Value = false;
+                        }
                     }
+
                 }
                 else
                 {
