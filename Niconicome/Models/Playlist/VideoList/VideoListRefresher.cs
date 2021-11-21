@@ -18,6 +18,13 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public interface IVideoListRefresher
     {
+        /// <summary>
+        /// 引数で与えた動画リスト内の動画情報を更新する
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="addFunc"></param>
+        /// <param name="disableDBRetrieving"></param>
+        /// <returns></returns>
         IAttemptResult Refresh(IEnumerable<IListVideoInfo> videos, Action<IListVideoInfo> addFunc, bool disableDBRetrieving = false);
     }
 
@@ -84,7 +91,8 @@ namespace Niconicome.Models.Playlist.VideoList
                         Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
                     };
                 }
-                originalVideos = playlist.Videos.Select(v => {
+                originalVideos = playlist.Videos.Select(v =>
+                {
                     IListVideoInfo video = VideoInfoContainer.New();
                     video.Id.Value = v.Id;
                     return video;
@@ -102,6 +110,7 @@ namespace Niconicome.Models.Playlist.VideoList
             var format = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? "[<id>]<title>";
             var replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
             var folderPath = this.current.PlaylistFolderPath;
+            string? economySuffix = this.settingHandler.GetStringSetting(SettingsEnum.EconomySuffix);
             bool searchByID = this.settingHandler.GetBoolSetting(SettingsEnum.SearchFileByID);
 
             this.videoThumnailUtility.GetFundamentalThumbsIfNotExist();
@@ -139,6 +148,19 @@ namespace Niconicome.Models.Playlist.VideoList
                     video.FileName.Value = filename;
                     video.FolderPath.Value = Path.GetDirectoryName(filename) ?? folderPath;
                     video.IsDownloaded.Value = !video.FileName.Value.IsNullOrEmpty();
+
+                    if (economySuffix is not null)
+                    {
+                        if (filename.Contains(economySuffix))
+                        {
+                            video.IsEconomy.Value = true;
+                        }
+                        else
+                        {
+                            video.IsEconomy.Value = false;
+                        }
+                    }
+
                 }
                 else
                 {

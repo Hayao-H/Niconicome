@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Dmc;
 using Niconicome.Models.Domain.Niconico.Download.Video.Resume;
@@ -69,6 +70,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         bool IsResumeEnable { get; }
         uint VerticalResolution { get; }
         int MaxParallelDownloadCount { get; }
+        string? PathOfExistingEconomyFileToRemove { get; }
     }
 
     /// <summary>
@@ -76,7 +78,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     /// </summary>
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(IWatchSession session, ILogger logger, IVideoDownloadHelper videoDownloadHelper, IDownloadMessenger messenger, IVideoEncoader encorder, INiconicoUtils utils, IVideoFileStorehandler fileStorehandler, IStreamResumer streamResumer)
+        public VideoDownloader(IWatchSession session, ILogger logger, IVideoDownloadHelper videoDownloadHelper, IDownloadMessenger messenger, IVideoEncoader encorder, INiconicoUtils utils, IVideoFileStorehandler fileStorehandler, IStreamResumer streamResumer, INicoFileIO fileIO)
         {
             this.session = session;
             this.logger = logger;
@@ -86,6 +88,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             this.utils = utils;
             this.fileStorehandler = fileStorehandler;
             this.streamResumer = streamResumer;
+            this.fileIO = fileIO;
         }
 
         ~VideoDownloader()
@@ -251,6 +254,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             this.DeleteTmpFolder(context);
 
+            bool isEconomy = session.Video.DmcInfo.IsEnonomy;
+            if (settings.PathOfExistingEconomyFileToRemove is not null && !isEconomy)
+            {
+                this.RemoveEconomyFile(settings.PathOfExistingEconomyFileToRemove);
+            }
+
             this.fileStorehandler.Add(settings.NiconicoId, Path.Combine(settings.FolderName, fileName));
 
             this.messenger.RemoveHandler(onMessage);
@@ -296,11 +305,34 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             }
             catch (Exception e)
             {
-
                 this.logger.Error("一時フォルダーの削除中にエラーが発生しました。", e);
                 this.messenger.SendMessage("一時フォルダーの削除中にエラー発生");
             }
         }
+
+        private void RemoveEconomyFile(string path)
+        {
+            try
+            {
+                this.fileIO.Delete(path);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("エコノミーファイルの削除中にエラーが発生しました。", e);
+            }
+        }
+
+
+        /// <summary>
+        /// キャンセル時のメッセージを取得する
+        /// </summary>
+        /// <returns></returns>
+        private IDownloadResult GetCancelledResult()
+        {
+            return new DownloadResult() { Issucceeded = false, Message = "処理がキャンセルされました" };
+        }
+
+        #region field
 
         private readonly IWatchSession session;
 
@@ -318,14 +350,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         private readonly IStreamResumer streamResumer;
 
-        /// <summary>
-        /// キャンセル時のメッセージを取得する
-        /// </summary>
-        /// <returns></returns>
-        private IDownloadResult GetCancelledResult()
-        {
-            return new DownloadResult() { Issucceeded = false, Message = "処理がキャンセルされました" };
-        }
+        private readonly INicoFileIO fileIO;
+
+        #endregion
     }
 
     /// <summary>
@@ -528,6 +555,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public string FileNameFormat { get; set; } = string.Empty;
 
         public string CommandFormat { get; set; } = Format.DefaultFFmpegFormat;
+
+        public string? PathOfExistingEconomyFileToRemove { get; set; }
 
         public string? EconomySuffix { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
@@ -28,6 +29,17 @@ namespace Niconicome.Models.Network.Download
         bool EnableUnsafeCommentHandle { get; }
         bool SaveWithoutEncode { get; }
         bool EnableExperimentalCommentSafetySystem { get; }
+
+        /// <summary>
+        /// エコノミーファイル削除フラグ
+        /// </summary>
+        bool DeleteExistingEconomyFile { get; }
+
+        /// <summary>
+        /// エコノミーフラグ
+        /// </summary>
+        bool IsEconomy { get; }
+
         string NiconicoId { get; }
         string FolderPath { get; }
         string FileNameFormat { get; }
@@ -39,6 +51,12 @@ namespace Niconicome.Models.Network.Download
         string ThumbSuffix { get; }
         string OwnerComSuffix { get; }
         string? EconomySuffix { get; }
+
+        /// <summary>
+        /// ファイルパス
+        /// </summary>
+        string FilePath { get; }
+
         uint VerticalResolution { get; }
         int PlaylistID { get; }
         int MaxCommentsCount { get; }
@@ -91,6 +109,8 @@ namespace Niconicome.Models.Network.Download
         public bool EnableExperimentalCommentSafetySystem { get; set; }
 
         public bool SaveWithoutEncode { get; set; }
+        public bool DeleteExistingEconomyFile { get; set; }
+        public bool IsEconomy { get; set; }
 
         public uint VerticalResolution { get; set; }
 
@@ -122,6 +142,8 @@ namespace Niconicome.Models.Network.Download
 
         public string CommandFormat { get; set; } = string.Empty;
 
+        public string FilePath { get; set; } = string.Empty;
+
         public string? EconomySuffix { get; set; }
 
 
@@ -146,6 +168,7 @@ namespace Niconicome.Models.Network.Download
                 IsNoEncodeEnable = this.SaveWithoutEncode,
                 CommandFormat = this.CommandFormat,
                 EconomySuffix = this.EconomySuffix,
+                PathOfExistingEconomyFileToRemove = (this.DeleteExistingEconomyFile && this.IsEconomy && !this.FilePath.IsNullOrEmpty()) ? this.FilePath : null,
             };
         }
 

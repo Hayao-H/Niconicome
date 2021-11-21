@@ -200,6 +200,8 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.ExperimentalSafety => STypes::SettingNames.IsExperimentalCommentSafetySystemEnable,
                 SettingsEnum.SnackbarDuration => STypes::SettingNames.SnackbarDuration,
                 SettingsEnum.CommentWaitSpan => STypes::SettingNames.CommentFetchWaitSpan,
+                SettingsEnum.MWEconomyColumnWid => STypes::SettingNames.MainWindowEconomyColumnWidth,
+                SettingsEnum.DeleteEcoFile => STypes::SettingNames.DeleteExistingEconomyFile,
                 _ => null
             };
         }
@@ -290,5 +292,7 @@ namespace Niconicome.Models.Local.Settings
         ExperimentalSafety,
         SnackbarDuration,
         CommentWaitSpan,
+        MWEconomyColumnWid,
+        DeleteEcoFile,
     }
 }

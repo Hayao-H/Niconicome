@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Niconicome.Models.Domain.Niconico.Watch;
-using WatchJson = Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 {
@@ -99,7 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public bool IsPeakTime { get; set; }
 
-        public bool IsEnonomy => !this.IsPremium && this.IsPeakTime;
+        public bool IsEnonomy => !this.IsPremium && this.IsPeakTime && this.ViewCount >= Const::Net.EconomyAvoidableViewCount;
 
         /// <summary>
         /// 投稿日時

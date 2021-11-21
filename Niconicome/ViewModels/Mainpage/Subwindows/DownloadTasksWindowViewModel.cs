@@ -236,8 +236,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         {
             this.StagedTasks = new ObservableCollection<DownloadTaskViewModel>();
             this.Tasks = new ObservableCollection<DownloadTaskViewModel>();
-            this.StagedTasks.Add(new DownloadTaskViewModel(new DownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = new ReactiveProperty<bool>(true), Message = new ReactiveProperty<string>("初期化完了") }) { IsChecked = true });
-            this.Tasks.Add(new DownloadTaskViewModel(new DownloadTask("sm9", "陰陽師", 1, new DownloadSettings()) { IsProcessing = new ReactiveProperty<bool>(true), Message = new ReactiveProperty<string>("初期化完了") }) { IsChecked = true });
+            this.StagedTasks.Add(new DownloadTaskViewModel(new DownloadTask("sm9", "陰陽師", "", false, 1, new DownloadSettings()) { IsProcessing = new ReactiveProperty<bool>(true), Message = new ReactiveProperty<string>("初期化完了") }) { IsChecked = true });
+            this.Tasks.Add(new DownloadTaskViewModel(new DownloadTask("sm9", "陰陽師", "", false, 1, new DownloadSettings()) { IsProcessing = new ReactiveProperty<bool>(true), Message = new ReactiveProperty<string>("初期化完了") }) { IsChecked = true });
         }
 
         public ObservableCollection<DownloadTaskViewModel> StagedTasks { get; init; }

@@ -128,6 +128,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             this.IsExperimentalCommentSafetySystemEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.ExperimentalSafety);
             this.CommentFetchWaitSpan = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.CommentWaitSpan, null, value => value < 0 ? LocalConstant.DefaultCommetFetchWaitSpan : value);
+            this.IsDeletingExistingEconomyFileEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DeleteEcoFile);
 
         }
 
@@ -216,6 +217,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public ReactiveProperty<bool> IsExperimentalCommentSafetySystemEnable { get; set; }
 
+        /// <summary>
+        /// エコノミーファイル削除
+        /// </summary>
+        public ReactiveProperty<bool> IsDeletingExistingEconomyFileEnable { get; init; }
 
         /// <summary>
         /// 一時フォルダーの最大保持数
@@ -291,6 +296,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactivePropertySlim<bool> IsUnsafeCommentHandleEnable { get; set; } = new(true);
 
         public ReactivePropertySlim<bool> IsExperimentalCommentSafetySystemEnable { get; set; } = new(true);
+
+        public ReactivePropertySlim<bool> IsDeletingExistingEconomyFileEnable { get; init; } = new(true);
 
         public ReactiveProperty<int> MaxTmpDirCount { get; set; } = new(20);
 

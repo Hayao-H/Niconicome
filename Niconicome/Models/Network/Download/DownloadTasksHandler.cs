@@ -44,7 +44,7 @@ namespace Niconicome.Models.Network.Download
         /// <param name="settings"></param>
         public void StageVIdeo(IListVideoInfo video, DownloadSettings settings, bool allowDupe)
         {
-            var task = new DownloadTask(video.NiconicoId.Value, video.Title.Value, video.Id.Value, settings);
+            var task = new DownloadTask(video.NiconicoId.Value, video.Title.Value, video.FileName.Value, video.IsEconomy.Value, video.Id.Value, settings);
             task.Message.Subscribe(value =>
             {
                 if (value is not null) video.Message.Value = value;
