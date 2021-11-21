@@ -31,6 +31,12 @@ namespace Niconicome.Models.Playlist
         ReactiveProperty<bool> IsSelected { get; set; }
         ReactiveProperty<bool> IsDownloaded { get; }
         ReactiveProperty<bool> IsThumbDownloading { get; }
+
+        /// <summary>
+        /// エコノミー画質（ファイル毎）
+        /// </summary>
+        ReactiveProperty<bool> IsEconomy { get; }
+
         ReactiveProperty<string> OwnerName { get; }
         ReactiveProperty<string> LargeThumbUrl { get; }
         ReactiveProperty<string> ThumbUrl { get; }
@@ -85,6 +91,8 @@ namespace Niconicome.Models.Playlist
         public ReactiveProperty<bool> IsSelected { get; set; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsDownloaded { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsThumbDownloading { get; init; } = new ReactiveProperty<bool>();
+        public ReactiveProperty<bool> IsEconomy { get; init; } = new();
+
         public ReactiveProperty<DateTime> UploadedOn { get; init; } = new ReactiveProperty<DateTime>();
         /// <summary>
         /// バインド可能なサムネイルフィルパス
