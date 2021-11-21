@@ -22,5 +22,7 @@ namespace Niconicome.Models.Const
         /// 削除動画のサムネ
         /// </summary>
         public const string NiconicoDeletedVideothumb = @"https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg";
+
+        public static int EconomyAvoidableViewCount = 500;
     }
 }
