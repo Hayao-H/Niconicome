@@ -254,7 +254,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
             this.DeleteTmpFolder(context);
 
-            if (settings.PathOfExistingEconomyFileToRemove is not null)
+            bool isEconomy = session.Video.DmcInfo.IsEnonomy;
+            if (settings.PathOfExistingEconomyFileToRemove is not null && !isEconomy)
             {
                 this.RemoveEconomyFile(settings.PathOfExistingEconomyFileToRemove);
             }
