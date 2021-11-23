@@ -885,21 +885,22 @@ namespace Niconicome.ViewModels.Mainpage
                     "aimp" => Playlist::PlaylistType.Aimp,
                     _ => Playlist::PlaylistType.Aimp,
                 };
-                var folderPath = WS::Mainpage.CurrentPlaylist.PlaylistFolderPath;
-                var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.CheckDownloaded(folderPath));
+
+                IEnumerable<IListVideoInfo> videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.IsDownloaded.Value);
+
                 if (!videos.Any()) return;
 
-                var result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Name.Value, folderPath, type);
+                IAttemptResult<int> result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, type);
 
-                if (result)
+                if (result.IsSucceeded)
                 {
-                    WS::Mainpage.Messagehandler.AppendMessage("プレイリストを保存フォルダーに作成しました。");
-                    this.SnackbarMessageQueue.Enqueue("プレイリストを保存フォルダーに作成しました。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"プレイリストを保存フォルダーに作成しました。({result.Data}件失敗)");
+                    this.SnackbarMessageQueue.Enqueue($"プレイリストを保存フォルダーに作成しました。({result.Data}件失敗)");
                 }
                 else
                 {
-                    WS::Mainpage.Messagehandler.AppendMessage("プレイリストの作成に失敗しました。詳しくはログファイルを参照して下さい。");
-                    this.SnackbarMessageQueue.Enqueue("プレイリストの作成に失敗しました。詳しくはログファイルを参照して下さい。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"プレイリストの作成に失敗しました。");
+                    this.SnackbarMessageQueue.Enqueue($"プレイリストの作成に失敗しました。（{result.Message}）");
                 }
             });
 
