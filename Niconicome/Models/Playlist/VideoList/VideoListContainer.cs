@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
@@ -494,7 +495,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 {
                     VideoSortType.Register => tmp.OrderBy(v => v.Id.Value),
                     VideoSortType.Title => tmp.OrderBy(v => v.Title.Value),
-                    VideoSortType.NiconicoID => tmp.OrderBy(v => v.NiconicoId.Value),
+                    VideoSortType.NiconicoID => tmp.OrderBy(v => long.Parse(Regex.Replace(v.NiconicoId.Value, @"[^\d]", "", RegexOptions.Compiled))),
                     VideoSortType.UploadedDT => tmp.OrderBy(v => v.UploadedOn.Value),
                     VideoSortType.ViewCount => tmp.OrderBy(v => v.ViewCount.Value),
                     VideoSortType.DownloadedFlag => tmp.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
@@ -509,7 +510,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 {
                     VideoSortType.Register => tmp.OrderByDescending(v => v.Id.Value),
                     VideoSortType.Title => tmp.OrderByDescending(v => v.Title.Value),
-                    VideoSortType.NiconicoID => tmp.OrderByDescending(v => v.NiconicoId.Value),
+                    VideoSortType.NiconicoID => tmp.OrderByDescending(v => long.Parse(Regex.Replace(v.NiconicoId.Value, @"[^\d]", "", RegexOptions.Compiled))),
                     VideoSortType.UploadedDT => tmp.OrderByDescending(v => v.UploadedOn.Value),
                     VideoSortType.ViewCount => tmp.OrderByDescending(v => v.ViewCount.Value),
                     VideoSortType.DownloadedFlag => tmp.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
