@@ -11,7 +11,7 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void 動画情報を変換する()
         {
-            var converted = new Download::DownloadTask("", "Hello World", 1, new DownloadSettings() { VerticalResolution = (uint)1080, FolderPath = @"fuga\hoge", PlaylistID = 1 });
+            var converted = new Download::DownloadTask("", "Hello World", "", false, 1, new DownloadSettings() { VerticalResolution = (uint)1080, FolderPath = @"fuga\hoge", PlaylistID = 1 });
 
             Assert.That(converted.Title, Is.EqualTo("Hello World"));
             Assert.That(converted.DirectoryPath, Is.EqualTo(@"fuga\hoge"));

@@ -38,7 +38,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO
             return this.readFunc();
         }
 
-        public void Write(string path, string content, bool append = false)
+        public void Write(string path, string content, bool append = false, Encoding? encoding = null)
         {
 
         }
