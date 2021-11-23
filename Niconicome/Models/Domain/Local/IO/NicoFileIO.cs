@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Windows.Automation;
 using System.Windows.Input;
 using Windows.Foundation;
@@ -19,7 +20,14 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <param name="path">パス</param>
         /// <param name="text">追記する文字列</param>
         void AppendText(string path, string text);
-        void Write(string path, string content, bool append = false);
+
+        /// <summary>
+        /// 文字列を書き込む
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="content"></param>
+        /// <param name="append"></param>
+        void Write(string path, string content, bool append = false, Encoding? encoding = null);
     }
 
     public class NicoFileIO : INicoFileIO
@@ -71,13 +79,7 @@ namespace Niconicome.Models.Domain.Local.IO
             File.Move(path, destPath, overwrite);
         }
 
-
-        /// <summary>
-        /// 文字列を書き込む
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="append"></param>
-        public void Write(string path, string content, bool append = false)
+        public void Write(string path, string content, bool append = false, Encoding? encoding = null)
         {
             string? dirPath = Path.GetDirectoryName(path);
             if (dirPath is not null)
@@ -90,7 +92,7 @@ namespace Niconicome.Models.Domain.Local.IO
             }
 
             using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-            using var writer = new StreamWriter(fs);
+            using var writer = new StreamWriter(fs, encoding ?? Encoding.UTF8);
             writer.Write(content);
         }
 

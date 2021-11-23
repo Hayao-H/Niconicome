@@ -2,39 +2,62 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Local.Playlist;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network;
+using Niconicome.Models.Playlist.VideoList;
+using Windows.System.Profile;
 using Playlist = Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Local
 {
     public interface IPlaylistCreator
     {
-        bool TryCreatePlaylist(IEnumerable<Playlist::IListVideoInfo> videos, string playlistName, string directoryPath, PlaylistType type);
+        /// <summary>
+        /// プレイリストを作成する
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="playlistName"></param>
+        /// <param name="directoryPath"></param>
+        /// <param name="type"></param>
+        /// <returns>失敗した動画の数</returns>
+        IAttemptResult<int> TryCreatePlaylist(IEnumerable<Playlist::IListVideoInfo> videos, PlaylistType type);
     }
 
 
     class PlaylistCreator : IPlaylistCreator
     {
-        public PlaylistCreator(IPlaylistFileFactory fileFactory, INetworkVideoHandler videoHandler, ILogger logger, IVideoFileStorehandler videoFileStorehandler)
+        public PlaylistCreator(IPlaylistFileFactory fileFactory, ILogger logger, IVideoFileStorehandler videoFileStorehandler, INicoFileIO fileIO, INicoDirectoryIO directoryIO, ICurrent current)
         {
-            this.fileFactory = fileFactory;
-            this.videoHandler = videoHandler;
-            this.logger = logger;
-            this.videoFileStorehandler = videoFileStorehandler;
+            this._fileFactory = fileFactory;
+            this._logger = logger;
+            this._videoFileStorehandler = videoFileStorehandler;
+            this._fileIO = fileIO;
+            this._directoryIO = directoryIO;
+            this._current = current;
         }
 
-        private readonly IPlaylistFileFactory fileFactory;
+        #region field
 
-        private readonly INetworkVideoHandler videoHandler;
+        private readonly IPlaylistFileFactory _fileFactory;
 
-        private readonly IVideoFileStorehandler videoFileStorehandler;
+        private readonly INicoFileIO _fileIO;
 
-        private readonly ILogger logger;
+        private readonly INicoDirectoryIO _directoryIO;
+
+        private readonly IVideoFileStorehandler _videoFileStorehandler;
+
+        private readonly ILogger _logger;
+
+        private readonly ICurrent _current;
+
+        #endregion
 
         /// <summary>
         /// プレイリストを作成する
@@ -43,47 +66,54 @@ namespace Niconicome.Models.Local
         /// <param name="directoryPath"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public bool TryCreatePlaylist(IEnumerable<Playlist::IListVideoInfo> videos, string playlistName, string directoryPath, PlaylistType type)
+        public IAttemptResult<int> TryCreatePlaylist(IEnumerable<Playlist::IListVideoInfo> videos, PlaylistType type)
         {
-            videos = videos.Where(v => v.CheckDownloaded(directoryPath));
-            if (!videos.Any()) return false;
+            if (this._current.SelectedPlaylist.Value is null) return AttemptResult<int>.Fail("プレイリストが選択されていません。");
 
+            string playlistName = this._current.SelectedPlaylist.Value.Name.Value;
+            string directoryPath = this._current.PlaylistFolderPath;
+
+            videos = videos.Where(v => v.IsDownloaded.Value);
+            if (!videos.Any()) return AttemptResult<int>.Fail("ダウンロードされた動画がありません。");
+
+            int allVideos = videos.Count();
+            List<string> videosPath = new();
             string data;
             try
             {
-                data = this.fileFactory.GetPlaylist(videos.Select(v => this.videoFileStorehandler.GetFilePath(v.NiconicoId.Value, directoryPath) ?? string.Empty).Where(p => !p.IsNullOrEmpty()), playlistName, type);
+                videosPath = videos.Select(v => v.FileName.Value).Where(p => this._fileIO.Exists(p)).ToList();
+                data = this._fileFactory.GetPlaylist(videosPath, playlistName, type);
             }
             catch (Exception e)
             {
-                this.logger.Error("プレイリストの作成に失敗しました。", e);
-                return false;
+                this._logger.Error("プレイリストの作成に失敗しました。", e);
+                return AttemptResult<int>.Fail("プレイリストの作成に失敗しました。");
             }
 
-            if (!Directory.Exists(directoryPath))
+            if (!this._directoryIO.Exists(directoryPath))
             {
                 try
                 {
-                    Directory.CreateDirectory(directoryPath);
+                    this._directoryIO.Create(directoryPath);
                 }
                 catch (Exception e)
                 {
-                    this.logger.Error("ディレクトリーの作成に失敗しました。", e);
-                    return false;
+                    this._logger.Error("ディレクトリーの作成に失敗しました。", e);
+                    return AttemptResult<int>.Fail("ディレクトリーの作成に失敗しました。");
                 }
             }
 
             try
             {
-                using var fs = new StreamWriter(Path.Combine(directoryPath, $"playlist.{this.GetExt(type)}"), false, this.GetEncording(type));
-                fs.Write(data);
+                this._fileIO.Write(Path.Combine(directoryPath, $"playlist.{this.GetExt(type)}"), data, encoding: this.GetEncording(type));
             }
             catch (Exception e)
             {
-                this.logger.Error("プレイリストへの書き込みに失敗しました。", e);
-                return false;
+                this._logger.Error("プレイリストへの書き込みに失敗しました。", e);
+                return AttemptResult<int>.Fail("プレイリストへの書き込みに失敗しました。");
             }
 
-            return true;
+            return new AttemptResult<int>() { IsSucceeded = true, Data = allVideos - videosPath.Count };
         }
 
         /// <summary>
