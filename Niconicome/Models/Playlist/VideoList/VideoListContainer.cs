@@ -22,8 +22,8 @@ namespace Niconicome.Models.Playlist.VideoList
         IAttemptResult RemoveRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true);
         IAttemptResult Add(IListVideoInfo video, int? playlistID = null, bool commit = true);
         IAttemptResult AddRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true);
-        IAttemptResult Update(IListVideoInfo video, bool commit = true);
-        IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, bool commit = true);
+        IAttemptResult Update(IListVideoInfo video, int? playlistID = null, bool commit = true);
+        IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true);
         IAttemptResult Refresh();
         IAttemptResult Clear();
         IAttemptResult ForEach(Action<IListVideoInfo> foreachFunc);
@@ -115,7 +115,7 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 return new AttemptResult()
                 {
-                    Message = $"{video.NiconicoId}は現在のプレイリストに存在しません。",
+                    Message = $"{video.NiconicoId.Value}は現在のプレイリストに存在しません。",
                 };
             }
 
@@ -127,7 +127,7 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 return new AttemptResult()
                 {
-                    Message = $"メモリ上のプレイリストからの削除に失敗しました。({video.NiconicoId})",
+                    Message = $"メモリ上のプレイリストからの削除に失敗しました。({video.NiconicoId.Value})",
                     Exception = e,
                 };
             }
@@ -164,7 +164,7 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 return new AttemptResult()
                 {
-                    Message = $"データベース上のプレイリストからの削除に失敗しました。({video.NiconicoId})",
+                    Message = $"データベース上のプレイリストからの削除に失敗しました。({video.NiconicoId.Value})",
                     Exception = e,
                 };
             }
@@ -217,7 +217,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 {
                     return new AttemptResult()
                     {
-                        Message = $"{video.NiconicoId}は既に現在のプレイリストに存在します。",
+                        Message = $"{video.NiconicoId.Value}は既に現在のプレイリストに存在します。",
                     };
                 }
 
@@ -229,7 +229,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 {
                     return new AttemptResult()
                     {
-                        Message = $"メモリ上のプレイリストへの追加に失敗しました。({video.NiconicoId})",
+                        Message = $"メモリ上のプレイリストへの追加に失敗しました。({video.NiconicoId.Value})",
                         Exception = e,
                     };
                 }
@@ -266,7 +266,7 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 return new AttemptResult()
                 {
-                    Message = $"データベース上のプレイリストへの追加に失敗しました。({video.NiconicoId})",
+                    Message = $"データベース上のプレイリストへの追加に失敗しました。({video.NiconicoId.Value})",
                     Exception = e,
                 };
             }
@@ -305,32 +305,38 @@ namespace Niconicome.Models.Playlist.VideoList
         /// 動画情報を更新する
         /// </summary>
         /// <param name="video"></param>
-        /// <param name="commit"></param>
+        /// <param name="playlistID"></param>
         /// <returns></returns>
-        public IAttemptResult Update(IListVideoInfo video, bool commit = true)
+        /// <param name="commit"></param>
+        public IAttemptResult Update(IListVideoInfo video, int? playlistID = null, bool commit = true)
         {
-            if (!this.Videos.Any(v => v.NiconicoId == video.NiconicoId))
-            {
-                return new AttemptResult()
-                {
-                    Message = $"{video.NiconicoId}は現在のプレイリストに存在しません。",
-                };
-            }
+            int id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
+            bool isSame = id == (this.current.SelectedPlaylist.Value?.Id ?? -1);
 
-            try
+            if (isSame)
             {
-                var targetVIdeo = this.Videos.First(v => v.NiconicoId == video.NiconicoId);
-                targetVIdeo.SetNewData(video);
-            }
-            catch (Exception e)
-            {
-                return new AttemptResult()
+                if (!this.Videos.Any(v => v.NiconicoId.Value == video.NiconicoId.Value))
                 {
-                    Message = $"メモリ上の動画情報の更新に失敗しました。({video.NiconicoId})",
-                    Exception = e,
-                };
-            }
+                    return new AttemptResult()
+                    {
+                        Message = $"{video.NiconicoId.Value}は現在のプレイリストに存在しません。",
+                    };
+                }
 
+                try
+                {
+                    var targetVIdeo = this.Videos.First(v => v.NiconicoId.Value == video.NiconicoId.Value);
+                    targetVIdeo.SetNewData(video);
+                }
+                catch (Exception e)
+                {
+                    return new AttemptResult()
+                    {
+                        Message = $"メモリ上の動画情報の更新に失敗しました。({video.NiconicoId.Value})",
+                        Exception = e,
+                    };
+                }
+            }
 
             if (!commit)
             {
@@ -348,7 +354,7 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 return new AttemptResult()
                 {
-                    Message = $"データベース上の動画情報の更新に失敗しました。({video.NiconicoId})",
+                    Message = $"データベース上の動画情報の更新に失敗しました。({video.NiconicoId.Value})",
                     Exception = e,
                 };
             }
@@ -363,13 +369,14 @@ namespace Niconicome.Models.Playlist.VideoList
         /// 複数の動画情報を更新する
         /// </summary>
         /// <param name="videos"></param>
-        /// <param name="commit"></param>
+        /// <param name="playlistID"></param>
         /// <returns></returns>
-        public IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, bool commit = true)
+        /// <param name="commit"></param>
+        public IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true)
         {
             foreach (var video in videos.Copy())
             {
-                var result = this.Update(video, commit);
+                var result = this.Update(video, playlistID, commit);
                 if (!result.IsSucceeded)
                 {
                     return result;
