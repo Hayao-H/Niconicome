@@ -67,11 +67,11 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.SnackbarMessageQueue = WS::Mainpage.SnackbarHandler.Queue;
 
-            this.isFetching = new ReactiveProperty<bool>(false);
             this.ea = ea;
 
+
             //アイコン
-            this.RefreshCommandIcon = new ReactivePropertySlim<MaterialDesign.PackIconKind>(MaterialDesign::PackIconKind.Refresh);
+            this.RefreshCommandIcon = WS::Mainpage.VideoRefreshManager.IsFetching.Select(value => value ? MaterialDesign::PackIconKind.Close : MaterialDesign::PackIconKind.Refresh).ToReadOnlyReactivePropertySlim();
             this.FilterIcon = new ReactivePropertySlim<MaterialDesign.PackIconKind>(MaterialDesign::PackIconKind.Filter);
 
             //幅
@@ -499,22 +499,14 @@ namespace Niconicome.ViewModels.Mainpage
             })
             .AddTo(this.disposables);
 
-            this.UpdateVideoCommand = new[]
-            {
-                WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(p=>p is not null),
-                this.isFetching
-                .Select(f=>!f)
-            }.CombineLatestValuesAreAllTrue()
+            this.UpdateVideoCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+                .Select(p => p is not null)
                 .ToReactiveCommand()
                 .WithSubscribe(async () =>
                 {
-                    if (this.isFetching.Value)
+                    if (WS::Mainpage.VideoRefreshManager.IsFetching.Value)
                     {
-                        this.cts?.Cancel();
-                        this.RefreshCommandIcon.Value = MaterialDesign::PackIconKind.Refresh;
-                        this.cts = null;
-                        this.isFetching.Value = false;
+                        WS::Mainpage.VideoRefreshManager.Cancel();
                         return;
                     }
 
@@ -524,35 +516,18 @@ namespace Niconicome.ViewModels.Mainpage
                         this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を更新できません");
                         return;
                     }
-                    int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
 
-                    var sourceVideos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).ToList();
-                    int sourceVideosCount = sourceVideos.Count;
+                    List<IListVideoInfo> videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).ToList();
 
-                    if (sourceVideosCount < 1) return;
+                    if (videos.Count < 1) return;
 
-                    this.SnackbarMessageQueue.Enqueue($"{sourceVideosCount}件の動画を更新します。");
-                    WS::Mainpage.Messagehandler.AppendMessage($"{sourceVideosCount}件の動画を更新します。");
+                    this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を更新します。");
+                    WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を更新します。");
 
-                    this.RefreshCommandIcon.Value = MaterialDesign::PackIconKind.Close;
-                    this.isFetching.Value = true;
+                    IAttemptResult<int> result = await WS::Mainpage.VideoRefreshManager.RefreshAndSaveAsync(videos);
 
-                    this.cts = new CancellationTokenSource();
-
-                    var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(sourceVideos, true, playlistId, true, this.cts.Token)).ToList();
-                    var result = WS::Mainpage.VideoListContainer.UpdateRange(videos);
-
-                    this.isFetching.Value = false;
-                    this.cts = null;
-                    this.RefreshCommandIcon.Value = MaterialDesign::PackIconKind.Refresh;
-
-                    this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を更新しました。");
-                    WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を更新しました。");
-
-                    if (sourceVideosCount > videos.Count)
-                    {
-                        WS::Mainpage.Messagehandler.AppendMessage($"{sourceVideosCount - videos.Count}件の動画の更新に失敗しました。");
-                    }
+                    this.SnackbarMessageQueue.Enqueue($"動画を更新しました。（{result.Data}件失敗）");
+                    WS::Mainpage.Messagehandler.AppendMessage($"動画を更新しました。（{result.Data}件失敗）");
 
                 })
             .AddTo(this.disposables);
@@ -561,7 +536,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 WS::Mainpage.CurrentPlaylist.SelectedPlaylist
                 .Select(p=>p is not null),
-                this.isFetching
+                WS::Mainpage.VideoRefreshManager.IsFetching
                 .Select(f=>!f),
                 WS::Mainpage.CurrentPlaylist.SelectedPlaylist
                 .Select(p=>p?.IsRemotePlaylist??false),
@@ -584,8 +559,6 @@ namespace Niconicome.ViewModels.Mainpage
 
                     if (!WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.IsRemotePlaylist || (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteId.IsNullOrEmpty() && WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.RemoteType != PlaylistPlaylist::RemoteType.WatchLater)) return;
 
-                    this.isFetching.Value = true;
-
                     int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
                     var videos = new List<IListVideoInfo>();
 
@@ -600,7 +573,6 @@ namespace Niconicome.ViewModels.Mainpage
                         {
                             WS::Mainpage.Messagehandler.AppendMessage($"追加するものはありません。");
                             this.SnackbarMessageQueue.Enqueue($"追加するものはありません。");
-                            this.isFetching.Value = false;
                             return;
                         }
 
@@ -625,7 +597,6 @@ namespace Niconicome.ViewModels.Mainpage
                         this.SnackbarMessageQueue.Enqueue($"情報の取得に失敗しました。(詳細: {detail})");
                     }
 
-                    this.isFetching.Value = false;
                 })
             .AddTo(this.disposables);
 
@@ -1222,7 +1193,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 更新アイコン
         /// </summary>
-        public ReactivePropertySlim<MaterialDesign::PackIconKind> RefreshCommandIcon { get; init; }
+        public ReadOnlyReactivePropertySlim<MaterialDesign::PackIconKind> RefreshCommandIcon { get; init; }
 
         /// <summary>
         /// メッセージボックスを表示するコマンド
@@ -1422,8 +1393,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// タスクキャンセラー
         /// </summary>
         private CancellationTokenSource? cts;
-
-        private readonly ReactiveProperty<bool> isFetching;
 
         private bool isFiltered;
 

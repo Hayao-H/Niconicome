@@ -17,6 +17,7 @@ using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Network.Download.Actions;
 using Niconicome.Models.Local.Timer;
 using Niconicome.Models.Local.Addon.API.Local.Tab;
+using Niconicome.Models.Network.Fetch;
 
 namespace Niconicome.Workspaces
 {
@@ -55,5 +56,10 @@ namespace Niconicome.Workspaces
         public static IPostDownloadActionssManager PostDownloadTasksManager { get; private set; } = DIFactory.Provider.GetRequiredService<IPostDownloadActionssManager>();
         public static IDlTimer DlTimer { get; private set; } = DIFactory.Provider.GetRequiredService<IDlTimer>();
         public static ITabsContainerHandler TabHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ITabsContainerHandler>();
+
+        /// <summary>
+        /// 動画情報の更新とか
+        /// </summary>
+        public static IOnlineVideoRefreshManager VideoRefreshManager { get; private set; } = DIFactory.Provider.GetRequiredService<IOnlineVideoRefreshManager>();
     }
 }
