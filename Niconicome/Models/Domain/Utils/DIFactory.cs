@@ -52,6 +52,7 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using DLActions = Niconicome.Models.Network.Download.Actions;
 using Timer = Niconicome.Models.Local.Timer;
+using Fetch = Niconicome.Models.Network.Fetch;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -237,6 +238,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<AddonAPI::Local.Tab.ITabsContainer, AddonAPI::Local.Tab.TabsContainer>();
             services.AddTransient<AddonAPI::Local.Tab.ITabsContainerHandler, AddonAPI::Local.Tab.TabsContainerHandler>();
             services.AddTransient<AddonAPI::Local.Tab.ITabsManager, AddonAPI::Local.Tab.TabsManager>();
+            services.AddSingleton<Fetch::IOnlineVideoRefreshManager, Fetch::OnlineVideoRefreshManager>();
             return services.BuildServiceProvider();
         }
 

@@ -2,20 +2,16 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
-		<SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
+		<TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
 		<AssemblyVersion>0.10.0.*</AssemblyVersion>
 		<FileVersion>0.0.0.0</FileVersion>
-		<StartupObject>Niconicome.App</StartupObject>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-		<EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
 		<PublishSingleFile>true</PublishSingleFile>
 		<PublishTrimmed>false</PublishTrimmed>
 		<Deterministic>false</Deterministic>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<Version>0.10.0</Version>
 		<PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
 		<Copyright>c2021 Hayao-H</Copyright>
@@ -23,8 +19,6 @@
 		<PackageIcon>icon.png</PackageIcon>
 		<ApplicationIcon>app.ico</ApplicationIcon>
 		<MinimumPlatformVersion>7.0</MinimumPlatformVersion>
-		<Platforms>AnyCPU</Platforms>
-		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,16 +29,6 @@
 		<DebugType>none</DebugType>
 		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Remove="src\app.ico" />
-		<None Remove="Views\Mainpage\Region\BottomTab.xaml" />
-		<ApplicationDefinition Include="App.xaml" />
-		<None Include="src\icon.png">
-			<Pack>True</Pack>
-			<PackagePath></PackagePath>
-		</None>
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="0.14.0" />
