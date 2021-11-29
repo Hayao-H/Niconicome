@@ -16,6 +16,7 @@ using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Helper.Result;
 using System.Reflection;
+using Niconicome.Models.Playlist.Playlist;
 
 namespace Niconicome.Models.Network
 {
@@ -43,6 +44,7 @@ namespace Niconicome.Models.Network
     class NetworkVideoHandler : INetworkVideoHandler
     {
 
+        #region field
         private readonly IWatch wacthPagehandler;
 
         private readonly State::IMessageHandler messageHandler;
@@ -53,16 +55,18 @@ namespace Niconicome.Models.Network
 
         private readonly IVideoInfoContainer videoInfoContainer;
 
-        private readonly ILightVideoListinfoHandler lightVideoListinfoHandler;
+        private readonly IVideosUnchecker unchecker;
 
-        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoInfoContainer videoInfoContainer, ILightVideoListinfoHandler lightVideoListinfoHandler)
+        #endregion
+
+        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoInfoContainer videoInfoContainer, IVideosUnchecker unchecker)
         {
             this.wacthPagehandler = watchPageHandler;
             this.messageHandler = messageHandler;
             this.fileStorehandler = fileStorehandler;
             this.settingHandler = settingHandler;
             this.videoInfoContainer = videoInfoContainer;
-            this.lightVideoListinfoHandler = lightVideoListinfoHandler;
+            this.unchecker = unchecker;
         }
 
 
@@ -168,9 +172,9 @@ namespace Niconicome.Models.Network
                         this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に成功しました。");
                         item.video.SetNewData(result.Data);
                         videos.Add(item.video);
-                        if (uncheck)
+                        if (uncheck && playlistID is not null)
                         {
-                            this.lightVideoListinfoHandler.GetLightVideoListInfo(item.video.NiconicoId.Value, playlistID ?? -1).IsSelected.Value = false;
+                            this.unchecker.Uncheck(item.video.NiconicoId.Value, playlistID ?? -1);
                         }
                     }
                 }, index => this.messageHandler.AppendMessage("待機中...(15s)"));
