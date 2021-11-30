@@ -180,7 +180,7 @@ namespace Niconicome.Models.Network.Fetch
             }
 
             this.PostFetching();
-            return AttemptResult<string>.Succeeded($"追加:{toBeAddedVideos.Count},更新:{toBeUpdatedVideos.Count}");
+            return AttemptResult<string>.Succeeded(result.Data, $"追加:{toBeAddedVideos.Count},更新:{toBeUpdatedVideos.Count}");
         }
 
         public bool CheckIfRemotePlaylistCanBeFetched(ITreePlaylistInfo playlistInfo)

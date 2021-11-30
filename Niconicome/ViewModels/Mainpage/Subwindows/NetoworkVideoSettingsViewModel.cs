@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using System.Text;
-using System.Windows;
-using Niconicome.Models.Playlist;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Playlist.Playlist;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using Playlist = Niconicome.Models.Playlist.Playlist;
 using WS = Niconicome.Workspaces;
-
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows
 {
@@ -54,113 +51,115 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
 
 
-            this.SetRemotePlaylistCommand = new CommandBase<Window>(arg => !this.isfetching, async arg =>
-            {
-                if ((this.Id.Value == string.Empty && this.RemoteType.Value.Value != Playlist::RemoteType.WatchLater)) return;
+            this.SetRemotePlaylistCommand = WS::Mainpage.VideoRefreshManager.IsFetching.Select(x => !x).ToAsyncReactiveCommand()
+                .WithSubscribe(async () =>
+           {
+               //変数定義
+               string remoteID = this.Id.Value;
+               Playlist::RemoteType remoteType = this.RemoteType.Value.Value;
+               ITreePlaylistInfo? playlistInfo = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value;
 
-                if (arg is null) return;
+               if (string.IsNullOrEmpty(remoteID) && remoteType != Playlist::RemoteType.WatchLater && remoteType != Playlist::RemoteType.None)
+               {
+                   this.AppendMessage("「あとで見る」以外のリモートプレイリストを設定するには、IDの入力が必要です。");
+                   return;
+               }
+               else if (playlistInfo is null)
+               {
 
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null) return;
+                   this.AppendMessage("「プレイリストが選択されていません。");
+                   return;
+               }
 
+               //そもそもリモートじゃない
+               if (remoteType == Playlist::RemoteType.None)
+               {
+                   WS::Mainpage.PlaylistHandler.SetAsLocalPlaylist(playlistInfo.Id);
+                   this.AppendMessage("リモートプレイリストとの同期を解除しました。");
+                   return;
+               }
 
-                if (arg is Window window)
-                {
+               //一時的に情報を設定
+               playlistInfo.RemoteId = remoteID;
+               playlistInfo.RemoteType = remoteType;
+               playlistInfo.IsRemotePlaylist = true;
 
-                    this.isfetching = true;
-                    this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
+               //更新処理
+               this.AppendMessage("情報を取得中です...");
+               IAttemptResult<string> result = await WS::Mainpage.VideoRefreshManager.RefreshRemoteAndSaveAsync();
 
-                    string messagePropName = nameof(this.Message);
-                    string id = this.Id.Value;
+               if (!result.IsSucceeded)
+               {
+                   this.AppendMessage($"情報の取得に失敗しました。(詳細:{result.Message})");
+                   return;
+               }
+               else
+               {
+                   this.AppendMessage($"リモートプレイリストと同期しました。({result.Message})");
+               }
 
-                    this.Id.Value = string.Empty;
+               WS::Mainpage.PlaylistHandler.SetAsRemotePlaylist(playlistInfo.Id, remoteID, result.Data ?? String.Empty, remoteType);
 
-                    this.messageField.Clear();
-                    this.OnPropertyChanged(messagePropName);
-
-                    var videos = new List<IListVideoInfo>();
-                    int playlistID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
-
-                    this.Message = "情報を取得中です...";
-
-                    var result = await WS::Mainpage.RemotePlaylistHandler.TryGetRemotePlaylistAsync(id, videos, this.RemoteType.Value.Value, new List<string>(), m =>
-                    {
-                        this.Message = m;
-                        WS::Mainpage.Messagehandler.AppendMessage(m);
-                    });
-
-
-                    if (!result.IsSucceeded)
-                    {
-                        string detail = result.Exception?.Message ?? "None";
-                        this.Message = $"{this.RemoteType.Value.DisplayValue}(id:{id})の取得に失敗しました。({result.Message})";
-                        this.Message = $"詳細情報:{detail}";
-
-                        this.isfetching = false;
-                        this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
-
-                        return;
-                    }
-                    else if (videos.Count == 0)
-                    {
-                        this.Message = "取得に成功しましたが、動画は一件も存在しませんでした。";
-                    }
-
-
-
-                    if (videos.Count > 0)
-                    {
-                        WS::Mainpage.VideoListContainer.AddRange(videos, playlistID, commit: !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
-                        WS::Mainpage.VideoListContainer.Refresh();
-                    }
-
-                    if (this.RemoteType.Value.Value == Playlist::RemoteType.None)
-                    {
-                        WS::Mainpage.PlaylistHandler.SetAsLocalPlaylist(playlistID);
-
-                    }
-                    else
-                    {
-                        WS::Mainpage.PlaylistHandler.SetAsRemotePlaylist(playlistID, id, result.Data!, this.RemoteType.Value.Value);
-                    }
-
-                    this.Message = "取得処理が完了しました。";
-                    this.isfetching = false;
-                    this.SetRemotePlaylistCommand?.RaiseCanExecutechanged();
-                }
-
-
-
-
-            });
+           });
 
         }
 
-        public CommandBase<Window> SetRemotePlaylistCommand { get; init; }
+        #region field
+
+        private readonly StringBuilder builder = new();
+
+        #endregion
+
+
+        #region Commands
+
+        /// <summary>
+        /// 設定コマンド
+        /// </summary>
+        public AsyncReactiveCommand SetRemotePlaylistCommand { get; init; }
+
+        #endregion
+
+        #region Props
 
         /// <summary>
         /// 設定一覧
         /// </summary>
         public List<ComboboxItem<Playlist::RemoteType>> NetworkSettings { get; init; }
 
-        public ReactiveProperty<ComboboxItem<Playlist::RemoteType>> RemoteType { get; init; } = new();
-
-
         /// <summary>
-        /// 同期中フラグ
+        /// 選択可能なタイプ
         /// </summary>
-        private bool isfetching;
+        public ReactiveProperty<ComboboxItem<Playlist::RemoteType>> RemoteType { get; init; } = new();
 
         /// <summary>
         /// ID
         /// </summary>
         public ReactiveProperty<string> Id { get; init; } = new();
 
-        private readonly StringBuilder messageField = new();
-
         /// <summary>
         /// 状態を表すメッセージ
         /// </summary>
-        public string Message { get => this.messageField.ToString(); set { this.messageField.AppendLine(value); this.OnPropertyChanged(); } }
+        public ReactiveProperty<string> Message { get; init; } = new();
+
+        #endregion
+
+        #region private
+
+        private void AppendMessage(string message)
+        {
+            this.builder.AppendLine(message);
+            this.Message.Value = this.builder.ToString();
+        }
+
+        private void ClearMessage()
+        {
+            this.builder.Clear();
+            this.Message.Value = "";
+        }
+
+        #endregion
+
     }
 
 }
