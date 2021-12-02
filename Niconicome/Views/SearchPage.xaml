@@ -11,7 +11,7 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
+        Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="Yu Gothic"
         x:Name="window"
         WindowStartupLocation="CenterOwner"
@@ -100,7 +100,7 @@
                 </StackPanel>
             </Grid>
         </StackPanel>
-        <TabControl  Grid.Row="1">
+        <TabControl  Grid.Row="1" Background="{DynamicResource MaterialDesignPaper}">
             <TabItem Header="出力">
                 <ScrollViewer>
                     <TextBlock Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="8" FontSize="14" TextWrapping="Wrap" />
