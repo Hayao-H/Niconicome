@@ -28,15 +28,6 @@ namespace Niconicome.Models.Helper.Result
         /// <summary>
         /// インスタンスを作成
         /// </summary>
-        /// <returns></returns>
-        public static IAttemptResult<T> Succeeded(string? message = null)
-        {
-            return new AttemptResult<T>() { IsSucceeded = true, Message = message };
-        }
-
-        /// <summary>
-        /// インスタンスを作成
-        /// </summary>
         /// <param name="data"></param>
         /// <param name="message"></param>
         /// <returns></returns>
