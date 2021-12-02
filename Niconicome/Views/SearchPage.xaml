@@ -18,6 +18,9 @@
         Style="{StaticResource Window_Style}"
         d:DataContext="{d:DesignInstance {x:Type vm:SearchViewModelD},IsDesignTimeCreatable=True}"
         Title="動画を検索する" Height="650" Width="850">
+    <Window.Resources>
+        <ResourceDictionary Source="/Style/TabStyle.xaml"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="8*"/>
@@ -147,6 +150,9 @@
                     </ListView.ItemContainerStyle>
                 </ListView>
             </TabItem>
+            <TabControl.Resources>
+                <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}"/>
+            </TabControl.Resources>
         </TabControl>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
