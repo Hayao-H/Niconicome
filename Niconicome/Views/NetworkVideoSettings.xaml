@@ -39,13 +39,13 @@
             <TextBox 
                 Width="250"
                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                Text="{Binding Id.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                Text="{Binding Id.Value}"
                 materialDesign:HintAssist.Hint="ID(「あとで見る」の場合は不要)"
                 materialDesign:TextFieldAssist.HasClearButton="True"
                 />
         </StackPanel>
         <ScrollViewer Grid.Row="1">
-            <TextBlock Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="8" FontSize="14" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Message.Value}" Padding="8" FontSize="14" TextWrapping="Wrap" />
         </ScrollViewer>
         <Button Grid.Row="2" Margin="80 0" Content="登録" Command="{Binding SetRemotePlaylistCommand}" CommandParameter="{Binding ElementName=window}"/>
     </Grid>

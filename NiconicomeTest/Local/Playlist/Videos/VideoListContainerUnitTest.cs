@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Playlist.VideoList;
@@ -183,6 +184,22 @@ namespace NiconicomeTest.Local.Playlist.Videos
             Assert.That(result.IsSucceeded, Is.EqualTo(expectedResult));
             Assert.That(this.videoListContainer.Videos[2].Id.Value, Is.EqualTo(lastID));
 
+        }
+
+        [Test]
+        public void 動画を更新する()
+        {
+            var count = 100;
+            var original = new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
+            var newItem = new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1"), ViewCount = new Reactive.Bindings.ReactiveProperty<int>(count) };
+
+            this.videoListContainer!.Add(original);
+            IAttemptResult result= this.videoListContainer.Update(newItem);
+
+            IListVideoInfo video = this.videoListContainer.Videos.First();
+
+            Assert.That(result.IsSucceeded, Is.True);
+            Assert.That(video.ViewCount.Value, Is.EqualTo(count));
         }
 
     }

@@ -22,16 +22,18 @@ namespace Niconicome.Models.Helper.Result
         /// <returns></returns>
         public static IAttemptResult<T> Fail(string? message = null, Exception? ex = null)
         {
-            return new AttemptResult<T>() { Message = message, Exception = ex};
+            return new AttemptResult<T>() { Message = message, Exception = ex };
         }
 
         /// <summary>
         /// インスタンスを作成
         /// </summary>
+        /// <param name="data"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
-        public static IAttemptResult<T> Succeeded()
+        public static IAttemptResult<T> Succeeded(T? data, string? message = null)
         {
-            return new AttemptResult<T>() { IsSucceeded = true };
+            return new AttemptResult<T>() { IsSucceeded = true, Message = message, Data = data };
         }
     }
 }
