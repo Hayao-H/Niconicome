@@ -9,7 +9,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              prism:ViewModelLocator.AutoWireViewModel="True"
-             Background="{StaticResource MaterialDesignPaper}"
+             Background="{DynamicResource MaterialDesignPaper}"
              d:DataContext="{d:DesignInstance {x:Type vm:TimerSettingsViewModelD},IsDesignTimeCreatable=True}"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="16">
