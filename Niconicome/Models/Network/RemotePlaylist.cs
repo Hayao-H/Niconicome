@@ -206,13 +206,11 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         private async Task<IAttemptResult<string>> TryGetChannelVideosAsync(string id, List<IListVideoInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage)
         {
-
-            var ids = new List<string>();
             IAttemptResult<string> result;
 
             try
             {
-                result = await this.channelVideoHandler.GetVideosAsync(id, ids, registeredVideo, m =>
+                result = await this.channelVideoHandler.GetVideosAsync(id, videos, registeredVideo, m =>
                  {
                      onMessage(m);
                  });
@@ -225,16 +223,6 @@ namespace Niconicome.Models.Network
 
             if (!result.IsSucceeded) return result;
 
-            var dupeCount = ids.Where(id => registeredVideo.Contains(id)).Count();
-            if (dupeCount > 0)
-            {
-                onMessage($"{dupeCount}件の動画が既に登録済みのためスキップされます。");
-            }
-
-            ids = ids.Where(id => !registeredVideo.Contains(id)).ToList();
-            var retlieved = await this.networkVideoHandler.GetVideoListInfosAsync(ids);
-
-            videos.AddRange(retlieved);
 
             return new AttemptResult<string>() { IsSucceeded = true, Data = result.Data };
         }

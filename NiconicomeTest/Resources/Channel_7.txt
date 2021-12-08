@@ -7,41 +7,7 @@
 <html class="gecko ">
 
 <head>
-<script type="text/javascript">
-  try {
-    window.NicoGoogleTagManagerDataLayer = [];
 
-    var data = {};
-
-        data.user = (function () {
-      var user = {};
-
-                  user.user_id = parseInt('74537208', 10) || null;
-      user.login_status = 'login';
-      user.member_status = 'premium';
-      user.birthday = '1990-03-01';
-                user.sex = 'male';
-            user.country = 'Japan';
-      user.prefecture = '北海道';
-      user.ui_area = 'jp';
-      user.ui_lang = 'ja-jp';
-            
-      return user;
-      })();
-
-    data.content = (function () {
-      var content = {};
-      content.community_id = '57025';
-      content.ch_screen_name = 'ch7';
-      content.channel_id = 'ch7';
-      content.ch_monthly_charge = null;
-      content.ch_register_status = '未入会';
-      return content;
-    })();
-
-    window.NicoGoogleTagManagerDataLayer.push(data);
-    } catch (e) {}
-</script>
 
 <!-- Google Tag Manager For Channel Access Analytics -->
 
@@ -191,28 +157,7 @@ div#channel-main a:visited {
 
 
 
-<script>
-var is_login   = true;
-var is_premium = true;
-var is_channel = true;
-var user_is_joinable = true;
-var nicopo_balance = false;
-var page_code  = "video_list"||null;
-var page_id    = "ch_video"||null;
-var user       = null,
-    ad_age     = null;
-user = {
-    "id":74537208,
-    "sex":"男性",
-    "age":31
-};
-ad_age    = user.age;
-var community = {
-    "type":"normal"
-};
-var channeloption = {
-    "first_month_free_flag":false};
-var show_danimestore_invitation = false</script>
+
 
 
 
@@ -277,60 +222,7 @@ var show_danimestore_invitation = false</script>
 <!---->
 
 
-<script>
-    window.onCommonHeaderReady = function(commonHeader) {
-        commonHeader.mount('#CommonHeader', {
-                        frontendId: 32,
-            site: 'channel',
-            nextUrl: '%2Fch7%2Fvideo',
-            user: {
-                                    id       :  74537208,
-                    nickname : 'ゲスト',
-                    iconUrl  : 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-                    isPremium:  true,
-                                isLogin: true            },
-            customization: {
-                size: {
-                    maxWidth: '1024px',
-                    minWidth: '1024px'
-                },
-                userPanelLinks: [
-                    {
-                        href : '/my/purchased',
-                        label: '購入したもの'
-                    },
-                    {
-                        href : '/my/following',
-                        label: '登録したチャンネル'
-                    },
-                    {
-                        href : '/my/mail/subscribing',
-                        label: '購読中のブロマガ'
-                    },
-                    {
-                        href : '/start',
-                        label: 'チャンネルを開設'
-                    },
-                                        {
-                        href : '/portal/anime',
-                        label: 'アニメ'
-                    },
-                    {
-                        href : '/portal/blomaga',
-                        label: 'ブロマガ'
-                    },
-                    {
-                        href : '/chlist',
-                        label: 'その他のカテゴリ'
-                    }
-                ],
-                helpLink: {
-                    href: 'https://qa.nicovideo.jp/category/show/429?site_domain=default'
-                }
-            }
-        });
-    };
-</script>
+
 <script type="text/javascript" src="https://secure-dcdn.cdn.nimg.jp/common-header/res/2.0.2/pc/CommonHeaderLoader.min.js"></script>    
         <header class="site">
                                             <div id="head_cp">
@@ -698,7 +590,8 @@ var show_danimestore_invitation = false</script>
         </ul>
 
         <p class="description">
-            ローズとの初バトルを控え緊張する舞桜のããæ ãã¡ãä¼ç»ããã®ã¯ãã¸ã£ããã¼ãã£ã¼â¦ãããªãã¦åå®¿ï¼å¤¢ãè¦ã¦ããããã ã£ãã¨ä»ã¾ã§ã®æ¥ããæ¯ãè¿ãè...
+            ローズとの初バトルを控え緊張する舞桜のããæ ãã¡ãä¼ç»ããã®ã¯ãã¸ã£ããã¼ãã£ã¼â¦ãããªãã¦åå®¿ï¼å¤¢ãè¦ã¦ããããã ã£ãã¨ä»ã¾ã§ã®æ¥ã
+ãæ¯ãè¿ãè...
         </p>
 
         <p class="time">
@@ -720,8 +613,10 @@ var show_danimestore_invitation = false</script>
     <div class="item_right">
 
         <h6 class="title">
-            <a href="https://www.nicovideo.jp/watch/so38583824" title="ã¢ã¤ã«ããã©ãããï¼ãç¬¬15è©±ããæç±ã®èèã"
-            >ã¢ã¤ã«ããã©ãããï¼ãç¬¬15è©±ããæç±ã®èèã</a>
+            <a href="https://www.nicovideo.jp/watch/so38583824" title="ã¢ã¤ã«ããã©ãããï¼ãç¬¬15è©±ããæ
+ç±ã®èèã"
+            >ã¢ã¤ã«ããã©ãããï¼ãç¬¬15è©±ããæ
+ç±ã®èèã</a>
         </h6>
 
                 <div class="actions">
@@ -754,7 +649,8 @@ var show_danimestore_invitation = false</script>
 
             <li class="mylist ">
                 <label>ãã¤ãªã¹ã</label>
-                <a href="https://www.nicovideo.jp/openlist/so38583824" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>6</var></a>
+                <a href="https://www.nicovideo.jp/openlist/so38583824" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå
+¬éãã¤ãªã¹ãä¸è¦§"><var>6</var></a>
             </li>
 
         </ul>
@@ -816,7 +712,8 @@ var show_danimestore_invitation = false</script>
 
             <li class="mylist ">
                 <label>ãã¤ãªã¹ã</label>
-                <a href="https://www.nicovideo.jp/openlist/so38551243" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>4</var></a>
+                <a href="https://www.nicovideo.jp/openlist/so38551243" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå
+¬éãã¤ãªã¹ãä¸è¦§"><var>4</var></a>
             </li>
 
         </ul>
@@ -878,7 +775,8 @@ var show_danimestore_invitation = false</script>
 
             <li class="mylist ">
                 <label>ãã¤ãªã¹ã</label>
-                <a href="https://www.nicovideo.jp/openlist/so38518699" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
+                <a href="https://www.nicovideo.jp/openlist/so38518699" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå
+¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
             </li>
 
         </ul>
@@ -940,7 +838,8 @@ var show_danimestore_invitation = false</script>
 
             <li class="mylist ">
                 <label>ãã¤ãªã¹ã</label>
-                <a href="https://www.nicovideo.jp/openlist/so38483796" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>4</var></a>
+                <a href="https://www.nicovideo.jp/openlist/so38483796" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå
+¬éãã¤ãªã¹ãä¸è¦§"><var>4</var></a>
             </li>
 
         </ul>
@@ -1002,13 +901,15 @@ var show_danimestore_invitation = false</script>
 
             <li class="mylist ">
                 <label>ãã¤ãªã¹ã</label>
-                <a href="https://www.nicovideo.jp/openlist/so38483794" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>2</var></a>
+                <a href="https://www.nicovideo.jp/openlist/so38483794" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå
+¬éãã¤ãªã¹ãä¸è¦§"><var>2</var></a>
             </li>
 
         </ul>
 
         <p class="description">
-            ã²ãã©ãããã®éå¥ä¼ã§ãæãã¬ãã¬ã¼ã³ããç¨æããã¦ããï¼æå¾é«ã¾ããã®ãã¬ã¼ã³ãã®ä¸­èº«ã¯æããã¦ï¼ï¼
+            ã²ãã©ãããã®éå¥ä¼ã§ãæãã¬ãã¬ã¼ã³ããç¨æããã¦ããï¼æå¾
+é«ã¾ããã®ãã¬ã¼ã³ãã®ä¸­èº«ã¯æããã¦ï¼ï¼
         </p>
 
         <p class="time">
@@ -1064,7 +965,8 @@ var show_danimestore_invitation = false</script>
 
             <li class="mylist ">
                 <label>ãã¤ãªã¹ã</label>
-                <a href="https://www.nicovideo.jp/openlist/so38448908" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
+                <a href="https://www.nicovideo.jp/openlist/so38448908" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå
+¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
             </li>
 
         </ul>
@@ -1126,7 +1028,8 @@ var show_danimestore_invitation = false</script>
 
             <li class="mylist ">
                 <label>ãã¤ãªã¹ã</label>
-                <a href="https://www.nicovideo.jp/openlist/so38448907" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>2</var></a>
+                <a href="https://www.nicovideo.jp/openlist/so38448907" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå
+¬éãã¤ãªã¹ãä¸è¦§"><var>2</var></a>
             </li>
 
         </ul>
@@ -1188,7 +1091,8 @@ var show_danimestore_invitation = false</script>
 
             <li class="mylist ">
                 <label>ãã¤ãªã¹ã</label>
-                <a href="https://www.nicovideo.jp/openlist/so38402242" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
+                <a href="https://www.nicovideo.jp/openlist/so38402242" target="_blank" title="ãã®åç»ãç»é²ãã¦ããå
+¬éãã¤ãªã¹ãä¸è¦§"><var>3</var></a>
             </li>
 
         </ul>
