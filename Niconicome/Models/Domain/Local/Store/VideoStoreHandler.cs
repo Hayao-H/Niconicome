@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
@@ -86,8 +87,15 @@ namespace Niconicome.Models.Domain.Local.Store
                 if (!video.PlaylistIds.Contains(playlistId))
                 {
                     video.PlaylistIds.Add(playlistId);
-                    this.databaseInstance.Update(video, STypes::Video.TableName);
                 }
+
+                //動画情報が存在する場合は更新
+                if (!videoData.Title.Value.IsNullOrEmpty())
+                {
+                    this.SetData(video, videoData);
+                }
+
+                this.databaseInstance.Update(video, STypes::Video.TableName);
                 videoId = video.Id;
             }
             else
