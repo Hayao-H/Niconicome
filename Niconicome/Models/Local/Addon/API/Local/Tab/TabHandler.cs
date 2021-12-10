@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ClearScript;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Tab
 {
@@ -13,6 +14,10 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         Task<bool> close();
 
         Task navigateToString(string htmlContent);
+
+        void postMessage(string message);
+
+        void addMessageHandler(ScriptObject handler);
 
         bool isClosed { get; }
     }
@@ -49,6 +54,23 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         {
             await Task.Delay(0);
             this._tabItem.NavigateString(htmlContent);
+        }
+
+        public void postMessage(string message)
+        {
+            this._tabItem.PostMessage(message);
+        }
+
+        public void addMessageHandler(ScriptObject handler)
+        {
+            this._tabItem.AddMessageHandler(message =>
+            {
+                try
+                {
+                    handler.Invoke(false, message);
+                }
+                catch { }
+            });
         }
 
         #endregion
