@@ -52,6 +52,18 @@ namespace Niconicome.Models.Domain.Local.Handlers
         /// <param name="virtualHostName"></param>
         /// <param name="folderName"></param>
         void SetVirtualHostName(string virtualHostName, string folderName);
+
+        /// <summary>
+        /// WevView2にメッセージを送信する
+        /// </summary>
+        /// <param name="message"></param>
+        void PostMessage(string message);
+
+        /// <summary>
+        /// メッセージハンドラを追加する
+        /// </summary>
+        /// <param name="handler"></param>
+        void AddMessageHandler(Action<string> handler);
     }
 
     public class CoreWebview2Handler : ICoreWebview2Handler
@@ -74,6 +86,8 @@ namespace Niconicome.Models.Domain.Local.Handlers
         private SynchronizationContext? ctx;
 
         #endregion
+
+        #region Methods
 
         public async Task DeleteBrowserCookiesAsync(string domain)
         {
@@ -124,7 +138,20 @@ namespace Niconicome.Models.Domain.Local.Handlers
             this.ctx?.Post(_ => this.wv2!.SetVirtualHostNameToFolderMapping(virtualHostName, folderName, CoreWebView2HostResourceAccessKind.Allow), null);
         }
 
+        public void PostMessage(string message)
+        {
+            this.CheckIfInitialized();
+            this.ctx?.Post(_ => this.wv2!.PostWebMessageAsString(message), null);
+        }
 
+        public void AddMessageHandler(Action<string> handler)
+        {
+            this.CheckIfInitialized();
+            this.ctx?.Post(_ => this.wv2!.WebMessageReceived += (_, e) => handler(e.WebMessageAsJson ?? ""), null);
+        }
+
+
+        #endregion
 
         #region private
 
