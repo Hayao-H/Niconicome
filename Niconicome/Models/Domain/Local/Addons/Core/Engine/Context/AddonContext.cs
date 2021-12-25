@@ -162,7 +162,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
              };
             this.Executer.AddHostObject("setTimeout", setTimeout);
 
-            Func<string, IDocument> parseHtml = source => HtmlParser.ParseDocument(source);
+            Func<string, IDocument?> parseHtml = source => HtmlParser.ParseDocument(source);
             this.Executer.AddHostObject("parseHtml", parseHtml);
         }
 

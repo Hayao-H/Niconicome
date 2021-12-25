@@ -59,14 +59,16 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
         {
             var series = new RemotePlaylistInfo();
 
-            IHtmlDocument document = HtmlParser.ParseDocument(source);
-            IHtmlCollection<IElement> videos = document.QuerySelectorAll(".SeriesVideoListContainer-video");
+            IHtmlDocument? document = HtmlParser.ParseDocument(source);
+            IHtmlCollection<IElement>? videos = document?.QuerySelectorAll(".SeriesVideoListContainer-video");
 
-            IElement? ownerElm = document.QuerySelector(".SeriesAdditionalContainer-ownerName");
+            if (videos is null) return series;
+
+            IElement? ownerElm = document?.QuerySelector(".SeriesAdditionalContainer-ownerName");
             string ownerName = ownerElm?.InnerHtml ?? string.Empty;
-            int ownerID = int.Parse((ownerElm?.GetAttribute("href").Split("/")[^1]) ?? "0");
+            int ownerID = int.Parse((ownerElm?.GetAttribute("href")?.Split("/")[^1]) ?? "0");
 
-            string seriesName = document.QuerySelector(".SeriesDetailContainer-bodyTitle")?.InnerHtml ?? string.Empty;
+            string seriesName = document?.QuerySelector(".SeriesDetailContainer-bodyTitle")?.InnerHtml ?? string.Empty;
             series.PlaylistName = seriesName;
 
             foreach (var videoElm in videos)
