@@ -63,6 +63,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
 
         private IAPIEntryPoint? _entryPoint;
 
+        private string? code;
+
         #endregion
 
         #region Props
@@ -96,11 +98,10 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
 
             this.AddonInfomation = infomation;
             string codePath = Path.Combine(FileFolder.AddonsFolder, infomation.PackageID.Value, infomation.Scripts.BackgroundScript);
-            string code;
 
             try
             {
-                code = this.fileIO.OpenRead(codePath);
+                this.code = this.fileIO.OpenRead(codePath);
             }
             catch (Exception e)
             {
@@ -124,7 +125,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
             {
                 try
                 {
-                    this.Executer.Evaluate(code);
+                    this.Executer.Evaluate(this.code);
                 }
                 catch (Exception e)
                 {
@@ -161,7 +162,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
              };
             this.Executer.AddHostObject("setTimeout", setTimeout);
 
-            Func<string, IDocument> parseHtml = source => HtmlParser.ParseDocument(source);
+            Func<string, IDocument?> parseHtml = source => HtmlParser.ParseDocument(source);
             this.Executer.AddHostObject("parseHtml", parseHtml);
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Helper.Result;
@@ -26,7 +27,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
         /// <returns></returns>
         public IAttemptResult<INiconicoIchibaInfo> ParseHtml(string source)
         {
-            IHtmlDocument document;
+            IHtmlDocument? document;
             try
             {
                 document = HtmlParser.ParseDocument(source);
@@ -54,19 +55,24 @@ namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
         /// </summary>
         /// <param name="document"></param>
         /// <returns></returns>
-        private INiconicoIchibaInfo GetNiconicoIchibaInfo(IHtmlDocument document)
+        private INiconicoIchibaInfo GetNiconicoIchibaInfo(IHtmlDocument? document)
         {
-            var items = document.QuerySelectorAll(".IchibaMainItem");
+            IHtmlCollection<IElement>? items = document?.QuerySelectorAll(".IchibaMainItem");
             var info = new NiconicoIchibaInfo();
+
+            if (items is null) return info;
 
             foreach (var item in items)
             {
-                var titleElm = item.QuerySelector(".IchibaMainItem_Name");
-                var title = titleElm.InnerHtml;
-                var link = titleElm.GetAttribute("href");
-                var category = item.QuerySelector(".IchibaMainItem_Info_Category").InnerHtml;
-                var price = item.QuerySelector(".IchibaMainItem_Price_Number")?.InnerHtml??"NaN";
-                var thumb = item.QuerySelector(".IchibaMainItem_Thumbnail img").GetAttribute("src");
+                IElement? titleElm = item.QuerySelector(".IchibaMainItem_Name");
+                string? title = titleElm?.InnerHtml;
+                string? link = titleElm?.GetAttribute("href");
+                string? category = item?.QuerySelector(".IchibaMainItem_Info_Category")?.InnerHtml;
+                string price = item?.QuerySelector(".IchibaMainItem_Price_Number")?.InnerHtml ?? "NaN";
+                string? thumb = item?.QuerySelector(".IchibaMainItem_Thumbnail img")?.GetAttribute("src");
+
+                if (title is null || link is null || category is null || price is null || thumb is null) continue;
+
                 var itemInfo = new IchibaItem()
                 {
                     Name = title,

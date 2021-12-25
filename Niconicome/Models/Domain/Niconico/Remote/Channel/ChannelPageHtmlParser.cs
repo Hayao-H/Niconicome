@@ -46,7 +46,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Channel
 
         public IChannelPageInfo ParseAndGetIds(string html)
         {
-            IHtmlDocument document;
+            IHtmlDocument? document;
             var info = new ChannelPageInfo();
 
             try
@@ -59,37 +59,48 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Channel
                 throw new InvalidOperationException("チャンネルページの解析に失敗しました。");
             }
 
-            var wrapper = document.QuerySelectorAll(".items").FirstOrDefault();
+            var wrapper = document?.QuerySelectorAll(".items").FirstOrDefault();
             if (wrapper is null)
             {
                 throw new InvalidOperationException(".itemsを発見できませんでした。");
             }
 
             //チャンネル名
-            var cName = document.QuerySelector(".channel_name")?.Children.FirstOrDefault()?.TextContent ?? string.Empty;
+            var cName = document?.QuerySelector(".channel_name")?.Children.FirstOrDefault()?.TextContent ?? string.Empty;
             info.ChannelName = cName;
 
             //動画解析
             IHtmlCollection<IElement> elements = wrapper.QuerySelectorAll(".item");
             var videos = new List<IListVideoInfo>();
 
-            foreach (var element in elements)
+            foreach (IElement element in elements)
             {
                 try
                 {
-                    IElement titleElm = element.QuerySelector(".title a");
-                    string title = titleElm.InnerHtml;
-                    string niconicoId = titleElm.GetAttribute("href").Split("/").LastOrDefault() ?? "";
 
-                    string thumbUrl = element.QuerySelector(".thumb_video img").GetAttribute("src");
+                    if (element is null) continue;
 
-                    IElement countElm = element.QuerySelector(".counts");
+                    IElement? titleElm = element.QuerySelector(".title a");
 
-                    int viewCount = int.Parse(countElm.QuerySelector(".view var").InnerHtml, NumberStyles.AllowThousands);
-                    int commentCount = int.Parse(countElm.QuerySelector(".comment var").InnerHtml, NumberStyles.AllowThousands);
-                    int mylistCount = int.Parse(countElm.QuerySelector(".mylist var").InnerHtml, NumberStyles.AllowThousands);
+                    if (titleElm is null) continue;
 
-                    DateTime uploadedAt = DateTime.ParseExact(element.QuerySelector(".time var").InnerHtml.Trim(), "yyyy-MM-dd HH:mm", null);
+                    string? title = titleElm.InnerHtml;
+                    string? niconicoId = titleElm.GetAttribute("href")?.Split("/")?.LastOrDefault();
+                    string? thumbUrl = element.QuerySelector(".thumb_video img")?.GetAttribute("src");
+
+                    if (title is null || niconicoId is null || thumbUrl is null) continue;
+
+                    IElement? countElm = element.QuerySelector(".counts");
+
+                    if (countElm is null) continue;
+
+                    int viewCount = int.Parse(countElm.QuerySelector(".view var")?.InnerHtml ?? "0", NumberStyles.AllowThousands);
+                    int commentCount = int.Parse(countElm.QuerySelector(".comment var")?.InnerHtml ?? "0", NumberStyles.AllowThousands);
+                    int mylistCount = int.Parse(countElm.QuerySelector(".mylist var")?.InnerHtml ?? "0", NumberStyles.AllowThousands);
+
+                    string? uploadStr = element.QuerySelector(".time var")?.InnerHtml?.Trim();
+                    if (uploadStr is null) continue;
+                    DateTime uploadedAt = DateTime.ParseExact(uploadStr, "yyyy-MM-dd HH:mm", null);
 
                     if (niconicoId.IsNullOrEmpty()) continue;
 
@@ -113,7 +124,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Channel
             info.Videos = videos;
 
             //ページャー
-            var pager = document.QuerySelector(".pager");
+            var pager = document?.QuerySelector(".pager");
             if (pager is not null)
             {
                 var next = pager.QuerySelector(".next")?.Children?.FirstOrDefault()?.GetAttribute("href");

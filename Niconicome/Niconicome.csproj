@@ -30,44 +30,44 @@
 		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="AngleSharp" Version="0.14.0" />
-		<PackageReference Include="CredentialManagement" Version="1.0.2" />
-		<PackageReference Include="LiteDB" Version="5.0.10" />
-		<PackageReference Include="MaterialDesignColors" Version="2.0.0" />
-		<PackageReference Include="MaterialDesignThemes" Version="4.0.0" />
-		<PackageReference Include="Microsoft.ClearScript" Version="7.1.4" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.4" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1020.30" />
-		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
-		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
-		<PackageReference Include="Prism.Unity" Version="8.1.97" />
-		<PackageReference Include="ReactiveProperty" Version="7.10.0" />
-		<PackageReference Include="ReactiveProperty.WPF" Version="7.10.0" />
-		<PackageReference Include="System.Security.Permissions" Version="5.0.0" />
-		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
-		<PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
-	</ItemGroup>
+		<ItemGroup>
+			<PackageReference Include="AngleSharp" Version="0.16.1" />
+			<PackageReference Include="CredentialManagement" Version="1.0.2" />
+			<PackageReference Include="LiteDB" Version="5.0.11" />
+			<PackageReference Include="MaterialDesignColors" Version="2.0.4" />
+			<PackageReference Include="MaterialDesignThemes" Version="4.3.0" />
+			<PackageReference Include="Microsoft.ClearScript" Version="7.2.0" />
+			<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.1" />
+			<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+			<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+			<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1054.31" />
+			<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
+			<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+			<PackageReference Include="Prism.Unity" Version="8.1.97" />
+			<PackageReference Include="ReactiveProperty" Version="8.0.3" />
+			<PackageReference Include="ReactiveProperty.WPF" Version="8.0.3" />
+			<PackageReference Include="System.Security.Permissions" Version="6.0.0" />
+			<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+			<PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
+		</ItemGroup>
 
-	<ItemGroup>
-		<Resource Include="src\app.ico" />
-	</ItemGroup>
+		<ItemGroup>
+			<Resource Include="src\app.ico" />
+		</ItemGroup>
 
-	<ItemGroup>
-		<Compile Update="Properties\Resources.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
-	</ItemGroup>
+		<ItemGroup>
+			<Compile Update="Properties\Resources.Designer.cs">
+				<DesignTime>True</DesignTime>
+				<AutoGen>True</AutoGen>
+				<DependentUpon>Resources.resx</DependentUpon>
+			</Compile>
+		</ItemGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Update="Properties\Resources.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-	</ItemGroup>
+		<ItemGroup>
+			<EmbeddedResource Update="Properties\Resources.resx">
+				<Generator>ResXFileCodeGenerator</Generator>
+				<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+			</EmbeddedResource>
+		</ItemGroup>
 
-</Project>
+	</Project>
