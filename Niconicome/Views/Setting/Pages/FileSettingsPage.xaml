@@ -185,8 +185,9 @@
                             <TranslateTransform Y="7"/>
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
-                    <Label Content="保存した動画ファイルををIDで探索する" />
-                    <ToggleButton IsChecked="{Binding IsSearchingVideosByIDEnable.Value,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right"/>
+                    <Label Content="保存した動画ファイルををフォーマット通りに検索する（非推奨）"
+                           ToolTip="検索精度が著しく低下するため、推奨しません。"/>
+                    <ToggleButton IsChecked="{Binding IsSearchingVideosExactEnable.Value}" HorizontalAlignment="Right"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             </StackPanel>
