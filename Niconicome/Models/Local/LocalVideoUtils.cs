@@ -14,7 +14,7 @@ namespace Niconicome.Models.Local
 {
     public interface ILocalVideoUtils
     {
-        string GetFilePath(IListVideoInfo video, string folderPath, string format, bool replaceStricted, bool searchByID);
+        string GetFilePath(IListVideoInfo video, string folderPath, string format, bool replaceStricted, bool searchExact);
         void ClearCache();
     }
 
@@ -41,7 +41,7 @@ namespace Niconicome.Models.Local
         /// <param name="video"></param>
         /// <param name="folderPath"></param>
         /// <returns></returns>
-        public string GetFilePath(IListVideoInfo video, string folderPath, string format, bool replaceStricted, bool searchByID)
+        public string GetFilePath(IListVideoInfo video, string folderPath, string format, bool replaceStricted, bool searchExact)
         {
 
             if (!Path.IsPathRooted(folderPath))
@@ -57,24 +57,25 @@ namespace Niconicome.Models.Local
                     this.cachedFiles.AddRange(this.directoryIO.GetFiles(folderPath, $"*{FileFolder.Mp4FileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
                     this.cachedFiles.AddRange(this.directoryIO.GetFiles(folderPath, $"*{FileFolder.TsFileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
                 }
-                
+
             }
 
-            bool SearchFunc(string currentPath,string targetPath)
+            bool SearchFunc(string currentPath, string targetPath)
             {
-                if (searchByID)
-                {
-                    return currentPath.Contains(video.NiconicoId.Value);
-                } else
+                if (searchExact)
                 {
                     return currentPath == targetPath;
+                }
+                else
+                {
+                    return currentPath.Contains(video.NiconicoId.Value);
                 }
             }
 
             var fn = this.niconicoUtils.GetFileName(format, video, FileFolder.Mp4FileExt, replaceStricted);
             var path = IOUtils.GetPrefixedPath(Path.Combine(folderPath, fn));
 
-            string? firstMp4 = this.cachedFiles.FirstOrDefault(p => SearchFunc(p,path));
+            string? firstMp4 = this.cachedFiles.FirstOrDefault(p => SearchFunc(p, path));
             //.mp4ファイルを確認
             if (firstMp4 is not null)
             {
