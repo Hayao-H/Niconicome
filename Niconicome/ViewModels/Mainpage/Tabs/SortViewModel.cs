@@ -33,94 +33,19 @@ namespace Niconicome.ViewModels.Mainpage
                 }).ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
             #region コマンドの初期化
-            this.SortVideosByID = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
+            this.SortVideos = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
                 .Select(value => value is not null)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
+                .ToReactiveCommand<VideoSortType>()
+                .WithSubscribe((type) =>
                 {
-                    if (WS::Mainpage.SortInfoHandler.SortType.Value == VideoSortType.NiconicoID)
+                    if (WS::Mainpage.SortInfoHandler.SortType.Value == type)
                     {
                         WS::Mainpage.SortInfoHandler.IsDescending.Value = !WS::Mainpage.SortInfoHandler.IsDescending.Value;
                         this.ShowMessage();
                         return;
                     }
-                    WS::Mainpage.SortInfoHandler.SortType.Value = VideoSortType.NiconicoID;
-                    this.ShowMessage();
-                }).AddTo(this.disposables);
 
-            this.SortVideosByTitle = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(value => value is not null)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
-                {
-                    if (WS::Mainpage.SortInfoHandler.SortType.Value == VideoSortType.Title)
-                    {
-                        WS::Mainpage.SortInfoHandler.IsDescending.Value = !WS::Mainpage.SortInfoHandler.IsDescending.Value;
-                        this.ShowMessage();
-                        return;
-                    }
-                    WS::Mainpage.SortInfoHandler.SortType.Value = VideoSortType.Title;
-                    this.ShowMessage();
-
-                }).AddTo(this.disposables);
-
-            this.SortVideosByUploadedDT = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(value => value is not null)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
-                {
-                    if (WS::Mainpage.SortInfoHandler.SortType.Value == VideoSortType.UploadedDT)
-                    {
-                        WS::Mainpage.SortInfoHandler.IsDescending.Value = !WS::Mainpage.SortInfoHandler.IsDescending.Value;
-                        this.ShowMessage();
-                        return;
-                    }
-                    WS::Mainpage.SortInfoHandler.SortType.Value = VideoSortType.UploadedDT;
-                    this.ShowMessage();
-                }).AddTo(this.disposables);
-
-            this.SortVideosByViewCount = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(value => value is not null)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
-                {
-                    if (WS::Mainpage.SortInfoHandler.SortType.Value == VideoSortType.ViewCount)
-                    {
-                        WS::Mainpage.SortInfoHandler.IsDescending.Value = !WS::Mainpage.SortInfoHandler.IsDescending.Value;
-                        this.ShowMessage();
-                        return;
-                    }
-                    WS::Mainpage.SortInfoHandler.SortType.Value = VideoSortType.ViewCount;
-                    this.ShowMessage();
-                }).AddTo(this.disposables);
-
-            this.SortVideosByDLFlag = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(value => value is not null)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
-                {
-                    if (WS::Mainpage.SortInfoHandler.SortType.Value == VideoSortType.DownloadedFlag)
-                    {
-                        WS::Mainpage.SortInfoHandler.IsDescending.Value = !WS::Mainpage.SortInfoHandler.IsDescending.Value;
-                        this.ShowMessage();
-                        return;
-                    }
-                    WS::Mainpage.SortInfoHandler.SortType.Value = VideoSortType.DownloadedFlag;
-                    this.ShowMessage();
-                }).AddTo(this.disposables);
-
-            this.SortVideosByRegister = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(value => value is not null)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
-                {
-                    if (WS::Mainpage.SortInfoHandler.SortType.Value == VideoSortType.Register)
-                    {
-                        WS::Mainpage.SortInfoHandler.IsDescending.Value = !WS::Mainpage.SortInfoHandler.IsDescending.Value;
-                        this.ShowMessage();
-                        return;
-                    }
-                    WS::Mainpage.SortInfoHandler.SortType.Value = VideoSortType.Register;
+                    WS::Mainpage.SortInfoHandler.SortType.Value =type;
                     this.ShowMessage();
                 }).AddTo(this.disposables);
 
@@ -181,35 +106,12 @@ namespace Niconicome.ViewModels.Mainpage
         }
 
         #region コマンド
-        /// <summary>
-        /// IDでソート
-        /// </summary>
-        public ReactiveCommand SortVideosByID { get; init; }
 
         /// <summary>
-        /// タイトルでソート
+        /// /動画をソート
         /// </summary>
-        public ReactiveCommand SortVideosByTitle { get; init; }
+        public ReactiveCommand<VideoSortType> SortVideos { get; init; } 
 
-        /// <summary>
-        /// 投稿日時でソート
-        /// </summary>
-        public ReactiveCommand SortVideosByUploadedDT { get; init; }
-
-        /// <summary>
-        /// 再生回数でソート
-        /// </summary>
-        public ReactiveCommand SortVideosByViewCount { get; init; }
-
-        /// <summary>
-        /// DL済みでソート
-        /// </summary>
-        public ReactiveCommand SortVideosByDLFlag { get; init; }
-
-        /// <summary>
-        /// 登録順でソート
-        /// </summary>
-        public ReactiveCommand SortVideosByRegister { get; init; }
 
         /// <summary>
         /// 動画を一つ前に移動する
@@ -259,17 +161,7 @@ namespace Niconicome.ViewModels.Mainpage
     [Obsolete("デザイナー専用！", true)]
     class SortViewModelD
     {
-        public ReactiveCommand SortVideosByID { get; init; } = new();
-
-        public ReactiveCommand SortVideosByTitle { get; init; } = new();
-
-        public ReactiveCommand SortVideosByUploadedDT { get; init; } = new();
-
-        public ReactiveCommand SortVideosByViewCount { get; init; } = new();
-
-        public ReactiveCommand SortVideosByDLFlag { get; init; } = new();
-
-        public ReactiveCommand SortVideosByRegister { get; init; } = new();
+        public ReactiveCommand<VideoSortType> SortVideos { get; init; } = new();
 
         public ReactiveCommand MoveVideoToPrevCommand { get; init; } = new();
 

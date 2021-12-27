@@ -506,6 +506,8 @@ namespace Niconicome.Models.Playlist.VideoList
                     VideoSortType.UploadedDT => tmp.OrderBy(v => v.UploadedOn.Value),
                     VideoSortType.ViewCount => tmp.OrderBy(v => v.ViewCount.Value),
                     VideoSortType.DownloadedFlag => tmp.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
+                    VideoSortType.Economy => tmp.OrderBy(v => v.IsEconomy.Value ? 1 : 0),
+                    VideoSortType.State => tmp.OrderBy(v => v.Message.Value),
                     _ => SortWithCustom(tmp, customSortSequence),
                 };
                 this.Videos.Addrange(sorted);
@@ -521,6 +523,8 @@ namespace Niconicome.Models.Playlist.VideoList
                     VideoSortType.UploadedDT => tmp.OrderByDescending(v => v.UploadedOn.Value),
                     VideoSortType.ViewCount => tmp.OrderByDescending(v => v.ViewCount.Value),
                     VideoSortType.DownloadedFlag => tmp.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
+                    VideoSortType.Economy => tmp.OrderByDescending(v => v.IsEconomy.Value ? 1 : 0),
+                    VideoSortType.State => tmp.OrderByDescending(v => v.Message.Value),
                     _ => SortWithCustom(tmp, customSortSequence),
                 };
                 this.Videos.Addrange(sorted);
