@@ -197,10 +197,10 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Width="{Binding EconomyColumnWidth.Value,Mode=TwoWay}"
-                                        Header="エコノミー"
+                                        Header="{Binding EconomyColumnTitle.Value}"
                                         DisplayMemberBinding="{Binding IsEconomy.Value}"
                                         />
-                        <GridViewColumn Width="{Binding StateColumnWidth.Value,Mode=TwoWay}" Header="状態" DisplayMemberBinding="{Binding Message.Value}"/>
+                        <GridViewColumn Width="{Binding StateColumnWidth.Value,Mode=TwoWay}" Header="{Binding StateColumnTitle.Value}" DisplayMemberBinding="{Binding Message.Value}"/>
                     </GridView>
                 </ListView.View>
                 <ListView.ItemContainerStyle>

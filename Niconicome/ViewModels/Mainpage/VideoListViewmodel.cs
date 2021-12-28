@@ -108,6 +108,8 @@ namespace Niconicome.ViewModels.Mainpage
             this.UploadColumnTitle = WS::Mainpage.SortInfoHandler.UploadColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.ViewCountColumnTitle = WS::Mainpage.SortInfoHandler.ViewCountColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
             this.DlFlagColumnTitle = WS::Mainpage.SortInfoHandler.DlFlagColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+            this.StateColumnTitle = WS::Mainpage.SortInfoHandler.StateColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
+            this.EconomyColumnTitle = WS::Mainpage.SortInfoHandler.EconomyColumnTitle.ToReadOnlyReactiveProperty().AddTo(this.disposables);
 
             #region Width系プロパティー
 
@@ -1280,6 +1282,17 @@ namespace Niconicome.ViewModels.Mainpage
         /// DLフラグ
         /// </summary>
         public ReadOnlyReactiveProperty<string?> DlFlagColumnTitle { get; init; }
+
+        /// <summary>
+        /// 状態
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> StateColumnTitle { get; init; }
+
+        /// <summary>
+        /// エコノミー
+        /// </summary>
+        public ReadOnlyReactiveProperty<string?> EconomyColumnTitle { get; init; }
+
         #endregion
 
         #region Width
@@ -1369,7 +1382,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// タスクキャンセラー
         /// </summary>
-        private CancellationTokenSource? cts;
 
         private bool isFiltered;
 
@@ -1566,6 +1578,10 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactivePropertySlim<string> DlFlagColumnTitle { get; init; } = new("DL済み");
 
+        public ReactivePropertySlim<string> StateColumnTitle { get; init; } = new("状態");
+
+        public ReactivePropertySlim<string> EconomyColumnTitle { get; init; } = new("エコノミー");
+
         public ReactiveProperty<string> ClipboardMonitoringToolTip { get; init; } = new("クリップボードを監視する");
 
     }
@@ -1696,6 +1712,13 @@ namespace Niconicome.ViewModels.Mainpage
             else if (header.StartsWith(SortInfoHandler.DefaultDlFlagColumnTitle))
             {
                 return VideoSortType.DownloadedFlag;
+            }
+            else if (header.StartsWith(SortInfoHandler.DefaultStateColumnTitle))
+            {
+                return VideoSortType.State;
+            } else if (header.StartsWith(SortInfoHandler.DefaultEconomyColumnTitle))
+            {
+                return VideoSortType.Economy;
             }
             else
             {
