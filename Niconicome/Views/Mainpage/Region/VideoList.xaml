@@ -10,6 +10,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:rp="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
+             xmlns:keydown="clr-namespace:Niconicome.ViewModels.Converter.KeyDown"
              mc:Ignorable="d"
              Background="{DynamicResource MaterialDesignPaper}"
              d:Width="1300"
@@ -43,7 +44,15 @@
                     VerticalContentAlignment="Bottom" 
                     materialDesign:HintAssist.Hint="ID・検索キーワード入力窓"
                     materialDesign:TextFieldAssist.HasClearButton="True"
-                    Padding="5 0"/>
+                    Padding="5 0">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyDown">
+                            <interactivity:EventToReactiveCommand Command="{Binding OnKeyDownCommand}">
+                                <keydown:KeyDownEventToKeyEventInfoConverter/>
+                            </interactivity:EventToReactiveCommand>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
                 <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する（インテリインプット）" Command="{Binding AddVideoCommand}"/>
             </Grid>
             <StackPanel Grid.Column="1" Orientation="Horizontal">

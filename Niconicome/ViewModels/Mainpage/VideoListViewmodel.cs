@@ -26,6 +26,7 @@ using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Utils;
 using Niconicome.ViewModels.Controls;
+using Niconicome.ViewModels.Converter.KeyDown;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
 using Prism.Events;
@@ -355,6 +356,15 @@ namespace Niconicome.ViewModels.Mainpage
                   }
               })
             .AddTo(this.disposables);
+
+            this.OnKeyDownCommand = new ReactiveCommand<KeyEventInfo>()
+                .WithSubscribe((info) =>
+                {
+                    if (info.Key == Key.Enter && this.AddVideoCommand.CanExecute())
+                    {
+                        this.AddVideoCommand.Execute(new object());
+                    }
+                });
 
             this.RemoveVideoCommand = new ReactiveCommand()
             .WithSubscribe(async () =>
@@ -1031,6 +1041,11 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveCommand<object> AddVideoCommand { get; init; }
 
         /// <summary>
+        /// キー押下時
+        /// </summary>
+        public ReactiveCommand<KeyEventInfo> OnKeyDownCommand { get; init; }
+
+        /// <summary>
         /// 動画を削除する
         /// </summary>
         public ReactiveCommand RemoveVideoCommand { get; init; }
@@ -1456,6 +1471,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveCommand RemoveVideoCommand { get; init; } = new();
 
+        public ReactiveCommand<KeyEventInfo> OnKeyDownCommand { get; init; } = new();
+
         public CommandBase<IListVideoInfo> WatchOnNiconicoCommand { get; init; } = new(_ => true, _ => { });
 
         public ReactiveCommand AddVideoFromClipboardCommand { get; init; } = new();
@@ -1716,7 +1733,8 @@ namespace Niconicome.ViewModels.Mainpage
             else if (header.StartsWith(SortInfoHandler.DefaultStateColumnTitle))
             {
                 return VideoSortType.State;
-            } else if (header.StartsWith(SortInfoHandler.DefaultEconomyColumnTitle))
+            }
+            else if (header.StartsWith(SortInfoHandler.DefaultEconomyColumnTitle))
             {
                 return VideoSortType.Economy;
             }
