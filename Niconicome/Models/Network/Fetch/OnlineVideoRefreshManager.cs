@@ -150,7 +150,7 @@ namespace Niconicome.Models.Network.Fetch
             this.PreFetching();
 
             //同期処理（Fetch）
-            IAttemptResult<string> result = await this._remotePlaylistHandler.TryGetRemotePlaylistAsync(remoteID, videos, remoteType, registeredVIdeos, m => this._message.AppendMessage(m));
+            IAttemptResult<string> result = await this._remotePlaylistHandler.TryGetRemotePlaylistAsync(remoteID, videos, remoteType, m => this._message.AppendMessage(m));
 
             if (!result.IsSucceeded)
             {

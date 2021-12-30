@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Reactive.Bindings;
@@ -15,167 +15,157 @@ namespace Niconicome.Models.Network
 {
     interface IVideoIDHandler
     {
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose);
-        Task<INetworkResult> TryGetVideoListInfosAsync(List<IListVideoInfo> videos, string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose);
+        /// <summary>
+        /// 入力した文字列から動画情報を取得する
+        /// </summary>
+        /// <param name="inputText">ソーステキスト</param>
+        /// <param name="filterFUnction">情報を取得するかどうかを選択する関数</param>
+        /// <param name="onMessage">メッセージハンドラー</param>
+        /// <returns></returns>
+        Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(string inputText, Func<string, bool> filterFUnction, Action<string> onMessage);
+
+        /// <summary>
+        /// 処理中フラグ
+        /// </summary>
         ReactiveProperty<bool> IsProcessing { get; }
     }
 
     class VideoIDHandler : IVideoIDHandler
     {
-        public VideoIDHandler(INetworkVideoHandler networkVideoHandler, INiconicoUtils niconicoUtils, ILocalDirectoryHandler localDirectoryHandler, IRemotePlaylistHandler remotePlaylistHandler)
+        public VideoIDHandler(INetworkVideoHandler networkVideoHandler, INiconicoUtils niconicoUtils, ILocalDirectoryHandler localDirectoryHandler, IRemotePlaylistHandler remotePlaylistHandler,ILogger logger)
         {
-            this.networkVideoHandler = networkVideoHandler;
-            this.niconicoUtils = niconicoUtils;
-            this.localDirectoryHandler = localDirectoryHandler;
+            this._networkVideoHandler = networkVideoHandler;
+            this._niconicoUtils = niconicoUtils;
+            this._localDirectoryHandler = localDirectoryHandler;
             this.remotePlaylistHandler = remotePlaylistHandler;
+            this._logger = logger;
         }
 
-        private readonly INetworkVideoHandler networkVideoHandler;
+        #region field
 
-        private readonly INiconicoUtils niconicoUtils;
+        private readonly INetworkVideoHandler _networkVideoHandler;
 
-        private readonly ILocalDirectoryHandler localDirectoryHandler;
+        private readonly INiconicoUtils _niconicoUtils;
+
+        private readonly ILocalDirectoryHandler _localDirectoryHandler;
 
         private readonly IRemotePlaylistHandler remotePlaylistHandler;
 
-        /// <summary>
-        /// 処理中フラグ
-        /// </summary>
+        private readonly ILogger _logger;
+
+        #endregion
+
+
+        #region Props
+
         public ReactiveProperty<bool> IsProcessing { get; init; } = new(false);
 
-        /// <summary>
-        /// 動画情報を取得する
-        /// </summary>
-        /// <param name="inputText"></param>
-        /// <param name="registeredVideos"></param>
-        /// <param name="onMessage"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose)
+        #endregion
+
+        #region Method
+
+        public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(string inputText, Func<string, bool> filterFUnction, Action<string> onMessage)
         {
-            this.IsProcessing.Value = true;
+            this.StartProcessing();
 
             inputText = inputText.Trim();
             var videos = new List<IListVideoInfo>();
 
+            onMessage($"入力値：{inputText}");
+
             if (Path.IsPathRooted(inputText))
             {
                 onMessage("ローカルディレクトリーから動画を取得します");
-                var retlieved = await this.GetVideoListInfosFromLocalPath(inputText);
-                videos.AddRange(retlieved);
-                this.IsProcessing.Value = false;
-                return videos;
+                try
+                {
+                    videos.AddRange(await this.GetVideoListInfosFromLocalPath(inputText));
+                }
+                catch (Exception e)
+                {
+                    this._logger.Error("ローカルディレクトリの探索に失敗しました。", e);
+                    this.FinishProcessing();
+                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("ローカルディレクトリの探索に失敗しました。", e);
+                }
+
             }
             else if (inputText.StartsWith("http"))
             {
-                if (this.niconicoUtils.IsSearchUrl(inputText))
+                onMessage("ネットワークから動画を取得します。");
+
+                try
                 {
-                    ISearchQuery query;
-
-                    try
-                    {
-                        query = this.niconicoUtils.GetQueryFromUrl(inputText);
-                    }
-                    catch (Exception e)
-                    {
-                        onMessage("検索URLの解析に失敗しました");
-                        onMessageVerbose($"検索URLの解析に失敗しました(詳細:{e.Message})");
-                        this.IsProcessing.Value = false;
-                        return videos;
-                    }
-
-                    var retlieved = await this.GetVideoListInfosFromSearchResult(query, onMessageVerbose);
-                    videos.AddRange(retlieved);
-                    this.IsProcessing.Value = false;
-                    return videos;
+                    videos.AddRange(await this.GetVideoListInfoWithNetAsync(inputText, onMessage));
                 }
-                else
+                catch (Exception e)
                 {
-                    var type = this.niconicoUtils.GetRemoteType(inputText);
-                    var id = this.niconicoUtils.GetID(inputText, type);
-
-                    if (type == RemoteType.WatchPage)
-                    {
-                        inputText = id;
-                    }
-                    else
-                    {
-                        onMessage("ネットワークから動画を取得します");
-                        var retlieved = await this.GetVideoListInfosFromRemote(registeredVideos, type, id, (m) => onMessageVerbose(m));
-                        videos.AddRange(retlieved);
-                        this.IsProcessing.Value = false;
-                        return videos;
-                    }
+                    this._logger.Error("ネットワークからの動画取得に失敗しました。", e);
+                    this.FinishProcessing();
+                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("ネットワークからの動画取得に失敗しました。", e);
                 }
-
             }
 
-            if (this.niconicoUtils.IsNiconicoID(inputText))
+            if (this._niconicoUtils.IsNiconicoID(inputText))
             {
                 onMessage("IDを登録します");
-                var retlievedId = await this.GetVideoListInfosFromID(inputText);
-                videos.AddRange(retlievedId);
-                this.IsProcessing.Value = false;
-                return videos;
+                try
+                {
+                    videos.AddRange(await this.GetVideoListInfosFromID(inputText));
+                }
+                catch (Exception e)
+                {
+                    this._logger.Error("ネットワークからの動画取得に失敗しました。", e);
+                    this.FinishProcessing();
+                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("ネットワークからの動画取得に失敗しました。", e);
+                }
             }
             else
             {
                 onMessage("動画を検索します");
-                var retlievedId = await this.GetVideoListInfosFromSearchResult(inputText, onMessageVerbose);
-                videos.AddRange(retlievedId);
-                this.IsProcessing.Value = false;
-                return videos;
+                try
+                {
+                    videos.AddRange(await this.GetVideoListInfosFromSearchResult(inputText, onMessage));
+                }
+                catch (Exception e)
+                {
+                    this._logger.Error("動画の検索に失敗しました。", e);
+                    this.FinishProcessing();
+                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("動画の検索に失敗しました。", e);
+                }
             }
 
+            this.FinishProcessing();
+            return AttemptResult<IEnumerable<IListVideoInfo>>.Succeeded(videos);
+
+        }
+
+        #endregion
+
+        #region private
+
+        /// <summary>
+        /// 処理を開始する
+        /// </summary>
+        private void StartProcessing()
+        {
+            this.IsProcessing.Value = true;
         }
 
         /// <summary>
-        /// 安全に動画情報を取得する
+        /// 処理を終了する
         /// </summary>
-        /// <param name="videos"></param>
-        /// <param name="inputText"></param>
-        /// <param name="registeredVideos"></param>
-        /// <param name="onMessage"></param>
-        /// <param name="onMessageVerbose"></param>
-        /// <returns></returns>
-        public async Task<INetworkResult> TryGetVideoListInfosAsync(List<IListVideoInfo> videos, string inputText, IEnumerable<string> registeredVideos, Action<string> onMessage, Action<string> onMessageVerbose)
+        private void FinishProcessing()
         {
-            try
-            {
-                var retlieved = await this.GetVideoListInfosAsync(inputText, registeredVideos, onMessage, onMessageVerbose);
-                videos.AddRange(retlieved);
-            }
-            catch
-            {
-                var result = new NetworkResult()
-                {
-                    IsFailed = true
-                };
-
-                this.IsProcessing.Value = false;
-
-                return result;
-            }
-
-            return new NetworkResult();
-
-
+            this.IsProcessing.Value = false;
         }
 
-        #region 内部処理
         /// <summary>
         /// ローカルフォルダーから動画情報を取得する
         /// </summary>
-        /// <param name="localPath"></param>
-        /// <param name="onSucceeded"></param>
-        /// <param name="onFailed"></param>
-        /// <param name="onStarted"></param>
-        /// <param name="onWaiting"></param>
-        /// <returns></returns>
         private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromLocalPath(string localPath)
         {
-            var ids = this.localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
+            IEnumerable<string> ids = this._localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
 
-            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(ids);
+            IEnumerable<IListVideoInfo> videos = await this._networkVideoHandler.GetVideoListInfosAsync(ids);
 
             return videos;
         }
@@ -183,32 +173,53 @@ namespace Niconicome.Models.Network
         /// <summary>
         /// IDから動画を取得する
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="onSucceeded"></param>
-        /// <param name="onFailed"></param>
-        /// <param name="onStarted"></param>
-        /// <param name="onWaiting"></param>
-        /// <returns></returns>
         private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromID(string id)
         {
-            var videos = await this.networkVideoHandler.GetVideoListInfosAsync(new List<string>() { id });
+            var videos = await this._networkVideoHandler.GetVideoListInfosAsync(new List<string>() { id });
 
             return videos;
         }
 
         /// <summary>
-        /// リモートプレイリストから取得する
+        /// ネットワークから動画を取得する（検索＋リモート）
         /// </summary>
-        /// <param name="url"></param>
-        /// <param name="registeredVideos"></param>
+        /// <param name="inputText"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromRemote(IEnumerable<string> registeredVideos, RemoteType type, string id, Action<string> onMessage)
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfoWithNetAsync(string inputText, Action<string> onMessage)
+        {
+
+            if (this._niconicoUtils.IsSearchUrl(inputText))
+            {
+                ISearchQuery query = this._niconicoUtils.GetQueryFromUrl(inputText);
+
+                return await this.GetVideoListInfosFromSearchResult(query, onMessage);
+            }
+            else
+            {
+                var type = this._niconicoUtils.GetRemoteType(inputText);
+                var id = this._niconicoUtils.GetID(inputText, type);
+
+                if (type == RemoteType.WatchPage)
+                {
+                    return await this.GetVideoListInfosFromID(id);
+                }
+                else
+                {
+                    return await this.GetVideoListInfosFromRemote(type, id, onMessage);
+                }
+            }
+        }
+
+        /// <summary>
+        /// リモートプレイリストから取得する
+        /// </summary>
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromRemote(RemoteType type, string id, Action<string> onMessage)
         {
 
             var videos = new List<IListVideoInfo>();
 
-            await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(id, videos, type, registeredVideos, onMessage);
+            await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(id, videos, type, onMessage);
 
             return videos;
         }
@@ -216,13 +227,6 @@ namespace Niconicome.Models.Network
         /// <summary>
         /// 動画を検索する
         /// </summary>
-        /// <param name="registeredVideos"></param>
-        /// <param name="keyword"></param>
-        /// <param name="onSucceeded"></param>
-        /// <param name="onFailed"></param>
-        /// <param name="onStarted"></param>
-        /// <param name="onWaiting"></param>
-        /// <returns></returns>
         private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromSearchResult(string keyword, Action<string> onMessage)
         {
             var query = new Search::SearchQuery()
@@ -239,13 +243,6 @@ namespace Niconicome.Models.Network
         /// <summary>
         /// 動画を検索する
         /// </summary>
-        /// <param name="registeredVideos"></param>
-        /// <param name="keyword"></param>
-        /// <param name="onSucceeded"></param>
-        /// <param name="onFailed"></param>
-        /// <param name="onStarted"></param>
-        /// <param name="onWaiting"></param>
-        /// <returns></returns>
         private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromSearchResult(ISearchQuery query, Action<string> onMessage)
         {
             var searchResult = await this.remotePlaylistHandler.TrySearchVideosAsync(query);

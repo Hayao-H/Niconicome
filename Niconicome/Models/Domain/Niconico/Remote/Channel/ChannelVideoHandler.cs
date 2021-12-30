@@ -16,7 +16,14 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Channel
 {
     public interface IChannelVideoHandler
     {
-        Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<IListVideoInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage);
+        /// <summary>
+        /// チャンネルから動画を取得する
+        /// </summary>
+        /// <param name="channelId">チャンネルID</param>
+        /// <param name="videos">取得した動画を追加するリスト</param>
+        /// <param name="onMessage">メッセージハンドラー</param>
+        /// <returns>チャンネル名と成功状態</returns>
+        Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<IListVideoInfo> videos, Action<string> onMessage);
     }
 
     class ChannelVideoHandler : IChannelVideoHandler
@@ -39,7 +46,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Channel
         /// </summary>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<IListVideoInfo> videos, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        public async Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<IListVideoInfo> videos, Action<string> onMessage)
         {
 
             string html;
