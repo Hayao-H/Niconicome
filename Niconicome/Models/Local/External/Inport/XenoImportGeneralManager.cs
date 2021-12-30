@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network;
@@ -266,7 +267,8 @@ namespace Niconicome.Models.Local.External.Import
             }
             else
             {
-                var videos = (await this.networkVideoHandler.GetVideoListInfosAsync(playlistInfo.Videos.Select(v => v.NiconicoId.Value))).ToList();
+                List<IListVideoInfo> videos = (await this.networkVideoHandler.GetVideoListInfosAsync(playlistInfo.Videos.Select(v => v.NiconicoId.Value))).Data!.ToList();
+
                 foreach (var video in videos)
                 {
                     this.playlistStoreHandler.AddVideo(video, id);

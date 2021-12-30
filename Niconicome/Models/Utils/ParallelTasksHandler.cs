@@ -11,16 +11,11 @@ namespace Niconicome.Models.Utils
 {
     public interface IParallelTask<T>
     {
-        Guid TaskId { get; }
         int Index { get; set; }
-        Func<T, object, IParallelTaskToken, Task> TaskFunction { get; }
+        Func<T, object, Task> TaskFunction { get; }
         Action<int> OnWait { get; }
     }
 
-    public interface IParallelTaskToken
-    {
-        bool IsSkipped { get; set; }
-    }
 
     class ParallelTasksHandler<T> where T : IParallelTask<T>
     {
@@ -170,7 +165,12 @@ namespace Niconicome.Models.Utils
 
                 Func<Task> func = async () =>
                 {
-                    await semaphore.WaitAsync();
+                    try
+                    {
+                        await semaphore.WaitAsync(ct);
+                    }
+                    catch { }
+
                     if (ct.IsCancellationRequested)
                     {
                         onCancelled?.Invoke();
@@ -213,11 +213,9 @@ namespace Niconicome.Models.Utils
                         return;
                     }
 
-                    var token = new ParallelTaskToken();
-
                     try
                     {
-                        await task.TaskFunction(task, lockobj, token);
+                        await task.TaskFunction(task, lockobj);
                     }
                     catch
                     {
@@ -264,10 +262,5 @@ namespace Niconicome.Models.Utils
 
         }
 
-    }
-
-    public struct ParallelTaskToken : IParallelTaskToken
-    {
-        public bool IsSkipped { get; set; }
     }
 }

@@ -32,7 +32,7 @@ namespace Niconicome.Models.Network
 
     class VideoIDHandler : IVideoIDHandler
     {
-        public VideoIDHandler(INetworkVideoHandler networkVideoHandler, INiconicoUtils niconicoUtils, ILocalDirectoryHandler localDirectoryHandler, IRemotePlaylistHandler remotePlaylistHandler,ILogger logger)
+        public VideoIDHandler(INetworkVideoHandler networkVideoHandler, INiconicoUtils niconicoUtils, ILocalDirectoryHandler localDirectoryHandler, IRemotePlaylistHandler remotePlaylistHandler, ILogger logger)
         {
             this._networkVideoHandler = networkVideoHandler;
             this._niconicoUtils = niconicoUtils;
@@ -109,7 +109,7 @@ namespace Niconicome.Models.Network
                 onMessage("IDを登録します");
                 try
                 {
-                    videos.AddRange(await this.GetVideoListInfosFromID(inputText));
+                    videos.Add(await this.GetVideoListInfosFromID(inputText));
                 }
                 catch (Exception e)
                 {
@@ -165,19 +165,19 @@ namespace Niconicome.Models.Network
         {
             IEnumerable<string> ids = this._localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
 
-            IEnumerable<IListVideoInfo> videos = await this._networkVideoHandler.GetVideoListInfosAsync(ids);
+            IAttemptResult<IEnumerable<IListVideoInfo>> result = await this._networkVideoHandler.GetVideoListInfosAsync(ids);
 
-            return videos;
+            return result.Data!;
         }
 
         /// <summary>
         /// IDから動画を取得する
         /// </summary>
-        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromID(string id)
+        private async Task<IListVideoInfo> GetVideoListInfosFromID(string id)
         {
-            var videos = await this._networkVideoHandler.GetVideoListInfosAsync(new List<string>() { id });
+            IAttemptResult<IListVideoInfo> result = await this._networkVideoHandler.GetVideoListInfoAsync(id);
 
-            return videos;
+            return result.Data!;
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace Niconicome.Models.Network
 
                 if (type == RemoteType.WatchPage)
                 {
-                    return await this.GetVideoListInfosFromID(id);
+                    return new List<IListVideoInfo>() { await this.GetVideoListInfosFromID(id) };
                 }
                 else
                 {
