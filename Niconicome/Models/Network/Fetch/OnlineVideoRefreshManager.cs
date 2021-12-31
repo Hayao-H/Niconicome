@@ -50,13 +50,14 @@ namespace Niconicome.Models.Network.Fetch
 
     public class OnlineVideoRefreshManager : IOnlineVideoRefreshManager
     {
-        public OnlineVideoRefreshManager(ICurrent current, IVideoListContainer container, INetworkVideoHandler netVideoHandler, IRemotePlaylistHandler remotePlaylistHandler, IMessageHandler message)
+        public OnlineVideoRefreshManager(ICurrent current, IVideoListContainer container, INetworkVideoHandler netVideoHandler, IRemotePlaylistHandler remotePlaylistHandler, IMessageHandler message,IVideosUnchecker unchecker)
         {
             this._current = current;
             this._container = container;
             this._netVideoHandler = netVideoHandler;
             this._remotePlaylistHandler = remotePlaylistHandler;
             this._message = message;
+            this._unchcecker = unchecker;
         }
 
         #region field
@@ -70,6 +71,8 @@ namespace Niconicome.Models.Network.Fetch
         private readonly IRemotePlaylistHandler _remotePlaylistHandler;
 
         private readonly IMessageHandler _message;
+
+        private readonly IVideosUnchecker _unchcecker;
 
         private CancellationTokenSource? _cts = null;
 
@@ -95,7 +98,7 @@ namespace Niconicome.Models.Network.Fetch
             int? playlistID = this._current.SelectedPlaylist.Value?.Id;
 
             //情報取得
-            IEnumerable<IListVideoInfo> retrieved = await this._netVideoHandler.GetVideoListInfosAsync(videos, playlistID: playlistID, uncheck: true, ct: this._cts!.Token);
+            IAttemptResult<IEnumerable<IListVideoInfo>> retrieved = await this._netVideoHandler.GetVideoListInfosAsync(videos.Select(v => v.NiconicoId.Value), id => this._unchcecker.Uncheck(id, playlistID ?? -1), this._cts!.Token);
 
             if (this._cts!.IsCancellationRequested)
             {
@@ -103,10 +106,10 @@ namespace Niconicome.Models.Network.Fetch
                 return AttemptResult<int>.Fail("処理がキャンセルされました。");
             }
 
-            int failedCount = videos.Count - retrieved.Count();
+            int failedCount = videos.Count - retrieved.Data!.Count();
 
             //保存
-            IAttemptResult updateResult = this._container.UpdateRange(videos, playlistID: playlistID);
+            IAttemptResult updateResult = this._container.UpdateRange(retrieved.Data!, playlistID: playlistID);
 
             if (!updateResult.IsSucceeded)
             {
@@ -150,7 +153,7 @@ namespace Niconicome.Models.Network.Fetch
             this.PreFetching();
 
             //同期処理（Fetch）
-            IAttemptResult<string> result = await this._remotePlaylistHandler.TryGetRemotePlaylistAsync(remoteID, videos, remoteType, registeredVIdeos, m => this._message.AppendMessage(m));
+            IAttemptResult<string> result = await this._remotePlaylistHandler.TryGetRemotePlaylistAsync(remoteID, videos, remoteType, m => this._message.AppendMessage(m));
 
             if (!result.IsSucceeded)
             {

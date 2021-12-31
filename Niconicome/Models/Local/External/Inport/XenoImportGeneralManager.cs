@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network;
@@ -247,7 +248,7 @@ namespace Niconicome.Models.Local.External.Import
                 this.playlistStoreHandler.SetAsRemotePlaylist(id, playlistInfo.RemoteId, playlistInfo.RemoteType);
 
                 var videos = new List<IListVideoInfo>();
-                var rResult = await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(playlistInfo.RemoteId, videos, RemoteType.Channel, new List<string>(), m => this.OnMessageVerbose(m));
+                var rResult = await this.remotePlaylistHandler.TryGetRemotePlaylistAsync(playlistInfo.RemoteId, videos, RemoteType.Channel, this.OnMessageVerbose);
 
                 if (rResult.IsSucceeded)
                 {
@@ -266,7 +267,8 @@ namespace Niconicome.Models.Local.External.Import
             }
             else
             {
-                var videos = (await this.networkVideoHandler.GetVideoListInfosAsync(playlistInfo.Videos.Select(v => v.NiconicoId.Value))).ToList();
+                List<IListVideoInfo> videos = (await this.networkVideoHandler.GetVideoListInfosAsync(playlistInfo.Videos.Select(v => v.NiconicoId.Value))).Data!.ToList();
+
                 foreach (var video in videos)
                 {
                     this.playlistStoreHandler.AddVideo(video, id);

@@ -17,15 +17,31 @@ using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Helper.Result;
 using System.Reflection;
 using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Const;
+using Windows.Devices.Midi;
 
 namespace Niconicome.Models.Network
 {
     public interface INetworkVideoHandler
     {
-        bool IsVideoDownloaded(string niconicoId);
-        string GetFilePath(string niconicoId);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null);
-        Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> videos, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null);
+        /// <summary>
+        /// IDから動画を取得する
+        /// </summary>
+        /// <param name="ids">ID</param>
+        /// <param name="ct">CT</param>
+        /// <returns>取得した動画</returns>
+        Task<IAttemptResult<IListVideoInfo>> GetVideoListInfoAsync(string id, CancellationToken? ct = null);
+
+        /// <summary>
+        /// 複数のIDから動画を取得する
+        /// </summary>
+        /// <param name="ids">ID一覧</param>
+        /// <param name="ct">CT</param>
+        /// <param name="onSucceeded">成功時に実行する関数</param>
+        /// <param name="ct"></param>
+        /// <returns>取得した動画の一覧</returns>
+        Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<string>? onSucceeded = null, CancellationToken? ct = null);
+
     }
 
     public interface INetworkResult
@@ -45,148 +61,96 @@ namespace Niconicome.Models.Network
     {
 
         #region field
-        private readonly IWatch wacthPagehandler;
 
-        private readonly State::IMessageHandler messageHandler;
+        private readonly IWatch _wacthPagehandler;
 
-        private readonly IVideoFileStorehandler fileStorehandler;
+        private readonly State::IMessageHandler _messageHandler;
 
-        private readonly ILocalSettingHandler settingHandler;
+        private readonly ILocalSettingHandler _settingHandler;
 
-        private readonly IVideoInfoContainer videoInfoContainer;
-
-        private readonly IVideosUnchecker unchecker;
+        private readonly IVideoInfoContainer _videoInfoContainer;
 
         #endregion
 
-        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, IVideoFileStorehandler fileStorehandler, ILocalSettingHandler settingHandler, IVideoInfoContainer videoInfoContainer, IVideosUnchecker unchecker)
+        public NetworkVideoHandler(IWatch watchPageHandler, State::IMessageHandler messageHandler, ILocalSettingHandler settingHandler, IVideoInfoContainer videoInfoContainer)
         {
-            this.wacthPagehandler = watchPageHandler;
-            this.messageHandler = messageHandler;
-            this.fileStorehandler = fileStorehandler;
-            this.settingHandler = settingHandler;
-            this.videoInfoContainer = videoInfoContainer;
-            this.unchecker = unchecker;
+            this._wacthPagehandler = watchPageHandler;
+            this._messageHandler = messageHandler;
+            this._settingHandler = settingHandler;
+            this._videoInfoContainer = videoInfoContainer;
         }
 
 
-        /// <summary>
-        /// IDから動画情報を取得する
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <param name="onSucceeded"></param>
-        /// <param name="onFailed"></param>
-        /// <param name="onStarted"></param>
-        /// <param name="onWaiting"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<string> ids, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null)
-        {
-            return await this.GetVideoListInfosAsync(ids.Select(i =>
-            {
-                return this.videoInfoContainer.GetVideo(i);
-            }), uncheck, playlistID, forceRegister, ct);
-        }
+        #region Methods
 
-        /// <summary>
-        /// ダウンロード済かどうかを確かめる
-        /// </summary>
-        /// <param name="niconicoId"></param>
-        /// <returns></returns>
-        public bool IsVideoDownloaded(string niconicoId)
-        {
-            return this.fileStorehandler.Exists(niconicoId);
-        }
-
-        /// <summary>
-        /// ファイルパスを取得する
-        /// </summary>
-        /// <param name="niconicoId"></param>
-        /// <returns></returns>
-        public string GetFilePath(string niconicoId)
-        {
-            if (!this.fileStorehandler.Exists(niconicoId)) throw new InvalidOperationException($"{niconicoId}は保存されていません。");
-            return this.fileStorehandler.GetFilePath(niconicoId)!;
-        }
-
-        /// <summary>
-        ///　指定したフォルダーに存在するファイルパスを取得する
-        /// </summary>
-        /// <param name="niconicoId"></param>
-        /// <param name="foldername"></param>
-        /// <returns></returns>
-        public string GetFilePath(string niconicoId, string foldername)
-        {
-            var paths = this.fileStorehandler.GetFilePaths(niconicoId);
-            return paths.First(p =>
-                (Path.GetDirectoryName(p) ?? string.Empty) == foldername);
-        }
-
-        #region
-
-        /// <summary>
-        /// 動画情報を取得して処理する（実装）
-        /// </summary>
-        /// <param name="emptyVideos"></param>
-        /// <param name="onSucceeded"></param>
-        /// <param name="onFailed"></param>
-        /// <param name="onStarted"></param>
-        /// <param name="onWaiting"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosAsync(IEnumerable<IListVideoInfo> emptyVideos, bool uncheck = false, int? playlistID = null, bool forceRegister = false, CancellationToken? ct = null)
+        public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<string>? onSucceeded = null, CancellationToken? ct = null)
         {
 
-            var registerOnlyID = forceRegister ? false : this.settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
-            if (registerOnlyID)
-            {
-                return emptyVideos;
-            }
-
-            int videosCount = emptyVideos.Count();
             var videos = new List<IListVideoInfo>();
-            var maxParallelCount = this.settingHandler.GetIntSetting(SettingsEnum.MaxFetchCount);
-            var waitInterval = this.settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
-            if (maxParallelCount < 1) maxParallelCount = 3;
-            if (waitInterval < 1) waitInterval = 5;
+
+            int videosCount = ids.Count();
+            int maxParallelCount = this._settingHandler.GetIntSetting(SettingsEnum.MaxFetchCount);
+            int waitInterval = this._settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
+
+            if (maxParallelCount < 1) maxParallelCount = Net.DefaultMaxParallelFetchCount;
+            if (waitInterval < 1) waitInterval = Net.DefaultFetchWaitInterval;
 
             var handler = new ParallelTasksHandler<NetworkVideoParallelTask>(maxParallelCount, waitInterval, 15);
 
-            foreach (var item in emptyVideos.Select((video, index) => new { video, index }))
+            foreach (var id in ids)
             {
 
-                var task = new NetworkVideoParallelTask(async (_, lockObj, _) =>
+                var task = new NetworkVideoParallelTask(async (_, lockObj) =>
                 {
-                    this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得を開始します。");
-
-                    IAttemptResult<IListVideoInfo> result = await this.wacthPagehandler.TryGetVideoInfoAsync(item.video.NiconicoId.Value, DWatch::WatchInfoOptions.NoDmcData);
-
-                    if (!result.IsSucceeded || result.Data is null)
+                    IAttemptResult<IListVideoInfo> result = await this.GetVideoListInfoAsync(id, ct);
+                    if (result.IsSucceeded && result.Data is not null)
                     {
-                        this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に失敗しました。(詳細:{result.Message})");
-                        if (result.Exception is not null)
-                        {
-                            this.messageHandler.AppendMessage($"技術的詳細情報：{result.Exception.Message}");
-                        }
+                        videos.Add(result.Data);
+                        onSucceeded?.Invoke(id);
                     }
-                    else
-                    {
-                        this.messageHandler.AppendMessage($"{item.video.NiconicoId.Value}の取得に成功しました。");
-                        item.video.SetNewData(result.Data);
-                        videos.Add(item.video);
-                        if (uncheck && playlistID is not null)
-                        {
-                            this.unchecker.Uncheck(item.video.NiconicoId.Value, playlistID ?? -1);
-                        }
-                    }
-                }, index => this.messageHandler.AppendMessage("待機中...(15s)"));
+
+                }, index => this._messageHandler.AppendMessage("待機中...(15s)"));
 
                 handler.AddTaskToQueue(task);
 
             }
 
-            await handler.ProcessTasksAsync(() => { }, () => this.messageHandler.AppendMessage("動画情報の取得処理が中断されました。"), ct ?? CancellationToken.None);
+            await handler.ProcessTasksAsync(() => { }, () => this._messageHandler.AppendMessage("動画情報の取得処理が中断されました。"), ct ?? CancellationToken.None);
 
 
-            return videos;
+            return AttemptResult<IEnumerable<IListVideoInfo>>.Succeeded(videos);
+        }
+
+        public async Task<IAttemptResult<IListVideoInfo>> GetVideoListInfoAsync(string id, CancellationToken? ct = null)
+        {
+
+            IListVideoInfo video = this._videoInfoContainer.GetVideo(id);
+
+            bool registerOnlyID = this._settingHandler.GetBoolSetting(SettingsEnum.StoreOnlyNiconicoID);
+            if (registerOnlyID)
+            {
+                return AttemptResult<IListVideoInfo>.Succeeded(video);
+            }
+
+
+
+            this._messageHandler.AppendMessage($"{id}の取得を開始します。");
+
+            IAttemptResult<IListVideoInfo> result = await this._wacthPagehandler.TryGetVideoInfoAsync(id, DWatch::WatchInfoOptions.NoDmcData);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                this._messageHandler.AppendMessage($"{id}の取得に失敗しました。(詳細:{result.Message})");
+                return AttemptResult<IListVideoInfo>.Fail($"{id}の取得に失敗しました。(詳細:{result.Message})");
+            }
+            else
+            {
+                this._messageHandler.AppendMessage($"{id}の取得に成功しました。");
+                video.SetNewData(result.Data);
+            }
+
+            return AttemptResult<IListVideoInfo>.Succeeded(video);
+
         }
 
         #endregion
@@ -230,17 +194,15 @@ namespace Niconicome.Models.Network
 
     public class NetworkVideoParallelTask : IParallelTask<NetworkVideoParallelTask>
     {
-        public NetworkVideoParallelTask(Func<NetworkVideoParallelTask, object, IParallelTaskToken, Task> taskFunction, Action<int> onwait)
+        public NetworkVideoParallelTask(Func<NetworkVideoParallelTask, object, Task> taskFunction, Action<int> onwait)
         {
             this.TaskFunction = taskFunction;
             this.OnWait = onwait;
         }
 
-        public Guid TaskId { get; init; } = Guid.NewGuid();
-
         public int Index { get; set; }
 
-        public Func<NetworkVideoParallelTask, object, IParallelTaskToken, Task> TaskFunction { get; init; }
+        public Func<NetworkVideoParallelTask, object, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
     }

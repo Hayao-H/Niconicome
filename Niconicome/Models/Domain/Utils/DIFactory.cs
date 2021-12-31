@@ -9,6 +9,7 @@ using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
 using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
+using DLActions = Niconicome.Models.Network.Download.Actions;
 using DlComment = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DlDescription = Niconicome.Models.Domain.Niconico.Download.Description;
 using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
@@ -23,6 +24,7 @@ using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
 using Ext = Niconicome.Models.Local.External;
+using Fetch = Niconicome.Models.Network.Fetch;
 using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Ichiba = Niconicome.Models.Domain.Niconico.Video.Ichiba;
@@ -38,6 +40,7 @@ using Niconico = Niconicome.Models.Domain.Niconico;
 using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
+using Register = Niconicome.Models.Network.Register;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
@@ -46,13 +49,11 @@ using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Style = Niconicome.Models.Domain.Local.Style;
+using Timer = Niconicome.Models.Local.Timer;
 using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
-using DLActions = Niconicome.Models.Network.Download.Actions;
-using Timer = Niconicome.Models.Local.Timer;
-using Fetch = Niconicome.Models.Network.Fetch;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -239,6 +240,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonAPI::Local.Tab.ITabsManager, AddonAPI::Local.Tab.TabsManager>();
             services.AddSingleton<Fetch::IOnlineVideoRefreshManager, Fetch::OnlineVideoRefreshManager>();
             services.AddTransient<PlaylistPlaylist::IVideosUnchecker, PlaylistPlaylist::VideosUnchecker>();
+            services.AddTransient<Register::IVideoRegistrationHandler, Register::VideoRegistrationHandler>();
             return services.BuildServiceProvider();
         }
 
