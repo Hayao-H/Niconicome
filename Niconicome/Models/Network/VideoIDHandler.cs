@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Niconico.Search;
@@ -9,11 +10,12 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Reactive.Bindings;
+using Windows.ApplicationModel.Calls;
 using Search = Niconicome.Models.Domain.Niconico.Search;
 
 namespace Niconicome.Models.Network
 {
-    interface IVideoIDHandler
+    public interface IVideoIDHandler
     {
         /// <summary>
         /// 入力した文字列から動画情報を取得する
@@ -21,8 +23,9 @@ namespace Niconicome.Models.Network
         /// <param name="inputText">ソーステキスト</param>
         /// <param name="filterFUnction">情報を取得するかどうかを選択する関数</param>
         /// <param name="onMessage">メッセージハンドラー</param>
+        /// <param name="extractFromText">ryyvv </param>
         /// <returns></returns>
-        Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(string inputText, Func<string, bool> filterFUnction, Action<string> onMessage);
+        Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(string inputText, Action<string> onMessage, bool extractFromText = false);
 
         /// <summary>
         /// 処理中フラグ
@@ -32,13 +35,14 @@ namespace Niconicome.Models.Network
 
     class VideoIDHandler : IVideoIDHandler
     {
-        public VideoIDHandler(INetworkVideoHandler networkVideoHandler, INiconicoUtils niconicoUtils, ILocalDirectoryHandler localDirectoryHandler, IRemotePlaylistHandler remotePlaylistHandler, ILogger logger)
+        public VideoIDHandler(INetworkVideoHandler networkVideoHandler, INiconicoUtils niconicoUtils, ILocalDirectoryHandler localDirectoryHandler, IRemotePlaylistHandler remotePlaylistHandler, ILogger logger,INiconicoUtils utils)
         {
             this._networkVideoHandler = networkVideoHandler;
             this._niconicoUtils = niconicoUtils;
             this._localDirectoryHandler = localDirectoryHandler;
             this.remotePlaylistHandler = remotePlaylistHandler;
             this._logger = logger;
+            this._utils = utils;
         }
 
         #region field
@@ -53,6 +57,8 @@ namespace Niconicome.Models.Network
 
         private readonly ILogger _logger;
 
+        private readonly INiconicoUtils _utils;
+
         #endregion
 
 
@@ -64,7 +70,7 @@ namespace Niconicome.Models.Network
 
         #region Method
 
-        public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(string inputText, Func<string, bool> filterFUnction, Action<string> onMessage)
+        public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(string inputText, Action<string> onMessage, bool extractFromText = false)
         {
             this.StartProcessing();
 
@@ -73,7 +79,21 @@ namespace Niconicome.Models.Network
 
             onMessage($"入力値：{inputText}");
 
-            if (Path.IsPathRooted(inputText))
+            if (extractFromText)
+            {
+                onMessage("文字列から動画を取得します。");
+                try
+                {
+                    videos.AddRange(await this.GetVideoListInfoFromTextAsync(inputText));
+                }
+                catch (Exception e)
+                {
+                    this._logger.Error("文字列からの動画取得に失敗しました。", e);
+                    this.FinishProcessing();
+                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("文字列からの動画取得に失敗しました。", e);
+                }
+            }
+            else if (Path.IsPathRooted(inputText))
             {
                 onMessage("ローカルディレクトリーから動画を取得します");
                 try
@@ -159,6 +179,18 @@ namespace Niconicome.Models.Network
         }
 
         /// <summary>
+        /// テキストから動画を取得する
+        /// </summary>
+        private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfoFromTextAsync(string text)
+        {
+            IEnumerable<string> ids = this._utils.GetNiconicoIdsFromText(text).Where(id => this._utils.IsNiconicoID(id));
+
+            IAttemptResult<IEnumerable<IListVideoInfo>> result = await this._networkVideoHandler.GetVideoListInfosAsync(ids);
+
+            return result.Data!;
+        }
+
+        /// <summary>
         /// ローカルフォルダーから動画情報を取得する
         /// </summary>
         private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromLocalPath(string localPath)
@@ -183,9 +215,6 @@ namespace Niconicome.Models.Network
         /// <summary>
         /// ネットワークから動画を取得する（検索＋リモート）
         /// </summary>
-        /// <param name="inputText"></param>
-        /// <param name="onMessage"></param>
-        /// <returns></returns>
         private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfoWithNetAsync(string inputText, Action<string> onMessage)
         {
 

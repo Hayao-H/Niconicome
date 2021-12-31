@@ -18,6 +18,7 @@ using Niconicome.Models.Network.Download.Actions;
 using Niconicome.Models.Local.Timer;
 using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Niconicome.Models.Network.Fetch;
+using Niconicome.Models.Network.Register;
 
 namespace Niconicome.Workspaces
 {
@@ -61,5 +62,10 @@ namespace Niconicome.Workspaces
         /// 動画情報の更新とか
         /// </summary>
         public static IOnlineVideoRefreshManager VideoRefreshManager { get; private set; } = DIFactory.Provider.GetRequiredService<IOnlineVideoRefreshManager>();
+
+        /// <summary>
+        /// 動画の追加とか
+        /// </summary>
+        public static IVideoRegistrationHandler VideoRegistrationHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoRegistrationHandler>();
     }
 }

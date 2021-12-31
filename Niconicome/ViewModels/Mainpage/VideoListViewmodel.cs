@@ -306,7 +306,6 @@ namespace Niconicome.ViewModels.Mainpage
                       this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
                       return;
                   }
-                  int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
 
                   string niconicoId;
                   if (arg is not null and string)
@@ -323,34 +322,33 @@ namespace Niconicome.ViewModels.Mainpage
                       return;
                   }
 
-                  var videos = new List<IListVideoInfo>();
-                  var result = await WS::Mainpage.VideoIDHandler.TryGetVideoListInfosAsync(videos, niconicoId, WS::Mainpage.VideoListContainer.Videos.Select(v => v.NiconicoId.Value), m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+                  this.SnackbarMessageQueue.Enqueue("動画を追加します");
 
-                  if (result.IsFailed)
+                  IAttemptResult<IEnumerable<IListVideoInfo>> result = await WS::Mainpage.VideoRegistrationHandler.ResgisterVideoAsync(niconicoId);
+
+                  if (!result.IsSucceeded || result.Data is null)
                   {
                       this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
                       return;
                   }
-                  else if (videos.Count == 0)
-                  {
 
+                  List<IListVideoInfo> videos = result.Data.ToList();
+
+                  if (videos.Count == 0)
+                  {
                       this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
                       return;
                   }
 
-                  WS::Mainpage.VideoListContainer.AddRange(videos, playlistId, !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
-
-                  WS::Mainpage.VideoListContainer.Refresh();
-
                   this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
                   WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を追加しました");
 
-                  if (!videos.First().ChannelID.Value.IsNullOrEmpty())
+                  if (!videos[0].ChannelID.Value.IsNullOrEmpty())
                   {
-                      var video = videos.First();
-                      WS::Mainpage.SnackbarHandler.Enqueue($"この動画のチャンネルは「{video.ChannelName.Value}」です", "IDをコピー", () =>
+                      IListVideoInfo firstVideo = videos[0];
+                      WS::Mainpage.SnackbarHandler.Enqueue($"この動画のチャンネルは「{firstVideo.ChannelName.Value}」です", "IDをコピー", () =>
                       {
-                          Clipboard.SetText(video.ChannelID.Value);
+                          Clipboard.SetText(firstVideo.ChannelID.Value);
                           WS::Mainpage.SnackbarHandler.Enqueue("コピーしました");
                       });
                   }
@@ -453,41 +451,47 @@ namespace Niconicome.ViewModels.Mainpage
                 .ToReactiveCommand()
                 .WithSubscribe
                 (async () =>
-            {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
-                    return;
-                }
-
-                int playlistId = WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id;
-
-                var data = Clipboard.GetText();
-                if (data == string.Empty) return;
-
-                Utils::INiconicoUtils reader = new Utils::NiconicoUtils();
-                var ids = reader.GetNiconicoIdsFromText(data).Where(i => !WS::Mainpage.PlaylistHandler.ContainsVideo(i, playlistId)).ToList();
-
-                var videos = (await WS::Mainpage.NetworkVideoHandler.GetVideoListInfosAsync(ids)).ToList();
-                var result = WS::Mainpage.VideoListContainer.AddRange(videos, playlistId, !WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.Value);
-                WS::Mainpage.VideoListContainer.Refresh();
-
-                if (result.IsSucceeded)
-                {
-                    WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を登録しました。");
-                    this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を登録しました。");
-
-                    if (videos.Count < ids.Count)
+                    if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                     {
-                        WS::Mainpage.Messagehandler.AppendMessage($"{ids.Count - videos.Count}件の動画の追加に失敗しました。");
+                        this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
+                        return;
                     }
-                }
-                else
-                {
-                    WS::Mainpage.Messagehandler.AppendMessage($"{ids.Count}件の動画の追加に失敗しました。");
-                }
 
-            })
+                    var data = Clipboard.GetText();
+                    if (string.IsNullOrEmpty(data)) return;
+
+                    this.SnackbarMessageQueue.Enqueue("動画を追加します");
+
+                    IAttemptResult<IEnumerable<IListVideoInfo>> result = await WS::Mainpage.VideoRegistrationHandler.ResgisterVideoAsync(data);
+
+                    if (!result.IsSucceeded || result.Data is null)
+                    {
+                        this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
+                        return;
+                    }
+
+                    List<IListVideoInfo> videos = result.Data.ToList();
+
+                    if (videos.Count == 0)
+                    {
+                        this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
+                        return;
+                    }
+
+                    this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
+                    WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を追加しました");
+
+                    if (!videos[0].ChannelID.Value.IsNullOrEmpty())
+                    {
+                        IListVideoInfo firstVideo = videos[0];
+                        WS::Mainpage.SnackbarHandler.Enqueue($"この動画のチャンネルは「{firstVideo.ChannelName.Value}」です", "IDをコピー", () =>
+                        {
+                            Clipboard.SetText(firstVideo.ChannelID.Value);
+                            WS::Mainpage.SnackbarHandler.Enqueue("コピーしました");
+                        });
+                    }
+                })
                 .AddTo(this.disposables);
 
             this.OpenNetworkSettingsCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
