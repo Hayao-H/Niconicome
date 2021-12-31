@@ -144,7 +144,7 @@ namespace Niconicome.Models.Domain.Utils
             string filename = Path.GetFileNameWithoutExtension(filenameWithExt) ?? string.Empty;
             if (filename == string.Empty) throw new InvalidOperationException("ファイル名が空です。");
 
-            var match = Regex.Match(filenameWithExt, "^.*(sm|nm|so)?[0-9]+.*$");
+            var match = Regex.Match(filenameWithExt, "(sm|nm|so)?[0-9]+");
             return match.Value;
         }
 
