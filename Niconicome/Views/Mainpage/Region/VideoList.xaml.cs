@@ -15,10 +15,5 @@ namespace Niconicome.Views.Mainpage.Region
         {
             this.InitializeComponent();
         }
-
-        private void Videolist_db_click(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-
-        }
     }
 }

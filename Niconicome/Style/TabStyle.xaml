@@ -11,7 +11,7 @@
                                 Margin="2" 
                                 Background="#e7e7e7" 
                                 BorderThickness="1" 
-                                Padding="5"
+                                Padding="8 4"
                                 CornerRadius="8">
                             <ContentPresenter VerticalAlignment="Center"
                                               HorizontalAlignment="Center"

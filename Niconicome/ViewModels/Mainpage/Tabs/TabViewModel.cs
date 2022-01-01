@@ -8,9 +8,9 @@ using Niconicome.Models.Local.Addon.API.Local.Tab;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs
 {
-    public class BottomTabViewModel : TabViewModelBase
+    public class TabViewModel : TabViewModelBase
     {
-        public BottomTabViewModel(ITabItem item) : base(item.Title, item.ID)
+        public TabViewModel(ITabItem item) : base(item.Title, item.ID)
         {
             this._tabItem = item;
         }

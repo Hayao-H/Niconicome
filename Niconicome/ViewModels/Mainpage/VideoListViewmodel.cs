@@ -27,6 +27,7 @@ using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Utils;
 using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Converter.KeyDown;
+using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.Views;
 using Niconicome.Views.Mainpage;
 using Prism.Events;
@@ -46,13 +47,13 @@ namespace Niconicome.ViewModels.Mainpage
     /// <summary>
     /// 動画一覧のVM
     /// </summary>
-    class VideoListViewModel : BindableBase, IDisposable
+    class VideoListViewModel : TabViewModelBase, IDisposable
     {
         public VideoListViewModel(IEventAggregator ea) : this((message, button, image) => MaterialMessageBox.Show(message, button, image), ea)
         {
 
         }
-        public VideoListViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox, IEventAggregator ea)
+        public VideoListViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessageBox, IEventAggregator ea) : base("動画一覧", "")
         {
             //プレイリスト選択変更イベントを購読する
             WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Subscribe(_ => this.OnSelectedPlaylistChanged());
