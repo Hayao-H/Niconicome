@@ -26,6 +26,11 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         string ID { get; }
 
         /// <summary>
+        /// タブの位置情報
+        /// </summary>
+        TabType TabType { get; }
+
+        /// <summary>
         /// アクセス可能であるかどうかを判断
         /// </summary>
         /// <param name="url"></param>
@@ -36,7 +41,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         /// 初期化
         /// </summary>
         /// <param name="infomation"></param>
-        void Initialize(AddonInfomation infomation, string title);
+        void Initialize(AddonInfomation infomation, string title, TabType tabType);
     }
 
     public class TabInfomation : ITabInfomation
@@ -60,21 +65,22 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
 
         public string Title { get; private set; } = string.Empty;
 
+        public TabType TabType { get; private set; }
+
         public string ID { get; init; } = Guid.NewGuid().ToString("D");
-
-
 
         #endregion
 
         #region Methods
 
-        public void Initialize(AddonInfomation infomation, string title)
+        public void Initialize(AddonInfomation infomation, string title,TabType tabType)
         {
             if (this.isInitialized) return;
 
             this.AddonInfomation = infomation;
             this._hostPermissionsHandler.Initialize(infomation.HostPermissions);
             this.Title = title;
+            this.TabType = tabType;
 
             this.isInitialized = true;
         }

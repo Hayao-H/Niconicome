@@ -174,13 +174,18 @@
                                 </Button>
                             </DockPanel>
                         </DockPanel>
-                        <Grid Grid.Row="1" x:Name="videoList">
+                        <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="{Binding TabsHeight.Value}"/>
                             </Grid.RowDefinitions>
-                            <UserControl prism:RegionManager.RegionName="VideoListRegion"/>
-                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="1" Margin="8" prism:RegionManager.RegionName="TabResion">
+                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion">
+                                <TabControl.Resources>
+                                    <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
+                                    </Style>
+                                </TabControl.Resources>
+                            </TabControl>
+                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="1" Margin="8" prism:RegionManager.RegionName="BottomTabResion">
                                 <TabControl.Resources>
                                     <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
                                     </Style>

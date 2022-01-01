@@ -12,6 +12,13 @@ namespace Niconicome.Models.Const
 
         public static int DefaultCommetFetchWaitSpan = 0;
 
-        public static string TabRegionName = "TabResion";
+        public static string BottomTabRegionName = "BottomTabResion";
+
+        public static string TopTabRegionName = "TopTabRegion";
+
+        public const string TabPositionTop = "top";
+
+        public const string TabPositionBottom = "bottom";
+
     }
 }

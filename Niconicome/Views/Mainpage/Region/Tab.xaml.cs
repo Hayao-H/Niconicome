@@ -20,15 +20,15 @@ using Niconicome.ViewModels.Mainpage.Tabs;
 namespace Niconicome.Views.Mainpage.Region
 {
     /// <summary>
-    /// BottomTab.xaml の相互作用ロジック
+    /// Tab.xaml の相互作用ロジック
     /// </summary>
-    public partial class BottomTab : UserControl
+    public partial class Tab : UserControl
     {
-        public BottomTab(BottomTabViewModel viewModel)
+        public Tab(ViewModels.Mainpage.Tabs.TabViewModel viewModel)
         {
             InitializeComponent();
             this.DataContext = viewModel;
-            this.WebView.NavigationCompleted += (_, _) => this.DataContext.As<BottomTabViewModel>().Initialize(this.WebView.CoreWebView2);
+            this.WebView.NavigationCompleted += (_, _) => this.DataContext.As<ViewModels.Mainpage.Tabs.TabViewModel>().Initialize(this.WebView.CoreWebView2);
         }
     }
 }

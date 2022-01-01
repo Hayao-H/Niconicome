@@ -22,12 +22,12 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         /// <summary>
         /// タブ追加イベント
         /// </summary>
-        event EventHandler<TabItem>? Add;
+        event EventHandler<AddTabEventArgs>? Add;
 
         /// <summary>
         /// タブ削除イベント
         /// </summary>
-        event EventHandler<string>? Remove;
+        event EventHandler<RemoveTabEventArgs>? Remove;
     }
 
     public class TabsContainer : ITabsContainer
@@ -41,9 +41,9 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
         #region event
 
-        public event EventHandler<string>? Remove;
+        public event EventHandler<RemoveTabEventArgs>? Remove;
 
-        public event EventHandler<TabItem>? Add;
+        public event EventHandler<AddTabEventArgs>? Add;
 
         #endregion
 
@@ -55,17 +55,44 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
             var tab = new TabItem(infomation, item =>
             {
                 if (!this.tabs.Any(t => t.ID == item.ID)) return false;
-                this.Remove?.Invoke(this, item.ID);
+                this.Remove?.Invoke(this, new RemoveTabEventArgs(item.TabType, item.ID));
                 this.tabs.RemoveAll(tab => tab.ID == item.ID);
                 return true;
             });
 
             this.tabs.Add(tab);
-            this.Add?.Invoke(this, tab);
+            this.Add?.Invoke(this, new AddTabEventArgs(infomation.TabType, tab));
 
             return tab;
         }
 
         #endregion
     }
+    public class AddTabEventArgs : EventArgs
+    {
+        public AddTabEventArgs(TabType tabType, ITabItem tabItem) : base()
+        {
+            this.TabType = tabType;
+            this.TabItem = tabItem;
+        }
+
+        public TabType TabType { get; init; }
+
+        public ITabItem TabItem { get; init; }
+    }
+
+    public class RemoveTabEventArgs : EventArgs
+    {
+        public RemoveTabEventArgs(TabType tabType, string tabID) : base()
+        {
+            this.TabType = tabType;
+            this.TabID = tabID;
+        }
+
+        public TabType TabType { get; init; }
+
+        public string TabID { get; init; }
+    }
+
+
 }
