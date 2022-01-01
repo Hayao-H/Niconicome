@@ -16,7 +16,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
     public interface ITabsManager : IAPIBase
     {
 
-        Task<ITabHandler> add(string title);
+        Task<ITabHandler> add(string title, string position = LocalConstant.TabPositionBottom);
 
     }
 
@@ -36,12 +36,18 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
         #region Method
 
-        public async Task<ITabHandler> add(string title)
+        public async Task<ITabHandler> add(string title, string position = LocalConstant.TabPositionBottom)
         {
             if (this._addonInfomation is null) throw new InvalidOperationException("Not Initialized!");
 
             var tabInfo = DIFactory.Provider.GetRequiredService<ITabInfomation>();
-            tabInfo.Initialize(this._addonInfomation, title);
+            TabType type = position switch
+            {
+                LocalConstant.TabPositionTop => TabType.Top,
+                _ => TabType.Bottom
+            };
+
+            tabInfo.Initialize(this._addonInfomation, title, type);
 
             ITabItem item = this._container.AddTab(tabInfo);
             var handler = new TabHandler(item);

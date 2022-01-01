@@ -68,6 +68,11 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         /// フラグ
         /// </summary>
         bool IsClosed { get; }
+
+        /// <summary>
+        /// タブの位置情報
+        /// </summary>
+        TabType TabType { get; }
     }
 
     public class TabItem : ITabItem
@@ -183,9 +188,12 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
         public string Title => this._tabInfomation.Title;
 
+        public TabType TabType => this._tabInfomation.TabType;
+
         public bool IsClosed { get; private set; }
 
         #endregion
 
     }
+
 }

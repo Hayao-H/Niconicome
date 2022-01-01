@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
@@ -13,10 +11,10 @@ using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Addons.API.Tab;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Local.Settings;
 using Niconicome.ViewModels.Controls;
-using Niconicome.ViewModels.Mainpage.BottomTabs;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.Views;
 using Niconicome.Views.AddonPage;
@@ -133,8 +131,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             #endregion
 
-            regionManager.RegisterViewWithRegion<VideoList>("VideoListRegion");
-
             this.RegionManager = regionManager;
 
             this.RegisterTabHandlers();
@@ -224,33 +220,46 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         private void RegisterTabHandlers()
         {
-            WS::Mainpage.TabHandler.RegisterAddHandler(tab =>
+            WS::Mainpage.TabHandler.RegisterAddHandler(e =>
             {
 
                 if (this.ctx is null) throw new InvalidOperationException($"{typeof(SynchronizationContext)}がnullのため、タブを追加できません。");
 
+                string regionName = e.TabType switch
+                {
+                    TabType.Top => LocalConstant.TopTabRegionName,
+                    _ => LocalConstant.BottomTabRegionName,
+                };
+
                 this.ctx.Post(_ =>
                 {
-                    var vm = new BottomTabViewModel(tab);
-                    var control = new BottomTab(vm);
-                    IRegion region = this.RegionManager.Regions[LocalConstant.TabRegionName];
+                    var vm = new TabViewModel(e.TabItem);
+                    var control = new Tab(vm);
+                    IRegion region = this.RegionManager.Regions[regionName];
                     region.Add(control);
                     region.Activate(control);
                 }, null);
+
             });
 
-            WS::Mainpage.TabHandler.RegisterRemoveHandler(id =>
+            WS::Mainpage.TabHandler.RegisterRemoveHandler(e =>
             {
-                IEnumerable<object> viewToRemove = this.RegionManager.Regions[LocalConstant.TabRegionName].Views.Where(v =>
+                string regionName = e.TabType switch
+                {
+                    TabType.Top => LocalConstant.TopTabRegionName,
+                    _ => LocalConstant.BottomTabRegionName,
+                };
+
+                IEnumerable<object> viewToRemove = this.RegionManager.Regions[LocalConstant.BottomTabRegionName].Views.Where(v =>
                 {
                     if (v is not UserControl control) return false; ;
                     if (control.DataContext is not TabViewModelBase vm) return false;
-                    return vm.ID == id;
+                    return vm.ID == e.TabID;
                 });
 
                 foreach (var view in viewToRemove)
                 {
-                    this.RegionManager.Regions[LocalConstant.TabRegionName].Remove(view);
+                    this.RegionManager.Regions[regionName].Remove(view);
                 }
 
             });
@@ -345,12 +354,17 @@ namespace Niconicome.ViewModels.Mainpage
             IContainerProvider containerProvider = application.Container;
             IRegionManager regionManager = vm.RegionManager;
 
-            IRegion tabRegion = regionManager.Regions[LocalConstant.TabRegionName];
-            tabRegion.Add(containerProvider.Resolve<DownloadSettings>());
-            tabRegion.Add(containerProvider.Resolve<Output>());
-            tabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
-            tabRegion.Add(containerProvider.Resolve<VideoListState>());
-            tabRegion.Add(containerProvider.Resolve<TimerSettings>());
+            IRegion bottomTabRegion = regionManager.Regions[LocalConstant.BottomTabRegionName];
+            bottomTabRegion.Add(containerProvider.Resolve<DownloadSettings>());
+            bottomTabRegion.Add(containerProvider.Resolve<Output>());
+            bottomTabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
+            bottomTabRegion.Add(containerProvider.Resolve<VideoListState>());
+            bottomTabRegion.Add(containerProvider.Resolve<TimerSettings>());
+
+            IRegion topTabRegion = regionManager.Regions[LocalConstant.TopTabRegionName];
+            var videoListView = containerProvider.Resolve<VideoList>();
+            topTabRegion.Add(videoListView);
+            topTabRegion.Activate(videoListView);
         }
     }
 }

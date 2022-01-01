@@ -12,39 +12,39 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         /// タブ追加イベントハンドラ
         /// </summary>
         /// <param name="handler"></param>
-        void RegisterAddHandler(Action<TabItem> handler);
+        void RegisterAddHandler(Action<AddTabEventArgs> handler);
 
         /// <summary>
         /// タブ削除イベントハンドラ
         /// </summary>
         /// <param name="handler"></param>
-        void RegisterRemoveHandler(Action<string> handler);
+        void RegisterRemoveHandler(Action<RemoveTabEventArgs> handler);
     }
 
     public class TabsContainerHandler : ITabsContainerHandler
     {
         public TabsContainerHandler(ITabsContainer container)
         {
-            container.Add += (_, tab) => this.addHandler?.Invoke(tab);
-            container.Remove += (_, id) => this.removeHandler?.Invoke(id);
+            container.Add += (_, e) => this.addHandler?.Invoke(e);
+            container.Remove += (_, e) => this.removeHandler?.Invoke(e);
         }
 
         #region field
 
-        private Action<TabItem>? addHandler;
+        private Action<AddTabEventArgs>? addHandler;
 
-        private Action<string>? removeHandler;
+        private Action<RemoveTabEventArgs>? removeHandler;
 
         #endregion
 
         #region Method
 
-        public void RegisterAddHandler(Action<TabItem> handler)
+        public void RegisterAddHandler(Action<AddTabEventArgs> handler)
         {
             this.addHandler += handler;
         }
 
-        public void RegisterRemoveHandler(Action<string> handler)
+        public void RegisterRemoveHandler(Action<RemoveTabEventArgs> handler)
         {
             this.removeHandler += handler;
         }
