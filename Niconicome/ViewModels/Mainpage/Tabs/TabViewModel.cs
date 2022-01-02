@@ -10,7 +10,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs
 {
     public class TabViewModel : TabViewModelBase
     {
-        public TabViewModel(ITabItem item) : base(item.Title, item.ID)
+        public TabViewModel(ITabItem item) : base(item.Title, item.ID, true)
         {
             this._tabItem = item;
         }
@@ -26,6 +26,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs
         public void Initialize(CoreWebView2 wv2)
         {
             this._tabItem.Initialize(wv2);
+            this.CloseCommand.Subscribe(() =>
+            {
+                this._tabItem.Close();
+            });
         }
 
         #endregion

@@ -250,7 +250,7 @@ namespace Niconicome.ViewModels.Mainpage
                     _ => LocalConstant.BottomTabRegionName,
                 };
 
-                IEnumerable<object> viewToRemove = this.RegionManager.Regions[LocalConstant.BottomTabRegionName].Views.Where(v =>
+                IEnumerable<object> viewToRemove = this.RegionManager.Regions[regionName].Views.Where(v =>
                 {
                     if (v is not UserControl control) return false; ;
                     if (control.DataContext is not TabViewModelBase vm) return false;
