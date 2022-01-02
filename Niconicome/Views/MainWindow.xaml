@@ -179,13 +179,13 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="{Binding TabsHeight.Value}"/>
                             </Grid.RowDefinitions>
-                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion">
+                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion" BorderBrush="#4A4A4A">
                                 <TabControl.Resources>
                                     <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
                                     </Style>
                                 </TabControl.Resources>
                             </TabControl>
-                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="1" Margin="8" prism:RegionManager.RegionName="BottomTabResion">
+                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="1" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A">
                                 <TabControl.Resources>
                                     <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
                                     </Style>
