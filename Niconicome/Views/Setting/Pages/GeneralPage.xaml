@@ -40,7 +40,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="自動ログイン" ToolTip="アプリケーション起動時にニコニコへのログインを自動で試行します。"/>
-                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsAutologinEnable}"/>
+                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsAutologinEnable.Value}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -70,7 +70,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="動画情報取得時の並列取得数"/>
-                    <ComboBox SelectedItem="{Binding MaxFetchParallelCount,UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding SelectableMaxParallelFetch}" DisplayMemberPath="DisplayValue" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="100"/>
+                    <ComboBox SelectedItem="{Binding MaxFetchParallelCount.Value}" ItemsSource="{Binding SelectableMaxParallelFetch}" DisplayMemberPath="DisplayValue" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="100"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -80,7 +80,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="動画情報取得時の待機間隔(動画数)"/>
-                    <ComboBox SelectedItem="{Binding FetchSleepInterval,UpdateSourceTrigger=PropertyChanged}" ItemsSource="{Binding SelectablefetchSleepInterval}" DisplayMemberPath="DisplayValue" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="100"/>
+                    <ComboBox SelectedItem="{Binding FetchSleepInterval.Value}" ItemsSource="{Binding SelectablefetchSleepInterval}" DisplayMemberPath="DisplayValue" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Width="100"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -105,7 +105,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="SSL証明書の検証をスキップする(強く非推奨)" ToolTip="安全性が著しく低下します。ほかの回避手段がない場合にのみ有効にしてください。"/>
-                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsSkippingSSLVerificationEnable}"/>
+                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsSkippingSSLVerificationEnable.Value}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -115,7 +115,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="起動時にプレイリストをすべて展開する" />
-                    <ToggleButton HorizontalAlignment="Right" x:Name="expandAllPlaylists" IsChecked="{Binding IsExpandallPlaylistsEnable}"/>
+                    <ToggleButton HorizontalAlignment="Right" x:Name="expandAllPlaylists" IsChecked="{Binding IsExpandallPlaylistsEnable.Value}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -125,7 +125,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="起動時に前回のプレイリスト展開状況を復元する" />
-                    <ToggleButton HorizontalAlignment="Right" IsEnabled="{Binding ElementName=expandAllPlaylists,Path=IsChecked,Converter={StaticResource booleanInverseconverter }}" IsChecked="{Binding IsSavePrevPlaylistExpandedStateEnable}"/>
+                    <ToggleButton HorizontalAlignment="Right" IsEnabled="{Binding ElementName=expandAllPlaylists,Path=IsChecked,Converter={StaticResource booleanInverseconverter }}" IsChecked="{Binding IsSavePrevPlaylistExpandedStateEnable.Value}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -135,7 +135,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="動画追加時にIDのみを登録する" ToolTip="動画情報は更新時、またはDL時に改めて登録されます。" />
-                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsStoreOnlyNiconicoIDEnable}"/>
+                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsStoreOnlyNiconicoIDEnable.Value}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -145,7 +145,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label Content="リモートプレイリストに設定した際に自動でプレイリストをリネームする"  />
-                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsAutoRenamingRemotePlaylistEnable}"/>
+                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsAutoRenamingRemotePlaylistEnable.Value}"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -166,6 +166,16 @@
                     </materialDesign:PackIcon>
                     <Label Content="DL中は終了前に確認する" />
                     <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsConfirmngIfDownloadingEnable.Value}" />
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="Tab" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="ダウンロードタスク一覧をタブで表示する" />
+                    <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsShowingTasksAsTabEnable.Value}" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             </StackPanel>
