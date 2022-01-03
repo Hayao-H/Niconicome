@@ -1,101 +1,129 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System.List;
 
 namespace Niconicome.Models.Network.Download
 {
     public interface IDownloadTaskPool
     {
-        IEnumerable<IDownloadTask> GetAllTasks();
-        IEnumerable<IDownloadTask> GetTaskWhere(Func<IDownloadTask, bool> predicate);
-        void AddTask(IDownloadTask task);
-        void AddTasks(IEnumerable<IDownloadTask> tasks);
-        void RemoveTask(IDownloadTask task);
-        void RemoveTasks(IEnumerable<IDownloadTask> tasks);
-        void RemoveTasks(Predicate<IDownloadTask> predicate);
-        event EventHandler<TaskPoolChangeEventargs>? TaskPoolChange;
-        void CancelAllTasks();
-        void Clear(bool cancel = true);
-        bool HasTask(Func<IDownloadTask, bool> predicate);
-        int Count { get; }
-    }
-
-    public class TaskPoolChangeEventargs : EventArgs
-    {
-        public TaskPoolChangeEventargs(TaskPoolChangeType changeType, IDownloadTask task)
-        {
-            this.ChangeType = changeType;
-            this.Task = task;
-        }
-
-
-        public TaskPoolChangeType ChangeType { get; init; }
-
-        public IDownloadTask Task { get; init; }
-
-    }
-
-    public enum TaskPoolChangeType
-    {
-        Remove,
-        Add,
-    }
-
-    /// <summary>
-    /// DLタスクプール
-    /// </summary>
-   public  class DownloadTaskPool : IDownloadTaskPool
-    {
-
-        private readonly List<IDownloadTask> innerList = new();
-
         /// <summary>
-        /// 全てのタスクを取得する
+        /// タスク一覧
         /// </summary>
-        /// <returns></returns>
-        public IEnumerable<IDownloadTask> GetAllTasks()
-        {
-            return this.innerList;
-        }
+        ReadOnlyObservableCollection<IDownloadTask> Tasks { get; }
 
         /// <summary>
-        /// 条件を指定してタスクを取得
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public IEnumerable<IDownloadTask> GetTaskWhere(Func<IDownloadTask, bool> predicate)
-        {
-            return this.innerList.Where(predicate);
-        }
-
-        /// <summary>
-        /// 全てのタスクをキャンセル
-        /// </summary>
-        public void CancelAllTasks()
-        {
-            foreach (var task in this.innerList)
-            {
-                task.Cancel();
-            }
-        }
-
-        /// <summary>
-        ///タスクを追加する 
+        /// タスクを追加する
         /// </summary>
         /// <param name="task"></param>
-        public void AddTask(IDownloadTask task)
-        {
-            this.innerList.Add(task);
-            this.RaiseTaskPoolChanged(TaskPoolChangeType.Add, task);
-
-        }
+        void AddTask(IDownloadTask task);
 
         /// <summary>
         /// 複数のタスクを追加する
         /// </summary>
         /// <param name="tasks"></param>
+        void AddTasks(IEnumerable<IDownloadTask> tasks);
+
+        /// <summary>
+        /// タスクを削除する
+        /// </summary>
+        /// <param name="task"></param>
+        void RemoveTask(IDownloadTask task);
+
+        /// <summary>
+        /// 複数のタスクを削除する
+        /// </summary>
+        /// <param name="tasks"></param>
+        void RemoveTasks(IEnumerable<IDownloadTask> tasks);
+
+        /// <summary>
+        /// 条件に一致するタスクを削除する
+        /// </summary>
+        /// <param name="predicate"></param>
+        void RemoveTasks(Predicate<IDownloadTask> predicate);
+
+        /// <summary>
+        /// すべてのタスクをキャンセルする
+        /// </summary>
+        void CancelAllTasks();
+
+        /// <summary>
+        /// すべてのタスクを削除する
+        /// </summary>
+        /// <param name="cancel"></param>
+        void Clear(bool cancel = true);
+
+        /// <summary>
+        /// Taskフィルターを登録する
+        /// </summary>
+        /// <param name="filter"></param>
+        void RegisterFilter(Func<IDownloadTask, bool> filter);
+
+        /// <summary>
+        /// 追加時のハンドラを登録する
+        /// </summary>
+        /// <param name="handler"></param>
+        void RegisterAddHandler(Action<IDownloadTask> handler);
+
+        /// <summary>
+        /// タスクを更新する
+        /// </summary>
+        void Refresh();
+    }
+
+    /// <summary>
+    /// DLタスクプール
+    /// </summary>
+    public class DownloadTaskPool : IDownloadTaskPool
+    {
+        public DownloadTaskPool()
+        {
+            this._innerList = new List<IDownloadTask>();
+            this._innerObservable = new ObservableCollection<IDownloadTask>(this._innerList);
+            this.Tasks = new ReadOnlyObservableCollection<IDownloadTask>(this._innerObservable);
+            this.filterFunc = _ => true;
+        }
+
+
+        #region field
+
+        private readonly ObservableCollection<IDownloadTask> _innerObservable;
+
+        private readonly List<IDownloadTask> _innerList;
+
+        private Action<IDownloadTask>? addhandler;
+
+        private Func<IDownloadTask, bool> filterFunc;
+
+        #endregion
+
+        #region Props
+
+        public ReadOnlyObservableCollection<IDownloadTask> Tasks { get; init; }
+
+        #endregion
+
+
+        #region Method
+
+        public void CancelAllTasks()
+        {
+            foreach (var task in this._innerList)
+            {
+                task.Cancel();
+            }
+        }
+
+        public void AddTask(IDownloadTask task)
+        {
+            this._innerList.Add(task);
+            this.addhandler?.Invoke(task);
+            this.Refresh();
+        }
+
         public void AddTasks(IEnumerable<IDownloadTask> tasks)
         {
             foreach (var task in tasks)
@@ -104,20 +132,12 @@ namespace Niconicome.Models.Network.Download
             }
         }
 
-        /// <summary>
-        /// タスクを削除する
-        /// </summary>
-        /// <param name="task"></param>
         public void RemoveTask(IDownloadTask task)
         {
-            this.innerList.RemoveAll(t => t == task);
-            this.RaiseTaskPoolChanged(TaskPoolChangeType.Remove, task);
+            this._innerList.RemoveAll(t => t == task);
+            this.Refresh();
         }
 
-        /// <summary>
-        /// 複数のタスクを削除する
-        /// </summary>
-        /// <param name="tasks"></param>
         public void RemoveTasks(IEnumerable<IDownloadTask> tasks)
         {
             foreach (var task in tasks)
@@ -126,57 +146,40 @@ namespace Niconicome.Models.Network.Download
             }
         }
 
-        /// <summary>
-        /// 複数のタスクを削除する
-        /// </summary>
-        /// <param name="predicate"></param>
         public void RemoveTasks(Predicate<IDownloadTask> predicate)
         {
-            this.innerList.RemoveAll(predicate);
+            this._innerList.RemoveAll(predicate);
+            this.Refresh();
         }
 
-
-        /// <summary>
-        /// プール変更イベント
-        /// </summary>
-        public event EventHandler<TaskPoolChangeEventargs>? TaskPoolChange;
-
-        /// <summary>
-        /// プール変更イベントを発火させる
-        /// </summary>
-        /// <param name="changeType"></param>
-        /// <param name="task"></param>
-        private void RaiseTaskPoolChanged(TaskPoolChangeType changeType, IDownloadTask task)
-        {
-            this.TaskPoolChange?.Invoke(this, new TaskPoolChangeEventargs(changeType, task));
-        }
-
-        /// <summary>
-        /// タスクの存在をチェックする
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public bool HasTask(Func<IDownloadTask, bool> predicate)
-        {
-            return this.innerList.Any(predicate);
-        }
-
-        /// <summary>
-        /// 全て削除する
-        /// </summary>
         public void Clear(bool cancel = true)
         {
             if (cancel)
             {
                 this.CancelAllTasks();
             }
-            this.innerList.Clear();
+            this._innerList.Clear();
+            this._innerObservable.Clear();
+        }
+
+        public void Refresh()
+        {
+            this._innerObservable.Clear();
+            this._innerObservable.Addrange(this._innerList.Where(this.filterFunc));
+        }
+
+        public void RegisterFilter(Func<IDownloadTask, bool> filter)
+        {
+            this.filterFunc = filter;
+        }
+
+        public void RegisterAddHandler(Action<IDownloadTask> handler)
+        {
+            this.addhandler += handler;
         }
 
 
-        /// <summary>
-        /// タスク数を取得
-        /// </summary>
-        public int Count { get => this.innerList.Count; }
+
+        #endregion
     }
 }

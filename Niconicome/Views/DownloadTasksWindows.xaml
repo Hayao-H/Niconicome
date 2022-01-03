@@ -40,8 +40,8 @@
                         登録済みタスク
                     </TextBlock>
                     <DockPanel Grid.Row="1">
-                        <CheckBox Margin="10 0" HorizontalAlignment="Left" Content="キャンセル済みを表示" IsChecked="{Binding DisplayCanceled}"/>
-                        <CheckBox HorizontalAlignment="Left" Content="完了済みを表示" IsChecked="{Binding DisplayCompleted}"/>
+                        <CheckBox Margin="10 0" HorizontalAlignment="Left" Content="キャンセル済みを表示" IsChecked="{Binding DisplayCanceled.Value}"/>
+                        <CheckBox HorizontalAlignment="Left" Content="完了済みを表示" IsChecked="{Binding DisplayCompleted.Value}"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Margin="5 0" ToolTip="更新" Command="{Binding RefreshTaskCommand}">
                                 <materialDesign:PackIcon Kind="Reload"/>
@@ -150,7 +150,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="メッセージ" DisplayMemberBinding="{Binding Message}"/>
+                                    <GridViewColumn Header="メッセージ" DisplayMemberBinding="{Binding Message.Value}"/>
                                 </GridView.Columns>
                             </GridView>
                         </ListView.View>

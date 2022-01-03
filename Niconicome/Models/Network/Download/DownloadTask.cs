@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Utils;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download
 {
 
-    public interface IDownloadTask
+    public interface IDownloadTask : IParallelTask<IDownloadTask>
     {
-        Guid ID { get; }
-        string DirectoryPath { get; }
-        string NiconicoID { get; }
+        /// <summary>
+        /// タイトル
+        /// </summary>
         string Title { get; }
+
+        /// <summary>
+        /// プレイリストID
+        /// </summary>
+        int PlaylistID { get; }
 
         /// <summary>
         /// 動画ファイルのパス
@@ -20,28 +27,68 @@ namespace Niconicome.Models.Network.Download
         string FilePath { get; }
 
         /// <summary>
+        /// ID
+        /// </summary>
+        string NiconicoID { get; }
+
+        /// <summary>
         /// エコノミーファイルであるかどうか
         /// </summary>
         bool IsEconomyFile { get; }
 
-        int PlaylistID { get; }
-        int VideoID { get; }
+        /// <summary>
+        /// メッセージ
+        /// </summary>
         ReactiveProperty<string> Message { get; }
+
+        /// <summary>
+        /// キャンセルフラグ
+        /// </summary>
         ReactiveProperty<bool> IsCanceled { get; }
+
+        /// <summary>
+        /// 処理中フラグ
+        /// </summary>
         ReactiveProperty<bool> IsProcessing { get; }
+
+        /// <summary>
+        /// 完了フラグ
+        /// </summary>
         ReactiveProperty<bool> IsDone { get; }
+
+        /// <summary>
+        /// 解像度
+        /// </summary>
         uint VerticalResolution { get; }
+
+        /// <summary>
+        /// DL設定
+        /// </summary>
         DownloadSettings DownloadSettings { get; }
+
+        /// <summary>
+        /// CT
+        /// </summary>
         CancellationToken CancellationToken { get; }
+
+        /// <summary>
+        /// 関数を外部からセットする
+        /// </summary>
+        /// <param name="func"></param>
+        void SetFuncctions(Func<IDownloadTask, object, Task> func, Action<int> onWait);
+
+        /// <summary>
+        /// DLをキャンセルする
+        /// </summary>
         void Cancel();
     }
 
     /// <summary>
     /// ダウンロードタスク
     /// </summary>
-    public record DownloadTask : BindableRecordBase, IDownloadTask
+    public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownloadTask>
     {
-        public DownloadTask(string niconicpoID, string title, string filePath, bool isEconomy, int videoID, DownloadSettings downloadSettings)
+        public DownloadTask(IListVideoInfo video, DownloadSettings downloadSettings)
         {
             this.DirectoryPath = downloadSettings.FolderPath;
             this.VerticalResolution = downloadSettings.VerticalResolution;
@@ -49,101 +96,85 @@ namespace Niconicome.Models.Network.Download
             this.IsCanceled = new ReactiveProperty<bool>();
             this.IsProcessing = new ReactiveProperty<bool>();
             this.IsDone = new ReactiveProperty<bool>();
-            this.ID = Guid.NewGuid();
             this.PlaylistID = downloadSettings.PlaylistID;
             this.DownloadSettings = downloadSettings;
-            this.NiconicoID = niconicpoID;
-            this.VideoID = videoID;
-            this.Title = title;
-            this.FilePath = filePath;
-            this.IsEconomyFile = isEconomy;
-            this.cts = new CancellationTokenSource();
-            this.CancellationToken = this.cts.Token;
+            this.IsEconomyFile = video.IsEconomy.Value;
+            this.FilePath = video.FileName.Value;
+            this._video = video;
+            this._cts = new CancellationTokenSource();
+
+            this.OnWait = _ => { };
+            this.TaskFunction = async (_, _) => await Task.Delay(0);
         }
 
 
-        protected readonly CancellationTokenSource cts;
+        #region field
 
-        /// <summary>
-        /// ダウンロードタスクID
-        /// </summary>
-        public Guid ID { get; init; }
+        private readonly CancellationTokenSource _cts;
 
-        /// <summary>
-        /// 保存フォルダーパス
-        /// </summary>
+        private readonly IListVideoInfo _video;
+
+        #endregion
+
+        #region IParallelTask
+
+        public int Index { get; set; }
+
+        public Func<IDownloadTask, object, Task> TaskFunction { get; private set; }
+
+        public Action<int> OnWait { get; private set; }
+
+        #endregion
+
+        #region Props
+
         public string DirectoryPath { get; init; }
 
-        /// <summary>
-        /// ニコニコ動画のID
-        /// </summary>
-        public string NiconicoID { get; init; }
+        public string NiconicoID => this._video.NiconicoId.Value;
 
-        /// <summary>
-        /// タイトル
-        /// </summary>
-        public string Title { get; init; }
+        public string Title => this._video.Title.Value;
 
         public string FilePath { get; init; }
 
-        /// <summary>
-        /// メッセージ
-        /// </summary>
-        public ReactiveProperty<string> Message { get; init; }
+        public bool IsEconomyFile { get; init; }
 
-        /// <summary>
-        /// プレイリストID
-        /// </summary>
         public int PlaylistID { get; init; }
 
-        /// <summary>
-        /// 動画ID
-        /// </summary>
-        public int VideoID { get; init; }
-
-        public bool IsEconomyFile { get; }
-
-        /// <summary>
-        /// キャンセルフラグ
-        /// </summary>
-        public ReactiveProperty<bool> IsCanceled { get; init; }
-
-        /// <summary>
-        /// 実行中フラグ
-        /// </summary>
-        public ReactiveProperty<bool> IsProcessing { get; init; }
-
-        /// <summary>
-        /// 完了フラグ
-        /// </summary>
-        public ReactiveProperty<bool> IsDone { get; init; }
-
-        /// <summary>
-        /// /垂直解像度
-        /// </summary>
         public uint VerticalResolution { get; init; }
 
-        /// <summary>
-        /// ダウンロード設定
-        /// </summary>
+        public CancellationToken CancellationToken => this._cts.Token;
+
+        public ReactiveProperty<string> Message { get; init; }
+
+        public ReactiveProperty<bool> IsCanceled { get; init; }
+
+        public ReactiveProperty<bool> IsProcessing { get; init; }
+
+        public ReactiveProperty<bool> IsDone { get; init; }
+
         public DownloadSettings DownloadSettings { get; init; }
 
-        /// <summary>
-        /// トークン
-        /// </summary>
-        public CancellationToken CancellationToken { get; init; }
+        #endregion
 
-        /// <summary>
-        /// タスクをキャンセル
-        /// </summary>
+        #region Method
+
+        public void SetFuncctions(Func<IDownloadTask, object, Task> func, Action<int> onWait)
+        {
+            this.TaskFunction = func;
+            this.OnWait = onWait;
+        }
+
+
         public void Cancel()
         {
             if (this.IsDone.Value) return;
-            this.cts.Cancel();
+            this._cts.Cancel();
             this.IsCanceled.Value = true;
             this.Message.Value = "DLをキャンセル";
             this.IsProcessing.Value = false;
         }
+
+        #endregion
 
     }
 }
