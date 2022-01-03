@@ -20,5 +20,7 @@ namespace Niconicome.Models.Const
 
         public const string TabPositionBottom = "bottom";
 
+        public const string TaskTabID = "CB85F0CE-BCE3-4B46-BB33-B285843223EC";
+
     }
 }

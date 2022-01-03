@@ -40,6 +40,8 @@ namespace Niconicome.ViewModels.Mainpage
         {
 
             this.ctx = SynchronizationContext.Current;
+            this.RegionManager = regionManager;
+            this.dialogService = dialogService;
 
             this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");
@@ -85,7 +87,21 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
              {
-                 WS::Mainpage.WindowsHelper.OpenWindow<DownloadTasksWindows>();
+                 if (Application.Current is not PrismApplication app) return;
+
+                 IContainerProvider container = app.Container;
+
+                 if (WS::Mainpage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.ShowTasksAsTab).Value)
+                 {
+                     IRegion region = this.RegionManager.Regions[LocalConstant.TopTabRegionName];
+                     var view = container.Resolve<DownloadTasksWindows>();
+                     region.Add(view);
+                     region.Activate(view);
+                 }
+                 else
+                 {
+                     this.dialogService.Show(nameof(DownloadTasksWindows));
+                 }
              });
 
             this.Restart = new ReactiveCommand()
@@ -131,7 +147,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             #endregion
 
-            this.RegionManager = regionManager;
 
             this.RegisterTabHandlers();
         }
@@ -141,6 +156,8 @@ namespace Niconicome.ViewModels.Mainpage
         private User? user;
 
         private readonly SynchronizationContext? ctx;
+
+        private readonly IDialogService dialogService;
 
         #endregion
 

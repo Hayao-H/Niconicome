@@ -4,11 +4,16 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows.Controls;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Const;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Download;
+using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Prism.Regions;
+using Prism.Services.Dialogs;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Material = MaterialDesignThemes.Wpf;
@@ -16,12 +21,14 @@ using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows
 {
-    class DownloadTasksWindowViewModel : BindableBase, IDisposable
+    class DownloadTasksWindowViewModel : TabViewModelBase, IDisposable, IDialogAware
     {
-        public DownloadTasksWindowViewModel()
+        public DownloadTasksWindowViewModel(IRegionManager regionManager) : base("ダウンロード", LocalConstant.TaskTabID, true)
         {
             this.StagedTasks = new ObservableCollection<DownloadTaskViewModel>();
             this.Tasks = new ObservableCollection<DownloadTaskViewModel>();
+
+            this.regionManager = regionManager;
 
             WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.TaskPoolChange += this.OnStagedTaskChanged;
             WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.TaskPoolChange += this.OnTaskChanged;
@@ -76,6 +83,22 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                 WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
                 this.StagedTasks.Clear();
             });
+
+            this.CloseCommand.Subscribe(() =>
+            {
+                IRegion region = this.regionManager.Regions[LocalConstant.TopTabRegionName];
+                IEnumerable<object> viewsToRemove = region.Views.Where(v =>
+                {
+                    if (v is not UserControl control) return false;
+                    if (control.DataContext is not TabViewModelBase vm) return false;
+                    return vm.ID == LocalConstant.TaskTabID;
+                });
+
+                foreach (var view in viewsToRemove)
+                {
+                    region.Remove(view);
+                }
+            });
         }
 
         ~DownloadTasksWindowViewModel()
@@ -86,6 +109,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         private bool displayCanceledField;
 
         private bool displayCompletedField;
+
+        private readonly IRegionManager regionManager;
 
         /// <summary>
         /// ステージング済みタスク
@@ -217,6 +242,27 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// メッセージキュー
         /// </summary>
         public ISnackbarHandler Queue { get; init; } = WS::Mainpage.SnackbarHandler.CreateNewHandler();
+
+        #region IDIalogAware
+
+        public bool CanCloseDialog()
+        {
+            return true;
+        }
+
+        public void OnDialogClosed()
+        {
+            this.Dispose();
+        }
+
+        public void OnDialogOpened(IDialogParameters parameters)
+        {
+
+        }
+
+        public event Action<IDialogResult> RequestClose;
+
+        #endregion
 
         /// <summary>
         /// インスタンスを破棄する
