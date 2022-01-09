@@ -117,7 +117,6 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
             Assert.That(task1.IsCanceled.Value, Is.True);
             Assert.That(task2.IsCanceled.Value, Is.True);
             Assert.That(task2.IsCanceled.Value, Is.True);
-            Assert.That(this.downloadTaskPool!.Tasks.Count, Is.Zero);
         }
 
     }
