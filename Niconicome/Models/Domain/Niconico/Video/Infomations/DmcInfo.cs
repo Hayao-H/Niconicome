@@ -99,7 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public bool IsPeakTime { get; set; }
 
-        public bool IsEnonomy => !this.IsPremium && this.IsPeakTime && this.ViewCount >= Const::Net.EconomyAvoidableViewCount;
+        public bool IsEnonomy => !this.IsPremium && this.IsPeakTime && this.ViewCount >= Const::NetConstant.EconomyAvoidableViewCount;
 
         /// <summary>
         /// 投稿日時

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Network.Download;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment
@@ -14,7 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
     public interface ICommentClient
     {
-        Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token);
+        Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token);
     }
 
     /// <summary>
@@ -42,13 +43,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="dmcInfo"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public async Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, IDownloadMessenger messenger, IDownloadContext context, CancellationToken token)
+        public async Task<ICommentCollection> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
             var (dThread, dFork) = this.GetDefaultPosyTarget(dmcInfo);
 
             if (dThread == -1 || dFork == -1) throw new InvalidOperationException("DefaultPostTargetが見つかりません。");
 
-            var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork, settings.IsUnsafeHandleEnable, settings.IsExperimentalSafetySystemEnable);
+            var comments = CommentCollection.GetInstance(settings.CommentOffset, dThread, dFork, settings.EnableUnsafeCommentHandle, settings.EnableExperimentalCommentSafetySystem);
             Response::Chat? first = null;
             int index = 0;
             long lastNo = 0;
@@ -59,16 +60,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
                 if (index > 0)
                 {
-                    if (settings.FetchWaitSpan > 0)
+                    if (settings.CommentFetchWaitSpan > 0)
                     {
-                        messenger.SendMessage($"待機中...({settings.FetchWaitSpan}ms)");
+                        onMessage($"待機中...({settings.CommentFetchWaitSpan}ms)");
                         try
                         {
-                            await Task.Delay(settings.FetchWaitSpan, token);
+                            await Task.Delay(settings.CommentFetchWaitSpan, token);
                         }
                         catch { }
                     }
-                    messenger.SendMessage($"過去ログをダウンロード中({index + 1}件目・{count}コメ)");
+                    onMessage($"過去ログをダウンロード中({index + 1}件目・{count}コメ)");
                 }
 
                 long? when = count == 0 ? 0 : first?.Date - 1;
@@ -95,20 +96,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                     lastNo = first?.No ?? 0;
                 }
 
-                if (settings.MaxcommentsCount > 0 && comments.Count > settings.MaxcommentsCount)
+                if (settings.MaxCommentsCount > 0 && comments.Count > settings.MaxCommentsCount)
                 {
-                    var rmCount = comments.Count - settings.MaxcommentsCount;
+                    var rmCount = comments.Count - settings.MaxCommentsCount;
                     comments.RemoveFor(rmCount);
                     break;
                 }
 
-                if (!settings.IsDownloadingLogEnable)
+                if (!settings.DownloadLog)
                 {
                     break;
                 }
                 else if (index == 0)
                 {
-                    messenger.SendMessage("過去ログのダウンロードを開始します。");
+                    onMessage("過去ログのダウンロードを開始します。");
                 }
 
                 ++index;
@@ -116,9 +117,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
             if (token.IsCancellationRequested) throw new TaskCanceledException("コメントのダウンロードがキャンセルされました。");
 
-            messenger.SendMessage($"コメントの正規化処理を開始します。");
+            onMessage($"コメントの正規化処理を開始します。");
             comments.Distinct();
-            messenger.SendMessage($"コメントの正規化処理が完了しました。");
+            onMessage($"コメントの正規化処理が完了しました。");
 
             this.logger.Log($"コメントのダウンロードが完了しました。({comments.Count}コメント, {context.GetLogContent()})");
 
@@ -133,12 +134,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="settings"></param>
         /// <param name="when"></param>
         /// <returns></returns>
-        private async Task<List<Response::Comment>> GetCommentsAsync(IDmcInfo dmcInfo, ICommentDownloadSettings settings, long? when = null)
+        private async Task<List<Response::Comment>> GetCommentsAsync(IDmcInfo dmcInfo, IDownloadSettings settings, long? when = null)
         {
             var option = new CommentOptions()
             {
-                NoEasyComment = !settings.IsDownloadingEasyCommentEnable,
-                OwnerComment = settings.IsDownloadingOwnerCommentEnable,
+                NoEasyComment = !settings.DownloadEasy,
+                OwnerComment = settings.DownloadOwner,
                 When = when ?? 0
             };
             var request = await this.requestBuilder.GetRequestDataAsync(dmcInfo, option);

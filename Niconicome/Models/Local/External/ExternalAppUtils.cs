@@ -133,8 +133,8 @@ namespace Niconicome.Models.Local.External
         private IAttemptResult SendToAppCommand(string appPath, string argBase, IListVideoInfo videoInfo)
         {
             var constructedArg = argBase
-                .Replace("<url>", Net.NiconicoWatchUrl + videoInfo.NiconicoId.Value)
-                .Replace("<url:short>", Net.NiconicoShortUrl + videoInfo.NiconicoId.Value)
+                .Replace("<url>", NetConstant.NiconicoWatchUrl + videoInfo.NiconicoId.Value)
+                .Replace("<url:short>", NetConstant.NiconicoShortUrl + videoInfo.NiconicoId.Value)
                 .Replace("<id>", videoInfo.NiconicoId.Value)
                 ;
 

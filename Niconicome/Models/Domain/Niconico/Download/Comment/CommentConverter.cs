@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Niconicome.Models.Network.Download;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
 using Utils = Niconicome.Models.Domain.Utils;
 using Xml = Niconicome.Models.Domain.Niconico.Net.Xml.Comment;
@@ -10,8 +11,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
     {
         Xml::Packet Chats { get; }
         Xml::Packet? OwnerComments { get; }
-        string Filename { get; set; }
-        string OwnerFilename { get; set; }
+        string FilePath { get; set; }
+        string OwnerFilPath { get; set; }
     }
 
     public class StoreCommentsData : IStoreCommentsData
@@ -20,15 +21,15 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 
         public Xml::Packet? OwnerComments { get; set; }
 
-        public string Filename { get; set; } = string.Empty;
+        public string FilePath { get; set; } = string.Empty;
 
-        public string OwnerFilename { get; set; } = string.Empty;
+        public string OwnerFilPath { get; set; } = string.Empty;
 
     }
 
     interface ICommentConverter
     {
-        IStoreCommentsData ConvertToStoreCommentsData(ICommentCollection comments, ICommentDownloadSettings settings);
+        IStoreCommentsData ConvertToStoreCommentsData(ICommentCollection comments, IDownloadSettings settings);
     }
 
     /// <summary>
@@ -42,7 +43,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
         /// <param name="comments"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        public IStoreCommentsData ConvertToStoreCommentsData(ICommentCollection comments, ICommentDownloadSettings settings)
+        public IStoreCommentsData ConvertToStoreCommentsData(ICommentCollection comments, IDownloadSettings settings)
         {
             var copy = comments.Clone();
             this.RemoveOwnerComment(comments);
@@ -52,7 +53,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
                 Chats = this.ConvertToXmlData(comments)
             };
 
-            if (settings.IsDownloadingOwnerCommentEnable)
+            if (settings.DownloadOwner)
             {
                 this.GetOwnerComment(copy);
                 if (copy.Count > 0)

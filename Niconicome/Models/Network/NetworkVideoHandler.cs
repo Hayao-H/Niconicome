@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Niconicome.Extensions.System.List;
-using Niconicome.Models.Domain.Local.Store;
-using Niconicome.Models.Playlist;
-using State = Niconicome.Models.Local.State;
-using DWatch = Niconicome.Models.Domain.Niconico.Watch;
-using Niconicome.Extensions.System;
-using Niconicome.Models.Utils;
-using Niconicome.Models.Playlist.VideoList;
-using Niconicome.Models.Network.Watch;
-using Niconicome.Models.Local.Settings;
-using Niconicome.Models.Helper.Result;
-using System.Reflection;
-using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Const;
-using Windows.Devices.Midi;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Network.Watch;
+using Niconicome.Models.Playlist;
+using Niconicome.Models.Utils;
+using DWatch = Niconicome.Models.Domain.Niconico.Watch;
+using State = Niconicome.Models.Local.State;
 
 namespace Niconicome.Models.Network
 {
@@ -42,16 +34,6 @@ namespace Niconicome.Models.Network
         /// <returns>取得した動画の一覧</returns>
         Task<IAttemptResult<IEnumerable<IListVideoInfo>>> GetVideoListInfosAsync(IEnumerable<string> ids, Action<string>? onSucceeded = null, CancellationToken? ct = null);
 
-    }
-
-    public interface INetworkResult
-    {
-        bool IsFailed { get; set; }
-        bool IsSucceededAll { get; set; }
-        bool IsCanceled { get; set; }
-        int SucceededCount { get; set; }
-        int FailedCount { get; set; }
-        IListVideoInfo? FirstVideo { get; set; }
     }
 
     /// <summary>
@@ -92,8 +74,8 @@ namespace Niconicome.Models.Network
             int maxParallelCount = this._settingHandler.GetIntSetting(SettingsEnum.MaxFetchCount);
             int waitInterval = this._settingHandler.GetIntSetting(SettingsEnum.FetchSleepInterval);
 
-            if (maxParallelCount < 1) maxParallelCount = Net.DefaultMaxParallelFetchCount;
-            if (waitInterval < 1) waitInterval = Net.DefaultFetchWaitInterval;
+            if (maxParallelCount < 1) maxParallelCount = NetConstant.DefaultMaxParallelFetchCount;
+            if (waitInterval < 1) waitInterval = NetConstant.DefaultFetchWaitInterval;
 
             var handler = new ParallelTasksHandler<NetworkVideoParallelTask>(maxParallelCount, waitInterval, 15);
 
@@ -156,41 +138,6 @@ namespace Niconicome.Models.Network
         #endregion
     }
 
-    public class NetworkResult : INetworkResult
-    {
-        /// <summary>
-        /// 処理失敗フラグ
-        /// </summary>
-        public bool IsFailed { get; set; }
-
-
-        /// <summary>
-        /// 全ての処理に成功
-        /// </summary>
-        public bool IsSucceededAll { get; set; }
-
-        /// <summary>
-        /// キャンセルフラグ
-        /// </summary>
-        public bool IsCanceled { get; set; }
-
-
-        /// <summary>
-        /// 成功したコンテンツの数
-        /// </summary>
-        public int SucceededCount { get; set; }
-
-        /// <summary>
-        /// 失敗したコンテンツの数
-        /// </summary>
-        public int FailedCount { get; set; }
-
-        /// <summary>
-        /// 動画情報
-        /// </summary>
-        public IListVideoInfo? FirstVideo { get; set; }
-
-    }
 
     public class NetworkVideoParallelTask : IParallelTask<NetworkVideoParallelTask>
     {

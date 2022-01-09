@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Const
 {
-    class Net
+    class NetConstant
     {
         /// <summary>
         /// ニコニコ動画視聴ページのURL
@@ -37,5 +37,15 @@ namespace Niconicome.Models.Const
         /// 動画取得の待機時間（デフォルト）
         /// </summary>
         public static int DefaultFetchWaitInterval = 5;
+
+        /// <summary>
+        /// 最大並列DL数（デフォルト）
+        /// </summary>
+        public static int DefaultMaxParallelDownloadCount = 2;
+
+        /// <summary>
+        /// 最大セグメント並列DL数（デフォルト）
+        /// </summary>
+        public static int DefaultMaxParallelSegmentDownloadCount = 3;
     }
 }

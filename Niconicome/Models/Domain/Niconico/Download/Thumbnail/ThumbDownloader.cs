@@ -10,56 +10,58 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Network.Download;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 {
-
-
-
     public interface IThumbDownloader
     {
-        Task<IDownloadResult> DownloadThumbnailAsync(IThumbDownloadSettings settings);
-        Task<IDownloadResult> DownloadThumbnailAsync(IThumbDownloadSettings settings, IWatchSession session);
+        Task<IAttemptResult> DownloadThumbnailAsync(IDownloadSettings settings, IWatchSession session);
     }
 
-    /// <summary>
-    /// 外部から触るAPIを提供する
-    /// </summary>
     public class ThumbDownloader : IThumbDownloader
     {
-        public ThumbDownloader(IWatchSession session, ILogger logger, INicoHttp http, INiconicoUtils niconicoUtils)
+        public ThumbDownloader(ILogger logger, INicoHttp http, INiconicoUtils niconicoUtils, IPathOrganizer pathOrganizer)
         {
-            this.session = session;
-            this.logger = logger;
-            this.http = http;
-            this.niconicoUtils = niconicoUtils;
+            this._logger = logger;
+            this._http = http;
+            this._niconicoUtils = niconicoUtils;
+            this._pathOrganizer = pathOrganizer;
         }
 
-        public async Task<IDownloadResult> DownloadThumbnailAsync(IThumbDownloadSettings settings, IWatchSession session)
+        #region field
+
+        private readonly ILogger _logger;
+
+        private readonly INicoHttp _http;
+
+        private readonly INiconicoUtils _niconicoUtils;
+
+        private readonly IPathOrganizer _pathOrganizer;
+        #endregion
+
+        #region Method
+
+        public async Task<IAttemptResult> DownloadThumbnailAsync(IDownloadSettings settings, IWatchSession session)
         {
-
-
             if (session.Video is null)
             {
-                throw new InvalidOperationException("動画情報が未取得です。");
+                return AttemptResult.Fail("動画情報が未取得です。");
             }
 
-
-            var generatedFIlename = this.niconicoUtils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, settings.Extension, settings.IsReplaceStrictedEnable, settings.Suffix);
-            string fileName = generatedFIlename.IsNullOrEmpty() ? $"[{session.Video!.Id}]{session.Video!.Title}{settings.Extension}" : generatedFIlename;
-
-            IOUtils.CreateDirectoryIfNotExist(settings.FolderName, fileName);
-
+            var filepath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.ThumbnailExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, settings.ThumbSuffix);
 
             string? thumbUrl;
+
             try
             {
                 thumbUrl = session.Video!.DmcInfo.ThumbInfo.GetSpecifiedThumbnail(settings.ThumbSize);
             }
             catch (Exception e)
             {
-                this.logger.Error($"サムネイルURLの取得に失敗しました。", e);
-                return new DownloadResult() { Issucceeded = false, Message = "サムネイルのURLを取得できませんでした。" };
+                this._logger.Error($"サムネイルURLの取得に失敗しました。", e);
+                return AttemptResult.Fail("サムネイルのURLを取得できませんでした。");
             }
 
 
@@ -70,44 +72,30 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
             }
             catch (Exception e)
             {
-                this.logger.Error($"サムネイルの取得に失敗しました。", e);
-                return new DownloadResult() { Issucceeded = false, Message = $"サムネイルの取得に失敗しました。(詳細: {e.Message})" };
+                this._logger.Error($"サムネイルの取得に失敗しました。", e);
+                return AttemptResult.Fail($"サムネイルの取得に失敗しました。(詳細: {e.Message})");
             }
 
             try
             {
-                this.WriteThumb(data, settings.FolderName, fileName, settings.IsOverwriteEnable);
+                this.WriteThumb(data, filepath);
             }
             catch (Exception e)
             {
-                this.logger.Error($"サムネイルの保存に失敗しました。", e);
-                return new DownloadResult() { Issucceeded = false, Message = $"サムネイルの保存に失敗しました。(詳細: {e.Message})" };
+                this._logger.Error($"サムネイルの保存に失敗しました。", e);
+                return AttemptResult.Fail($"サムネイルの保存に失敗しました。(詳細: {e.Message})");
             }
 
-            return new DownloadResult() { Issucceeded = true };
+            return AttemptResult.Succeeded();
         }
 
-        public async Task<IDownloadResult> DownloadThumbnailAsync(IThumbDownloadSettings settings)
-        {
-            return await this.DownloadThumbnailAsync(settings, this.session);
-        }
+        #endregion
 
-        private readonly IWatchSession session;
+        #region private
 
-        private readonly ILogger logger;
-
-        private readonly INicoHttp http;
-
-        private readonly INiconicoUtils niconicoUtils;
-
-        /// <summary>
-        /// サムネイルをダウンロードする
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
         private async Task<byte[]> DownloadAsync(string url)
         {
-            var res = await this.http.GetAsync(new Uri(url));
+            var res = await this._http.GetAsync(new Uri(url));
 
             if (!res.IsSuccessStatusCode)
             {
@@ -119,24 +107,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
             }
         }
 
-        /// <summary>
-        /// サムネイルを書き込む
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="folderName"></param>
-        /// <param name="fileName"></param>
-        /// <param name="isOverwriteEnable"></param>
-        private void WriteThumb(byte[] data, string folderName, string fileName, bool isOverwriteEnable)
+        private void WriteThumb(byte[] data, string filePath)
         {
-            folderName = this.GetFolderName(folderName);
-            fileName = this.GetFilePath(fileName, folderName, isOverwriteEnable);
-
-            if (!Directory.Exists(folderName))
-            {
-                Directory.CreateDirectory(folderName);
-            }
-
-            using var fs = File.Create(fileName);
+            IOUtils.CreateDirectoryIfNotExist(filePath);
+            using var fs = File.Create(filePath);
             fs.Write(data);
         }
 
@@ -151,12 +125,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
             return filePath;
         }
 
-
-        /// <summary>
-        /// フォルダー名を取得する
-        /// </summary>
-        /// <param name="foldername"></param>
-        /// <returns></returns>
         private string GetFolderName(string foldername)
         {
             if (Path.IsPathRooted(foldername))
@@ -168,6 +136,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
                 return Path.Combine(AppContext.BaseDirectory, foldername);
             }
         }
+
+        #endregion
     }
 
 

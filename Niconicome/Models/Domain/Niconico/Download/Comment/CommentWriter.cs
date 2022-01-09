@@ -12,7 +12,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
 {
     public interface ICommentStream
     {
-        void Write(IStoreCommentsData comments, string folderPath, bool overwrite);
+        /// <summary>
+        /// コメントを書き込む
+        /// </summary>
+        /// <param name="comments"></param>
+        /// <param name="overwrite"></param>
+        void Write(IStoreCommentsData comments, bool overwrite);
     }
 
     /// <summary>
@@ -21,53 +26,38 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment
     public class CommentStream : ICommentStream
     {
 
-        /// <summary>
-        /// コメントを保存する
-        /// </summary>
-        /// <param name="comments"></param>
-        /// <param name="folderPath"></param>
-        public void Write(IStoreCommentsData comments, string folderPath, bool overwrite)
+        #region Method
+
+        public void Write(IStoreCommentsData comments, bool overwrite)
         {
-            IOUtils.CreateDirectoryIfNotExist(folderPath, comments.Filename);
-            string targetPath = this.GetFilePath(folderPath, comments.Filename, overwrite);
+            string targetPath = comments.FilePath;
             this.WriteComments(comments.Chats, targetPath);
 
             if (comments.OwnerComments is not null)
             {
-                string ownerFIlePath = this.GetFilePath(folderPath, comments.OwnerFilename, overwrite);
+                string ownerFIlePath = comments.OwnerFilPath;
                 this.WriteComments(comments.OwnerComments, ownerFIlePath);
             }
         }
 
-        private string GetFilePath(string folderPath,string fileName,bool overwrite)
-        {
-            var path = Path.Combine(folderPath, fileName);
-            if (!overwrite)
-            {
-                path = this.GetModifiedFilePath(path);
-            }
+        #endregion
 
-            return path;
-        }
-
-        private string GetModifiedFilePath(string old)
-        {
-            return IOUtils.CheclFileExistsAndReturnNewFilename(old);
-        }
+        #region private
 
         /// <summary>
         /// コメントを書き込む
         /// </summary>
-        /// <param name="comments"></param>
-        /// <param name="folderPath"></param>
-        /// <param name="filename"></param>
         private void WriteComments(Xml::Packet comments, string targetPath)
         {
             string content = Xmlparser.Serialize(comments);
 
+            IOUtils.CreateDirectoryIfNotExist(targetPath);
+
             using var fs = new StreamWriter(targetPath);
             fs.Write(content);
         }
+
+        #endregion
     }
 
 

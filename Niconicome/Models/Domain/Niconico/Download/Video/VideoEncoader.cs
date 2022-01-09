@@ -15,7 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface IVideoEncoader
     {
-        Task EncodeAsync(IEncodeSettings settings, IDownloadMessenger messenger, CancellationToken token);
+        Task EncodeAsync(IEncodeSettings settings, Action<string> onMessage, CancellationToken token);
         string Mp4FilePath { get; }
     }
 
@@ -26,8 +26,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface IEncodeSettings
     {
-        string FileName { get; }
-        string FolderName { get; }
+        string FilePath { get; }
         string CommandFormat { get; }
         bool IsOverwriteEnable { get; }
         bool IsOverrideDTEnable { get; }
@@ -61,20 +60,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         public string Mp4FilePath { get; private set; } = string.Empty;
 
 
-        public async Task EncodeAsync(IEncodeSettings settings, IDownloadMessenger messenger, CancellationToken token)
+        public async Task EncodeAsync(IEncodeSettings settings, Action<string> onMessage, CancellationToken token)
         {
             string tsFolderName = Path.GetDirectoryName(settings.TsFilePaths.First()) ?? string.Empty;
             string targetFilePath = Path.Combine(tsFolderName, "combined.ts");
-            string mp4Foldername = this.GetFolderPath(settings.FolderName);
-            string mp4Filename = this.GetFilePath(settings.FileName, mp4Foldername, settings.IsOverwriteEnable);
+            string mp4Filename = settings.FilePath;
 
-            IOUtils.CreateDirectoryIfNotExist(mp4Foldername, mp4Filename);
+            IOUtils.CreateDirectoryIfNotExist(mp4Filename);
 
             this.Mp4FilePath = mp4Filename;
 
             if (token.IsCancellationRequested) return;
 
-            messenger.SendMessage("セグメントファイルの結合を開始");
+            onMessage("セグメントファイルの結合を開始");
             var e = await Task.Run(() =>
              {
                  Exception? e = null;
@@ -94,21 +92,21 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             {
                 throw new IOException($"セグメントファイルのマージ中にエラーが発生しました。(詳細: {e.Message})");
             }
-            messenger.SendMessage("セグメントファイルの結合が完了");
+            onMessage("セグメントファイルの結合が完了");
 
             if (token.IsCancellationRequested) return;
 
             if (settings.IsNoEncodeEnable)
             {
-                messenger.SendMessage("動画ファイルをコピー中");
+                onMessage("動画ファイルをコピー中");
                 File.Copy(targetFilePath, mp4Filename);
-                messenger.SendMessage("動画ファイルのコピーが完了");
+                onMessage("動画ファイルのコピーが完了");
             }
             else
             {
-                messenger.SendMessage("ffmpegで変換を開始(.ts=>.mp4)");
+                onMessage("ffmpegで変換を開始(.ts=>.mp4)");
                 await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, settings.CommandFormat, token, LocalFile::EncodeOptions.Copy);
-                messenger.SendMessage("ffmpegの変換が完了");
+                onMessage("ffmpegの変換が完了");
             }
 
             if (settings.IsOverrideDTEnable)
@@ -188,12 +186,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public class EncodeSettings : IEncodeSettings
     {
-        public string FileName { get; set; } = string.Empty;
-
-        public string FolderName { get; set; } = string.Empty;
+        public string FilePath { get; set; } = string.Empty;
 
         public string CommandFormat { get; set; } = Format.DefaultFFmpegFormat;
-
 
         public bool IsOverwriteEnable { get; set; }
 

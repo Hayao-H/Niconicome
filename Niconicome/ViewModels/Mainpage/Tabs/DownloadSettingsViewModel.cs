@@ -332,7 +332,7 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
             }
 
-            await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
+            await WS::Mainpage.Videodownloader.DownloadVideosFriendlyAsync(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
             WS::Mainpage.PostDownloadTasksManager.HandleAction();
         }
 

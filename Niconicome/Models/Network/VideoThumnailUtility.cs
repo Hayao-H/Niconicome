@@ -82,7 +82,7 @@ namespace Niconicome.Models.Network
         /// <returns></returns>
         public bool IsValidThumbnailUrl(IListVideoInfo video)
         {
-            string deletedVideoUrl = Net.NiconicoDeletedVideothumb;
+            string deletedVideoUrl = NetConstant.NiconicoDeletedVideothumb;
             return !(video.ThumbUrl.Value.IsNullOrEmpty() || video.ThumbUrl.Value == deletedVideoUrl);
         }
 
@@ -178,7 +178,7 @@ namespace Niconicome.Models.Network
             {
                 if (!this.niconicoIDsAndActions.Any(p => p.Key == "0"))
                 {
-                    this.thumbConfigs.Enqueue(new ThumbConfig() { NiconicoID = "0", Url = Net.NiconicoDeletedVideothumb, Overwrite = false });
+                    this.thumbConfigs.Enqueue(new ThumbConfig() { NiconicoID = "0", Url = NetConstant.NiconicoDeletedVideothumb, Overwrite = false });
                     this.niconicoIDsAndActions.Add("0", () => { });
                 }
             }
