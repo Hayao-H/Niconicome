@@ -105,5 +105,20 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
             Assert.That(this.downloadTaskPool!.Tasks.Count, Is.EqualTo(1));
         }
 
+        [Test]
+        public void タスクをキャンセル()
+        {
+            var task1 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
+            var task2 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
+            var task3 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
+            this.downloadTaskPool!.AddTasks(new[] { task1, task2, task3 });
+            this.downloadTaskPool!.CancelAllTasks();
+
+            Assert.That(task1.IsCanceled.Value, Is.True);
+            Assert.That(task2.IsCanceled.Value, Is.True);
+            Assert.That(task2.IsCanceled.Value, Is.True);
+            Assert.That(this.downloadTaskPool!.Tasks.Count, Is.Zero);
+        }
+
     }
 }
