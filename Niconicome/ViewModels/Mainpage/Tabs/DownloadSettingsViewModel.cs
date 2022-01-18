@@ -13,6 +13,7 @@ using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Niconicome.Views;
 using Prism.Events;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
@@ -23,10 +24,11 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class DownloadSettingsViewModel : TabViewModelBase, IDisposable
     {
-        public DownloadSettingsViewModel(IEventAggregator ea, IDialogService dialogService) : base("設定", "")
+        public DownloadSettingsViewModel(IEventAggregator ea, IDialogService dialogService,IRegionManager regionManager) : base("設定", "")
         {
 
             this._dialogService = dialogService;
+            this._regionManager = regionManager;
 
             this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
             this.IsLimittingCommentCountEnable = WS::Mainpage.DownloadSettingsHandler.IsLimittingCommentCountEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
@@ -135,7 +137,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
                 {
-                    this._dialogService.Show(nameof(DownloadTasksWindows));
+                    WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager, this._dialogService);
                 });
             })
             .AddTo(this.disposables);
@@ -160,6 +162,8 @@ namespace Niconicome.ViewModels.Mainpage
         #region field
 
         private readonly IDialogService _dialogService;
+
+        private readonly IRegionManager _regionManager;
 
         #endregion
 

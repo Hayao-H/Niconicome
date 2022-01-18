@@ -12,7 +12,6 @@ namespace Niconicome.Models.Local.State
     {
         string LogFileName { get; }
         string ApplicationVersion { get; }
-        bool IsAddonManagerOpen { get; set; }
         bool IsMultiWindowsAllowed { get; }
     }
 
@@ -53,11 +52,6 @@ namespace Niconicome.Models.Local.State
                 return v?.ToString() ?? "Nan";
             }
         }
-
-        /// <summary>
-        /// アドオンウィンドウ
-        /// </summary>
-        public bool IsAddonManagerOpen { get; set; }
 
         /// <summary>
         /// マルチウィンドウ

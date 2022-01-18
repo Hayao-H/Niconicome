@@ -87,21 +87,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
              {
-                 if (Application.Current is not PrismApplication app) return;
-
-                 IContainerProvider container = app.Container;
-
-                 if (WS::Mainpage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.ShowTasksAsTab).Value)
-                 {
-                     IRegion region = this.RegionManager.Regions[LocalConstant.TopTabRegionName];
-                     var view = container.Resolve<DownloadTasksWindows>();
-                     region.Add(view);
-                     region.Activate(view);
-                 }
-                 else
-                 {
-                     this.dialogService.Show(nameof(DownloadTasksWindows));
-                 }
+                 WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this.RegionManager, this.dialogService);
              });
 
             this.Restart = new ReactiveCommand()
@@ -132,7 +118,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenAddonManagerCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    if (WS::Mainpage.LocalInfo.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
+                    if (WS::Mainpage.LocalState.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
                     {
                         return;
                     }

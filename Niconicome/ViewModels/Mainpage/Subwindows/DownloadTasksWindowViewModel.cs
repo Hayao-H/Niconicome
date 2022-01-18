@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Controls;
-using Niconicome.Extensions;
-using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Download;
@@ -18,7 +15,6 @@ using Prism.Services.Dialogs;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Reactive.Bindings.Helpers;
-using Material = MaterialDesignThemes.Wpf;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows
@@ -90,6 +86,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                 {
                     region.Remove(view);
                 }
+
+                WS::Mainpage.LocalState.IsTaskWindowOpen = false;
             });
         }
 
@@ -99,6 +97,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         }
 
         private readonly IRegionManager regionManager;
+
+        #region Props
 
         /// <summary>
         /// ステージング済みタスク
@@ -110,16 +110,15 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// </summary>
         public ReadOnlyReactiveCollection<DownloadTaskViewModel> Tasks { get; init; }
 
-
         /// <summary>
         /// キャンセル済みを表示
         /// </summary>
-        public ReactiveProperty<bool> DisplayCanceled { get; init; } 
+        public ReactiveProperty<bool> DisplayCanceled { get; init; }
 
         /// <summary>
         /// 完了済みを表示
         /// </summary>
-        public ReactiveProperty<bool> DisplayCompleted { get; init; } 
+        public ReactiveProperty<bool> DisplayCompleted { get; init; }
 
         /// <summary>
         /// DLを開始
@@ -151,6 +150,18 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// </summary>
         public ISnackbarHandler Queue { get; init; } = WS::Mainpage.SnackbarHandler.CreateNewHandler();
 
+        /// <summary>
+        /// 幅
+        /// </summary>
+        public ReactivePropertySlim<double> Width { get; private set; } = new(double.NaN);
+
+        /// <summary>
+        /// 高さ
+        /// </summary>
+        public ReactivePropertySlim<double> Height { get; private set; } = new(double.NaN);
+
+        #endregion
+
         #region IDIalogAware
 
         public bool CanCloseDialog()
@@ -160,12 +171,15 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         public void OnDialogClosed()
         {
+            WS::Mainpage.LocalState.IsTaskWindowOpen = false;
             this.Dispose();
         }
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
-
+            this.Height.Value = 600;
+            this.Width.Value = 1200;
+            WS::Mainpage.LocalState.IsTaskWindowOpen = true;
         }
 
         public event Action<IDialogResult> RequestClose;
@@ -190,6 +204,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public ReactiveProperty<bool> DisplayCanceled { get; set; } = new(true);
 
         public ReactiveProperty<bool> DisplayCompleted { get; set; } = new(true);
+
+        public ReactivePropertySlim<double> Width { get; private set; } = new(600);
+
+        public ReactivePropertySlim<double> Height { get; private set; } = new(1200);
 
         public ReactiveCommand RefreshTaskCommand { get; init; } = new();
 

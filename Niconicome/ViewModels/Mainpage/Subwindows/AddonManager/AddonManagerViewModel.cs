@@ -59,12 +59,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 
         public void OnDialogClosed()
         {
-            WS::AddonPage.LocalInfo.IsAddonManagerOpen = false;
+            WS::AddonPage.LocalState.IsAddonManagerOpen = false;
         }
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            WS::AddonPage.LocalInfo.IsAddonManagerOpen = true;
+            WS::AddonPage.LocalState.IsAddonManagerOpen = true;
             this.RegionManager.Value.RegisterViewWithRegion(AddonManagerRegionName.Name, typeof(MainPage));
         }
 

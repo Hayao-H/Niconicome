@@ -240,6 +240,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Fetch::IOnlineVideoRefreshManager, Fetch::OnlineVideoRefreshManager>();
             services.AddTransient<PlaylistPlaylist::IVideosUnchecker, PlaylistPlaylist::VideosUnchecker>();
             services.AddTransient<Register::IVideoRegistrationHandler, Register::VideoRegistrationHandler>();
+            services.AddTransient<Utils::IWindowTabHelper, Utils::WindowTabHelper>();
             return services.BuildServiceProvider();
         }
 
