@@ -99,6 +99,8 @@ namespace Niconicome.Models.Network.Download
         {
             var videoCount = this.parallelTasksHandler!.PallarelTasks.Count;
 
+            if (videoCount == 0) return;
+
             onMessage($"動画のダウンロードを開始します。({videoCount}件)");
             onMessageShort($"動画のダウンロードを開始します。({videoCount}件)");
 
