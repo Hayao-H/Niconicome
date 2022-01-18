@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Niconicome.ViewModels;
 using Niconicome.ViewModels.Mainpage.Subwindows;
 
 namespace Niconicome.Views
@@ -18,12 +19,12 @@ namespace Niconicome.Views
     /// <summary>
     /// DownloadTasksWindows.xaml の相互作用ロジック
     /// </summary>
-    public partial class DownloadTasksWindows : Window
+    [ViewModel(typeof(DownloadTasksWindowViewModel))]
+    public partial class DownloadTasksWindows : UserControl
     {
         public DownloadTasksWindows()
         {
             this.InitializeComponent();
-            this.DataContext = new DownloadTasksWindowViewModel();
         }
     }
 }

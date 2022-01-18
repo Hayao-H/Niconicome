@@ -974,7 +974,7 @@ namespace Niconicome.ViewModels.Mainpage
                     }
                     else
                     {
-                        source = Niconicome.Models.Const.Net.NiconicoShortUrl + video.NiconicoId.Value;
+                        source = Niconicome.Models.Const.NetConstant.NiconicoShortUrl + video.NiconicoId.Value;
                     }
 
                     try
@@ -1013,7 +1013,7 @@ namespace Niconicome.ViewModels.Mainpage
                     {
                         foreach (IListVideoInfo video in videos)
                         {
-                            builder.AppendLine(Niconicome.Models.Const.Net.NiconicoShortUrl + video.NiconicoId.Value);
+                            builder.AppendLine(Niconicome.Models.Const.NetConstant.NiconicoShortUrl + video.NiconicoId.Value);
                         }
                     }
 

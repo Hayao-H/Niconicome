@@ -67,5 +67,15 @@ namespace Niconicome.Workspaces
         /// 動画の追加とか
         /// </summary>
         public static IVideoRegistrationHandler VideoRegistrationHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoRegistrationHandler>();
+
+        /// <summary>
+        /// ローカル情報
+        /// </summary>
+        public static ILocalState LocalState { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalState>();
+
+        /// <summary>
+        /// ウィンドウ
+        /// </summary>
+        public static IWindowTabHelper WindowTabHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowTabHelper>();
     }
 }

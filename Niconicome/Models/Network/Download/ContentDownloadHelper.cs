@@ -4,28 +4,31 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Niconico.Download;
+using Niconicome.Models.Domain.Niconico.Download.Ichiba;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Watch;
+using Niconicome.Models.Playlist;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
-using Download = Niconicome.Models.Domain.Niconico.Download;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
-using EnumSetting = Niconicome.Models.Local.Settings.EnumSettingsValue;
-using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Local.Settings.EnumSettingsValue;
-using Niconicome.Models.Domain.Niconico.Download.Ichiba;
-using Niconicome.Models.Playlist;
 
 namespace Niconicome.Models.Network.Download
 {
     interface IContentDownloadHelper
     {
-        INetworkResult? CurrentResult { get; }
-
-        Task<IDownloadResult> TryDownloadContentAsync(IDownloadSettings setting, Action<string> OnMessage, CancellationToken token);
+        /// <summary>
+        /// 非同期でコンテンツをダウンロードする
+        /// </summary>
+        /// <param name="videoInfo"></param>
+        /// <param name="setting"></param>
+        /// <param name="OnMessage"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IListVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token);
     }
 
     class ContentDownloadHelper : IContentDownloadHelper
@@ -58,20 +61,10 @@ namespace Niconicome.Models.Network.Download
 
         #endregion
 
-        /// <summary>
-        /// 現在の結果
-        /// </summary>
-        public INetworkResult? CurrentResult { get; private set; }
+        #region Methods
 
-        /// <summary>
-        /// 非同期でコンテンツをダウンロードする
-        /// </summary>
-        /// <param name="setting"></param>
-        /// <param name="OnMessage"></param>
-        /// <returns></returns>
-        public async Task<IDownloadResult> TryDownloadContentAsync(IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
+        public async Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IListVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
         {
-            var result = new DownloadResult() { VideoInfo = this.container.GetVideo(setting.NiconicoId) };
             var context = new DownloadContext(setting.NiconicoId);
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
@@ -79,7 +72,7 @@ namespace Niconicome.Models.Network.Download
 
             if (session.Video is not null)
             {
-                this.converter.ConvertDomainVideoInfoToListVideoInfo(result.VideoInfo, session.Video);
+                this.converter.ConvertDomainVideoInfoToListVideoInfo(videoInfo, session.Video);
             }
 
 
@@ -90,14 +83,13 @@ namespace Niconicome.Models.Network.Download
 
             if (session.State != WatchSessionState.GotPage || session.Video is null)
             {
-                result.IsSucceeded = false;
-                result.Message = session.State switch
+                string message = session.State switch
                 {
                     WatchSessionState.PaymentNeeded => "視聴ページの解析に失敗しました。",
                     WatchSessionState.HttpRequestOrPageAnalyzingFailure => "視聴ページの取得、または視聴ページの解析に失敗しました。",
                     _ => "不明なエラーにより、視聴ページの取得に失敗しました。"
                 };
-                return result;
+                return AttemptResult<IDownloadContext>.Fail(message);
             }
 
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
@@ -122,21 +114,16 @@ namespace Niconicome.Models.Network.Download
                 if (info?.VideoExist ?? false)
                 {
                     OnMessage("動画を保存済みのためスキップしました。");
-                    result.IsSucceeded = true;
                 }
                 else if (setting.FromAnotherFolder && (info?.VIdeoExistInOnotherFolder ?? false) && info?.LocalPath is not null)
                 {
                     var vResult = this.localContentHandler.MoveDownloadedFile(setting.NiconicoId, info.LocalPath, setting.FolderPath);
                     if (!vResult.IsSucceeded)
                     {
-                        result.IsSucceeded = false;
-                        result.Message = vResult.Message ?? "None";
-                        return result;
+                        return AttemptResult<IDownloadContext>.Fail(vResult.Message ?? "None");
                     }
                     else
                     {
-                        result.IsSucceeded = true;
-                        result.VideoFileName = vResult.VideoFileName ?? string.Empty;
                         OnMessage("別フォルダーに保存済みの動画をコピーしました。");
                     }
                 }
@@ -145,17 +132,8 @@ namespace Niconicome.Models.Network.Download
                     var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, session, context, token);
                     if (!vResult.IsSucceeded)
                     {
-                        result.IsSucceeded = false;
-                        result.Message = vResult.Message ?? "None";
                         OnMessage("DL失敗");
-                        return result;
-                    }
-                    else
-                    {
-                        result.IsSucceeded = true;
-                        result.VideoFileName = vResult.VideoFileName ?? string.Empty;
-                        result.VideoInfo.FileName.Value = vResult.VideoFileName ?? string.Empty;
-                        result.VideoVerticalResolution = vResult.VideoVerticalResolution;
+                        return AttemptResult<IDownloadContext>.Fail(vResult.Message ?? "None");
                     }
                 }
             }
@@ -173,20 +151,13 @@ namespace Niconicome.Models.Network.Download
 
                     if (!tResult.IsSucceeded)
                     {
-                        result.IsSucceeded = false;
-                        result.Message = tResult.Message ?? "None";
                         OnMessage("DL失敗");
-                        return result;
-                    }
-                    else
-                    {
-                        result.IsSucceeded = true;
+                        return AttemptResult<IDownloadContext>.Fail(tResult.Message ?? "None");
                     }
                 }
                 else if (info?.ThumbExist ?? false)
                 {
                     OnMessage("サムネイルを保存済みのためスキップしました。");
-                    result.IsSucceeded = true;
                 }
             }
 
@@ -204,20 +175,13 @@ namespace Niconicome.Models.Network.Download
 
                     if (!cResult.IsSucceeded)
                     {
-                        result.IsSucceeded = false;
-                        result.Message = cResult.Message ?? "None";
                         OnMessage("DL失敗");
-                        return result;
-                    }
-                    else
-                    {
-                        result.IsSucceeded = true;
+                        return AttemptResult<IDownloadContext>.Fail(cResult.Message ?? "None");
                     }
                 }
                 else if (info?.CommentExist ?? false)
                 {
                     OnMessage("コメントを保存済みのためスキップしました。");
-                    result.IsSucceeded = true;
                 }
             }
 
@@ -234,14 +198,8 @@ namespace Niconicome.Models.Network.Download
 
                     if (!iResult.IsSucceeded)
                     {
-                        result.IsSucceeded = false;
-                        result.Message = iResult.Message ?? "None";
                         OnMessage("DL失敗");
-                        return result;
-                    }
-                    else
-                    {
-                        result.IsSucceeded = true;
+                        return AttemptResult<IDownloadContext>.Fail(iResult.Message ?? "None");
                     }
                 }
             }
@@ -260,167 +218,131 @@ namespace Niconicome.Models.Network.Download
 
                     if (!iResult.IsSucceeded)
                     {
-                        result.IsSucceeded = false;
-                        result.Message = iResult.Message ?? "None";
                         OnMessage("DL失敗");
-                        return result;
-                    }
-                    else
-                    {
-                        result.IsSucceeded = true;
+                        return AttemptResult<IDownloadContext>.Fail(iResult.Message ?? "None");
                     }
                 }
                 else
                 {
                     OnMessage("市場情報を保存済みのためスキップしました。");
-                    result.IsSucceeded = true;
                 }
             }
 
             if (session.IsSessionEnsured) session.Dispose();
 
-            return result;
+            return AttemptResult<IDownloadContext>.Succeeded(context);
         }
+
+        #endregion
 
         #region private
 
         /// <summary>
         /// 非同期で動画をダウンロードする
         /// </summary>
-        /// <param name="niconicoid"></param>
-        /// <param name="onMessage"></param>
-        /// <returns></returns>
-        private async Task<IDownloadResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
+        private async Task<IAttemptResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
         {
-            int maxParallel = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelSegDl);
-            if (maxParallel <= 0)
-            {
-                maxParallel = 1;
-            }
-
-            var vSettings = settings.ConvertToVideoDownloadSettings(false, maxParallel);
             var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::IVideoDownloader>();
-            Download::IDownloadResult result;
+            IAttemptResult result;
             try
             {
-                result = await videoDownloader.DownloadVideoAsync(vSettings, onMessage, session, context, token);
+                result = await videoDownloader.DownloadVideoAsync(settings, onMessage, context, session, token);
             }
             catch (Exception e)
             {
-                this.logger.Error("動画のダウンロードに失敗しました。", e);
-                return new DownloadResult() { IsSucceeded = false, Message = e.Message };
+                this.logger.Error($"動画のダウンロードに失敗しました。({context.GetLogContent()})", e);
+                return AttemptResult.Fail($"動画のダウンロードに失敗しました。(詳細:{e.Message})");
             }
-            return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null, VideoFileName = result.VideoFileName, VideoVerticalResolution = result.VerticalResolution };
+            return result;
         }
 
         /// <summary>
         /// 動画情報をダウンロードする
         /// </summary>
-        /// <param name="niconicoid"></param>
-        /// <param name="onMessage"></param>
-        /// <returns></returns>
-        private IDownloadResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
+        private IAttemptResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
         {
-            var dlType = this.enumSettingsHandler.GetSetting<EnumSetting::VideoInfoTypeSettings>();
-
-            var dSettings = settings.ConvertToDescriptionDownloadSetting(dlType == EnumSetting::VideoInfoTypeSettings.Json, dlType == EnumSetting::VideoInfoTypeSettings.Xml, dlType == EnumSetting::VideoInfoTypeSettings.Text);
             var descriptionDownloader = DIFactory.Provider.GetRequiredService<DDL::IDescriptionDownloader>();
-            Download::IDownloadResult result;
+
+            IAttemptResult result;
             try
             {
-                result = descriptionDownloader.DownloadVideoInfo(dSettings, session, onMessage);
+                result = descriptionDownloader.DownloadVideoInfoAsync(settings, session, onMessage);
             }
             catch (Exception e)
             {
-                this.logger.Error("動画情報のダウンロードに失敗しました。", e);
-                return new DownloadResult() { IsSucceeded = false, Message = e.Message };
+                this.logger.Error($"動画情報のダウンロードに失敗しました。", e);
+                return AttemptResult.Fail($"動画情報のダウンロードに失敗しました。(詳細:{e.Message})");
             }
-            return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null, VideoFileName = result.VideoFileName, VideoVerticalResolution = result.VerticalResolution };
+
+            return result;
         }
 
         /// <summary>
         /// サムネイルをダウンロードする
         /// </summary>
-        /// <param name="setting"></param>
-        /// <param name="session"></param>
-        /// <returns></returns>
-        private async Task<IDownloadResult> TryDownloadThumbAsync(IDownloadSettings setting, IWatchSession session)
+        private async Task<IAttemptResult> TryDownloadThumbAsync(IDownloadSettings setting, IWatchSession session)
         {
-            var tSettings = setting.ConvertToThumbDownloadSetting();
             var thumbDownloader = DIFactory.Provider.GetRequiredService<Tdl::IThumbDownloader>();
-            Download::IDownloadResult result;
+            IAttemptResult result;
             try
             {
-                result = await thumbDownloader.DownloadThumbnailAsync(tSettings, session);
+                result = await thumbDownloader.DownloadThumbnailAsync(setting, session);
             }
             catch (Exception e)
             {
-                this.logger.Error("サムネイルのダウンロードに失敗しました。", e);
-                return new DownloadResult() { IsSucceeded = false, Message = e.Message };
+                this.logger.Error($"サムネイルのダウンロードに失敗しました。", e);
+                return AttemptResult.Fail($"サムネイルのダウンロードに失敗しました。(詳細:{e.Message})");
             }
-            return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null };
+
+            return result;
         }
 
         /// <summary>
         /// コメントをダウンロードする
         /// </summary>
-        /// <param name="settings"></param>
-        /// <param name="session"></param>
-        /// <param name="onMessage"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        private async Task<IDownloadResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context, CancellationToken token)
+        private async Task<IAttemptResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
-            var cOffset = this.settingHandler.GetIntSetting(SettingsEnum.CommentOffset);
-            var autoSwicth = this.settingHandler.GetBoolSetting(SettingsEnum.SwitchOffset);
-
-            if (cOffset < 0) cOffset = Cdl::CommentCollection.NumberToThrough;
-            if (autoSwicth && session.Video!.DmcInfo.IsOfficial) cOffset = 0;
-
-            var cSettings = settings.ConvertToCommentDownloadSetting(cOffset);
             var commentDownloader = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
-            Download::IDownloadResult result;
+            IAttemptResult result;
             try
             {
-                result = await commentDownloader.DownloadComment(session, cSettings, onMessage, context, token);
+                result = await commentDownloader.DownloadComment(session, settings, onMessage, context, token);
             }
             catch (Exception e)
             {
                 this.logger.Error("コメントのダウンロードに失敗しました。", e);
-                return new DownloadResult() { IsSucceeded = false, Message = e.Message };
+                return AttemptResult.Fail($"コメントのダウンロードに失敗しました。({e.Message})");
             }
-            return new DownloadResult() { IsSucceeded = result.Issucceeded, Message = result.Message ?? null };
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
         /// 市場情報をダウンロードする
         /// </summary>
-        /// <param name="settings"></param>
-        /// <param name="session"></param>
-        /// <param name="onMessage"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
         private async Task<IAttemptResult> DownloadIchibaInfoAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context)
         {
-            var iSettings = settings.ConvertToIchibaInfoDownloadSettings();
-            var filePath = this.pathOrganizer.GetFIlePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.IchibaInfoExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, settings.IchibaInfoSuffix);
-            IOUtils.CreateDirectoryIfNotExist(filePath);
-            iSettings.FilePath = filePath;
 
             var iDownloader = DIFactory.Provider.GetRequiredService<IIchibaInfoDownloader>();
-            var result = await iDownloader.DownloadIchibaInfo(session, iSettings, onMessage, context);
+            IAttemptResult result;
+            try
+            {
+                result = await iDownloader.DownloadIchibaInfo(session, settings, onMessage, context);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("市場情報のダウンロードに失敗しました。", e);
+                return AttemptResult.Fail($"市場情報のダウンロードに失敗しました。({e.Message})");
+            }
             return result;
 
         }
 
         /// <summary>
-        /// DLをキャンセルする
+        /// キャンセルした結果を取得する
         /// </summary>
-        /// <returns></returns>
-        private IDownloadResult CancelledDownloadAndGetResult()
+        private IAttemptResult<IDownloadContext> CancelledDownloadAndGetResult()
         {
-
-            return new DownloadResult() { Message = "キャンセルされました。", IsCanceled = true };
+            return AttemptResult<IDownloadContext>.Fail("キャンセルされました。");
         }
         #endregion
     }

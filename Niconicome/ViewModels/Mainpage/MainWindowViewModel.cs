@@ -40,6 +40,8 @@ namespace Niconicome.ViewModels.Mainpage
         {
 
             this.ctx = SynchronizationContext.Current;
+            this.RegionManager = regionManager;
+            this.dialogService = dialogService;
 
             this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");
@@ -85,7 +87,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
              {
-                 WS::Mainpage.WindowsHelper.OpenWindow<DownloadTasksWindows>();
+                 WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this.RegionManager, this.dialogService);
              });
 
             this.Restart = new ReactiveCommand()
@@ -116,7 +118,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenAddonManagerCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    if (WS::Mainpage.LocalInfo.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
+                    if (WS::Mainpage.LocalState.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
                     {
                         return;
                     }
@@ -131,7 +133,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             #endregion
 
-            this.RegionManager = regionManager;
 
             this.RegisterTabHandlers();
         }
@@ -141,6 +142,8 @@ namespace Niconicome.ViewModels.Mainpage
         private User? user;
 
         private readonly SynchronizationContext? ctx;
+
+        private readonly IDialogService dialogService;
 
         #endregion
 
@@ -250,7 +253,7 @@ namespace Niconicome.ViewModels.Mainpage
                     _ => LocalConstant.BottomTabRegionName,
                 };
 
-                IEnumerable<object> viewToRemove = this.RegionManager.Regions[LocalConstant.BottomTabRegionName].Views.Where(v =>
+                IEnumerable<object> viewToRemove = this.RegionManager.Regions[regionName].Views.Where(v =>
                 {
                     if (v is not UserControl control) return false; ;
                     if (control.DataContext is not TabViewModelBase vm) return false;

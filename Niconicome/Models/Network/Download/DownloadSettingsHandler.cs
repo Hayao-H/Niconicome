@@ -1,6 +1,7 @@
 ﻿using System;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Niconico.Download.Comment;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Playlist.VideoList;
@@ -99,46 +100,63 @@ namespace Niconicome.Models.Network.Download
 
             if (this.current.SelectedPlaylist.Value is null) throw new InvalidOperationException("");
 
+            //フラグ系
             bool replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
             bool overrideVideoDT = this.settingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT);
             bool resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
             bool unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
             bool experimentalSafety = this.settingHandler.GetBoolSetting(SettingsEnum.ExperimentalSafety);
             bool deleteEconomyFile = this.settingHandler.GetBoolSetting(SettingsEnum.DeleteEcoFile);
+
+            //ファイル系
             string folderPath = this.current.PlaylistFolderPath;
-            string fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.FIleFormat;
-
-            VideoInfoTypeSettings videoInfoT = this.enumSettingsHandler.GetSetting<VideoInfoTypeSettings>();
-            string videoInfoExt = videoInfoT == VideoInfoTypeSettings.Json ? ".json" : videoInfoT == VideoInfoTypeSettings.Xml ? ".xml" : ".txt";
-
-            IchibaInfoTypeSettings ichibaInfoT = this.enumSettingsHandler.GetSetting<IchibaInfoTypeSettings>();
-            string? htmlExt = this.settingHandler.GetStringSetting(SettingsEnum.HtmlExt);
-            string ichibaInfoExt = ichibaInfoT == IchibaInfoTypeSettings.Json ? ".json" : ichibaInfoT == IchibaInfoTypeSettings.Xml ? ".xml" : htmlExt ?? ".html";
-
+            string fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.DefaultFileNameFormat;
             string thumbExt = this.settingHandler.GetStringSetting(SettingsEnum.JpegExt) ?? FileFolder.DefaultJpegFileExt;
-
             string videoInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.VideoinfoSuffix) ?? Format.DefaultVideoInfoSuffix;
             string ichibaInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.IchibaInfoSuffix) ?? Format.DefaultIchibaSuffix;
             string thumbSuffix = this.settingHandler.GetStringSetting(SettingsEnum.ThumbSuffix) ?? Format.DefaultThumbnailSuffix;
             string ownerComSuffix = this.settingHandler.GetStringSetting(SettingsEnum.OwnerComSuffix) ?? Format.DefaultOwnerCommentSuffix;
+            string economySuffix = this.settingHandler.GetStringSetting(SettingsEnum.EconomySuffix) ?? "";
 
+            //動画情報
+            VideoInfoTypeSettings videoInfoT = this.enumSettingsHandler.GetSetting<VideoInfoTypeSettings>();
+            string videoInfoExt = videoInfoT == VideoInfoTypeSettings.Json ? ".json" : videoInfoT == VideoInfoTypeSettings.Xml ? ".xml" : ".txt";
+
+            //市場情報
+            IchibaInfoTypeSettings ichibaInfoT = this.enumSettingsHandler.GetSetting<IchibaInfoTypeSettings>();
+            string? htmlExt = this.settingHandler.GetStringSetting(SettingsEnum.HtmlExt);
+            string ichibaInfoExt = ichibaInfoT == IchibaInfoTypeSettings.Json ? ".json" : ichibaInfoT == IchibaInfoTypeSettings.Xml ? ".xml" : htmlExt ?? ".html";
+
+            //FFmpeg系
             string commandFormat = this.settingHandler.GetStringSetting(SettingsEnum.FFmpegFormat) ?? Format.DefaultFFmpegFormat;
             if (commandFormat.IsNullOrEmpty())
             {
                 commandFormat = Format.DefaultFFmpegFormat;
             }
 
-            string? economySuffix = this.settingHandler.GetStringSetting(SettingsEnum.EconomySuffix);
-            if (economySuffix?.IsNullOrEmpty() ?? true)
-            {
-                economySuffix = null;
-            }
-
+            //時関・並列係
             int commentFetchWaitSpan = this.settingHandler.GetIntSetting(SettingsEnum.CommentWaitSpan);
             if (commentFetchWaitSpan < 0)
             {
                 commentFetchWaitSpan = LocalConstant.DefaultCommetFetchWaitSpan;
             }
+
+            int maxParallelSegmentDownloadCount = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelSegDl);
+            if (maxParallelSegmentDownloadCount <= 0)
+            {
+                maxParallelSegmentDownloadCount = NetConstant.DefaultMaxParallelDownloadCount;
+            }
+
+            int commentOffset = this.settingHandler.GetIntSetting(SettingsEnum.CommentOffset);
+            if (commentOffset <= 0)
+            {
+                commentOffset = CommentCollection.NumberToThrough;
+            }
+
+            //履歴系
+            bool saveSucceeded = !this.settingHandler.GetBoolSetting(SettingsEnum.DisableDLSucceededHistory);
+            bool saveFailed = !this.settingHandler.GetBoolSetting(SettingsEnum.DisableDLFailedHistory);
+
 
             return new DownloadSettings
             {
@@ -177,6 +195,11 @@ namespace Niconicome.Models.Network.Download
                 EnableExperimentalCommentSafetySystem = experimentalSafety,
                 CommentFetchWaitSpan = commentFetchWaitSpan,
                 DeleteExistingEconomyFile = deleteEconomyFile,
+                MaxParallelSegmentDLCount = maxParallelSegmentDownloadCount,
+                CommentOffset = commentOffset,
+                VideoInfoType = videoInfoT,
+                SaveFailedHistory = saveFailed,
+                SaveSucceededHistory = saveSucceeded,
             };
         }
 

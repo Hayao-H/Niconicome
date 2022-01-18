@@ -6,159 +6,136 @@ using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Network.Download;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment
 {
     interface ICommentDownloader
     {
-        Task<IDownloadResult> DownloadComment(IWatchSession session, ICommentDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token);
-    }
-
-    class CommentDownloader : ICommentDownloader
-    {
-        public CommentDownloader(INiconicoUtils utils, ICommentClient client, IDownloadMessenger messenger, ILogger logger, ICommentConverter converter, ICommentStream stream)
-        {
-            this.utils = utils;
-            this.client = client;
-            this.messenger = messenger;
-            this.logger = logger;
-            this.commentConverter = converter;
-            this.commentStream = stream;
-        }
-
-        private readonly INiconicoUtils utils;
-
-        private readonly ICommentClient client;
-
-        private readonly IDownloadMessenger messenger;
-
-        private readonly ILogger logger;
-
-        private readonly ICommentConverter commentConverter;
-
-        private readonly ICommentStream commentStream;
-
         /// <summary>
         /// コメントをダウンロードする
         /// </summary>
         /// <param name="session"></param>
         /// <param name="settings"></param>
         /// <param name="onMessage"></param>
+        /// <param name="context"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<IDownloadResult> DownloadComment(IWatchSession session, ICommentDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token)
+        Task<IAttemptResult> DownloadComment(IWatchSession session, IDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token);
+    }
+
+    class CommentDownloader : ICommentDownloader
+    {
+        public CommentDownloader(IPathOrganizer pathOrganizer, ICommentClient client, ILogger logger, ICommentConverter converter, ICommentStream stream)
         {
-            this.messenger.AddHandler(onMessage);
+            this._client = client;
+            this._logger = logger;
+            this._commentConverter = converter;
+            this._commentStream = stream;
+            this._pathOrganizer = pathOrganizer;
+        }
+
+        #region field
+
+        private readonly ICommentClient _client;
+
+        private readonly ILogger _logger;
+
+        private readonly ICommentConverter _commentConverter;
+
+        private readonly ICommentStream _commentStream;
+
+        private readonly IPathOrganizer _pathOrganizer;
+
+        #endregion
+
+        #region Method
+
+        public async Task<IAttemptResult> DownloadComment(IWatchSession session, IDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token)
+        {
 
             if (session.Video is null)
             {
-                throw new InvalidOperationException("動画情報が未取得です。");
+                return AttemptResult.Fail("動画情報が未取得です。");
             }
 
-            string fileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml", settings.IsReplaceStrictedEnable);
-            string ownerFileName = this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ".xml", settings.IsReplaceStrictedEnable, settings.OwnerSuffix);
+            string filePath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, session.Video!.DmcInfo, ".xml", settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
+            string ownerFileName = this._pathOrganizer.GetFilePath(settings.FileNameFormat, session.Video!.DmcInfo, ".xml", settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, settings.OwnerComSuffix);
 
             if (token.IsCancellationRequested)
             {
-                this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
             }
 
-            this.messenger.SendMessage("コメントのダウンロードを開始します。");
-            this.logger.Log($"{settings.NiconicoId}のコメントダウンロードを開始します。({context.GetLogContent()})");
+            onMessage("コメントのダウンロードを開始します。");
+            this._logger.Log($"{settings.NiconicoId}のコメントダウンロードを開始します。({context.GetLogContent()})");
 
             ICommentCollection result;
             try
             {
-                result = await this.client.DownloadCommentAsync(session.Video!.DmcInfo, settings, this.messenger, context, token);
-            }
-            catch (TaskCanceledException)
-            {
-                this.messenger.RemoveHandler(onMessage);
-                return new DownloadResult()
-                {
-                    Message = $"キャンセルされました。"
-                };
+                result = await this._client.DownloadCommentAsync(session.Video!.DmcInfo, settings, onMessage, context, token);
             }
             catch (Exception e)
             {
-                this.messenger.RemoveHandler(onMessage);
-                this.logger.Error("コメントの取得に失敗しました。", e);
-                return new DownloadResult()
-                {
-                    Message = $"コメントの取得に失敗しました。(詳細:{e.Message})"
-                };
+                this._logger.Error($"コメントの取得に失敗しました。({context.GetLogContent()})", e);
+                return AttemptResult.Fail($"コメントの取得に失敗しました。(詳細:{e.Message})");
             }
-            this.messenger.SendMessage("コメントのダウンロードが完了しました。");
+            onMessage("コメントのダウンロードが完了しました。");
 
             if (token.IsCancellationRequested)
             {
-                this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
             }
 
-            this.messenger.SendMessage("コメントの変換処理を開始します。");
+            onMessage("コメントの変換処理を開始します。");
             IStoreCommentsData data;
             try
             {
-                data = this.commentConverter.ConvertToStoreCommentsData(result, settings);
+                data = this._commentConverter.ConvertToStoreCommentsData(result, settings);
             }
             catch (Exception e)
             {
-                this.messenger.RemoveHandler(onMessage);
-                this.logger.Error($"コメントの解析に失敗しました。({context.GetLogContent()})", e);
-                return new DownloadResult()
-                {
-                    Message = $"コメントの解析に失敗しました。(詳細:{e.Message})"
-                };
+                this._logger.Error($"コメントの解析に失敗しました。({context.GetLogContent()})", e);
+                return AttemptResult.Fail($"コメントの解析に失敗しました。");
             }
-            this.messenger.SendMessage("コメントの変換処理が完了しました。");
+            onMessage("コメントの変換処理が完了しました。");
 
-            data.Filename = fileName;
-            data.OwnerFilename = ownerFileName;
+            data.FilePath = filePath;
+            data.OwnerFilPath = ownerFileName;
 
             if (token.IsCancellationRequested)
             {
-                this.messenger.RemoveHandler(onMessage);
                 return this.GetCancelledResult();
             }
 
-            this.messenger.SendMessage($"コメントの書き込みを開始します。");
+            onMessage($"コメントの書き込みを開始します。");
             try
             {
-                this.commentStream.Write(data, settings.FolderName, settings.IsOverwriteEnable);
+                this._commentStream.Write(data, settings.Overwrite);
             }
             catch (Exception e)
             {
-                this.messenger.RemoveHandler(onMessage);
-                this.logger.Error($"コメントの書き込みに失敗しました。({context.GetLogContent()})", e);
-                return new DownloadResult()
-                {
-                    Message = $"コメントの書き込みに失敗しました。(詳細:{e.Message})"
-                };
+                this._logger.Error($"コメントの書き込みに失敗しました。({context.GetLogContent()})", e);
+                return AttemptResult.Fail("コメントの書き込みに失敗しました。");
             }
-            this.messenger.SendMessage("コメントのダウンロードが完了しました。");
-            this.logger.Log($"コメントのダウンロードが完了しました。({context.GetLogContent()})");
+            onMessage("コメントのダウンロードが完了しました。");
+            this._logger.Log($"コメントのダウンロードが完了しました。({context.GetLogContent()})");
 
-            this.messenger.RemoveHandler(onMessage);
-            return new DownloadResult()
-            {
-                Issucceeded = true
-            };
+            return AttemptResult.Succeeded();
 
 
         }
 
-        /// <summary>
-        /// キャンセル時の結果を取得する
-        /// </summary>
-        /// <returns></returns>
-        private IDownloadResult GetCancelledResult()
+        #endregion
+
+        #region private
+
+        private IAttemptResult GetCancelledResult()
         {
-            return new DownloadResult()
-            {
-                Message = "処理がキャンセルされました"
-            };
+            return AttemptResult.Fail("処理がキャンセルされました");
         }
+
+        #endregion
     }
 }

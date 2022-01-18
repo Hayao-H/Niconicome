@@ -202,6 +202,7 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.MWEconomyColumnWid => STypes::SettingNames.MainWindowEconomyColumnWidth,
                 SettingsEnum.DeleteEcoFile => STypes::SettingNames.DeleteExistingEconomyFile,
                 SettingsEnum.SearchExact => STypes::SettingNames.SearchVideosExact,
+                SettingsEnum.ShowTasksAsTab => STypes::SettingNames.ShowDownloadTasksAsTab,
                 _ => null
             };
         }
@@ -294,5 +295,6 @@ namespace Niconicome.Models.Local.Settings
         MWEconomyColumnWid,
         DeleteEcoFile,
         SearchExact,
+        ShowTasksAsTab,
     }
 }

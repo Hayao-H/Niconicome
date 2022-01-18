@@ -114,7 +114,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideo::IVideoDownloadHelper, DlVideo::VideoDownloadHelper>();
             services.AddTransient<DlVideo::IVideoDownloader, DlVideo::VideoDownloader>();
             services.AddTransient<DlVideo::ISegmentWriter, DlVideo::SegmentWriter>();
-            services.AddTransient<DomainDownload::IDownloadMessenger, DomainDownload::DownloadMessanger>();
             services.AddTransient<DlVideo::IVideoEncoader, DlVideo::VideoEncoader>();
             services.AddTransient<DlVideo::ITsMerge, DlVideo::TsMerge>();
             services.AddSingleton<Download::IContentDownloader, Download::ContentDownloader>();
@@ -241,6 +240,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Fetch::IOnlineVideoRefreshManager, Fetch::OnlineVideoRefreshManager>();
             services.AddTransient<PlaylistPlaylist::IVideosUnchecker, PlaylistPlaylist::VideosUnchecker>();
             services.AddTransient<Register::IVideoRegistrationHandler, Register::VideoRegistrationHandler>();
+            services.AddTransient<Utils::IWindowTabHelper, Utils::WindowTabHelper>();
             return services.BuildServiceProvider();
         }
 

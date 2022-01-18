@@ -107,7 +107,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 };
             }
 
-            string format = this._settingsContainer.GetReactiveStringSetting(SettingsEnum.FileNameFormat, Format.FIleFormat).Value;
+            string format = this._settingsContainer.GetReactiveStringSetting(SettingsEnum.FileNameFormat, Format.DefaultFileNameFormat).Value;
             bool replaceStricted = this._settingsContainer.GetReactiveBoolSetting(SettingsEnum.ReplaceSBToMB).Value;
             string folderPath = this._current.PlaylistFolderPath;
             string? economySuffix = this._settingsContainer.GetReactiveStringSetting(SettingsEnum.EconomySuffix).Value;

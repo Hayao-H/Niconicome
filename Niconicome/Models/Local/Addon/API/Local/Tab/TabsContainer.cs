@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Addons.API.Tab;
+using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Tab
 {
@@ -32,9 +33,16 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
     public class TabsContainer : ITabsContainer
     {
+        public TabsContainer(ILogger logger)
+        {
+            this._logger = logger;
+        }
+
         #region field
 
         private List<TabItem> tabs = new();
+
+        private readonly ILogger _logger;
 
         #endregion
 
@@ -57,11 +65,14 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
                 if (!this.tabs.Any(t => t.ID == item.ID)) return false;
                 this.Remove?.Invoke(this, new RemoveTabEventArgs(item.TabType, item.ID));
                 this.tabs.RemoveAll(tab => tab.ID == item.ID);
+                this._logger.Log($"タブを削除しました。（Title:{item.Title}, Tab_ID:{item.ID}, Pos:{item.TabType}");
                 return true;
             });
 
             this.tabs.Add(tab);
             this.Add?.Invoke(this, new AddTabEventArgs(infomation.TabType, tab));
+
+            this._logger.Log($"タブを追加しました。（Title:{infomation.Title}, Tab_ID:{infomation.ID}, Pos:{infomation.TabType}");
 
             return tab;
         }

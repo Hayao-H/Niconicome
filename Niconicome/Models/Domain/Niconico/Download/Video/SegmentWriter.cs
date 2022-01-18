@@ -11,7 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
     public interface ISegmentWriter
     {
-        void Write(byte[] data, IParallelDownloadTask task, IDownloadContext context);
+        void Write(byte[] data, IParallelDownloadTask task, string segmentDirectoryName);
         string FolderNameAbs { get; }
         IEnumerable<string> FilesPath { get; }
         IEnumerable<string> FilesPathAbs { get; }
@@ -30,9 +30,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// </summary>
         /// <param name="data"></param>
         /// <param name="task"></param>
-        public void Write(byte[] data, IParallelDownloadTask task, IDownloadContext context)
+        public void Write(byte[] data, IParallelDownloadTask task, string segmentDirectoryName)
         {
-            this.folderName = Path.Combine("tmp", context.SegmentsDirectoryName);
+            this.folderName = Path.Combine("tmp", segmentDirectoryName);
 
             if (!Directory.Exists(this.folderName))
             {

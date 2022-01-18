@@ -37,11 +37,11 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             if (maxP <= 0)
             {
-                maxP = 3;
+                maxP = NetConstant.DefaultMaxParallelDownloadCount;
             }
             if (maxSP <= 0)
             {
-                maxSP = 1;
+                maxSP = NetConstant.DefaultMaxParallelSegmentDownloadCount;
             }
 
             this.IsDownloadVideoInfoInJsonEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.VideoInfoInJson)).AddTo(this.disposables);

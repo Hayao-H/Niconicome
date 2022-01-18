@@ -13,6 +13,8 @@ using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Niconicome.Views;
 using Prism.Events;
+using Prism.Regions;
+using Prism.Services.Dialogs;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using MaterialDesign = MaterialDesignThemes.Wpf;
@@ -22,8 +24,11 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class DownloadSettingsViewModel : TabViewModelBase, IDisposable
     {
-        public DownloadSettingsViewModel(IEventAggregator ea) : base("設定", "")
+        public DownloadSettingsViewModel(IEventAggregator ea, IDialogService dialogService,IRegionManager regionManager) : base("設定", "")
         {
+
+            this._dialogService = dialogService;
+            this._regionManager = regionManager;
 
             this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
             this.IsLimittingCommentCountEnable = WS::Mainpage.DownloadSettingsHandler.IsLimittingCommentCountEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
@@ -132,7 +137,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
                 {
-                    WS::Mainpage.WindowsHelper.OpenWindow<DownloadTasksWindows>();
+                    WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager, this._dialogService);
                 });
             })
             .AddTo(this.disposables);
@@ -153,6 +158,14 @@ namespace Niconicome.ViewModels.Mainpage
         {
             this.Dispose();
         }
+
+        #region field
+
+        private readonly IDialogService _dialogService;
+
+        private readonly IRegionManager _regionManager;
+
+        #endregion
 
 
         /// <summary>
@@ -323,7 +336,7 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
             }
 
-            await WS::Mainpage.Videodownloader.DownloadVideosFriendly(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
+            await WS::Mainpage.Videodownloader.DownloadVideosFriendlyAsync(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
             WS::Mainpage.PostDownloadTasksManager.HandleAction();
         }
 

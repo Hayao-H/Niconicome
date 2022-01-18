@@ -12,6 +12,7 @@
              xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              xmlns:keydown="clr-namespace:Niconicome.ViewModels.Converter.KeyDown"
              mc:Ignorable="d"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              Background="{DynamicResource MaterialDesignPaper}"
              d:Width="1300"
              d:Height="600"

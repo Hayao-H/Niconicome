@@ -191,5 +191,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string MainWindowEconomyColumnWidth { get; private set; } = "mainwindoweconomycolumnwidth";
         public static string DeleteExistingEconomyFile { get; private set; } = "deleteexistingeconomyfile";
         public static string SearchVideosExact { get; private set; } = "searchvideosexact";
+        public static string ShowDownloadTasksAsTab { get; private set; } = "showdownloadtasksastab";
     }
 }

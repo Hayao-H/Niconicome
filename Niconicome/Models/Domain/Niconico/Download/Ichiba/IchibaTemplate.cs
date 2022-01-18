@@ -30,7 +30,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
         {
             return IchibaTemplate.template
                 .Replace("{title}", niconicoID + "の市場情報")
-                .Replace("{watch_url}", Const::Net.NiconicoShortUrl + niconicoID);
+                .Replace("{watch_url}", Const::NetConstant.NiconicoShortUrl + niconicoID);
         }
 
         private readonly static string template = "<!DOCTYPE html><html><head><title>{title}</title><meta charset=\"utf8\" /><style> p{ font-size: 18px; }" + Environment.NewLine +
