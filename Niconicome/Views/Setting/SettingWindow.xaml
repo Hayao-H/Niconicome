@@ -104,16 +104,6 @@
                 </Border>
                 <Border BorderThickness="6 0 0 0" Padding="5 4">
                     <DockPanel>
-                        <materialDesign:PackIcon Kind="Import">
-                            <materialDesign:PackIcon.RenderTransform>
-                                <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>
-                            </materialDesign:PackIcon.RenderTransform>
-                        </materialDesign:PackIcon>
-                        <TextBlock Padding="8 2 0 0" Text="インポート" FontSize="20" Cursor="Hand"/>
-                    </DockPanel>
-                </Border>
-                <Border BorderThickness="6 0 0 0" Padding="5 4">
-                    <DockPanel>
                         <materialDesign:PackIcon Kind="Bug">
                             <materialDesign:PackIcon.RenderTransform>
                                 <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-15"/>

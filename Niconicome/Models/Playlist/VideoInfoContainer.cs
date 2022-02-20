@@ -39,7 +39,7 @@ namespace Niconicome.Models.Playlist
             }
             else
             {
-                var newVideo = new NonBindableListVideoInfo();
+                var newVideo = New();
                 newVideo.NiconicoId.Value = niconicoID;
                 this.videos.Add(niconicoID, newVideo);
                 return newVideo;

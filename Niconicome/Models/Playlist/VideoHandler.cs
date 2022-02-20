@@ -1,117 +1,133 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store;
-using Niconicome.Models.Playlist.VideoList;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Playlist.SharedUtils;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Playlist
 {
     public interface IVideoHandler
     {
-        void Update(IListVideoInfo video);
+        /// <summary>
+        /// 動画を追加する
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        IAttemptResult<int> AddVideo(IListVideoInfo video);
+
+        /// <summary>
+        /// 動画を削除する
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        IAttemptResult RemoveVideo(IListVideoInfo video);
+
+        /// <summary>
+        /// 動画を更新する
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        IAttemptResult Update(IListVideoInfo video);
+
+        /// <summary>
+        /// IDを指定して動画を取得する
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IAttemptResult<IListVideoInfo> GetVideo(int id);
+
+        /// <summary>
+        /// すべての動画を取得する
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IEnumerable<IListVideoInfo>> GetAllVideos();
+
+        /// <summary>
+        /// 動画の存在を確認する
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         bool Exist(int id);
-        IEnumerable<IListVideoInfo> GetAllVideos();
-        IListVideoInfo GetVideo(int id);
 
     }
 
     public class VideoHandler : IVideoHandler
     {
 
-        public VideoHandler(IVideoStoreHandler storeHandler, IPlaylistStoreHandler playlistStoreHandler, IVideoInfoContainer videoInfoContainer)
+        public VideoHandler(IVideoStoreHandler storeHandler,IVideoPlaylistConverter converter)
         {
-            this.videoStoreHandler = storeHandler;
-            this.playlistStoreHandler = playlistStoreHandler;
-            this.videoInfoContainer = videoInfoContainer;
+            this._videoStoreHandler = storeHandler;
+            this._converter = converter;
         }
 
-        #region DI
+        #region field
 
-        private readonly IVideoInfoContainer videoInfoContainer;
+        private readonly IVideoStoreHandler _videoStoreHandler;
 
-        private readonly IVideoStoreHandler videoStoreHandler;
-
-        private readonly IPlaylistStoreHandler playlistStoreHandler;
+        private readonly IVideoPlaylistConverter _converter;
 
         #endregion
 
-        /// <summary>
-        /// 動画を追加する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlidtId"></param>
-        /// <returns></returns>
-        public int AddVideo(IListVideoInfo video, int playlidtId)
+        public IAttemptResult<int> AddVideo(IListVideoInfo video)
         {
-            int id = this.playlistStoreHandler.AddVideo(video, playlidtId);
-            return id;
+            STypes::Video converted = this._converter.ConvertLocalVideoToStoreVideo(video);
+
+            IAttemptResult<int> result = this._videoStoreHandler.AddVideo(converted);
+
+            return result;
         }
 
-        /// <summary>
-        /// 動画を削除する
-        /// </summary>
-        /// <param name="videoID"></param>
-        /// <param name="playlistID"></param>
-        public void RemoveVideo(int videoID, int playlistID)
+        public IAttemptResult RemoveVideo(IListVideoInfo video)
         {
-            this.playlistStoreHandler.RemoveVideo(videoID, playlistID);
+            IAttemptResult result = this._videoStoreHandler.RemoveVideo(video.Id.Value);
+
+            return result;
         }
 
-        /// <summary>
-        /// 動画情報を更新する
-        /// </summary>
-        /// <param name="video"></param>
-        public void Update(IListVideoInfo video)
+        public IAttemptResult Update(IListVideoInfo video)
         {
-            this.videoStoreHandler.Update(video);
+            STypes::Video converted = this._converter.ConvertLocalVideoToStoreVideo(video);
+
+            IAttemptResult result = this._videoStoreHandler.Update(converted);
+
+            return result;
         }
 
-
-        /// <summary>
-        /// 全ての動画を取得する
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<IListVideoInfo> GetAllVideos()
+        public IAttemptResult<IListVideoInfo> GetVideo(int id)
         {
-            return this.videoStoreHandler.GetAllVideos().Select(v =>
+
+            IAttemptResult<STypes::Video> sResult = this._videoStoreHandler.GetVideo(id);
+
+            if (!sResult.IsSucceeded || sResult.Data is null)
             {
+                return AttemptResult<IListVideoInfo>.Fail(sResult.Message);
+            }
 
-                IListVideoInfo video = this.videoInfoContainer.GetVideo(v.NiconicoId);
-                video.SetDataBaseData(v);
-                return video;
-            });
+            IListVideoInfo converted = this._converter.ConvertStoreVideoToLocalVideo(sResult.Data);
+
+            return AttemptResult<IListVideoInfo>.Succeeded(converted);
         }
 
-        /// <summary>
-        /// 指定した動画を取得する
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IListVideoInfo GetVideo(int id)
+        public IAttemptResult<IEnumerable<IListVideoInfo>> GetAllVideos()
         {
-            if (!this.videoStoreHandler.Exists(id)) throw new InvalidOperationException($"動画({id})はデータベースに存在しません。");
+            IAttemptResult<List<STypes::Video>> sResult = this._videoStoreHandler.GetAllVideos();
 
-            STypes::Video dbVideo = this.videoStoreHandler.GetVideo(id)!;
+            if (!sResult.IsSucceeded || sResult.Data is null)
+            {
+                return AttemptResult<IEnumerable<IListVideoInfo>>.Fail(sResult.Message);
+            }
 
-            IListVideoInfo video = this.videoInfoContainer.GetVideo(dbVideo.NiconicoId);
-            video.SetDataBaseData(dbVideo);
-            return video;
+            IEnumerable<IListVideoInfo> converted = sResult.Data.Select(v => this._converter.ConvertStoreVideoToLocalVideo(v));
+
+            return AttemptResult<IEnumerable<IListVideoInfo>>.Succeeded(converted);
+
         }
 
-        /// <summary>
-        /// 動画の存在をチェックする
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public bool Exist(int id)
         {
-            return this.videoStoreHandler.Exists(id);
+            return this._videoStoreHandler.Exists(id);
         }
-
-
 
     }
 }

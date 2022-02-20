@@ -70,4 +70,8 @@
 			</EmbeddedResource>
 		</ItemGroup>
 
+		<ItemGroup>
+		  <Folder Include="Models\Local\External\Inport\" />
+		</ItemGroup>
+
 	</Project>

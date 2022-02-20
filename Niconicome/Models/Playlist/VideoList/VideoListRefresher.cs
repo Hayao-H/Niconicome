@@ -12,6 +12,7 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network;
+using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Playlist.VideoList
 {
@@ -30,7 +31,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public class VideoListRefresher : IVideoListRefresher
     {
-        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current, ILightVideoListinfoHandler lightVideoListinfoHandler,ILocalSettingsContainer container)
+        public VideoListRefresher(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, ILocalVideoUtils localVideoUtils, IVideoThumnailUtility videoThumnailUtility, ICurrent current, ILightVideoListinfoHandler lightVideoListinfoHandler, ILocalSettingsContainer container)
         {
             this._playlistStoreHandler = playlistStoreHandler;
             this._videoHandler = videoHandler;
@@ -69,10 +70,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (playlistID == -1)
             {
-                return new AttemptResult()
-                {
-                    Message = $"プレイストが選択されていません。",
-                };
+                return AttemptResult.Fail($"プレイストが選択されていません。");
             }
 
             IEnumerable<IListVideoInfo> originalVideos;
@@ -82,29 +80,23 @@ namespace Niconicome.Models.Playlist.VideoList
             }
             else
             {
-                var playlist = this._playlistStoreHandler.GetPlaylist(playlistID);
+                IAttemptResult<STypes::Playlist> pResult = this._playlistStoreHandler.GetPlaylist(playlistID);
 
-                if (playlist is null)
+                if (!pResult.IsSucceeded || pResult.Data is null)
                 {
-                    return new AttemptResult()
-                    {
-                        Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})",
-                    };
+                    return AttemptResult.Fail($"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})");
                 }
-                originalVideos = playlist.Videos.Select(v =>
-                {
-                    IListVideoInfo video = VideoInfoContainer.New();
-                    video.Id.Value = v.Id;
-                    return video;
-                });
+                originalVideos = pResult.Data.Videos.Select(v =>
+               {
+                   IListVideoInfo video = VideoInfoContainer.New();
+                   video.Id.Value = v.Id;
+                   return video;
+               });
             }
 
             if (originalVideos is null)
             {
-                return new AttemptResult()
-                {
-                    Message = $"データベースからのプレイリストの取得に失敗しました。(id:{playlistID}, detail: VIDEO_PROPERTY_IS_NULL)",
-                };
+                return AttemptResult.Fail($"データベースからのプレイリストの取得に失敗しました。(id:{playlistID}, detail: VIDEO_PROPERTY_IS_NULL)");
             }
 
             string format = this._settingsContainer.GetReactiveStringSetting(SettingsEnum.FileNameFormat, Format.DefaultFileNameFormat).Value;
@@ -121,10 +113,7 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 if (playlistID != (this._current.SelectedPlaylist.Value?.Id ?? -1))
                 {
-                    return new AttemptResult()
-                    {
-                        Message = $"動画リスト更新中にプレイリストが変更されました。",
-                    };
+                    return AttemptResult.Fail($"動画リスト更新中にプレイリストが変更されました。");
                 }
 
                 IListVideoInfo video;
@@ -134,7 +123,12 @@ namespace Niconicome.Models.Playlist.VideoList
                 }
                 else
                 {
-                    video = this._videoHandler.GetVideo(originalVideo.Id.Value);
+                    IAttemptResult<IListVideoInfo> vResult = this._videoHandler.GetVideo(originalVideo.Id.Value);
+                    if (!vResult.IsSucceeded||vResult.Data is null)
+                    {
+                        continue;
+                    }
+                    video = vResult.Data;
                 }
 
                 ILightVideoListInfo light = this._lightVideoListinfoHandler.GetLightVideoListInfo(video.NiconicoId.Value, playlistID);

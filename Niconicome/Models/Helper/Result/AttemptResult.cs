@@ -11,6 +11,7 @@ namespace Niconicome.Models.Helper.Result
         bool IsSucceeded { get; }
         string? Message { get; }
         Exception? Exception { get; }
+        string ExceptionMessage { get; }
     }
 
     public class AttemptResult : IAttemptResult
@@ -21,6 +22,7 @@ namespace Niconicome.Models.Helper.Result
 
         public Exception? Exception { get; set; }
 
+        public string ExceptionMessage => this.Exception?.Message ?? "None";
 
         /// <summary>
         /// インスタンスを作成

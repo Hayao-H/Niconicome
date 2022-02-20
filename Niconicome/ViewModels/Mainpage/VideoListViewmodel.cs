@@ -616,7 +616,21 @@ namespace Niconicome.ViewModels.Mainpage
                   else if (!this.InputString.Value.IsNullOrEmpty())
                   {
                       FilterringOptions option = this.IsFilteringOnlyByTag.Value ? FilterringOptions.OnlyByTag : FilterringOptions.None;
-                      var videos = this.IsFilteringFromAllVideos.Value ? WS::Mainpage.VideoHandler.GetAllVideos() : WS::Mainpage.VideoListContainer.Videos;
+                      IEnumerable<IListVideoInfo> videos;
+                      if (this.IsFilteringFromAllVideos.Value)
+                      {
+                          IAttemptResult<IEnumerable<IListVideoInfo>> result = WS::Mainpage.VideoHandler.GetAllVideos();
+                          if (!result.IsSucceeded||result.Data is null)
+                          {
+                              this.SnackbarMessageQueue.Enqueue("データベースからの動画情報の取得に失敗しました。");
+                              return;
+                          }
+                          videos = result.Data;
+                      } else
+                      {
+                          videos = WS::Mainpage.VideoListContainer.Videos;
+                      }
+
                       videos = WS::Mainpage.VideoFilter.FilterVideos(this.InputString.Value, videos, option);
 
                       WS::Mainpage.VideoListContainer.Clear();
