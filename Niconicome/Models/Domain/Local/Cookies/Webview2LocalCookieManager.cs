@@ -11,7 +11,6 @@ namespace Niconicome.Models.Domain.Local.Cookies
         bool IsNicosidExpired { get; }
         string? UserSession { get; }
         string? UserSessionSecure { get; }
-        string? Nicosid { get; }
     }
 
     interface IWebview2LocalCookieManager
@@ -60,14 +59,13 @@ namespace Niconicome.Models.Domain.Local.Cookies
             var rawKey = this.cookieJsonLoader.GetEncryptedKey(jsonPath);
             var key = this.chromeCookieDecryptor.GetEncryptionKey(rawKey);
 
-            if (cookies.UserSession is null || cookies.UserSessionSecure is null || cookies.Nicosid is null)
+            if (cookies.UserSession is null || cookies.UserSessionSecure is null)
             {
                 throw new IOException("Cookieの値がnullです。");
             }
 
             var usersessionEncrypted = this.chromeCookieDecryptor.DecryptCookie(cookies.UserSession, key);
             var usersessionSecureEncrypted = this.chromeCookieDecryptor.DecryptCookie(cookies.UserSessionSecure, key);
-            var nicosidEncrypted = this.chromeCookieDecryptor.DecryptCookie(cookies.Nicosid, key);
 
             var info = new UserCookieInfo()
             {
@@ -76,7 +74,6 @@ namespace Niconicome.Models.Domain.Local.Cookies
                 IsNicosidExpired = cookies.IsNnicosidExpires,
                 UserSession = this.chromeCookieDecryptor.ToUtf8String(usersessionEncrypted),
                 UserSessionSecure = this.chromeCookieDecryptor.ToUtf8String(usersessionSecureEncrypted),
-                Nicosid = this.chromeCookieDecryptor.ToUtf8String(nicosidEncrypted)
             };
 
             return info;
@@ -84,7 +81,7 @@ namespace Niconicome.Models.Domain.Local.Cookies
         }
     }
 
-    class UserCookieInfo:IUserCookieInfo
+    class UserCookieInfo : IUserCookieInfo
     {
         public bool IsUserSessionExpired { get; set; }
 
@@ -96,6 +93,5 @@ namespace Niconicome.Models.Domain.Local.Cookies
 
         public string? UserSessionSecure { get; set; }
 
-        public string? Nicosid { get; set; }
     }
 }
