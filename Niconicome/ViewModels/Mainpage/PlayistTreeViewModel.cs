@@ -56,7 +56,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.PlaylistRefreshcommand = new ReactiveCommand()
                 .WithSubscribe(() =>
             {
-                ///WS::Mainpage.PlaylistHandler.Refresh();
+                WS::Mainpage.PlaylistHandler.Refresh();
                 ///if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
                 ///{
                 ///    WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistHandler.GetPlaylist(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);

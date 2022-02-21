@@ -608,7 +608,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (commit)
             {
-                var result = this._playlistHandler.MoveVideoToPrev(determinedPlaylistID, videoIndex);
+                var result = this._playlistHandler.MoveVideoToPrev(videoIndex, determinedPlaylistID);
                 if (!result.IsSucceeded)
                 {
 
@@ -652,7 +652,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (commit)
             {
-                IAttemptResult result = this._playlistHandler.MoveVideoToForward(determinedPlaylistID, videoIndex);
+                IAttemptResult result = this._playlistHandler.MoveVideoToForward(videoIndex, determinedPlaylistID);
                 if (!result.IsSucceeded)
                 {
                     return AttemptResult.Fail("プレイリストにおける動画の並び替えに失敗しました。");

@@ -529,7 +529,9 @@ namespace Niconicome.Models.Playlist.Playlist
             {
                 STypes::Playlist p = pResult.Data[i];
 
-                var ex = false;
+                ITreePlaylistInfo playlist = this._converter.ConvertStorePlaylistToLocalPlaylist(p);
+
+                var ex = playlist.IsExpanded;
                 if (expandAll)
                 {
                     ex = true;
@@ -539,7 +541,6 @@ namespace Niconicome.Models.Playlist.Playlist
                     ex = p.IsExpanded;
                 }
 
-                ITreePlaylistInfo playlist = this._converter.ConvertStorePlaylistToLocalPlaylist(p);
                 playlist.IsExpanded = ex;
                 list.Add(playlist);
             }

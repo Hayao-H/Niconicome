@@ -240,6 +240,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Register::IVideoRegistrationHandler, Register::VideoRegistrationHandler>();
             services.AddTransient<Utils::IWindowTabHelper, Utils::WindowTabHelper>();
             services.AddTransient<Playlist::SharedUtils.IVideoPlaylistConverter, Playlist::SharedUtils.VideoPlaylistConverter>();
+            services.AddSingleton<PlaylistPlaylist::IPlaylistInfoContainer, PlaylistPlaylist::PlaylistInfoContainer>();
             return services.BuildServiceProvider();
         }
 

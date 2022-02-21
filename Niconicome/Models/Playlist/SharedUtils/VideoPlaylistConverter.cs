@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist.Playlist;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
@@ -43,14 +45,20 @@ namespace Niconicome.Models.Playlist.SharedUtils
     public class VideoPlaylistConverter : IVideoPlaylistConverter
     {
 
-        public VideoPlaylistConverter(IVideoInfoContainer container)
+        public VideoPlaylistConverter(IVideoInfoContainer container, IPlaylistStoreHandler playlistStoreHandler, IPlaylistInfoContainer playlistInfoContainer)
         {
             this._container = container;
+            this._playlistStoreHandler = playlistStoreHandler;
+            this._playlistInfoContainer = playlistInfoContainer;
         }
 
         #region field
 
         private readonly IVideoInfoContainer _container;
+
+        private readonly IPlaylistStoreHandler _playlistStoreHandler;
+
+        private readonly IPlaylistInfoContainer _playlistInfoContainer;
 
         #endregion
 
@@ -58,6 +66,7 @@ namespace Niconicome.Models.Playlist.SharedUtils
         {
             var converted = new STypes::Video();
 
+            converted.Id = source.Id.Value;
             converted.NiconicoId = source.NiconicoId.Value;
             converted.Title = source.Title.Value;
             converted.UploadedOn = source.UploadedOn.Value;
@@ -107,6 +116,8 @@ namespace Niconicome.Models.Playlist.SharedUtils
         {
             var converted = new STypes::Playlist();
 
+            converted.Id = source.Id;
+            converted.IsRoot = source.IsRoot;
             converted.PlaylistName = source.Name.Value;
             converted.FolderPath = source.Folderpath;
             converted.IsExpanded = source.IsExpanded;
@@ -115,14 +126,29 @@ namespace Niconicome.Models.Playlist.SharedUtils
             converted.IsTemporary = source.IsTemporary;
             converted.IsDownloadSucceededHistory = source.IsDownloadSucceededHistory;
             converted.IsDownloadFailedHistory = source.IsDownloadFailedHistory;
+            converted.IsRemotePlaylist = source.RemoteType != RemoteType.None;
+            converted.RemoteId = source.RemoteId;
+            converted.IsWatchLater = source.RemoteType == RemoteType.WatchLater;
+            converted.IsMylist = source.RemoteType == RemoteType.Mylist;
+            converted.IsSeries = source.RemoteType == RemoteType.Series;
+            converted.IsChannel = source.RemoteType == RemoteType.Channel;
+            converted.IsUserVideos = source.RemoteType == RemoteType.UserVideos;
             converted.BookMarkedVideoID = source.BookMarkedVideoID;
+            converted.Videos.Clear();
+            converted.Videos.AddRange(source.Videos.Select(v => this.ConvertLocalVideoToStoreVideo(v)));
+
+            IAttemptResult<STypes::Playlist> pResult = this._playlistStoreHandler.GetPlaylist(source.ParentId);
+            if (pResult.IsSucceeded && pResult.Data is not null)
+            {
+                converted.ParentPlaylist = pResult.Data;
+            }
 
             return converted;
         }
 
         public ITreePlaylistInfo ConvertStorePlaylistToLocalPlaylist(STypes::Playlist source)
         {
-            var converted = new BindableTreePlaylistInfo();
+            var converted = this._playlistInfoContainer.GetPlaylist(source.Id);
 
             converted.Id = source.Id;
             converted.ParentId = source.ParentPlaylist?.Id ?? -1;
@@ -132,13 +158,19 @@ namespace Niconicome.Models.Playlist.SharedUtils
             converted.RemoteType = source.IsMylist ? RemoteType.Mylist : source.IsUserVideos ? RemoteType.UserVideos : source.IsWatchLater ? RemoteType.WatchLater : source.IsChannel ? RemoteType.Channel : source.IsSeries ? RemoteType.Series : RemoteType.None;
             converted.RemoteId = source.RemoteId ?? string.Empty;
             converted.Folderpath = source.FolderPath ?? string.Empty;
-            converted.IsExpanded = source.IsExpanded;
+            converted.IsExpanded = converted.IsExpanded || source.IsExpanded;
             converted.VideoSortType = source.SortType;
             converted.IsVideoDescending = source.IsVideoDescending;
             converted.IsDownloadFailedHistory = source.IsDownloadFailedHistory;
             converted.IsDownloadSucceededHistory = source.IsDownloadSucceededHistory;
             converted.IsTemporary = source.IsTemporary;
             converted.BookMarkedVideoID = source.BookMarkedVideoID;
+            converted.Videos.Clear();
+            converted.Videos.AddRange(source.Videos.Select(v => this.ConvertStoreVideoToLocalVideo(v)));
+            if (source.ParentPlaylist is not null)
+            {
+                converted.ParentId = source.ParentPlaylist.Id;
+            }
 
             return converted;
         }
