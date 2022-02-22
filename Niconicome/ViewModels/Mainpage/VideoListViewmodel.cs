@@ -91,7 +91,7 @@ namespace Niconicome.ViewModels.Mainpage
             //展開状況を引き継ぐ
             var inheritExpandedState = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.InheritExpandedState);
             var expandAll = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ExpandAll);
-            WS::Mainpage.PlaylistHandler.Refresh(expandAll, inheritExpandedState);
+            WS::Mainpage.PlaylistHandler.Refresh(expandAll, inheritExpandedState, true);
             WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistTreeHandler.GetTmp();
 
             //インデックス
@@ -620,13 +620,14 @@ namespace Niconicome.ViewModels.Mainpage
                       if (this.IsFilteringFromAllVideos.Value)
                       {
                           IAttemptResult<IEnumerable<IListVideoInfo>> result = WS::Mainpage.VideoHandler.GetAllVideos();
-                          if (!result.IsSucceeded||result.Data is null)
+                          if (!result.IsSucceeded || result.Data is null)
                           {
                               this.SnackbarMessageQueue.Enqueue("データベースからの動画情報の取得に失敗しました。");
                               return;
                           }
                           videos = result.Data;
-                      } else
+                      }
+                      else
                       {
                           videos = WS::Mainpage.VideoListContainer.Videos;
                       }

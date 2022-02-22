@@ -147,7 +147,6 @@ namespace Niconicome.Models.Domain.Local.Store
 
         public IAttemptResult<STypes::Playlist> GetPlaylist(int id)
         {
-
             var result = this.databaseInstance.GetRecord<STypes::Playlist, List<STypes::Video>>(STypes::Playlist.TableName, id, p => p.Videos);
 
             if (!result.IsSucceeded || result.Data is null)
@@ -206,7 +205,6 @@ namespace Niconicome.Models.Domain.Local.Store
             return AttemptResult<STypes::Playlist>.Succeeded(result.Data);
         }
 
-
         public IAttemptResult<STypes::Playlist> GetRootPlaylist()
         {
             var result = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot);
@@ -254,7 +252,10 @@ namespace Niconicome.Models.Domain.Local.Store
 
         public IAttemptResult<List<STypes::Playlist>> GetAllPlaylists()
         {
-            var result = this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName);
+            var result = this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName, collection =>
+            {
+                return collection.Include(p => p.Videos);
+            });
 
             if (!result.IsSucceeded || result.Data is null)
             {

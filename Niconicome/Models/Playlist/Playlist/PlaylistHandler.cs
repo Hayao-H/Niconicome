@@ -116,7 +116,7 @@ namespace Niconicome.Models.Playlist.Playlist
         /// </summary>
         /// <param name="expandAll"></param>
         /// <param name="inheritExpandedState"></param>
-        IAttemptResult Refresh(bool expandAll, bool inheritExpandedState);
+        IAttemptResult Refresh(bool expandAll, bool inheritExpandedState, bool isInitialRefresh);
 
         /// <summary>
         /// プレイリストを移動する
@@ -150,7 +150,7 @@ namespace Niconicome.Models.Playlist.Playlist
 
     public class PlaylistHandler : IPlaylistHandler
     {
-        public PlaylistHandler(IPlaylistTreeHandler handler, IPlaylistStoreHandler playlistStoreHandler, ILocalSettingHandler settingHandler, ILogger logger, IVideoPlaylistConverter converter,IVideoStoreHandler videoStoreHandler)
+        public PlaylistHandler(IPlaylistTreeHandler handler, IPlaylistStoreHandler playlistStoreHandler, ILocalSettingHandler settingHandler, ILogger logger, IVideoPlaylistConverter converter, IVideoStoreHandler videoStoreHandler,IPlaylistInfoContainer playlistInfoContainer,IVideoInfoContainer videoInfoContainer)
         {
             this._treeHandler = handler;
             this._playlistStoreHandler = playlistStoreHandler;
@@ -158,6 +158,8 @@ namespace Niconicome.Models.Playlist.Playlist
             this._logger = logger;
             this._converter = converter;
             this._videoStoreHandler = videoStoreHandler;
+            this._playlistInfoContainer = playlistInfoContainer;
+            this._videoInfoContainer = videoInfoContainer;
         }
 
         #region field
@@ -173,6 +175,9 @@ namespace Niconicome.Models.Playlist.Playlist
 
         private readonly IVideoPlaylistConverter _converter;
 
+        private readonly IPlaylistInfoContainer _playlistInfoContainer;
+
+        private readonly IVideoInfoContainer _videoInfoContainer;
 
         #endregion
 
@@ -311,11 +316,30 @@ namespace Niconicome.Models.Playlist.Playlist
 
             IAttemptResult result = this._playlistStoreHandler.WireVideo(video, playlistID);
 
+            ITreePlaylistInfo playlistInfo = this._playlistInfoContainer.GetPlaylist(playlistID);
+            IListVideoInfo videoInfo = this._videoInfoContainer.GetVideo(video.NiconicoId);
+            if (!playlistInfo.Videos.Any(v => v.Id.Value == videoID))
+            {
+                playlistInfo.Videos.Add(videoInfo);
+            }
+
             return result;
         }
 
         public IAttemptResult UnWireVideoToPlaylist(int videoID, int playlistID)
         {
+            IAttemptResult<STypes::Video> vResult = this._videoStoreHandler.GetVideo(videoID);
+
+            if (!vResult.IsSucceeded || vResult.Data is null)
+            {
+                return AttemptResult.Fail("削除する動画はDBに保存されていません。");
+            }
+
+            STypes::Video video = vResult.Data;
+            ITreePlaylistInfo playlistInfo = this._playlistInfoContainer.GetPlaylist(playlistID);
+            IListVideoInfo videoInfo = this._videoInfoContainer.GetVideo(video.NiconicoId);
+            playlistInfo.Videos.RemoveAll(v => v.Id.Value == videoID);
+
             IAttemptResult result = this._playlistStoreHandler.UnWireVideo(videoID, playlistID);
             return result;
         }
@@ -424,9 +448,9 @@ namespace Niconicome.Models.Playlist.Playlist
             return this.SetPlaylists();
         }
 
-        public IAttemptResult Refresh(bool expandAll, bool inheritExpandedState)
+        public IAttemptResult Refresh(bool expandAll, bool inheritExpandedState, bool isInitialRefresh)
         {
-            return this.SetPlaylists(expandAll, inheritExpandedState);
+            return this.SetPlaylists(expandAll, inheritExpandedState, isInitialRefresh);
         }
 
         public IAttemptResult Move(int id, int targetId)
@@ -511,7 +535,7 @@ namespace Niconicome.Models.Playlist.Playlist
         }
         #endregion
 
-        private IAttemptResult SetPlaylists(bool expandAll = false, bool inheritExpandedState = false)
+        private IAttemptResult SetPlaylists(bool expandAll = false, bool inheritExpandedState = false, bool isInitialRefresh = false)
         {
 
             //プレイリスト
@@ -532,6 +556,12 @@ namespace Niconicome.Models.Playlist.Playlist
                 ITreePlaylistInfo playlist = this._converter.ConvertStorePlaylistToLocalPlaylist(p);
 
                 var ex = playlist.IsExpanded;
+
+                if (isInitialRefresh && !inheritExpandedState)
+                {
+                    ex = false;
+                }
+
                 if (expandAll)
                 {
                     ex = true;

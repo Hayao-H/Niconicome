@@ -452,14 +452,18 @@ namespace Niconicome.Models.Playlist.VideoList
                     if (v.IsSelected.Value) this.current.SelectedVideos.Value++;
                 }, true);
             }
-            else
+            else if (this.current.SelectedPlaylist.Value is not null)
             {
                 this.Clear();
-                result = this.refresher.Refresh(this.Videos, v =>
+                result = this.refresher.Refresh(this.current.SelectedPlaylist.Value.Videos, v =>
                 {
                     this.Videos.Add(v);
                     if (v.IsSelected.Value) this.current.SelectedVideos.Value++;
                 });
+            }
+            else
+            {
+                return AttemptResult.Fail();
             }
 
             this.Sort(this.current.SelectedPlaylist.Value!.VideoSortType, this.current.SelectedPlaylist.Value!.IsVideoDescending, this.current.SelectedPlaylist.Value!.CustomSortSequence);

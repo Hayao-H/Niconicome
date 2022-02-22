@@ -64,7 +64,7 @@ namespace Niconicome.Models.Playlist.VideoList
         /// </summary>
         /// <param name="videos"></param>
         /// <returns></returns>
-        public IAttemptResult Refresh(IEnumerable<IListVideoInfo> videos, Action<IListVideoInfo> addFunc, bool disableDBRetrieving = false)
+        public IAttemptResult Refresh(IEnumerable<IListVideoInfo> originalVideos, Action<IListVideoInfo> addFunc, bool disableDBRetrieving = false)
         {
             var playlistID = this._current.SelectedPlaylist.Value?.Id ?? -1;
 
@@ -73,31 +73,6 @@ namespace Niconicome.Models.Playlist.VideoList
                 return AttemptResult.Fail($"プレイストが選択されていません。");
             }
 
-            IEnumerable<IListVideoInfo> originalVideos;
-            if (disableDBRetrieving)
-            {
-                originalVideos = videos;
-            }
-            else
-            {
-                IAttemptResult<STypes::Playlist> pResult = this._playlistStoreHandler.GetPlaylist(playlistID);
-
-                if (!pResult.IsSucceeded || pResult.Data is null)
-                {
-                    return AttemptResult.Fail($"データベースからのプレイリストの取得に失敗しました。(id:{playlistID})");
-                }
-                originalVideos = pResult.Data.Videos.Select(v =>
-               {
-                   IListVideoInfo video = VideoInfoContainer.New();
-                   video.Id.Value = v.Id;
-                   return video;
-               });
-            }
-
-            if (originalVideos is null)
-            {
-                return AttemptResult.Fail($"データベースからのプレイリストの取得に失敗しました。(id:{playlistID}, detail: VIDEO_PROPERTY_IS_NULL)");
-            }
 
             string format = this._settingsContainer.GetReactiveStringSetting(SettingsEnum.FileNameFormat, Format.DefaultFileNameFormat).Value;
             bool replaceStricted = this._settingsContainer.GetReactiveBoolSetting(SettingsEnum.ReplaceSBToMB).Value;
