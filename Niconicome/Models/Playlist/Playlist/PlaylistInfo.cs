@@ -306,19 +306,6 @@ namespace Niconicome.Models.Playlist.Playlist
 
         public override Visibility BeforeSeparatorVisibility { get => this.beforeSeparatorVisibilityField; set => this.SetProperty(ref this.beforeSeparatorVisibilityField, value); }
 
-        /// <summary>
-        /// DBの型をBindablePlaylistInfo型のインスタンスに変換する
-        /// </summary>
-        /// <param name="playlist"></param>
-        /// <returns></returns>
-        public static new ITreePlaylistInfo ConvertToTreePlaylistInfo(STypes::Playlist playlist)
-        {
-
-            var converted = new BindableTreePlaylistInfo();
-            SetData(playlist, converted);
-            return converted;
-        }
-
     }
 
     /// <summary>

@@ -28,22 +28,144 @@ namespace Niconicome.Models.Domain.Local
 
     public interface IDataBase : IDisposable
     {
+        /// <summary>
+        /// コレクションを取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         IAttemptResult<IEnumerable<T>> GetCollection<T>(string tableName) where T : IStorable;
+
+        /// <summary>
+        /// レコード数を取得する
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         IAttemptResult<int> GetRecordCount(string tableName);
+
+        /// <summary>
+        /// 条件を指定してレコードを取得
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tablename"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         IAttemptResult<T> GetRecord<T>(string tablename, Expression<Func<T, bool>> predicate) where T : IStorable;
+
+        /// <summary>
+        /// IDを指定してレコードを取得
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         IAttemptResult<T> GetRecord<T>(string tableName, int id) where T : IStorable;
+
+        /// <summary>
+        /// IDを指定してレコードを取得＆マップ
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="MemberT"></typeparam>
+        /// <param name="tableName"></param>
+        /// <param name="id"></param>
+        /// <param name="factory"></param>
+        /// <returns></returns>
         IAttemptResult<T> GetRecord<T, MemberT>(string tableName, int id, Expression<Func<T, MemberT>> factory) where T : IStorable;
 
+        /// <summary>
+        /// レコードの存在を確認する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tablename"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         bool Exists<T>(string tablename, int id) where T : IStorable;
+
+        /// <summary>
+        /// レコードの存在を確認する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tablename"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         bool Exists<T>(string tablename, Expression<Func<T, bool>> predicate) where T : IStorable;
+
+        /// <summary>
+        /// 追加
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         IAttemptResult<int> Store<T>(T data, string tableName) where T : IStorable;
+
+        /// <summary>
+        /// 条件に一致するレコードを削除
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         IAttemptResult<bool> DeleteAll<T>(string tableName, Expression<Func<T, bool>> predicate) where T : IStorable;
+
+        /// <summary>
+        /// レコードを削除
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
         IAttemptResult<bool> Delete(string tableName, BsonValue id);
+
+        /// <summary>
+        /// レコードを更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         IAttemptResult Update<T>(T data, string tableName) where T : IStorable;
+
+        /// <summary>
+        /// すべてのレコードを取得
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         IAttemptResult<List<T>> GetAllRecords<T>(string tableName) where T : IStorable;
+
+        /// <summary>
+        /// 条件に一致するレコードをすべて取得
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         IAttemptResult<List<T>> GetAllRecords<T>(string tableName, Func<T, bool> predicate) where T : IStorable;
+
+        /// <summary>
+        /// すべてのレコードを取得&マップ
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName"></param>
+        /// <param name="factory"></param>
+        /// <returns></returns>
+        IAttemptResult<List<T>> GetAllRecords<T>(string tableName, Func<ILiteCollection<T>, ILiteCollection<T>> factory) where T : IStorable;
+
+        /// <summary>
+        /// コレクションをクリア
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="setUpAgain"></param>
+        /// <returns></returns>
         IAttemptResult Clear(string tableName, bool setUpAgain = true);
+
+        /// <summary>
+        /// データベースを開く
+        /// </summary>
+        /// <returns></returns>
         IAttemptResult Open();
+
+        ILiteDatabase? DB { get; }
     }
 
     public class DataBase : IDataBase
@@ -75,6 +197,8 @@ namespace Niconicome.Models.Domain.Local
             this.Dispose();
         }
 
+        public ILiteDatabase? DB => this.DbInstance;
+
         #region field
         /// <summary>
         /// 自動でインスタンス破棄フラグ
@@ -97,12 +221,6 @@ namespace Niconicome.Models.Domain.Local
         private ILiteDatabase? DbInstance;
         #endregion
 
-        /// <summary>
-        /// 指定したテーブルを取得
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
         public IAttemptResult<IEnumerable<T>> GetCollection<T>(string tableName) where T : IStorable
         {
             var result = this.GetCollectionInternal<T>(tableName);
@@ -115,11 +233,6 @@ namespace Niconicome.Models.Domain.Local
             return new AttemptResult<IEnumerable<T>>() { Data = result.Data.FindAll(), IsSucceeded = true };
         }
 
-        /// <summary>
-        /// レコドード数を取得する
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
         public IAttemptResult<int> GetRecordCount(string tableName)
         {
             var result = this.GetCollectionInternal<BsonDocument>(tableName);
@@ -144,13 +257,6 @@ namespace Niconicome.Models.Domain.Local
 
         }
 
-        /// <summary>
-        /// レコードを取得する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tablename"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
         public IAttemptResult<T> GetRecord<T>(string tablename, System.Linq.Expressions.Expression<Func<T, bool>> predicate) where T : IStorable
         {
             var result = this.GetCollectionInternal<T>(tablename);
@@ -175,13 +281,6 @@ namespace Niconicome.Models.Domain.Local
 
         }
 
-        /// <summary>
-        /// レコードをIDで取得する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tablename"></param>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public IAttemptResult<T> GetRecord<T>(string tablename, int id) where T : IStorable
         {
             var result = this.GetCollectionInternal<T>(tablename);
@@ -205,15 +304,6 @@ namespace Niconicome.Models.Domain.Local
             return new AttemptResult<T>() { Data = data, IsSucceeded = true };
         }
 
-        /// <summary>
-        /// 関連付けこみでレコードを取得する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TMem"></typeparam>
-        /// <param name="tablename"></param>
-        /// <param name="id"></param>
-        /// <param name="factory"></param>
-        /// <returns></returns>
         public IAttemptResult<T> GetRecord<T, TMem>(string tablename, int id, Expression<Func<T, TMem>> factory) where T : IStorable
         {
             var result = this.GetCollectionInternal(tablename, factory);
@@ -237,14 +327,6 @@ namespace Niconicome.Models.Domain.Local
             return new AttemptResult<T>() { Data = data, IsSucceeded = true };
         }
 
-
-        /// <summary>
-        /// レコードが存在するかどうかをチェックする(ID)
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tablename"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
         public bool Exists<T>(string tablename, int id) where T : IStorable
         {
             var result = this.GetCollectionInternal<T>(tablename);
@@ -254,13 +336,6 @@ namespace Niconicome.Models.Domain.Local
             return result.Data!.Exists(item => item.Id == id);
         }
 
-        /// <summary>
-        /// レコードが存在するかどうかをチェックする
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tablename"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
         public bool Exists<T>(string tablename, Expression<Func<T, bool>> predicate) where T : IStorable
         {
             var collections = this.GetCollectionInternal<T>(tablename);
@@ -270,12 +345,6 @@ namespace Niconicome.Models.Domain.Local
             return collections.Data.Exists(predicate);
         }
 
-        /// <summary>
-        /// インスタンスを保存する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="tableName"></param>
         public IAttemptResult<int> Store<T>(T data, string tableName) where T : IStorable
         {
             var colResult = this.GetCollectionInternal<T>(tableName);
@@ -297,13 +366,6 @@ namespace Niconicome.Models.Domain.Local
             return new AttemptResult<int>() { IsSucceeded = true, Data = (int)result };
         }
 
-        /// <summary>
-        /// 指定した条件に合致したレコードを全て削除する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
         public IAttemptResult<bool> DeleteAll<T>(string tableName, Expression<Func<T, bool>> predicate) where T : IStorable
         {
             var colResult = this.GetCollectionInternal<T>(tableName);
@@ -325,13 +387,6 @@ namespace Niconicome.Models.Domain.Local
             return new AttemptResult<bool>() { IsSucceeded = true, Data = count > 0 };
         }
 
-        /// <summary>
-        /// レコードを削除する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public IAttemptResult<bool> Delete(string tableName, BsonValue id)
         {
             var colResult = this.GetCollectionInternal<BsonDocument>(tableName);
@@ -351,13 +406,6 @@ namespace Niconicome.Models.Domain.Local
 
         }
 
-        /// <summary>
-        /// 更新する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
         public IAttemptResult Update<T>(T data, string tableName) where T : IStorable
         {
             var colResult = this.GetCollectionInternal<T>(tableName);
@@ -377,9 +425,6 @@ namespace Niconicome.Models.Domain.Local
 
         }
 
-        /// <summary>
-        /// DBのインスタンスを破棄する
-        /// </summary>
         public void Dispose()
         {
             if (this.autoDispose) this.DbInstance?.Dispose();
@@ -387,12 +432,6 @@ namespace Niconicome.Models.Domain.Local
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// 全てのレコードを取得する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
         public IAttemptResult<List<T>> GetAllRecords<T>(string tableName) where T : IStorable
         {
             var colResult = this.GetCollectionInternal<T>(tableName);
@@ -413,13 +452,6 @@ namespace Niconicome.Models.Domain.Local
             return new AttemptResult<List<T>>() { IsSucceeded = true, Data = data };
         }
 
-        /// <summary>
-        /// 条件を指定してすべてのレコードを取得する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
         public IAttemptResult<List<T>> GetAllRecords<T>(string tableName, Func<T, bool> predicate) where T : IStorable
         {
             var colResult = this.GetCollectionInternal<T>(tableName);
@@ -440,12 +472,29 @@ namespace Niconicome.Models.Domain.Local
             return new AttemptResult<List<T>>() { IsSucceeded = true, Data = data };
         }
 
+        public IAttemptResult<List<T>> GetAllRecords<T>(string tableName, Func<ILiteCollection<T>, ILiteCollection<T>> factory) where T : IStorable
+        {
 
-        /// <summary>
-        /// 全て削除する
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="tableName"></param>
+            var colResult = this.GetCollectionInternal<T>(tableName);
+
+            if (!colResult.IsSucceeded || colResult.Data is null) return new AttemptResult<List<T>>() { Message = $"テーブル「{tableName}」の取得に失敗しました。", Exception = colResult.Exception };
+
+            List<T> data;
+
+            ILiteCollection<T> collection = factory(colResult.Data);
+
+            try
+            {
+                data = collection.FindAll().ToList();
+            }
+            catch (Exception e)
+            {
+                return new AttemptResult<List<T>>() { Message = $"テーブル「{tableName}」からのレコード取得に失敗しました。", Exception = e };
+            }
+
+            return new AttemptResult<List<T>>() { IsSucceeded = true, Data = data };
+        }
+
         public IAttemptResult Clear(string tableName, bool setUpAgain = true)
         {
             var colResult = this.GetCollectionInternal<BsonDocument>(tableName);
@@ -464,9 +513,6 @@ namespace Niconicome.Models.Domain.Local
             return new AttemptResult() { IsSucceeded = true };
         }
 
-        /// <summary>
-        /// データベースを開く
-        /// </summary>
         public IAttemptResult Open()
         {
             if (this.DbInstance is not null)
@@ -487,6 +533,7 @@ namespace Niconicome.Models.Domain.Local
         }
 
         #region private
+
         /// <summary>
         /// コレクションを取得する
         /// </summary>

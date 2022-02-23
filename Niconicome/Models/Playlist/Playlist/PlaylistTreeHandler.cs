@@ -110,7 +110,7 @@ namespace Niconicome.Models.Playlist.Playlist
                     after.BeforeSeparatorVisibility = before.BeforeSeparatorVisibility;
                     after.AfterSeparatorVisibility = before.AfterSeparatorVisibility;
                     after.IsExpanded = before.IsExpanded;
-                    before.UpdateData(after);
+                    //before.UpdateData(after);
                     continue;
                 }
 

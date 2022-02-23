@@ -28,7 +28,6 @@ using Fetch = Niconicome.Models.Network.Fetch;
 using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Ichiba = Niconicome.Models.Domain.Niconico.Video.Ichiba;
-using Import = Niconicome.Models.Local.External.Import;
 using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
@@ -150,7 +149,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainXeno::IXenoRootParser, DomainXeno::XenoRootParser>();
             services.AddTransient<DomainXeno::IXenoVideoNodeParser, DomainXeno::XenoVideoNodeParser>();
             services.AddTransient<DomainXeno::IXenoPlaylistConverter, DomainXeno::XenoPlaylistConverter>();
-            services.AddTransient<Import::IXenoImportGeneralManager, Import::XenoImportGeneralManager>();
             services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
             services.AddTransient<Download::ILocalContentHandler, Download::LocalContentHandler>();
             services.AddTransient<Download::IDownloadTaskPool, Download::DownloadTaskPool>();
@@ -241,6 +239,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<PlaylistPlaylist::IVideosUnchecker, PlaylistPlaylist::VideosUnchecker>();
             services.AddTransient<Register::IVideoRegistrationHandler, Register::VideoRegistrationHandler>();
             services.AddTransient<Utils::IWindowTabHelper, Utils::WindowTabHelper>();
+            services.AddTransient<Playlist::SharedUtils.IVideoPlaylistConverter, Playlist::SharedUtils.VideoPlaylistConverter>();
+            services.AddSingleton<PlaylistPlaylist::IPlaylistInfoContainer, PlaylistPlaylist::PlaylistInfoContainer>();
             return services.BuildServiceProvider();
         }
 

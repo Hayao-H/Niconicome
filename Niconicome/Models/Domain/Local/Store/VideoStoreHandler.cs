@@ -1,26 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Network.Watch;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Domain.Local.Store
 {
     public interface IVideoStoreHandler
     {
-        int AddVideo(IListVideoInfo video, int playlistId);
-        void RemoveVideo(int videoID, int playlistID);
-        void Update(IListVideoInfo video);
-        IEnumerable<STypes::Video> GetAllVideos();
-        STypes::Video? GetVideo(int Id);
-        STypes::Video? GetVideo(string niconicoId);
+        /// <summary>
+        /// 動画を追加する
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        IAttemptResult<int> AddVideo(STypes::Video video);
+
+        /// <summary>
+        /// 動画を削除する
+        /// </summary>
+        /// <param name="videoID"></param>
+        /// <param name="playlistID"></param>
+        /// <returns></returns>
+        IAttemptResult RemoveVideo(int videoID);
+
+        /// <summary>
+        /// 動画を更新する
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        IAttemptResult Update(STypes::Video video);
+
+        /// <summary>
+        /// すべての動画を取得する
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<List<STypes::Video>> GetAllVideos();
+
+        /// <summary>
+        /// IDを指定して動画を取得する
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        IAttemptResult<STypes::Video> GetVideo(int Id);
+
+        /// <summary>
+        /// ニコニコのIDを指定して動画を取得する
+        /// </summary>
+        /// <param name="niconicoId"></param>
+        /// <returns></returns>
+        IAttemptResult<STypes::Video> GetVideo(string niconicoId);
+
+        /// <summary>
+        /// 動画の存在を確認する
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         bool Exists(int id);
+
+        /// <summary>
+        /// 動画の存在を確認する
+        /// </summary>
+        /// <param name="niconicoId"></param>
+        /// <returns></returns>
         bool Exists(string niconicoId);
-        void JustifyVideos();
     }
 
     public class VideoStoreHandler : IVideoStoreHandler
@@ -28,257 +71,154 @@ namespace Niconicome.Models.Domain.Local.Store
 
         public VideoStoreHandler(IDataBase dataBase, ILogger logger)
         {
-            this.databaseInstance = dataBase;
-            this.logger = logger;
+            this._databaseInstance = dataBase;
+            this._logger = logger;
         }
 
         #region field
 
-        private readonly IDataBase databaseInstance;
+        private readonly IDataBase _databaseInstance;
 
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
+
         #endregion
 
-
-        /// <summary>
-        /// 全ての動画を取得する
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<STypes::Video> GetAllVideos()
+        public IAttemptResult<int> AddVideo(STypes::Video video)
         {
-
-            var result = this.databaseInstance.GetAllRecords<STypes::Video>(STypes::Video.TableName);
-
-            if (!result.IsSucceeded || result.Data is null)
-            {
-                if (result.Exception is not null)
-                {
-                    this.logger.Error("全動画の取得に失敗しました。", result.Exception);
-                }
-                else
-                {
-                    this.logger.Error("全動画の取得に失敗しました。");
-                }
-
-                return Enumerable.Empty<STypes::Video>();
-            }
-
-            return result.Data;
-        }
-
-
-        /// <summary>
-        /// 動画を追加する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="playlistId"></param>
-        public int AddVideo(IListVideoInfo videoData, int playlistId)
-        {
-            int videoId;
 
             //既にデータベースに存在する場合は再利用
-            if (this.Exists(videoData.NiconicoId.Value))
+            if (this.Exists(video.NiconicoId))
             {
-                var video = this.GetVideo(videoData.NiconicoId.Value)!;
-                if (video.PlaylistIds is null)
+                IAttemptResult<STypes::Video> vResult = this.GetVideo(video.NiconicoId);
+
+                if (!vResult.IsSucceeded || vResult.Data is null)
                 {
-                    video.PlaylistIds = new List<int>();
+                    return AttemptResult<int>.Fail(vResult.Message);
                 }
-                if (!video.PlaylistIds.Contains(playlistId))
-                {
-                    video.PlaylistIds.Add(playlistId);
-                }
+
 
                 //動画情報が存在する場合は更新
-                if (!videoData.Title.Value.IsNullOrEmpty())
+                if (string.IsNullOrEmpty(video.Title))
                 {
-                    this.SetData(video, videoData);
+                    return AttemptResult<int>.Succeeded(vResult.Data.Id);
                 }
 
-                this.databaseInstance.Update(video, STypes::Video.TableName);
-                videoId = video.Id;
+                video.Id = vResult.Data.Id;
+
+                IAttemptResult uResult = this.UpdateInternal(video);
+
+                if (uResult.IsSucceeded)
+                {
+                    this._logger.Log($"動画を上書きモードで追加しました。(niconicoID:{video.NiconicoId})");
+                }
+
+                return uResult.IsSucceeded switch
+                {
+                    true => AttemptResult<int>.Succeeded(vResult.Data.Id),
+                    _ => AttemptResult<int>.Fail(uResult.Message)
+                };
             }
             else
             {
-                var video = new STypes::Video()
+
+                IAttemptResult<int> result = this._databaseInstance.Store(video, STypes::Video.TableName);
+
+                if (result.IsSucceeded)
                 {
-                    PlaylistIds = new List<int>() { playlistId },
-                };
-
-                this.SetData(video, videoData);
-
-                var result = this.databaseInstance.Store(video, STypes::Video.TableName);
-
-                if (!result.IsSucceeded)
-                {
-                    if (result.Exception is not null)
-                    {
-                        this.logger.Error($"動画({videoData.NiconicoId})の追加に失敗しました。", result.Exception);
-                    }
-                    else
-                    {
-                        this.logger.Error($"動画({videoData.NiconicoId})の追加に失敗しました。");
-                    }
-
-                    return -1;
+                    this._logger.Log($"動画を追加しました。(niconicoID:{video.NiconicoId})");
                 }
 
-                videoId = result.Data;
+                return result;
             }
 
-            return videoId;
         }
 
-
-        /// <summary>
-        /// 動画を削除する
-        /// </summary>
-        /// <param name="videoID"></param>
-        /// <param name="playlistID"></param>
-        public void RemoveVideo(int videoID, int playlistID)
+        public IAttemptResult RemoveVideo(int videoID)
         {
+
             if (!this.Exists(videoID))
             {
-                throw new InvalidOperationException("指定された動画が存在しません。");
+                return AttemptResult.Fail("指定された動画が存在しません。");
             }
-            else
+
+            IAttemptResult result = this._databaseInstance.DeleteAll<STypes::Video>(STypes::Video.TableName, video => video.Id == videoID);
+
+            if (result.IsSucceeded)
             {
-                var video = this.GetVideo(videoID)!;
-
-                //動画側の参照を切る
-                if (video.PlaylistIds is not null)
-                {
-                    video.PlaylistIds.RemoveAll(pid => pid == playlistID);
-
-                    if (video.PlaylistIds.Count > 0)
-                    {
-                        this.databaseInstance.Update(video, STypes::Video.TableName);
-                        return;
-                    }
-                }
-
-                var result = this.databaseInstance.DeleteAll<STypes::Video>(STypes::Video.TableName, video => video.Id == videoID);
-
-                if (!result.IsSucceeded)
-                {
-                    if (result.Exception is not null)
-                    {
-                        this.logger.Error($"動画({videoID})の{playlistID}からの削除に失敗しました。", result.Exception);
-                    }
-                    else
-                    {
-                        this.logger.Error($"動画({videoID})の{playlistID}からの削除に失敗しました。");
-                    }
-
-                }
-
-                this.logger.Log($"動画({videoID})を{playlistID}から削除しました。");
-
+                this._logger.Log($"動画({videoID})を削除しました。");
             }
+
+            return result;
+
+
         }
 
-        /// <summary>
-        /// 動画を削除する
-        /// </summary>
-        /// <param name="videoId"></param>
-        private void RemoveVideo(int videoId)
+        public IAttemptResult Update(STypes::Video video)
         {
-            this.databaseInstance.DeleteAll<STypes::Video>(STypes::Video.TableName, video => video.Id == videoId);
-        }
 
-        /// <summary>
-        /// 情報を更新する
-        /// </summary>
-        /// <param name="videoData"></param>
-        public void Update(IListVideoInfo videoData)
-        {
-            if (this.Exists(videoData.Id.Value))
+            if (!this.Exists(video.Id))
             {
-                var video = this.GetVideo(videoData.Id.Value)!;
-                this.SetData(video, videoData);
-                this.Update(video);
+                return AttemptResult.Fail("指定された動画が存在しません。");
             }
+
+            return this.UpdateInternal(video);
         }
 
-        /// <summary>
-        /// 情報を更新する
-        /// </summary>
-        /// <param name="video"></param>
-        private void Update(STypes::Video video)
+        public IAttemptResult<List<STypes::Video>> GetAllVideos()
         {
-            this.databaseInstance.Update(video, STypes::Video.TableName);
-        }
 
-        /// <summary>
-        /// 指定したIDの動画を取得する
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public STypes::Video? GetVideo(int id)
-        {
-            var result = this.databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, id);
-
+            IAttemptResult<List<STypes::Video>> result = this._databaseInstance.GetAllRecords<STypes::Video>(STypes::Video.TableName);
 
             if (!result.IsSucceeded || result.Data is null)
             {
-                if (result.Exception is not null)
-                {
-                    this.logger.Error($"動画({id})の取得に失敗しました。", result.Exception);
-                }
-                else
-                {
-                    this.logger.Error($"動画({id})の取得に失敗しました。");
-                }
 
-                return null;
+                return AttemptResult<List<STypes::Video>>.Fail(result.Message);
             }
 
-            return result.Data;
+            return AttemptResult<List<STypes::Video>>.Succeeded(result.Data);
         }
 
-        /// <summary>
-        /// 指定したIDの動画を取得する
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public STypes::Video? GetVideo(string niconicoId)
+        public IAttemptResult<STypes::Video> GetVideo(int id)
         {
-            var result = this.databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, video => video.NiconicoId == niconicoId);
-
-            if (!result.IsSucceeded || result.Data is null)
+            if (!this.Exists(id))
             {
-                if (result.Exception is not null)
-                {
-                    this.logger.Error($"動画({niconicoId})の取得に失敗しました。", result.Exception);
-                }
-                else
-                {
-                    this.logger.Error($"動画({niconicoId})の取得に失敗しました。");
-                }
-
-                return null;
+                return AttemptResult<STypes::Video>.Fail("指定された動画が存在しません。");
             }
-            return result.Data;
+
+            IAttemptResult<STypes::Video> result = this._databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, id);
+
+            return result;
         }
 
-        /// <summary>
-        /// 動画の存在をチェックする
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        public IAttemptResult<STypes::Video> GetVideo(string niconicoId)
+        {
+
+            if (!this.Exists(niconicoId))
+            {
+                return AttemptResult<STypes::Video>.Fail("指定された動画が存在しません。");
+            }
+
+            IAttemptResult<STypes::Video> result = this._databaseInstance.GetRecord<STypes::Video>(STypes::Video.TableName, v => v.NiconicoId == niconicoId);
+
+            return result;
+        }
+
         public bool Exists(int id)
         {
-            return this.databaseInstance.Exists<STypes::Video>(STypes::Video.TableName, id);
+            return this._databaseInstance.Exists<STypes::Video>(STypes::Video.TableName, id);
         }
 
-        /// <summary>
-        /// 動画の存在をチェックする
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public bool Exists(string niconicoId)
         {
-            return this.databaseInstance.Exists<STypes::Video>(STypes::Video.TableName, video => video.NiconicoId == niconicoId);
+            return this._databaseInstance.Exists<STypes::Video>(STypes::Video.TableName, v => v.NiconicoId == niconicoId);
+        }
+
+
+        #region private
+
+        private IAttemptResult UpdateInternal(STypes::Video video)
+        {
+            return this._databaseInstance.Update(video, STypes::Video.TableName);
         }
 
         /// <summary>
@@ -306,47 +246,7 @@ namespace Niconicome.Models.Domain.Local.Store
             dbVideo.OwnerName = videoData.OwnerName.Value;
         }
 
-        private void JustifyVideo(STypes::Video video)
-        {
-            if (video.PlaylistIds is null || video.PlaylistIds.Count == 0)
-            {
-                this.RemoveVideo(video.Id);
-            }
-            else
-            {
-                int original = video.PlaylistIds.Count;
-                video.PlaylistIds = video.PlaylistIds.Where(playlistId =>
-                {
-                    bool exists = this.databaseInstance.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlistId);
-                    if (!exists) return false;
-                    var playlist = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlistId).Data!;
-                    bool contains = playlist.Videos.Select(v => v.Id).Contains(video.Id);
-                    return contains;
-                }).Distinct().ToList();
-
-                if (video.PlaylistIds is null)
-                {
-                    this.RemoveVideo(video.Id);
-                }
-                else
-                {
-                    this.Update(video);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 動画の整合性をとる
-        /// </summary>
-        public void JustifyVideos()
-        {
-            var videos = this.GetAllVideos();
-            foreach (var video in videos)
-            {
-                this.JustifyVideo(video);
-            }
-        }
-
+        #endregion
 
 
     }

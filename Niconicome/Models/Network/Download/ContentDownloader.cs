@@ -232,10 +232,10 @@ namespace Niconicome.Models.Network.Download
 
                         if (video is not null && self.DownloadSettings.SaveFailedHistory)
                         {
-                            ITreePlaylistInfo? playlist = this._playlistHandler.GetSpecialPlaylist(SpecialPlaylistTypes.DLFailedHistory);
-                            if (playlist is not null)
+                            IAttemptResult<ITreePlaylistInfo> pResult = this._playlistHandler.GetSpecialPlaylist(SpecialPlaylistTypes.DLFailedHistory);
+                            if (pResult.IsSucceeded && pResult.Data is not null)
                             {
-                                this._playlistHandler.AddVideo(video, playlist.Id);
+                                this._playlistHandler.WireVideoToPlaylist(video.Id.Value, pResult.Data.Id);
                             }
                         }
                     }
@@ -262,10 +262,10 @@ namespace Niconicome.Models.Network.Download
 
                         if (video is not null && self.DownloadSettings.SaveSucceededHistory)
                         {
-                            ITreePlaylistInfo? playlist = this._playlistHandler.GetSpecialPlaylist(SpecialPlaylistTypes.DLSucceedeeHistory);
-                            if (playlist is not null)
+                            IAttemptResult<ITreePlaylistInfo> pResult = this._playlistHandler.GetSpecialPlaylist(SpecialPlaylistTypes.DLSucceedeeHistory);
+                            if (pResult.IsSucceeded && pResult.Data is not null)
                             {
-                                this._playlistHandler.AddVideo(video, playlist.Id);
+                                this._playlistHandler.WireVideoToPlaylist(video.Id.Value, pResult.Data.Id);
                             }
                         }
                     }

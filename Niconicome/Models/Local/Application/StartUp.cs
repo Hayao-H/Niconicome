@@ -24,7 +24,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer,NicoIO::INicoDirectoryIO nicoDirectoryIO,IAddonHandler addonHandler)
+        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonHandler addonHandler)
         {
 
             this.videoStoreHandler = videoStoreHandler;
@@ -108,12 +108,7 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         private void JustifyData()
         {
-            this.videoStoreHandler.JustifyVideos();
-            var playlists = this.playlistStoreHandler.GetAllPlaylists();
-            if (playlists.Any())
-            {
-                this.playlistStoreHandler.JustifyPlaylists(playlists.Select(p => p.Id));
-            }
+            this.playlistStoreHandler.Initialize();
         }
 
         /// <summary>

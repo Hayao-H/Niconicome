@@ -11,7 +11,6 @@ namespace Niconicome.Models.Domain.Local.SQLite
         bool IsNnicosidExpires { get; }
         byte[]? UserSession { get; }
         byte[]? UserSessionSecure { get; }
-        byte[]? Nicosid { get; }
     }
 
     public interface ISqliteCookieLoader
@@ -91,12 +90,6 @@ namespace Niconicome.Models.Domain.Local.SQLite
                     data.IsUserSessionSecureExpires = DateTime.Now > expiresDT.ToLocalTime();
 
                 }
-                else if (name == "nicosid")
-                {
-                    data.Nicosid = new byte[stream.Length];
-                    stream.Read(data.Nicosid);
-                    data.IsNnicosidExpires = DateTime.Now > expiresDT.ToLocalTime();
-                }
             }
 
             return data;
@@ -115,8 +108,6 @@ namespace Niconicome.Models.Domain.Local.SQLite
         public byte[]? UserSession { get; set; }
 
         public byte[]? UserSessionSecure { get; set; }
-
-        public byte[]? Nicosid { get; set; }
     }
 
     public enum CookieType

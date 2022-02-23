@@ -44,11 +44,10 @@ namespace Niconicome.Models.Auth
                 return false;
             }
 
-            if (cookie.UserSession is null || cookie.UserSessionSecure is null || cookie.Nicosid is null) return false;
+            if (cookie.UserSession is null || cookie.UserSessionSecure is null) return false;
 
             this.cookieManager.AddCookie("user_session", cookie.UserSession);
             this.cookieManager.AddCookie("user_session_secure", cookie.UserSessionSecure);
-            this.cookieManager.AddCookie("nicosid", cookie.Nicosid);
 
             var result = await this.CheckIfLoginSucceeded();
 
