@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Printing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using AngleSharp.Dom;
@@ -18,8 +14,6 @@ using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Addon.API;
-using Niconicome.Models.Local.Settings;
-using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
 {
@@ -65,6 +59,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
 
         private string? code;
 
+        private readonly List<Timer> _timers = new();
+
         #endregion
 
         #region Props
@@ -97,7 +93,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
             }
 
             this.AddonInfomation = infomation;
-            string codePath = Path.Combine(FileFolder.AddonsFolder, infomation.PackageID.Value, infomation.Scripts.BackgroundScript);
+            string codePath = Path.Combine(AppContext.BaseDirectory, FileFolder.AddonsFolder, infomation.PackageID.Value, infomation.Scripts.BackgroundScript);
 
             try
             {
@@ -154,10 +150,16 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Engine.Context
             Action<ScriptObject, int> setTimeout = (function, delay) =>
              {
                  var timer = new Timer(delay);
-                 timer.Elapsed += (_, _) =>
+                 timer.Elapsed += (sender, _) =>
                  {
                      function.Invoke(false);
+                     if (sender is not null and Timer tm)
+                     {
+                         this._timers.Remove(tm);
+                     }
                  };
+                 this._timers.Add(timer);
+                 timer.AutoReset = false;
                  timer.Enabled = true;
              };
             this.Executer.AddHostObject("setTimeout", setTimeout);

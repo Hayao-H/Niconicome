@@ -19,6 +19,7 @@ using Niconicome.Models.Local.Timer;
 using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Niconicome.Models.Network.Fetch;
 using Niconicome.Models.Network.Register;
+using Niconicome.Models.Utils.InitializeAwaiter;
 
 namespace Niconicome.Workspaces
 {
@@ -53,7 +54,7 @@ namespace Niconicome.Workspaces
         public static IApplicationPowerManager ApplicationPower { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
         public static IStyleHandler StyleHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IStyleHandler>();
         public static ILocalSettingsContainer SettingsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingsContainer>();
-        public static IAddonHandler AddonHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonHandler>();
+
         public static IPostDownloadActionssManager PostDownloadTasksManager { get; private set; } = DIFactory.Provider.GetRequiredService<IPostDownloadActionssManager>();
         public static IDlTimer DlTimer { get; private set; } = DIFactory.Provider.GetRequiredService<IDlTimer>();
         public static ITabsContainerHandler TabHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ITabsContainerHandler>();
@@ -77,5 +78,8 @@ namespace Niconicome.Workspaces
         /// ウィンドウ
         /// </summary>
         public static IWindowTabHelper WindowTabHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowTabHelper>();
+
+        public static IInitializeAwaiterHandler InitializeAwaiterHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IInitializeAwaiterHandler>();
+
     }
 }
