@@ -534,12 +534,6 @@ namespace Niconicome.Models.Playlist.VideoList
         {
             if (sortType == VideoSortType.Custom && customSortSequence is null) return new AttemptResult() { Message = "並び替えの設定がカスタムになっていますが、Listがnullです。" };
 
-            IEnumerable<IListVideoInfo> SortWithCustom(List<IListVideoInfo> source, List<int>? seq)
-            {
-                if (seq is null) throw new InvalidOperationException();
-                return seq.Select(id => source.FirstOrDefault(v => v.Id.Value == id) ?? new NonBindableListVideoInfo()).Where(v => !v.Title.Value.IsNullOrEmpty());
-            }
-
             List<IListVideoInfo> tmp = this.Videos.ToList();
             this.Clear();
             if (!isDescending)
