@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core
@@ -62,7 +63,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="code"></param>
-        /// <returns></returns>
+        /// <returns></returns>-
         public T EvaluateAs<T>(string code)
         {
             return (T)this.Evaluate(code);
@@ -116,7 +117,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         /// <summary>
         /// デフォルト設定
         /// </summary>
-        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion | V8ScriptEngineFlags.EnableDynamicModuleImports;
+        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion;
 
 
     }

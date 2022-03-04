@@ -1,12 +1,9 @@
-using NUnit.Framework;
 using Niconicome.Models.Domain.Local;
-using System.Linq;
-using System;
-using System.Collections.Generic;
-using STypes = Niconicome.Models.Domain.Local.Store.Types;
-using Niconicome.Models.Playlist;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Helper.Result;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
+using NUnit.Framework;
+using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace NiconicomeTest.Local.Video
 {
@@ -35,78 +32,77 @@ namespace NiconicomeTest.Local.Video
             this.handler = new VideoStoreHandler(this.databaseInstance, new LoggerStab());
 
             //プレイリストを操作する為のハンドラを作成する
-            this.playlistHandler = new PlaylistStoreHandler(this.databaseInstance, this.handler, new LoggerStab());
+            this.playlistHandler = new PlaylistStoreHandler(this.databaseInstance, new LoggerStab());
+            this.playlistHandler.Initialize();
 
             ///ルート直下にテスト用のプレイリストを作成する
-            int rootId = this.playlistHandler.GetRootPlaylist().Id;
-            this.playlist1Id = this.playlistHandler.AddPlaylist(rootId, "テストプレイリスト1");
-            this.playlist2Id = this.playlistHandler.AddPlaylist(rootId, "テストプレイリスト2");
+            ///
+            int rootId = this.playlistHandler.GetRootPlaylist().Data!.Id;
+            this.playlist1Id = this.playlistHandler.AddPlaylist(rootId, "テストプレイリスト1").Data;
+            this.playlist2Id = this.playlistHandler.AddPlaylist(rootId, "テストプレイリスト2").Data;
 
         }
 
         [Test]
         public void 動画を追加する()
         {
-            var videoInfo = new NonBindableListVideoInfo();
-            videoInfo.NiconicoId.Value = "sm9";
-            videoInfo.Title.Value = "テスト動画";
+            var videoInfo = new STypes::Video();
+            videoInfo.NiconicoId = "sm9";
+            videoInfo.Title = "テスト動画";
 
-            int videoId = this.handler?.AddVideo(videoInfo, this.playlist1Id) ?? -1;
+            IAttemptResult<int> videoResult = this.handler!.AddVideo(videoInfo);
 
-            Assert.Greater(videoId, -1);
-            Assert.IsTrue(this.handler?.Exists(videoId));
-            Assert.IsTrue(this.handler?.Exists("sm9"));
+            int videoId = videoResult.Data;
+
+            Assert.That(videoResult.IsSucceeded, Is.True);
+            Assert.That(this.handler.Exists(videoId), Is.True);
+            Assert.That(this.handler.Exists("sm9"), Is.True);
         }
 
         [Test]
         public void 複数プレイリストに単一動画を追加する()
         {
-            var videoInfo = new NonBindableListVideoInfo();
-            videoInfo.NiconicoId.Value = "sm9";
-            videoInfo.Title.Value = "テスト動画";
+            var videoInfo = new STypes::Video();
+            videoInfo.NiconicoId = "sm9";
+            videoInfo.Title = "テスト動画";
 
-            int videoId1 = this.handler?.AddVideo(videoInfo, this.playlist1Id) ?? -1;
-            int videoId2 = this.handler?.AddVideo(videoInfo, this.playlist2Id) ?? -1;
+            IAttemptResult<int> videoResult = this.handler!.AddVideo(videoInfo);
 
-            var video = this.handler?.GetVideo(videoId1);
+            IAttemptResult<int> v1Result = this.handler!.AddVideo(videoInfo);
+            IAttemptResult<int> v2Result = this.handler.AddVideo(videoInfo);
 
-            Assert.Greater(videoId1, -1);
-            Assert.Greater(videoId2, -1);
+            int videoId1 = v1Result.Data;
+            int videoId2 = v2Result.Data;
+
+            IAttemptResult<STypes::Video> video = this.handler.GetVideo(videoId1);
+
+            Assert.That(v1Result.IsSucceeded, Is.True);
+            Assert.That(v2Result.IsSucceeded, Is.True);
             Assert.AreEqual(videoId1, videoId2);
-            Assert.IsNotNull(video);
-            Assert.IsNotNull(video?.PlaylistIds);
-            Assert.AreEqual(2, video?.PlaylistIds?.Count);
+            Assert.That(video.IsSucceeded, Is.True);
+            Assert.That(video.Data, Is.Not.Null);
+            Assert.That(video.Data!.Id, Is.EqualTo(videoId1));
+            Assert.That(video.Data.NiconicoId, Is.EqualTo("sm9"));
+            Assert.That(video.Data.Title, Is.EqualTo("テスト動画"));
         }
 
         [Test]
         public void 動画を削除する()
         {
-            var videoInfo = new NonBindableListVideoInfo();
-            videoInfo.NiconicoId.Value = "sm9";
-            videoInfo.Title.Value = "テスト動画";
+            var videoInfo = new STypes::Video();
+            videoInfo.NiconicoId = "sm9";
+            videoInfo.Title = "テスト動画";
 
-            int videoId = this.handler?.AddVideo(videoInfo, this.playlist1Id) ?? -1;
-            this.handler?.RemoveVideo(videoId, this.playlist1Id);
+            IAttemptResult<int> videoResult = this.handler!.AddVideo(videoInfo);
 
-            Assert.Greater(videoId, -1);
-            Assert.IsFalse(this.handler?.Exists(videoId));
-            Assert.IsFalse(this.handler?.Exists("sm9"));
+            int videoId = videoResult.Data;
+
+            IAttemptResult result = this.handler.RemoveVideo(videoId);
+
+            Assert.That(result.IsSucceeded, Is.True);
+            Assert.That(this.handler.Exists(videoId), Is.False);
+            Assert.That(this.handler.Exists("sm9"), Is.False);
         }
 
-        [Test]
-        public void 複数プレイリストに追加した動画を削除する()
-        {
-            var videoInfo = new NonBindableListVideoInfo();
-            videoInfo.NiconicoId.Value = "sm9";
-            videoInfo.Title.Value = "テスト動画";
-
-            int videoId = this.handler?.AddVideo(videoInfo, this.playlist1Id) ?? -1;
-            this.handler?.AddVideo(videoInfo, this.playlist2Id);
-            this.handler?.RemoveVideo(videoId, this.playlist1Id);
-
-            Assert.Greater(videoId, -1);
-            Assert.IsTrue(this.handler?.Exists(videoId));
-            Assert.IsTrue(this.handler?.Exists("sm9"));
-        }
     }
 }

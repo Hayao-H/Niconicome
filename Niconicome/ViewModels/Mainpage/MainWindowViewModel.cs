@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -13,7 +14,9 @@ using Niconicome.Models.Auth;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.API.Tab;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Utils.InitializeAwaiter;
 using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.Views;
@@ -266,6 +269,8 @@ namespace Niconicome.ViewModels.Mainpage
                 }
 
             });
+
+            WS::Mainpage.InitializeAwaiterHandler.NotifyCompletedStep(AwaiterNames.Addon, this.GetType());
         }
 
         #endregion

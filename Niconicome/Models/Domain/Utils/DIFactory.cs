@@ -241,6 +241,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Utils::IWindowTabHelper, Utils::WindowTabHelper>();
             services.AddTransient<Playlist::SharedUtils.IVideoPlaylistConverter, Playlist::SharedUtils.VideoPlaylistConverter>();
             services.AddSingleton<PlaylistPlaylist::IPlaylistInfoContainer, PlaylistPlaylist::PlaylistInfoContainer>();
+            services.AddSingleton<Utils::InitializeAwaiter.IInitializeAwaiterHandler, Utils::InitializeAwaiter.InitializeAwaiterHandler>();
             return services.BuildServiceProvider();
         }
 

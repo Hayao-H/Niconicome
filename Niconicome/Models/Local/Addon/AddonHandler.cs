@@ -18,6 +18,8 @@ using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 using Niconicome.Models.Local.Addon.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Watch;
+using Niconicome.Models.Utils.InitializeAwaiter;
+using VM = Niconicome.ViewModels.Mainpage;
 
 namespace Niconicome.Models.Local.Addon
 {
@@ -44,38 +46,41 @@ namespace Niconicome.Models.Local.Addon
     public class AddonHandler : IAddonHandler
     {
 
-        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller, IAddonInstaller installer, IAddonStoreHandler storeHandler)
+        public AddonHandler(IAddonInfomationsContainer container, INicoDirectoryIO directoryIO, ILogger logger, IAddonEngine engine, ILocalSettingHandler settingHandler, IAddonContexts contexts, IAddonUninstaller uninstaller, IAddonInstaller installer, IAddonStoreHandler storeHandler,IInitializeAwaiterHandler initializeAwaiterHandler)
         {
-            this.container = container;
-            this.directoryIO = directoryIO;
-            this.logger = logger;
-            this.engine = engine;
-            this.contexts = contexts;
-            this.settingHandler = settingHandler;
-            this.uninstaller = uninstaller;
-            this.installer = installer;
-            this.storeHandler = storeHandler;
+            this._container = container;
+            this._directoryIO = directoryIO;
+            this._logger = logger;
+            this._engine = engine;
+            this._contexts = contexts;
+            this._settingHandler = settingHandler;
+            this._uninstaller = uninstaller;
+            this._installer = installer;
+            this._storeHandler = storeHandler;
+            this._initializeAwaiterHandler = initializeAwaiterHandler;
         }
 
         #region field
 
-        private readonly IAddonInfomationsContainer container;
+        private readonly IAddonInfomationsContainer _container;
 
-        private readonly IAddonContexts contexts;
+        private readonly IAddonContexts _contexts;
 
-        private readonly IAddonEngine engine;
+        private readonly IAddonEngine _engine;
 
-        private readonly INicoDirectoryIO directoryIO;
+        private readonly INicoDirectoryIO _directoryIO;
 
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
 
-        private readonly ILocalSettingHandler settingHandler;
+        private readonly ILocalSettingHandler _settingHandler;
 
-        private readonly IAddonUninstaller uninstaller;
+        private readonly IAddonUninstaller _uninstaller;
 
-        private readonly IAddonInstaller installer;
+        private readonly IAddonInstaller _installer;
 
-        private readonly IAddonStoreHandler storeHandler;
+        private readonly IAddonStoreHandler _storeHandler;
+
+        private readonly IInitializeAwaiterHandler _initializeAwaiterHandler;
 
         private bool isInitialized;
 
@@ -94,13 +99,16 @@ namespace Niconicome.Models.Local.Addon
                 return new AttemptResult() { Message = "既に初期化されています。" };
             }
 
-            IAttemptResult dResult = this.uninstaller.DeleteListed();
+            this._initializeAwaiterHandler.RegisterStep(AwaiterNames.Addon, typeof(VM::MainWindowViewModel));
+            await this._initializeAwaiterHandler.GetAwaiter(AwaiterNames.Addon);
+
+            IAttemptResult dResult = this._uninstaller.DeleteListed();
             if (!dResult.IsSucceeded)
             {
                 return new AttemptResult() { Message = "アンインストール済みアドオンフォルダーの削除に失敗しました。", Exception = dResult.Exception };
             }
 
-            IAttemptResult mResult = this.installer.ReplaceTemporaryFiles();
+            IAttemptResult mResult = this._installer.ReplaceTemporaryFiles();
             if (!mResult.IsSucceeded)
             {
                 return new AttemptResult() { Message = mResult.Message, Exception = mResult.Exception };
@@ -109,21 +117,21 @@ namespace Niconicome.Models.Local.Addon
             List<string> packages;
             try
             {
-                packages = this.directoryIO.GetDirectorys(FileFolder.AddonsFolder);
+                packages = this._directoryIO.GetDirectorys(FileFolder.AddonsFolder);
             }
             catch (Exception e)
             {
-                this.logger.Error("アドオンパッケージ一覧の取得に失敗しました。", e);
+                this._logger.Error("アドオンパッケージ一覧の取得に失敗しました。", e);
                 return new AttemptResult() { Message = "アドオンパッケージ一覧の取得に失敗しました。", Exception = e };
             }
 
-            bool isDevMode = this.settingHandler.GetBoolSetting(SettingsEnum.IsDevMode);
-            bool isAddonDebuggingEnable = this.settingHandler.GetBoolSetting(SettingsEnum.IsAddonDebugEnable);
+            bool isDevMode = this._settingHandler.GetBoolSetting(SettingsEnum.IsDevMode);
+            bool isAddonDebuggingEnable = this._settingHandler.GetBoolSetting(SettingsEnum.IsAddonDebugEnable);
 
             foreach (var packagePath in packages)
             {
                 string package = Path.GetFileName(packagePath);
-                IAttemptResult<bool> result = await this.engine.InitializeAsync(package, isDevMode);
+                IAttemptResult<bool> result = await this._engine.InitializeAsync(package, isDevMode);
                 if (!result.IsSucceeded)
                 {
                     var failedResult = new FailedAddonResult(package, result.Message ?? string.Empty, result.Data);
@@ -131,9 +139,9 @@ namespace Niconicome.Models.Local.Addon
                 }
             }
 
-            foreach (KeyValuePair<int, IAddonContext> item in this.contexts.Contexts)
+            foreach (KeyValuePair<int, IAddonContext> item in this._contexts.Contexts)
             {
-                AddonInfomation info = this.container.GetAddon(item.Key);
+                AddonInfomation info = this._container.GetAddon(item.Key);
                 IAPIEntryPoint entryPoint = DIFactory.Provider.GetRequiredService<IAPIEntryPoint>();
 
                 IAttemptResult result = item.Value.Initialize(info, engine =>
@@ -166,10 +174,10 @@ namespace Niconicome.Models.Local.Addon
                 }
             }
 
-            IAttemptResult<IEnumerable<string>> packageIds = this.storeHandler.GetAllAddonsPackageID();
+            IAttemptResult<IEnumerable<string>> packageIds = this._storeHandler.GetAllAddonsPackageID();
             if (packageIds.IsSucceeded && packageIds.Data is not null)
             {
-                List<string> loaded = this.contexts.Contexts.Select(v => v.Value.AddonInfomation!.PackageID.Value).ToList();
+                List<string> loaded = this._contexts.Contexts.Select(v => v.Value.AddonInfomation!.PackageID.Value).ToList();
                 foreach (var package in packageIds.Data)
                 {
                     if (!loaded.Contains(package))
@@ -192,7 +200,7 @@ namespace Niconicome.Models.Local.Addon
         /// <summary>
         /// アドオン
         /// </summary>
-        public ObservableCollection<AddonInfomation> Addons => this.container.Addons;
+        public ObservableCollection<AddonInfomation> Addons => this._container.Addons;
 
         public ObservableCollection<FailedAddonResult> LoadFailedAddons { get; init; } = new();
 

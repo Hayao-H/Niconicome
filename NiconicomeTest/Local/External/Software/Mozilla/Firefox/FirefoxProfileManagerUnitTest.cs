@@ -2,6 +2,7 @@
 using System.Linq;
 using Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 using NiconicomeTest.Stabs.Models.Domain.Local.IO;
+using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;
 
 namespace NiconicomeTest.Local.External.Software.Mozilla.Firefox
@@ -14,7 +15,8 @@ namespace NiconicomeTest.Local.External.Software.Mozilla.Firefox
         public void SetUp()
         {
             var stab = new NicoDirectoryIOMock(p => true, (_, _, _) => new List<string>(), (_, _, _) => new List<string>() { "abcd64.default-release", "abcd64.dev-edition-default", "abcd64.default", "abcd64.default-nightly" });
-            this.manager = new FirefoxProfileManager(stab);
+            this.manager = new FirefoxProfileManager(stab, new LoggerStab());
+            this.manager.Initialize();
         }
 
         [Test]
@@ -38,7 +40,7 @@ namespace NiconicomeTest.Local.External.Software.Mozilla.Firefox
         [Test]
         public void プロファイルを取得する()
         {
-            var profile = this.manager!.GetProfile("abcd64.default-release");
+            var profile = this.manager!.GetProfile("default-release");
             Assert.That(profile.ProfileName, Is.EqualTo("default-release"));
         }
     }
