@@ -150,7 +150,7 @@ namespace Niconicome.Models.Playlist.Playlist
 
     public class PlaylistHandler : IPlaylistHandler
     {
-        public PlaylistHandler(IPlaylistTreeHandler handler, IPlaylistStoreHandler playlistStoreHandler, ILocalSettingHandler settingHandler, ILogger logger, IVideoPlaylistConverter converter, IVideoStoreHandler videoStoreHandler,IPlaylistInfoContainer playlistInfoContainer,IVideoInfoContainer videoInfoContainer)
+        public PlaylistHandler(IPlaylistTreeHandler handler, IPlaylistStoreHandler playlistStoreHandler, ILocalSettingHandler settingHandler, ILogger logger, IVideoPlaylistConverter converter, IVideoStoreHandler videoStoreHandler, IPlaylistInfoContainer playlistInfoContainer, IVideoInfoContainer videoInfoContainer)
         {
             this._treeHandler = handler;
             this._playlistStoreHandler = playlistStoreHandler;
@@ -374,6 +374,7 @@ namespace Niconicome.Models.Playlist.Playlist
             }
 
             ITreePlaylistInfo playlist = result.Data;
+            playlist.VideoSortType = STypes::VideoSortType.Custom;
 
             try
             {
@@ -399,6 +400,7 @@ namespace Niconicome.Models.Playlist.Playlist
             }
 
             ITreePlaylistInfo playlist = result.Data;
+            playlist.VideoSortType = STypes::VideoSortType.Custom;
 
             if (videoIndex == playlist.Videos.Count - 1)
             {
