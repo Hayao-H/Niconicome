@@ -117,7 +117,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         /// <summary>
         /// デフォルト設定
         /// </summary>
-        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion | V8ScriptEngineFlags.EnableDynamicModuleImports;
+        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion;
 
 
     }
