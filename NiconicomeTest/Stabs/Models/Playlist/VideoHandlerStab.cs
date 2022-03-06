@@ -8,7 +8,7 @@ namespace NiconicomeTest.Stabs.Models.Playlist
     {
         public IAttemptResult<int> AddVideo(IListVideoInfo video)
         {
-            return AttemptResult<int>.Succeeded(-1);
+            return AttemptResult<int>.Succeeded(video.Id.Value);
         }
 
         public IAttemptResult RemoveVideo(IListVideoInfo video)
