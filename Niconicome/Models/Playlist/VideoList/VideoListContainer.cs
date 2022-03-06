@@ -534,13 +534,7 @@ namespace Niconicome.Models.Playlist.VideoList
         {
             if (sortType == VideoSortType.Custom && customSortSequence is null) return new AttemptResult() { Message = "並び替えの設定がカスタムになっていますが、Listがnullです。" };
 
-            IEnumerable<IListVideoInfo> SortWithCustom(List<IListVideoInfo> source, List<int>? seq)
-            {
-                if (seq is null) throw new InvalidOperationException();
-                return seq.Select(id => source.FirstOrDefault(v => v.Id.Value == id) ?? new NonBindableListVideoInfo()).Where(v => !v.Title.Value.IsNullOrEmpty());
-            }
-
-            var tmp = this.Videos.ToList();
+            List<IListVideoInfo> tmp = this.Videos.ToList();
             this.Clear();
             if (!isDescending)
             {
@@ -554,7 +548,7 @@ namespace Niconicome.Models.Playlist.VideoList
                     VideoSortType.DownloadedFlag => tmp.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
                     VideoSortType.Economy => tmp.OrderBy(v => v.IsEconomy.Value ? 1 : 0),
                     VideoSortType.State => tmp.OrderBy(v => v.Message.Value),
-                    _ => tmp,
+                    _ => Enumerable.Reverse(tmp),
                 };
                 this.Videos.Addrange(sorted);
             }
@@ -571,9 +565,19 @@ namespace Niconicome.Models.Playlist.VideoList
                     VideoSortType.DownloadedFlag => tmp.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
                     VideoSortType.Economy => tmp.OrderByDescending(v => v.IsEconomy.Value ? 1 : 0),
                     VideoSortType.State => tmp.OrderByDescending(v => v.Message.Value),
-                    _ => tmp,
+                    _ => Enumerable.Reverse(tmp),
                 };
                 this.Videos.Addrange(sorted);
+            }
+
+            if (this.current.SelectedPlaylist.Value is not null)
+            {
+                ITreePlaylistInfo playlist = this.current.SelectedPlaylist.Value;
+                if (!playlist.IsTemporary)
+                {
+                    playlist.Videos.Clear();
+                    playlist.Videos.AddRange(this.Videos);
+                }
             }
 
             this.RaiseListChanged(null, ChangeType.Overall);

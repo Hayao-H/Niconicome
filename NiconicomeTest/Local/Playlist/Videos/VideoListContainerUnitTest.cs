@@ -138,9 +138,9 @@ namespace NiconicomeTest.Local.Playlist.Videos
 
         }
 
-        ///[TestCase(VideoSortType.Register, 1)]
-        ///[TestCase(VideoSortType.Title, 3)]
-        ///[TestCase(VideoSortType.NiconicoID, 3)]
+        [TestCase(VideoSortType.Register, 1)]
+        [TestCase(VideoSortType.Title, 3)]
+        [TestCase(VideoSortType.NiconicoID, 3)]
         public void 動画を並び替える(VideoSortType sortType, int expectedID)
         {
             var video1 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(1), Title = new Reactive.Bindings.ReactiveProperty<string>("3"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("3") };
@@ -152,9 +152,9 @@ namespace NiconicomeTest.Local.Playlist.Videos
             Assert.That(this.videoListContainer!.Videos.First().Id.Value, Is.EqualTo(expectedID));
         }
 
-        ///[TestCase(0, false, "1")]
-        ///[TestCase(1, true, "2")]
-        ///[TestCase(2, true, "1")]
+        [TestCase(0, false, "1")]
+        [TestCase(1, true, "2")]
+        [TestCase(2, true, "1")]
         public void 動画をひとつ前に挿入する(int index, bool expectedResult, int initialID)
         {
             var video1 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(1), Title = new Reactive.Bindings.ReactiveProperty<string>("3"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
@@ -168,9 +168,9 @@ namespace NiconicomeTest.Local.Playlist.Videos
             Assert.That(this.videoListContainer.Videos[0].Id.Value, Is.EqualTo(initialID));
         }
 
-        ///[TestCase(0, true, "3")]
-        ///[TestCase(1, true, "2")]
-        ///[TestCase(2, false, "3")]
+        [TestCase(0, true, "3")]
+        [TestCase(1, true, "2")]
+        [TestCase(2, false, "3")]
         public void 動画をひとつ後ろに挿入する(int index, bool expectedResult, int lastID)
         {
             var video1 = new NonBindableListVideoInfo() { Id = new Reactive.Bindings.ReactiveProperty<int>(1), Title = new Reactive.Bindings.ReactiveProperty<string>("3"), NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("1") };
