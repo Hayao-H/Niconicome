@@ -7,7 +7,7 @@ using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download
 {
-    interface IDownloadTasksHandler
+    public interface IDownloadTasksHandler
     {
         /// <summary>
         /// ダウンロードタスク
@@ -59,7 +59,7 @@ namespace Niconicome.Models.Network.Download
         void StageVIdeos(IEnumerable<IListVideoInfo> videos, DownloadSettings settings, bool allowDupe);
     }
 
-    class DownloadTasksHandler : IDownloadTasksHandler
+    public class DownloadTasksHandler : IDownloadTasksHandler
     {
 
         public DownloadTasksHandler(IDownloadTaskPool staged, IDownloadTaskPool download)
@@ -103,6 +103,10 @@ namespace Niconicome.Models.Network.Download
 
         public void StageVIdeo(IListVideoInfo video, DownloadSettings settings, bool allowDupe)
         {
+            if (!allowDupe && this.StagedDownloadTaskPool.Tasks.Any(t => t.NiconicoID == video.NiconicoId.Value))
+            {
+                return;
+            }
             var task = new DownloadTask(video, settings);
             task.Message.Subscribe(value =>
             {

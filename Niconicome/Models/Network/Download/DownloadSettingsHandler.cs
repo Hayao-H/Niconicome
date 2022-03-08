@@ -13,7 +13,7 @@ using VideoInfo = Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace Niconicome.Models.Network.Download
 {
-    interface IDownloadSettingsHandler
+    public interface IDownloadSettingsHandler
     {
         ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; }
         ReactiveProperty<bool> IsDownloadingCommentEnable { get; }
@@ -34,7 +34,7 @@ namespace Niconicome.Models.Network.Download
         DownloadSettings CreateDownloadSettings();
     }
 
-    class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
+    public class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
     {
         public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current, IEnumSettingsHandler enumSettingsHandler)
         {
