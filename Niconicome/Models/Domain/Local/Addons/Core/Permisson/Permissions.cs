@@ -22,6 +22,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static Permission Resource { get; private set; } = new(PermissionNames.Resource, "Resource API。この権限を持つ拡張機能は拡張機能フォルダー内のresourceディレクトリのファイルを動的に読み込むことができます。");
 
         public static Permission Tab { get; private set; } = new(PermissionNames.Tab, "Tab API。この権限を持つ拡張機能は画面下部のタブを追加して文書を表示したり、Host権限を持つサイトを表示し、そのサイト上の全てのデータを読み取ったりすることができます。");
+
+        public static Permission DownloadSettings { get; private set; } = new(PermissionNames.DownloadSettings, "Download Settings API。この権限を持つ拡張機能はダウンロード設定の変更、動画のステージング、ダウンロードの実行、ダウンロードのキャンセル及びダウンロード可否の読み取りが可能になります。");
     }
 
     public static class PermissionNames
@@ -39,6 +41,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Permisson
         public static string Resource { get; private set; } = "resource";
 
         public static string Tab { get; private set; } = "tab";
+
+        public static string DownloadSettings { get; private set; } = "downloadSettings";
     }
 
     public class Permission
