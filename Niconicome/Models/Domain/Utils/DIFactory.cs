@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Models.Const;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using Addons = Niconicome.Models.Local.Addon;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
@@ -242,6 +243,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Playlist::SharedUtils.IVideoPlaylistConverter, Playlist::SharedUtils.VideoPlaylistConverter>();
             services.AddSingleton<PlaylistPlaylist::IPlaylistInfoContainer, PlaylistPlaylist::PlaylistInfoContainer>();
             services.AddSingleton<Utils::InitializeAwaiter.IInitializeAwaiterHandler, Utils::InitializeAwaiter.InitializeAwaiterHandler>();
+            services.AddTransient<AddonAPI::Net.Download.Integrate.IDownloadSettings, AddonAPI::Net.Download.Integrate.DownloadSettings>();
             return services.BuildServiceProvider();
         }
 
