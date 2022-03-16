@@ -60,16 +60,16 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
         public void コメントの欠けをチェックする()
         {
             //構造
-            //[1,2][null,null][5,6][7,null][null,null]
-            foreach (var no in new[] { 1, 2, 5, 6, 7 }) this._collection!.Add(this._comments![no - 1]);
+            //[1,2][null,null][null,null][7,null][null,null]
+            foreach (var no in new[] { 1, 2, 7 }) this._collection!.Add(this._comments![no - 1]);
 
-            Assert.That(this._collection!.Count, Is.EqualTo(5));
+            Assert.That(this._collection!.Count, Is.EqualTo(3));
 
-            List<(Core::IComment, int)> unFilled = this._collection.GetUnFilledRange();
+            IReadOnlyList<(Core::IComment, int)> unFilled = this._collection.GetUnFilledRange();
 
             Assert.That(unFilled.Count, Is.EqualTo(1));
-            Assert.That(unFilled[0].Item1.No, Is.EqualTo(5));
-            Assert.That(unFilled[0].Item2, Is.EqualTo(2));
+            Assert.That(unFilled[0].Item1.No, Is.EqualTo(7));
+            Assert.That(unFilled[0].Item2, Is.EqualTo(4));
 
 
 

@@ -41,16 +41,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// > コメントX（IComment）からコメント番号が小さい（古い）方にY（int）コメント
         /// </summary>
         /// <returns></returns>
-        List<(IComment, int)> GetUnFilledRange();
+        IReadOnlyList<(IComment, int)> GetUnFilledRange();
     }
 
     public class ChildCommentCollection : IChildCommentCollection
     {
-        public ChildCommentCollection(long commentCount, int commentCountPerBlock, string thread, int fork)
+        public ChildCommentCollection(int commentCount, int commentCountPerBlock, string thread, int fork)
         {
             this.Fork = fork;
             this.Thread = thread;
-            this._comment = new IComment[(int)Math.Ceiling((double)(commentCount / commentCountPerBlock))][];
+            this._comment = new IComment[(int)Math.Ceiling((double)commentCount / commentCountPerBlock)][];
             this._commentCountPerBlock = commentCountPerBlock;
 
             for (var i = 0; i < this._comment.Length; i++)
@@ -99,7 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
             return AttemptResult.Succeeded();
         }
 
-        public List<(IComment, int)> GetUnFilledRange()
+        public IReadOnlyList<(IComment, int)> GetUnFilledRange()
         {
             bool requreEmptyCheck = true;
             var range = new List<(IComment, int)>();
