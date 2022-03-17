@@ -186,6 +186,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                             Label = rawThread.Label,
                             PostkeyStatus = rawThread.PostkeyStatus,
                             Server = rawThread.Server,
+                            VideoID = rawThread.VideoID,
+                            ForkLabel = rawThread.ForkLabel,
                         };
                         this.cachedDmcInfo.CommentThreads.Add(thread);
                     }
