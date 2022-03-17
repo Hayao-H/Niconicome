@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Core = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
+using CCore = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
 
-namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
+namespace NiconicomeTest.NetWork.Download.Comment.V2.Core
 {
     internal class ChildCommentCollectionUnitTest
     {
-        private Core::ChildCommentCollection? _collection;
+        private CCore::ChildCommentCollection? _collection;
 
-        private List<Core::IComment>? _comments;
+        private List<CCore::IComment>? _comments;
 
         private readonly string _thread = "1";
 
@@ -21,7 +21,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
         [OneTimeSetUp]
         public void SetUpOnce()
         {
-            this._comments = new List<Core.IComment>(Enumerable.Range(1, 10).Select(i => new Core::Comment()
+            this._comments = new List<CCore::IComment>(Enumerable.Range(1, 10).Select(i => new CCore::Comment()
             {
                 No = i,
                 Fork = this._fork,
@@ -34,7 +34,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
         [SetUp]
         public void Setup()
         {
-            this._collection = new Core::ChildCommentCollection(10, 2, this._thread, this._fork);
+            this._collection = new CCore::ChildCommentCollection(10, 2, this._thread, this._fork);
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
 
             Assert.That(this._collection!.Count, Is.EqualTo(3));
 
-            IReadOnlyList<(Core::IComment, int)> unFilled = this._collection.GetUnFilledRange();
+            IReadOnlyList<(CCore::IComment, int)> unFilled = this._collection.GetUnFilledRange();
 
             Assert.That(unFilled.Count, Is.EqualTo(1));
             Assert.That(unFilled[0].Item1.No, Is.EqualTo(7));

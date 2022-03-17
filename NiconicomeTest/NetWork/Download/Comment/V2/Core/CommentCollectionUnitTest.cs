@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
 using NUnit.Framework;
-using Core = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
+using CCore = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
 
-namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
+namespace NiconicomeTest.NetWork.Download.Comment.V2.Core
 {
     internal class CommentCollectionUnitTest
     {
-        private Core::CommentCollection? _collection;
+        private CCore::CommentCollection? _collection;
 
-        private List<Core::IComment>? _comments1;
+        private List<CCore::IComment>? _comments1;
 
-        private List<Core::IComment>? _comments2;
+        private List<CCore::IComment>? _comments2;
 
         private readonly string _thread = "1";
 
@@ -24,7 +23,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
         [OneTimeSetUp]
         public void SetUpOnce()
         {
-            this._comments1 = new List<Core.IComment>(Enumerable.Range(1, 10).Select(i => new Core::Comment()
+            this._comments1 = new List<CCore::IComment>(Enumerable.Range(1, 10).Select(i => new CCore::Comment()
             {
                 No = i,
                 Fork = 0,
@@ -32,7 +31,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
                 Content = "Hello World",
             }));
 
-            this._comments2 = new List<Core.IComment>(Enumerable.Range(1, 10).Select(i => new Core::Comment()
+            this._comments2 = new List<CCore::IComment>(Enumerable.Range(1, 10).Select(i => new CCore::Comment()
             {
                 No = i,
                 Fork = 0,
@@ -45,7 +44,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
         [SetUp]
         public void Setup()
         {
-            this._collection = new Core::CommentCollection(10, 2);
+            this._collection = new CCore::CommentCollection(10, 2);
         }
 
         [Test]
@@ -75,18 +74,18 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Comment
 
             Assert.That(this._collection!.Count, Is.EqualTo(8));
 
-            IReadOnlyList<UnFilledRange> unFilled = this._collection.GetUnFilledRange();
+            IReadOnlyList<CCore::UnFilledRange> unFilled = this._collection.GetUnFilledRange();
 
             Assert.That(unFilled.Count, Is.EqualTo(2));
 
-            UnFilledRange range1 = unFilled[0];
+            CCore::UnFilledRange range1 = unFilled[0];
 
             Assert.That(range1.Thread, Is.EqualTo("1"));
             Assert.That(range1.Fork, Is.EqualTo(0));
             Assert.That(range1.Start.No, Is.EqualTo(7));
             Assert.That(range1.Count, Is.EqualTo(4));
 
-            UnFilledRange range2 = unFilled[1];
+            CCore::UnFilledRange range2 = unFilled[1];
 
             Assert.That(range2.Thread, Is.EqualTo("2"));
             Assert.That(range2.Fork, Is.EqualTo(0));
