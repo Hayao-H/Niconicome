@@ -14,7 +14,7 @@ namespace NiconicomeTest.Local.External.Inport.Xeno
         [SetUp]
         public void SetUp()
         {
-            this.parser = new XenoVideoNodeParser(new LoggerStab());
+            this.parser = new XenoVideoNodeParser(new LoggerStub());
         }
 
         [TestCase]
@@ -35,7 +35,7 @@ namespace NiconicomeTest.Local.External.Inport.Xeno
         [SetUp]
         public void SetUp()
         {
-            this.parser = new XenoRootParser(new LoggerStab(),new XenoVideoNodeParserStab());
+            this.parser = new XenoRootParser(new LoggerStub(),new XenoVideoNodeParserStab());
         }
 
         [Test]

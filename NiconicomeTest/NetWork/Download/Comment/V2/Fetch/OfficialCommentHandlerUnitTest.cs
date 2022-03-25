@@ -24,7 +24,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Fetch
         public void OneTimeSetUp()
         {
             this._http = new NicoHttpStab(new StringContent(string.Empty), new StringContent(string.Empty));
-            this._handler = new OfficialCommentHandler(this._http, new LoggerStab(), new NetWorkHelper());
+            this._handler = new OfficialCommentHandler(this._http, new LoggerStub(), new NetWorkHelper());
         }
 
         [TestCase("waybackkey=123456.abcdefg",true, "123456.abcdefg")]

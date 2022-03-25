@@ -16,7 +16,7 @@ namespace NiconicomeTest.Local.Backup
         [SetUp]
         public void Setup()
         {
-            this.backuphandler = new BackupHandler(new LoggerStab(),Static.DataBaseInstance);
+            this.backuphandler = new BackupHandler(new LoggerStub(),Static.DataBaseInstance);
             if (Directory.Exists("backups"))
             {
                 Directory.Delete("backups", true);

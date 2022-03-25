@@ -29,10 +29,10 @@ namespace NiconicomeTest.Local.Video
             this.databaseInstance.Clear(STypes::Video.TableName);
 
             //動画を操作する為のハンドラを作成する
-            this.handler = new VideoStoreHandler(this.databaseInstance, new LoggerStab());
+            this.handler = new VideoStoreHandler(this.databaseInstance, new LoggerStub());
 
             //プレイリストを操作する為のハンドラを作成する
-            this.playlistHandler = new PlaylistStoreHandler(this.databaseInstance, new LoggerStab());
+            this.playlistHandler = new PlaylistStoreHandler(this.databaseInstance, new LoggerStub());
             this.playlistHandler.Initialize();
 
             ///ルート直下にテスト用のプレイリストを作成する

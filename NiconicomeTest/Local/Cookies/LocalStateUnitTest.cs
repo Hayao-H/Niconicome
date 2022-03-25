@@ -17,7 +17,7 @@ namespace NiconicomeTest.Local.Cookies
         [SetUp]
         public void SetUp()
         {
-            this.loader = new CookieJsonLoader(new LoggerStab());
+            this.loader = new CookieJsonLoader(new LoggerStub());
         }
 
         [Test]

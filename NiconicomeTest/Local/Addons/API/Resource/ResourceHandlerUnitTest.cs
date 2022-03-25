@@ -25,7 +25,7 @@ namespace NiconicomeTest.Local.Addons.API.Resource
         public void SetUp()
         {
             this._nicoFileIOMock = new NicoFileIOMock(() => true, () => "resource");
-            this._handler = new ResourceHander(this._nicoFileIOMock, new AddonLogger(new LoggerStab()));
+            this._handler = new ResourceHander(this._nicoFileIOMock, new AddonLogger(new LoggerStub()));
         }
 
         [Test]

@@ -16,7 +16,7 @@ namespace NiconicomeTest.NetWork.Niconico.Videos.Channel
         [SetUp]
         public void SetUp()
         {
-            this.parser = new ChannelPageHtmlParser(new LoggerStab(), new NiconicoUtils(), new VideoInfoContainerStab());
+            this.parser = new ChannelPageHtmlParser(new LoggerStub(), new NiconicoUtils(), new VideoInfoContainerStab());
         }
 
         [Test]
