@@ -154,7 +154,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public bool HasNicoscript { get; init; }
 
-
         public int PostkeyStatus { get; init; }
 
         public string Server { get; init; } = string.Empty;
