@@ -42,6 +42,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// </summary>
         /// <returns></returns>
         IReadOnlyList<(IComment, int)> GetUnFilledRange();
+
+        /// <summary>
+        /// 最初のコメントを取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IComment> GetFirstcomment();
     }
 
     public class ChildCommentCollection : IChildCommentCollection
@@ -146,6 +152,21 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
             return range;
 
         }
+
+        public IAttemptResult<IComment> GetFirstcomment()
+        {
+            IComment? first = this.Comments.FirstOrDefault(c => c is not null);
+
+            if (first is null)
+            {
+                return AttemptResult<IComment>.Fail("最初のコメントを取得できませんでした。コメント画からの可能性があります。");
+            }
+            else
+            {
+                return AttemptResult<IComment>.Succeeded(first);
+            }
+        }
+
 
         #endregion
 

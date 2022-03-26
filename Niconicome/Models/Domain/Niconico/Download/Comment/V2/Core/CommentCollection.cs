@@ -32,6 +32,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// </summary>
         /// <returns></returns>
         IReadOnlyList<UnFilledRange> GetUnFilledRange();
+
+        /// <summary>
+        /// 指定したthread/forkの最初のコメントを取得
+        /// </summary>
+        /// <param name="trhead"></param>
+        /// <param name="fork"></param>
+        /// <returns></returns>
+        IAttemptResult<IComment> GetFirstComment(string trhead, int fork);
     }
 
     public class CommentCollection : ICommentCollection
@@ -90,6 +98,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
             return list;
         }
+
+        public IAttemptResult<IComment> GetFirstComment(string thread, int fork)
+        {
+            IChildCommentCollection collection = this.GetCollection(thread, fork);
+
+            return collection.GetFirstcomment();
+        }
+
 
         #endregion
 
