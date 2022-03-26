@@ -75,7 +75,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Series
         /// <returns></returns>
         private async Task<IAttemptResult<string>> GetSeriesPage(string id)
         {
-            var url = new Uri(API.SeriesUrl + id);
+            var url = new Uri(APIConstant.SeriesUrl + id);
 
             HttpResponseMessage response = await this.http.GetAsync(url);
 

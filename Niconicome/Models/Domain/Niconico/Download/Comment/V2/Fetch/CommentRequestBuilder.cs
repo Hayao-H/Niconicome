@@ -316,7 +316,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 return AttemptResult<Request::ThreadLeaves>.Fail($"動画再生時間の計算に失敗しました。（詳細:{ex.Message}）");
             }
 
-            leaves.Content = $"0-{flooredDuration}:100,1000:nicoru:100";
+            //leaves.Content = $"0-{flooredDuration}:100,1000:nicoru:100";
+            leaves.Content = "1000";
 
             return AttemptResult<Request::ThreadLeaves>.Succeeded(leaves);
         }
