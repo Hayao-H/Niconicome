@@ -28,6 +28,15 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         IAttemptResult Add(IComment comment);
 
         /// <summary>
+        /// 指定したコメントを取得
+        /// </summary>
+        /// <param name="thread"></param>
+        /// <param name="fork"></param>
+        /// <param name="no"></param>
+        /// <returns></returns>
+        IAttemptResult<IComment> Get(string thread, int fork, int no);
+
+        /// <summary>
         /// コメントの欠け情報を取得する
         /// </summary>
         /// <returns></returns>
@@ -79,6 +88,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
             return collection.Add(comment);
         }
+
+        public IAttemptResult<IComment> Get(string thread, int fork, int no)
+        {
+            var collection = this.GetCollection(thread, fork);
+
+            return collection.Get(no);
+        }
+
 
         public IReadOnlyList<UnFilledRange> GetUnFilledRange()
         {

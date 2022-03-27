@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AngleSharp.Browser;
 using Niconicome.Models.Helper.Result;
 using NUnit.Framework;
 using CCore = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
@@ -88,6 +89,23 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Core
             Assert.That(result.IsSucceeded, Is.True);
             Assert.That(result.Data, Is.Not.Null);
             Assert.That(result.Data!.No, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void 指定したコメントを取得する()
+        {
+            //構造
+            //[1,2][null,null][null,null][7,null][null,null]
+            foreach (var no in new[] { 1, 2, 7 }) this._collection!.Add(this._comments![no - 1]);
+
+
+            Assert.That(this._collection!.Count, Is.EqualTo(3));
+
+            IAttemptResult<CCore::IComment> result = this._collection!.Get(7);
+
+            Assert.That(result.IsSucceeded, Is.True);
+            Assert.That(result.Data, Is.Not.Null);
+            Assert.That(result.Data!.No, Is.EqualTo(7));
         }
     }
 }

@@ -37,6 +37,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         IAttemptResult Add(IComment comment);
 
         /// <summary>
+        /// 指定したコメントを取得
+        /// </summary>
+        /// <param name="no"></param>
+        /// <returns></returns>
+        IAttemptResult<IComment> Get(int no);
+
+        /// <summary>
         /// 欠けているコメントの幅を取得
         /// > コメントX（IComment）からコメント番号が小さい（古い）方にY（int）コメント
         /// </summary>
@@ -104,6 +111,29 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
             return AttemptResult.Succeeded();
         }
+
+        public IAttemptResult<IComment> Get(int no)
+        {
+
+            int cIndex = (int)Math.Ceiling(no / (double)this._commentCountPerBlock) - 1;
+            int cInnerIndex = no - cIndex * this._commentCountPerBlock - 1;
+
+            if (cIndex < 0 || cIndex + 1 > this._comment.GetLength(0) || cInnerIndex < 0 || cInnerIndex + 1 > this._commentCountPerBlock)
+            {
+                return AttemptResult<IComment>.Fail("コメントインデックスの算出に失敗しました。");
+            }
+
+            var comment = this._comment[cIndex][cInnerIndex];
+
+            if (comment is null)
+            {
+                return AttemptResult<IComment>.Fail("指定されたコメントが存在しません");
+            } else
+            {
+                return AttemptResult<IComment>.Succeeded(comment);
+            }
+        }
+
 
         public IReadOnlyList<(IComment, int)> GetUnFilledRange()
         {
