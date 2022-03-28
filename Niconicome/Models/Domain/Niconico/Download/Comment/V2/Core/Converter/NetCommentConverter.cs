@@ -9,10 +9,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter
 {
     public interface INetCommentConverter
     {
-        Comment ConvertNetCommentToCoreComment(Chat chat);
+        IComment ConvertNetCommentToCoreComment(Chat chat);
     }
 
-    internal class NetCommentConverter
+    public class NetCommentConverter
     {
     }
 }

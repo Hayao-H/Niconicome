@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Network;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.Response;
+using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.V2.Response;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 {
-    public interface ICommentDownloadder
+    public interface ICommentDownloader
     {
         /// <summary>
         /// 非同期にコメントをダウンロードする
@@ -17,10 +19,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
         /// <param name="dmcInfo"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        Task<IAttemptResult<Response::Comment>> DownloadCommentAsync(string url, string request);
+        Task<IAttemptResult<IReadOnlyList<Response::ResponseRoot>>> DownloadCommentAsync(string url, string request);
     }
 
-    public class CommentDownloader : ICommentDownloadder
+    public class CommentDownloader : ICommentDownloader
     {
         public CommentDownloader(ILogger logger, INetWorkHelper helper, INicoHttp http)
         {
@@ -41,7 +43,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
         #region Method
 
-        public async Task<IAttemptResult<Response::Comment>> DownloadCommentAsync(string url, string request)
+        public async Task<IAttemptResult<IReadOnlyList<Response::ResponseRoot>>> DownloadCommentAsync(string url, string request)
         {
             HttpResponseMessage res = await this._http.PostAsync(new Uri(url), new StringContent(request));
 
@@ -49,23 +51,23 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
             {
                 string status = this._helper.GetHttpStatusForLog(res);
                 this._logger.Error($"コメントサーバーへのリクエストに失敗しました。（{status}）");
-                return AttemptResult<Response::Comment>.Fail($"コメントサーバーへのリクエストに失敗しました。（{ status}）");
+                return AttemptResult<IReadOnlyList<Response::ResponseRoot>>.Fail($"コメントサーバーへのリクエストに失敗しました。（{ status}）");
             }
 
-            Response::Comment data;
+            IReadOnlyList<Response::ResponseRoot> data;
 
             try
             {
                 string content = await res.Content.ReadAsStringAsync();
-                data = JsonParser.DeSerialize<Response::Comment>(content);
+                data = JsonParser.DeSerialize<IReadOnlyList<Response::ResponseRoot>>(content);
             }
             catch (Exception ex)
             {
                 this._logger.Error("コメントの解析に失敗しました。", ex);
-                return AttemptResult<Response::Comment>.Fail($"コメントの解析に失敗しました。（詳細:{ex.Message}）");
+                return AttemptResult<IReadOnlyList<Response::ResponseRoot>>.Fail($"コメントの解析に失敗しました。（詳細:{ex.Message}）");
             }
 
-            return AttemptResult<Response::Comment>.Succeeded(data);
+            return AttemptResult<IReadOnlyList<Response::ResponseRoot>>.Succeeded(data);
         }
 
 

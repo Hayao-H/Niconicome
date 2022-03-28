@@ -214,6 +214,11 @@ namespace Niconicome.Models.Network.Download
         int MaxParallelSegmentDLCount { get; }
 
         /// <summary>
+        /// コメントコレクションの1ブロックあたりのコメント数
+        /// </summary>
+        int CommentCountPerBlock { get; }
+
+        /// <summary>
         /// 市場情報の形式
         /// </summary>
         IchibaInfoTypeSettings IchibaInfoType { get; }
@@ -288,6 +293,8 @@ namespace Niconicome.Models.Network.Download
         public int CommentOffset { get; set; }
 
         public int MaxParallelSegmentDLCount { get; set; }
+
+        public int CommentCountPerBlock { get; set; }
 
         public string NiconicoId { get; set; } = string.Empty;
 

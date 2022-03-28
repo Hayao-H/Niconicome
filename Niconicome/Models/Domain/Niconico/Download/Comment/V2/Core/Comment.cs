@@ -59,6 +59,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         long Deleted { get; }
 
         /// <summary>
+        /// 投稿日時
+        /// </summary>
+        long Date { get; }
+
+        /// <summary>
+        /// 投稿日時の秒以下
+        /// </summary>
+        long DateUsec { get; }
+
+        /// <summary>
         /// コメントの種別
         /// </summary>
         CommentType CommentType { get; }
@@ -85,6 +95,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         public int Anonimity { get; init; }
 
         public long Deleted { get; init; }
+
+        public long Date { get; set; }
+
+        public long DateUsec { get; set; }
 
         public CommentType CommentType { get; init; }
     }

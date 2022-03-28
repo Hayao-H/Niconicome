@@ -19,7 +19,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
         /// <param name="option"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        Task<IAttemptResult<string>> BuildRequestAsync(IDmcInfo dmcInfo, CommentFetchOption option, string key);
+        Task<IAttemptResult<string>> BuildRequestAsync(IDmcInfo dmcInfo, ICommentFetchOption option, string key);
 
         /// <summary>
         /// 状態をリセットする
@@ -52,7 +52,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
         #region Method
 
-        public async Task<IAttemptResult<string>> BuildRequestAsync(IDmcInfo dmcInfo, CommentFetchOption option, string key)
+        public async Task<IAttemptResult<string>> BuildRequestAsync(IDmcInfo dmcInfo, ICommentFetchOption option, string key)
         {
             IAttemptResult<List<Request::RequestRoot>> result;
 

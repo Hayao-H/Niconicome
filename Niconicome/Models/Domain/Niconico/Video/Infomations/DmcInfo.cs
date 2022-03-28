@@ -16,6 +16,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         string ChannelID { get; }
         string ChannelName { get; }
         string Description { get; }
+        string CommentServer { get; }
         int ViewCount { get; }
         int CommentCount { get; }
         int MylistCount { get; }
@@ -76,6 +77,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         public string ChannelName { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
+
+        public string CommentServer { get; set; } = string.Empty;
 
         public int ViewCount { get; set; }
 
