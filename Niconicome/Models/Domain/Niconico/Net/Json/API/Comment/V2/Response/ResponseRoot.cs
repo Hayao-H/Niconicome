@@ -11,5 +11,8 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.V2.Response
     {
         [JsonPropertyName("chat")]
         public Chat? Chat { get; set; }
+
+        [JsonPropertyName("thread")]
+        public Thread? Thread { get; set; }
     }
 }
