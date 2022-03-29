@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace Niconicome.Models.Domain.Niconico.Net.Xml.Comment.V2
 {
-    internal class ThreadElement
+    public class ThreadElement
     {
         [XmlAttribute(AttributeName = "resultcode")]
         public long Resultcode { get; set; }

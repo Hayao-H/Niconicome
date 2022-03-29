@@ -29,14 +29,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         string Thread { get; }
 
         /// <summary>
-        /// コメ番
-        /// </summary>
-        int No { get; }
-
-        /// <summary>
         /// Fork
         /// </summary>
         int Fork { get; }
+
+        /// <summary>
+        /// コメ番
+        /// </summary>
+        int No { get; }
 
         /// <summary>
         /// VPOS
@@ -46,7 +46,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <summary>
         /// プレ垢フラグ
         /// </summary>
-        int Premium { get; }
+        int? Premium { get; }
 
         /// <summary>
         /// ？
@@ -54,9 +54,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         int Anonimity { get; }
 
         /// <summary>
+        /// ニコられ数
+        /// </summary>
+        int Nicoru { get; }
+
+        /// <summary>
         /// 削除フラグ？
         /// </summary>
-        long Deleted { get; }
+        int? Deleted { get; }
+
+        /// <summary>
+        /// 共有NGスコア
+        /// </summary>
+        int Score { get; }
 
         /// <summary>
         /// 投稿日時
@@ -90,17 +100,22 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
         public int Vpos { get; init; }
 
-        public int Premium { get; init; }
+        public int? Premium { get; init; }
 
         public int Anonimity { get; init; }
 
-        public long Deleted { get; init; }
+        public int Nicoru { get; init; }
+
+        public int? Deleted { get; init; }
+
+        public int Score { get; init; }
 
         public long Date { get; set; }
 
         public long DateUsec { get; set; }
 
         public CommentType CommentType { get; init; }
+
     }
 
     public enum CommentType

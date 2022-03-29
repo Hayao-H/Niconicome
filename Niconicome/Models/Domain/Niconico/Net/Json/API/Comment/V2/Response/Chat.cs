@@ -48,6 +48,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.V2.Response
         [JsonPropertyName("deleted")]
         public int? Deleted { get; set; }
 
+        [JsonPropertyName("fork")]
+        public int? Fork { get; set; }
+
     }
 
 }

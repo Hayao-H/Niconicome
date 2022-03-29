@@ -71,7 +71,6 @@
 		</ItemGroup>
 
 		<ItemGroup>
-		  <Folder Include="Models\Domain\Niconico\Download\Comment\V2\Local\" />
 		  <Folder Include="Models\Local\External\Inport\" />
 		</ItemGroup>
 

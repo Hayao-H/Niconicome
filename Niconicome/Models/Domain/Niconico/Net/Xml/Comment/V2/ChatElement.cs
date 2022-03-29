@@ -9,46 +9,56 @@ using System.ComponentModel;
 
 namespace Niconicome.Models.Domain.Niconico.Net.Xml.Comment.V2
 {
-    internal class ChatElement
+    public class ChatElement
     {
-        [XmlAttribute(AttributeName = "thread")]
+        [XmlAttribute("thread")]
         public string Thread { get; set; } = string.Empty;
 
-        [XmlAttribute(AttributeName = "no")]
-        public long No { get; set; }
+        [XmlAttribute("fork")]
+        public int Fork { get; set; }
 
-        [XmlAttribute(AttributeName = "vpos")]
-        public long Vpos { get; set; }
+        [XmlAttribute("no")]
+        public int No { get; set; }
 
-        [XmlAttribute(AttributeName = "date")]
+        [XmlAttribute("vpos")]
+        public int Vpos { get; set; }
+
+        [XmlAttribute("date")]
         public long Date { get; set; }
 
-        [XmlAttribute(AttributeName = "date_usec")]
-        public int DateUsec { get; set; }
+        [XmlAttribute("date_usec")]
+        public long DateUsec { get; set; }
 
-        [XmlAttribute(AttributeName = "anonymity")]
-        public long Anonymity { get; set; }
+        [XmlAttribute("anonymity")]
+        public int Anonymity { get; set; }
 
-        [XmlAttribute(AttributeName = "user_id")]
+        [XmlAttribute("nicoru")]
+        public int Nicoru { get; set; }
+
+        [XmlAttribute("user_id")]
         public string? UserId { get; set; }
 
-        [XmlAttribute(AttributeName = "mail")]
+        [XmlAttribute("mail")]
         public string? Mail { get; set; }
 
         [XmlText]
         public string? Text { get; set; }
 
-        [XmlAttribute(AttributeName = "leaf")]
-        public int Leaf { get; set; }
-
-        [XmlAttribute(AttributeName = "premium")]
+        [XmlAttribute("premium")]
         public int? Premium { get; set; }
 
-        [XmlAttribute(AttributeName = "score")]
+        [XmlAttribute("score")]
         public int Score { get; set; }
+
+        [XmlAttribute("deleted")]
+        public int? Deleted { get; set; }
 
         [Browsable(false)]
         [XmlIgnore]
         public bool PremiumSpecified => Premium.HasValue;
+
+        [Browsable(false)]
+        [XmlIgnore]
+        public bool DeletedSpecified => Deleted.HasValue;
     }
 }
