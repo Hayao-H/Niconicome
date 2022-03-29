@@ -68,7 +68,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
             try
             {
-                result = await this.DownloadCommentAsyncInternal(dmcInfo, settings, getCommetUntil);
+                result = await this.DownloadCommentAsyncInternal(dmcInfo, settings, option);
             }
             catch (Exception ex)
             {
