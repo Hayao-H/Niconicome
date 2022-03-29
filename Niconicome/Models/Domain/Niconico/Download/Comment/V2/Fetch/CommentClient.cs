@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Network;
+using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -11,7 +14,7 @@ using Core = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
 using Fetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.V2.Response;
 
-namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
+namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 {
     public interface ICommentClient
     {
@@ -22,17 +25,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
         /// <param name="settings"></param>
         /// <param name="getCommetUntil">指定した日付より新しいコメントを取得</param>
         /// <returns></returns>
-        Task<IAttemptResult<(IEnumerable<Core::IComment>, Core::IThreadInfo)>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, DateTime getCommetUntil = default);
+        Task<IAttemptResult<(IEnumerable<Core::IComment>, Core::IThreadInfo)>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option);
     }
 
     public class CommentClient : ICommentClient
     {
-        public CommentClient(Fetch::ICommentRequestBuilder requestBuilder, Fetch::ICommentDownloader downloader, Converter::INetCommentConverter converter, ILogger logger)
+        public CommentClient(ICommentRequestBuilder requestBuilder, Converter::INetCommentConverter converter, ILogger logger, INicoHttp http, INetWorkHelper helper)
         {
             this._requestBuilder = requestBuilder;
-            this._downloader = downloader;
             this._converter = converter;
             this._logger = logger;
+            this._helper = helper;
+            this._http = http;
         }
 
         #region field
@@ -42,19 +46,23 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
         /// </summary>
         private readonly Dictionary<string, (int, int)[]> _lastFetchedInfo = new();
 
-        private readonly Fetch::ICommentRequestBuilder _requestBuilder;
-
-        private readonly Fetch::ICommentDownloader _downloader;
+        private readonly ICommentRequestBuilder _requestBuilder;
 
         private readonly Converter::INetCommentConverter _converter;
 
         private readonly ILogger _logger;
 
+        private readonly INicoHttp _http;
+
+        private readonly INetWorkHelper _helper;
+
+        private Core::IThreadInfo? threadInfo;
+
         #endregion
 
         #region Method
 
-        public async Task<IAttemptResult<(IEnumerable<Core::IComment>, Core::IThreadInfo)>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, DateTime getCommetUntil = default)
+        public async Task<IAttemptResult<(IEnumerable<Core::IComment>, Core::IThreadInfo)>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option)
         {
             IAttemptResult<(IEnumerable<Core::IComment>, Core::IThreadInfo)> result;
 
@@ -82,7 +90,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
         /// <param name="dmcInfo"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        private async Task<IAttemptResult<(IEnumerable<Core::IComment>, Core::IThreadInfo)>> DownloadCommentAsyncInternal(IDmcInfo dmcInfo, IDownloadSettings settings, DateTime getCommetUntil = default)
+        private async Task<IAttemptResult<(IEnumerable<Core::IComment>, Core::IThreadInfo)>> DownloadCommentAsyncInternal(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption clientOption)
         {
             //コレクションを作成
             var collection = new Core::CommentCollection(dmcInfo.CommentCount, settings.CommentCountPerBlock);
@@ -94,43 +102,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
             var fetchedCommentCountOfDefaultThread = new List<int>();
             Core::IComment? firstComment = null;
             IThread? defaultThread = dmcInfo.CommentThreads.FirstOrDefault(t => t.IsDefaultPostTarget);
-            Core::IThreadInfo? threadInfo = null;
-
-            async Task<IAttemptResult<IEnumerable<Core::IComment>>> Fetch(Fetch::ICommentFetchOption option)
-            {
-                //リクエストを構築
-                IAttemptResult<string> rResult = await this._requestBuilder.BuildRequestAsync(dmcInfo, option, key);
-                if (!rResult.IsSucceeded || rResult.Data is null)
-                {
-                    return AttemptResult<IEnumerable<Core::IComment>>.Fail(rResult.Message);
-                }
-
-                //コメントをダウンロード
-                IAttemptResult<IReadOnlyList<Response::ResponseRoot>> dResult = await this._downloader.DownloadCommentAsync(dmcInfo.CommentServer, rResult.Data);
-
-                if (!dResult.IsSucceeded || dResult.Data is null)
-                {
-                    return AttemptResult<IEnumerable<Core::IComment>>.Fail(dResult.Message);
-                }
-
-                //ダウンロードしたコメントを変換
-                var converted = dResult.Data.Where(c => c.Chat is not null).Select(c => this._converter.ConvertNetCommentToCoreComment(c.Chat!));
-
-                if (threadInfo is null)
-                {
-                    Response::Thread? responseThread = dResult.Data.FirstOrDefault(r => r.Thread is not null)?.Thread;
-
-                    if (responseThread is null)
-                    {
-                        return AttemptResult<IEnumerable<Core::IComment>>.Fail("スレッド情報の取得に失敗しました。");
-                    }
-
-                    threadInfo = this._converter.ConvertNetThreadToCoreThreadInfo(responseThread);
-                }
-
-
-                return AttemptResult<IEnumerable<Core::IComment>>.Succeeded(converted);
-            }
+            this.threadInfo = null;
 
             //デフォルトスレッドが存在しない場合はエラー
             if (defaultThread is null)
@@ -147,13 +119,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
                 long when = firstComment is null ? 0 : firstComment.Date - 1;
 
                 //コメント取得の起点に達した場合、ループを終了
-                if (getCommetUntil != default && when < new DateTimeOffset(getCommetUntil).ToUnixTimeSeconds()) break;
+                if (clientOption.IsOriginationSpecified && when < new DateTimeOffset(clientOption.Origination).ToUnixTimeSeconds()) break;
 
                 //リクエストのオプションを定義
-                var option = new Fetch::CommentFetchOption(settings.DownloadOwner, settings.DownloadEasy, settings.DownloadLog, when);
+                var option = new CommentFetchOption(settings.DownloadOwner, settings.DownloadEasy, settings.DownloadLog, when);
 
                 //コメントを取得
-                IAttemptResult<IEnumerable<Core::IComment>> fResult = await Fetch(option);
+                IAttemptResult<IEnumerable<Core::IComment>> fResult = await this.FetchCommentAsync(dmcInfo, option, key);
 
                 if (!fResult.IsSucceeded || fResult.Data is null)
                 {
@@ -170,7 +142,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
                 foreach (var c in converted) collection.Add(c);
 
                 //過去ログをDLしない場合、ループを終了
-                if (!settings.DownloadLog && getCommetUntil != default) break;
+                if (!settings.DownloadLog && !clientOption.IsOriginationSpecified) break;
 
                 //最初のコメントを取得
                 IAttemptResult<Core::IComment> fiResult = collection.GetFirstComment(defaultThreadID, defaultThreadFork);
@@ -183,7 +155,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
             }
 
             //過去ログをダウンロードしない場合は終了
-            if (!settings.DownloadLog && getCommetUntil != default)
+            if (!settings.DownloadLog && !clientOption.IsOriginationSpecified)
             {
                 return AttemptResult<(IEnumerable<Core::IComment>, Core::IThreadInfo)>.Succeeded(new(collection.Comments, threadInfo!));
             }
@@ -198,8 +170,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
 
             while (true)
             {
-                //取得できなかったコメントのうち、一番新しいものの情報（すでに取得したものは除外）
-                var unfetched = collection.GetUnFilledRange().OrderByDescending(r => r.Start.No).FirstOrDefault(r => r.Start.No < this._lastFetchedInfo[r.Thread][r.Fork].Item1 - this._lastFetchedInfo[r.Thread][r.Fork].Item2);
+                //取得できなかったコメントのうち、一番新しいものの情報（すでに取得したものは除外、取得起点より古いものは除外）
+                var unfetched = collection.GetUnFilledRange().OrderByDescending(r => r.Start.No).FirstOrDefault(r => r.Start.No < this._lastFetchedInfo[r.Thread][r.Fork].Item1 - this._lastFetchedInfo[r.Thread][r.Fork].Item2 && (!clientOption.IsOriginationSpecified || DateTimeOffset.FromUnixTimeSeconds(r.Start.Date).ToLocalTime().DateTime > clientOption.Origination));
 
                 //取得できなかったコメントが存在しないので終了
                 if (unfetched is null)
@@ -208,8 +180,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
                 }
 
                 //取得
-                var option = new Fetch::CommentFetchOption(settings.DownloadOwner, settings.DownloadEasy, true, unfetched.Start.Date - 1);
-                IAttemptResult<IEnumerable<Core::IComment>> fResult = await Fetch(option);
+                var option = new CommentFetchOption(settings.DownloadOwner, settings.DownloadEasy, true, unfetched.Start.Date - 1);
+                IAttemptResult<IEnumerable<Core::IComment>> fResult = await this.FetchCommentAsync(dmcInfo, option, key);
 
                 if (!fResult.IsSucceeded || fResult.Data is null)
                 {
@@ -258,6 +230,65 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
             {
                 this._lastFetchedInfo.Add(threadID.ToString(), new (int, int)[max + 1]);
             }
+
+        }
+
+        /// <summary>
+        /// コメント取得の実処理（リクエスト構築=>DL=>デシリアライズ=>抽象コメント化）
+        /// </summary>
+        /// <param name="dmcInfo"></param>
+        /// <param name="option"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private async Task<IAttemptResult<IEnumerable<Core::IComment>>> FetchCommentAsync(IDmcInfo dmcInfo, ICommentFetchOption option, string key)
+        {
+            //リクエストを構築
+            IAttemptResult<string> rResult = await this._requestBuilder.BuildRequestAsync(dmcInfo, option, key);
+            if (!rResult.IsSucceeded || rResult.Data is null)
+            {
+                return AttemptResult<IEnumerable<Core::IComment>>.Fail(rResult.Message);
+            }
+
+            //コメントをダウンロード
+            HttpResponseMessage res = await this._http.PostAsync(new Uri(dmcInfo.CommentServer), new StringContent(rResult.Data));
+
+            if (!res.IsSuccessStatusCode)
+            {
+                string status = this._helper.GetHttpStatusForLog(res);
+                this._logger.Error($"コメントサーバーへのリクエストに失敗しました。（{status}）");
+                return AttemptResult<IEnumerable<Core::IComment>>.Fail($"コメントサーバーへのリクエストに失敗しました。（{ status}）");
+            }
+
+            IReadOnlyList<Response::ResponseRoot> data;
+
+            try
+            {
+                string content = await res.Content.ReadAsStringAsync();
+                data = JsonParser.DeSerialize<IReadOnlyList<Response::ResponseRoot>>(content);
+            }
+            catch (Exception ex)
+            {
+                this._logger.Error("コメントの解析に失敗しました。", ex);
+                return AttemptResult<IEnumerable<Core::IComment>>.Fail($"コメントの解析に失敗しました。（詳細:{ex.Message}）");
+            }
+
+            //ダウンロードしたコメントを変換
+            var converted = data.Where(c => c.Chat is not null).Select(c => this._converter.ConvertNetCommentToCoreComment(c.Chat!));
+
+            if (this.threadInfo is null)
+            {
+                Response::Thread? responseThread = data.FirstOrDefault(r => r.Thread is not null)?.Thread;
+
+                if (responseThread is null)
+                {
+                    return AttemptResult<IEnumerable<Core::IComment>>.Fail("スレッド情報の取得に失敗しました。");
+                }
+
+                threadInfo = this._converter.ConvertNetThreadToCoreThreadInfo(responseThread);
+            }
+
+
+            return AttemptResult<IEnumerable<Core::IComment>>.Succeeded(converted);
 
         }
 
