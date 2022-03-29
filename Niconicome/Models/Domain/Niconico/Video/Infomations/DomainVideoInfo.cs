@@ -162,6 +162,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         SessionInfo = sessionInfo,
                         IsPremium = this.RawDmcInfo.IsPremium,
                         IsPeakTime = this.RawDmcInfo.IsPeakTime,
+                        CommentServer=this.RawDmcInfo.CommentsServer,
                     };
                     this.cachedDmcInfo.Tags.AddRange(JsUtils.ToClrArray<string>(this.RawDmcInfo.Tags));
 

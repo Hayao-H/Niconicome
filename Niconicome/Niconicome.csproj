@@ -30,6 +30,10 @@
 		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <None Remove="Models\Domain\Niconico\Download\Comment\V2\Core\Converter\NetCommentConverter.cs~RF1ee155.TMP" />
+	</ItemGroup>
+
 		<ItemGroup>
 			<PackageReference Include="AngleSharp" Version="0.16.1" />
 			<PackageReference Include="CredentialManagement" Version="1.0.2" />
