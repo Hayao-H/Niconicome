@@ -12,7 +12,7 @@ using V2 = Niconicome.Models.Domain.Niconico.Net.Xml.Comment.V2;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
 {
-    internal interface ICommentLoader
+    public interface ICommentLoader
     {
         /// <summary>
         /// コメントを読み込む
@@ -31,7 +31,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
         bool CommentExists(string folderPath, string niconicoID);
     }
 
-    internal class CommentLoader : ICommentLoader
+    public class CommentLoader : ICommentLoader
     {
         public CommentLoader(Converter::ILocalCommentConverter converter, INicoDirectoryIO directoryIO, INicoFileIO fileIO, ILogger logger)
         {

@@ -12,7 +12,7 @@ using V2 = Niconicome.Models.Domain.Niconico.Net.Xml.Comment.V2;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
 {
-    internal interface ICommentWriter
+    public interface ICommentWriter
     {
         /// <summary>
         /// コメントを書き込む
@@ -24,9 +24,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
         IAttemptResult WriteComment(IEnumerable<Core::IComment> comments, Core::IThreadInfo threadInfo, CommentWriterOption option);
     }
 
-    internal class CommentWriter : ICommentWriter
+    public class CommentWriter : ICommentWriter
     {
-        public CommentWriter(INicoFileIO fileIO,ILogger logger, Converter::ILocalCommentConverter converter)
+        public CommentWriter(INicoFileIO fileIO, ILogger logger, Converter::ILocalCommentConverter converter)
         {
             this._fileIO = fileIO;
             this._logger = logger;
