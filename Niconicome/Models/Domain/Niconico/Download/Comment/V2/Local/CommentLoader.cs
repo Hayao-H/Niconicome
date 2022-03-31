@@ -139,5 +139,5 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
         #endregion
     }
 
-    internal record LocalCommentInfo(DateTime LastUpdatedTime, IEnumerable<Core::IComment> Comments);
+    public record LocalCommentInfo(DateTime LastUpdatedTime, IEnumerable<Core::IComment> Comments);
 }
