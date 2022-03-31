@@ -72,7 +72,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
 
             //コメント取得処理
             var dlOption = new Fetch::CommentClientOption(originationSpecidied, origination);
-            IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)> dlResult = await this._commentClient.DownloadCommentAsync(dmcInfo, settings, dlOption, token);
+            IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)> dlResult = await this._commentClient.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
 
             if (!dlResult.IsSucceeded)
             {

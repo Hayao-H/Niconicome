@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Download;
+using Windows.Devices.Display.Core;
 using Converter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
 using Core = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
 using Fetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
@@ -25,9 +26,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
         /// <param name="dmcInfo"></param>
         /// <param name="settings"></param>
         /// <param name="option">オプション</param>
+        /// <param name="context">コンテクスト</param>
         /// <param name="token">トークン</param>
         /// <returns></returns>
-        Task<IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option, CancellationToken token);
+        Task<IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option, IDownloadContext context, CancellationToken token);
     }
 
     public class CommentClient : ICommentClient
@@ -64,13 +66,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
         #region Method
 
-        public async Task<IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option, CancellationToken token)
+        public async Task<IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option, IDownloadContext context, CancellationToken token)
         {
             IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)> result;
 
             try
             {
-                result = await this.DownloadCommentAsyncInternal(dmcInfo, settings, option, token);
+                result = await this.DownloadCommentAsyncInternal(dmcInfo, settings, option, context, token);
             }
             catch (Exception ex)
             {
@@ -92,7 +94,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
         /// <param name="dmcInfo"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        private async Task<IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)>> DownloadCommentAsyncInternal(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption clientOption, CancellationToken token)
+        private async Task<IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)>> DownloadCommentAsyncInternal(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption clientOption, IDownloadContext context, CancellationToken token)
         {
             //コレクションを作成
             var collection = new Core::CommentCollection(dmcInfo.CommentCount, settings.CommentCountPerBlock);
@@ -101,6 +103,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
             var key = this._requestBuilder.ResetState();
 
             //変数定義
+            var loopIndex = 0;
             var fetchedCommentCountOfDefaultThread = new List<int>();
             Core::IComment? firstComment = null;
             IThread? defaultThread = dmcInfo.CommentThreads.FirstOrDefault(t => t.IsDefaultPostTarget);
@@ -117,6 +120,25 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
             while (firstComment?.No is null or > 1)
             {
+
+                //メッセージを送信
+                if (loopIndex > 0)
+                {
+                    if (settings.CommentFetchWaitSpan > 0)
+                    {
+                        try
+                        {
+                            await Task.Delay(settings.CommentFetchWaitSpan, token);
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            return AttemptResult<(Core::ICommentCollection, Core::IThreadInfo)>.Fail("ダウンロード処理がキャンセルされました。");
+                        }
+                    }
+
+                    context.SendMessage($"過去ログを取得中（{loopIndex + 1}件目・{collection.Count}コメ取得済み）");
+                }
+
                 //過去ログの起点を取得
                 long when = firstComment is null ? 0 : firstComment.Date - 1;
 
@@ -146,7 +168,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 foreach (var c in converted) collection.Add(c);
 
                 //過去ログをDLしない場合、ループを終了
-                if (!settings.DownloadLog && !clientOption.IsOriginationSpecified) break;
+                if (!settings.DownloadLog && !clientOption.IsOriginationSpecified)
+                {
+                    break;
+                }
+                else if (loopIndex == 0)
+                {
+                    context.SendMessage("過去ログの取得を開始します。");
+                }
 
                 //最初のコメントを取得
                 IAttemptResult<Core::IComment> fiResult = collection.GetFirstComment(defaultThreadID, defaultThreadFork);
@@ -156,6 +185,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 }
                 firstComment = fiResult.Data;
 
+                //変数を更新
+                loopIndex++;
             }
 
             //過去ログをダウンロードしない場合は終了
@@ -170,10 +201,31 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
             //取得情報を初期化
             this.SetupLastFetchedInfo(dmcInfo);
+            loopIndex = 0;
 
+            //メッセージを送信
+            context.SendMessage("取得できなかったコメントを再取得します。");
 
             while (true)
             {
+                //メッセージを送信
+                if (loopIndex > 0)
+                {
+                    if (settings.CommentFetchWaitSpan > 0)
+                    {
+                        try
+                        {
+                            await Task.Delay(settings.CommentFetchWaitSpan, token);
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            return AttemptResult<(Core::ICommentCollection, Core::IThreadInfo)>.Fail("ダウンロード処理がキャンセルされました。");
+                        }
+                    }
+
+                    context.SendMessage($"コメントを再取得中（{loopIndex + 1}件目・{collection.Count}コメ取得済み）");
+                }
+
                 //取得できなかったコメントのうち、一番新しいものの情報（すでに取得したものは除外、取得起点より古いものは除外）
                 var unfetched = collection.GetUnFilledRange().OrderByDescending(r => r.Start.No).FirstOrDefault(r => r.Start.No < this._lastFetchedInfo[r.Thread][r.Fork].Item1 - this._lastFetchedInfo[r.Thread][r.Fork].Item2 && (!clientOption.IsOriginationSpecified || DateTimeOffset.FromUnixTimeSeconds(r.Start.Date).ToLocalTime().DateTime > clientOption.Origination));
 
@@ -200,6 +252,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
                 //変数を更新
                 this._lastFetchedInfo[unfetched.Thread][unfetched.Fork] = new(unfetched.Start.No - 1, this.GetDefaultThreadCommentCount(defaultThreadID, defaultThreadFork, fResult.Data));
+                loopIndex++;
             }
 
 
