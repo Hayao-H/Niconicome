@@ -192,5 +192,9 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string DeleteExistingEconomyFile { get; private set; } = "deleteexistingeconomyfile";
         public static string SearchVideosExact { get; private set; } = "searchvideosexact";
         public static string ShowDownloadTasksAsTab { get; private set; } = "showdownloadtasksastab";
+        public static string CommentCountPerBlock { get; private set; } = "commentcountperblock";
+        public static string IsAppendingToLocalCommentEnable { get; private set; } = "isappendingtolocalcommentenable";
+        public static string IsOmittingXmlDeclarationIsEnable { get; private set; } = "isomittingxmldeclarationisenable";
+
     }
 }
