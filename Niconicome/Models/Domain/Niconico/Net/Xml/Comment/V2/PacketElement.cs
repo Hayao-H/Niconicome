@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace Niconicome.Models.Domain.Niconico.Net.Xml.Comment.V2
 {
     [XmlRoot("packet")]
-    internal class PacketElement
+    public class PacketElement
     {
         [XmlAnyElement]
         public XmlComment VideoIDComment
