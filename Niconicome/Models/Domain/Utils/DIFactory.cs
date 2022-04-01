@@ -7,6 +7,7 @@ using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
 using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
+using CommentConverter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
 using CommentFetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
 using CommentIntegrate = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
 using CommentLocal = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local;
@@ -251,6 +252,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<CommentLocal::ICommentLoader, CommentLocal::CommentLoader>();
             services.AddTransient<CommentLocal::ICommentWriter, CommentLocal::CommentWriter>();
             services.AddTransient<CommentIntegrate::ICommentDownloader, CommentIntegrate::CommentDownloader>();
+            services.AddTransient<CommentConverter::ILocalCommentConverter, CommentConverter::LocalCommentConverter>();
+            services.AddTransient<CommentConverter::INetCommentConverter, CommentConverter::NetCommentConverter>();
             return services.BuildServiceProvider();
         }
 
