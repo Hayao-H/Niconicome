@@ -109,7 +109,7 @@ namespace Niconicome.Models.Network.Download
 
     public class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
     {
-        public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current, IEnumSettingsHandler enumSettingsHandler,ILocalSettingsContainer container)
+        public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current, IEnumSettingsHandler enumSettingsHandler, ILocalSettingsContainer container)
         {
             this.settingHandler = settingHandler;
             this.current = current;
@@ -180,6 +180,7 @@ namespace Niconicome.Models.Network.Download
             bool unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
             bool experimentalSafety = this.settingHandler.GetBoolSetting(SettingsEnum.ExperimentalSafety);
             bool deleteEconomyFile = this.settingHandler.GetBoolSetting(SettingsEnum.DeleteEcoFile);
+            bool omitXmlDec = this.settingHandler.GetBoolSetting(SettingsEnum.OmitXmlDeclaration);
 
             //ファイル系
             string folderPath = this.current.PlaylistFolderPath;
@@ -206,6 +207,9 @@ namespace Niconicome.Models.Network.Download
             {
                 commandFormat = Format.DefaultFFmpegFormat;
             }
+
+            //コメントDL系
+            int commentCountPerBlock = this.settingHandler.GetIntSetting(SettingsEnum.CommentCountPerBlock);
 
             //時関・並列係
             int commentFetchWaitSpan = this.settingHandler.GetIntSetting(SettingsEnum.CommentWaitSpan);
@@ -242,6 +246,8 @@ namespace Niconicome.Models.Network.Download
                 DownloadOwner = this.IsDownloadingOwnerComment.Value,
                 FromAnotherFolder = this.IsCopyFromAnotherFolderEnable.Value,
                 Skip = this.IsSkippingEnable.Value,
+                AppendingToLocalComment = this.IsAppendingCommentEnable.Value,
+                OmittingXmlDeclaration = omitXmlDec,
                 FolderPath = folderPath,
                 VerticalResolution = this.Resolution.Value.Vertical,
                 PlaylistID = this.current.SelectedPlaylist.Value.Id,
@@ -273,6 +279,7 @@ namespace Niconicome.Models.Network.Download
                 VideoInfoType = videoInfoT,
                 SaveFailedHistory = saveFailed,
                 SaveSucceededHistory = saveSucceeded,
+                CommentCountPerBlock = commentCountPerBlock,
             };
         }
 

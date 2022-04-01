@@ -19,22 +19,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 {
     public interface IWatchInfohandler
     {
-        Task<IAttemptResult<IDomainVideoInfo>> GetVideoInfoAsync(string id, WatchInfoOptions options);
-    }
-    public interface IWatchPageHtmlParser
-    {
-        IDmcInfo GetDmcInfo(string sourceHtml, string niconicoId, string userID, WatchInfoOptions options);
-        bool HasJsDataElement { get; }
-    }
-
-    public enum WatchInfoHandlerState
-    {
-        RequestHasNotCompleted,
-        HttpRequestFailure,
-        NoJsDataElement,
-        JsonParsingFailure,
-        AnalyzerIsNotRegistered,
-        OK
+        Task<IAttemptResult<IDomainVideoInfo>> GetVideoInfoAsync(string id);
     }
 
     /// <summary>
@@ -64,7 +49,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// 動画情報を取得する
         /// </summary>
         /// <returns></returns>
-        public async Task<IAttemptResult<IDomainVideoInfo>> GetVideoInfoAsync(string id, WatchInfoOptions options)
+        public async Task<IAttemptResult<IDomainVideoInfo>> GetVideoInfoAsync(string id)
         {
             string source;
             Uri url = NiconicoContext.Context.GetPageUri(id);

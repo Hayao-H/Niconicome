@@ -259,7 +259,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         private async Task<IAttemptResult> EnsureSessionAsync(IWatchSession session, IDownloadSettings settings)
         {
 
-            await session.EnsureSessionAsync(settings.NiconicoId, true);
+            await session.EnsureSessionAsync(settings.NiconicoId);
 
             if (!session.IsSessionEnsured)
             {

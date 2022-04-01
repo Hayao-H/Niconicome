@@ -56,7 +56,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
             var originationSpecidied = false;
             var oldComments = new List<Core::IComment>();
 
-            if (settings.IsAppendingToLocalCommentEnable && this._commentLoader.CommentExists(settings.FolderPath, settings.NiconicoId))
+            if (settings.AppendingToLocalComment && this._commentLoader.CommentExists(settings.FolderPath, settings.NiconicoId))
             {
                 IAttemptResult<Local::LocalCommentInfo> localResult = this._commentLoader.LoadComment(settings.FolderPath, settings.NiconicoId);
                 if (localResult.IsSucceeded && localResult.Data is not null)
@@ -91,7 +91,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
 
             //コメント書き込み処理
             string path = this._path.GetFilePath(settings.FileNameFormat, dmcInfo, ".xml", settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
-            var writerOption = new Local::CommentWriterOption(path, settings.IsOmittingXmlDeclarationIsEnable, dmcInfo.Id);
+            var writerOption = new Local::CommentWriterOption(path, settings.OmittingXmlDeclaration, dmcInfo.Id);
 
             IAttemptResult writeResult = this._commentWriter.WriteComment(collection.Comments, threadInfo, writerOption);
 

@@ -15,6 +15,7 @@ using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
+using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -68,7 +69,7 @@ namespace Niconicome.Models.Network.Download
             var context = new DownloadContext(setting.NiconicoId);
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
-            await session.GetVideoDataAsync(setting.NiconicoId, setting.Video);
+            await session.GetVideoDataAsync(setting.NiconicoId);
 
             if (session.Video is not null)
             {
@@ -302,11 +303,23 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         private async Task<IAttemptResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
-            var commentDownloader = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
+            Cdl::ICommentDownloader? v1 = null;
+            V2Comment::ICommentDownloader? v2 = null;
+
+            if (settings.EnableExperimentalCommentSafetySystem)
+            {
+                v2 = DIFactory.Provider.GetRequiredService<V2Comment::ICommentDownloader>();
+            }
+            else
+            {
+                v1 = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
+
+            }
+
             IAttemptResult result;
             try
             {
-                result = await commentDownloader.DownloadComment(session, settings, onMessage, context, token);
+                result = v2 is null ? await v1!.DownloadComment(session, settings, onMessage, context, token) : await v2.DownloadCommentAsync(session.Video!.DmcInfo, settings, context, token);
             }
             catch (Exception e)
             {

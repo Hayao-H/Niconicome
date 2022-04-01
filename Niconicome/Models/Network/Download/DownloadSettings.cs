@@ -120,12 +120,12 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// コメント追記フラグ
         /// </summary>
-        bool IsAppendingToLocalCommentEnable { get; }
+        bool AppendingToLocalComment { get; }
 
         /// <summary>
         /// XML宣言の非出力フラグ
         /// </summary>
-        bool IsOmittingXmlDeclarationIsEnable { get; }
+        bool OmittingXmlDeclaration { get; }
 
         /// <summary>
         /// 動画ID
@@ -291,9 +291,9 @@ namespace Niconicome.Models.Network.Download
 
         public bool SaveFailedHistory { get; set; }
 
-        public bool IsAppendingToLocalCommentEnable { get; set; }
+        public bool AppendingToLocalComment { get; set; }
 
-        public bool IsOmittingXmlDeclarationIsEnable { get; set; }
+        public bool OmittingXmlDeclaration { get; set; }
 
         public uint VerticalResolution { get; set; }
 
