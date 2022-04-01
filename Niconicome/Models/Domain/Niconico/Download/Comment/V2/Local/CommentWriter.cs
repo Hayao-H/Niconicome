@@ -80,5 +80,5 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
         #endregion
     }
 
-    internal record CommentWriterOption(string Path, bool OmitXmlDeclaration);
+    public record CommentWriterOption(string Path, bool OmitXmlDeclaration);
 }
