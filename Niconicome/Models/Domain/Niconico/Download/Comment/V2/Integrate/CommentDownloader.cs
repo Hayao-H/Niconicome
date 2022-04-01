@@ -91,7 +91,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
 
             //コメント書き込み処理
             string path = this._path.GetFilePath(settings.FileNameFormat, dmcInfo, ".xml", settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
-            var writerOption = new Local::CommentWriterOption(path, settings.IsOmittingXmlDeclarationIsEnable);
+            var writerOption = new Local::CommentWriterOption(path, settings.IsOmittingXmlDeclarationIsEnable, dmcInfo.Id);
 
             IAttemptResult writeResult = this._commentWriter.WriteComment(collection.Comments, threadInfo, writerOption);
 

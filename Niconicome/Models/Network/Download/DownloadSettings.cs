@@ -123,7 +123,7 @@ namespace Niconicome.Models.Network.Download
         bool IsAppendingToLocalCommentEnable { get; }
 
         /// <summary>
-        /// XML宣言の出力フラグ
+        /// XML宣言の非出力フラグ
         /// </summary>
         bool IsOmittingXmlDeclarationIsEnable { get; }
 

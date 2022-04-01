@@ -49,7 +49,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
         {
             string content;
 
-            var data = new V2::PacketElement();
+            var data = new V2::PacketElement() { VideoID = option.VideoID };
             data.Chat.AddRange(comments.Select(c => this._converter.ConvertCoreCommentToChat(c)));
             data.Thread = this._converter.ConvertCoreThreadInfoToThread(threadInfo);
 
@@ -80,5 +80,5 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
         #endregion
     }
 
-    public record CommentWriterOption(string Path, bool OmitXmlDeclaration);
+    public record CommentWriterOption(string Path, bool OmitXmlDeclaration, string VideoID);
 }
