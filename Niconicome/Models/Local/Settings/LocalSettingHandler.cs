@@ -301,6 +301,6 @@ namespace Niconicome.Models.Local.Settings
         ShowTasksAsTab,
         CommentCountPerBlock,
         AppendComment,
-        OmitXmlDeclaration.
+        OmitXmlDeclaration,
     }
 }

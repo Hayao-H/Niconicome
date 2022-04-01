@@ -44,6 +44,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.MaxCommentsCount = WS::Mainpage.DownloadSettingsHandler.MaxCommentsCount.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
             this.IsNotEncodeEnable = WS::Mainpage.DownloadSettingsHandler.IsNoEncodeEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
             this.IsDownloadingIchibaInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingIchibaInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsCommentAppendingEnable = WS::Mainpage.DownloadSettingsHandler.IsAppendingCommentEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
 
             var s1 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"), "1080px");
             var s2 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("1280x720"), "720px");
@@ -255,6 +256,11 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<bool> IsNotEncodeEnable { get; init; }
 
         /// <summary>
+        /// コメント追記設定
+        /// </summary>
+        public ReactiveProperty<bool> IsCommentAppendingEnable { get; init; }
+
+        /// <summary>
         /// コメントの最大取得数
         /// </summary>
         public ReactiveProperty<int> MaxCommentsCount { get; init; }
@@ -409,6 +415,8 @@ namespace Niconicome.ViewModels.Mainpage
         public ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; set; } = new(true);
 
         public ReactiveProperty<bool> IsNotEncodeEnable { get; init; } = new(false);
+
+        public ReactiveProperty<bool> IsCommentAppendingEnable { get; init; } = new();
 
         public ReactiveProperty<int> MaxCommentsCount { get; set; } = new(2000);
 
