@@ -39,7 +39,7 @@ namespace Niconicome.Models.Domain.Local.Cookies
         bool IsInitialized { get; }
     }
 
-    class FirefoxCookieManager : IFirefoxCookieManager
+    public class FirefoxCookieManager : IFirefoxCookieManager
     {
         public FirefoxCookieManager(IFirefoxProfileManager profileManager, INicoFileIO fileIO, ISqliteCookieLoader cookieLoader)
         {

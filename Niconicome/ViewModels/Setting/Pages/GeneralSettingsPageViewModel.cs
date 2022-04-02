@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reactive.Linq;
@@ -22,15 +23,12 @@ namespace Niconicome.ViewModels.Setting.Pages
             #region 自動ログイン
             this.IsAutologinEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.AutologinEnable);
 
-            this.SelectableFirefoxProfiles = WS::SettingPage.AutoLogin.GetFirefoxProfiles().Select(p => p.ProfileName).ToList();
-            var profile = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.FFProfileName) ?? string.Empty;
-            this.SelectedFirefoxProfileName = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FFProfileName, this.SelectableFirefoxProfiles.FirstOrDefault(p => p == profile) ?? "");
-
             var normal = new ComboboxItem<string>(AutoLoginTypeString.Normal, "パスワードログイン");
             var wv2 = new ComboboxItem<string>(AutoLoginTypeString.Webview2, "Webview2とCookieを共有");
             var firefox = new ComboboxItem<string>(AutoLoginTypeString.Firefox, "FirefoxとCookieを共有");
+            var storeFirefox = new ComboboxItem<string>(AutoLoginTypeString.StoreFirefox, "Store版FirefoxとCookieを共有");
 
-            this.SelectableAutoLoginTypes = new List<ComboboxItem<string>>() { normal, wv2, firefox };
+            this.SelectableAutoLoginTypes = new List<ComboboxItem<string>>() { normal, wv2, firefox, storeFirefox };
 
             //自動ログインのタイプ
             this.SelectedAutoLoginType = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AutologinMode).ToReactivePropertyAsSynchronized(x => x.Value, x => x switch
@@ -38,12 +36,29 @@ namespace Niconicome.ViewModels.Setting.Pages
                    AutoLoginTypeString.Normal => normal,
                    AutoLoginTypeString.Webview2 => wv2,
                    AutoLoginTypeString.Firefox => firefox,
+                   AutoLoginTypeString.StoreFirefox => storeFirefox,
                    _ => normal,
                }, x => x.Value);
 
+
+            this.SelectedAutoLoginType.Subscribe(x =>
+            {
+                this.SelectableFirefoxProfiles.Clear();
+                if (x.Value == AutoLoginTypeString.Firefox)
+                {
+                    this.SelectableFirefoxProfiles.AddRange(WS::SettingPage.AutoLogin.GetFirefoxProfiles(AutoLoginType.Firefox).Select(y => y.ProfileName));
+                }
+                else if (x.Value == AutoLoginTypeString.StoreFirefox)
+                {
+                    this.SelectableFirefoxProfiles.AddRange(WS::SettingPage.AutoLogin.GetFirefoxProfiles(AutoLoginType.StoreFirefox).Select(y => y.ProfileName));
+                }
+            });
+            var profile = WS::SettingPage.SettingHandler.GetStringSetting(SettingsEnum.FFProfileName) ?? string.Empty;
+            this.SelectedFirefoxProfileName = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FFProfileName, this.SelectableFirefoxProfiles.FirstOrDefault(p => p == profile) ?? "");
+
             //Firefoxのプロファイル選択肢を表示するかどうか
             this.DisplayFirefoxPrifile = this.SelectedAutoLoginType
-                .Select(value => value.Value == AutoLoginTypeString.Firefox)
+                .Select(value => value.Value == AutoLoginTypeString.Firefox || value.Value == AutoLoginTypeString.StoreFirefox)
                 .ToReactiveProperty();
             #endregion
 
@@ -120,7 +135,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// 選択可能なFirefoxのプロファイル
         /// </summary>
-        public List<string> SelectableFirefoxProfiles { get; init; }
+        public ObservableCollection<string> SelectableFirefoxProfiles { get; init; } = new();
 
         /// <summary>
         /// 同時取得数
@@ -221,7 +236,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public ReactiveProperty<bool> IsAutologinEnable { set; get; } = new(true);
 
-        public ReactiveProperty<bool> IsSkippingSSLVerificationEnable { get; set; } =new(false);
+        public ReactiveProperty<bool> IsSkippingSSLVerificationEnable { get; set; } = new(false);
 
         public ReactiveProperty<bool> IsSavePrevPlaylistExpandedStateEnable { get; set; } = new(true);
 

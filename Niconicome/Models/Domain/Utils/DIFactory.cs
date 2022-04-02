@@ -254,6 +254,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<CommentIntegrate::ICommentDownloader, CommentIntegrate::CommentDownloader>();
             services.AddTransient<CommentConverter::ILocalCommentConverter, CommentConverter::LocalCommentConverter>();
             services.AddTransient<CommentConverter::INetCommentConverter, CommentConverter::NetCommentConverter>();
+            services.AddTransient<FF::IStoreFirefoxProfileManager, FF::StoreFirefoxProfileManager>();
+            services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
+            services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
             return services.BuildServiceProvider();
         }
 
