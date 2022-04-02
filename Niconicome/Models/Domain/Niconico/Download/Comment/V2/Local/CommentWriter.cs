@@ -55,7 +55,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
 
             try
             {
-                content = Xmlparser.Serialize(data, new XmlWriterSettings() { OmitXmlDeclaration = option.OmitXmlDeclaration });
+                content = Xmlparser.Serialize(data, new XmlWriterSettings() { OmitXmlDeclaration = option.OmitXmlDeclaration, Indent = true });
             }
             catch (Exception ex)
             {

@@ -328,7 +328,8 @@ namespace Niconicome.Models.Network.Download
                 this.logger.Error("コメントのダウンロードに失敗しました。", e);
                 return AttemptResult.Fail($"コメントのダウンロードに失敗しました。({e.Message})");
             }
-            return AttemptResult.Succeeded();
+
+            return result;
         }
 
         /// <summary>

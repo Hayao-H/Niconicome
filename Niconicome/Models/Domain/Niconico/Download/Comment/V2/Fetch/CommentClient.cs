@@ -118,6 +118,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
             string defaultThreadID = defaultThread.ID.ToString();
             int defaultThreadFork = defaultThread.Fork;
+            long lastWhen = 0;
 
             while (firstComment?.No is null or > 1)
             {
@@ -143,8 +144,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 //過去ログの起点を取得
                 long when = firstComment is null ? 0 : firstComment.Date - 1;
 
+                //過去ログの起点が前回のループと同じ場合は、ループを終了
+                if (loopIndex > 0 && when == lastWhen)
+                {
+                    break;
+                }
+                else
+                {
+                    lastWhen = when;
+                }
+
                 //コメント取得の起点に達した場合、ループを終了
-                if (clientOption.IsOriginationSpecified && when < new DateTimeOffset(clientOption.Origination).ToUnixTimeSeconds()) break;
+                if (loopIndex > 0 && clientOption.IsOriginationSpecified && when < new DateTimeOffset(clientOption.Origination).ToUnixTimeSeconds()) break;
 
                 //リクエストのオプションを定義
                 var option = new CommentFetchOption(settings.DownloadOwner, settings.DownloadEasy, settings.DownloadLog && loopIndex > 0, when);
