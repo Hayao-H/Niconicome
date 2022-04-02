@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
@@ -241,7 +242,12 @@ namespace Niconicome.Models.Network.Download
                     }
                     else
                     {
-                        string rMessage = result.Data.ActualVerticalResolution == 0 ? string.Empty : $"(vertical:{result.Data.ActualVerticalResolution}px)";
+                        var builder = new StringBuilder();
+                        if (setting.Video || setting.Comment) builder.Append("(");
+                        if (setting.Video) builder.Append($"vertical:{result.Data.ActualVerticalResolution}px ");
+                        if (setting.Comment) builder.Append($"{result.Data.CommentCount}コメ");
+                        if (setting.Video || setting.Comment) builder.Append(")");
+                        string rMessage = builder.ToString();
                         this._messageHandler.AppendMessage($"{self.NiconicoID}のダウンロードに成功しました。");
 
                         if (!string.IsNullOrEmpty(result.Data.FileName))
@@ -270,7 +276,7 @@ namespace Niconicome.Models.Network.Download
                         }
                     }
 
-
+                    result.Data?.Dispose();
 
                     self.IsProcessing.Value = false;
                     if (!self.IsCanceled.Value)

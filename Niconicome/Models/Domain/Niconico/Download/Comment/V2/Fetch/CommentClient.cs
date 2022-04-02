@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -146,7 +147,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 if (clientOption.IsOriginationSpecified && when < new DateTimeOffset(clientOption.Origination).ToUnixTimeSeconds()) break;
 
                 //リクエストのオプションを定義
-                var option = new CommentFetchOption(settings.DownloadOwner, settings.DownloadEasy, settings.DownloadLog, when);
+                var option = new CommentFetchOption(settings.DownloadOwner, settings.DownloadEasy, settings.DownloadLog && loopIndex > 0, when);
 
                 //コメントを取得
                 IAttemptResult<IEnumerable<Core::IComment>> fResult = await this.FetchCommentAsync(dmcInfo, option, key);
@@ -227,7 +228,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 }
 
                 //取得できなかったコメントのうち、一番新しいものの情報（すでに取得したものは除外、取得起点より古いものは除外）
-                var unfetched = collection.GetUnFilledRange().OrderByDescending(r => r.Start.No).FirstOrDefault(r => r.Start.No < this._lastFetchedInfo[r.Thread][r.Fork].Item1 - this._lastFetchedInfo[r.Thread][r.Fork].Item2 && (!clientOption.IsOriginationSpecified || DateTimeOffset.FromUnixTimeSeconds(r.Start.Date).ToLocalTime().DateTime > clientOption.Origination));
+                var unfetched = collection.GetUnFilledRange().OrderByDescending(r => r.Start.No).FirstOrDefault(r => this._lastFetchedInfo[r.Thread][r.Fork].Item1 == 0 || r.Start.No < this._lastFetchedInfo[r.Thread][r.Fork].Item1 - this._lastFetchedInfo[r.Thread][r.Fork].Item2 && (!clientOption.IsOriginationSpecified || DateTimeOffset.FromUnixTimeSeconds(r.Start.Date).ToLocalTime().DateTime > clientOption.Origination));
 
                 //取得できなかったコメントが存在しないので終了
                 if (unfetched is null)
@@ -251,7 +252,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 foreach (var c in fResult.Data!) collection.Add(c);
 
                 //変数を更新
-                this._lastFetchedInfo[unfetched.Thread][unfetched.Fork] = new(unfetched.Start.No - 1, this.GetDefaultThreadCommentCount(defaultThreadID, defaultThreadFork, fResult.Data));
+                this._lastFetchedInfo[unfetched.Thread][unfetched.Fork] = new(unfetched.Start.No - 1, settings.CommentCountPerBlock);// this.GetDefaultThreadCommentCount(defaultThreadID, defaultThreadFork, fResult.Data));
                 loopIndex++;
             }
 
@@ -286,9 +287,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
             this._lastFetchedInfo.Clear();
 
             //threadを追加
-            foreach (var threadID in dmcInfo.CommentThreads.Select(t => t.ID))
+            foreach (var threadID in dmcInfo.CommentThreads.Select(t => t.ID.ToString()))
             {
-                this._lastFetchedInfo.Add(threadID.ToString(), new (int, int)[max + 1]);
+                if (this._lastFetchedInfo.ContainsKey(threadID)) continue;
+                this._lastFetchedInfo.Add(threadID, new (int, int)[max + 1]);
             }
 
         }
@@ -309,8 +311,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 return AttemptResult<IEnumerable<Core::IComment>>.Fail(rResult.Message);
             }
 
+            string url = dmcInfo.CommentServer.EndsWith(".json") ? dmcInfo.CommentServer : dmcInfo.CommentServer[0..^1] + ".json";
+
             //コメントをダウンロード
-            HttpResponseMessage res = await this._http.PostAsync(new Uri(dmcInfo.CommentServer), new StringContent(rResult.Data));
+            HttpResponseMessage res = await this._http.PostAsync(new Uri(url), new StringContent(rResult.Data));
 
             if (!res.IsSuccessStatusCode)
             {

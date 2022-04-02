@@ -66,7 +66,7 @@ namespace Niconicome.Models.Network.Download
 
         public async Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IListVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
         {
-            using var context = new DownloadContext(setting.NiconicoId);
+            var context = new DownloadContext(setting.NiconicoId);
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
             context.RegisterMessageHandler(OnMessage);

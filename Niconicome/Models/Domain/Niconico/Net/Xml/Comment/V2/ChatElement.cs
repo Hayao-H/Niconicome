@@ -45,20 +45,12 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.Comment.V2
         public string? Text { get; set; }
 
         [XmlAttribute("premium")]
-        public int? Premium { get; set; }
+        public int Premium { get; set; }
 
         [XmlAttribute("score")]
         public int Score { get; set; }
 
         [XmlAttribute("deleted")]
-        public int? Deleted { get; set; }
-
-        [Browsable(false)]
-        [XmlIgnore]
-        public bool PremiumSpecified => Premium.HasValue;
-
-        [Browsable(false)]
-        [XmlIgnore]
-        public bool DeletedSpecified => Deleted.HasValue;
+        public int Deleted { get; set; }
     }
 }

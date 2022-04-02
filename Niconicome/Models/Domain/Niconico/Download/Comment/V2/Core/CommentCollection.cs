@@ -73,7 +73,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
         public int Count => this._children.Select(c => c.Count).Sum();
 
-        public IEnumerable<IComment> Comments => this._children.Select(c => c.Comments).SelectMany(_ => _);
+        public IEnumerable<IComment> Comments => this._children.Select(c => c.Comments).SelectMany(_ => _).Where(x => x is not null);
 
         #endregion
 
