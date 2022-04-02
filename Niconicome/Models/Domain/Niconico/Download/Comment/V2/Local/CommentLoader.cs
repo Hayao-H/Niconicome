@@ -133,7 +133,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
         /// <returns></returns>
         private string? GetCommentFilePath(string folderPath, string niconicoID)
         {
-            return this._directoryIO.GetFiles(folderPath).FirstOrDefault(p => p.Contains(niconicoID));
+            return this._directoryIO.GetFiles(folderPath).FirstOrDefault(p => p.Contains(niconicoID) && p.EndsWith(".xml"));
         }
 
         #endregion
