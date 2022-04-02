@@ -11,14 +11,14 @@ using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Auth
 {
-    interface IFirefoxSharedLogin
+    public interface IFirefoxSharedLogin
     {
         bool CanLogin(string profileName);
         Task<bool> TryLogin(string profileName);
         IEnumerable<IFirefoxProfileInfo> GetFirefoxProfiles();
     }
 
-    class FirefoxSharedLogin : SharedLoginBase, IFirefoxSharedLogin
+    public class FirefoxSharedLogin : SharedLoginBase, IFirefoxSharedLogin
     {
         public FirefoxSharedLogin(IFirefoxCookieManager firefoxCookieManager, ILogger logger, INicoHttp http, INiconicoContext context, ICookieManager cookieManager, IFirefoxProfileManager firefoxProfileManager) : base(http, cookieManager, context)
         {
