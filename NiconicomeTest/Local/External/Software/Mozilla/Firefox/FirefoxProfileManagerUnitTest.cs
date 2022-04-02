@@ -15,7 +15,7 @@ namespace NiconicomeTest.Local.External.Software.Mozilla.Firefox
         public void SetUp()
         {
             var stab = new NicoDirectoryIOMock(p => true, (_, _, _) => new List<string>(), (_, _, _) => new List<string>() { "abcd64.default-release", "abcd64.dev-edition-default", "abcd64.default", "abcd64.default-nightly" });
-            this.manager = new FirefoxProfileManager(stab, new LoggerStab());
+            this.manager = new FirefoxProfileManager(stab, new LoggerStub());
             this.manager.Initialize();
         }
 

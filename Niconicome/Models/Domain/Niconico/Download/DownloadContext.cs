@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.Devices.I2c.Provider;
 
 namespace Niconicome.Models.Domain.Niconico.Download
 {
 
-    public interface IDownloadContext
+    public interface IDownloadContext : IDisposable
     {
         /// <summary>
         /// コンテクストID
@@ -35,11 +37,27 @@ namespace Niconicome.Models.Domain.Niconico.Download
         int OriginalSegmentsCount { get; set; }
 
         /// <summary>
+        /// コメント数
+        /// </summary>
+        int CommentCount { get; set; }
+
+        /// <summary>
         /// ログ出力
         /// </summary>
         /// <returns></returns>
-
         string GetLogContent();
+
+        /// <summary>
+        /// メッセージをハンドラに送信する
+        /// </summary>
+        /// <param name="content"></param>
+        void SendMessage(string content);
+
+        /// <summary>
+        /// メッセージハンドラを追加
+        /// </summary>
+        /// <param name="handler"></param>
+        void RegisterMessageHandler(Action<string> handler);
     }
 
     public class DownloadContext : IDownloadContext
@@ -49,6 +67,14 @@ namespace Niconicome.Models.Domain.Niconico.Download
             this.NiconicoId = niconicoId;
             this.ContextID = Guid.NewGuid().ToString("D");
         }
+
+        #region field
+
+        private readonly List<Action<string>> messageHandlers = new();
+
+        #endregion
+
+        #region Props
 
         public string ContextID { get; init; }
 
@@ -60,10 +86,40 @@ namespace Niconicome.Models.Domain.Niconico.Download
 
         public int OriginalSegmentsCount { get; set; }
 
+        public int CommentCount { get; set; }
+
+        #endregion
+
+        #region Method
+
         public string GetLogContent()
         {
             return $"context_id: {this.ContextID}, content_id: {this.NiconicoId}";
         }
+
+        public void RegisterMessageHandler(Action<string> handler)
+        {
+            this.messageHandlers.Add(handler);
+        }
+
+        public void SendMessage(string content)
+        {
+            foreach (var handler in this.messageHandlers)
+            {
+                try
+                {
+                    handler(content);
+                }
+                catch { }
+            }
+        }
+
+        public void Dispose()
+        {
+            this.messageHandlers.Clear();
+        }
+
+        #endregion
 
     }
 }

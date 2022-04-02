@@ -15,32 +15,106 @@ namespace Niconicome.Models.Network.Download
 {
     public interface IDownloadSettingsHandler
     {
+        /// <summary>
+        /// 別フォルダーからコピー
+        /// </summary>
         ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; }
+
+        /// <summary>
+        /// コメントDL
+        /// </summary>
         ReactiveProperty<bool> IsDownloadingCommentEnable { get; }
+
+        /// <summary>
+        /// 過去ログDL
+        /// </summary>
         ReactiveProperty<bool> IsDownloadingCommentLogEnable { get; }
+
+        /// <summary>
+        /// かんたんコメントDL
+        /// </summary>
         ReactiveProperty<bool> IsDownloadingEasyComment { get; }
+
+        /// <summary>
+        /// 投コメDL
+        /// </summary>
         ReactiveProperty<bool> IsDownloadingOwnerComment { get; }
+
+        /// <summary>
+        /// サムネDL
+        /// </summary>
         ReactiveProperty<bool> IsDownloadingThumbEnable { get; }
+
+        /// <summary>
+        /// 動画DL
+        /// </summary>
         ReactiveProperty<bool> IsDownloadingVideoEnable { get; }
+
+        /// <summary>
+        /// 動画情報DL
+        /// </summary>
         ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; }
+
+        /// <summary>
+        /// 市場情報DL
+        /// </summary>
         ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; }
+
+        /// <summary>
+        /// コメ数制限有効フラグ
+        /// </summary>
         ReactiveProperty<bool> IsLimittingCommentCountEnable { get; }
+
+        /// <summary>
+        /// 上書きフラグ
+        /// </summary>
         ReactiveProperty<bool> IsOverwriteEnable { get; }
+
+        /// <summary>
+        /// スキップフラグ
+        /// </summary>
         ReactiveProperty<bool> IsSkippingEnable { get; }
+
+        /// <summary>
+        /// エンコードスキップフラグ
+        /// </summary>
         ReactiveProperty<bool> IsNoEncodeEnable { get; }
+
+        /// <summary>
+        /// コメント追記フラグ
+        /// </summary>
+        ReactiveProperty<bool> IsAppendingCommentEnable { get; }
+
+        /// <summary>
+        /// コメ数制限
+        /// </summary>
         ReactiveProperty<int> MaxCommentsCount { get; }
+
+        /// <summary>
+        /// 解像度設定
+        /// </summary>
         ReactiveProperty<VideoInfo::IResolution> Resolution { get; }
+
+        /// <summary>
+        /// サムネサイズ設定
+        /// </summary>
         ReactiveProperty<VideoInfo::ThumbSize> ThumbnailSize { get; }
+
+        /// <summary>
+        /// DL設定を構築
+        /// </summary>
+        /// <returns></returns>
         DownloadSettings CreateDownloadSettings();
     }
 
     public class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
     {
-        public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current, IEnumSettingsHandler enumSettingsHandler)
+        public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current, IEnumSettingsHandler enumSettingsHandler, ILocalSettingsContainer container)
         {
             this.settingHandler = settingHandler;
             this.current = current;
             this.enumSettingsHandler = enumSettingsHandler;
+            this._container = container;
 
             this.IsDownloadingVideoInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLVideoInfo)).AddTo(this.disposables);
             this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount)).AddTo(this.disposables);
@@ -58,6 +132,7 @@ namespace Niconicome.Models.Network.Download
             this.IsNoEncodeEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlWithoutEncode)).AddTo(this.disposables);
             this.IsDownloadingIchibaInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlIchiba)).AddTo(this.disposables);
             this.ThumbnailSize = new ReactiveProperty<VideoInfo::ThumbSize>(this.enumSettingsHandler.GetSetting<VideoInfo::ThumbSize>());
+            this.IsAppendingCommentEnable = this._container.GetReactiveBoolSetting(SettingsEnum.AppendComment);
 
             this.IsDownloadingVideoInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideoInfo));
             this.IsDownloadingVideoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideo));
@@ -83,18 +158,16 @@ namespace Niconicome.Models.Network.Download
             this.Dispose();
         }
 
-        #region フィールド
+        #region field
         private readonly ILocalSettingHandler settingHandler;
 
         private readonly ICurrent current;
 
         private readonly IEnumSettingsHandler enumSettingsHandler;
+
+        private readonly ILocalSettingsContainer _container;
         #endregion
 
-        /// <summary>
-        /// DL設定を取得する
-        /// </summary>
-        /// <returns></returns>
         public DownloadSettings CreateDownloadSettings()
         {
 
@@ -107,6 +180,7 @@ namespace Niconicome.Models.Network.Download
             bool unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
             bool experimentalSafety = this.settingHandler.GetBoolSetting(SettingsEnum.ExperimentalSafety);
             bool deleteEconomyFile = this.settingHandler.GetBoolSetting(SettingsEnum.DeleteEcoFile);
+            bool omitXmlDec = this.settingHandler.GetBoolSetting(SettingsEnum.OmitXmlDeclaration);
 
             //ファイル系
             string folderPath = this.current.PlaylistFolderPath;
@@ -133,6 +207,9 @@ namespace Niconicome.Models.Network.Download
             {
                 commandFormat = Format.DefaultFFmpegFormat;
             }
+
+            //コメントDL系
+            int commentCountPerBlock = this.settingHandler.GetIntSetting(SettingsEnum.CommentCountPerBlock);
 
             //時関・並列係
             int commentFetchWaitSpan = this.settingHandler.GetIntSetting(SettingsEnum.CommentWaitSpan);
@@ -169,6 +246,8 @@ namespace Niconicome.Models.Network.Download
                 DownloadOwner = this.IsDownloadingOwnerComment.Value,
                 FromAnotherFolder = this.IsCopyFromAnotherFolderEnable.Value,
                 Skip = this.IsSkippingEnable.Value,
+                AppendingToLocalComment = this.IsAppendingCommentEnable.Value,
+                OmittingXmlDeclaration = omitXmlDec,
                 FolderPath = folderPath,
                 VerticalResolution = this.Resolution.Value.Vertical,
                 PlaylistID = this.current.SelectedPlaylist.Value.Id,
@@ -200,88 +279,42 @@ namespace Niconicome.Models.Network.Download
                 VideoInfoType = videoInfoT,
                 SaveFailedHistory = saveFailed,
                 SaveSucceededHistory = saveSucceeded,
+                CommentCountPerBlock = commentCountPerBlock,
             };
         }
 
-        /// <summary>
-        /// 動画DL
-        /// </summary>
         public ReactiveProperty<bool> IsDownloadingVideoEnable { get; init; }
 
-        /// <summary>
-        /// コメントDL
-        /// </summary>
         public ReactiveProperty<bool> IsDownloadingCommentEnable { get; init; }
 
-        /// <summary>
-        /// 過去ログ
-        /// </summary>
         public ReactiveProperty<bool> IsDownloadingCommentLogEnable { get; init; }
 
-        /// <summary>
-        /// 投コメ
-        /// </summary>
         public ReactiveProperty<bool> IsDownloadingOwnerComment { get; init; }
 
-        /// <summary>
-        /// かんたんコメント
-        /// </summary>
         public ReactiveProperty<bool> IsDownloadingEasyComment { get; init; }
 
-        /// <summary>
-        /// サムネ
-        /// </summary>
         public ReactiveProperty<bool> IsDownloadingThumbEnable { get; init; }
 
-        /// <summary>
-        /// 上書き
-        /// </summary>
         public ReactiveProperty<bool> IsOverwriteEnable { get; init; }
 
-        /// <summary>
-        /// DL済みをスキップ
-        /// </summary>
         public ReactiveProperty<bool> IsSkippingEnable { get; init; }
 
-        /// <summary>
-        /// 他フォルダーからコピー
-        /// </summary>
+        public ReactiveProperty<bool> IsAppendingCommentEnable { get; init; }
+
         public ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; init; }
 
-        /// <summary>
-        /// エンコードしない
-        /// </summary>
         public ReactiveProperty<bool> IsNoEncodeEnable { get; init; }
 
-
-        /// <summary>
-        /// 最大コメ数
-        /// </summary>
         public ReactiveProperty<bool> IsLimittingCommentCountEnable { get; init; }
 
-        /// <summary>
-        /// 動画情報
-        /// </summary>
         public ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; init; }
 
-        /// <summary>
-        /// 市場情報
-        /// </summary>
         public ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; init; }
 
-        /// <summary>
-        /// 最大コメ数
-        /// </summary>
         public ReactiveProperty<int> MaxCommentsCount { get; init; }
 
-        /// <summary>
-        /// 解像度
-        /// </summary>
         public ReactiveProperty<VideoInfo::IResolution> Resolution { get; init; }
 
-        /// <summary>
-        /// サムネイルサイズ
-        /// </summary>
         public ReactiveProperty<VideoInfo::ThumbSize> ThumbnailSize { get; init; }
     }
 }

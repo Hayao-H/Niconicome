@@ -117,6 +117,15 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         bool SaveFailedHistory { get; }
 
+        /// <summary>
+        /// コメント追記フラグ
+        /// </summary>
+        bool AppendingToLocalComment { get; }
+
+        /// <summary>
+        /// XML宣言の非出力フラグ
+        /// </summary>
+        bool OmittingXmlDeclaration { get; }
 
         /// <summary>
         /// 動画ID
@@ -214,6 +223,11 @@ namespace Niconicome.Models.Network.Download
         int MaxParallelSegmentDLCount { get; }
 
         /// <summary>
+        /// コメントコレクションの1ブロックあたりのコメント数
+        /// </summary>
+        int CommentCountPerBlock { get; }
+
+        /// <summary>
         /// 市場情報の形式
         /// </summary>
         IchibaInfoTypeSettings IchibaInfoType { get; }
@@ -277,6 +291,10 @@ namespace Niconicome.Models.Network.Download
 
         public bool SaveFailedHistory { get; set; }
 
+        public bool AppendingToLocalComment { get; set; }
+
+        public bool OmittingXmlDeclaration { get; set; }
+
         public uint VerticalResolution { get; set; }
 
         public int PlaylistID { get; set; }
@@ -288,6 +306,8 @@ namespace Niconicome.Models.Network.Download
         public int CommentOffset { get; set; }
 
         public int MaxParallelSegmentDLCount { get; set; }
+
+        public int CommentCountPerBlock { get; set; }
 
         public string NiconicoId { get; set; } = string.Empty;
 

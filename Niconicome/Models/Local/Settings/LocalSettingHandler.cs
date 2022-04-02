@@ -203,6 +203,9 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.DeleteEcoFile => STypes::SettingNames.DeleteExistingEconomyFile,
                 SettingsEnum.SearchExact => STypes::SettingNames.SearchVideosExact,
                 SettingsEnum.ShowTasksAsTab => STypes::SettingNames.ShowDownloadTasksAsTab,
+                SettingsEnum.CommentCountPerBlock => STypes::SettingNames.CommentCountPerBlock,
+                SettingsEnum.AppendComment => STypes::SettingNames.IsAppendingToLocalCommentEnable,
+                SettingsEnum.OmitXmlDeclaration => STypes::SettingNames.IsOmittingXmlDeclarationIsEnable,
                 _ => null
             };
         }
@@ -296,5 +299,8 @@ namespace Niconicome.Models.Local.Settings
         DeleteEcoFile,
         SearchExact,
         ShowTasksAsTab,
+        CommentCountPerBlock,
+        AppendComment,
+        OmitXmlDeclaration,
     }
 }

@@ -118,7 +118,7 @@ namespace Niconicome.Models.Network
 
             this._messageHandler.AppendMessage($"{id}の取得を開始します。");
 
-            IAttemptResult<IListVideoInfo> result = await this._wacthPagehandler.TryGetVideoInfoAsync(id, DWatch::WatchInfoOptions.NoDmcData);
+            IAttemptResult<IListVideoInfo> result = await this._wacthPagehandler.TryGetVideoInfoAsync(id);
 
             if (!result.IsSucceeded || result.Data is null)
             {

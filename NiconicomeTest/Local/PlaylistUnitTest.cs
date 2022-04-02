@@ -30,7 +30,7 @@ namespace NiconicomeTest
                     this.database = Static.DataBaseInstance;
                     //プレイリストテーブルをクリア
                     this.database.Clear(STypes::Playlist.TableName);
-                    this.playlistStorehandler = new PlaylistStoreHandler(this.database, new LoggerStab());
+                    this.playlistStorehandler = new PlaylistStoreHandler(this.database, new LoggerStub());
                     this.playlistStorehandler.Initialize();
                 }
 

@@ -4,7 +4,7 @@ using Niconicome.Models.Helper.Result;
 
 namespace NiconicomeTest.Stabs.Models.Domain.Utils
 {
-    class LoggerStab : ILogger
+    class LoggerStub : ILogger
     {
 
         public string? LastMessage { get; private set; }

@@ -1,13 +1,16 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
-using Niconicome.Models.Const;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using Addons = Niconicome.Models.Local.Addon;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
 using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
+using CommentConverter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
+using CommentFetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
+using CommentIntegrate = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
+using CommentLocal = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local;
 using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
 using DLActions = Niconicome.Models.Network.Download.Actions;
@@ -17,7 +20,6 @@ using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
 using DlThumb = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using DlVideo = Niconicome.Models.Domain.Niconico.Download.Video;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
-using DomainDownload = Niconicome.Models.Domain.Niconico.Download;
 using DomainExt = Niconicome.Models.Domain.Local.External;
 using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
@@ -244,6 +246,14 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<PlaylistPlaylist::IPlaylistInfoContainer, PlaylistPlaylist::PlaylistInfoContainer>();
             services.AddSingleton<Utils::InitializeAwaiter.IInitializeAwaiterHandler, Utils::InitializeAwaiter.InitializeAwaiterHandler>();
             services.AddTransient<AddonAPI::Net.Download.Integrate.IDownloadSettings, AddonAPI::Net.Download.Integrate.DownloadSettings>();
+            services.AddTransient<CommentFetch::ICommentClient, CommentFetch::CommentClient>();
+            services.AddTransient<CommentFetch::ICommentRequestBuilder, CommentFetch::CommentRequestBuilder>();
+            services.AddTransient<CommentFetch::IOfficialCommentHandler, CommentFetch::OfficialCommentHandler>();
+            services.AddTransient<CommentLocal::ICommentLoader, CommentLocal::CommentLoader>();
+            services.AddTransient<CommentLocal::ICommentWriter, CommentLocal::CommentWriter>();
+            services.AddTransient<CommentIntegrate::ICommentDownloader, CommentIntegrate::CommentDownloader>();
+            services.AddTransient<CommentConverter::ILocalCommentConverter, CommentConverter::LocalCommentConverter>();
+            services.AddTransient<CommentConverter::INetCommentConverter, CommentConverter::NetCommentConverter>();
             return services.BuildServiceProvider();
         }
 

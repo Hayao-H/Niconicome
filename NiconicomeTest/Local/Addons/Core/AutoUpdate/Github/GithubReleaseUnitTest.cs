@@ -24,7 +24,7 @@ namespace NiconicomeTest.Local.Addons.Core.AutoUpdate.Github
         {
             var content = new StringContent(Properties.Resources.GithubReleases);
             var http = new NicoHttpStab(content,content);
-            this.checker = new ReleaseChecker(http, new NetWorkHelper(), new LoggerStab());
+            this.checker = new ReleaseChecker(http, new NetWorkHelper(), new LoggerStub());
         }
 
         [Test]

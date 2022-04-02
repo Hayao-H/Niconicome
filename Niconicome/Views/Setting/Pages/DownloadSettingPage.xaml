@@ -4,18 +4,19 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Niconicome.Views.Setting.Pages"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
-        xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="13"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingPageViewModelD},IsDesignTimeCreatable=True}"
-        FontFamily="Yu Gothic"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
+      xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      mc:Ignorable="d"
+      Background="{DynamicResource MaterialDesignPaper}"
+      TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+      TextElement.FontWeight="Regular"
+      TextElement.FontSize="13"
+      TextOptions.TextFormattingMode="Ideal"
+      TextOptions.TextRenderingMode="Auto"
+      d:DataContext="{d:DesignInstance {x:Type vm:DownloadSettingPageViewModelD},IsDesignTimeCreatable=True}"
+      FontFamily="Yu Gothic"
       d:DesignHeight="600" d:DesignWidth="800"
       Title="ダウンロード設定">
     <Grid>
@@ -58,6 +59,16 @@
                     </materialDesign:PackIcon>
                     <Label Content="一時フォルダーの最大保持数" ToolTip="DLをレジュームできる動画の最大数です。" />
                     <TextBox Text="{Binding MaxTmpDirCount.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="CodeJson" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="【上級者向け】コレクション1ブロックあたりのコメント数（推奨値：100）"/>
+                    <TextBox IsEnabled="{Binding IsChecked, ElementName=newCommentSystem}" HorizontalAlignment="Right"  Width="60" Text="{Binding CommentCountPerBlock.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" HorizontalContentAlignment="Right"/>
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -165,7 +176,7 @@
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
                     <Label ToolTip="コメントのDL速度は多少小さくなりますが、コメントの取りこぼしが少なくなります。" Content="試験的なコメント取得システムを有効にする" />
-                    <ToggleButton IsChecked="{Binding IsExperimentalCommentSafetySystemEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
+                    <ToggleButton x:Name="newCommentSystem" IsChecked="{Binding IsExperimentalCommentSafetySystemEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
                 <DockPanel>
@@ -176,6 +187,16 @@
                     </materialDesign:PackIcon>
                     <Label Content="非エコノミーファイルをDL後、エコノミーファイルを削除" />
                     <ToggleButton IsChecked="{Binding IsDeletingExistingEconomyFileEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="Xml" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="コメントファイルにXML宣言を追加しない" />
+                    <ToggleButton IsEnabled="{Binding IsChecked, ElementName=newCommentSystem}" IsChecked="{Binding IsOmitXmlDeclarationEnable.Value}" HorizontalAlignment="Right"  Width="60" HorizontalContentAlignment="Right" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             </StackPanel>

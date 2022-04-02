@@ -16,6 +16,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         string ChannelID { get; }
         string ChannelName { get; }
         string Description { get; }
+        string CommentServer { get; }
         int ViewCount { get; }
         int CommentCount { get; }
         int MylistCount { get; }
@@ -38,19 +39,21 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
     public interface IThread
     {
         long ID { get; }
-        long Fork { get; }
-        bool IsActive { get; }
-        bool IsDefaultPostTarget { get; }
-        bool IsEasyCommentPostTarget { get; }
+        int Fork { get; }
         bool IsLeafRequired { get; }
         bool IsOwnerThread { get; }
         bool IsThreadkeyRequired { get; }
+        bool IsActive { get; }
+        bool IsDefaultPostTarget { get; }
+        bool IsEasyCommentPostTarget { get; }
         string? Threadkey { get; }
         bool Is184Forced { get; }
         bool HasNicoscript { get; }
         string Label { get; }
+        string ForkLabel { get; }
         int PostkeyStatus { get; }
         string Server { get; }
+        string VideoID { get; }
     }
 
 
@@ -74,6 +77,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         public string ChannelName { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
+
+        public string CommentServer { get; set; } = string.Empty;
 
         public int ViewCount { get; set; }
 
@@ -132,7 +137,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
     {
         public long ID { get; init; }
 
-        public long Fork { get; init; }
+        public int Fork { get; init; }
 
         public bool IsActive { get; init; }
 
@@ -152,10 +157,15 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public bool HasNicoscript { get; init; }
 
-        public string Label { get; init; } = string.Empty;
-
         public int PostkeyStatus { get; init; }
 
         public string Server { get; init; } = string.Empty;
+
+        public string Label { get; init; } = string.Empty;
+
+        public string ForkLabel { get; init; } = string.Empty;
+
+        public string VideoID { get; init; } = string.Empty;
+
     }
 }

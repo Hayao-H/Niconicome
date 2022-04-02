@@ -37,7 +37,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Ichiba
         /// <returns></returns>
         public async Task<IAttemptResult<INiconicoIchibaInfo>> GetIchibaInfo(string id)
         {
-            var res = await this.http.GetAsync(new Uri(API.IchibaAPIV3 + id));
+            var res = await this.http.GetAsync(new Uri(APIConstant.IchibaAPIV3 + id));
 
             if (!res.IsSuccessStatusCode)
             {

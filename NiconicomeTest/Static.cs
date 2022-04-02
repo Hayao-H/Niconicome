@@ -29,7 +29,7 @@ namespace NiconicomeTest
             {
                 if (Static.innerDataBaseInstance == null)
                 {
-                    Static.innerDataBaseInstance = new DataBase(Static.LiteDataBaseInstance, new LoggerStab(), false);
+                    Static.innerDataBaseInstance = new DataBase(Static.LiteDataBaseInstance, new LoggerStub(), false);
                 }
                 return Static.innerDataBaseInstance;
             }

@@ -62,6 +62,9 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.IsDownloadResumingEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.EnableResume)).AddTo(this.disposables);
             this.IsDownloadResumingEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.EnableResume));
 
+            this.IsOmitXmlDeclarationEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.OmitXmlDeclaration);
+            this.CommentCountPerBlock = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.CommentCountPerBlock, selectFunc: v => v <= 0 ? NetConstant.DefaultCommentCountPerBlock : v);
+
             var n1 = new ComboboxItem<int>(1, "1");
             var n2 = new ComboboxItem<int>(2, "2");
             var n3 = new ComboboxItem<int>(3, "3");
@@ -218,6 +221,16 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactiveProperty<bool> IsExperimentalCommentSafetySystemEnable { get; set; }
 
         /// <summary>
+        /// Xml宣言を出力
+        /// </summary>
+        public ReactiveProperty<bool> IsOmitXmlDeclarationEnable { get; init; }
+
+        /// <summary>
+        /// 1ブロックあたりのコメント数
+        /// </summary>
+        public ReactiveProperty<int> CommentCountPerBlock { get; init; }
+
+        /// <summary>
         /// エコノミーファイル削除
         /// </summary>
         public ReactiveProperty<bool> IsDeletingExistingEconomyFileEnable { get; init; }
@@ -298,6 +311,10 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactivePropertySlim<bool> IsExperimentalCommentSafetySystemEnable { get; set; } = new(true);
 
         public ReactivePropertySlim<bool> IsDeletingExistingEconomyFileEnable { get; init; } = new(true);
+
+        public ReactiveProperty<bool> IsOmitXmlDeclarationEnable { get; init; } = new(true);
+
+        public ReactiveProperty<int> CommentCountPerBlock { get; init; } = new(NetConstant.DefaultCommentCountPerBlock);
 
         public ReactiveProperty<int> MaxTmpDirCount { get; set; } = new(20);
 

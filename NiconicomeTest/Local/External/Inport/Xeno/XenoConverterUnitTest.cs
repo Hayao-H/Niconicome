@@ -18,7 +18,7 @@ namespace NiconicomeTest.Local.External.Inport.Xeno
         public void Setup()
         {
             this.converter = new XenoPlaylistConverter(new VideoInfoContainerStab());
-            this.playlist = new XenoRootParser(new LoggerStab(), new XenoVideoNodeParserStab()).ParseText(Properties.Resources.Xeno_Playlist_File).RootPlaylist!;
+            this.playlist = new XenoRootParser(new LoggerStub(), new XenoVideoNodeParserStab()).ParseText(Properties.Resources.Xeno_Playlist_File).RootPlaylist!;
         }
 
         [Test]

@@ -47,5 +47,10 @@ namespace Niconicome.Models.Const
         /// 最大セグメント並列DL数（デフォルト）
         /// </summary>
         public static int DefaultMaxParallelSegmentDownloadCount = 3;
+
+        /// <summary>
+        /// コメントコレクションの1ブロックあたりのコメント数（デフォルト）
+        /// </summary>
+        public static int DefaultCommentCountPerBlock = 100;
     }
 }
