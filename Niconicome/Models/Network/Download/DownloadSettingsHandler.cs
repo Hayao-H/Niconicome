@@ -132,7 +132,7 @@ namespace Niconicome.Models.Network.Download
             this.IsNoEncodeEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlWithoutEncode)).AddTo(this.disposables);
             this.IsDownloadingIchibaInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlIchiba)).AddTo(this.disposables);
             this.ThumbnailSize = new ReactiveProperty<VideoInfo::ThumbSize>(this.enumSettingsHandler.GetSetting<VideoInfo::ThumbSize>());
-            this.IsAppendingCommentEnable = this._container.GetReactiveBoolSetting(SettingsEnum.AppendComment).ToReactiveProperty().AddTo(this.disposables);
+            this.IsAppendingCommentEnable = this._container.GetReactiveBoolSetting(SettingsEnum.AppendComment);
 
             this.IsDownloadingVideoInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideoInfo));
             this.IsDownloadingVideoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideo));
