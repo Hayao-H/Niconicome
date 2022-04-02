@@ -52,13 +52,13 @@ namespace Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox
 
         #region field
 
-        private readonly INicoDirectoryIO _directoryIO;
+        protected readonly INicoDirectoryIO _directoryIO;
 
-        private string? profileFolder;
+        protected string? profileFolder;
 
-        private readonly ILogger _logger;
+        protected readonly ILogger _logger;
 
-        private bool isInitialized;
+        protected bool isInitialized;
 
         #endregion
 
@@ -101,7 +101,7 @@ namespace Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox
             };
         }
 
-        public IAttemptResult Initialize()
+        public virtual IAttemptResult Initialize()
         {
             if (this.isInitialized) return AttemptResult.Succeeded();
 
@@ -117,39 +117,10 @@ namespace Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox
                 this.profileFolder = defaultProfilePath;
                 this.isInitialized = true;
                 return AttemptResult.Succeeded();
-            }
-
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            List<string> packages;
-
-            try
+            } else
             {
-                packages = this._directoryIO.GetDirectorys(Path.Combine(appData, "Packages"), "Mozilla.Firefox*");
+                return AttemptResult.Fail("プロファイルフォルダーが存在しません。");
             }
-            catch (Exception e)
-            {
-                this._logger.Error("Microsoft Store版Firefoxアプリフォルダーの取得に失敗しました。", e);
-                return AttemptResult.Fail("Microsoft Store版Firefoxアプリフォルダーの取得に失敗しました。");
-            }
-
-            if (packages.Count == 0)
-            {
-                return AttemptResult.Fail("プロファイルの取得に失敗しました。");
-            }
-
-            string profileRoot = Path.Combine(packages[0], @"LocalCache\Roaming\Mozilla\Firefox\Profiles");
-
-            if (this._directoryIO.Exists(profileRoot))
-            {
-                this.profileFolder = profileRoot;
-                this.isInitialized = true;
-                return AttemptResult.Succeeded();
-            }
-            else
-            {
-                return AttemptResult.Fail("プロファイルフォルダーが存在しません、");
-            }
-
 
         }
 
