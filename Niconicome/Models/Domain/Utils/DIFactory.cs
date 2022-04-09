@@ -79,7 +79,6 @@ namespace Niconicome.Models.Domain.Utils
                             if (skip) return true;
                             return sslPolicyErrors == SslPolicyErrors.None;
                         };
-                        handler.AllowAutoRedirect = false;
                     }
                 });
             services.AddSingleton<Niconico::ICookieManager, Niconico::CookieManager>();
