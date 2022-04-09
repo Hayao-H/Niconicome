@@ -35,7 +35,7 @@ namespace Niconicome.Models.Network
 
     class VideoIDHandler : IVideoIDHandler
     {
-        public VideoIDHandler(INetworkVideoHandler networkVideoHandler, INiconicoUtils niconicoUtils, ILocalDirectoryHandler localDirectoryHandler, IRemotePlaylistHandler remotePlaylistHandler, ILogger logger,INiconicoUtils utils)
+        public VideoIDHandler(INetworkVideoHandler networkVideoHandler, INiconicoUtils niconicoUtils, ILocalDirectoryHandler localDirectoryHandler, IRemotePlaylistHandler remotePlaylistHandler, ILogger logger, INiconicoUtils utils)
         {
             this._networkVideoHandler = networkVideoHandler;
             this._niconicoUtils = niconicoUtils;
@@ -127,15 +127,14 @@ namespace Niconicome.Models.Network
             if (this._niconicoUtils.IsNiconicoID(inputText))
             {
                 onMessage("IDを登録します");
-                try
+                IAttemptResult<IListVideoInfo> result = await this.GetVideoListInfosFromID(inputText);
+
+                if (!result.IsSucceeded||result.Data is null)
                 {
-                    videos.Add(await this.GetVideoListInfosFromID(inputText));
-                }
-                catch (Exception e)
+                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("ネットワークからの動画取得に失敗しました。");
+                } else
                 {
-                    this._logger.Error("ネットワークからの動画取得に失敗しました。", e);
-                    this.FinishProcessing();
-                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("ネットワークからの動画取得に失敗しました。", e);
+                    videos.Add(result.Data);
                 }
             }
             else
@@ -205,11 +204,11 @@ namespace Niconicome.Models.Network
         /// <summary>
         /// IDから動画を取得する
         /// </summary>
-        private async Task<IListVideoInfo> GetVideoListInfosFromID(string id)
+        private async Task<IAttemptResult<IListVideoInfo>> GetVideoListInfosFromID(string id)
         {
             IAttemptResult<IListVideoInfo> result = await this._networkVideoHandler.GetVideoListInfoAsync(id);
 
-            return result.Data!;
+            return result;
         }
 
         /// <summary>
@@ -231,7 +230,14 @@ namespace Niconicome.Models.Network
 
                 if (type == RemoteType.WatchPage)
                 {
-                    return new List<IListVideoInfo>() { await this.GetVideoListInfosFromID(id) };
+                    var list = new List<IListVideoInfo>();
+                    IAttemptResult<IListVideoInfo> result = await this.GetVideoListInfosFromID(id);
+                    if (result.IsSucceeded && result.Data is not null)
+                    {
+                        list.Add(result.Data);
+                    }
+
+                    return list;
                 }
                 else
                 {
