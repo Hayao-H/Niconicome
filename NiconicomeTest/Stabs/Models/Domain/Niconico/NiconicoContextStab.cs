@@ -14,18 +14,18 @@ namespace NiconicomeTest.Stabs.Models.Domain.Niconico
 
         public ReactiveProperty<User?> User { get; } = new ReactiveProperty<User?>();
 
-        public async Task<bool> Login(string u, string p)
+        public async Task<bool> LoginAsync(string u, string p)
         {
             await Task.Delay(1);
             return true;
         }
 
-        public async Task Logout()
+        public async Task LogoutAsync()
         {
             await Task.Delay(1);
         }
 
-        public async Task<string> GetUserName(string i)
+        public async Task<string> GetUserNameAsync(string i)
         {
             await Task.Delay(1);
             return string.Empty;
