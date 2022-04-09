@@ -24,6 +24,36 @@ namespace Niconicome.Models.Const
         public const string NiconicoDeletedVideothumb = @"https://nicovideo.cdn.nimg.jp/web/img/common/video_deleted.jpg";
 
         /// <summary>
+        /// ニコニコのURL
+        /// </summary>
+        public const string NiconicoBaseURL = @"https://nicovideo.jp";
+
+        /// <summary>
+        /// ニコニコのURL（非SSL）
+        /// </summary>
+        public const string NiconicoBaseURLNonSSL = @"http://nicovideo.jp";
+
+        /// <summary>
+        /// ニコニコのログインページURL
+        /// </summary>
+        public const string NiconicoLoginPageURL = @"https://account.nicovideo.jp/login";
+
+        /// <summary>
+        /// ニコニコのログインURL
+        /// </summary>
+        public const string NiconicoLoginURL = @"https://account.nicovideo.jp/login/redirector";
+
+        /// <summary>
+        /// ニコニコのログアウトURL
+        /// </summary>
+        public const string NiconicoLogoutURL = @"https://account.nicovideo.jp/logout";
+
+        /// <summary>
+        /// ニコニコのドメイン
+        /// </summary>
+        public const string NiconicoDomain = @"nicovideo.jp";
+
+        /// <summary>
         /// エコノミー判定されない視聴回数
         /// </summary>
         public static int EconomyAvoidableViewCount = 500;

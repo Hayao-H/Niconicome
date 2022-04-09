@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Const =Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.Core;
 using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Niconicome.Models.Domain.Niconico;
@@ -45,7 +46,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
 
-            this.client.DefaultRequestHeaders.Referrer = this.NicoHttp!.NiconicoBaseUri;
+            this.client.DefaultRequestHeaders.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
             this.client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
             this.client.DefaultRequestHeaders.Add("X-Frontend-Id", "6");
             this.client.DefaultRequestHeaders.Add("X-Frontend-Version", "0");
