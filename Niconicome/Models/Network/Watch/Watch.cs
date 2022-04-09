@@ -13,13 +13,7 @@ namespace Niconicome.Models.Network.Watch
 
     public interface IWatch
     {
-        Task<IAttemptResult<IListVideoInfo>> TryGetVideoInfoAsync(string nicoId, WatchInfoOptions options = WatchInfoOptions.Default);
-    }
-
-    public interface IResult
-    {
-        bool IsSucceeded { get; }
-        string Message { get; }
+        Task<IAttemptResult<IListVideoInfo>> TryGetVideoInfoAsync(string nicoId);
     }
 
     public class Watch : IWatch
@@ -48,14 +42,14 @@ namespace Niconicome.Models.Network.Watch
         /// <param name="nicoId"></param>
         /// <param name="info"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<IListVideoInfo>> TryGetVideoInfoAsync(string nicoId, WatchInfoOptions options = WatchInfoOptions.Default)
+        public async Task<IAttemptResult<IListVideoInfo>> TryGetVideoInfoAsync(string nicoId)
         {
 
             IAttemptResult<IListVideoInfo> result;
 
             try
             {
-                result = await this.GetVideoInfoAsync(nicoId, options);
+                result = await this.GetVideoInfoAsync(nicoId);
             }
             catch (Exception e)
             {
@@ -74,13 +68,13 @@ namespace Niconicome.Models.Network.Watch
         /// <param name="info"></param>
         /// <param name="options"></param>
         /// <returns></returns>
-        private async Task<IAttemptResult<IListVideoInfo>> GetVideoInfoAsync(string nicoId, WatchInfoOptions options = WatchInfoOptions.Default)
+        private async Task<IAttemptResult<IListVideoInfo>> GetVideoInfoAsync(string nicoId)
         {
             IAttemptResult<IDomainVideoInfo> result;
 
             try
             {
-                result = await this.handler.GetVideoInfoAsync(nicoId, options);
+                result = await this.handler.GetVideoInfoAsync(nicoId);
             }
             catch (Exception e)
             {
@@ -101,12 +95,5 @@ namespace Niconicome.Models.Network.Watch
         }
 
     }
-
-    public class Result : IResult
-    {
-        public bool IsSucceeded { get; set; }
-        public string Message { get; set; } = string.Empty;
-    }
-
 
 }

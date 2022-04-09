@@ -44,5 +44,8 @@ namespace Niconicome.Models.Domain.Local.Style.Type.MainPage
 
         [JsonPropertyName("bookMark")]
         public bool BookMark { get; set; } = true;
+
+        [JsonPropertyName("economy")]
+        public bool Economy { get; set; } = true;
     }
 }

@@ -14,17 +14,16 @@ using WatchInfo = Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Domain.Niconico.Remote.Channel
 {
-    public interface IChannelResult
-    {
-        List<IListVideoInfo> RetrievedVideos { get; }
-
-        int FailedCounts { get; }
-        bool IsSucceededAll { get; }
-    }
-
     public interface IChannelVideoHandler
     {
-        Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<string> ids, IEnumerable<string> registeredVideo, Action<string> onMessage);
+        /// <summary>
+        /// チャンネルから動画を取得する
+        /// </summary>
+        /// <param name="channelId">チャンネルID</param>
+        /// <param name="videos">取得した動画を追加するリスト</param>
+        /// <param name="onMessage">メッセージハンドラー</param>
+        /// <returns>チャンネル名と成功状態</returns>
+        Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<IListVideoInfo> videos, Action<string> onMessage);
     }
 
     class ChannelVideoHandler : IChannelVideoHandler
@@ -47,7 +46,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Channel
         /// </summary>
         /// <param name="channelId"></param>
         /// <returns></returns>
-        public async Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<string> ids, IEnumerable<string> registeredVideo, Action<string> onMessage)
+        public async Task<IAttemptResult<string>> GetVideosAsync(string channelId, List<IListVideoInfo> videos, Action<string> onMessage)
         {
 
             string html;
@@ -84,8 +83,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Channel
                 }
 
                 urlQuery = info.NextPageQuery ?? string.Empty;
-                ids.AddRange(info.IDs);
-                onMessage($"{info.IDs.Count()}件の動画を新たに取得しました。(現在の取得数:{ids.Count})");
+                videos.AddRange(info.Videos);
+                onMessage($"{info.Videos.Count()}件の動画を新たに取得しました。(現在の取得数:{videos.Count})");
                 ++index;
             }
             while (info.HasNext);
@@ -126,17 +125,5 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Channel
         {
             return this.htmlParser.ParseAndGetIds(html);
         }
-    }
-
-    /// <summary>
-    /// チャンネル動画の取得結果
-    /// </summary>
-    public class ChannelResult : IChannelResult
-    {
-        public List<IListVideoInfo> RetrievedVideos { get; init; } = new();
-
-        public int FailedCounts { get; set; }
-
-        public bool IsSucceededAll { get; set; }
     }
 }

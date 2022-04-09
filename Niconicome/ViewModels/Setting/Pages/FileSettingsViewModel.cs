@@ -43,7 +43,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.VideoInfoSuffix.Subscribe(value => this.SaveSetting(value, SettingsEnum.VideoinfoSuffix)).AddTo(this.disposables);
             this.IchibaSuffix.Subscribe(value => this.SaveSetting(value, SettingsEnum.IchibaInfoSuffix)).AddTo(this.disposables);
 
-            this.IsSearchingVideosByIDEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.SearchFileByID);
+            this.IsSearchingVideosExactEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.SearchExact);
             this.ThumbnailSuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.ThumbSuffix, Format.DefaultThumbnailSuffix);
             this.OwnerCommentSuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.OwnerComSuffix, Format.DefaultOwnerCommentSuffix);
             this.EconomySuffix = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.EconomySuffix);
@@ -89,7 +89,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// 動画をIDで探索する
         /// </summary>
-        public ReactiveProperty<bool> IsSearchingVideosByIDEnable { get; init; }
+        public ReactiveProperty<bool> IsSearchingVideosExactEnable { get; init; }
 
         /// <summary>
         /// サムネイルの接尾辞
@@ -127,7 +127,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public ReactiveProperty<string> IchibaSuffix { get; init; } = new(Format.DefaultIchibaSuffix);
 
-        public ReactiveProperty<bool> IsSearchingVideosByIDEnable { get; init; } = new(true);
+        public ReactiveProperty<bool> IsSearchingVideosExactEnable { get; init; } = new(true);
 
         public ReactiveProperty<string> ThumbnailSuffix { get; init; } = new(Format.DefaultThumbnailSuffix);
 

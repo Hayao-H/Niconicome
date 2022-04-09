@@ -35,34 +35,38 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.PlaylistTree = WS::Mainpage.PlaylistTreeHandler.Playlists.ToReadOnlyReactiveCollection(x => x);
 
-#pragma warning disable CS8622
-            this.AddPlaylist = new CommandBase<int>((object? arg) => true, (int parent) =>
+            this.AddPlaylist = new ReactiveCommand<int>()
+                .WithSubscribe((int parent) =>
             {
                 WS::Mainpage.PlaylistHandler.AddPlaylist(parent);
                 this.OnPropertyChanged(nameof(this.PlaylistTree));
             });
-            this.RemovePlaylist = new CommandBase<int>((object? arg) => true, async (int playlist) =>
-            {
-                var result = await this.ShowMessageBox("本当にプレイリストを削除しますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
 
-                if (result != MaterialMessageBoxResult.Yes) return;
+            this.RemovePlaylist = new ReactiveCommand<int>()
+                .WithSubscribe(async (int playlist) =>
+           {
+               var result = await this.ShowMessageBox("本当にプレイリストを削除しますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
 
-                WS::Mainpage.PlaylistHandler.DeletePlaylist(playlist);
-                this.OnPropertyChanged(nameof(this.PlaylistTree));
-            });
-#pragma warning restore CS8622
+               if (result != MaterialMessageBoxResult.Yes) return;
 
-            this.PlaylistRefreshcommand = new CommandBase<object>(_ => true, _ =>
+               WS::Mainpage.PlaylistHandler.DeletePlaylist(playlist);
+               this.OnPropertyChanged(nameof(this.PlaylistTree));
+           });
+
+            this.PlaylistRefreshcommand = new ReactiveCommand()
+                .WithSubscribe(() =>
             {
                 WS::Mainpage.PlaylistHandler.Refresh();
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
-                {
-                    WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistHandler.GetPlaylist(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
-                }
-                this.OnPropertyChanged(nameof(this.PlaylistTree));
+                ///if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is not null)
+                ///{
+                ///    WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = WS::Mainpage.PlaylistHandler.GetPlaylist(WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
+                ///}
+                ///this.OnPropertyChanged(nameof(this.PlaylistTree));
+                WS::Mainpage.VideoListContainer.Refresh();
             });
 
-            this.EditPlaylistCommand = new CommandBase<object>(_ => true, arg =>
+            this.EditPlaylistCommand = new ReactiveCommand<object>()
+                .WithSubscribe(arg =>
             {
                 if (arg is null || arg.AsNullable<ITreePlaylistInfo>() is not ITreePlaylistInfo playlist || playlist is null) return;
                 WS::Mainpage.WindowsHelper.OpenWindow(() => new EditPlaylist
@@ -91,22 +95,22 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// プレイリスト追加
         /// </summary>
-        public CommandBase<int> AddPlaylist { get; private set; }
+        public ReactiveCommand<int> AddPlaylist { get; init; }
 
         /// <summary>
         /// プレイリスト削除
         /// </summary>
-        public CommandBase<int> RemovePlaylist { get; private set; }
+        public ReactiveCommand<int> RemovePlaylist { get; init; }
 
         /// <summary>
         /// プレイリストを更新する
         /// </summary>
-        public CommandBase<object> PlaylistRefreshcommand { get; init; }
+        public ReactiveCommand PlaylistRefreshcommand { get; init; }
 
         /// <summary>
         /// プレイリストを編集
         /// </summary>
-        public CommandBase<object> EditPlaylistCommand { get; init; }
+        public ReactiveCommand<object> EditPlaylistCommand { get; init; }
     }
 
     /// <summary>

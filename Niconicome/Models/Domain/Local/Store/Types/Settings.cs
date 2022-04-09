@@ -176,7 +176,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string ApplicationTheme { get; private set; } = "applicationtheme";
         public static string ConfirmIfDownloading { get; private set; } = "confirmifdownloading";
         public static string FFmpegFormat { get; private set; } = "ffmpegformat";
-        public static string SearchVideosByID { get; private set; } = "searchvideosbyid";
         public static string ThumbnailSize { get; private set; } = "thumbnailsize";
         public static string DisableScrollRestore { get; private set; } = "disablescrollrestore";
         public static string ThumbnailSuffix { get; private set; } = "thumbnailsuffix";
@@ -188,7 +187,14 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string EnonomyQualitySuffix { get; private set; } = "enonomyqualitysuffix";
         public static string IsExperimentalCommentSafetySystemEnable { get; private set; } = "isexperimentalcommentsafetysystemenable";
         public static string SnackbarDuration { get; private set; } = "snackbarduration";
-
         public static string CommentFetchWaitSpan { get; private set; } = "commentfetchwaitspan";
+        public static string MainWindowEconomyColumnWidth { get; private set; } = "mainwindoweconomycolumnwidth";
+        public static string DeleteExistingEconomyFile { get; private set; } = "deleteexistingeconomyfile";
+        public static string SearchVideosExact { get; private set; } = "searchvideosexact";
+        public static string ShowDownloadTasksAsTab { get; private set; } = "showdownloadtasksastab";
+        public static string CommentCountPerBlock { get; private set; } = "commentcountperblock";
+        public static string IsAppendingToLocalCommentEnable { get; private set; } = "isappendingtolocalcommentenable";
+        public static string IsOmittingXmlDeclarationIsEnable { get; private set; } = "isomittingxmldeclarationisenable";
+
     }
 }

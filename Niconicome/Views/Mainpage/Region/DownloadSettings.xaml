@@ -80,6 +80,7 @@
                 <CheckBox Margin="5 0" Content="ダウンロード済をスキップ" IsChecked="{Binding IsSkippingEnable.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 <CheckBox Margin="5 0" Content="ファイルを別フォルダーからコピー" IsChecked="{Binding IsCopyFromAnotherFolderEnable.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 <CheckBox Margin="5 0" Content="動画をエンコードしない" ToolTip="mp4形式にエンコードせずにMpeg2-TSのまま保存します。" IsChecked="{Binding IsNotEncodeEnable.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Margin="5 0" Content="コメントを追記する" IsChecked="{Binding IsCommentAppendingEnable.Value,UpdateSourceTrigger=PropertyChanged}" ToolTip="前回取得した時点よりも新しいコメントを取得します。これには過去ログも含まれます。（新方式でのみ有効）"/>
                 <DockPanel HorizontalAlignment="Right">
                     <Button Content="ステージ" HorizontalAlignment="Right" Margin="10 0" Command="{Binding StageVideosCommand}"/>
                     <Button Content="中断" HorizontalAlignment="Right" Margin="10 0" Command="{Binding CancelCommand}"/>

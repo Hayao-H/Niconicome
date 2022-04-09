@@ -14,79 +14,44 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Store
 {
     class PlaylistStoreHandlerStab : IPlaylistStoreHandler
     {
-        public int PlayilistCount { get; private set; }
-
-        public int VideoCount { get; private set; }
-
-        public STypes::Playlist GetRootPlaylist()
+        public IAttemptResult<List<STypes::Playlist>> GetAllPlaylists()
         {
-            return new STypes::Playlist();
-        }
-        public STypes::Playlist? GetPlaylist(int id)
-        {
-            return new STypes::Playlist();
+            return AttemptResult<List<STypes::Playlist>>.Succeeded(new List<STypes::Playlist>());
         }
 
-        public STypes::Playlist? GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate)
+        public IAttemptResult<STypes::Playlist> GetRootPlaylist()
         {
-            return new STypes::Playlist();
+            return AttemptResult<STypes::Playlist>.Succeeded(new STypes::Playlist());
         }
 
-        public int AddPlaylist(int parentID, string name)
+        public IAttemptResult<STypes::Playlist> GetPlaylist(int id)
         {
-            this.PlayilistCount++;
-            return 0;
+            return AttemptResult<STypes::Playlist>.Succeeded(new STypes::Playlist());
         }
 
-        public int AddVideo(IListVideoInfo video, int playlistId)
+        public IAttemptResult<STypes::Playlist> GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate)
         {
-            this.VideoCount++;
-            return 0;
+            return AttemptResult<STypes::Playlist>.Succeeded(new STypes::Playlist());
         }
 
-        public void RemoveVideo(int id, int playlistId)
+        public IAttemptResult<List<STypes::Playlist>> GetChildPlaylists(int id)
         {
-            this.VideoCount--;
+            return AttemptResult<List<STypes::Playlist>>.Succeeded(new List<STypes::Playlist>());
         }
 
-        public void Update(ITreePlaylistInfo newplaylist)
+        public IAttemptResult<int> AddPlaylist(int parentID, string name)
         {
-        }
-        public List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
-        {
-            return new List<STypes::Playlist>() { this.GetRootPlaylist() };
+            return AttemptResult<int>.Succeeded(-1);
         }
 
-        public List<STypes::Playlist> GetChildPlaylists(int id)
+        public IAttemptResult Update(STypes::Playlist playlist)
         {
-            return new List<STypes::Playlist>() { this.GetRootPlaylist() };
-
+            return AttemptResult.Succeeded();
         }
 
-        public List<STypes::Playlist> GetAllPlaylists()
+        public IAttemptResult DeletePlaylist(int id)
         {
-            return new List<STypes::Playlist>() { this.GetRootPlaylist() };
-        }
-
-
-        public IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex)
-        {
-            return new AttemptResult() { IsSucceeded = true };
-        }
-
-        public IAttemptResult MoveVideoToForward(int playlistID, int videoIndex)
-        {
-            return new AttemptResult() { IsSucceeded = true };
-
-        }
-
-        public void RemoveChildPlaylist(int selfId)
-        {
-        }
-
-        public void DeletePlaylist(int id)
-        {
-            this.PlayilistCount--;
+            return AttemptResult.Succeeded();
         }
 
         public bool Exists(int id)
@@ -99,53 +64,34 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Store
             return true;
         }
 
-
-        public bool JustifyPlaylists(int Id)
+        public IAttemptResult WireVideo(STypes::Video video, int playlistId)
         {
-            return true;
-        }
-        public bool JustifyPlaylists(IEnumerable<int> Id)
-        {
-            return true;
+            return AttemptResult.Succeeded();
         }
 
-        public bool ContainsVideo(string niconicoId, int playlistId)
+        public IAttemptResult UnWireVideo(int id, int playlistId)
         {
-            return true;
+            return AttemptResult.Succeeded();
         }
 
-        public void Move(int id, int destId)
+        public IAttemptResult Move(int id, int destId)
         {
-
+            return AttemptResult.Succeeded();
         }
 
-        public void Copy(int id, int destId)
+        public IAttemptResult SetAsRemotePlaylist(int id, string remoteId, RemoteType type)
         {
-
+            return AttemptResult.Succeeded();
         }
 
-        public void SetAsRemotePlaylist(int id, string remoteId, RemoteType type)
+        public IAttemptResult SetAsLocalPlaylist(int id)
         {
-
-        }
-
-        public void SetAsLocalPlaylist(int id)
-        {
-
-        }
-
-        public int GetPlaylistsCount()
-        {
-            return 0;
-        }
-
-        public void Refresh()
-        {
+            return AttemptResult.Succeeded();
         }
 
         public IAttemptResult Initialize()
         {
-            return new AttemptResult() { IsSucceeded = true };
+            return AttemptResult.Succeeded();
         }
 
     }

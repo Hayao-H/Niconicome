@@ -10,7 +10,9 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:rp="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
              xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
+             xmlns:keydown="clr-namespace:Niconicome.ViewModels.Converter.KeyDown"
              mc:Ignorable="d"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              Background="{DynamicResource MaterialDesignPaper}"
              d:Width="1300"
              d:Height="600"
@@ -43,7 +45,15 @@
                     VerticalContentAlignment="Bottom" 
                     materialDesign:HintAssist.Hint="ID・検索キーワード入力窓"
                     materialDesign:TextFieldAssist.HasClearButton="True"
-                    Padding="5 0"/>
+                    Padding="5 0">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyDown">
+                            <interactivity:EventToReactiveCommand Command="{Binding OnKeyDownCommand}">
+                                <keydown:KeyDownEventToKeyEventInfoConverter/>
+                            </interactivity:EventToReactiveCommand>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
                 <Button Content="登録" Grid.Column="1" Margin="5,0" ToolTip="入力した動画を登録する（インテリインプット）" Command="{Binding AddVideoCommand}"/>
             </Grid>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
@@ -196,7 +206,11 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Width="{Binding StateColumnWidth.Value,Mode=TwoWay}" Header="状態" DisplayMemberBinding="{Binding Message.Value}"/>
+                        <GridViewColumn Width="{Binding EconomyColumnWidth.Value,Mode=TwoWay}"
+                                        Header="{Binding EconomyColumnTitle.Value}"
+                                        DisplayMemberBinding="{Binding IsEconomy.Value}"
+                                        />
+                        <GridViewColumn Width="{Binding StateColumnWidth.Value,Mode=TwoWay}" Header="{Binding StateColumnTitle.Value}" DisplayMemberBinding="{Binding Message.Value}"/>
                     </GridView>
                 </ListView.View>
                 <ListView.ItemContainerStyle>

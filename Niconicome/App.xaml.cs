@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Application;
 using Niconicome.ViewModels;
+using Niconicome.Views;
 using Niconicome.Views.AddonPage;
 using Niconicome.Views.AddonPage.Install;
 using Niconicome.Views.Controls.MVVM;
@@ -43,6 +44,7 @@ namespace Niconicome
             containerRegistry.RegisterDialog<AddonManagerWindow>(nameof(AddonManagerWindow));
             containerRegistry.RegisterDialog<AddonInstallWindow>(nameof(AddonInstallWindow));
             containerRegistry.RegisterDialog<CommonMessageBox>(nameof(CommonMessageBox));
+            containerRegistry.RegisterDialog<DownloadTasksWindows>(nameof(DownloadTasksWindows));
             containerRegistry.RegisterForNavigation<FileOpenPage>();
             containerRegistry.RegisterForNavigation<AddonLoadPage>();
             containerRegistry.RegisterForNavigation<AddonInstallPage>();

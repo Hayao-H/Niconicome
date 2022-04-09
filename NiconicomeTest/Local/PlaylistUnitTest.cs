@@ -8,6 +8,8 @@ using Niconicome.Models.Playlist;
 using Reactive.Bindings;
 using System.Linq;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
+using System.Windows.Forms;
 
 namespace NiconicomeTest
 {
@@ -28,41 +30,61 @@ namespace NiconicomeTest
                     this.database = Static.DataBaseInstance;
                     //プレイリストテーブルをクリア
                     this.database.Clear(STypes::Playlist.TableName);
-                    this.playlistStorehandler = new PlaylistStoreHandler(this.database, new VideoStoreHandler(this.database, new LoggerStab()), new LoggerStab());
-                    this.playlistStorehandler.Refresh();
+                    this.playlistStorehandler = new PlaylistStoreHandler(this.database, new LoggerStub());
+                    this.playlistStorehandler.Initialize();
                 }
 
                 [Test]
                 public void ルートプレイリストを取得()
                 {
-                    STypes::Playlist? root = this.playlistStorehandler?.GetRootPlaylist();
-                    Assert.IsNotNull(root);
-                    Assert.IsTrue(root?.IsRoot);
+                    IAttemptResult<STypes::Playlist> root = this.playlistStorehandler!.GetRootPlaylist();
+                    Assert.That(root.IsSucceeded, Is.True);
+                    Assert.That(root.Data, Is.Not.Null);
+                    Assert.That(root.Data!.IsRoot, Is.True);
                 }
 
                 [Test]
                 public void ルート直下にプレイリストを作成する()
                 {
-                    int rootId = this.playlistStorehandler?.GetRootPlaylist().Id ?? -1;
-                    int childId = this.playlistStorehandler?.AddPlaylist(rootId, "子プレイリスト") ?? -1;
-                    Assert.Greater(rootId, -1);
-                    Assert.Greater(childId, -1);
-                    STypes::Playlist? child = this.database?.GetCollection<STypes::Playlist>(STypes::Playlist.TableName).Data!.FirstOrDefault(p => p.Id == childId);
+                    IAttemptResult<STypes::Playlist> rootResult = this.playlistStorehandler!.GetRootPlaylist();
+                    Assert.That(rootResult.IsSucceeded, Is.True);
+                    Assert.That(rootResult.Data, Is.Not.Null);
+                    Assert.That(rootResult.Data!.IsRoot, Is.True);
+
+                    IAttemptResult<int> childId = this.playlistStorehandler!.AddPlaylist(rootResult.Data!.Id, "子プレイリスト");
+
+                    Assert.That(childId.IsSucceeded, Is.True);
+                    Assert.That(childId.Data, Is.GreaterThan(-1));
+
+                    STypes::Playlist? child = this.database?.GetCollection<STypes::Playlist>(STypes::Playlist.TableName).Data!.FirstOrDefault(p => p.Id == childId.Data);
                     Assert.IsNotNull(child);
                     Assert.IsNotNull(child?.ParentPlaylist);
-                    Assert.AreEqual(rootId, child?.ParentPlaylist?.Id);
+                    Assert.AreEqual(rootResult.Data.Id, child?.ParentPlaylist?.Id);
                 }
 
                 [Test]
                 public void プレイリストを削除する()
                 {
                     //親-子-孫の関係を作る
-                    int rootId = this.playlistStorehandler?.GetRootPlaylist().Id ?? -1;
-                    int childId = this.playlistStorehandler?.AddPlaylist(rootId, "子プレイリスト") ?? -1;
-                    int grandChildId = this.playlistStorehandler?.AddPlaylist(childId, "孫プレイリスト") ?? -1;
+                    IAttemptResult<STypes::Playlist> rootResult = this.playlistStorehandler!.GetRootPlaylist();
+                    Assert.That(rootResult.IsSucceeded, Is.True);
+                    Assert.That(rootResult.Data, Is.Not.Null);
+                    Assert.That(rootResult.Data!.IsRoot, Is.True);
+
+                    int rootId = rootResult.Data!.Id;
+
+                    IAttemptResult<int> childResult = this.playlistStorehandler.AddPlaylist(rootId, "子プレイリスト");
+                    Assert.That(childResult.IsSucceeded, Is.True);
+
+                    int childId = childResult.Data;
+
+                    IAttemptResult<int> grandchildResult = this.playlistStorehandler.AddPlaylist(childId, "孫プレイリスト");
+                    Assert.That(grandchildResult.IsSucceeded, Is.True);
+
+                    int grandChildId = grandchildResult.Data;
 
                     //削除
-                    this.playlistStorehandler?.DeletePlaylist(childId);
+                    this.playlistStorehandler.DeletePlaylist(childId);
 
                     //プレイリストが存在しないことを確認
                     Assert.IsFalse(this.database?.Exists<STypes::Playlist>(STypes::Playlist.TableName, childId));
@@ -74,15 +96,26 @@ namespace NiconicomeTest
                 {
                     /// playlistA=>playlistB
                     /// target:移動するプレイリスト
-                    int rooId = this.playlistStorehandler?.GetRootPlaylist().Id ?? -1;
-                    int playlistAId = this.playlistStorehandler?.AddPlaylist(rooId, "プレイリストA") ?? -1;
-                    int playlistBId = this.playlistStorehandler?.AddPlaylist(rooId, "プレイリストB") ?? -1;
-                    int targetId = this.playlistStorehandler?.AddPlaylist(playlistAId, "移動するプレイリスト") ?? -1;
+                    IAttemptResult<STypes::Playlist> rootResult = this.playlistStorehandler!.GetRootPlaylist();
+                    Assert.That(rootResult.IsSucceeded, Is.True);
+                    Assert.That(rootResult.Data, Is.Not.Null);
+                    Assert.That(rootResult.Data!.IsRoot, Is.True);
 
-                    Assert.AreNotEqual(-1, rooId);
-                    Assert.AreNotEqual(-1, playlistAId);
-                    Assert.AreNotEqual(-1, playlistBId);
-                    Assert.AreNotEqual(-1, targetId);
+                    int rootId = rootResult.Data!.Id;
+                    IAttemptResult<int> playlistAResult = this.playlistStorehandler.AddPlaylist(rootId, "プレイリストA");
+                    IAttemptResult<int> playlistBResult = this.playlistStorehandler.AddPlaylist(rootId, "プレイリストB");
+
+                    Assert.That(playlistAResult.IsSucceeded, Is.True);
+                    Assert.That(playlistBResult.IsSucceeded, Is.True);
+
+                    int playlistAId = playlistAResult.Data;
+                    int playlistBId = playlistBResult.Data;
+
+                    IAttemptResult<int> targetResult = this.playlistStorehandler.AddPlaylist(playlistAId, "移動するプレイリスト");
+
+                    Assert.That(targetResult.IsSucceeded, Is.True);
+
+                    int targetId = targetResult.Data;
 
                     //移動
                     this.playlistStorehandler?.Move(targetId, playlistBId);
@@ -101,92 +134,76 @@ namespace NiconicomeTest
                 [Test]
                 public void リモートプレイリストとして設定する()
                 {
-                    if (this.playlistStorehandler is null) throw new InvalidOperationException();
 
                     //プレイリストを2つ作成する
-                    int rootId = this.playlistStorehandler.GetRootPlaylist().Id;
-                    int playlist1Id = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト1");
-                    int playlist2Id = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト2");
+                    IAttemptResult<STypes::Playlist> rootResult = this.playlistStorehandler!.GetRootPlaylist();
+                    Assert.That(rootResult.IsSucceeded, Is.True);
+                    Assert.That(rootResult.Data, Is.Not.Null);
+                    Assert.That(rootResult.Data!.IsRoot, Is.True);
+
+                    int rootId = rootResult.Data!.Id;
+
+                    IAttemptResult<int> playlist1Result = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト1");
+                    IAttemptResult<int> playlist2Result = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト2");
+
+                    Assert.That(playlist1Result.IsSucceeded, Is.True);
+                    Assert.That(playlist2Result.IsSucceeded, Is.True);
+
+                    int playlist1Id = playlist1Result.Data;
+                    int playlist2Id = playlist2Result.Data;
 
                     this.playlistStorehandler.SetAsRemotePlaylist(playlist1Id, "1234", Playlist::Playlist.RemoteType.Mylist);
                     this.playlistStorehandler.SetAsRemotePlaylist(playlist2Id, "1234", Playlist::Playlist.RemoteType.UserVideos);
 
-                    var playlist1 = this.playlistStorehandler.GetPlaylist(playlist1Id);
-                    var playlist2 = this.playlistStorehandler.GetPlaylist(playlist2Id);
+                    IAttemptResult<STypes::Playlist> playlist1 = this.playlistStorehandler.GetPlaylist(playlist1Id);
+                    IAttemptResult<STypes::Playlist> playlist2 = this.playlistStorehandler.GetPlaylist(playlist2Id);
 
-                    Assert.IsTrue(playlist1!.IsRemotePlaylist);
-                    Assert.IsTrue(playlist2!.IsRemotePlaylist);
-                    Assert.IsTrue(playlist1.IsMylist);
-                    Assert.IsTrue(playlist2.IsUserVideos);
-                    Assert.IsFalse(playlist1.IsUserVideos);
-                    Assert.IsFalse(playlist2.IsMylist);
+                    Assert.That(playlist1.IsSucceeded, Is.True);
+                    Assert.That(playlist2.IsSucceeded, Is.True);
+                    Assert.That(playlist1.Data, Is.Not.Null);
+                    Assert.That(playlist2.Data, Is.Not.Null);
+                    Assert.That(playlist1.Data!.IsRemotePlaylist, Is.True);
+                    Assert.That(playlist2.Data!.IsRemotePlaylist, Is.True);
+                    Assert.That(playlist1.Data!.IsMylist, Is.True);
+                    Assert.That(playlist2.Data!.IsUserVideos, Is.True);
+                    Assert.That(playlist1.Data!.IsWatchLater, Is.False);
+                    Assert.That(playlist1.Data!.IsChannel, Is.False);
+                    Assert.That(playlist1.Data!.IsSeries, Is.False);
+                    Assert.That(playlist1.Data!.IsUserVideos, Is.False);
                 }
 
                 [Test]
                 public void ローカルプレイリストとして設定する()
                 {
-                    if (this.playlistStorehandler is null) throw new InvalidOperationException();
 
                     //プレイリストを作成する
-                    int rootId = this.playlistStorehandler.GetRootPlaylist().Id;
-                    int playlistId = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト1");
+                    IAttemptResult<STypes::Playlist> rootResult = this.playlistStorehandler!.GetRootPlaylist();
+                    Assert.That(rootResult.IsSucceeded, Is.True);
+                    Assert.That(rootResult.Data, Is.Not.Null);
+                    Assert.That(rootResult.Data!.IsRoot, Is.True);
+
+                    int rootId = rootResult.Data!.Id;
+
+                    IAttemptResult<int> playlistResult = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト1");
+
+
+                    Assert.That(playlistResult.IsSucceeded, Is.True);
+
+                    int playlistId = playlistResult.Data;
 
                     this.playlistStorehandler.SetAsLocalPlaylist(playlistId);
 
-                    var playlist = this.playlistStorehandler.GetPlaylist(playlistId);
 
-                    Assert.IsFalse(playlist!.IsRemotePlaylist);
-                    Assert.IsFalse(playlist.IsMylist);
-                    Assert.IsFalse(playlist.IsUserVideos);
-                }
+                    IAttemptResult<STypes::Playlist> playlist = this.playlistStorehandler.GetPlaylist(playlistId);
 
-                [Test]
-                public void プレイリストのシーケンスを確認する()
-                {
-                    //設定
-                    var rootId = this.playlistStorehandler!.GetRootPlaylist().Id;
-                    var mainPlaylstID = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト");
-                    var video1Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("0") }, mainPlaylstID);
-                    var video2Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("1") }, mainPlaylstID);
-
-                    var playlist = this.playlistStorehandler!.GetPlaylist(mainPlaylstID)!;
-                    Assert.That(playlist.CustomVideoSequence.Count, Is.EqualTo(2));
-                    Assert.That(playlist.CustomVideoSequence[0], Is.EqualTo(video1Id));
-                    Assert.That(playlist.CustomVideoSequence[1], Is.EqualTo(video2Id));
-                }
-
-                [Test]
-                public void 二番目のプレイリストを先頭に移動する()
-                {
-                    //設定
-                    var rootId = this.playlistStorehandler!.GetRootPlaylist().Id;
-                    var mainPlaylstID = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト");
-                    var video1Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("0") }, mainPlaylstID);
-                    var video2Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("1") }, mainPlaylstID);
-
-                    this.playlistStorehandler!.MoveVideoToPrev(mainPlaylstID, 1);
-
-                    var playlist = this.playlistStorehandler!.GetPlaylist(mainPlaylstID)!;
-                    Assert.That(playlist.CustomVideoSequence.Count, Is.EqualTo(2));
-                    Assert.That(playlist.CustomVideoSequence[0], Is.EqualTo(video2Id));
-                    Assert.That(playlist.CustomVideoSequence[1], Is.EqualTo(video1Id));
-                }
-
-                [Test]
-                public void 先頭のプレイリストを二番目に移動する()
-                {
-                    //設定
-                    var rootId = this.playlistStorehandler!.GetRootPlaylist().Id;
-                    var mainPlaylstID = this.playlistStorehandler.AddPlaylist(rootId, "プレイリスト");
-                    var video1Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("0") }, mainPlaylstID);
-                    var video2Id = this.playlistStorehandler!.AddVideo(new NonBindableListVideoInfo() { NiconicoId = new ReactiveProperty<string>("1") }, mainPlaylstID);
-
-                    this.playlistStorehandler!.MoveVideoToForward(mainPlaylstID, 0);
-
-                    var playlist = this.playlistStorehandler!.GetPlaylist(mainPlaylstID)!;
-                    Assert.That(playlist.CustomVideoSequence.Count, Is.EqualTo(2));
-                    Assert.That(playlist.CustomVideoSequence[0], Is.EqualTo(video2Id));
-                    Assert.That(playlist.CustomVideoSequence[1], Is.EqualTo(video1Id));
+                    Assert.That(playlist.IsSucceeded, Is.True);
+                    Assert.That(playlist.Data, Is.Not.Null);
+                    Assert.That(playlist.Data!.IsRemotePlaylist, Is.False);
+                    Assert.That(playlist.Data.IsWatchLater, Is.False);
+                    Assert.That(playlist.Data.IsMylist, Is.False);
+                    Assert.That(playlist.Data.IsSeries, Is.False);
+                    Assert.That(playlist.Data.IsChannel, Is.False);
+                    Assert.That(playlist.Data.IsUserVideos, Is.False);
                 }
 
 

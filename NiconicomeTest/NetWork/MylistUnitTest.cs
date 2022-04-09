@@ -22,7 +22,7 @@ namespace NiconicomeTest.NetWork
         {
             var content = new StringContent(Properties.Resources.API_Mylist_Get);
             var http = new NicoHttpStab(content,content);
-            this.handler = new Mylist::MylistHandler(http,new LoggerStab(),new VideoInfoContainerStab());
+            this.handler = new Mylist::MylistHandler(http,new LoggerStub(),new VideoInfoContainerStab());
         }
 
         [Test]

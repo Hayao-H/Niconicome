@@ -7,7 +7,7 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     {
         public static string TableName { get; } = "videos";
 
-        public int Id { get; private set; }
+        public int Id { get; set; }
 
         public int ViewCount { get; set; }
 
@@ -43,25 +43,9 @@ namespace Niconicome.Models.Domain.Local.Store.Types
 
         public bool IsSelected { get; set; }
 
-        public List<int>? PlaylistIds { get; set; }
+        public List<int> PlaylistIds { get; set; } = new();
 
         public DateTime UploadedOn { get; set; }
-
-        /// <summary>
-        /// ニコニコ動画のページUriを取得
-        /// </summary>
-        /// <returns></returns>
-        public Uri GetNiconicoPageUri()
-        {
-            if (this.NiconicoId == null)
-            {
-                throw new InvalidOperationException("ニコニコ動画におけるIDが設定されていません。");
-            }
-            else
-            {
-                return new Uri(this.NiconicoId);
-            }
-        }
 
         public override string ToString()
         {

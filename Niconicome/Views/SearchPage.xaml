@@ -11,13 +11,16 @@
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource MaterialDesignBackground}"
+        Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="Yu Gothic"
         x:Name="window"
         WindowStartupLocation="CenterOwner"
         Style="{StaticResource Window_Style}"
         d:DataContext="{d:DesignInstance {x:Type vm:SearchViewModelD},IsDesignTimeCreatable=True}"
         Title="動画を検索する" Height="650" Width="850">
+    <Window.Resources>
+        <ResourceDictionary Source="/Style/TabStyle.xaml"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="8*"/>
@@ -100,7 +103,7 @@
                 </StackPanel>
             </Grid>
         </StackPanel>
-        <TabControl  Grid.Row="1">
+        <TabControl  Grid.Row="1" Background="{DynamicResource MaterialDesignPaper}">
             <TabItem Header="出力">
                 <ScrollViewer>
                     <TextBlock Text="{Binding Message,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Padding="8" FontSize="14" TextWrapping="Wrap" />
@@ -147,6 +150,9 @@
                     </ListView.ItemContainerStyle>
                 </ListView>
             </TabItem>
+            <TabControl.Resources>
+                <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}"/>
+            </TabControl.Resources>
         </TabControl>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

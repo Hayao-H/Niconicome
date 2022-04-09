@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Niconicome.Models.Domain.Niconico.Net.Json
 {
@@ -15,17 +16,14 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
     /// </summary>
     public static class JsonParser
     {
-        public static JsonSerializerOptions DefaultOption
-        {
-            get =>
+        public static JsonSerializerOptions DefaultOption =>
                 new JsonSerializerOptions()
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     PropertyNameCaseInsensitive = false,
-                    IgnoreNullValues = true,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
                 };
-        }
 
         /// <summary>
         /// json文字列をデシリアライズする
@@ -55,12 +53,13 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
 
             if (options is null)
             {
-                options = JsonParser.DefaultOption;
+                options = DefaultOption;
             }
 
             string json = JsonSerializer.Serialize<T>(source, options);
 
             return json;
         }
+
     }
 }

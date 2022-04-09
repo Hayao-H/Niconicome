@@ -22,7 +22,7 @@ namespace NiconicomeTest.NetWork
         {
             var content = new StringContent(Properties.Resources.User_Video_Response);
             var http = new NicoHttpStab(content, content);
-            this.handler = new UVideo::UserVideoHandler(http, new LoggerStab(),new VideoInfoContainerStab());
+            this.handler = new UVideo::UserVideoHandler(http, new LoggerStub(),new VideoInfoContainerStab());
         }
 
         [Test]

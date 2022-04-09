@@ -31,6 +31,12 @@ namespace Niconicome.Models.Playlist
         ReactiveProperty<bool> IsSelected { get; set; }
         ReactiveProperty<bool> IsDownloaded { get; }
         ReactiveProperty<bool> IsThumbDownloading { get; }
+
+        /// <summary>
+        /// エコノミー画質（ファイル毎）
+        /// </summary>
+        ReactiveProperty<bool> IsEconomy { get; }
+
         ReactiveProperty<string> OwnerName { get; }
         ReactiveProperty<string> LargeThumbUrl { get; }
         ReactiveProperty<string> ThumbUrl { get; }
@@ -46,7 +52,6 @@ namespace Niconicome.Models.Playlist
         Uri GetNiconicoPageUri();
         bool CheckDownloaded(string folderPath);
         string GetFilePath(string folderPath);
-        void SetDataBaseData(STypes::Video dbVideo);
         void SetNewData(IListVideoInfo video);
 
     }
@@ -85,6 +90,8 @@ namespace Niconicome.Models.Playlist
         public ReactiveProperty<bool> IsSelected { get; set; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsDownloaded { get; init; } = new ReactiveProperty<bool>();
         public ReactiveProperty<bool> IsThumbDownloading { get; init; } = new ReactiveProperty<bool>();
+        public ReactiveProperty<bool> IsEconomy { get; init; } = new();
+
         public ReactiveProperty<DateTime> UploadedOn { get; init; } = new ReactiveProperty<DateTime>();
         /// <summary>
         /// バインド可能なサムネイルフィルパス
@@ -168,31 +175,6 @@ namespace Niconicome.Models.Playlist
         public override string ToString()
         {
             return $"[{this.NiconicoId.Value}]{this.Title.Value}";
-        }
-
-        /// <summary>
-        /// DBの値をセットする
-        /// </summary>
-        /// <param name="dbVideo"></param>
-        public void SetDataBaseData(STypes::Video dbVideo)
-        {
-            this.Id.Value = dbVideo.Id;
-            this.NiconicoId.Value = dbVideo.NiconicoId;
-            this.Title.Value = dbVideo.Title;
-            this.IsDeleted.Value = dbVideo.IsDeleted;
-            this.OwnerName.Value = dbVideo.OwnerName;
-            this.UploadedOn.Value = dbVideo.UploadedOn;
-            this.LargeThumbUrl.Value = dbVideo.LargeThumbUrl;
-            this.ThumbUrl.Value = dbVideo.ThumbUrl;
-            this.ThumbPath.Value = dbVideo.ThumbPath;
-            this.FileName.Value = dbVideo.FileName;
-            this.Tags = dbVideo.Tags ?? new List<string>();
-            this.ViewCount.Value = dbVideo.ViewCount;
-            this.CommentCount.Value = dbVideo.CommentCount;
-            this.MylistCount.Value = dbVideo.MylistCount;
-            this.LikeCount.Value = dbVideo.LikeCount;
-            this.OwnerID.Value = dbVideo.OwnerID;
-            this.Duration.Value = dbVideo.Duration;
         }
 
         /// <summary>

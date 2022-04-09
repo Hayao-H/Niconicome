@@ -17,7 +17,7 @@ namespace NiconicomeTest.Local
         public void SetUp()
         {
             Static.DataBaseInstance.Clear(Niconicome.Models.Domain.Local.Store.Types.VideoFile.TableName);
-            this.handler = new VideoFileStorehandler(Static.DataBaseInstance, new LoggerStab());
+            this.handler = new VideoFileStorehandler(Static.DataBaseInstance, new LoggerStub());
         }
 
         [Test]

@@ -1,25 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Models.Auth;
+using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Addons.API.Tab;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Utils.InitializeAwaiter;
 using Niconicome.ViewModels.Controls;
+using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.Views;
 using Niconicome.Views.AddonPage;
 using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
+using Prism.Ioc;
 using Prism.Regions;
 using Prism.Services.Dialogs;
 using Prism.Unity;
-using Prism.Ioc;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
@@ -30,8 +39,12 @@ namespace Niconicome.ViewModels.Mainpage
     public class MainWindowViewModel : BindableBase
     {
 
-        public MainWindowViewModel(IRegionManager regionManager, IDialogService dialogService)
+        public MainWindowViewModel(IRegionManager regionManager, IDialogService dialogService, IContainerProvider containerProvider)
         {
+
+            this.ctx = SynchronizationContext.Current;
+            this.RegionManager = regionManager;
+            this.dialogService = dialogService;
 
             this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");
@@ -77,7 +90,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
              {
-                 WS::Mainpage.WindowsHelper.OpenWindow<DownloadTasksWindows>();
+                 WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this.RegionManager, this.dialogService);
              });
 
             this.Restart = new ReactiveCommand()
@@ -108,12 +121,13 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenAddonManagerCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    if (WS::Mainpage.LocalInfo.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
+                    if (WS::Mainpage.LocalState.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
                     {
                         return;
                     }
                     dialogService.Show(nameof(AddonManagerWindow));
                 });
+
 
             #region UI系の設定
 
@@ -122,18 +136,22 @@ namespace Niconicome.ViewModels.Mainpage
 
             #endregion
 
-            regionManager.RegisterViewWithRegion<VideoList>("VideoListRegion");
-            regionManager.RegisterViewWithRegion<DownloadSettings>("DownloadSettingsRegion");
-            regionManager.RegisterViewWithRegion<Output>("OutputRegion");
-            regionManager.RegisterViewWithRegion<VideoSortSetting>("VideoSortSetting");
-            regionManager.RegisterViewWithRegion<VideoListState>("VideolistState");
-            regionManager.RegisterViewWithRegion<TimerSettings>("TimerSettings");
+
+            this.RegisterTabHandlers();
         }
 
-        /// <summary>
-        /// ユーザー情報(フィールド)
-        /// </summary>
+        #region field
+
         private User? user;
+
+        private readonly SynchronizationContext? ctx;
+
+        private readonly IDialogService dialogService;
+
+        #endregion
+
+        #region Props
+        public IRegionManager RegionManager { get; init; }
 
         /// <summary>
         /// ユーザー名
@@ -154,6 +172,10 @@ namespace Niconicome.ViewModels.Mainpage
         /// ログインボタンの表示文字
         /// </summary>
         public ReactiveProperty<string> LoginBtnVal { get; init; }
+
+        #endregion
+
+        #region Command
 
         /// <summary>
         /// ログインコマンド
@@ -179,6 +201,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveCommand Restart { get; init; }
 
+        #endregion
+
+        #region private
+
+
         /// <summary>
         /// ログイン成功時
         /// </summary>
@@ -193,6 +220,61 @@ namespace Niconicome.ViewModels.Mainpage
             this.Username.Value = this.user.Nickname;
             this.UserImage.Value = this.user.UserImage;
         }
+
+        /// <summary>
+        /// タブハンドラを登録
+        /// </summary>
+        private void RegisterTabHandlers()
+        {
+            WS::Mainpage.TabHandler.RegisterAddHandler(e =>
+            {
+
+                if (this.ctx is null) throw new InvalidOperationException($"{typeof(SynchronizationContext)}がnullのため、タブを追加できません。");
+
+                string regionName = e.TabType switch
+                {
+                    TabType.Top => LocalConstant.TopTabRegionName,
+                    _ => LocalConstant.BottomTabRegionName,
+                };
+
+                this.ctx.Post(_ =>
+                {
+                    var vm = new TabViewModel(e.TabItem);
+                    var control = new Tab(vm);
+                    IRegion region = this.RegionManager.Regions[regionName];
+                    region.Add(control);
+                    region.Activate(control);
+                }, null);
+
+            });
+
+            WS::Mainpage.TabHandler.RegisterRemoveHandler(e =>
+            {
+                string regionName = e.TabType switch
+                {
+                    TabType.Top => LocalConstant.TopTabRegionName,
+                    _ => LocalConstant.BottomTabRegionName,
+                };
+
+                IEnumerable<object> viewToRemove = this.RegionManager.Regions[regionName].Views.Where(v =>
+                {
+                    if (v is not UserControl control) return false; ;
+                    if (control.DataContext is not TabViewModelBase vm) return false;
+                    return vm.ID == e.TabID;
+                });
+
+                foreach (var view in viewToRemove)
+                {
+                    this.RegionManager.Regions[regionName].Remove(view);
+                }
+
+            });
+
+            WS::Mainpage.InitializeAwaiterHandler.NotifyCompletedStep(AwaiterNames.Addon, this.GetType());
+        }
+
+        #endregion
+
 
         #region UI系
 
@@ -210,6 +292,8 @@ namespace Niconicome.ViewModels.Mainpage
 
 
     }
+
+    public record TabInfo(string Title, string RegionName, IRegionManager RegionManager);
 
     /// <summary>
     /// ユーザー画像の取得に失敗したときなど
@@ -241,6 +325,7 @@ namespace Niconicome.ViewModels.Mainpage
         {
             base.OnAttached();
             this.AssociatedObject.Closing += this.OnClosing;
+            this.AssociatedObject.Loaded += (_, _) => this.CreateTabs();
         }
 
         protected override void OnDetaching()
@@ -258,7 +343,7 @@ namespace Niconicome.ViewModels.Mainpage
                 if (!WS::Mainpage.Videodownloader.CanDownload.Value && confirm)
                 {
                     var cResult = CommonMessageBoxAPI.Show(service, "ダウンロードが進行中ですが、本当に終了しますか？", CommonMessageBoxAPI.MessageType.Warinng, CommonMessageBoxButtons.Yes | CommonMessageBoxButtons.No);
-                    if (cResult.Result !=ButtonResult.Yes)
+                    if (cResult.Result != ButtonResult.Yes)
                     {
                         e.Cancel = true;
                         return;
@@ -267,6 +352,27 @@ namespace Niconicome.ViewModels.Mainpage
 
                 WS::Mainpage.Shutdown.ShutdownApp();
             }
+        }
+
+        private void CreateTabs()
+        {
+            if (this.AssociatedObject.DataContext is not MainWindowViewModel vm) return;
+            if (Application.Current is not PrismApplication application) return;
+
+            IContainerProvider containerProvider = application.Container;
+            IRegionManager regionManager = vm.RegionManager;
+
+            IRegion bottomTabRegion = regionManager.Regions[LocalConstant.BottomTabRegionName];
+            bottomTabRegion.Add(containerProvider.Resolve<DownloadSettings>());
+            bottomTabRegion.Add(containerProvider.Resolve<Output>());
+            bottomTabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
+            bottomTabRegion.Add(containerProvider.Resolve<VideoListState>());
+            bottomTabRegion.Add(containerProvider.Resolve<TimerSettings>());
+
+            IRegion topTabRegion = regionManager.Regions[LocalConstant.TopTabRegionName];
+            var videoListView = containerProvider.Resolve<VideoList>();
+            topTabRegion.Add(videoListView);
+            topTabRegion.Activate(videoListView);
         }
     }
 }

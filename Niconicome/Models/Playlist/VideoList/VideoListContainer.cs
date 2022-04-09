@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Store;
@@ -10,6 +11,7 @@ using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Playlist.Playlist;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Playlist.VideoList
@@ -17,33 +19,132 @@ namespace Niconicome.Models.Playlist.VideoList
 
     public interface IVideoListContainer
     {
+        /// <summary>
+        /// 動画を削除する
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
         IAttemptResult Remove(IListVideoInfo video, int? playlistID = null, bool commit = true);
+
+        /// <summary>
+        /// 複数の動画を削除する
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
         IAttemptResult RemoveRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true);
+
+        /// <summary>
+        /// 動画を追加する
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
         IAttemptResult Add(IListVideoInfo video, int? playlistID = null, bool commit = true);
+
+        /// <summary>
+        /// 複数の動画を追加する
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
         IAttemptResult AddRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true);
-        IAttemptResult Update(IListVideoInfo video, bool commit = true);
-        IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, bool commit = true);
+
+        /// <summary>
+        /// 動画を更新する
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
+        IAttemptResult Update(IListVideoInfo video, int? playlistID = null, bool commit = true);
+
+        /// <summary>
+        /// 複数の動画を更新する
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
+        IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true);
+
+        /// <summary>
+        /// プレイリストを更新
+        /// </summary>
+        /// <returns></returns>
         IAttemptResult Refresh();
+
+        /// <summary>
+        /// プレイリストをクリア
+        /// </summary>
+        /// <returns></returns>
         IAttemptResult Clear();
+
+        /// <summary>
+        /// forEach処理
+        /// </summary>
+        /// <param name="foreachFunc"></param>
+        /// <returns></returns>
         IAttemptResult ForEach(Action<IListVideoInfo> foreachFunc);
+
+        /// <summary>
+        /// ソートする
+        /// </summary>
+        /// <param name="sortType"></param>
+        /// <param name="isDescending"></param>
+        /// <param name="customSortSequence"></param>
+        /// <returns></returns>
         IAttemptResult Sort(VideoSortType sortType, bool isDescending, List<int>? customSortSequence = null);
+
+        /// <summary>
+        /// 選択している動画を前に移動
+        /// </summary>
+        /// <param name="videoIndex"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
         IAttemptResult MovevideotoPrev(int videoIndex, int? playlistID = null, bool commit = true);
+
+        /// <summary>
+        /// 選択している動画を後ろに移動
+        /// </summary>
+        /// <param name="videoIndex"></param>
+        /// <param name="playlistID"></param>
+        /// <param name="commit"></param>
+        /// <returns></returns>
         IAttemptResult MovevideotoForward(int videoIndex, int? playlistID = null, bool commit = true);
+
+        /// <summary>
+        /// 動画数
+        /// </summary>
         int Count { get; }
+
+        /// <summary>
+        /// 動画
+        /// </summary>
         ObservableCollection<IListVideoInfo> Videos { get; }
+
+        /// <summary>
+        /// リスト変更イベント
+        /// </summary>
         event EventHandler<ListChangedEventArgs<IListVideoInfo>>? ListChanged;
     }
 
     public class VideoListContainer : IVideoListContainer
     {
-        public VideoListContainer(IPlaylistStoreHandler playlistStoreHandler, IVideoHandler videoHandler, IVideoListRefresher refresher, ICurrent current, ILogger logger)
+        public VideoListContainer(IPlaylistHandler playlistHandler, IVideoHandler videoHandler, IVideoListRefresher refresher, ICurrent current, ILogger logger)
         {
-            this.playlistStoreHandler = playlistStoreHandler;
             this.videoHandler = videoHandler;
             this.refresher = refresher;
             this.current = current;
             this.logger = logger;
             this.Videos = new ObservableCollection<IListVideoInfo>();
+            this._playlistHandler = playlistHandler;
 
             this.current.IsTemporaryPlaylist.Subscribe(value =>
             {
@@ -54,9 +155,9 @@ namespace Niconicome.Models.Playlist.VideoList
             });
         }
 
-        #region DIされるクラス
+        #region field
 
-        private readonly IPlaylistStoreHandler playlistStoreHandler;
+        private readonly IPlaylistHandler _playlistHandler;
 
         private readonly IVideoHandler videoHandler;
 
@@ -65,14 +166,10 @@ namespace Niconicome.Models.Playlist.VideoList
         private readonly ICurrent current;
 
         private readonly ILogger logger;
-        #endregion
-
-        #region プライベートフィールド
-
 
         #endregion
 
-        #region プライベートメソッド
+        #region private
 
         /// <summary>
         /// 変更イベントを通知する
@@ -112,10 +209,7 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (!this.Videos.Any(v => v.NiconicoId == video.NiconicoId))
             {
-                return new AttemptResult()
-                {
-                    Message = $"{video.NiconicoId}は現在のプレイリストに存在しません。",
-                };
+                return AttemptResult.Fail("{video.NiconicoId.Value}は現在のプレイリストに存在しません。");
             }
 
             try
@@ -124,11 +218,7 @@ namespace Niconicome.Models.Playlist.VideoList
             }
             catch (Exception e)
             {
-                return new AttemptResult()
-                {
-                    Message = $"メモリ上のプレイリストからの削除に失敗しました。({video.NiconicoId})",
-                    Exception = e,
-                };
+                return AttemptResult.Fail($"メモリ上のプレイリストからの削除に失敗しました。({video.NiconicoId.Value})", e);
             }
 
             if (video.IsSelected.Value)
@@ -140,39 +230,23 @@ namespace Niconicome.Models.Playlist.VideoList
             if (!commit)
             {
                 if (id == (this.current.SelectedPlaylist.Value?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Remove);
-                return new AttemptResult()
-                {
-                    IsSucceeded = true,
-                };
+                return AttemptResult.Succeeded();
             }
 
 
             if (id == -1)
             {
-                return new AttemptResult()
-                {
-                    Message = $"プレイストが選択されていません。",
-                };
+                return AttemptResult.Fail("プレイストが選択されていません。");
             }
 
-            try
+            IAttemptResult pResult = this._playlistHandler.UnWireVideoToPlaylist(video.Id.Value, id);
+            if (!pResult.IsSucceeded)
             {
-                this.playlistStoreHandler.RemoveVideo(video.Id.Value, id);
-            }
-            catch (Exception e)
-            {
-                return new AttemptResult()
-                {
-                    Message = $"データベース上のプレイリストからの削除に失敗しました。({video.NiconicoId})",
-                    Exception = e,
-                };
+                return AttemptResult.Fail($"データベース上のプレイリストからの削除に失敗しました。({video.NiconicoId.Value})");
             }
 
             if (id == (this.current.SelectedPlaylist.Value?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Remove);
-            return new AttemptResult()
-            {
-                IsSucceeded = true,
-            };
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
@@ -191,10 +265,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 }
             }
 
-            return new AttemptResult()
-            {
-                IsSucceeded = true,
-            };
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
@@ -214,10 +285,7 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 if (this.Videos.Any(v => v.NiconicoId.Value == video.NiconicoId.Value))
                 {
-                    return new AttemptResult()
-                    {
-                        Message = $"{video.NiconicoId}は既に現在のプレイリストに存在します。",
-                    };
+                    return AttemptResult.Fail("{video.NiconicoId.Value}は既に現在のプレイリストに存在します。");
                 }
 
                 try
@@ -226,11 +294,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 }
                 catch (Exception e)
                 {
-                    return new AttemptResult()
-                    {
-                        Message = $"メモリ上のプレイリストへの追加に失敗しました。({video.NiconicoId})",
-                        Exception = e,
-                    };
+                    return AttemptResult.Fail($"メモリ上のプレイリストへの追加に失敗しました。({video.NiconicoId.Value})", e);
                 }
             }
 
@@ -242,39 +306,40 @@ namespace Niconicome.Models.Playlist.VideoList
             if (!commit)
             {
                 if (id == (this.current.SelectedPlaylist.Value?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Add);
-                return new AttemptResult()
-                {
-                    IsSucceeded = true,
-                };
+                return AttemptResult.Succeeded();
             }
 
 
             if (id == -1)
             {
-                return new AttemptResult()
-                {
-                    Message = $"プレイストが選択されていません。",
-                };
+                return AttemptResult.Fail("プレイストが選択されていません。");
             }
 
-            try
+
+            IAttemptResult<int> vResult = this.videoHandler.AddVideo(video);
+
+            if (!vResult.IsSucceeded)
             {
-                this.playlistStoreHandler.AddVideo(video, id);
+                return AttemptResult.Fail($"動画のデータベースへの保存に失敗しました。({video.NiconicoId.Value})");
             }
-            catch (Exception e)
+            else
             {
-                return new AttemptResult()
-                {
-                    Message = $"データベース上のプレイリストへの追加に失敗しました。({video.NiconicoId})",
-                    Exception = e,
-                };
+                video.Id.Value = vResult.Data;
+            }
+
+            IAttemptResult pResult = this._playlistHandler.WireVideoToPlaylist(vResult.Data, id);
+
+            if (!pResult.IsSucceeded)
+            {
+                return AttemptResult.Fail($"データベース上のプレイリストへの追加に失敗しました。({video.NiconicoId.Value})");
+            }
+            else
+            {
+                video.Id.Value = vResult.Data;
             }
 
             if (id == (this.current.SelectedPlaylist.Value?.Id ?? -1)) this.RaiseListChanged(video, ChangeType.Add);
-            return new AttemptResult()
-            {
-                IsSucceeded = true,
-            };
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
@@ -294,42 +359,38 @@ namespace Niconicome.Models.Playlist.VideoList
                 }
             }
 
-            return new AttemptResult()
-            {
-                IsSucceeded = true,
-            };
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
         /// 動画情報を更新する
         /// </summary>
         /// <param name="video"></param>
-        /// <param name="commit"></param>
+        /// <param name="playlistID"></param>
         /// <returns></returns>
-        public IAttemptResult Update(IListVideoInfo video, bool commit = true)
+        /// <param name="commit"></param>
+        public IAttemptResult Update(IListVideoInfo video, int? playlistID = null, bool commit = true)
         {
-            if (!this.Videos.Any(v => v.NiconicoId == video.NiconicoId))
-            {
-                return new AttemptResult()
-                {
-                    Message = $"{video.NiconicoId}は現在のプレイリストに存在しません。",
-                };
-            }
+            int id = playlistID ?? this.current.SelectedPlaylist.Value?.Id ?? -1;
+            bool isSame = id == (this.current.SelectedPlaylist.Value?.Id ?? -1);
 
-            try
+            if (isSame)
             {
-                var targetVIdeo = this.Videos.First(v => v.NiconicoId == video.NiconicoId);
-                targetVIdeo.SetNewData(video);
-            }
-            catch (Exception e)
-            {
-                return new AttemptResult()
+                if (!this.Videos.Any(v => v.NiconicoId.Value == video.NiconicoId.Value))
                 {
-                    Message = $"メモリ上の動画情報の更新に失敗しました。({video.NiconicoId})",
-                    Exception = e,
-                };
-            }
+                    return AttemptResult.Fail($"{video.NiconicoId.Value}は現在のプレイリストに存在しません。");
+                }
 
+                try
+                {
+                    var targetVIdeo = this.Videos.First(v => v.NiconicoId.Value == video.NiconicoId.Value);
+                    targetVIdeo.SetNewData(video);
+                }
+                catch (Exception e)
+                {
+                    AttemptResult.Fail($"メモリ上の動画情報の更新に失敗しました。({video.NiconicoId.Value})", e);
+                }
+            }
 
             if (!commit)
             {
@@ -339,46 +400,35 @@ namespace Niconicome.Models.Playlist.VideoList
                 };
             }
 
-            try
+            IAttemptResult vResult = this.videoHandler.Update(video);
+            if (!vResult.IsSucceeded)
             {
-                this.videoHandler.Update(video);
-            }
-            catch (Exception e)
-            {
-                return new AttemptResult()
-                {
-                    Message = $"データベース上の動画情報の更新に失敗しました。({video.NiconicoId})",
-                    Exception = e,
-                };
+                return AttemptResult.Fail($"データベース上の動画情報の更新に失敗しました。({video.NiconicoId.Value})");
+
             }
 
-            return new AttemptResult()
-            {
-                IsSucceeded = true,
-            };
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
         /// 複数の動画情報を更新する
         /// </summary>
         /// <param name="videos"></param>
-        /// <param name="commit"></param>
+        /// <param name="playlistID"></param>
         /// <returns></returns>
-        public IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, bool commit = true)
+        /// <param name="commit"></param>
+        public IAttemptResult UpdateRange(IEnumerable<IListVideoInfo> videos, int? playlistID = null, bool commit = true)
         {
             foreach (var video in videos.Copy())
             {
-                var result = this.Update(video, commit);
+                var result = this.Update(video, playlistID, commit);
                 if (!result.IsSucceeded)
                 {
                     return result;
                 }
             }
 
-            return new AttemptResult()
-            {
-                IsSucceeded = true,
-            };
+            return AttemptResult.Succeeded();
         }
 
 
@@ -402,14 +452,18 @@ namespace Niconicome.Models.Playlist.VideoList
                     if (v.IsSelected.Value) this.current.SelectedVideos.Value++;
                 }, true);
             }
-            else
+            else if (this.current.SelectedPlaylist.Value is not null)
             {
                 this.Clear();
-                result = this.refresher.Refresh(this.Videos, v =>
+                result = this.refresher.Refresh(this.current.SelectedPlaylist.Value.Videos, v =>
                 {
                     this.Videos.Add(v);
                     if (v.IsSelected.Value) this.current.SelectedVideos.Value++;
                 });
+            }
+            else
+            {
+                return AttemptResult.Fail();
             }
 
             this.Sort(this.current.SelectedPlaylist.Value!.VideoSortType, this.current.SelectedPlaylist.Value!.IsVideoDescending, this.current.SelectedPlaylist.Value!.CustomSortSequence);
@@ -480,46 +534,54 @@ namespace Niconicome.Models.Playlist.VideoList
         {
             if (sortType == VideoSortType.Custom && customSortSequence is null) return new AttemptResult() { Message = "並び替えの設定がカスタムになっていますが、Listがnullです。" };
 
-            IEnumerable<IListVideoInfo> SortWithCustom(List<IListVideoInfo> source, List<int>? seq)
-            {
-                if (seq is null) throw new InvalidOperationException();
-                return seq.Select(id => source.FirstOrDefault(v => v.Id.Value == id) ?? new NonBindableListVideoInfo()).Where(v => !v.Title.Value.IsNullOrEmpty());
-            }
-
-            var tmp = this.Videos.ToList();
+            List<IListVideoInfo> tmp = this.Videos.ToList();
             this.Clear();
             if (!isDescending)
             {
-                var sorted = sortType switch
+                IEnumerable<IListVideoInfo> sorted = sortType switch
                 {
                     VideoSortType.Register => tmp.OrderBy(v => v.Id.Value),
                     VideoSortType.Title => tmp.OrderBy(v => v.Title.Value),
-                    VideoSortType.NiconicoID => tmp.OrderBy(v => v.NiconicoId.Value),
+                    VideoSortType.NiconicoID => tmp.OrderBy(v => long.Parse(Regex.Replace(v.NiconicoId.Value, @"[^\d]", "", RegexOptions.Compiled))),
                     VideoSortType.UploadedDT => tmp.OrderBy(v => v.UploadedOn.Value),
                     VideoSortType.ViewCount => tmp.OrderBy(v => v.ViewCount.Value),
                     VideoSortType.DownloadedFlag => tmp.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
-                    _ => SortWithCustom(tmp, customSortSequence),
+                    VideoSortType.Economy => tmp.OrderBy(v => v.IsEconomy.Value ? 1 : 0),
+                    VideoSortType.State => tmp.OrderBy(v => v.Message.Value),
+                    _ => Enumerable.Reverse(tmp),
                 };
                 this.Videos.Addrange(sorted);
             }
             else
             {
 
-                var sorted = sortType switch
+                IEnumerable<IListVideoInfo> sorted = sortType switch
                 {
                     VideoSortType.Register => tmp.OrderByDescending(v => v.Id.Value),
                     VideoSortType.Title => tmp.OrderByDescending(v => v.Title.Value),
-                    VideoSortType.NiconicoID => tmp.OrderByDescending(v => v.NiconicoId.Value),
+                    VideoSortType.NiconicoID => tmp.OrderByDescending(v => long.Parse(Regex.Replace(v.NiconicoId.Value, @"[^\d]", "", RegexOptions.Compiled))),
                     VideoSortType.UploadedDT => tmp.OrderByDescending(v => v.UploadedOn.Value),
                     VideoSortType.ViewCount => tmp.OrderByDescending(v => v.ViewCount.Value),
                     VideoSortType.DownloadedFlag => tmp.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
-                    _ => SortWithCustom(tmp, customSortSequence),
+                    VideoSortType.Economy => tmp.OrderByDescending(v => v.IsEconomy.Value ? 1 : 0),
+                    VideoSortType.State => tmp.OrderByDescending(v => v.Message.Value),
+                    _ => Enumerable.Reverse(tmp),
                 };
                 this.Videos.Addrange(sorted);
             }
 
+            if (this.current.SelectedPlaylist.Value is not null)
+            {
+                ITreePlaylistInfo playlist = this.current.SelectedPlaylist.Value;
+                if (!playlist.IsTemporary)
+                {
+                    playlist.Videos.Clear();
+                    playlist.Videos.AddRange(this.Videos);
+                }
+            }
+
             this.RaiseListChanged(null, ChangeType.Overall);
-            return new AttemptResult() { IsSucceeded = true };
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
@@ -535,12 +597,12 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (determinedPlaylistID == -1)
             {
-                return new AttemptResult() { Message = "プレイリストが選択されていません" };
+                return AttemptResult.Fail("プレイリストが選択されていません");
             }
 
             if (determinedPlaylistID == this.current.SelectedPlaylist.Value!.Id)
             {
-                if (videoIndex == 0) return new AttemptResult() { Message = "選択している動画は既に先頭にあるため、これ以上前に移動できません。" };
+                if (videoIndex == 0) return AttemptResult.Fail("選択している動画は既に先頭にあるため、これ以上前に移動できません。");
                 try
                 {
                     this.Videos.InsertIntoPrev(videoIndex);
@@ -548,29 +610,21 @@ namespace Niconicome.Models.Playlist.VideoList
                 catch (Exception e)
                 {
                     this.logger.Error("メモリ上のプレイリストにおける動画の並び替えに失敗しました。", e);
-                    return new AttemptResult() { Message = "メモリ上のプレイリストにおける動画の並び替えに失敗しました。", Exception = e };
+                    return AttemptResult.Fail("メモリ上のプレイリストにおける動画の並び替えに失敗しました。", e);
                 }
             }
 
             if (commit)
             {
-                var result = this.playlistStoreHandler.MoveVideoToPrev(determinedPlaylistID, videoIndex);
+                var result = this._playlistHandler.MoveVideoToPrev(videoIndex, determinedPlaylistID);
                 if (!result.IsSucceeded)
                 {
-                    if (result.Exception is not null)
-                    {
-                        this.logger.Error("プレイリストにおける動画の並び替えに失敗しました。", result.Exception);
-                    }
-                    else
-                    {
-                        this.logger.Error("プレイリストにおける動画の並び替えに失敗しました。");
-                    }
 
-                    return new AttemptResult() { Message = "プレイリストにおける動画の並び替えに失敗しました。", Exception = result.Exception };
+                    return AttemptResult.Fail("プレイリストにおける動画の並び替えに失敗しました。", result.Exception);
                 }
             }
 
-            return new AttemptResult() { IsSucceeded = true };
+            return AttemptResult.Succeeded();
 
         }
 
@@ -587,12 +641,12 @@ namespace Niconicome.Models.Playlist.VideoList
 
             if (determinedPlaylistID == -1)
             {
-                return new AttemptResult() { Message = "プレイリストが選択されていません" };
+                return AttemptResult.Fail("プレイリストが選択されていません");
             }
 
             if (determinedPlaylistID == this.current.SelectedPlaylist.Value!.Id)
             {
-                if (videoIndex + 1 == this.Videos.Count) return new AttemptResult() { Message = "選択している動画は既に最後尾にあるため、これ以上後ろに移動できません。" };
+                if (videoIndex + 1 == this.Videos.Count) return AttemptResult.Fail("選択している動画は既に最後尾にあるため、これ以上後ろに移動できません。");
                 try
                 {
                     this.Videos.InsertIntoForward(videoIndex);
@@ -600,29 +654,20 @@ namespace Niconicome.Models.Playlist.VideoList
                 catch (Exception e)
                 {
                     this.logger.Error("メモリ上のプレイリストにおける動画の並び替えに失敗しました。", e);
-                    return new AttemptResult() { Message = "メモリ上のプレイリストにおける動画の並び替えに失敗しました。", Exception = e };
+                    return AttemptResult.Fail("メモリ上のプレイリストにおける動画の並び替えに失敗しました。", e);
                 }
             }
 
             if (commit)
             {
-                var result = this.playlistStoreHandler.MoveVideoToForward(determinedPlaylistID, videoIndex);
+                IAttemptResult result = this._playlistHandler.MoveVideoToForward(videoIndex, determinedPlaylistID);
                 if (!result.IsSucceeded)
                 {
-                    if (result.Exception is not null)
-                    {
-                        this.logger.Error("プレイリストにおける動画の並び替えに失敗しました。", result.Exception);
-                    }
-                    else
-                    {
-                        this.logger.Error("プレイリストにおける動画の並び替えに失敗しました。");
-                    }
-
-                    return new AttemptResult() { Message = "プレイリストにおける動画の並び替えに失敗しました。", Exception = result.Exception };
+                    return AttemptResult.Fail("プレイリストにおける動画の並び替えに失敗しました。");
                 }
             }
 
-            return new AttemptResult() { IsSucceeded = true };
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>

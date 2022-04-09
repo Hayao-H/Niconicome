@@ -6,9 +6,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
-             xmlns:cv="clr-namespace:Niconicome.Views.Converter"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:interactivity="clr-namespace:Reactive.Bindings.Interactivity;assembly=ReactiveProperty.WPF"
+             xmlns:store="clr-namespace:Niconicome.Models.Domain.Local.Store.Types"
              mc:Ignorable="d"
              Background="{DynamicResource MaterialDesignPaper}"
              d:Width="1200"
@@ -32,17 +30,19 @@
                 <Label Content="{Binding IsDscending.Value}"/>
             </StackPanel>
             <StackPanel Margin="10 0" Grid.Row="1" Orientation="Horizontal">
-                <Button Margin="5 0" Content="登録順" Command="{Binding SortVideosByRegister}"/>
-                <Button Margin="5 0" Content="ID" Command="{Binding SortVideosByID}"/>
-                <Button Margin="5 0" Content="タイトル" Command="{Binding SortVideosByTitle}"/>
-                <Button Margin="5 0" Content="投稿日時" Command="{Binding SortVideosByUploadedDT}"/>
-                <Button Margin="5 0" Content="再生回数" Command="{Binding SortVideosByViewCount}"/>
-                <Button Margin="5 0" Content="DL済み" Command="{Binding SortVideosByDLFlag}"/>
+                <Button Margin="5 0" Content="登録順" Command="{Binding SortVideos}" CommandParameter="{x:Static store:VideoSortType.Register}"/>
+                <Button Margin="5 0" Content="ID" Command="{Binding SortVideos}" CommandParameter="{x:Static store:VideoSortType.NiconicoID}"/>
+                <Button Margin="5 0" Content="タイトル" Command="{Binding SortVideos}" CommandParameter="{x:Static store:VideoSortType.Title}"/>
+                <Button Margin="5 0" Content="投稿日時" Command="{Binding SortVideos}" CommandParameter="{x:Static store:VideoSortType.UploadedDT}"/>
+                <Button Margin="5 0" Content="再生回数" Command="{Binding SortVideos}" CommandParameter="{x:Static store:VideoSortType.ViewCount}"/>
+                <Button Margin="5 0" Content="DL済み" Command="{Binding SortVideos}" CommandParameter="{x:Static store:VideoSortType.DownloadedFlag}"/>
+                <Button Margin="5 0" Content="状態" Command="{Binding SortVideos}" CommandParameter="{x:Static store:VideoSortType.State}"/>
+                <Button Margin="5 0" Content="エコノミー" Command="{Binding SortVideos}" CommandParameter="{x:Static store:VideoSortType.Economy}"/>
                 <Button Margin="5 0" Content="昇順・降順を切り替える" Command="{Binding SwitchDesending}"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="1">
-                <Separator BorderThickness="2" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}" Margin="0 5"/>
+            <Separator BorderThickness="2" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}" Margin="0 5"/>
             <StackPanel Orientation="Horizontal">
                 <Label Content="選択されている動画："/>
                 <Label Content="{Binding SelectedVideoInfo.Value}"/>

@@ -29,7 +29,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml
             }
             var emptyns = new XmlSerializerNamespaces();
             emptyns.Add(string.Empty, string.Empty);
-            var stringWriter = new StringWriter();
+            var stringWriter = new XmlStringWriter();
             var writer = XmlWriter.Create(stringWriter, settings);
 
             serializer.Serialize(writer, data, emptyns);
@@ -58,6 +58,11 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml
             {
                 throw new InvalidOperationException("シリアライズしようとしているコンテンツはnullです。");
             }
+        }
+
+        private class XmlStringWriter : StringWriter
+        {
+            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }

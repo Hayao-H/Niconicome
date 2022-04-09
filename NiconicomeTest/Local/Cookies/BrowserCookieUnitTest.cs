@@ -11,7 +11,7 @@ namespace NiconicomeTest.Local.Cookies
         [SetUp]
         public void SetUp()
         {
-            this.loader = new SqliteCookieLoader(new SQliteLoader(new LoggerStab()));
+            this.loader = new SqliteCookieLoader(new SQliteLoader(new LoggerStub()));
         }
 
         [Test]

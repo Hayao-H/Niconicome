@@ -11,6 +11,7 @@ using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using NicoIO = Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Addon;
+using Niconicome.Models.Utils.InitializeAwaiter;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -24,44 +25,48 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer,NicoIO::INicoDirectoryIO nicoDirectoryIO,IAddonHandler addonHandler)
+        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonHandler addonHandler)
         {
 
-            this.videoStoreHandler = videoStoreHandler;
-            this.playlistStoreHandler = playlistStoreHandler;
-            this.fileStorehandler = fileStorehandler;
-            this.backuphandler = backuphandler;
-            this.autoLogin = autoLogin;
-            this.snackbarHandler = snackbarHandler;
-            this.logger = logger;
-            this.settingHandler = settingHandler;
-            this.streamResumer = streamResumer;
-            this.nicoDirectoryIO = nicoDirectoryIO;
-            this.addonHandler = addonHandler;
+            this._videoStoreHandler = videoStoreHandler;
+            this._playlistStoreHandler = playlistStoreHandler;
+            this._fileStorehandler = fileStorehandler;
+            this._backuphandler = backuphandler;
+            this._autoLogin = autoLogin;
+            this._snackbarHandler = snackbarHandler;
+            this._logger = logger;
+            this._settingHandler = settingHandler;
+            this._streamResumer = streamResumer;
+            this._nicoDirectoryIO = nicoDirectoryIO;
+            this._addonHandler = addonHandler;
             this.DeleteInvalidbackup();
         }
 
-        private readonly Store::IVideoStoreHandler videoStoreHandler;
+        #region field
 
-        private readonly Store::IPlaylistStoreHandler playlistStoreHandler;
+        private readonly Store::IVideoStoreHandler _videoStoreHandler;
 
-        private readonly Store::IVideoFileStorehandler fileStorehandler;
+        private readonly Store::IPlaylistStoreHandler _playlistStoreHandler;
 
-        private readonly IBackuphandler backuphandler;
+        private readonly Store::IVideoFileStorehandler _fileStorehandler;
 
-        private readonly IAutoLogin autoLogin;
+        private readonly IBackuphandler _backuphandler;
 
-        private readonly ISnackbarHandler snackbarHandler;
+        private readonly IAutoLogin _autoLogin;
 
-        private readonly ILogger logger;
+        private readonly ISnackbarHandler _snackbarHandler;
 
-        private readonly ILocalSettingHandler settingHandler;
+        private readonly ILogger _logger;
 
-        private readonly Resume::IStreamResumer streamResumer;
+        private readonly ILocalSettingHandler _settingHandler;
 
-        private readonly NicoIO::INicoDirectoryIO nicoDirectoryIO;
+        private readonly Resume::IStreamResumer _streamResumer;
 
-        private readonly IAddonHandler addonHandler;
+        private readonly NicoIO::INicoDirectoryIO _nicoDirectoryIO;
+
+        private readonly IAddonHandler _addonHandler;
+
+        #endregion
 
         /// <summary>
         /// 自動ログイン成功時
@@ -88,16 +93,16 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         private void RemoveTmpFolder()
         {
-            if (this.nicoDirectoryIO.Exists("tmp"))
+            if (this._nicoDirectoryIO.Exists("tmp"))
             {
-                var maxTmp = this.settingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
+                var maxTmp = this._settingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
                 if (maxTmp < 0) maxTmp = 20;
-                var infos = this.streamResumer.GetAllSegmentsDirectoryInfo().ToList();
+                var infos = this._streamResumer.GetAllSegmentsDirectoryInfo().ToList();
                 if (infos.Count <= maxTmp) return;
                 infos = infos.OrderBy(i => i.StartedOn).ToList();
                 foreach (var i in Enumerable.Range(0, infos.Count - maxTmp))
                 {
-                    this.nicoDirectoryIO.Delete(Path.Combine(AppContext.BaseDirectory, "tmp", infos[i].DirectoryName));
+                    this._nicoDirectoryIO.Delete(Path.Combine(AppContext.BaseDirectory, "tmp", infos[i].DirectoryName));
                 }
 
             }
@@ -108,12 +113,7 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         private void JustifyData()
         {
-            this.videoStoreHandler.JustifyVideos();
-            var playlists = this.playlistStoreHandler.GetAllPlaylists();
-            if (playlists.Any())
-            {
-                this.playlistStoreHandler.JustifyPlaylists(playlists.Select(p => p.Id));
-            }
+            this._playlistStoreHandler.Initialize();
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         private void DeleteInvalidFilePath()
         {
-            this.fileStorehandler.Clean();
+            this._fileStorehandler.Clean();
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         private void DeleteInvalidbackup()
         {
-            this.backuphandler.Clean();
+            this._backuphandler.Clean();
         }
 
         /// <summary>
@@ -138,10 +138,10 @@ namespace Niconicome.Models.Local.Application
         /// <returns></returns>
         private async Task Autologin()
         {
-            if (!this.autoLogin.IsAUtologinEnable) return;
-            if (!this.autoLogin.Canlogin())
+            if (!this._autoLogin.IsAUtologinEnable) return;
+            if (!this._autoLogin.Canlogin())
             {
-                this.snackbarHandler.Enqueue("自動ログインが出来ません。");
+                this._snackbarHandler.Enqueue("自動ログインが出来ません。");
                 return;
             }
 
@@ -149,23 +149,23 @@ namespace Niconicome.Models.Local.Application
 
             try
             {
-                result = await this.autoLogin.LoginAsync();
+                result = await this._autoLogin.LoginAsync();
             }
             catch (Exception e)
             {
-                this.logger.Error("自動ログインに失敗しました。", e);
-                this.snackbarHandler.Enqueue("自動ログインに失敗しました。");
+                this._logger.Error("自動ログインに失敗しました。", e);
+                this._snackbarHandler.Enqueue("自動ログインに失敗しました。");
                 return;
             }
 
             if (!result)
             {
-                this.snackbarHandler.Enqueue("自動ログインに失敗しました。");
+                this._snackbarHandler.Enqueue("自動ログインに失敗しました。");
                 return;
             }
             else
             {
-                this.snackbarHandler.Enqueue("自動ログインに成功しました。");
+                this._snackbarHandler.Enqueue("自動ログインに成功しました。");
                 this.RaiseLoginSucceeded();
             }
         }
@@ -183,7 +183,7 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         private async Task LoadAddonAsync()
         {
-            await this.addonHandler.InitializeAsync();
+            await this._addonHandler.InitializeAsync();
         }
     }
 }

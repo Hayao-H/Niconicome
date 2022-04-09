@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
+        xmlns:tabs="clr-namespace:Niconicome.ViewModels.Mainpage.Tabs"
         xmlns:cv="clr-namespace:Niconicome.Views.Converter"
         xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -25,7 +26,12 @@
         <vm:MainWindowBehavior/>
     </i:Interaction.Behaviors>
     <Window.Resources>
-        <cv:BooleanCircleConverter x:Key="BooleanCircleConverter"/>
+        <ResourceDictionary>
+            <cv:BooleanCircleConverter x:Key="BooleanCircleConverter"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Style/TabStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
     <materialDesign:DialogHost Identifier="default">
         <DockPanel>
@@ -125,31 +131,31 @@
                                                 <MenuItem Header="プレイリストを追加する"
                                                   Command="{Binding AddPlaylist}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                        <MenuItem.Icon>
-                                                            <materialDesign:PackIcon Kind="Plus"/>
-                                                        </MenuItem.Icon>
-                                                    </MenuItem>
-                                                    <MenuItem Header="このプレイリストを削除する"
+                                                    <MenuItem.Icon>
+                                                        <materialDesign:PackIcon Kind="Plus"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="このプレイリストを削除する"
                                                   Command="{Binding RemovePlaylist}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                        <MenuItem.Icon>
-                                                            <materialDesign:PackIcon Kind="Delete"/>
-                                                        </MenuItem.Icon>
-                                                    </MenuItem>
-                                                    <MenuItem Header="このプレイリストを編集する"
+                                                    <MenuItem.Icon>
+                                                        <materialDesign:PackIcon Kind="Delete"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="このプレイリストを編集する"
                                                   Command="{Binding EditPlaylistCommand}"
                                                   CommandParameter="{Binding  Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                        <MenuItem.Icon>
-                                                            <materialDesign:PackIcon Kind="Edit"/>
-                                                        </MenuItem.Icon>
-                                                    </MenuItem>
-                                                </ContextMenu>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                    </Style>
-                                </TreeView.ItemContainerStyle>
-                            </TreeView>
+                                                    <MenuItem.Icon>
+                                                        <materialDesign:PackIcon Kind="Edit"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                        </TreeView>
                     </Grid>
                     <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
@@ -168,33 +174,22 @@
                                 </Button>
                             </DockPanel>
                         </DockPanel>
-                        <Grid Grid.Row="1" x:Name="videoList">
+                        <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="{Binding TabsHeight.Value}"/>
                             </Grid.RowDefinitions>
-                            <UserControl prism:RegionManager.RegionName="VideoListRegion"/>
-                            <TabControl Background="{DynamicResource MaterialDesignBackground}" Grid.Row="1" Margin="8">
+                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion" BorderBrush="#4A4A4A">
                                 <TabControl.Resources>
-                                    <Style TargetType="TabItem">
-                                        <Setter Property="Foreground" Value="Black"/>
+                                    <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
                                     </Style>
                                 </TabControl.Resources>
-                                <TabItem Header="設定">
-                                    <UserControl prism:RegionManager.RegionName="DownloadSettingsRegion"/>
-                                </TabItem>
-                                <TabItem Header="出力">
-                                    <UserControl prism:RegionManager.RegionName="OutputRegion"/>
-                                </TabItem>
-                                <TabItem Header="並び替え">
-                                    <UserControl prism:RegionManager.RegionName="VideoSortSetting"/>
-                                </TabItem>
-                                <TabItem Header="状態">
-                                    <UserControl prism:RegionManager.RegionName="VideolistState"/>
-                                </TabItem>
-                                <TabItem Header="タイマー">
-                                    <UserControl prism:RegionManager.RegionName="TimerSettings"/>
-                                </TabItem>
+                            </TabControl>
+                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="1" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A">
+                                <TabControl.Resources>
+                                    <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
+                                    </Style>
+                                </TabControl.Resources>
                             </TabControl >
                         </Grid>
                     </Grid>

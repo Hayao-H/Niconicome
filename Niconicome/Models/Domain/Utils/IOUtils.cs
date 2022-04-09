@@ -39,23 +39,14 @@ namespace Niconicome.Models.Domain.Utils
         }
 
         /// <summary>
-        /// パスが存在しない場合作成する
+        /// 指定したファイルパスの親ディレクトリが存在しない場合作成する
         /// </summary>
-        /// <param name="folderPath"></param>
+        /// <param name="folderPath">ファイル名</param>
         /// <param name="fileName"></param>
-        public static void CreateDirectoryIfNotExist(string folderPath, string? fileName = null)
+        public static void CreateDirectoryIfNotExist(string filePath)
         {
-            string path;
-            if (fileName is not null)
-            {
-                path = Path.Combine(folderPath, fileName);
-            }
-            else
-            {
-                path = folderPath;
-            }
-
-            var dirname = Path.GetDirectoryName(path);
+            var info = new FileInfo(filePath);
+            var dirname = Path.GetDirectoryName(filePath);
             if (dirname is not null && !Directory.Exists(dirname))
             {
                 Directory.CreateDirectory(dirname);

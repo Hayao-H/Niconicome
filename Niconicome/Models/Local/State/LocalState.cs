@@ -5,27 +5,42 @@ namespace Niconicome.Models.Local.State
 
     public interface ILocalState
     {
-        bool IsSettingWindowOpen { get; set; }
-        bool IsDebugMode { get; set; }
-        bool IsImportingFromXeno { get; set; }
-    }
-
-    public class LocalState : ILocalState
-    {
         /// <summary>
-        /// 設定ウィンドウフラグ
+        /// 設定ウィンドウ
         /// </summary>
-        public bool IsSettingWindowOpen { get; set; }
+        bool IsSettingWindowOpen { get; set; }
 
         /// <summary>
         /// デバッグフラグ
         /// </summary>
-        public bool IsDebugMode { get; set; }
+        bool IsDebugMode { get; set; }
 
         /// <summary>
-        /// インポート中フラグ
+        /// インポート中
         /// </summary>
+        bool IsImportingFromXeno { get; set; }
+
+        /// <summary>
+        /// アドオンマネージャー
+        /// </summary>
+        bool IsAddonManagerOpen { get; set; }
+
+        /// <summary>
+        /// ダウンロードタスク一覧
+        /// </summary>
+        bool IsTaskWindowOpen { get; set; }
+    }
+
+    public class LocalState : ILocalState
+    {
+        public bool IsSettingWindowOpen { get; set; }
+
+        public bool IsDebugMode { get; set; }
+
         public bool IsImportingFromXeno { get; set; }
 
+        public bool IsAddonManagerOpen { get; set; }
+
+        public bool IsTaskWindowOpen { get; set; }
     }
 }

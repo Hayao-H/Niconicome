@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Niconico.Dmc;
 using Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Utils;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Network.Download;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video
 {
@@ -27,48 +27,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         Action<IDownloadTask>? PostCompletedCallback { get; set; }
     }
 
-
-    public interface IVideoDownloadHelper
-    {
-        Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, int maxParallelDownloadCount, CancellationToken token);
-        IEnumerable<string> GetAllFileAbsPaths();
-        string FolderName { get; }
-    }
-
-    public interface IDownloadTaskHandler
-    {
-        IDownloadTask RetrieveNextTask();
-        IEnumerable<IDownloadTask> ConvertToTasks(IStreamInfo streamInfo);
-        void AddTask(IDownloadTask task);
-        void AddTasks(IEnumerable<IDownloadTask> task);
-        bool IsCompleted { get; }
-        bool HasNextTask { get; }
-        int OriginalTasksCount { get; }
-        int CurrentTasksCount { get; }
-        int CurrentCompletedTasksCount { get; }
-    }
-
     public interface IVideoDownloader
     {
-        Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> OnMessage, IDownloadContext context, CancellationToken token);
-        Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> OnMessage, IWatchSession session, IDownloadContext context, CancellationToken token);
-    }
-
-    public interface IVideoDownloadSettings
-    {
-        string NiconicoId { get; }
-        string FolderName { get; }
-        string FileNameFormat { get; }
-        string CommandFormat { get; }
-        string? EconomySuffix { get; }
-        bool IsOverwriteEnable { get; }
-        bool IsAutoDisposingEnable { get; }
-        bool IsReplaceStrictedEnable { get; }
-        bool IsOvwrridingFileDTEnable { get; }
-        bool IsNoEncodeEnable { get; }
-        bool IsResumeEnable { get; }
-        uint VerticalResolution { get; }
-        int MaxParallelDownloadCount { get; }
+        Task<IAttemptResult> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDownloadContext context, IWatchSession session, CancellationToken token);
     }
 
     /// <summary>
@@ -76,476 +37,306 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     /// </summary>
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(IWatchSession session, ILogger logger, IVideoDownloadHelper videoDownloadHelper, IDownloadMessenger messenger, IVideoEncoader encorder, INiconicoUtils utils, IVideoFileStorehandler fileStorehandler, IStreamResumer streamResumer)
+        public VideoDownloader(ILogger logger, IVideoDownloadHelper videoDownloadHelper, IVideoEncoader encorder, INiconicoUtils utils, IVideoFileStorehandler fileStorehandler, IStreamResumer streamResumer, INicoFileIO fileIO, IPathOrganizer pathOrganizer)
         {
-            this.session = session;
-            this.logger = logger;
-            this.videoDownloadHelper = videoDownloadHelper;
-            this.messenger = messenger;
-            this.encorder = encorder;
-            this.utils = utils;
-            this.fileStorehandler = fileStorehandler;
-            this.streamResumer = streamResumer;
+            this._logger = logger;
+            this._videoDownloadHelper = videoDownloadHelper;
+            this._encorder = encorder;
+            this._utils = utils;
+            this._fileStorehandler = fileStorehandler;
+            this._streamResumer = streamResumer;
+            this._fileIO = fileIO;
+            this._pathOrganizer = pathOrganizer;
         }
 
-        ~VideoDownloader()
-        {
-            if (!this.session.IsSessionExipired) this.session.Dispose();
-        }
+        #region field
 
-        public async Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
+        private readonly ILogger _logger;
+
+        private readonly IVideoDownloadHelper _videoDownloadHelper;
+
+        private readonly IVideoEncoader _encorder;
+
+        private readonly INiconicoUtils _utils;
+
+        private readonly IVideoFileStorehandler _fileStorehandler;
+
+        private readonly IStreamResumer _streamResumer;
+
+        private readonly INicoFileIO _fileIO;
+
+        private readonly IPathOrganizer _pathOrganizer;
+
+        private IDownloadContext? context;
+
+        #endregion
+
+        public async Task<IAttemptResult> DownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IDownloadContext context, IWatchSession session, CancellationToken token)
         {
-            this.messenger.AddHandler(onMessage);
-            this.logger.Log($"動画のダウンロードを開始しました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
+            IAttemptResult OnCanceled()
+            {
+                this._logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。({context.GetLogContent()})");
+                onMessage("ダウンロードをキャンセル");
+                return AttemptResult.Fail("処理がキャンセルされました");
+            }
+
+            this.context = context;
+            this._logger.Log($"動画のダウンロードを開始しました。({context.GetLogContent()})");
 
             if (session.IsSessionExipired)
             {
-                this.logger.Log("セッションが失効していたため動画のダウンロードをキャンセルします。(context_id: {context.Id}, content_id: {context.NiconicoId})");
-                this.messenger.RemoveHandler(onMessage);
-                return new DownloadResult() { Issucceeded = false, Message = "セッションが失効済のためダウンロード出来ません。" };
+                this._logger.Log($"セッションが失効していたため動画のダウンロードをキャンセルします。({context.GetLogContent()})");
+                return AttemptResult<string>.Fail("セッションが失効済のためダウンロード出来ません。");
             }
-
 
             if (!session.IsSessionEnsured)
             {
                 if (token.IsCancellationRequested)
                 {
-                    this.logger.Log("ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
-                    this.messenger.SendMessage("ダウンロードをキャンセル");
-                    this.messenger.RemoveHandler(onMessage);
-                    return this.GetCancelledResult();
+                    return OnCanceled();
                 }
-                await session.EnsureSessionAsync(settings.NiconicoId, true);
 
-                if (!session.IsSessionEnsured)
+                IAttemptResult sessionR = await this.EnsureSessionAsync(session, settings);
+
+                if (!sessionR.IsSucceeded)
                 {
-                    string message = session.State switch
-                    {
-                        WatchSessionState.HttpRequestOrPageAnalyzingFailure => "視聴ページの取得、または解析に失敗しました。",
-                        WatchSessionState.EncryptedVideo => "暗号化された動画のため、ダウンロードできません。",
-                        WatchSessionState.SessionEnsuringFailure => "セッションの確立に失敗しました。",
-                        _ => "不明なエラーにより、セッションの確立に失敗しました。"
-                    };
-
-                    this.messenger.SendMessage(message);
-                    this.messenger.RemoveHandler(onMessage);
-                    return new DownloadResult() { Issucceeded = false, Message = message };
+                    onMessage(sessionR.Message ?? "");
+                    return sessionR;
                 }
             }
 
 
-            string? economySuffix = session.Video!.DmcInfo.IsEnonomy ? settings.EconomySuffix : null;
-            string? suffix = economySuffix;
-            string ext = settings.IsNoEncodeEnable ? ".ts" : ".mp4";
-            string fileName = !settings.FileNameFormat.IsNullOrEmpty() ? this.utils.GetFileName(settings.FileNameFormat, session.Video!.DmcInfo, ext, settings.IsReplaceStrictedEnable, suffix)
-                : $"[{session.Video!.Id}]{session.Video!.Title}{ext}"
-                ;
+            //ファイル名取得
+            string fileName = this.GetFileName(session, settings);
+            context.FileName = fileName;
+
 
             if (token.IsCancellationRequested)
             {
-                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
-                this.messenger.SendMessage("ダウンロードをキャンセル");
-                this.messenger.RemoveHandler(onMessage);
-                return this.GetCancelledResult();
+                return OnCanceled();
             }
 
-            var streams = await session.GetAvailableStreamsAsync();
 
-            var targetStream = streams.GetStream(settings.VerticalResolution);
+            //ストリーム系
+            IAttemptResult<IStreamInfo> streamResult = await this.GetStream(session, settings.VerticalResolution);
 
+            if (!streamResult.IsSucceeded || streamResult.Data is null)
+            {
+                return AttemptResult.Fail(streamResult.Message, streamResult.Exception);
+            }
+
+            IStreamInfo targetStream = streamResult.Data;
+            List<string> rawsegmentFilePaths = targetStream.StreamUrls.Select(u => u.FileName).ToList();
             context.ActualVerticalResolution = targetStream.Resolution?.Vertical ?? 0;
             context.OriginalSegmentsCount = targetStream.StreamUrls.Count;
 
+
             if (token.IsCancellationRequested)
             {
-                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
-                this.messenger.SendMessage("ダウンロードをキャンセル");
-                this.messenger.RemoveHandler(onMessage);
-                return this.GetCancelledResult();
+                return OnCanceled();
             }
 
-            ISegmentsDirectoryInfo? segmentsDirectoryInfo = null;
-            var segmentFilePaths = targetStream.StreamUrls.Select(u => u.FileName).Copy();
-            if (settings.IsResumeEnable)
-            {
-                try
-                {
-                    segmentsDirectoryInfo = this.GetSegmentsDirectoryInfo(settings.NiconicoId, targetStream.Resolution?.Vertical ?? 0);
-                }
-                catch (Exception e)
-                {
-                    this.logger.Error("セグメントディレクトリ情報の取得に失敗しました。", e);
-                }
-            }
 
-            if (segmentsDirectoryInfo is not null)
+            //レジューム系
+            string segmentDirectoryName;
+            IAttemptResult<string> sResult = settings.ResumeEnable ? this.GetAndSetSegmentsDirectoryInfoIfExists(settings.NiconicoId, targetStream.Resolution?.Vertical ?? 0, targetStream) : AttemptResult<string>.Fail();
+
+            if (sResult.IsSucceeded && sResult.Data is not null)
             {
-                var urls = targetStream.StreamUrls.Where(u => !segmentsDirectoryInfo.ExistsFileNames.Contains(u.FileName)).Copy();
-                targetStream.StreamUrls.Clear();
-                targetStream.StreamUrls.AddRange(urls);
-                context.SegmentsDirectoryName = segmentsDirectoryInfo.DirectoryName;
-                this.messenger.SendMessage("DLをレジューム");
+                segmentDirectoryName = sResult.Data;
+                onMessage("DLをレジューム");
+                this._logger.Log($"ダウンロードをレジュームします。({context.GetLogContent()})");
             }
             else
             {
-                context.SegmentsDirectoryName = $"{settings.NiconicoId}-{targetStream.Resolution?.Vertical ?? 0}-{DateTime.Now.ToString("yyyy-MM-dd")}";
+                segmentDirectoryName = $"{settings.NiconicoId}-{targetStream.Resolution?.Vertical ?? 0}-{DateTime.Now.ToString("yyyy-MM-dd")}";
             }
+            List<string> segmentFilePaths = rawsegmentFilePaths.Select(p => Path.Combine(AppContext.BaseDirectory, "tmp", segmentDirectoryName, p)).ToList();
 
-            segmentFilePaths = segmentFilePaths.Select(p => Path.Combine(AppContext.BaseDirectory, "tmp", context.SegmentsDirectoryName, p));
 
-            try
+            //DL系
+            IAttemptResult downloadresult = await this.DownloadVideoInternalAsync(targetStream, onMessage, context, settings.MaxParallelSegmentDLCount, segmentDirectoryName, token);
+            if (!downloadresult.IsSucceeded)
             {
-                await this.videoDownloadHelper.DownloadAsync(targetStream, this.messenger, context, settings.MaxParallelDownloadCount, token);
-
+                return downloadresult;
             }
-            catch (Exception e)
-            {
-                this.logger.Error("動画のダウンロード中にエラーが発生しました。", e);
-                this.messenger.SendMessage("動画のダウンロードに失敗");
-                this.messenger.RemoveHandler(onMessage);
-                return new DownloadResult() { Issucceeded = false, Message = $"動画のダウンロード中にエラーが発生しました。(詳細: {e.Message})" };
-            }
-
-            if (settings.IsAutoDisposingEnable) session.Dispose();
 
             if (token.IsCancellationRequested)
             {
-                this.logger.Log($"ユーザーの操作によって動画のダウンロード処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
-                this.messenger.SendMessage("ダウンロードをキャンセル");
-                this.messenger.RemoveHandler(onMessage);
-                return this.GetCancelledResult();
+                return OnCanceled();
             }
 
-            this.messenger.SendMessage("動画を変換中...");
+            onMessage("動画を変換中...");
+            IAttemptResult encodeResult = await this.EncodeVideosAsync(session, context, settings, onMessage, segmentFilePaths, token);
+            if (!encodeResult.IsSucceeded)
+            {
+                return encodeResult;
+            }
+            onMessage("動画の変換が完了");
+
+            this.DeleteTmpFolder(segmentDirectoryName, onMessage);
+
+
+            bool isEconomy = session.Video!.DmcInfo.IsEnonomy;
+            if (settings.IsEconomy && settings.DeleteExistingEconomyFile && !isEconomy)
+            {
+                this.RemoveEconomyFile(settings.FilePath);
+            }
+
+            this._fileStorehandler.Add(settings.NiconicoId, Path.Combine(settings.FolderPath, fileName));
+
+            this._logger.Log($"動画のダウンロードが完了しました。({context.GetLogContent()})");
+
+            return AttemptResult.Succeeded();
+        }
+
+        #region private
+
+        private async Task<IAttemptResult> EncodeVideosAsync(IWatchSession session, IDownloadContext context, IDownloadSettings settings, Action<string> onMessage, IEnumerable<string> segmentFilePaths, CancellationToken token)
+        {
+
             var encodeSetting = new EncodeSettings()
             {
-                FileName = fileName,
-                FolderName = settings.FolderName,
+                FilePath = context.FileName,
                 CommandFormat = settings.CommandFormat,
                 TsFilePaths = segmentFilePaths,
-                IsOverwriteEnable = settings.IsOverwriteEnable,
-                IsOverrideDTEnable = settings.IsOvwrridingFileDTEnable,
-                UploadedOn = session.Video.DmcInfo.UploadedOn,
-                IsNoEncodeEnable = settings.IsNoEncodeEnable,
+                IsOverwriteEnable = settings.Overwrite,
+                IsOverrideDTEnable = settings.OverrideVideoFileDateToUploadedDT,
+                UploadedOn = session.Video!.DmcInfo.UploadedOn,
+                IsNoEncodeEnable = settings.SaveWithoutEncode,
             };
 
             try
             {
-                await this.encorder.EncodeAsync(encodeSetting, this.messenger, token);
-            }
-            catch (TaskCanceledException)
-            {
-                this.logger.Log($"ユーザーの操作によって動画の変換処理がキャンセルされました。(context_id: {context.Id}, content_id: {context.NiconicoId})");
-                this.messenger.SendMessage("動画の変換中にキャンセル");
-                this.messenger.RemoveHandler(onMessage);
-                return new DownloadResult() { Issucceeded = false, Message = $"動画の変換中にキャンセルされました。" };
+                await this._encorder.EncodeAsync(encodeSetting, onMessage, token);
             }
             catch (Exception e)
             {
-                this.logger.Error("ファイルの変換中にエラーが発生しました。", e);
-                this.messenger.SendMessage("動画の変換中にエラー発生");
-                this.messenger.RemoveHandler(onMessage);
-                return new DownloadResult() { Issucceeded = false, Message = $"ファイルの変換中にエラーが発生しました。(詳細: {e.Message})" };
+                this._logger.Error($"ファイルの変換中にエラーが発生しました。({this.context!.GetLogContent()})", e);
+                onMessage("動画の変換中にエラー発生");
+                return AttemptResult.Fail($"ファイルの変換中にエラーが発生しました。(詳細: {e.Message})");
             }
-            this.messenger.SendMessage("動画の変換が完了");
 
-            this.DeleteTmpFolder(context);
-
-            this.fileStorehandler.Add(settings.NiconicoId, Path.Combine(settings.FolderName, fileName));
-
-            this.messenger.RemoveHandler(onMessage);
-            return new DownloadResult() { Issucceeded = true, VideoFileName = fileName, VerticalResolution = targetStream.Resolution!.Vertical };
+            return AttemptResult.Succeeded();
         }
 
-        public async Task<IDownloadResult> DownloadVideoAsync(IVideoDownloadSettings settings, Action<string> onMessage, IDownloadContext context, CancellationToken token)
+        private async Task<IAttemptResult> DownloadVideoInternalAsync(IStreamInfo targetStream, Action<string> onMessage, IDownloadContext context, int maxParallelSegmentDLCount, string segmentDirectoryName, CancellationToken token)
         {
-            return await this.DownloadVideoAsync(settings, onMessage, this.session, context, token);
+
+            try
+            {
+                await this._videoDownloadHelper.DownloadAsync(targetStream, onMessage, context, maxParallelSegmentDLCount, segmentDirectoryName, token);
+
+            }
+            catch (Exception e)
+            {
+                this._logger.Error($"動画のダウンロード中にエラーが発生しました。({this.context!.GetLogContent()})", e);
+                onMessage("動画のダウンロードに失敗");
+                return AttemptResult.Fail($"動画のダウンロード中にエラーが発生しました。(詳細: {e.Message})");
+            }
+
+            return AttemptResult.Succeeded();
         }
 
-        /// <summary>
-        /// セグメントディレクトリ情報を取得する
-        /// </summary>
-        /// <param name="niconicoID"></param>
-        /// <param name="verticalResolution"></param>
-        /// <returns></returns>
-        private ISegmentsDirectoryInfo? GetSegmentsDirectoryInfo(string niconicoID, uint verticalResolution)
+        private async Task<IAttemptResult<IStreamInfo>> GetStream(IWatchSession session, uint resolution)
         {
-            if (!this.streamResumer.SegmentsDirectoryExists(niconicoID)) return null;
+            IStreamInfo targetStream;
 
-            var info = this.streamResumer.GetSegmentsDirectoryInfo(niconicoID);
+            try
+            {
+                IStreamsCollection streams = await session.GetAvailableStreamsAsync();
+                targetStream = streams.GetStream(resolution);
+            }
+            catch (Exception e)
+            {
+                this._logger.Error($"ストリームの取得に失敗しました。({this.context!.GetLogContent()})", e);
+                return AttemptResult<IStreamInfo>.Fail("ストリームの取得に失敗しました。", e);
+            }
+
+            return AttemptResult<IStreamInfo>.Succeeded(targetStream);
+        }
+
+        private async Task<IAttemptResult> EnsureSessionAsync(IWatchSession session, IDownloadSettings settings)
+        {
+
+            await session.EnsureSessionAsync(settings.NiconicoId);
+
+            if (!session.IsSessionEnsured)
+            {
+                string message = session.State switch
+                {
+                    WatchSessionState.HttpRequestOrPageAnalyzingFailure => "視聴ページの取得、または解析に失敗しました。",
+                    WatchSessionState.EncryptedVideo => "暗号化された動画のため、ダウンロードできません。",
+                    WatchSessionState.SessionEnsuringFailure => "セッションの確立に失敗しました。",
+                    _ => "不明なエラーにより、セッションの確立に失敗しました。"
+                };
+
+                return AttemptResult.Fail(message);
+            }
+            else
+            {
+                this._logger.Log($"視聴セッションを確立しました。({this.context!.GetLogContent()})");
+                return AttemptResult.Succeeded();
+            }
+        }
+
+        private IAttemptResult<string> GetAndSetSegmentsDirectoryInfoIfExists(string niconicoID, uint verticalResolution, IStreamInfo stream)
+        {
+            if (!this._streamResumer.SegmentsDirectoryExists(niconicoID)) return AttemptResult<string>.Fail();
+
+            var info = this._streamResumer.GetSegmentsDirectoryInfo(niconicoID);
 
             if (info.Resolution != verticalResolution)
             {
-                this.streamResumer.RemoveSegmentsdirectory(niconicoID);
-                return null;
+                this._streamResumer.RemoveSegmentsdirectory(niconicoID);
+                return AttemptResult<string>.Fail();
             }
 
-            return info;
+            var urls = stream.StreamUrls.Where(u => info.ExistsFileNames.Contains(u.FileName)).Copy();
+            stream.StreamUrls.Clear();
+            stream.StreamUrls.AddRange(urls);
+            return AttemptResult<string>.Succeeded(info.DirectoryName);
         }
 
-        /// <summary>
-        /// 一時フォルダーを削除
-        /// </summary>
-        private void DeleteTmpFolder(IDownloadContext context)
+        private string GetFileName(IWatchSession session, IDownloadSettings settings)
         {
-            string folderPath = Path.Combine(AppContext.BaseDirectory, "tmp", context.SegmentsDirectoryName);
+            string? economySuffix = session.Video!.DmcInfo.IsEnonomy ? settings.EconomySuffix : null;
+            string? suffix = economySuffix;
+            string ext = settings.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt;
+            string format = string.IsNullOrEmpty(settings.FileNameFormat) ? Format.DefaultFileNameFormat : settings.FileNameFormat;
+
+            return this._pathOrganizer.GetFilePath(format, session.Video!.DmcInfo, ext, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, suffix);
+        }
+
+        private void DeleteTmpFolder(string segmentDirectoryName, Action<string> onMessage)
+        {
+            string folderPath = Path.Combine(AppContext.BaseDirectory, "tmp", segmentDirectoryName);
             if (!Directory.Exists(folderPath)) return;
+
             try
             {
                 Directory.Delete(folderPath, true);
             }
             catch (Exception e)
             {
-
-                this.logger.Error("一時フォルダーの削除中にエラーが発生しました。", e);
-                this.messenger.SendMessage("一時フォルダーの削除中にエラー発生");
+                this._logger.Error($"一時フォルダーの削除中にエラーが発生しました。({this.context!.GetLogContent()})", e);
+                onMessage("一時フォルダーの削除中にエラー発生");
             }
         }
 
-        private readonly IWatchSession session;
-
-        private readonly ILogger logger;
-
-        private readonly IVideoDownloadHelper videoDownloadHelper;
-
-        private readonly IDownloadMessenger messenger;
-
-        private readonly IVideoEncoader encorder;
-
-        private readonly INiconicoUtils utils;
-
-        private readonly IVideoFileStorehandler fileStorehandler;
-
-        private readonly IStreamResumer streamResumer;
-
-        /// <summary>
-        /// キャンセル時のメッセージを取得する
-        /// </summary>
-        /// <returns></returns>
-        private IDownloadResult GetCancelledResult()
+        private void RemoveEconomyFile(string path)
         {
-            return new DownloadResult() { Issucceeded = false, Message = "処理がキャンセルされました" };
-        }
-    }
-
-    /// <summary>
-    /// ダウンロードの実処理を担当する
-    /// </summary>
-    public class VideoDownloadHelper : IVideoDownloadHelper
-    {
-
-        public VideoDownloadHelper(INicoHttp http, ISegmentWriter writer, ILogger logger)
-        {
-            this.http = http;
-            this.writer = writer;
-            this.logger = logger;
-        }
-
-        /// <summary>
-        /// httpクライアント
-        /// </summary>
-        private readonly INicoHttp http;
-
-        /// <summary>
-        /// データハンドラ
-        /// </summary>
-        private readonly ISegmentWriter writer;
-
-        private readonly ILogger logger;
-
-        /// <summary>
-        /// 非同期でダウンロードする
-        /// </summary>
-        /// <param name="taskHandler"></param>
-        /// <returns></returns>
-        public async Task DownloadAsync(IStreamInfo stream, IDownloadMessenger messenger, IDownloadContext context, int maxParallelDownloadCount, CancellationToken token)
-        {
-            var taskHandler = new ParallelTasksHandler<IParallelDownloadTask>(maxParallelDownloadCount, false);
-            var completed = context.OriginalSegmentsCount - stream.StreamUrls.Count;
-            var all = context.OriginalSegmentsCount;
-            var resolution = context.ActualVerticalResolution == 0 ? string.Empty : $"（{context.ActualVerticalResolution}px）";
-            Exception? ex = null;
-
-            var tasks = stream.StreamUrls.Select(url => new ParallelDownloadTask(async (self, _, pToken) =>
+            try
             {
-                if (token.IsCancellationRequested || ex is not null)
-                {
-                    pToken.IsSkipped = true;
-                    return;
-                }
-
-                byte[] data;
-
-                try
-                {
-                    data = await this.DownloadInternalAsync(self.Url, self.Context, token);
-                }
-                catch (Exception e)
-                {
-                    ex = e;
-                    this.logger.Error($"セグメント(idx:{self.SequenceZero})の取得に失敗しました。(context_id:{context.Id},content_id:{context.NiconicoId})", e);
-                    return;
-                }
-
-                this.logger.Log($"セグメント(idx:{self.SequenceZero})を取得しました。(context_id:{context.Id},content_id:{context.NiconicoId})");
-
-                if (token.IsCancellationRequested)
-                {
-                    return;
-                }
-
-
-                try
-                {
-                    this.writer.Write(data, self, context);
-                }
-                catch (Exception e)
-                {
-                    ex = e;
-                    return;
-                }
-
-                completed++;
-                messenger.SendMessage($"完了: {completed}/{all}{resolution}");
-
-                await Task.Delay(1 * 1000, token);
-
-
-            }, context, url.AbsoluteUrl, url.SequenceZero, url.FileName));
-
-            foreach (var task in tasks)
-            {
-                taskHandler.AddTaskToQueue(task);
+                this._fileIO.Delete(path);
             }
-
-            await taskHandler.ProcessTasksAsync(ct: token);
-
-            if (ex is not null)
+            catch (Exception e)
             {
-                throw ex;
+                this._logger.Error($"エコノミーファイルの削除中にエラーが発生しました。({this.context!.GetLogContent()})", e);
             }
         }
 
-        /// <summary>
-        /// 全てのファイルの完全パスを取得する
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<string> GetAllFileAbsPaths()
-        {
-            return this.writer.FilesPathAbs;
-        }
-
-        /// <summary>
-        /// フォルダー名
-        /// </summary>
-        public string FolderName => this.writer.FolderNameAbs;
-
-        /// <summary>
-        /// 内部ダウンロードメソッド
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="context"></param>
-        /// <param name="retryAttempt"></param>
-        /// <returns></returns>
-        private async Task<byte[]> DownloadInternalAsync(string url, IDownloadContext context, CancellationToken token, int retryAttempt = 0)
-        {
-            var res = await this.http.GetAsync(new Uri(url));
-            if (!res.IsSuccessStatusCode)
-            {
-                //リトライ回数は3回
-                if (retryAttempt < 3)
-                {
-                    retryAttempt++;
-                    await Task.Delay(10 * 1000, token);
-                    return await this.DownloadInternalAsync(url, context, token, retryAttempt);
-                }
-                else
-                {
-                    throw new HttpRequestException($"セグメントファイルの取得に失敗しました。(status: {(int)res.StatusCode}, reason_phrase: {res.ReasonPhrase}, url: {url}, context_id:{context.Id},content_id:{context.NiconicoId})");
-                }
-            }
-
-            return await res.Content.ReadAsByteArrayAsync();
-        }
-    }
-
-    public interface IParallelDownloadTask : IParallelTask<IParallelDownloadTask>
-    {
-        IDownloadContext Context { get; init; }
-        string FileName { get; init; }
-        int SequenceZero { get; init; }
-        string Url { get; init; }
-    }
-
-    /// <summary>
-    /// 並列DLタスク
-    /// </summary>
-    public class ParallelDownloadTask : IParallelDownloadTask
-    {
-        public ParallelDownloadTask(Func<IParallelDownloadTask, object, IParallelTaskToken, Task> taskFunc, IDownloadContext context, string url, int sequenceZero, string filename)
-        {
-            this.TaskFunction = taskFunc;
-            this.TaskId = Guid.NewGuid();
-            this.OnWait += (_) => { };
-            this.Context = context;
-            this.Url = url;
-            this.SequenceZero = sequenceZero;
-            this.FileName = filename;
-        }
-
-        /// <summary>
-        /// コンテクスト
-        /// </summary>
-        public IDownloadContext Context { get; init; }
-
-        public string Url { get; init; }
-
-        public string FileName { get; init; }
-
-        /// <summary>
-        /// ストリームのインデックス
-        /// </summary>
-        public int SequenceZero { get; init; }
-
-        public int Index { get; set; }
-
-        public Guid TaskId { get; init; }
-
-        public Func<IParallelDownloadTask, object, IParallelTaskToken, Task> TaskFunction { get; init; }
-
-        public Action<int> OnWait { get; init; }
-    }
-
-    /// <summary>
-    /// ダウンロード設定
-    /// </summary>
-    public class VideoDownloadSettings : IVideoDownloadSettings
-    {
-        public string NiconicoId { get; set; } = string.Empty;
-
-        public string FolderName { get; set; } = string.Empty;
-
-        public string FileNameFormat { get; set; } = string.Empty;
-
-        public string CommandFormat { get; set; } = Format.DefaultFFmpegFormat;
-
-        public string? EconomySuffix { get; set; }
-
-        public bool IsOverwriteEnable { get; set; }
-
-        public bool IsAutoDisposingEnable { get; set; }
-
-        public bool IsReplaceStrictedEnable { get; set; }
-
-        public bool IsOvwrridingFileDTEnable { get; set; }
-
-        public bool IsResumeEnable { get; set; }
-
-        public bool IsNoEncodeEnable { get; set; }
-
-        public uint VerticalResolution { get; set; }
-
-        public int MaxParallelDownloadCount { get; set; }
+        #endregion
 
     }
 }

@@ -1,50 +1,113 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using Niconicome.Models.Playlist;
+using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download
 {
-    interface IDownloadTasksHandler
+    public interface IDownloadTasksHandler
     {
+        /// <summary>
+        /// ダウンロードタスク
+        /// </summary>
         IDownloadTaskPool DownloadTaskPool { get; init; }
+
+        /// <summary>
+        /// ステージ済みタスク
+        /// </summary>
         IDownloadTaskPool StagedDownloadTaskPool { get; init; }
 
-        void ClearStaged();
+        /// <summary>
+        /// キャンセル済みを表示
+        /// </summary>
+        ReactiveProperty<bool> DisplayCanceled { get; }
+
+        /// <summary>
+        /// 完了済みを表示
+        /// </summary>
+        ReactiveProperty<bool> DisplayCompleted { get; }
+
+        /// <summary>
+        /// ステージ済みタスクをキューに移動
+        /// </summary>
+        /// <param name="clearAfterMove"></param>
         void MoveStagedToQueue(bool clearAfterMove = true);
+
+        /// <summary>
+        /// 条件に一致するステージ済みタスクをキューに移動
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <param name="clearAfterMove"></param>
         void MoveStagedToQueue(Func<IDownloadTask, bool> predicate, bool clearAfterMove = true);
+
+        /// <summary>
+        /// 動画をステージ
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="settings"></param>
+        /// <param name="allowDupe"></param>
         void StageVIdeo(IListVideoInfo video, DownloadSettings settings, bool allowDupe);
+
+        /// <summary>
+        /// 複数の動画をステージ
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="settings"></param>
+        /// <param name="allowDupe"></param>
         void StageVIdeos(IEnumerable<IListVideoInfo> videos, DownloadSettings settings, bool allowDupe);
-        bool ContainsStage(Func<IDownloadTask, bool> predicate);
     }
 
-    class DownloadTasksHandler : IDownloadTasksHandler
+    public class DownloadTasksHandler : IDownloadTasksHandler
     {
 
         public DownloadTasksHandler(IDownloadTaskPool staged, IDownloadTaskPool download)
         {
             this.StagedDownloadTaskPool = staged;
             this.DownloadTaskPool = download;
+
+            this.DownloadTaskPool.RegisterFilter(task =>
+            {
+                if (!this.DisplayCanceled.Value && task.IsCanceled.Value)
+                {
+                    return false;
+                }
+                else if (!this.DisplayCompleted.Value && task.IsDone.Value)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            });
+
+            this.DisplayCanceled.Subscribe(_ => this.DownloadTaskPool.Refresh());
+            this.DisplayCompleted.Subscribe(_ => this.DownloadTaskPool.Refresh());
         }
 
-        /// <summary>
-        /// ステージング済み
-        /// </summary>
+        #region Props
+
         public IDownloadTaskPool StagedDownloadTaskPool { get; init; }
 
-        /// <summary>
-        /// ダウンロード対象
-        /// </summary>
         public IDownloadTaskPool DownloadTaskPool { get; init; }
 
-        /// <summary>
-        /// 動画をステージする
-        /// </summary>
-        /// <param name="video"></param>
-        /// <param name="settings"></param>
+        public ReactiveProperty<bool> DisplayCanceled { get; init; } = new(true);
+
+        public ReactiveProperty<bool> DisplayCompleted { get; init; } = new(true);
+
+        #endregion
+
+        #region Method
+
         public void StageVIdeo(IListVideoInfo video, DownloadSettings settings, bool allowDupe)
         {
-            var task = new DownloadTask(video.NiconicoId.Value, video.Title.Value, video.Id.Value, settings);
+            if (!allowDupe && this.StagedDownloadTaskPool.Tasks.Any(t => t.NiconicoID == video.NiconicoId.Value))
+            {
+                return;
+            }
+            var task = new DownloadTask(video, settings);
             task.Message.Subscribe(value =>
             {
                 if (value is not null) video.Message.Value = value;
@@ -52,11 +115,6 @@ namespace Niconicome.Models.Network.Download
             this.StagedDownloadTaskPool.AddTask(task);
         }
 
-        /// <summary>
-        /// 複数の動画をステージする
-        /// </summary>
-        /// <param name="videos"></param>
-        /// <param name="settings"></param>
         public void StageVIdeos(IEnumerable<IListVideoInfo> videos, DownloadSettings settings, bool allowDupe)
         {
             foreach (var video in videos)
@@ -65,55 +123,44 @@ namespace Niconicome.Models.Network.Download
             }
         }
 
-        /// <summary>
-        /// ステージング済みをクリア
-        /// </summary>
-        public void ClearStaged()
+        public void MoveStagedToQueue(bool clearAfterMove = true)
+        {
+            this.DownloadTaskPool.AddTasks(this.StagedDownloadTaskPool.Tasks);
+            this.SubscribeTaskProperty(this.StagedDownloadTaskPool.Tasks);
+            if (clearAfterMove) this.ClearStaged();
+        }
+
+        public void MoveStagedToQueue(Func<IDownloadTask, bool> predicate, bool clearAfterMove = true)
+        {
+            var tasks = this.StagedDownloadTaskPool.Tasks.Where(predicate);
+            this.DownloadTaskPool.AddTasks(tasks);
+            this.SubscribeTaskProperty(tasks);
+            if (clearAfterMove) this.RemoveStaged(tasks);
+        }
+
+        #endregion
+
+        #region private
+
+        private void RemoveStaged(IEnumerable<IDownloadTask> tasks)
+        {
+            this.StagedDownloadTaskPool.RemoveTasks(tasks);
+        }
+
+        private void ClearStaged()
         {
             this.StagedDownloadTaskPool.Clear(false);
         }
 
-        /// <summary>
-        /// フィルターして削除
-        /// </summary>
-        /// <param name="predicate"></param>
-        public void RemoveStaged(Predicate<IDownloadTask> predicate)
+        private void SubscribeTaskProperty(IEnumerable<IDownloadTask> tasks)
         {
-            this.StagedDownloadTaskPool.RemoveTasks(predicate);
+            foreach (var task in tasks)
+            {
+                Observable.Merge(task.IsCanceled, task.IsDone).Subscribe(_ => this.DownloadTaskPool.Refresh());
+            }
         }
 
-        /// <summary>
-        /// ステージング済みをキューに追加
-        /// </summary>
-        /// <param name="clearAfterMove"></param>
-        public void MoveStagedToQueue(bool clearAfterMove = true)
-        {
-            this.DownloadTaskPool.AddTasks(this.StagedDownloadTaskPool.GetAllTasks());
-            if (clearAfterMove) this.ClearStaged();
-        }
-
-        /// <summary>
-        /// ステージング済みをフィルターして追加
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <param name="clearAfterMove"></param>
-        public void MoveStagedToQueue(Func<IDownloadTask, bool> predicate, bool clearAfterMove = true)
-        {
-            var videos = this.StagedDownloadTaskPool.GetAllTasks().Where(predicate);
-            this.DownloadTaskPool.AddTasks(videos);
-            if (clearAfterMove) this.RemoveStaged(t => predicate(t));
-
-        }
-
-        /// <summary>
-        /// ステージング済みタスクを確認
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public bool ContainsStage(Func<IDownloadTask, bool> predicate)
-        {
-            return this.StagedDownloadTaskPool.HasTask(predicate);
-        }
+        #endregion
 
 
     }

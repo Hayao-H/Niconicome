@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
+using CS = Microsoft.ClearScript;
 
 namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 {
@@ -162,6 +163,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         SessionInfo = sessionInfo,
                         IsPremium = this.RawDmcInfo.IsPremium,
                         IsPeakTime = this.RawDmcInfo.IsPeakTime,
+                        CommentServer = this.RawDmcInfo.CommentServer is CS::Undefined ? string.Empty : this.RawDmcInfo.CommentServer,
                     };
                     this.cachedDmcInfo.Tags.AddRange(JsUtils.ToClrArray<string>(this.RawDmcInfo.Tags));
 
@@ -186,6 +188,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                             Label = rawThread.Label,
                             PostkeyStatus = rawThread.PostkeyStatus,
                             Server = rawThread.Server,
+                            VideoID = rawThread.VideoID,
+                            ForkLabel = rawThread.ForkLabel,
                         };
                         this.cachedDmcInfo.CommentThreads.Add(thread);
                     }

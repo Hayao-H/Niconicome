@@ -45,31 +45,6 @@
   <link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/styles/pages/watch.css?5634edb0" as="style"><link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/failover2flash/watch_failover2flash.js?dbcea936" crossorigin="anonymous" as="script"><link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/modern/watch_dll_c915f9febc0b1c112d2f.js" crossorigin="anonymous" as="script"><link rel="prefetch" href="https://nicovideo.cdn.nimg.jp/web/scripts/pages/watch/modern/watch_app_b1eb38cfa0c078718100.js" crossorigin="anonymous" as="script">
 
 
-            <script type="text/javascript">
-  try {
-    window.NicoGoogleTagManagerDataLayer = [];
-
-    var data = {
-    };
-
-        data.user = (function() {
-      var user = {
-      };
-
-                  user.user_id = parseInt('74537208', 10) || null;
-      user.login_status = 'login';
-      user.member_status = 'premium';
-      user.ui_area = 'jp';
-      user.ui_lang = 'ja-jp';
-
-            
-      return user;
-    })();
-
-    window.NicoGoogleTagManagerDataLayer.push(data);
-  } catch(e) {
-  }
-</script>
 <script>
     
   (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

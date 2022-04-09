@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core
@@ -20,7 +21,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         /// 外部から設定する
         /// </summary>
         /// <param name="flags"></param>
-        void Configure(V8ScriptEngineFlags flags, int debugPort = 2525);
+        void Configure(V8ScriptEngineFlags flags);
     }
 
     public class JavaScriptExecuter : IJavaScriptExecuter
@@ -62,7 +63,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="code"></param>
-        /// <returns></returns>
+        /// <returns></returns>-
         public T EvaluateAs<T>(string code)
         {
             return (T)this.Evaluate(code);
@@ -108,15 +109,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core
             GC.SuppressFinalize(this);
         }
 
-        public void Configure(V8ScriptEngineFlags flags, int debugPort = 2525)
+        public void Configure(V8ScriptEngineFlags flags)
         {
-            this.engine = new V8ScriptEngine(flags, debugPort);
+            this.engine = new V8ScriptEngine(flags);
         }
 
         /// <summary>
         /// デフォルト設定
         /// </summary>
-        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion | V8ScriptEngineFlags.EnableDynamicModuleImports;
+        public static V8ScriptEngineFlags DefaultFlags => V8ScriptEngineFlags.EnableTaskPromiseConversion | V8ScriptEngineFlags.EnableDateTimeConversion;
 
 
     }

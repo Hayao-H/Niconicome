@@ -12,15 +12,61 @@ namespace Niconicome.Models.Playlist.Playlist
 {
     public interface ISortInfoHandler
     {
+        /// <summary>
+        /// ソート方法
+        /// </summary>
         ReactiveProperty<VideoSortType> SortType { get; }
+
+        /// <summary>
+        /// ソート方法（文字列）
+        /// </summary>
         ReactiveProperty<string?> SortTypeStr { get; }
+
+        /// <summary>
+        /// 降順
+        /// </summary>
         ReactiveProperty<bool> IsDescending { get; }
+
+        /// <summary>
+        /// 降順（文字列）
+        /// </summary>
         ReactiveProperty<string?> IsDescendingStr { get; }
+
+        /// <summary>
+        /// ID列
+        /// </summary>
         ReactiveProperty<string> IdColumnTitle { get; }
+
+        /// <summary>
+        /// タイトル列
+        /// </summary>
         ReactiveProperty<string> TitleColumnTitle { get; }
+
+        /// <summary>
+        /// 投稿日時列
+        /// </summary>
         ReactiveProperty<string> UploadColumnTitle { get; }
+
+        /// <summary>
+        /// 再生回数列
+        /// </summary>
         ReactiveProperty<string> ViewCountColumnTitle { get; }
+
+        /// <summary>
+        /// DL済み列
+        /// </summary>
         ReactiveProperty<string> DlFlagColumnTitle { get; }
+
+        /// <summary>
+        /// 状態列
+        /// </summary>
+        ReactiveProperty<string> StateColumnTitle { get; }
+
+        /// <summary>
+        /// エコノミー列
+        /// </summary>
+        ReactiveProperty<string> EconomyColumnTitle { get; }
+
     }
 
     /// <summary>
@@ -43,13 +89,17 @@ namespace Niconicome.Models.Playlist.Playlist
             this.UploadColumnTitle = new ReactiveProperty<string>(DefaultUploadColumnTitle);
             this.DlFlagColumnTitle = new ReactiveProperty<string>(DefaultDlFlagColumnTitle);
             this.ViewCountColumnTitle = new ReactiveProperty<string>(DefaultViewCountColumnTitle);
+            this.StateColumnTitle = new ReactiveProperty<string>(DefaultStateColumnTitle);
+            this.EconomyColumnTitle = new ReactiveProperty<string>(DefaultEconomyColumnTitle);
             this.SortTypeStr = this.SortType.Select(value => value switch
             {
-                VideoSortType.NiconicoID => "ID",
-                VideoSortType.Title => "タイトル",
-                VideoSortType.UploadedDT => "投稿日",
-                VideoSortType.ViewCount => "再生回数",
+                VideoSortType.NiconicoID => DefaultIdColumnTitle,
+                VideoSortType.Title => DefaultTitleColumnTitle,
+                VideoSortType.UploadedDT => DefaultUploadColumnTitle,
+                VideoSortType.ViewCount => DefaultViewCountColumnTitle,
                 VideoSortType.Custom => "カスタム",
+                VideoSortType.State => DefaultStateColumnTitle,
+                VideoSortType.Economy => DefaultEconomyColumnTitle,
                 _ => "登録順",
             }).ToReactiveProperty().AddTo(this.disposables);
             this.IsDescendingStr = this.IsDescending.Select(value => value ? "降順" : "昇順").ToReactiveProperty().AddTo(this.disposables);
@@ -153,56 +203,41 @@ namespace Niconicome.Models.Playlist.Playlist
 
         public const string DefaultDlFlagColumnTitle = "DL済み";
 
+        public const string DefaultStateColumnTitle = "状態";
+
+        public const string DefaultEconomyColumnTitle = "エコノミー";
+
         private bool noSort;
         #endregion
 
-        /// <summary>
-        /// 並び替え情報
-        /// </summary>
+        #region Props
+
         public ReactiveProperty<VideoSortType> SortType { get; init; }
 
-        /// <summary>
-        /// 降順
-        /// </summary>
         public ReactiveProperty<bool> IsDescending { get; init; }
 
-
-        /// <summary>
-        /// 並び替え情報(文字列)
-        /// </summary>
-        /// <value></value>
         public ReactiveProperty<string?> SortTypeStr { get; init; }
 
-        /// <summary>
-        /// 降順(文字列)
-        /// </summary>
-        /// <value></value>
         public ReactiveProperty<string?> IsDescendingStr { get; init; }
 
-        /// <summary>
-        /// ID
-        /// </summary>
         public ReactiveProperty<string> IdColumnTitle { get; init; }
 
-        /// <summary>
-        /// タイトル
-        /// </summary>
         public ReactiveProperty<string> TitleColumnTitle { get; init; }
 
-        /// <summary>
-        /// 投稿日時
-        /// </summary>
         public ReactiveProperty<string> UploadColumnTitle { get; init; }
 
-        /// <summary>
-        /// 視聴回数
-        /// </summary>
         public ReactiveProperty<string> ViewCountColumnTitle { get; init; }
 
-        /// <summary>
-        /// ダウンロードフラグ
-        /// </summary>
         public ReactiveProperty<string> DlFlagColumnTitle { get; init; }
+
+        public ReactiveProperty<string> StateColumnTitle { get; init; }
+
+        public ReactiveProperty<string> EconomyColumnTitle { get; init; }
+
+        #endregion
+
+
+        #region private
 
         /// <summary>
         /// カラムタイトルを設定する
@@ -216,7 +251,11 @@ namespace Niconicome.Models.Playlist.Playlist
             this.UploadColumnTitle.Value = sort == VideoSortType.UploadedDT ? DefaultUploadColumnTitle + dMark : DefaultUploadColumnTitle;
             this.ViewCountColumnTitle.Value = sort == VideoSortType.ViewCount ? DefaultViewCountColumnTitle + dMark : DefaultViewCountColumnTitle;
             this.DlFlagColumnTitle.Value = sort == VideoSortType.DownloadedFlag ? DefaultDlFlagColumnTitle + dMark : DefaultDlFlagColumnTitle;
+            this.StateColumnTitle.Value = sort == VideoSortType.State ? DefaultStateColumnTitle + dMark : DefaultStateColumnTitle;
+            this.EconomyColumnTitle.Value = sort == VideoSortType.Economy ? DefaultEconomyColumnTitle + dMark : DefaultEconomyColumnTitle;
         }
+
+        #endregion
 
 
     }

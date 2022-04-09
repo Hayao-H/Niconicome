@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Domain.Local.LocalFile
@@ -39,7 +40,8 @@ namespace Niconicome.Models.Domain.Local.LocalFile
 
             try
             {
-                files.AddRange(Directory.GetFiles(directoryPath, "*.mp4", option));
+                files.AddRange(Directory.GetFiles(directoryPath, FileFolder.Mp4FileExt, option));
+                files.AddRange(Directory.GetFiles(directoryPath, FileFolder.TsFileExt, option));
             }
             catch (Exception e)
             {

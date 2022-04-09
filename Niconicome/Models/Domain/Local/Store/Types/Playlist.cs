@@ -128,6 +128,8 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         UploadedDT,
         ViewCount,
         DownloadedFlag,
+        State,
+        Economy,
         Custom
     }
 }

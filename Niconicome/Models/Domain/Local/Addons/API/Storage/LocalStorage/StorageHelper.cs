@@ -152,7 +152,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
         private void OpenDataBase(ILogger logger, string packageID)
         {
             ILiteDatabase db;
-            string path = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, packageID, Const::Adddon.LocalStorageFileName);
+            string path = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, packageID, Const::AddonConstant.LocalStorageFileName);
 
             try
             {

@@ -13,58 +13,140 @@ namespace Niconicome.Models.Domain.Local.Store
 {
     public interface IPlaylistStoreHandler
     {
-        STypes::Playlist GetRootPlaylist();
-        STypes::Playlist? GetPlaylist(int id);
-        STypes::Playlist? GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate);
-        public int AddPlaylist(int parentID, string name);
-        public int AddVideo(IListVideoInfo video, int playlistId);
-        public void RemoveVideo(int id, int playlistId);
-        public void Update(ITreePlaylistInfo newplaylist);
-        List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self);
-        List<STypes::Playlist> GetChildPlaylists(int id);
-        List<STypes::Playlist> GetAllPlaylists();
-        IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex);
-        IAttemptResult MoveVideoToForward(int playlistID, int videoIndex);
-        void DeletePlaylist(int id);
+        /// <summary>
+        /// すべてのプレイリストを取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<List<STypes::Playlist>> GetAllPlaylists();
+
+        /// <summary>
+        /// ルートプレイリストを取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<STypes::Playlist> GetRootPlaylist();
+
+        /// <summary>
+        /// 指定したIDのプレイリストを取得
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IAttemptResult<STypes::Playlist> GetPlaylist(int id);
+
+        /// <summary>
+        /// 指定した条件でプレイリストを取得
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        IAttemptResult<STypes::Playlist> GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate);
+
+        /// <summary>
+        /// 子プレイリストを取得
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IAttemptResult<List<STypes::Playlist>> GetChildPlaylists(int id);
+
+        /// <summary>
+        /// プレイリストを追加
+        /// </summary>
+        /// <param name="parentID"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        IAttemptResult<int> AddPlaylist(int parentID, string name);
+
+        /// <summary>
+        /// プレイレイストを更新
+        /// </summary>
+        /// <param name="newplaylist"></param>
+        /// <returns></returns>
+        IAttemptResult Update(STypes::Playlist playlist);
+
+        /// <summary>
+        /// プレイリストを削除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IAttemptResult DeletePlaylist(int id);
+
+        /// <summary>
+        /// プレイリストの存在チェック
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         bool Exists(int id);
+
+        /// <summary>
+        /// プレイリストの存在チェック
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         bool Exists(Expression<Func<STypes::Playlist, bool>> predicate);
-        bool JustifyPlaylists(IEnumerable<int> Id);
-        bool ContainsVideo(string niconicoId, int playlistId);
-        void Move(int id, int destId);
-        void Copy(int id, int destId);
-        void SetAsRemotePlaylist(int id, string remoteId, RemoteType type);
-        void SetAsLocalPlaylist(int id);
-        int GetPlaylistsCount();
-        void Refresh();
+
+        /// <summary>
+        /// 動画をプレイリストに追加
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="playlistId"></param>
+        /// <returns></returns>
+        IAttemptResult WireVideo(STypes::Video video, int playlistId);
+
+        /// <summary>
+        /// 動画をプレイリストから削除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="playlistId"></param>
+        /// <returns></returns>
+        IAttemptResult UnWireVideo(int id, int playlistId);
+
+        /// <summary>
+        /// プレイリストを移動
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="destId"></param>
+        /// <returns></returns>
+        IAttemptResult Move(int id, int destId);
+
+        /// <summary>
+        /// リモートプレイリストにする
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="remoteId"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        IAttemptResult SetAsRemotePlaylist(int id, string remoteId, RemoteType type);
+
+        /// <summary>
+        /// ローカルプレイリストにする
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IAttemptResult SetAsLocalPlaylist(int id);
+
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        /// <returns></returns>
         IAttemptResult Initialize();
     }
 
     public class PlaylistStoreHandler : IPlaylistStoreHandler
     {
-        public PlaylistStoreHandler(IDataBase dataBase, IVideoStoreHandler videoHandler, ILogger logger)
+        public PlaylistStoreHandler(IDataBase dataBase, ILogger logger)
         {
             this.databaseInstance = dataBase;
-            this.videoHandler = videoHandler;
             this.logger = logger;
         }
 
         #region field
         private readonly IDataBase databaseInstance;
 
-        private readonly IVideoStoreHandler videoHandler;
-
         private readonly ILogger logger;
         #endregion
 
         #region CRUD
-        /// <summary>
-        /// プレイリストを取得する
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public STypes::Playlist? GetPlaylist(int id)
-        {
 
+        public IAttemptResult<STypes::Playlist> GetPlaylist(int id)
+        {
             var result = this.databaseInstance.GetRecord<STypes::Playlist, List<STypes::Video>>(STypes::Playlist.TableName, id, p => p.Videos);
 
             if (!result.IsSucceeded || result.Data is null)
@@ -78,7 +160,7 @@ namespace Niconicome.Models.Domain.Local.Store
                     this.logger.Error("プレイリストの取得に失敗しました。");
                 }
 
-                return null;
+                return AttemptResult<STypes::Playlist>.Fail("プレイリストの取得に失敗しました。");
             }
 
 
@@ -89,16 +171,11 @@ namespace Niconicome.Models.Domain.Local.Store
             }
 
             this.logger.Log($"プレイリスト(name:{result.Data.PlaylistName}, ID:{id})を取得しました。");
-            return result.Data;
+            return AttemptResult<STypes::Playlist>.Succeeded(result.Data);
 
         }
 
-        /// <summary>
-        /// 指定した条件でプレイリストを取得する
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public STypes::Playlist? GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate)
+        public IAttemptResult<STypes::Playlist> GetPlaylist(Expression<Func<STypes::Playlist, bool>> predicate)
         {
 
             IAttemptResult<STypes::Playlist> result = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, predicate);
@@ -114,7 +191,7 @@ namespace Niconicome.Models.Domain.Local.Store
                     this.logger.Error("プレイリストの取得に失敗しました。");
                 }
 
-                return null;
+                return AttemptResult<STypes::Playlist>.Fail("プレイリストの取得に失敗しました。");
             }
 
 
@@ -125,15 +202,10 @@ namespace Niconicome.Models.Domain.Local.Store
             }
 
             this.logger.Log($"プレイリスト(name:{result.Data.PlaylistName}, ID:{result.Data.Id})を取得しました。");
-            return result.Data;
+            return AttemptResult<STypes::Playlist>.Succeeded(result.Data);
         }
 
-
-        /// <summary>
-        /// ルートレベルプレイリストを取得する
-        /// </summary>
-        /// <returns></returns>
-        public STypes::Playlist GetRootPlaylist()
+        public IAttemptResult<STypes::Playlist> GetRootPlaylist()
         {
             var result = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, playlist => playlist.IsRoot);
 
@@ -148,29 +220,14 @@ namespace Niconicome.Models.Domain.Local.Store
                     this.logger.Error("ルートプレイリストの取得に失敗しました。");
                 }
 
-                return new STypes::Playlist();
+                return AttemptResult<STypes::Playlist>.Fail("ルートプレイリストの取得に失敗しました。");
             }
 
             this.logger.Log("ルートプレイリストを取得しました。");
-            return result.Data;
+            return AttemptResult<STypes::Playlist>.Succeeded(result.Data);
         }
 
-        /// <summary>
-        /// 子プレイリストを取得する
-        /// </summary>
-        /// <param name="self"></param>
-        /// <returns></returns>
-        public List<STypes::Playlist> GetChildPlaylists(STypes::Playlist self)
-        {
-            return this.GetChildPlaylists(self.Id);
-        }
-
-        /// <summary>
-        /// 子プレイリストをIDから取得する
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public List<STypes::Playlist> GetChildPlaylists(int id)
+        public IAttemptResult<List<STypes::Playlist>> GetChildPlaylists(int id)
         {
             var result = this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName, p => p.ParentPlaylist is null ? false : p.ParentPlaylist.Id == id);
 
@@ -178,56 +235,50 @@ namespace Niconicome.Models.Domain.Local.Store
             {
                 if (result.Exception is not null)
                 {
-                    this.logger.Error("子プレイリストの更新に失敗しました。", result.Exception);
+                    this.logger.Error("子プレイリストの取得に失敗しました。", result.Exception);
                 }
                 else
                 {
-                    this.logger.Error("子プレイリストの更新に失敗しました。");
+                    this.logger.Error("子プレイリストの取得に失敗しました。");
                 }
 
-                return new List<STypes::Playlist>();
+                return AttemptResult<List<STypes::Playlist>>.Fail("子プレイリストの取得に失敗しました。");
             }
 
             this.logger.Log($"{id}の子プレイリストを取得しました。");
-            return result.Data;
+            return AttemptResult<List<STypes::Playlist>>.Succeeded(result.Data);
 
         }
 
-        /// <summary>
-        /// 全てのプレイリストを取得する
-        /// </summary>
-        /// <returns></returns>
-        public List<STypes::Playlist> GetAllPlaylists()
+        public IAttemptResult<List<STypes::Playlist>> GetAllPlaylists()
         {
-            var result = this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName);
+            var result = this.databaseInstance.GetAllRecords<STypes::Playlist>(STypes::Playlist.TableName, collection =>
+            {
+                return collection.Include(p => p.Videos);
+            });
 
             if (!result.IsSucceeded || result.Data is null)
             {
                 if (result.Exception is not null)
                 {
-                    this.logger.Error("全プレイリストの更新に失敗しました。", result.Exception);
+                    this.logger.Error("全プレイリストの取得に失敗しました。", result.Exception);
                 }
                 else
                 {
-                    this.logger.Error("全プレイリストの更新に失敗しました。");
+                    this.logger.Error("全プレイリストの取得に失敗しました。");
                 }
 
-                return new List<STypes::Playlist>();
+                return AttemptResult<List<STypes::Playlist>>.Fail("全プレイリストの取得に失敗しました。");
             }
 
             this.logger.Log("すべてのプレイリストを取得しました。");
-            return result.Data;
+            return AttemptResult<List<STypes::Playlist>>.Succeeded(result.Data);
         }
 
-        /// <summary>
-        /// プレイリストを追加する
-        /// </summary>
-        /// <param name="parentID"></param>
-        /// <param name="name"></param>
-        public int AddPlaylist(int parentId, string name)
+        public IAttemptResult<int> AddPlaylist(int parentId, string name)
         {
 
-            if (this.databaseInstance.Exists<STypes::Playlist>(STypes::Playlist.TableName, parentId))
+            if (this.Exists(parentId))
             {
                 var parent = this.databaseInstance.GetRecord<STypes::Playlist>(STypes::Playlist.TableName, parentId);
 
@@ -241,17 +292,14 @@ namespace Niconicome.Models.Domain.Local.Store
                     {
                         this.logger.Error("親プレイリストの取得に失敗しました。");
                     }
-                    return -1;
+                    return AttemptResult<int>.Fail("親プレイリストの取得に失敗しました。");
                 }
 
-                //動画を保持している場合はキャンセル
-                if (parent.Data!.IsConcretePlaylist) return -1;
+                //動画を保持している、特殊なプレイリスト場合はキャンセル
+                if (parent.Data!.IsConcretePlaylist || parent.Data.IsTemporary || parent.Data.IsDownloadFailedHistory || parent.Data.IsDownloadSucceededHistory) return AttemptResult<int>.Fail("指定したプレイリストは子プレイリストを持つことができません。");
 
                 //5階層よりも深い場合はキャンセル
-                if (parent.Data.Layer > 5) return -1;
-
-                //特殊なプレイリストの場合はキャンセル
-                if (parent.Data.IsTemporary || parent.Data.IsDownloadFailedHistory || parent.Data.IsDownloadSucceededHistory) return -1;
+                if (parent.Data.Layer > 5) return AttemptResult<int>.Fail("5階層よりも深くすることはできません。");
 
                 var playlist = new STypes::Playlist(parent.Data)
                 {
@@ -273,238 +321,181 @@ namespace Niconicome.Models.Domain.Local.Store
 
                     }
 
-                    return -1;
-                }
-
-
-                var updateResult = this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
-
-                if (!updateResult.IsSucceeded)
-                {
-                    if (parent.Exception is not null)
-                    {
-                        this.logger.Error("親プレイリストの更新に失敗しました。", parent.Exception);
-                    }
-                    else
-                    {
-                        this.logger.Error("親プレイリストの更新に失敗しました。");
-                    }
-                    return -1;
+                    return AttemptResult<int>.Fail("プレイリストの保存に失敗しました。");
                 }
 
                 this.logger.Log($"新規プレイリスト`{name}`を追加しました。");
 
-                return storeResult.Data;
+                return AttemptResult<int>.Succeeded(storeResult.Data);
             }
             else
             {
-                this.logger.Error($"親プレイリストが存在しなかったため新規プレイリストを保存できませんでした。");
-                return -1;
+                this.logger.Error("親プレイリストが存在しなかったため新規プレイリストを保存できませんでした。");
+                return AttemptResult<int>.Fail("親プレイリストが存在しなかったため新規プレイリストを保存できませんでした。");
             }
 
         }
 
-        /// <summary>
-        /// プレイリスト情報を更新する
-        /// </summary>
-        /// <param name="newPlaylist"></param>
-        public void Update(ITreePlaylistInfo newPlaylist)
+        public IAttemptResult Update(STypes::Playlist playlist)
         {
-            var dbPlaylist = this.GetPlaylist(newPlaylist.Id);
-            if (dbPlaylist is null)
+            if (!this.Exists(playlist.Id))
             {
-                this.logger.Error($"存在しないプレイリストに対して更新が試行されました。(name:{newPlaylist.Name}, ID:{newPlaylist.Id})");
+                this.logger.Error($"存在しないプレイリストに対して更新が試行されました。(name:{playlist.PlaylistName}, ID:{playlist.Id})");
+                return AttemptResult.Fail("存在しないプレイリストに対して更新が試行されました。");
             }
-            this.SetData(dbPlaylist!, newPlaylist);
-            this.Update(dbPlaylist!);
 
-            this.logger.Log($"プレイリスト(name:{newPlaylist.Name}, ID:{newPlaylist.Id})を更新しました。");
+            this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
+
+            this.logger.Log($"プレイリスト(name:{playlist.PlaylistName}, ID:{playlist.Id})を更新しました。");
+
+            return AttemptResult.Succeeded();
         }
 
-        /// <summary>
-        /// プレイリストを削除する
-        /// </summary>
-        /// <param name="playlistID"></param>
-        public void DeletePlaylist(int playlistID)
+        public IAttemptResult DeletePlaylist(int playlistID)
         {
-            var playlist = this.GetPlaylist(playlistID);
 
-            if (playlist is null)
+            if (!this.Exists(playlistID))
             {
                 this.logger.Error("存在しないプレイリストに対して削除が試行されました。");
+                return AttemptResult.Fail("存在しないプレイリストに対して削除が試行されました。");
             }
+
+            IAttemptResult<STypes::Playlist> result = this.GetPlaylist(playlistID);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                this.logger.Error("削除対象のプレイリストの取得に失敗しました。");
+                return AttemptResult.Fail("削除対象のプレイリストの取得に失敗しました。");
+            }
+
+            STypes::Playlist playlist = result.Data;
 
 
             //ルートプレイリストは削除禁止
-            if (playlist!.IsRoot || playlist.Layer == 1 || playlist!.IsTemporary || playlist!.IsDownloadFailedHistory || playlist!.IsDownloadSucceededHistory)
+            if (playlist.IsRoot || playlist.Layer == 1 || playlist!.IsTemporary || playlist!.IsDownloadFailedHistory || playlist!.IsDownloadSucceededHistory)
             {
                 this.logger.Log($"削除できないプレイリストに対する削除が試行されました。(isRoot:{playlist.IsRoot}, layer:{playlist.Layer}, isTmp:{playlist.IsTemporary}, isFailed:{ playlist.IsDownloadFailedHistory}, IsSucceeeded:{playlist.IsDownloadSucceededHistory})");
-                return;
+                return AttemptResult.Fail("削除できないプレイリストに対する削除が試行されました。");
             }
 
-            this.RemoveChildPlaylist(playlistID);
-
-            var result = this.databaseInstance.Delete(STypes::Playlist.TableName, playlistID);
-            if (!result.IsSucceeded || !result.Data)
+            IAttemptResult cResult = this.RemoveChildPlaylist(playlist);
+            if (!cResult.IsSucceeded)
             {
-                if (result.Exception is not null)
-                {
-                    this.logger.Error($"{playlistID}の削除に失敗しました。", result.Exception);
-                }
-                else
-                {
-                    this.logger.Error($"{playlistID}の削除に失敗しました。");
-                }
-                return;
+                return cResult;
+            }
+
+            IAttemptResult<bool> deleteResult = this.databaseInstance.Delete(STypes::Playlist.TableName, playlistID);
+            if (!deleteResult.IsSucceeded || !deleteResult.Data)
+            {
+                return AttemptResult.Fail("プレイリストの削除に失敗しました。");
             }
 
             this.logger.Log($"{playlistID}を削除しました。");
+
+            return AttemptResult.Succeeded();
         }
         #endregion
 
         #region プレイリスト情報
 
-        /// <summary>
-        /// プレイリストの存在をチェックする
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public bool Exists(int id)
         {
             return this.databaseInstance.Exists<STypes::Playlist>(STypes::Playlist.TableName, id);
         }
 
-        /// <summary>
-        ///関数でプレイリストの存在をチェックする
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
         public bool Exists(Expression<Func<STypes::Playlist, bool>> predicate)
         {
             return this.databaseInstance.Exists(STypes::Playlist.TableName, predicate);
         }
 
-
-
-        /// <summary>
-        /// データベース上のプレイリスト数を取得
-        /// </summary>
-        /// <returns></returns>
-        public int GetPlaylistsCount()
+        public IAttemptResult SetAsRemotePlaylist(int playlistId, string remoteId, RemoteType type)
         {
-            var result = this.databaseInstance.GetRecordCount(STypes::Playlist.TableName);
+            if (!this.Exists(playlistId)) return new AttemptResult() { Message = $"指定されたプレイリストは存在しません。(id={playlistId})" };
 
-            if (!result.IsSucceeded)
+            IAttemptResult<STypes::Playlist> pResult = this.GetPlaylist(playlistId);
+
+            if (!pResult.IsSucceeded || pResult.Data is null)
             {
-                if (result.Exception is not null)
-                {
-                    this.logger.Error("レコード数の更新に失敗しました。", result.Exception);
-                }
-                else
-                {
-                    this.logger.Error("レコード数の更新に失敗しました。");
-                }
-
-                return -1;
+                return AttemptResult.Fail("プレイリストの取得に失敗しました。");
             }
 
-            return result.Data;
-        }
-        #endregion
+            STypes::Playlist playlist = pResult.Data;
 
-        /// <summary>
-        /// リモートプレイリストとして登録する
-        /// </summary>
-        /// <param name="playlistId"></param>
-        /// <param name="remoteId"></param>
-        /// <param name="type"></param>
-        public void SetAsRemotePlaylist(int playlistId, string remoteId, RemoteType type)
-        {
-            if (this.Exists(playlistId))
-            {
-                var playlist = this.GetPlaylist(playlistId);
-                playlist!.IsRemotePlaylist = true;
-                playlist.RemoteId = remoteId;
+            playlist!.IsRemotePlaylist = true;
+            playlist.RemoteId = remoteId;
 
-                switch (type)
-                {
-                    case RemoteType.Mylist:
-                        playlist.IsMylist = true;
-                        playlist.IsUserVideos = false;
-                        playlist.IsWatchLater = false;
-                        playlist.IsChannel = false;
-                        playlist.IsSeries = false;
-                        break;
-                    case RemoteType.UserVideos:
-                        playlist.IsUserVideos = true;
-                        playlist.IsMylist = false;
-                        playlist.IsWatchLater = false;
-                        playlist.IsChannel = false;
-                        playlist.IsSeries = false;
-                        break;
-                    case RemoteType.WatchLater:
-                        playlist.IsUserVideos = false;
-                        playlist.IsMylist = false;
-                        playlist.IsWatchLater = true;
-                        playlist.IsChannel = false;
-                        playlist.IsSeries = false;
-                        break;
-                    case RemoteType.Channel:
-                        playlist.IsUserVideos = false;
-                        playlist.IsMylist = false;
-                        playlist.IsWatchLater = false;
-                        playlist.IsChannel = true;
-                        playlist.IsSeries = false;
-                        break;
-                    case RemoteType.Series:
-                        playlist.IsUserVideos = false;
-                        playlist.IsMylist = false;
-                        playlist.IsWatchLater = false;
-                        playlist.IsChannel = false;
-                        playlist.IsSeries = true;
-                        break;
-                }
-                this.Update(playlist);
-                this.logger.Log($"{playlistId}をリモートプレイリスト({type})に設定しました。");
-            }
-            else
+            playlist.IsMylist = false;
+            playlist.IsUserVideos = false;
+            playlist.IsWatchLater = false;
+            playlist.IsChannel = false;
+            playlist.IsSeries = false;
+
+            switch (type)
             {
-                this.logger.Error($"存在しないプレイリストをリモートプレイリストに設定しようと試行しました。");
+                case RemoteType.Mylist:
+                    playlist.IsMylist = true;
+                    break;
+                case RemoteType.UserVideos:
+                    playlist.IsUserVideos = true;
+                    break;
+                case RemoteType.WatchLater:
+                    playlist.IsWatchLater = true;
+                    break;
+                case RemoteType.Channel:
+                    playlist.IsChannel = true;
+                    break;
+                case RemoteType.Series:
+                    playlist.IsSeries = true;
+                    break;
             }
+
+            IAttemptResult uResult = this.Update(playlist);
+
+            if (!uResult.IsSucceeded)
+            {
+                return uResult;
+            }
+
+            this.logger.Log($"{playlistId}をリモートプレイリスト({type})に設定しました。");
+
+            return AttemptResult.Succeeded();
         }
 
-        /// <summary>
-        /// ローカルプレイリストとして設定する
-        /// </summary>
-        /// <param name="playlistId"></param>
-        public void SetAsLocalPlaylist(int playlistId)
+        public IAttemptResult SetAsLocalPlaylist(int playlistId)
         {
-            if (this.Exists(playlistId))
+            if (!this.Exists(playlistId)) return new AttemptResult() { Message = $"指定されたプレイリストは存在しません。(id={playlistId})" };
+
+            IAttemptResult<STypes::Playlist> pResult = this.GetPlaylist(playlistId);
+
+            if (!pResult.IsSucceeded || pResult.Data is null)
             {
-                var playlist = this.GetPlaylist(playlistId);
-                playlist!.IsRemotePlaylist = false;
-                playlist.IsMylist = false;
-                playlist.IsUserVideos = false;
-                playlist.IsWatchLater = false;
-                playlist.IsChannel = false;
-                playlist.IsSeries = false;
-                this.Update(playlist);
-                this.logger.Log($"{playlistId}をローカルプレイリストに設定しました。");
+                return AttemptResult.Fail("プレイリストの取得に失敗しました。");
             }
-            else
+
+            STypes::Playlist playlist = pResult.Data;
+
+            playlist.IsRemotePlaylist = false;
+            playlist.IsMylist = false;
+            playlist.IsUserVideos = false;
+            playlist.IsWatchLater = false;
+            playlist.IsChannel = false;
+            playlist.IsSeries = false;
+
+            IAttemptResult uResult = this.Update(playlist);
+
+            if (!uResult.IsSucceeded)
             {
-                this.logger.Error($"存在しないプレイリストをローカルプレイリストに設定しようと試行しました。");
+                return uResult;
             }
+
+            this.logger.Log($"{playlistId}をローカルプレイリストに設定しました。");
+
+            return AttemptResult.Succeeded();
         }
 
-        /// <summary>
-        /// プレイリストを移動する
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="destId"></param>
-        public void Move(int id, int destId)
+        public IAttemptResult Move(int id, int destId)
         {
-            this.InternalMove(id, destId, false);
+            return this.InternalMove(id, destId, false);
         }
 
         /// <summary>
@@ -516,39 +507,6 @@ namespace Niconicome.Models.Domain.Local.Store
         {
             throw new NotImplementedException();
             //this.InternalMove(id, destId, true);
-        }
-
-        /// <summary>
-        /// データベースのレコードを更新する
-        /// </summary>
-        public void Refresh()
-        {
-            IAttemptResult result = this.Initialize();
-            if (!result.IsSucceeded)
-            {
-                if (result.Exception is not null)
-                {
-                    this.logger.Error($"プレイリストのリフレッシュに失敗しました。({result.Message})", result.Exception);
-                }
-                else
-                {
-                    this.logger.Error($"プレイリストのリフレッシュに失敗しました。({result.Message})");
-                }
-            }
-            else
-            {
-                this.logger.Log("プレイリストがリフレッシュされました。");
-            }
-        }
-
-        /// <summary>
-        /// プレイリストの不整合性を修復する
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <returns></returns>
-        public bool JustifyPlaylists(IEnumerable<int> ids)
-        {
-            return !ids.Select(id => this.JustifyPlaylists(id)).Any(ok => ok == false);
         }
 
         /// <summary>
@@ -605,7 +563,6 @@ namespace Niconicome.Models.Domain.Local.Store
                 this.logger.Log("DL成功履歴が存在しなかったので作成しました。");
             }
 
-
             if (!this.Exists(p => p.IsDownloadFailedHistory))
             {
                 var failed = new STypes::Playlist()
@@ -654,112 +611,106 @@ namespace Niconicome.Models.Domain.Local.Store
                 this.logger.Log("一時プレイリストが存在しなかったので作成しました。");
             }
 
-            return new AttemptResult() { IsSucceeded = true };
+            IAttemptResult<List<STypes::Playlist>> pResult = this.GetAllPlaylists();
+            if (!pResult.IsSucceeded || pResult.Data is null)
+            {
+                return AttemptResult.Fail("プレイリストの取得に失敗しました。");
+            }
+
+            foreach (var playlist in pResult.Data)
+            {
+                this.FixPlaylist(playlist);
+            }
+
+            return AttemptResult.Succeeded();
         }
 
+        #endregion
 
         #region 動画操作系メソッド
-
-        /// <summary>
-        /// 指定されたIDの動画を含むかどうかを返す
-        /// </summary>
-        /// <param name="videoId"></param>
-        /// <param name="playlistId"></param>
-        /// <returns></returns>
-        public bool ContainsVideo(string niconicoId, int playlistId)
+        public IAttemptResult WireVideo(STypes::Video video, int playlistId)
         {
-            var playlist = this.GetPlaylist(playlistId);
-            if (playlist is null) return false;
-            return playlist.Videos.Any(v => v.NiconicoId == niconicoId);
-        }
+            if (!this.Exists(playlistId))
+            {
+                return AttemptResult.Fail("指定したプレイリストが存在しません。");
+            }
 
-        /// <summary>
-        /// プレイリストに動画を追加する
-        /// </summary>
-        /// <param name="videoData"></param>
-        /// <param name="playlistId"></param>
-        /// <returns></returns>
-        public int AddVideo(IListVideoInfo videoData, int playlistId)
-        {
-            if (!this.Exists(playlistId)) throw new InvalidOperationException($"指定したプレイリストが存在しません。(id:{playlistId})");
+            IAttemptResult<STypes::Playlist> pResult = this.GetPlaylist(playlistId);
 
-            var playlist = this.GetPlaylist(playlistId);
-            int videoId = this.videoHandler.AddVideo(videoData, playlistId);
-            var video = this.videoHandler.GetVideo(videoId)!;
+            if (!pResult.IsSucceeded || pResult.Data is null)
+            {
+                return AttemptResult.Fail("プレイリストの取得に失敗しました。");
+            }
 
-            if (playlist!.Videos is null) playlist.Videos = new List<STypes.Video>();
+            STypes::Playlist playlist = pResult.Data;
 
-            if (playlist.Videos.Any(v => v.NiconicoId == videoData.NiconicoId.Value)) return -1;
+
+            if (playlist.Videos is null) playlist.Videos = new List<STypes.Video>();
+
+            if (playlist.Videos.Any(v => v.NiconicoId == video.NiconicoId))
+            {
+                return AttemptResult.Fail("すでに登録されている動画です。");
+            }
 
             playlist.Videos.Add(video);
             playlist.CustomVideoSequence.Add(video.Id);
 
-            var pResult = this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
+            IAttemptResult uResult = this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
 
-            if (!pResult.IsSucceeded)
+            if (!uResult.IsSucceeded)
             {
-                if (pResult.Exception is not null)
-                {
-                    this.logger.Error($"{playlist.PlaylistName}への動画({videoData.NiconicoId})の追加に失敗しました。", pResult.Exception);
-                }
-                else
-                {
-                    this.logger.Error($"{playlist.PlaylistName}への動画({videoData.NiconicoId})の追加に失敗しました。");
-                }
-                return -1;
+                return AttemptResult.Fail($"動画の追加に失敗しました。（詳細：{uResult.ExceptionMessage}）");
             }
 
-            this.logger.Log($"{videoData.NiconicoId}をプレイリスト({playlist.PlaylistName})に追加しました。");
+            this.logger.Log($"{video.NiconicoId}をプレイリスト({playlist.PlaylistName})に追加しました。");
 
-            return videoId;
+            return AttemptResult.Succeeded();
         }
 
-        /// <summary>
-        /// 動画を削除する
-        /// </summary>
-        /// <param name="videoId"></param>
-        /// <param name="playlistId"></param>
-        public void RemoveVideo(int videoId, int playlistId)
+        public IAttemptResult UnWireVideo(int videoId, int playlistId)
         {
-            if (!this.Exists(playlistId)) throw new InvalidOperationException($"指定したプレイリストが存在しません。(id:{playlistId})");
-            if (!this.videoHandler.Exists(videoId)) throw new InvalidOperationException($"指定した動画が存在しません。(id:{playlistId})");
-
-            var vieo = this.videoHandler.GetVideo(videoId);
-            var playlist = this.GetPlaylist(playlistId);
-
-            this.videoHandler.RemoveVideo(videoId, playlistId);
-            playlist!.Videos.RemoveAll(v => v.Id == videoId);
-            playlist!.CustomVideoSequence.RemoveAll(v => v == videoId);
-
-            var result = this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
-
-            if (!result.IsSucceeded)
+            if (!this.Exists(playlistId))
             {
-                if (result.Exception is not null)
-                {
-                    this.logger.Error($"{playlist.PlaylistName}からの動画({videoId})の削除に失敗しました。", result.Exception);
-                }
-                else
-                {
-                    this.logger.Error($"{playlist.PlaylistName}からの動画({videoId})の削除に失敗しました。");
-                }
+                return AttemptResult.Fail("指定したプレイリストが存在しません。");
+            }
+
+            IAttemptResult<STypes::Playlist> pResult = this.GetPlaylist(playlistId);
+
+            if (!pResult.IsSucceeded || pResult.Data is null)
+            {
+                return AttemptResult.Fail("プレイリストの取得に失敗しました。");
+            }
+
+            STypes::Playlist playlist = pResult.Data;
+
+            playlist.Videos.RemoveAll(v => v.Id == videoId);
+            playlist.CustomVideoSequence.RemoveAll(v => v == videoId);
+
+            var uResult = this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
+
+            if (!uResult.IsSucceeded)
+            {
+                return AttemptResult.Fail($"動画の削除に失敗しました。(詳細:{uResult.ExceptionMessage})");
             }
 
             this.logger.Log($"{playlist.PlaylistName}からの動画({videoId})を削除しました。");
 
+            return AttemptResult.Succeeded();
+
         }
 
-        /// <summary>
-        /// 動画を後ろに挿入する
-        /// </summary>
-        /// <param name="playlistID"></param>
-        /// <param name="videoIndex"></param>
-        /// <returns></returns>
         public IAttemptResult MoveVideoToPrev(int playlistID, int videoIndex)
         {
             if (!this.Exists(playlistID)) return new AttemptResult() { Message = $"指定されたプレイリストは存在しません。(id={playlistID})" };
 
-            var playlist = this.GetPlaylist(playlistID)!;
+            IAttemptResult<STypes::Playlist> pResult = this.GetPlaylist(playlistID);
+
+            if (!pResult.IsSucceeded || pResult.Data is null)
+            {
+                return AttemptResult.Fail("プレイリストの取得に失敗しました。");
+            }
+
+            STypes::Playlist playlist = pResult.Data;
 
             if (playlist.Videos.Count < videoIndex + 1) return new AttemptResult() { Message = $"指定されたインデックスは範囲外です。(index={videoIndex}, actual={playlist.Videos.Count})" };
 
@@ -782,17 +733,17 @@ namespace Niconicome.Models.Domain.Local.Store
             return new AttemptResult() { IsSucceeded = true };
         }
 
-        /// <summary>
-        /// 動画をうしろに挿入する
-        /// </summary>
-        /// <param name="playlistID"></param>
-        /// <param name="videoIndex"></param>
-        /// <returns></returns>
         public IAttemptResult MoveVideoToForward(int playlistID, int videoIndex)
         {
-            if (!this.Exists(playlistID)) return new AttemptResult() { Message = $"指定されたプレイリストは存在しません。(id={playlistID})" };
 
-            var playlist = this.GetPlaylist(playlistID)!;
+            IAttemptResult<STypes::Playlist> pResult = this.GetPlaylist(playlistID);
+
+            if (!pResult.IsSucceeded || pResult.Data is null)
+            {
+                return AttemptResult.Fail("プレイリストの取得に失敗しました。");
+            }
+
+            STypes::Playlist playlist = pResult.Data;
 
             if (playlist.Videos.Count < videoIndex + 1) return new AttemptResult() { Message = $"指定されたインデックスは範囲外です。(index={videoIndex}, actual={playlist.Videos.Count})" };
 
@@ -819,41 +770,50 @@ namespace Niconicome.Models.Domain.Local.Store
 
         #region private
 
-        /// <summary>
-        /// プレイリストの不整合を修復する
-        /// </summary>
-        /// <param name="Id"></param>
-        /// <returns></returns>
-        private bool JustifyPlaylists(int Id)
+        private IAttemptResult FixPlaylist(STypes::Playlist playlist)
         {
-            var playlist = this.GetPlaylist(Id);
+            //親が存在しないプレイリスト(孤児プレイリスト)の場合はそれ自体を削除
+            if (playlist.ParentPlaylist is not null && !this.Exists(playlist.ParentPlaylist.Id))
+            {
+                IAttemptResult dResult = this.DeletePlaylist(playlist.Id);
 
-            if (playlist is null)
-            {
-                return false;
-            }
-            else
-            {
-                //親が存在しないプレイリスト(孤児プレイリスト)の場合はそれ自体を削除
-                if (playlist.ParentPlaylist is not null && !this.databaseInstance.Exists<STypes::Playlist>(STypes::Playlist.TableName, playlist.ParentPlaylist.Id))
+                if (!dResult.IsSucceeded)
                 {
-                    this.DeletePlaylist(playlist.Id);
-                    this.logger.Log($"孤児プレイリスト(name:{playlist.PlaylistName}, ID:{playlist.Id})を削除しました。");
-                    return false;
+                    return dResult;
                 }
-                if (playlist.Videos.Count > 0)
-                {
-                    var videos = playlist.Videos.Distinct(v => v.NiconicoId).ToList();
-                    if (videos.Count != playlist.Videos.Count)
-                    {
-                        this.logger.Log($"重複登録された動画をプレイリスト(name:{playlist.PlaylistName}, ID:{playlist.Id})から削除しました。");
-                    }
-                    playlist.Videos.Clear();
-                    playlist.Videos.AddRange(videos);
-                    this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
-                }
-                return true;
+
+                this.logger.Log($"孤児プレイリスト(name:{playlist.PlaylistName}, ID:{playlist.Id})を削除しました。");
+                return AttemptResult.Succeeded();
             }
+
+            //並び替え情報を実際の動画と揃える
+            if (playlist.Videos.Count > 0 && playlist.Videos.Count != playlist.CustomVideoSequence.Count)
+            {
+
+                if (playlist.Videos.Count > playlist.CustomVideoSequence.Count)
+                {
+                    var videosToAdd = playlist.Videos.Select(v => v.Id).Where(id => !playlist.CustomVideoSequence.Contains(id));
+                    playlist.CustomVideoSequence.AddRange(videosToAdd);
+                }
+                else
+                {
+                    var videoIDs = playlist.Videos.Select(v => v.Id).ToList();
+                    var newSequence = playlist.CustomVideoSequence.Where(id => videoIDs.Contains(id));
+                    playlist.CustomVideoSequence.Clear();
+                    playlist.CustomVideoSequence.AddRange(newSequence);
+                }
+
+                IAttemptResult uResult = this.Update(playlist);
+
+                if (!uResult.IsSucceeded)
+                {
+                    return uResult;
+                }
+
+                this.logger.Log($"並び替え順情報を登録されている動画数と同期しました。(id:{playlist.Id})");
+            }
+
+            return AttemptResult.Succeeded();
 
         }
 
@@ -861,20 +821,39 @@ namespace Niconicome.Models.Domain.Local.Store
         /// 子プレイリストを辿って削除する
         /// </summary>
         /// <param name="parentId"></param>
-        private void RemoveChildPlaylist(int selfId)
+        private IAttemptResult RemoveChildPlaylist(STypes::Playlist self)
         {
-            if (this.Exists(selfId))
+            if (self.IsConcretePlaylist)
             {
-                IEnumerable<STypes::Playlist> childPlaylists = this.GetChildPlaylists(selfId);
+                return AttemptResult.Succeeded();
+            }
 
-                foreach (var childPlaylist in childPlaylists)
+            IAttemptResult<List<STypes::Playlist>> cResult = this.GetChildPlaylists(self.Id);
+
+            if (!cResult.IsSucceeded || cResult.Data is null)
+            {
+                return AttemptResult.Fail("子プレイリストの取得に失敗しました。");
+            }
+
+            foreach (var childPlaylist in cResult.Data)
+            {
+                IAttemptResult crResult = this.RemoveChildPlaylist(childPlaylist);
+                if (!crResult.IsSucceeded)
                 {
-                    this.RemoveChildPlaylist(childPlaylist.Id);
-                    this.DeletePlaylist(childPlaylist.Id);
-                    this.logger.Log($"{selfId}の子プレイリストを削除しました。");
+                    return AttemptResult.Fail("子孫プレイリストの削除に失敗しました。");
                 }
 
+                IAttemptResult dResul = this.DeletePlaylist(childPlaylist.Id);
+                if (!dResul.IsSucceeded)
+                {
+                    return AttemptResult.Fail("子プレイリストの削除に失敗しました。");
+                }
+
+                this.logger.Log($"{self.Id}の子プレイリストを削除しました。");
             }
+
+            return AttemptResult.Succeeded();
+
         }
 
         /// <summary>
@@ -883,46 +862,45 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="id"></param>
         /// <param name="destId"></param>
         /// <param name="IsCopy"></param>
-        private void InternalMove(int id, int destId, bool IsCopy)
+        private IAttemptResult InternalMove(int id, int destId, bool IsCopy)
         {
             //移動先と異動元が同一のプレイリストの場合キャンセル
             //(自分に自分を入れることは出来ない。)
-            if (id == destId) return;
-
-            if (this.Exists(id) && this.Exists(destId))
+            if (id == destId)
             {
-                STypes::Playlist destination = this.GetPlaylist(destId)!;
-                STypes::Playlist target = this.GetPlaylist(id)!;
-
-                //フォルダー・プレイリストでない場合はキャンセル
-                if (destination.IsConcretePlaylist) return;
-
-
-                if (IsCopy)
-                {
-                    STypes::Playlist newtarget = target with { ParentPlaylist = destination };
-                    this.databaseInstance.Store(newtarget, STypes::Playlist.TableName);
-                }
-                else
-                {
-                    target.ParentPlaylist = destination;
-                    this.databaseInstance.Update(target, STypes::Playlist.TableName);
-                    this.logger.Log($"プレイリスト(name:{target.PlaylistName}, ID:{target.Id})を{target.ParentPlaylist.PlaylistName}から{destination.PlaylistName}に移動しました。");
-                }
-
+                return AttemptResult.Fail("移動先と移動元が同じです。");
             }
-        }
 
-        /// <summary>
-        /// プレイリストを更新する
-        /// </summary>
-        /// <param name="playlist"></param>
-        private void Update(STypes::Playlist playlist)
-        {
-            if (this.Exists(playlist.Id))
+            IAttemptResult<STypes::Playlist> rDestination = this.GetPlaylist(destId)!;
+            IAttemptResult<STypes::Playlist> rTarget = this.GetPlaylist(id)!;
+
+            if (!rDestination.IsSucceeded || rDestination.Data is null || !rTarget.IsSucceeded || rTarget.Data is null)
             {
-                this.databaseInstance.Update(playlist, STypes::Playlist.TableName);
+                return AttemptResult.Fail("プレイリストの取得に失敗しました。");
             }
+
+            STypes::Playlist destination = rDestination.Data;
+            STypes::Playlist target = rTarget.Data;
+
+            //フォルダー・プレイリストでない場合はキャンセル
+            if (destination.IsConcretePlaylist)
+            {
+                return AttemptResult.Fail("移動先のプレイリストが不適切です。");
+            }
+
+
+            if (IsCopy)
+            {
+                STypes::Playlist newtarget = target with { ParentPlaylist = destination };
+                return this.databaseInstance.Store(newtarget, STypes::Playlist.TableName);
+            }
+            else
+            {
+                target.ParentPlaylist = destination;
+                this.logger.Log($"プレイリスト(name:{target.PlaylistName}, ID:{target.Id})を{target.ParentPlaylist.PlaylistName}から{destination.PlaylistName}に移動しました。");
+                return this.Update(target);
+            }
+
         }
 
         /// <summary>

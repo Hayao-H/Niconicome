@@ -51,7 +51,7 @@ namespace Niconicome.Models.Auth
         {
             if (this.context.IsLogin) return true;
 
-            bool result = await this.context.Login(credential.Username, credential.Password);
+            bool result = await this.context.LoginAsync(credential.Username, credential.Password);
 
             return result;
         }
@@ -62,7 +62,7 @@ namespace Niconicome.Models.Auth
         /// <returns></returns>
         public async Task Logout()
         {
-            await this.context.Logout();
+            await this.context.LogoutAsync();
         }
     }
 }

@@ -1,22 +1,22 @@
-﻿<Window x:Class="Niconicome.Views.DownloadTasksWindows"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows"
-        xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="13"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        WindowStartupLocation="CenterOwner"
-        Style="{StaticResource Window_Style}"
-        d:DataContext="{d:DesignInstance {x:Type vm:DownloadTasksWindowViewModelD}, IsDesignTimeCreatable=True}"
-        Title="ダウンロードタスク管理" Height="600" Width="1200">
+﻿<UserControl x:Class="Niconicome.Views.DownloadTasksWindows"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage.Subwindows"
+             xmlns:prism="http://prismlibrary.com/"
+             mc:Ignorable="d"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.FontWeight="Regular"
+             TextElement.FontSize="13"
+             TextOptions.TextFormattingMode="Ideal"
+             TextOptions.TextRenderingMode="Auto"
+             d:DataContext="{d:DesignInstance {x:Type vm:DownloadTasksWindowViewModelD}, IsDesignTimeCreatable=True}"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             Height="{Binding Height.Value}"
+             Width="{Binding Width.Value}"
+        >
     <Grid>
         <TabControl
             Style="{StaticResource MaterialDesignNavigatilRailTabControl}"
@@ -42,8 +42,8 @@
                         登録済みタスク
                     </TextBlock>
                     <DockPanel Grid.Row="1">
-                        <CheckBox Margin="10 0" HorizontalAlignment="Left" Content="キャンセル済みを表示" IsChecked="{Binding DisplayCanceled}"/>
-                        <CheckBox HorizontalAlignment="Left" Content="完了済みを表示" IsChecked="{Binding DisplayCompleted}"/>
+                        <CheckBox Margin="10 0" HorizontalAlignment="Left" Content="キャンセル済みを表示" IsChecked="{Binding DisplayCanceled.Value}"/>
+                        <CheckBox HorizontalAlignment="Left" Content="完了済みを表示" IsChecked="{Binding DisplayCompleted.Value}"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Margin="5 0" ToolTip="更新" Command="{Binding RefreshTaskCommand}">
                                 <materialDesign:PackIcon Kind="Reload"/>
@@ -152,7 +152,7 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="メッセージ" DisplayMemberBinding="{Binding Message}"/>
+                                    <GridViewColumn Header="メッセージ" DisplayMemberBinding="{Binding Message.Value}"/>
                                 </GridView.Columns>
                             </GridView>
                         </ListView.View>
@@ -168,4 +168,4 @@
         </TabControl>
         <materialDesign:Snackbar MessageQueue="{Binding Queue.Queue}"/>
     </Grid>
-</Window>
+</UserControl>

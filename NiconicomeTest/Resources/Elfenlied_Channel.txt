@@ -7,41 +7,7 @@
 <html class="gecko ">
 
 <head>
-<script type="text/javascript">
-  try {
-    window.NicoGoogleTagManagerDataLayer = [];
 
-    var data = {};
-
-        data.user = (function () {
-      var user = {};
-
-                  user.user_id = parseInt('74537208', 10) || null;
-      user.login_status = 'login';
-      user.member_status = 'premium';
-      user.birthday = '1990-03-01';
-                user.sex = 'male';
-            user.country = 'Japan';
-      user.prefecture = '–kŠC“¹';
-      user.ui_area = 'jp';
-      user.ui_lang = 'ja-jp';
-            
-      return user;
-      })();
-
-    data.content = (function () {
-      var content = {};
-      content.community_id = '3760945';
-      content.ch_screen_name = 'elfenlied';
-      content.channel_id = 'ch2635292';
-      content.ch_monthly_charge = null;
-      content.ch_register_status = '–¢“ü‰ï';
-      return content;
-    })();
-
-    window.NicoGoogleTagManagerDataLayer.push(data);
-    } catch (e) {}
-</script>
 
 <!-- Google Tag Manager For Channel Access Analytics -->
 
@@ -168,29 +134,6 @@ div#channel-main a:visited {color:#c62673;}
 
 
 
-<script>
-var is_login   = true;
-var is_premium = true;
-var is_channel = true;
-var user_is_joinable = true;
-var nicopo_balance = false;
-var page_code  = "video_list"||null;
-var page_id    = "ch_video"||null;
-var user       = null,
-    ad_age     = null;
-user = {
-    "id":74537208,
-    "sex":"’j«",
-    "age":31
-};
-ad_age    = user.age;
-var community = {
-    "type":"normal"
-};
-var channeloption = {
-    "first_month_free_flag":false};
-var show_danimestore_invitation = false</script>
-
 
 
 <script src="https://secure-dcdn.cdn.nimg.jp/nicochannel/chfront/js/lib/jquery/jquery-1.8.3.min.js"></script>
@@ -254,60 +197,7 @@ var show_danimestore_invitation = false</script>
 <!---->
 
 
-<script>
-    window.onCommonHeaderReady = function(commonHeader) {
-        commonHeader.mount('#CommonHeader', {
-                        frontendId: 32,
-            site: 'channel',
-            nextUrl: '%2Felfenlied%2Fvideo',
-            user: {
-                                    id       :  74537208,
-                    nickname : 'ƒQƒXƒg',
-                    iconUrl  : 'https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg',
-                    isPremium:  true,
-                                isLogin: true            },
-            customization: {
-                size: {
-                    maxWidth: '1024px',
-                    minWidth: '1024px'
-                },
-                userPanelLinks: [
-                    {
-                        href : '/my/purchased',
-                        label: 'w“ü‚µ‚½‚à‚Ì'
-                    },
-                    {
-                        href : '/my/following',
-                        label: '“o˜^‚µ‚½ƒ`ƒƒƒ“ƒlƒ‹'
-                    },
-                    {
-                        href : '/my/mail/subscribing',
-                        label: 'w“Ç’†‚Ìƒuƒƒ}ƒK'
-                    },
-                    {
-                        href : '/start',
-                        label: 'ƒ`ƒƒƒ“ƒlƒ‹‚ğŠJİ'
-                    },
-                                        {
-                        href : '/portal/anime',
-                        label: 'ƒAƒjƒ'
-                    },
-                    {
-                        href : '/portal/blomaga',
-                        label: 'ƒuƒƒ}ƒK'
-                    },
-                    {
-                        href : '/chlist',
-                        label: '‚»‚Ì‘¼‚ÌƒJƒeƒSƒŠ'
-                    }
-                ],
-                helpLink: {
-                    href: 'https://qa.nicovideo.jp/category/show/429?site_domain=default'
-                }
-            }
-        });
-    };
-</script>
+
 <script type="text/javascript" src="https://secure-dcdn.cdn.nimg.jp/common-header/res/2.0.2/pc/CommonHeaderLoader.min.js"></script>    
         <header class="site">
                                             <div id="head_cp">

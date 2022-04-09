@@ -88,7 +88,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
             try
             {
-                this.fileIO.AppendText(Path.Combine(FileFolder.AddonsFolder, Const::Adddon.UninstalledAddonsFile), addon.PackageID.Value);
+                this.fileIO.AppendText(Path.Combine(FileFolder.AddonsFolder, Const::AddonConstant.UninstalledAddonsFile), addon.PackageID.Value);
             }
             catch (Exception ex)
             {
@@ -103,7 +103,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.Installer
 
         public IAttemptResult DeleteListed()
         {
-            string delAddonsList = Path.Combine(FileFolder.AddonsFolder, Const::Adddon.UninstalledAddonsFile);
+            string delAddonsList = Path.Combine(FileFolder.AddonsFolder, Const::AddonConstant.UninstalledAddonsFile);
             if (!this.fileIO.Exists(delAddonsList))
             {
                 return new AttemptResult() { IsSucceeded = true };

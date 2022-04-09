@@ -112,7 +112,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Search
             list.Add($"_offset={50 * (query.Page - 1)}");
 
 
-            return API.SnapshotAPIV2 + "?" + string.Join("&", list);
+            return APIConstant.SnapshotAPIV2 + "?" + string.Join("&", list);
         }
 
     }

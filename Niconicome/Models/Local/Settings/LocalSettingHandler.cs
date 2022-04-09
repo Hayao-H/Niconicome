@@ -187,7 +187,6 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.ConfirmIfDownloading => STypes::SettingNames.ConfirmIfDownloading,
                 SettingsEnum.MWBookMarkColumnWid => STypes::SettingNames.MainWindowBookMarkColumnWidth,
                 SettingsEnum.FFmpegFormat => STypes::SettingNames.FFmpegFormat,
-                SettingsEnum.SearchFileByID => STypes::SettingNames.SearchVideosByID,
                 SettingsEnum.ThumbSize => STypes::SettingNames.ThumbnailSize,
                 SettingsEnum.DisableScrollRestore => STypes::SettingNames.DisableScrollRestore,
                 SettingsEnum.OwnerComSuffix => STypes::SettingNames.OwnerCommentSuffix,
@@ -200,6 +199,13 @@ namespace Niconicome.Models.Local.Settings
                 SettingsEnum.ExperimentalSafety => STypes::SettingNames.IsExperimentalCommentSafetySystemEnable,
                 SettingsEnum.SnackbarDuration => STypes::SettingNames.SnackbarDuration,
                 SettingsEnum.CommentWaitSpan => STypes::SettingNames.CommentFetchWaitSpan,
+                SettingsEnum.MWEconomyColumnWid => STypes::SettingNames.MainWindowEconomyColumnWidth,
+                SettingsEnum.DeleteEcoFile => STypes::SettingNames.DeleteExistingEconomyFile,
+                SettingsEnum.SearchExact => STypes::SettingNames.SearchVideosExact,
+                SettingsEnum.ShowTasksAsTab => STypes::SettingNames.ShowDownloadTasksAsTab,
+                SettingsEnum.CommentCountPerBlock => STypes::SettingNames.CommentCountPerBlock,
+                SettingsEnum.AppendComment => STypes::SettingNames.IsAppendingToLocalCommentEnable,
+                SettingsEnum.OmitXmlDeclaration => STypes::SettingNames.IsOmittingXmlDeclarationIsEnable,
                 _ => null
             };
         }
@@ -277,7 +283,6 @@ namespace Niconicome.Models.Local.Settings
         AppTheme,
         ConfirmIfDownloading,
         FFmpegFormat,
-        SearchFileByID,
         ThumbSize,
         DisableScrollRestore,
         OwnerComSuffix,
@@ -290,5 +295,12 @@ namespace Niconicome.Models.Local.Settings
         ExperimentalSafety,
         SnackbarDuration,
         CommentWaitSpan,
+        MWEconomyColumnWid,
+        DeleteEcoFile,
+        SearchExact,
+        ShowTasksAsTab,
+        CommentCountPerBlock,
+        AppendComment,
+        OmitXmlDeclaration,
     }
 }

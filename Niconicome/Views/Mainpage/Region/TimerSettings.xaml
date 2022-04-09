@@ -5,9 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Niconicome.Views.Mainpage.Region"
              xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
+             xmlns:prism="http://prismlibrary.com/"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
-             Background="{StaticResource MaterialDesignPaper}"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             Background="{DynamicResource MaterialDesignPaper}"
              d:DataContext="{d:DesignInstance {x:Type vm:TimerSettingsViewModelD},IsDesignTimeCreatable=True}"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="16">

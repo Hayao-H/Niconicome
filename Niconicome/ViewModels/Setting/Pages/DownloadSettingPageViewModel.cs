@@ -37,11 +37,11 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             if (maxP <= 0)
             {
-                maxP = 3;
+                maxP = NetConstant.DefaultMaxParallelDownloadCount;
             }
             if (maxSP <= 0)
             {
-                maxSP = 1;
+                maxSP = NetConstant.DefaultMaxParallelSegmentDownloadCount;
             }
 
             this.IsDownloadVideoInfoInJsonEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.VideoInfoInJson)).AddTo(this.disposables);
@@ -61,6 +61,9 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             this.IsDownloadResumingEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.EnableResume)).AddTo(this.disposables);
             this.IsDownloadResumingEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.EnableResume));
+
+            this.IsOmitXmlDeclarationEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.OmitXmlDeclaration);
+            this.CommentCountPerBlock = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.CommentCountPerBlock, selectFunc: v => v <= 0 ? NetConstant.DefaultCommentCountPerBlock : v);
 
             var n1 = new ComboboxItem<int>(1, "1");
             var n2 = new ComboboxItem<int>(2, "2");
@@ -128,6 +131,7 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             this.IsExperimentalCommentSafetySystemEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.ExperimentalSafety);
             this.CommentFetchWaitSpan = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.CommentWaitSpan, null, value => value < 0 ? LocalConstant.DefaultCommetFetchWaitSpan : value);
+            this.IsDeletingExistingEconomyFileEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DeleteEcoFile);
 
         }
 
@@ -216,6 +220,20 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// </summary>
         public ReactiveProperty<bool> IsExperimentalCommentSafetySystemEnable { get; set; }
 
+        /// <summary>
+        /// Xml宣言を出力
+        /// </summary>
+        public ReactiveProperty<bool> IsOmitXmlDeclarationEnable { get; init; }
+
+        /// <summary>
+        /// 1ブロックあたりのコメント数
+        /// </summary>
+        public ReactiveProperty<int> CommentCountPerBlock { get; init; }
+
+        /// <summary>
+        /// エコノミーファイル削除
+        /// </summary>
+        public ReactiveProperty<bool> IsDeletingExistingEconomyFileEnable { get; init; }
 
         /// <summary>
         /// 一時フォルダーの最大保持数
@@ -291,6 +309,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         public ReactivePropertySlim<bool> IsUnsafeCommentHandleEnable { get; set; } = new(true);
 
         public ReactivePropertySlim<bool> IsExperimentalCommentSafetySystemEnable { get; set; } = new(true);
+
+        public ReactivePropertySlim<bool> IsDeletingExistingEconomyFileEnable { get; init; } = new(true);
+
+        public ReactiveProperty<bool> IsOmitXmlDeclarationEnable { get; init; } = new(true);
+
+        public ReactiveProperty<int> CommentCountPerBlock { get; init; } = new(NetConstant.DefaultCommentCountPerBlock);
 
         public ReactiveProperty<int> MaxTmpDirCount { get; set; } = new(20);
 
