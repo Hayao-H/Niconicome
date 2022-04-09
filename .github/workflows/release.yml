@@ -1,4 +1,4 @@
-name: .Net5 CI/CD
+name: .Net6 CI/CD
 on: 
   push:
     tags:
@@ -14,7 +14,7 @@ jobs:
       NUGET_XMLDOC_MODE: skip
     steps:
     - uses: actions/checkout@v1
-    - name: Setup .NET Core 5.0.*
+    - name: Setup .NET 6.0.*
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.*
@@ -60,10 +60,10 @@ jobs:
       NUGET_XMLDOC_MODE: skip
     steps:
     - uses: actions/checkout@v1
-    - name: Setup .NET 5.0
+    - name: Setup .NET6.0
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.*
+        dotnet-version: 6.0.*
     - name:  Download ffmpeg
       shell: powershell
       run: |
@@ -71,7 +71,7 @@ jobs:
         mkdir ffmpeg/bin
         cd tmp
         $ProgressPreference = 'SilentlyContinue'
-        Invoke-WebRequest https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2021-09-29-12-22/ffmpeg-N-103910-gc5f3143090-win64-gpl.zip -o ffbin.zip
+        Invoke-WebRequest https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip -o ffbin.zip
         Expand-Archive ffbin.zip -Force
         $item = Get-Childitem -Recurse -Filter ffmpeg.exe
         cd ..
