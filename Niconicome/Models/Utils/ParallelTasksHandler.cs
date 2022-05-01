@@ -11,13 +11,32 @@ namespace Niconicome.Models.Utils
 {
     public interface IParallelTask<T>
     {
+        /// <summary>
+        /// Inxex
+        /// </summary>
         int Index { get; set; }
+
+        /// <summary>
+        /// タスク関数
+        /// </summary>
         Func<T, object, Task> TaskFunction { get; }
+
+        /// <summary>
+        /// 待機ハンドラ
+        /// </summary>
         Action<int> OnWait { get; }
+
+        /// <summary>
+        /// キャンセルメソッド（任意）
+        /// </summary>
+        void Cancel()
+        {
+
+        }
     }
 
 
-    class ParallelTasksHandler<T> where T : IParallelTask<T>
+    public class ParallelTasksHandler<T> where T : IParallelTask<T>
     {
 
         public ParallelTasksHandler(int maxPallarelTasksCount, int waitInterval, int waitSeconds, bool createThread = true, bool untilEmpty = false)
@@ -101,6 +120,14 @@ namespace Niconicome.Models.Utils
         {
             lock (this.lockobj)
             {
+                foreach(var t in this.PallarelTasks)
+                {
+                    try
+                    {
+                        t.Cancel();
+                    }
+                    catch { }
+                }
                 this.PallarelTasks.Clear();
             }
         }

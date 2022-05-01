@@ -1,8 +1,15 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
+﻿using System;
+using System.Collections.Generic;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Download;
 using Niconicome.Models.Playlist;
+using NiconicomeTest.Stabs.Models.Local.State;
+using NiconicomeTest.Stabs.Models.Network.Download;
+using NiconicomeTest.Stabs.Models.Playlist.Playlist;
+using NiconicomeTest.Stabs.Models.Playlist.VideoList;
 using NUnit.Framework;
-using Download = Niconicome.Models.Network.Download;
+using Reactive.Bindings.Extensions;
+using Download = Niconicome.Models.Network.Download.DLTask;
 
 namespace NiconicomeTest.NetWork.Download.DownloadTask
 {
@@ -15,24 +22,21 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
             var video = new NonBindableListVideoInfo();
             video.Title.Value = "Hello World";
             video.NiconicoId.Value = "0";
-            video.FileName.Value = "nyaa/a.mp4";
-            video.IsEconomy.Value = true;
 
-            var converted = new Download::DownloadTask(video, new DownloadSettings() { VerticalResolution = (uint)1080, FolderPath = @"fuga\hoge", PlaylistID = 1 });
+            var task = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
 
-            Assert.That(converted.Title, Is.EqualTo("Hello World"));
-            Assert.That(converted.DirectoryPath, Is.EqualTo(@"fuga\hoge"));
-            Assert.That(converted.PlaylistID, Is.EqualTo(1));
-            Assert.That(converted.VerticalResolution, Is.EqualTo((uint)1080));
-            Assert.That(converted.NiconicoID, Is.EqualTo("0"));
-            Assert.That(converted.FilePath, Is.EqualTo(video.FileName.Value));
-            Assert.That(converted.IsEconomyFile, Is.True);
+            task.Initialize(video, new DownloadSettings() { PlaylistID = 1 });
+
+            Assert.That(task.Title, Is.EqualTo("Hello World"));
+            Assert.That(task.PlaylistID, Is.EqualTo(1));
+            Assert.That(task.NiconicoID, Is.EqualTo("0"));
         }
 
         [Test]
         public void キャンセルする()
         {
-            var task = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
+            var task = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+
             task.Cancel();
 
             Assert.That(task.IsCanceled.Value, Is.True);
