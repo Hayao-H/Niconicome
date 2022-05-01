@@ -93,6 +93,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         this.IsCompleted = new ReactiveProperty<bool>().AddTo(this.disposables);
         this.IsProcessing = new ReactiveProperty<bool>().AddTo(this.disposables);
         this.IsCanceled = new ReactiveProperty<bool>().AddTo(this.disposables);
+        this.Message = new ReactiveProperty<string>("未初期化").AddTo(this.disposables);
 
         this.Resolution.Subscribe(value =>
         {
@@ -146,7 +147,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
 
     #region Props
 
-    public ReactiveProperty<string> Message { get; init; } = new("未初期化");
+    public ReactiveProperty<string> Message { get; private set; } 
 
     public ReactiveProperty<uint> Resolution { get; init; } = new();
 
@@ -174,6 +175,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         this._video = video;
         this._settings = settings;
         this.Resolution.Value = settings.VerticalResolution;
+        this.Message.Subscribe(m => this._video.Message.Value = m);
         this.Message.Value = "待機中...";
     }
 
