@@ -27,12 +27,9 @@ namespace Niconicome.Models.Utils
         Action<int> OnWait { get; }
 
         /// <summary>
-        /// キャンセルメソッド（任意）
+        /// キャンセルメソッド
         /// </summary>
-        void Cancel()
-        {
-
-        }
+        void Cancel();
     }
 
 

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Const;
@@ -101,6 +103,8 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         private readonly IVideoListContainer _videoListContainer;
 
+        private readonly List<IDownloadTask> _processingTasks = new();
+
         private readonly ReactiveProperty<bool> _isProcessingSource = new();
 
         private ReactiveProperty<int>? _maxParallelDL;
@@ -112,6 +116,8 @@ namespace Niconicome.Models.Network.Download.DLTask
         private readonly IDownloadTaskPool _queuePool = new DownloadTaskPool();
 
         private readonly IDownloadTaskPool _stagedPool = new DownloadTaskPool();
+
+        private CancellationTokenSource? _cts;
 
         #endregion
 
@@ -134,10 +140,12 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         public void StageVIdeo()
         {
-            DownloadSettings settings = this._settingsHandler.CreateDownloadSettings();
 
             foreach (var video in this._videoListContainer.Videos.Where(v => v.IsSelected.Value).ToList())
             {
+
+                DownloadSettings settings = this._settingsHandler.CreateDownloadSettings();
+
                 //動画固有の情報を設定
                 settings.NiconicoId = video.NiconicoId.Value;
                 settings.IsEconomy = video.IsEconomy.Value;
@@ -151,12 +159,12 @@ namespace Niconicome.Models.Network.Download.DLTask
             }
         }
 
-        public　void ClearStaged()
+        public void ClearStaged()
         {
             this._stagedPool.Clear();
         }
 
-        public　void RemoveFromStaged(IDownloadTask task)
+        public void RemoveFromStaged(IDownloadTask task)
         {
             this._stagedPool.RemoveTask(task);
         }
@@ -165,13 +173,23 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         public async Task StartDownloadAsync(Action<string> onMessage, Action<string> onMessageVerbose)
         {
+            void Finalize()
+            {
+                this._isProcessingSource.Value = false;
+                this._cts = null;
+                this._processingTasks.Clear();
+            }
+
             //ダウンロード中ならキャンセル
             if (this.IsProcessing.Value) return;
+
+            //初期化
+            this._processingTasks.Clear();
 
             //ステージ済みをキューに移動
             this.MoveStagedToQueue();
             var videoCount = this._tasksHandler!.PallarelTasks.Count;
-            IDownloadTask[]? tmp = this._tasksHandler.PallarelTasks.ToArray();
+            this._processingTasks.AddRange(this._tasksHandler.PallarelTasks);
 
             //タスクが0なら中止
             if (videoCount == 0) return;
@@ -181,22 +199,24 @@ namespace Niconicome.Models.Network.Download.DLTask
             onMessageVerbose($"動画のダウンロードを開始します。({videoCount}件)");
             onMessage($"動画のダウンロードを開始します。({videoCount}件)");
 
+            //トークン生成
+            this._cts = new CancellationTokenSource();
 
             try
             {
-                await this._tasksHandler.ProcessTasksAsync();
+                await this._tasksHandler.ProcessTasksAsync(ct: this._cts.Token);
             }
             catch (Exception e)
             {
                 this._logger.Error("ダウンロード中にエラーが発生しました", e);
                 onMessageVerbose($"ダウンロード中にエラーが発生しました。(詳細: {e.Message})");
                 onMessage($"ダウンロード中にエラーが発生しました。");
-                this._isProcessingSource.Value = false;
+                Finalize();
                 return;
             }
 
             //結果判定
-            int succeededCount = tmp.Select(t => t.IsSuceeded).Count();
+            int succeededCount = this._processingTasks.Select(t => t.IsSuceeded).Count();
 
             if (succeededCount == 0)
             //1件もできなかった
@@ -206,7 +226,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             }
             else
             {
-                string niconicoID = tmp.First().NiconicoID;
+                string niconicoID = this._processingTasks.First().NiconicoID;
 
                 if (succeededCount > 1)
                 //2件以上DLできた
@@ -227,12 +247,21 @@ namespace Niconicome.Models.Network.Download.DLTask
                 }
             }
 
-            this._isProcessingSource.Value = false;
-            tmp = null;
+            Finalize();
         }
 
         public void CancelDownload()
         {
+            //並列タスクハンドラ用のトークンをキャンセル
+            this._cts?.Cancel();
+            this._cts = null;
+
+            //ダウンロード中のタスクをキャンセル
+            foreach (var task in this._processingTasks)
+            {
+                task.Cancel();
+            }
+
             this._tasksHandler!.CancellAllTasks();
             this._isProcessingSource.Value = false;
         }
@@ -256,7 +285,7 @@ namespace Niconicome.Models.Network.Download.DLTask
                     this._queuePool.AddTask(t);
                     this._tasksHandler!.AddTaskToQueue(t);
                 }
-                this._queuePool.Clear();
+                this._stagedPool.Clear();
 
             }
             else

@@ -210,6 +210,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
             }
 
             this.IsCompleted.Value = true;
+            this.IsProcessing.Value = false;
             return AttemptResult.Fail(result.Message);
         }
         else

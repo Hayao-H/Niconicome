@@ -81,7 +81,7 @@ namespace Niconicome.Models.Local.State
         {
             if (this._isInitialized) return;
 
-            this._settingsContainer.GetReactiveIntSetting(SettingsEnum.SnackbarDuration).Subscribe(this.OnDurationChanged);
+            this._settingsContainer.GetReactiveIntSetting(SettingsEnum.SnackbarDuration, null, value => value < 0 ? LocalConstant.DefaultSnackbarDuration : value).Subscribe(this.OnDurationChanged);
 
             this._isInitialized = true;
         }
