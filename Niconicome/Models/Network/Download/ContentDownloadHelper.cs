@@ -19,7 +19,7 @@ using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrat
 
 namespace Niconicome.Models.Network.Download
 {
-    interface IContentDownloadHelper
+    public interface IContentDownloadHelper
     {
         /// <summary>
         /// 非同期でコンテンツをダウンロードする
@@ -32,7 +32,7 @@ namespace Niconicome.Models.Network.Download
         Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IListVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token);
     }
 
-    class ContentDownloadHelper : IContentDownloadHelper
+    public class ContentDownloadHelper : IContentDownloadHelper
     {
         public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter, IEnumSettingsHandler enumSettingsHander, IPathOrganizer pathOrganizer, IVideoInfoContainer container)
         {

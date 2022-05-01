@@ -20,6 +20,7 @@ using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Niconicome.Models.Network.Fetch;
 using Niconicome.Models.Network.Register;
 using Niconicome.Models.Utils.InitializeAwaiter;
+using Niconicome.Models.Network.Download.DLTask;
 
 namespace Niconicome.Workspaces
 {
@@ -33,7 +34,6 @@ namespace Niconicome.Workspaces
         public static ILocalInfo LocalInfo { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalInfo>();
         public static INetworkVideoHandler NetworkVideoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<INetworkVideoHandler>();
         public static IMessageHandler Messagehandler { get; private set; } = DIFactory.Provider.GetRequiredService<IMessageHandler>();
-        public static IContentDownloader Videodownloader { get; private set; } = DIFactory.Provider.GetRequiredService<IContentDownloader>();
         public static IVideoFilter VideoFilter { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoFilter>();
         public static ILocalSettingHandler SettingHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingHandler>();
         public static IPlaylistCreator PlaylistCreator { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistCreator>();
@@ -41,7 +41,6 @@ namespace Niconicome.Workspaces
         public static IShutdown Shutdown { get; private set; } = DIFactory.Provider.GetRequiredService<IShutdown>();
         public static IStartUp StartUp { get; private set; } = DIFactory.Provider.GetRequiredService<IStartUp>();
         public static IVideoIDHandler VideoIDHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoIDHandler>();
-        public static IDownloadTasksHandler DownloadTasksHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IDownloadTasksHandler>();
         public static VideoList::ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::ICurrent>();
         public static VideoList::IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::IVideoListContainer>();
         public static Ext::IExternalAppUtils ExternalAppUtils { get; private set; } = DIFactory.Provider.GetRequiredService<Ext::IExternalAppUtils>();
@@ -79,7 +78,15 @@ namespace Niconicome.Workspaces
         /// </summary>
         public static IWindowTabHelper WindowTabHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowTabHelper>();
 
+        /// <summary>
+        /// 初期化ヘルパー
+        /// </summary>
         public static IInitializeAwaiterHandler InitializeAwaiterHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IInitializeAwaiterHandler>();
+
+        /// <summary>
+        /// ダウンロードを一括管理
+        /// </summary>
+        public static IDownloadManager DownloadManager { get; private set; }=DIFactory.Provider.GetRequiredService<IDownloadManager>();
 
     }
 }

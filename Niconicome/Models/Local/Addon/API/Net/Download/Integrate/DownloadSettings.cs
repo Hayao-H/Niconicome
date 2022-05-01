@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.ClearScript;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Download;
+using Niconicome.Models.Network.Download.DLTask;
 using Niconicome.Models.Playlist.VideoList;
 using Info = Niconicome.Models.Domain.Niconico.Video.Infomations;
 
@@ -54,29 +55,20 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
 
     public class DownloadSettings : IDownloadSettings
     {
-        public DownloadSettings(IContentDownloader downloader, IDownloadSettingsHandler downloadSettingsHandler, ILocalSettingsContainer settingsContainer,IDownloadTasksHandler tasksHandler,IVideoListContainer container,ICurrent current)
+        public DownloadSettings(IDownloadSettingsHandler downloadSettingsHandler, ICurrent current, IDownloadManager manager)
         {
-            this._downloader = downloader;
             this._downloadSettings = downloadSettingsHandler;
-            this._settingContainer = settingsContainer;
-            this._tasksHandler = tasksHandler;
-            this._container = container;
             this._current = current;
+            this._manager = manager;
 
 
         }
 
         #region field
 
-        private readonly IContentDownloader _downloader;
-
         private readonly IDownloadSettingsHandler _downloadSettings;
 
-        private readonly ILocalSettingsContainer _settingContainer;
-
-        private readonly IDownloadTasksHandler _tasksHandler;
-
-        private readonly IVideoListContainer _container;
+        private readonly IDownloadManager _manager;
 
         private readonly ICurrent _current;
 
@@ -86,7 +78,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
 
         #region Props
 
-        public bool canDownload => this._downloader.CanDownload.Value;
+        public bool canDownload => !this._manager.IsProcessing.Value;
 
         public bool downloadVideo
         {
@@ -204,7 +196,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
         {
             if (eventName == canDownloadChangeEventName)
             {
-                this._downloader.CanDownload.Subscribe(_ =>
+                this._manager.IsProcessing.Subscribe(_ =>
                 {
                     try
                     {
@@ -219,45 +211,31 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
         {
             if (this._current.SelectedPlaylist.Value is null) return;
 
-            bool dlFromQueue = this._settingContainer.GetReactiveBoolSetting(SettingsEnum.DLAllFromQueue).Value;
-            int currentPlaylistID = this._current.SelectedPlaylist.Value.Id;
-
-            if (dlFromQueue)
-            {
-                this._tasksHandler.MoveStagedToQueue();
-            }
-            else
-            {
-                this._tasksHandler.MoveStagedToQueue(t => t.PlaylistID == currentPlaylistID);
-            }
-
-            await this._downloader.DownloadVideosFriendlyAsync(m =>
+            await this._manager.StartDownloadAsync(m =>
+           {
+               try
+               {
+                   onMessage.Invoke(false, m);
+               }
+               catch { };
+           }, m =>
              {
-                 try
-                 {
-                     onMessageVerbose.Invoke(false, m);
-                 }
-                 catch { };
-             }, m =>
-             {
-                 try
-                 {
-                     onMessage.Invoke(false, m);
-                 }
-                 catch { };
-             });
+               try
+               {
+                   onMessageVerbose.Invoke(false, m);
+               }
+               catch { };
+           });
         }
 
         public void cancelDownload()
         {
-            this._downloader.Cancel();
+            this._manager.CancelDownload();
         }
 
         public void stageSelectedVideos()
         {
-            bool allowDupe = this._settingContainer.GetReactiveBoolSetting(SettingsEnum.AllowDupeOnStage).Value;
-
-            this._tasksHandler.StageVIdeos(this._container.Videos.Where(v => v.IsSelected.Value), this._downloadSettings.CreateDownloadSettings(), allowDupe);
+            this._manager.StageVIdeo();
         }
 
         #endregion

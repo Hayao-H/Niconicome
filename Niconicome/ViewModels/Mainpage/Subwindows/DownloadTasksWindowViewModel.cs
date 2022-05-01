@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using Niconicome.Models.Const;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Network.Download;
+using Niconicome.Models.Network.Download.DLTask;
 using Niconicome.Models.Playlist;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
@@ -23,29 +24,29 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
     {
         public DownloadTasksWindowViewModel(IRegionManager regionManager) : base("ダウンロード", LocalConstant.TaskTabID, true)
         {
-            this.StagedTasks = WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.Tasks.ToReadOnlyReactiveCollection(t => new DownloadTaskViewModel(t));
-            this.Tasks = WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.Tasks.ToReadOnlyReactiveCollection(t => new DownloadTaskViewModel(t));
-            this.DisplayCanceled = WS::Mainpage.DownloadTasksHandler.DisplayCanceled.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.DisplayCompleted = WS::Mainpage.DownloadTasksHandler.DisplayCompleted.ToReactivePropertyAsSynchronized(x => x.Value);
+            this.StagedTasks = WS::Mainpage.DownloadManager.Staged.ToReadOnlyReactiveCollection(t => new DownloadTaskViewModel(t));
+            this.Tasks = WS::Mainpage.DownloadManager.Queue.ToReadOnlyReactiveCollection(t => new DownloadTaskViewModel(t));
+            this.DisplayCanceled = WS::Mainpage.DownloadManager.DisplayCanceled.ToReactivePropertyAsSynchronized(x => x.Value);
+            this.DisplayCompleted = WS::Mainpage.DownloadManager.DisplayCompleted.ToReactivePropertyAsSynchronized(x => x.Value);
 
             this.regionManager = regionManager;
             this.RequestClose += _ => { };
 
-            this.StartDownloadCommand = WS::Mainpage.Videodownloader.CanDownload
+            this.StartDownloadCommand = WS::Mainpage.DownloadManager.IsProcessing
+            .Select(x => !x)
             .ToReactiveCommand()
             .WithSubscribe(async () =>
            {
-               await WS::Mainpage.Videodownloader.DownloadVideosFriendlyAsync(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.Queue.Enqueue(m));
+               await WS::Mainpage.DownloadManager.StartDownloadAsync(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.Queue.Enqueue(m));
                WS::Mainpage.PostDownloadTasksManager.HandleAction();
            })
             .AddTo(this.disposables);
 
-            this.CancelDownloadCommand = WS::Mainpage.Videodownloader.CanDownload
-                .Select(f => !f)
+            this.CancelDownloadCommand = WS::Mainpage.DownloadManager.IsProcessing
                 .ToReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    WS::Mainpage.DownloadTasksHandler.DownloadTaskPool.CancelAllTasks();
+                    WS::Mainpage.DownloadManager.CancelDownload();
                     this.Queue.Enqueue("ユーザーによってダウンロードがキャンセルされました。");
                     WS::Mainpage.Messagehandler.AppendMessage("ユーザーによってダウンロードがキャンセルされました。");
                 })
@@ -53,24 +54,18 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
             this.ClearStagedCommand = new ReactiveCommand().WithSubscribe(() =>
             {
-                WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.Clear();
+                WS::Mainpage.DownloadManager.ClearStaged();
             });
 
             this.RemoveStagedTaskCommand = new ReactiveCommand().WithSubscribe(() =>
              {
-                 var tasks = this.StagedTasks.Where(t => t.IsChecked);
+                 var tasks = this.StagedTasks.Where(t => t.IsChecked.Value);
                  foreach (var task in tasks)
                  {
-                     WS::Mainpage.DownloadTasksHandler.StagedDownloadTaskPool.RemoveTask(task.Task);
+                     WS::Mainpage.DownloadManager.RemoveFromStaged(task.Task);
                  }
 
              });
-
-            this.MoveTasksToQueue = new ReactiveCommand().WithSubscribe(() =>
-            {
-                WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
-            });
-
 
             this.CloseCommand.Subscribe(() =>
             {
@@ -141,11 +136,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public ReactiveCommand RemoveStagedTaskCommand { get; init; }
 
         /// <summary>
-        /// ステージング済みタスクをキューに追加
-        /// </summary>
-        public ReactiveCommand MoveTasksToQueue { get; init; }
-
-        /// <summary>
         /// メッセージキュー
         /// </summary>
         public ISnackbarHandler Queue { get; init; } = WS::Mainpage.SnackbarHandler.CreateNewHandler();
@@ -191,15 +181,16 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
     {
         public DownloadTasksWindowViewModelD()
         {
-            this.StagedTasks = new ObservableCollection<DownloadTaskViewModel>();
-            this.Tasks = new ObservableCollection<DownloadTaskViewModel>();
-            this.StagedTasks.Add(new DownloadTaskViewModel(new DownloadTask(new NonBindableListVideoInfo() { Title = new ReactiveProperty<string>("陰陽師"), NiconicoId = new ReactiveProperty<string>("sm9") }, new DownloadSettings()) { IsProcessing = new ReactiveProperty<bool>(true), Message = new ReactiveProperty<string>("初期化完了") }) { IsChecked = true });
-            this.Tasks.Add(new DownloadTaskViewModel(new DownloadTask(new NonBindableListVideoInfo() { Title = new ReactiveProperty<string>("陰陽師"), NiconicoId = new ReactiveProperty<string>("sm9") }, new DownloadSettings()) { IsProcessing = new ReactiveProperty<bool>(true), Message = new ReactiveProperty<string>("初期化完了") }) { IsChecked = true });
+            this.StagedTasks = new ObservableCollection<DownloadTaskViewModelD>();
+            this.Tasks = new ObservableCollection<DownloadTaskViewModelD>();
+            this.StagedTasks.Add(new DownloadTaskViewModelD("陰陽師", "sm9", true, false, false, true));
+            this.StagedTasks.Add(new DownloadTaskViewModelD("陰陽師", "sm9", false, false, true, true));
+            this.StagedTasks.Add(new DownloadTaskViewModelD("陰陽師", "sm9", false, true, false, true));
         }
 
-        public ObservableCollection<DownloadTaskViewModel> StagedTasks { get; init; }
+        public ObservableCollection<DownloadTaskViewModelD> StagedTasks { get; init; }
 
-        public ObservableCollection<DownloadTaskViewModel> Tasks { get; init; }
+        public ObservableCollection<DownloadTaskViewModelD> Tasks { get; init; }
 
         public ReactiveProperty<bool> DisplayCanceled { get; set; } = new(true);
 
@@ -209,10 +200,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         public ReactivePropertySlim<double> Height { get; private set; } = new(1200);
 
-        public ReactiveCommand RefreshTaskCommand { get; init; } = new();
-
-        public ReactiveCommand RefreshStagedTaskCommand { get; init; } = new();
-
         public ReactiveCommand StartDownloadCommand { get; init; } = new();
 
         public ReactiveCommand CancelDownloadCommand { get; init; } = new();
@@ -220,8 +207,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public ReactiveCommand ClearStagedCommand { get; init; } = new();
 
         public ReactiveCommand RemoveStagedTaskCommand { get; init; } = new();
-
-        public ReactiveCommand MoveTasksToQueue { get; init; } = new();
 
         public ISnackbarHandler? Queue { get; init; } = null;
     }
@@ -237,10 +222,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public DownloadTaskViewModel(IDownloadTask task)
         {
             this.associatedTask = task;
-            this.Message = task.Message.ToReadOnlyReactiveProperty<string>();
+            this.Message = task.Message.ToReadOnlyReactiveProperty();
             this.IsProcessing = task.IsProcessing.ToReadOnlyReactiveProperty();
-            this.IsCancel = task.IsCanceled.ToReadOnlyReactiveProperty();
-            this.IsEnd = task.IsDone.ToReadOnlyReactiveProperty();
+            this.IsCanceled = task.IsCanceled.ToReadOnlyReactiveProperty();
+            this.IsCompleted = task.IsCompleted.ToReadOnlyReactiveProperty();
 
             var r1 = new ComboboxItem<int>(1080, "1080p");
             var r2 = new ComboboxItem<int>(720, "720p");
@@ -249,19 +234,19 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
             var r5 = new ComboboxItem<int>(240, "240p");
 
             this.SelectableResolutions = new List<ComboboxItem<int>>() { r1, r2, r3, r4, r5 };
-            this.selectedResolutionField = task.DownloadSettings.VerticalResolution switch
+            this.SelectedResolution = new ReactiveProperty<ComboboxItem<int>>(task.Resolution.Value switch
             {
                 1080 => r1,
                 720 => r2,
                 480 => r3,
                 240 => r4,
                 _ => r1
-            };
+            });
 
 
             this.CancelCommand = new[] {
-                    this.IsCancel,
-                    this.IsEnd,
+                    this.IsCanceled,
+                    this.IsCompleted,
                 }
                 .CombineLatestValuesAreAllFalse()
                 .ToReactiveCommand()
@@ -271,32 +256,18 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                 }).AddTo(this.disposables);
 
         }
+        #region field
 
         private readonly IDownloadTask associatedTask;
 
-        private bool isCheckedField;
+        #endregion
 
-        private ComboboxItem<int> selectedResolutionField;
-
-        public List<ComboboxItem<int>> SelectableResolutions { get; init; }
+        #region Props
 
         /// <summary>
         /// タスク
         /// </summary>
         public IDownloadTask Task { get => this.associatedTask; }
-
-        /// <summary>
-        /// 選択された解像度
-        /// </summary>
-        public ComboboxItem<int> SelectedResolution
-        {
-            get => this.selectedResolutionField;
-            set
-            {
-                this.SetProperty(ref this.selectedResolutionField, value);
-                this.associatedTask.DownloadSettings.VerticalResolution = (uint)value.Value;
-            }
-        }
 
         /// <summary>
         /// 動画タイトル
@@ -309,6 +280,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public string NiconicoID { get => this.associatedTask.NiconicoID; }
 
         /// <summary>
+        /// 選択可能な解像度
+        /// </summary>
+        public List<ComboboxItem<int>> SelectableResolutions { get; init; }
+
+        /// <summary>
         /// 処理中フラグ
         /// </summary>
         public ReadOnlyReactiveProperty<bool> IsProcessing { get; }
@@ -316,28 +292,79 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// 終了フラグ
         /// </summary>
-        public ReadOnlyReactiveProperty<bool> IsEnd { get; init; }
+        public ReadOnlyReactiveProperty<bool> IsCompleted { get; init; }
 
         /// <summary>
         /// キャンセルフラグ
         /// </summary>
-        public ReadOnlyReactiveProperty<bool> IsCancel { get; }
+        public ReadOnlyReactiveProperty<bool> IsCanceled { get; }
 
         /// <summary>
         /// 状態
         /// </summary>
-        public ReadOnlyReactiveProperty<string> Message { get; }
+        public ReadOnlyReactiveProperty<string?> Message { get; }
 
         /// <summary>
         /// 選択フラグ
         /// </summary>
-        public bool IsChecked { get => this.isCheckedField; set => this.SetProperty(ref this.isCheckedField, value); }
+        public ReactiveProperty<bool> IsChecked { get; init; } = new();
+
+        /// <summary>
+        /// 選択された解像度
+        /// </summary>
+        public ReactiveProperty<ComboboxItem<int>> SelectedResolution { get; init; }
+
+        #endregion
 
         /// <summary>
         /// 処理をキャンセル
         /// </summary>
         public ReactiveCommand CancelCommand { get; init; }
 
+
+    }
+
+    class DownloadTaskViewModelD : BindableBase
+    {
+        public DownloadTaskViewModelD(string title, string niconicoID, bool isProcessing, bool isCompleted, bool isCanceled, bool isChecked)
+        {
+            this.Title = title;
+            this.NiconicoID = niconicoID;
+            this.IsProcessing = new ReactivePropertySlim<bool>(isProcessing);
+            this.IsCompleted = new ReactivePropertySlim<bool>(isCompleted);
+            this.IsCanceled = new ReactivePropertySlim<bool>(isCanceled);
+            this.IsChecked = new ReactivePropertySlim<bool>(isChecked);
+
+            var r1 = new ComboboxItem<int>(1080, "1080p");
+            var r2 = new ComboboxItem<int>(720, "720p");
+            var r3 = new ComboboxItem<int>(480, "480p");
+            var r4 = new ComboboxItem<int>(360, "360p");
+            var r5 = new ComboboxItem<int>(240, "240p");
+
+            this.SelectableResolutions = new List<ComboboxItem<int>>() { r1, r2, r3, r4, r5 };
+            this.SelectedResolution = new ReactiveProperty<ComboboxItem<int>>(r1);
+
+        }
+
+        public string Title { get; init; }
+
+        public string NiconicoID { get; init; }
+
+        public List<ComboboxItem<int>> SelectableResolutions { get; init; }
+
+        public ReactivePropertySlim<bool> IsProcessing { get; init; }
+
+        public ReactivePropertySlim<bool> IsCompleted { get; init; }
+
+        public ReactivePropertySlim<bool> IsCanceled { get; init; }
+
+        public ReactivePropertySlim<string> Message { get; init; } = new("テスト");
+
+        public ReactivePropertySlim<bool> IsChecked { get; init; }
+
+        public ReactiveCommand CancelCommand { get; init; } = new();
+
+        public ReactiveProperty<ComboboxItem<int>> SelectedResolution { get; init; }
 
     }
 }

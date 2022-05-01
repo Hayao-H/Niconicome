@@ -340,7 +340,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 IDialogService service = Application.Current.As<PrismApplication>().Container.Resolve<IDialogService>();
                 bool confirm = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.ConfirmIfDownloading);
-                if (!WS::Mainpage.Videodownloader.CanDownload.Value && confirm)
+                if (WS::Mainpage.DownloadManager.IsProcessing.Value && confirm)
                 {
                     var cResult = CommonMessageBoxAPI.Show(service, "ダウンロードが進行中ですが、本当に終了しますか？", CommonMessageBoxAPI.MessageType.Warinng, CommonMessageBoxButtons.Yes | CommonMessageBoxButtons.No);
                     if (cResult.Result != ButtonResult.Yes)

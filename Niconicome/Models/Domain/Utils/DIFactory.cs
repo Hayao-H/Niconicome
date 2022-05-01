@@ -26,6 +26,7 @@ using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
+using DownloadTask = Niconicome.Models.Network.Download.DLTask;
 using Ext = Niconicome.Models.Local.External;
 using Fetch = Niconicome.Models.Network.Fetch;
 using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
@@ -117,7 +118,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideo::ISegmentWriter, DlVideo::SegmentWriter>();
             services.AddTransient<DlVideo::IVideoEncoader, DlVideo::VideoEncoader>();
             services.AddTransient<DlVideo::ITsMerge, DlVideo::TsMerge>();
-            services.AddSingleton<Download::IContentDownloader, Download::ContentDownloader>();
             services.AddSingleton<Download::IContentDownloadHelper, Download::ContentDownloadHelper>();
             services.AddTransient<DlThumb::IThumbDownloader, DlThumb::ThumbDownloader>();
             services.AddTransient<Playlist::IVideoFilter, Playlist::VideoFilter>();
@@ -153,8 +153,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainXeno::IXenoPlaylistConverter, DomainXeno::XenoPlaylistConverter>();
             services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
             services.AddTransient<Download::ILocalContentHandler, Download::LocalContentHandler>();
-            services.AddTransient<Download::IDownloadTaskPool, Download::DownloadTaskPool>();
-            services.AddSingleton<Download::IDownloadTasksHandler, Download::DownloadTasksHandler>();
+            services.AddTransient<DownloadTask::IDownloadTaskPool, DownloadTask::DownloadTaskPool>();
+            services.AddSingleton<DownloadTask::IDownloadManager, DownloadTask.DownloadManager>();
+            services.AddTransient<DownloadTask::IDownloadTask, DownloadTask::DownloadTask>();
             services.AddSingleton<Download::IDownloadSettingsHandler, Download::DownloadSettingsHandler>();
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
             services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();

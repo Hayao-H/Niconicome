@@ -80,6 +80,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         public Action<int> OnWait { get; init; }
 
+        public void Cancel()
+        {
+
+        }
+
         #endregion
 
         #region Method
