@@ -21,6 +21,8 @@ using Niconicome.Models.Network.Fetch;
 using Niconicome.Models.Network.Register;
 using Niconicome.Models.Utils.InitializeAwaiter;
 using Niconicome.Models.Network.Download.DLTask;
+using System.Windows.Controls;
+using Niconicome.Models.Local.OS;
 
 namespace Niconicome.Workspaces
 {
@@ -86,7 +88,12 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// ダウンロードを一括管理
         /// </summary>
-        public static IDownloadManager DownloadManager { get; private set; }=DIFactory.Provider.GetRequiredService<IDownloadManager>();
+        public static IDownloadManager DownloadManager { get; private set; } = DIFactory.Provider.GetRequiredService<IDownloadManager>();
+
+        /// <summary>
+        /// クリップボード管理
+        /// </summary>
+        public static IClipbordManager ClipbordManager { get; private set; } = DIFactory.Provider.GetRequiredService<IClipbordManager>();
 
     }
 }

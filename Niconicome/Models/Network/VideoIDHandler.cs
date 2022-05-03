@@ -79,21 +79,7 @@ namespace Niconicome.Models.Network
 
             onMessage($"入力値：{inputText}");
 
-            if (extractFromText)
-            {
-                onMessage("文字列から動画を取得します。");
-                try
-                {
-                    videos.AddRange(await this.GetVideoListInfoFromTextAsync(inputText));
-                }
-                catch (Exception e)
-                {
-                    this._logger.Error("文字列からの動画取得に失敗しました。", e);
-                    this.FinishProcessing();
-                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("文字列からの動画取得に失敗しました。", e);
-                }
-            }
-            else if (Path.IsPathRooted(inputText))
+            if (Path.IsPathRooted(inputText))
             {
                 onMessage("ローカルディレクトリーから動画を取得します");
                 try
@@ -123,18 +109,32 @@ namespace Niconicome.Models.Network
                     return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("ネットワークからの動画取得に失敗しました。", e);
                 }
             }
-
-            if (this._niconicoUtils.IsNiconicoID(inputText))
+            else if (this._niconicoUtils.IsNiconicoID(inputText))
             {
                 onMessage("IDを登録します");
                 IAttemptResult<IListVideoInfo> result = await this.GetVideoListInfosFromID(inputText);
 
-                if (!result.IsSucceeded||result.Data is null)
+                if (!result.IsSucceeded || result.Data is null)
                 {
                     return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("ネットワークからの動画取得に失敗しました。");
-                } else
+                }
+                else
                 {
                     videos.Add(result.Data);
+                }
+            }
+            else if (extractFromText)
+            {
+                onMessage("文字列から動画を取得します。");
+                try
+                {
+                    videos.AddRange(await this.GetVideoListInfoFromTextAsync(inputText));
+                }
+                catch (Exception e)
+                {
+                    this._logger.Error("文字列からの動画取得に失敗しました。", e);
+                    this.FinishProcessing();
+                    return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("文字列からの動画取得に失敗しました。", e);
                 }
             }
             else
@@ -151,6 +151,8 @@ namespace Niconicome.Models.Network
                     return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("動画の検索に失敗しました。", e);
                 }
             }
+
+            onMessage($"{videos.AddRange}件の動画を取得しました。");
 
             this.FinishProcessing();
             return AttemptResult<IEnumerable<IListVideoInfo>>.Succeeded(videos);
