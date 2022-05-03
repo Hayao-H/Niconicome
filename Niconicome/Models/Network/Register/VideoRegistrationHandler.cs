@@ -20,13 +20,6 @@ namespace Niconicome.Models.Network.Register
         /// <returns></returns>
         Task<IAttemptResult<IEnumerable<IListVideoInfo>>> ResgisterVideoAsync(string inputText);
 
-        /// <summary>
-        /// IDが含まれる文字列から動画を登録する
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        Task<IAttemptResult<IEnumerable<IListVideoInfo>>> ResgisterVideoFromTextAsync(string text);
-
 
         /// <summary>
         /// 処理中フラグ

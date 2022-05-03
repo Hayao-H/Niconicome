@@ -122,9 +122,7 @@ namespace Niconicome.Models.Network
                     this.FinishProcessing();
                     return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("ネットワークからの動画取得に失敗しました。", e);
                 }
-            }
-
-            if (this._niconicoUtils.IsNiconicoID(inputText))
+            }else if (this._niconicoUtils.IsNiconicoID(inputText))
             {
                 onMessage("IDを登録します");
                 IAttemptResult<IListVideoInfo> result = await this.GetVideoListInfosFromID(inputText);

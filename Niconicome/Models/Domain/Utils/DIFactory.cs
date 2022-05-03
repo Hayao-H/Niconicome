@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
+using Reactive.Bindings.Extensions;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using Addons = Niconicome.Models.Local.Addon;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
@@ -57,6 +58,7 @@ using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
+using OS = Niconicome.Models.Local.OS;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -257,6 +259,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<FF::IStoreFirefoxProfileManager, FF::StoreFirefoxProfileManager>();
             services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
             services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
+            services.AddSingleton<OS::IClipbordManager, OS::ClipbordManager>();
             return services.BuildServiceProvider();
         }
 

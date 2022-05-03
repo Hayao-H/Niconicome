@@ -260,14 +260,12 @@ namespace Niconicome.ViewModels.Mainpage
 
             #region クリップボード監視
 
-            this.isClipbordMonitoring = new ReactiveProperty<bool>();
-
-            this.ClipbordMonitorIcon = this.isClipbordMonitoring
+            this.ClipbordMonitorIcon = WS::Mainpage.ClipbordManager.IsMonitoring
                 .Select(value => value ? MaterialDesign::PackIconKind.ClipboardRemove : MaterialDesign::PackIconKind.ClipboardPulse)
                 .ToReactiveProperty()
                 .AddTo(this.disposables);
 
-            this.isClipbordMonitoring
+            WS::Mainpage.ClipbordManager.IsMonitoring
                 .Skip(1)
                 .Subscribe(value =>
             {
@@ -284,9 +282,15 @@ namespace Niconicome.ViewModels.Mainpage
                 }
             }).AddTo(this.disposables);
 
-            this.ClipboardMonitoringToolTip = this.isClipbordMonitoring
+            this.ClipboardMonitoringToolTip = WS::Mainpage.ClipbordManager.IsMonitoring
                 .Select(value => value ? "クリップボードの監視を終了する" : "クリップボードを監視する")
                 .ToReadOnlyReactiveProperty();
+
+            WS::Mainpage.ClipbordManager.RegisterClipboardChangeHandler(_ =>
+            {
+                SystemSounds.Asterisk.Play();
+                this.AddVideoFromClipboardCommand?.Execute();
+            });
 
             #endregion
 
@@ -323,36 +327,7 @@ namespace Niconicome.ViewModels.Mainpage
                       return;
                   }
 
-                  this.SnackbarMessageQueue.Enqueue("動画を追加します");
-
-                  IAttemptResult<IEnumerable<IListVideoInfo>> result = await WS::Mainpage.VideoRegistrationHandler.ResgisterVideoAsync(niconicoId);
-
-                  if (!result.IsSucceeded || result.Data is null)
-                  {
-                      this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
-                      return;
-                  }
-
-                  List<IListVideoInfo> videos = result.Data.ToList();
-
-                  if (videos.Count == 0)
-                  {
-                      this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
-                      return;
-                  }
-
-                  this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
-                  WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を追加しました");
-
-                  if (!videos[0].ChannelID.Value.IsNullOrEmpty())
-                  {
-                      IListVideoInfo firstVideo = videos[0];
-                      WS::Mainpage.SnackbarHandler.Enqueue($"この動画のチャンネルは「{firstVideo.ChannelName.Value}」です", "IDをコピー", () =>
-                      {
-                          Clipboard.SetText(firstVideo.ChannelID.Value);
-                          WS::Mainpage.SnackbarHandler.Enqueue("コピーしました");
-                      });
-                  }
+                  await this.RegisterVideoAsync(niconicoId);
               })
             .AddTo(this.disposables);
 
@@ -459,39 +434,20 @@ namespace Niconicome.ViewModels.Mainpage
                         return;
                     }
 
-                    var data = Clipboard.GetText();
-                    if (string.IsNullOrEmpty(data)) return;
-
-                    this.SnackbarMessageQueue.Enqueue("動画を追加します");
-
-                    IAttemptResult<IEnumerable<IListVideoInfo>> result = await WS::Mainpage.VideoRegistrationHandler.ResgisterVideoAsync(data);
+                    IAttemptResult<string> result = WS::Mainpage.ClipbordManager.GetClipboardContent();
 
                     if (!result.IsSucceeded || result.Data is null)
                     {
-                        this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
+                        this.SnackbarMessageQueue.Enqueue("クリップボードの読み込みに失敗しました。");
+                        return;
+                    }
+                    else if (result.Data.IsNullOrEmpty())
+                    {
+                        this.SnackbarMessageQueue.Enqueue("クリップボードが空です。");
                         return;
                     }
 
-                    List<IListVideoInfo> videos = result.Data.ToList();
-
-                    if (videos.Count == 0)
-                    {
-                        this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
-                        return;
-                    }
-
-                    this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
-                    WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を追加しました");
-
-                    if (!videos[0].ChannelID.Value.IsNullOrEmpty())
-                    {
-                        IListVideoInfo firstVideo = videos[0];
-                        WS::Mainpage.SnackbarHandler.Enqueue($"この動画のチャンネルは「{firstVideo.ChannelName.Value}」です", "IDをコピー", () =>
-                        {
-                            Clipboard.SetText(firstVideo.ChannelID.Value);
-                            WS::Mainpage.SnackbarHandler.Enqueue("コピーしました");
-                        });
-                    }
+                    await this.RegisterVideoAsync(result.Data);
                 })
                 .AddTo(this.disposables);
 
@@ -920,25 +876,18 @@ namespace Niconicome.ViewModels.Mainpage
                 .ToReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    if (!this.isClipbordMonitoring.Value)
+                    if (WS::Mainpage.ClipbordManager.IsMonitoring.Value)
                     {
-                        if (!Compatibility.IsOsVersionLargerThan(10, 0, 10240))
+                        IAttemptResult result = WS::Mainpage.ClipbordManager.StartMonitoring();
+                        if (!result.IsSucceeded)
                         {
-                            WS::Mainpage.SnackbarHandler.Enqueue("この機能はOSでサポートされていません。");
-                            WS::Mainpage.Messagehandler.AppendMessage("この機能は'Windows10 1507'以降のOSでのみ利用可能です。");
-                            return;
+                            this.SnackbarMessageQueue.Enqueue("クリップボードの監視に失敗しました。");
+                            WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "クリップボードの監視に失敗しました。");
                         }
-
-                        Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged += this.OnContextMenuChange;
-                        this.isClipbordMonitoring.Value = true;
-
                     }
                     else
                     {
-                        if (!Compatibility.IsOsVersionLargerThan(10, 0, 10240)) return;
-                        Windows.ApplicationModel.DataTransfer.Clipboard.ContentChanged -= this.OnContextMenuChange;
-                        this.isClipbordMonitoring.Value = false;
-
+                        WS::Mainpage.ClipbordManager.StopMonitoring();
                     }
                 }).AddTo(this.disposables);
 
@@ -1420,9 +1369,44 @@ namespace Niconicome.ViewModels.Mainpage
 
         private bool isFiltered;
 
-        private ReactiveProperty<bool> isClipbordMonitoring;
-
         private readonly IEventAggregator ea;
+
+        /// <summary>
+        /// 動画追加処理
+        /// </summary>
+        private async Task RegisterVideoAsync(string data)
+        {
+            this.SnackbarMessageQueue.Enqueue("動画を追加します");
+
+            IAttemptResult<IEnumerable<IListVideoInfo>> result = await WS::Mainpage.VideoRegistrationHandler.ResgisterVideoAsync(data);
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
+                return;
+            }
+
+            List<IListVideoInfo> videos = result.Data.ToList();
+
+            if (videos.Count == 0)
+            {
+                this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
+                return;
+            }
+
+            this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
+            WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を追加しました");
+
+            if (!videos[0].ChannelID.Value.IsNullOrEmpty())
+            {
+                IListVideoInfo firstVideo = videos[0];
+                WS::Mainpage.SnackbarHandler.Enqueue($"この動画のチャンネルは「{firstVideo.ChannelName.Value}」です", "IDをコピー", () =>
+                {
+                    Clipboard.SetText(firstVideo.ChannelID.Value);
+                    WS::Mainpage.SnackbarHandler.Enqueue("コピーしました");
+                });
+            }
+        }
 
         /// <summary>
         /// 選択したプレイリストが変更された場合
@@ -1452,17 +1436,6 @@ namespace Niconicome.ViewModels.Mainpage
                 var count = WS::Mainpage.VideoListContainer.Count;
                 this.PlaylistTitle.Value = $"{name}({count}件)";
             }
-        }
-
-        /// <summary>
-        /// コンテキストメニュー監視
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnContextMenuChange(object? sender, object? e)
-        {
-            SystemSounds.Asterisk.Play();
-            this.AddVideoFromClipboardCommand.Execute();
         }
 
         #endregion
