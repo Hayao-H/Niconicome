@@ -94,14 +94,13 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.SnackbarMessageQueue = WS::Mainpage.SnackbarHandler.Queue;
 
-            this.IsDownloading = WS::Mainpage.Videodownloader.CanDownload
-                .ToReactivePropertyAsSynchronized(x => x.Value, x => !x, x => !x)
-                .AddTo(this.disposables);
+            this.IsDownloading = WS::Mainpage.DownloadManager.IsProcessing.ToReactiveProperty().AddTo(this.disposables);
 
             this.DownloadCommand = new[] {
                 WS::Mainpage.CurrentPlaylist.SelectedPlaylist
                 .Select(p=>p is not null),
-                WS::Mainpage.Videodownloader.CanDownload
+                WS::Mainpage.DownloadManager.IsProcessing
+                .Select(x=>!x)
             }
             .CombineLatestValuesAreAllTrue()
             .ToReactiveCommand()
@@ -127,27 +126,20 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value && !this.IsDownloadingIchibaInfoEnable.Value) return;
 
-                var videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).Copy();
-                if (!videos.Any()) return;
+                WS::Mainpage.DownloadManager.StageVIdeo();
 
-                int videoCount = videos.Count();
-                var firstVideo = videos.First();
-                var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.AllowDupeOnStage);
-
-                WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, WS::Mainpage.DownloadSettingsHandler.CreateDownloadSettings(), allowDupe);
-
-                this.SnackbarMessageQueue.Enqueue($"{videos.Count()}件の動画をステージしました。", "管理画面を開く", () =>
+                this.SnackbarMessageQueue.Enqueue($"選択された動画をステージしました。", "管理画面を開く", () =>
                 {
                     WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager, this._dialogService);
                 });
             })
             .AddTo(this.disposables);
 
-            this.CancelCommand = this.IsDownloading
+            this.CancelCommand = WS::Mainpage.DownloadManager.IsProcessing
             .ToReactiveCommand()
             .WithSubscribe(() =>
             {
-                WS::Mainpage.Videodownloader.Cancel();
+                WS::Mainpage.DownloadManager.CancelDownload();
             })
             .AddTo(this.disposables);
 
@@ -319,30 +311,9 @@ namespace Niconicome.ViewModels.Mainpage
 
             if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value && !this.IsDownloadingIchibaInfoEnable.Value) return;
 
-            var videos = vm is null ? WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).Copy() : new List<IListVideoInfo>() { vm.VideoInfo };
-            if (!videos.Any()) return;
+            WS::Mainpage.DownloadManager.StageVIdeo();
 
-            var cts = new CancellationTokenSource();
-
-            int videoCount = videos.Count();
-            var firstVideo = videos.First();
-            var allowDupe = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.AllowDupeOnStage);
-            var setting = WS::Mainpage.DownloadSettingsHandler.CreateDownloadSettings();
-            var dlFromQueue = WS::Mainpage.SettingHandler.GetBoolSetting(SettingsEnum.DLAllFromQueue);
-
-
-            WS::Mainpage.DownloadTasksHandler.StageVIdeos(videos, setting, allowDupe);
-
-            if (dlFromQueue)
-            {
-                WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue();
-            }
-            else
-            {
-                WS::Mainpage.DownloadTasksHandler.MoveStagedToQueue(t => t.PlaylistID == WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value.Id);
-            }
-
-            await WS::Mainpage.Videodownloader.DownloadVideosFriendlyAsync(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.SnackbarMessageQueue.Enqueue(m));
+            await WS::Mainpage.DownloadManager.StartDownloadAsync( m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
             WS::Mainpage.PostDownloadTasksManager.HandleAction();
         }
 

@@ -41,7 +41,7 @@ namespace Niconicome.Models.Const
         /// <summary>
         /// ニコニコのログインURL
         /// </summary>
-        public const string NiconicoLoginURL = @"https://account.nicovideo.jp/login/redirector";
+        public const string NiconicoLoginURL = @"https://secure.nicovideo.jp/secure/login?site=niconico";
 
         /// <summary>
         /// ニコニコのログアウトURL

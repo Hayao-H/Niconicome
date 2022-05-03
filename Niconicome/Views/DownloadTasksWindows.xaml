@@ -27,7 +27,7 @@
                          Kind="DownloadLock"
                          Width="24"
                          Height="24"
-                         ToolTip="登録済みタスク（ダウンロード待ち状態のタスク）"
+                         ToolTip="ウンロード中のタスク"
                     />
                 </TabItem.Header>
                 <Grid>
@@ -39,16 +39,12 @@
                     <TextBlock
                     Padding="5"
                     Style="{DynamicResource MaterialDesignHeadline5TextBlock}">
-                        登録済みタスク
+                       　ダウンロード中のタスク
                     </TextBlock>
                     <DockPanel Grid.Row="1">
                         <CheckBox Margin="10 0" HorizontalAlignment="Left" Content="キャンセル済みを表示" IsChecked="{Binding DisplayCanceled.Value}"/>
                         <CheckBox HorizontalAlignment="Left" Content="完了済みを表示" IsChecked="{Binding DisplayCompleted.Value}"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Margin="5 0" ToolTip="更新" Command="{Binding RefreshTaskCommand}">
-                                <materialDesign:PackIcon Kind="Reload"/>
-                            </Button>
-                            <Button Margin="4 0" Content="ダウンロード開始" Command="{Binding StartDownloadCommand}"/>
                             <Button Margin="4 0" Content="全て中断" Command="{Binding CancelDownloadCommand}"/>
                         </StackPanel>
                     </DockPanel>
@@ -69,12 +65,12 @@
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
                                                     <ProgressBar ToolTip="DL中です" Style="{StaticResource MaterialDesignCircularProgressBar}" Value="35" IsIndeterminate="{Binding IsProcessing.Value}" Visibility="{Binding IsProcessing.Value,Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                                    <materialDesign:PackIcon ToolTip="完了しました" Kind="Check" Foreground="Purple" Visibility="{Binding IsEnd,Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <materialDesign:PackIcon ToolTip="完了しました" Kind="Check" Foreground="Purple" Visibility="{Binding IsCompleted,Converter={StaticResource BooleanToVisibilityConverter}}">
                                                         <materialDesign:PackIcon.RenderTransform>
                                                             <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-8"/>
                                                         </materialDesign:PackIcon.RenderTransform>
                                                     </materialDesign:PackIcon>
-                                                    <materialDesign:PackIcon ToolTip="キャンセルされました" Kind="Close" Foreground="Red" Visibility="{Binding IsCancel.Value,Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <materialDesign:PackIcon ToolTip="キャンセルされました" Kind="Close" Foreground="Red" Visibility="{Binding IsCanceled.Value,Converter={StaticResource BooleanToVisibilityConverter}}">
                                                         <materialDesign:PackIcon.RenderTransform>
                                                             <ScaleTransform ScaleX="1.4" ScaleY="1.4" CenterY="-8"/>
                                                         </materialDesign:PackIcon.RenderTransform>
@@ -124,10 +120,7 @@
                     </TextBlock>
                     <DockPanel Grid.Row="1">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Margin="5 0" ToolTip="更新" Command="{Binding RefreshStagedTaskCommand}">
-                                <materialDesign:PackIcon Kind="Reload"/>
-                            </Button>
-                            <Button Margin="4 0" Content="全て登録" Command="{Binding MoveTasksToQueue}" />
+                            <Button Margin="4 0" Content="ダウンロード開始" Command="{Binding StartDownloadCommand}"/>
                             <Button Margin="4 0" Content="全て削除" Command="{Binding ClearStagedCommand}" />
                             <Button Margin="4 0" Content="選択したタスクを削除" Command="{Binding RemoveStagedTaskCommand}"/>
                         </StackPanel>
@@ -143,12 +136,12 @@
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Header="ID"         DisplayMemberBinding="{Binding NiconicoID}"/>
+                                    <GridViewColumn Header="ID" DisplayMemberBinding="{Binding NiconicoID}"/>
                                     <GridViewColumn Header="タイトル" DisplayMemberBinding="{Binding Title}"/>
                                     <GridViewColumn Header="解像度">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
-                                                <ComboBox ItemsSource="{Binding SelectableResolutions}" SelectedItem="{Binding SelectedResolution}" DisplayMemberPath="DisplayValue"/>
+                                                <ComboBox ItemsSource="{Binding SelectableResolutions}" SelectedItem="{Binding SelectedResolution.Value}" DisplayMemberPath="DisplayValue"/>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>

@@ -8,7 +8,7 @@ using Niconicome.Models.Playlist.Playlist;
 
 namespace NiconicomeTest.Stabs.Models.Playlist.Playlist
 {
-    public class PlaylistHandlerStab : IPlaylistHandler
+    public class PlaylistHandlerStub : IPlaylistHandler
     {
 
         public IAttemptResult<int> AddPlaylist(int parentId)

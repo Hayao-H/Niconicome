@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
+using Reactive.Bindings.Extensions;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using Addons = Niconicome.Models.Local.Addon;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
@@ -26,6 +27,7 @@ using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
+using DownloadTask = Niconicome.Models.Network.Download.DLTask;
 using Ext = Niconicome.Models.Local.External;
 using Fetch = Niconicome.Models.Network.Fetch;
 using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
@@ -56,6 +58,7 @@ using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
+using OS = Niconicome.Models.Local.OS;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -117,7 +120,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideo::ISegmentWriter, DlVideo::SegmentWriter>();
             services.AddTransient<DlVideo::IVideoEncoader, DlVideo::VideoEncoader>();
             services.AddTransient<DlVideo::ITsMerge, DlVideo::TsMerge>();
-            services.AddSingleton<Download::IContentDownloader, Download::ContentDownloader>();
             services.AddSingleton<Download::IContentDownloadHelper, Download::ContentDownloadHelper>();
             services.AddTransient<DlThumb::IThumbDownloader, DlThumb::ThumbDownloader>();
             services.AddTransient<Playlist::IVideoFilter, Playlist::VideoFilter>();
@@ -153,8 +155,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainXeno::IXenoPlaylistConverter, DomainXeno::XenoPlaylistConverter>();
             services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
             services.AddTransient<Download::ILocalContentHandler, Download::LocalContentHandler>();
-            services.AddTransient<Download::IDownloadTaskPool, Download::DownloadTaskPool>();
-            services.AddSingleton<Download::IDownloadTasksHandler, Download::DownloadTasksHandler>();
+            services.AddTransient<DownloadTask::IDownloadTaskPool, DownloadTask::DownloadTaskPool>();
+            services.AddSingleton<DownloadTask::IDownloadManager, DownloadTask.DownloadManager>();
+            services.AddTransient<DownloadTask::IDownloadTask, DownloadTask::DownloadTask>();
             services.AddSingleton<Download::IDownloadSettingsHandler, Download::DownloadSettingsHandler>();
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
             services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();
@@ -256,6 +259,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<FF::IStoreFirefoxProfileManager, FF::StoreFirefoxProfileManager>();
             services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
             services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
+            services.AddSingleton<OS::IClipbordManager, OS::ClipbordManager>();
             return services.BuildServiceProvider();
         }
 

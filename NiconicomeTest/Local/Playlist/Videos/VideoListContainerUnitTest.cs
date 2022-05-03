@@ -36,7 +36,7 @@ namespace NiconicomeTest.Local.Playlist.Videos
             ITreePlaylistInfo? p = new NonBindableTreePlaylistInfo() { Id = 1 };
             this.cStab = new CurrentStab();
             cStab.SelectedPlaylist.Value = p;
-            this.videoListContainer = new VideoListContainer(new PlaylistHandlerStab(), new VideoHandlerStab(), new VideoListRefresherStab(), this.cStab, new LoggerStub());
+            this.videoListContainer = new VideoListContainer(new PlaylistHandlerStub(), new VideoHandlerStab(), new VideoListRefresherStab(), this.cStab, new LoggerStub());
             this.lastVIdeoNicoID = null;
             this.videoListContainer.ListChanged += (_, e) =>
             {

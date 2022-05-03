@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
-using Niconicome.Models.Network.Download;
-using Niconicome.Models.Playlist;
+﻿using System;
+using NiconicomeTest.Stabs.Models.Local.State;
+using NiconicomeTest.Stabs.Models.Network.Download;
+using NiconicomeTest.Stabs.Models.Playlist.Playlist;
+using NiconicomeTest.Stabs.Models.Playlist.VideoList;
 using NUnit.Framework;
-using Download = Niconicome.Models.Network.Download;
+using Reactive.Bindings.Extensions;
+using Download = Niconicome.Models.Network.Download.DLTask;
 
 namespace NiconicomeTest.NetWork.Download.DownloadTask
 {
@@ -19,38 +22,27 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void タスクを追加する()
         {
-            var task = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
+            var task = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
             this.downloadTaskPool!.AddTask(task);
 
             Assert.That(this.downloadTaskPool!.Tasks.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void 複数のタスクを追加する()
-        {
-            var task1 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var task2 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var tasks = new List<Download::IDownloadTask>() { task1, task2 };
-            this.downloadTaskPool!.AddTasks(tasks);
-
-            Assert.That(this.downloadTaskPool!.Tasks.Count, Is.EqualTo(2));
-        }
-
-        [Test]
         public void 追加イベントをチェックする()
         {
-            var id = "";
-            this.downloadTaskPool!.RegisterAddHandler(task => id = task.NiconicoID);
-            var task = new Download::DownloadTask(new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("sm9") }, new DownloadSettings());
+            bool isFired = true;
+            this.downloadTaskPool!.Tasks.CollectionChangedAsObservable().Subscribe(e => isFired = true);
+            var task = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
             this.downloadTaskPool!.AddTask(task);
 
-            Assert.That(id, Is.EqualTo(task.NiconicoID));
+            Assert.That(isFired, Is.True);
         }
 
         [Test]
         public void タスクを削除する()
         {
-            var task = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
+            var task = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
             this.downloadTaskPool!.AddTask(task);
             this.downloadTaskPool!.RemoveTask(task);
 
@@ -60,22 +52,19 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void 複数のタスクを削除する()
         {
-            var task1 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var task2 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var task3 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            this.downloadTaskPool!.AddTasks(new[] { task1, task2, task3 });
-            this.downloadTaskPool!.RemoveTasks(new[] { task1, task2, task3 });
+            var task1 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task2 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task3 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
 
-            Assert.That(this.downloadTaskPool!.Tasks.Count, Is.Zero);
-        }
+            foreach (var task in new[] { task1, task2, task3 })
+            {
+                this.downloadTaskPool!.AddTask(task);
+            }
 
-        [Test]
-        public void 条件に合致するタスクを削除()
-        {
-            var task = new Download::DownloadTask(new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("sm9") }, new DownloadSettings());
-            this.downloadTaskPool!.AddTask(task);
-            this.downloadTaskPool.RemoveTasks(task => task.NiconicoID == "sm9");
-
+            foreach (var task in new[] { task1, task2, task3 })
+            {
+                this.downloadTaskPool!.RemoveTask(task);
+            }
 
             Assert.That(this.downloadTaskPool!.Tasks.Count, Is.Zero);
         }
@@ -83,41 +72,62 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void タスクをクリア()
         {
-            var task1 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var task2 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var task3 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            this.downloadTaskPool!.AddTasks(new[] { task1, task2, task3 });
+            var task1 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task2 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task3 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+
+            foreach (var task in new[] { task1, task2, task3 })
+            {
+                this.downloadTaskPool!.AddTask(task);
+            }
+
             this.downloadTaskPool!.Clear();
 
             Assert.That(this.downloadTaskPool!.Tasks.Count, Is.Zero);
         }
 
-        public void フィルター関数をテスト()
+        [Test]
+        public void 完了済みフィルターをテスト()
         {
-            var task1 = new Download::DownloadTask(new NonBindableListVideoInfo() { NiconicoId = new Reactive.Bindings.ReactiveProperty<string>("sm9") }, new DownloadSettings());
-            var task2 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var task3 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            this.downloadTaskPool!.AddTasks(new[] { task1, task2, task3 });
+            this.downloadTaskPool!.DisplayCompleted.Value = false;
 
-            this.downloadTaskPool!.RegisterFilter(task => task.NiconicoID == "sm9");
-            this.downloadTaskPool!.Refresh();
+            var task1 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task2 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task3 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+
+            task1.IsCompleted.Value = true;
+            task2.IsCompleted.Value = true;
+
+            foreach (var task in new[] { task1, task2, task3 })
+            {
+                this.downloadTaskPool!.AddTask(task);
+            }
+
 
             Assert.That(this.downloadTaskPool!.Tasks.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void タスクをキャンセル()
+        public void キャンセル済みフィルターをテスト()
         {
-            var task1 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var task2 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            var task3 = new Download::DownloadTask(new NonBindableListVideoInfo(), new DownloadSettings());
-            this.downloadTaskPool!.AddTasks(new[] { task1, task2, task3 });
-            this.downloadTaskPool!.CancelAllTasks();
+            this.downloadTaskPool!.DisplayCanceled.Value = false;
 
-            Assert.That(task1.IsCanceled.Value, Is.True);
-            Assert.That(task2.IsCanceled.Value, Is.True);
-            Assert.That(task2.IsCanceled.Value, Is.True);
+            var task1 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task2 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task3 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+
+            task1.IsCanceled.Value = true;
+            task3.IsCanceled.Value = true;
+
+            foreach (var task in new[] { task1, task2, task3 })
+            {
+                this.downloadTaskPool!.AddTask(task);
+            }
+
+
+            Assert.That(this.downloadTaskPool!.Tasks.Count, Is.EqualTo(1));
         }
+
 
     }
 }

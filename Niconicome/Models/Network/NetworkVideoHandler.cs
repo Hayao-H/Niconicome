@@ -152,6 +152,10 @@ namespace Niconicome.Models.Network
         public Func<NetworkVideoParallelTask, object, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
+        public void Cancel()
+        {
+
+        }
     }
 
 }
