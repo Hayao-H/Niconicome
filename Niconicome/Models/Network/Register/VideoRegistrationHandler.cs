@@ -17,9 +17,9 @@ namespace Niconicome.Models.Network.Register
         /// 動画を登録する
         /// </summary>
         /// <param name="inputText">入力値</param>
+        /// <param name="extractIDsFromText">テキストからIDを抽出(クリップボード監視等)</param>
         /// <returns></returns>
-        Task<IAttemptResult<IEnumerable<IListVideoInfo>>> ResgisterVideoAsync(string inputText);
-
+        Task<IAttemptResult<IEnumerable<IListVideoInfo>>> ResgisterVideoAsync(string inputText, bool extractIDsFromText);
 
         /// <summary>
         /// 処理中フラグ
@@ -52,17 +52,11 @@ namespace Niconicome.Models.Network.Register
 
         #region Methods
 
-        public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> ResgisterVideoAsync(string inputText)
+        public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> ResgisterVideoAsync(string inputText, bool extractIDsFromText)
         {
-            return await this.RegisterVideosInternalAsync(inputText, false);
+            return await this.RegisterVideosInternalAsync(inputText, extractIDsFromText);
 
         }
-
-        public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> ResgisterVideoFromTextAsync(string text)
-        {
-            return await this.RegisterVideosInternalAsync(text, true);
-        }
-
 
         #endregion
 

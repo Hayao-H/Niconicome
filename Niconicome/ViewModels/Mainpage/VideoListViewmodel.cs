@@ -327,7 +327,7 @@ namespace Niconicome.ViewModels.Mainpage
                       return;
                   }
 
-                  await this.RegisterVideoAsync(niconicoId);
+                  await this.RegisterVideoAsync(niconicoId, false);
               })
             .AddTo(this.disposables);
 
@@ -447,7 +447,7 @@ namespace Niconicome.ViewModels.Mainpage
                         return;
                     }
 
-                    await this.RegisterVideoAsync(result.Data);
+                    await this.RegisterVideoAsync(result.Data, true);
                 })
                 .AddTo(this.disposables);
 
@@ -878,16 +878,16 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     if (WS::Mainpage.ClipbordManager.IsMonitoring.Value)
                     {
+                        WS::Mainpage.ClipbordManager.StopMonitoring();
+                    }
+                    else
+                    {
                         IAttemptResult result = WS::Mainpage.ClipbordManager.StartMonitoring();
                         if (!result.IsSucceeded)
                         {
                             this.SnackbarMessageQueue.Enqueue("クリップボードの監視に失敗しました。");
                             WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "クリップボードの監視に失敗しました。");
                         }
-                    }
-                    else
-                    {
-                        WS::Mainpage.ClipbordManager.StopMonitoring();
                     }
                 }).AddTo(this.disposables);
 
@@ -1372,13 +1372,16 @@ namespace Niconicome.ViewModels.Mainpage
         private readonly IEventAggregator ea;
 
         /// <summary>
-        /// 動画追加処理
+        /// 動画を非同期に登録する
         /// </summary>
-        private async Task RegisterVideoAsync(string data)
+        /// <param name="data">入力値</param>
+        /// <param name="isTextIsFromClipBoard">入力値がクリップボードからの入力であるかどうか</param>
+        /// <returns></returns>
+        private async Task RegisterVideoAsync(string data, bool isTextIsFromClipBoard)
         {
             this.SnackbarMessageQueue.Enqueue("動画を追加します");
 
-            IAttemptResult<IEnumerable<IListVideoInfo>> result = await WS::Mainpage.VideoRegistrationHandler.ResgisterVideoAsync(data);
+            IAttemptResult<IEnumerable<IListVideoInfo>> result = await WS::Mainpage.VideoRegistrationHandler.ResgisterVideoAsync(data, isTextIsFromClipBoard);
 
             if (!result.IsSucceeded || result.Data is null)
             {
