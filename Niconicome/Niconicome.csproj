@@ -5,7 +5,7 @@
 		<TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>0.11.0.*</AssemblyVersion>
+		<AssemblyVersion>0.11.1.*</AssemblyVersion>
 		<FileVersion>0.0.0.0</FileVersion>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -14,7 +14,7 @@
 		<Deterministic>false</Deterministic>
 		<Version>0.11.0</Version>
 		<PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
-		<Copyright>c2021 Hayao-H</Copyright>
+		<Copyright>c2022 Hayao-H</Copyright>
 		<Authors>Hayao-H</Authors>
 		<PackageIcon>icon.png</PackageIcon>
 		<ApplicationIcon>app.ico</ApplicationIcon>
