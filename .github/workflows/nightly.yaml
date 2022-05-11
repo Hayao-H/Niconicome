@@ -1,7 +1,8 @@
 name: niconicome-nightly-build
-on: pull_request:
-  branches:
-    - develop
+on: 
+  pull_request:
+    branches:
+      - develop
 jobs:
   test:
     name: Debug Build & Test
