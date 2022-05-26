@@ -12,7 +12,9 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+      with:
+        ref: develop
     - name: Setup .NET 6.0.*
       uses: actions/setup-dotnet@v1
       with:
@@ -31,7 +33,9 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+      with:
+        ref: develop
     - name: Setup .NET6.0
       uses: actions/setup-dotnet@v1
       with:
