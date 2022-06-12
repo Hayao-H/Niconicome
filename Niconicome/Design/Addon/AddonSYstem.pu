@@ -1,0 +1,99 @@
+@startuml AddonSystem
+title アドオン機能
+
+interface IattemptResult<T>
+interface ITabInfomation
+
+class View
+class ViewModel
+
+class AddonInfomation {
+    + string ID
+    + string Name
+    + string IconPath
+    + description
+    + List<Permission> Permissions
+    + string Author
+    + string HomePage
+    + string ScriptPath
+    + string DllPath
+}
+
+class JavaScriptEngine {
+    + void Execute(string scpt)
+}
+
+class AddonContext {
+    + List<ITabInfomation> HandlingTabs
+    + AddonInfomation AddonInfomation
+    - JavaScriptEngine Enginee
+    + IattemptResult Initialize(AddonInfomation infomation)
+    + ShutDown()
+    + RegisterExceptionHandler(AddonContext sender,Exception ex)
+}
+
+class AddonLoader {
+    + AddonInfomation LoadAddon(string manifestPath)
+}
+
+class AddonSettingsHandler {
+    + bool IsAutoUpdateEnable
+    + bool IsSafemodeEnable
+    + bool IsDevelopperModeEnable
+    + void ResetSafemodeStatus() 
+}
+
+class AddonInstaller {
+    + IattemptResult<InstallInfomation> ExtractAddon(string zipFilePath)
+    + IattemptResult Install(string folderPath)
+}
+
+class AddonUpdator {
+    + Task<IAttemptResult<bool>> CheckForUpdate(AddonInfomation Infomation)
+    + Task<IAttemptResult> UpdateAsync(AddonInfomation Infomation)
+}
+
+class InstallInfomation {
+    + AddonInfomation Addon
+    + string FolderPath
+}
+
+class AddonUninstaller {
+    + IattemptResult Uninstall(string id)
+}
+
+class AddonManager {
+    + IattemptResult<AddonInfomation> Install(string zipFilePath)
+    + IAttemptResult Unintlall(string id)
+    + IattemptResult InitializeAddons()
+    + IattemptResult Reload(string id)
+    + Task<IAttemptResult> UpdateAsync()
+    + List<AddonInfomation> LoadedAddons
+    + List<AddonInfomation> LoadFailedAddons
+    - IattemptResult Kill(string id)
+}
+
+class AddonContextsContainer {
+    + List<AddonContext> Contexts
+}
+
+View *-- ViewModel
+ViewModel --> AddonManager
+AddonManager --> AddonInstaller
+AddonManager --> AddonUninstaller
+AddonManager --> AddonLoader
+AddonManager --> AddonUpdator
+AddonUpdator --> AddonInstaller
+AddonManager --> AddonSettingsHandler
+AddonManager --> AddonContextsContainer
+
+
+AddonInstaller *-- InstallInfomation
+
+AddonContext --> JavaScriptEngine
+AddonContext --> AddonInfomation
+AddonContext o-- ITabInfomation
+
+AddonContextsContainer o-- AddonContext
+
+@enduml 
