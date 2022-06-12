@@ -69,4 +69,9 @@
 				<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 			</EmbeddedResource>
 		</ItemGroup>
+
+		<ItemGroup>
+		  <Folder Include="Models\Domain\Local\Addons\Core\V2\Install\" />
+		  <Folder Include="Models\Domain\Local\Addons\Core\V2\Uninstall\" />
+		</ItemGroup>
 	</Project>
