@@ -24,17 +24,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Manifest.V1
         [JsonPropertyName("auto_update")]
         public bool AutoUpdate { get; set; }
 
-        [JsonPropertyName("github_release")]
-        public bool GithubRelease { get; set; }
 
-        [JsonPropertyName("github_release_filename_pattern")]
-        public string GithubReleaseFileNamePattern { get; set; } = string.Empty;
-
-        [JsonPropertyName("github_owner_name")]
-        public string GithubOwnerName { get; set; } = string.Empty;
-
-        [JsonPropertyName("github_repo_name")]
-        public string GithubRepoName { get; set; } = string.Empty;
+        [JsonPropertyName("updatejson-url")]
+        public string UpdateJsonUrl { get; set; } = string.Empty;
     }
 
     public class Scripts

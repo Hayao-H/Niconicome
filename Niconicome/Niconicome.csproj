@@ -31,21 +31,21 @@
 	</PropertyGroup>
 
 		<ItemGroup>
-			<PackageReference Include="AngleSharp" Version="0.16.1" />
+			<PackageReference Include="AngleSharp" Version="0.17.1" />
 			<PackageReference Include="CredentialManagement" Version="1.0.2" />
 			<PackageReference Include="LiteDB" Version="5.0.11" />
 			<PackageReference Include="MaterialDesignColors" Version="2.0.4" />
 			<PackageReference Include="MaterialDesignThemes" Version="4.3.0" />
-			<PackageReference Include="Microsoft.ClearScript" Version="7.2.0" />
-			<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.1" />
+			<PackageReference Include="Microsoft.ClearScript" Version="7.3.0" />
+			<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.5" />
 			<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
 			<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-			<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1054.31" />
+			<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1210.39" />
 			<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
 			<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
 			<PackageReference Include="Prism.Unity" Version="8.1.97" />
-			<PackageReference Include="ReactiveProperty" Version="8.0.3" />
-			<PackageReference Include="ReactiveProperty.WPF" Version="8.0.3" />
+			<PackageReference Include="ReactiveProperty" Version="8.1.2" />
+			<PackageReference Include="ReactiveProperty.WPF" Version="8.1.2" />
 			<PackageReference Include="System.Security.Permissions" Version="6.0.0" />
 			<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 			<PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
@@ -73,5 +73,6 @@
 		<ItemGroup>
 		  <Folder Include="Models\Domain\Local\Addons\Core\V2\Install\" />
 		  <Folder Include="Models\Domain\Local\Addons\Core\V2\Uninstall\" />
+		  <Folder Include="Models\Domain\Local\Addons\Manifest\V2\" />
 		</ItemGroup>
 	</Project>
