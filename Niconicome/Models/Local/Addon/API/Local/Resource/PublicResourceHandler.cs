@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.API.Resource;
 using Niconicome.Models.Domain.Local.Addons.Core;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Resource
@@ -22,7 +23,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.Resource
         /// 初期化する
         /// </summary>
         /// <param name="info"></param>
-        void Initialize(AddonInfomation info);
+        void Initialize(IAddonInfomation info);
     }
 
     public class PublicResourceHandler : IPublicResourceHandler
@@ -52,9 +53,9 @@ namespace Niconicome.Models.Local.Addon.API.Local.Resource
         }
 
 
-        public void Initialize(AddonInfomation info)
+        public void Initialize(IAddonInfomation info)
         {
-            this._handler.Initialize(info.PackageID.Value, info.Name.Value);
+            this._handler.Initialize(info.DirectoryName, info.Name);
         }
 
     }

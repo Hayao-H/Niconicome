@@ -4,8 +4,12 @@ title アドオン機能
 interface IattemptResult<T>
 interface ITabInfomation
 
+class ReactiveProperty
+
 class View
 class ViewModel
+
+class Permission
 
 class AddonInfomation {
     + string ID
@@ -17,6 +21,7 @@ class AddonInfomation {
     + string HomePage
     + string ScriptPath
     + string DllPath
+    + ReactiveProperty<bool> HaveUpdate
 }
 
 class JavaScriptEngine {
@@ -48,9 +53,18 @@ class AddonInstaller {
     + IattemptResult Install(string folderPath)
 }
 
-class AddonUpdator {
+class AddonUpdatChecker {
     + Task<IAttemptResult<bool>> CheckForUpdate(AddonInfomation Infomation)
-    + Task<IAttemptResult> UpdateAsync(AddonInfomation Infomation)
+}
+
+class AddonUpdator {
+    + IattemptResult<UpdateInfomation> DownloadAndLoad(IAddonInfomation Infomation)
+}
+
+class UpdateInfomation {
+    + List<Permission> NewPermissions
+    + bool HasNewPermission
+    + IAddonInfomation AddonInfomation
 }
 
 class InstallInfomation {
@@ -63,14 +77,25 @@ class AddonUninstaller {
 }
 
 class AddonManager {
-    + IattemptResult<AddonInfomation> Install(string zipFilePath)
-    + IAttemptResult Unintlall(string id)
     + IattemptResult InitializeAddons()
+    + IattemptResult CheckForUpdate()
     + IattemptResult Reload(string id)
-    + Task<IAttemptResult> UpdateAsync()
+    + Task<IAttemptResult> UpdateAsync(string ID)
+    - IattemptResult Kill(string id)
+}
+
+class AddonStatusContainer {
     + List<AddonInfomation> LoadedAddons
     + List<AddonInfomation> LoadFailedAddons
-    - IattemptResult Kill(string id)
+    + List<AddonInfomation> ToBeUpdatedAddons
+}
+
+class InstallManager {
+    + IAttemptResult<IAddonInfomation> LoadInfomation(string archivePath)
+    + IAttemptResult InstallAndLoad(string archivePath)
+    + IAttemptResult UpdateAndLoad(string ID, string archivePath)
+    + Task<IattemptResult<UpdateInfomation>> DownloadAndLoadUpdate(IAddonInfomation Infomation
+    + IAttemptResult Unintlall(string id)
 }
 
 class AddonContextsContainer {
@@ -79,21 +104,34 @@ class AddonContextsContainer {
 
 View *-- ViewModel
 ViewModel --> AddonManager
-AddonManager --> AddonInstaller
-AddonManager --> AddonUninstaller
+ViewModel --> InstallManager
+ViewModel --> AddonStatusContainer
+InstallManager--> AddonInstaller
+InstallManager --> AddonUninstaller
 AddonManager --> AddonLoader
-AddonManager --> AddonUpdator
-AddonUpdator --> AddonInstaller
 AddonManager --> AddonSettingsHandler
+AddonManager --> AddonUpdatChecker
 AddonManager --> AddonContextsContainer
+AddonManager --> AddonStatusContainer
+InstallManager --> AddonContextsContainer
+InstallManager --> AddonUpdator
 
 
 AddonInstaller *-- InstallInfomation
+AddonInstaller --> AddonLoader
 
-AddonContext --> JavaScriptEngine
-AddonContext --> AddonInfomation
+AddonUninstaller --> AddonContextsContainer
+
+AddonContext --* JavaScriptEngine
+AddonContext --* AddonInfomation
 AddonContext o-- ITabInfomation
 
 AddonContextsContainer o-- AddonContext
+
+UpdateInfomation *-- Permission
+UpdateInfomation --o AddonUpdator
+AddonUpdator --> AddonLoader
+
+AddonInfomation --o AddonStatusContainer
 
 @enduml 

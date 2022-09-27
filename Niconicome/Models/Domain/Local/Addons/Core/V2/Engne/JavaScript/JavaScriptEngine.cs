@@ -7,9 +7,9 @@ using Microsoft.ClearScript.V8;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 
-namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
+namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.JavaScript
 {
-    public interface IJavaScriptEngine
+    public interface IJavaScriptEngine:IDisposable
     {
         /// <summary>
         /// エンジンの初期化
@@ -87,6 +87,10 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
             return AttemptResult.Succeeded();
         }
 
+        public void Dispose()
+        {
+            this._engine.Dispose();
+        }
 
         #endregion
     }

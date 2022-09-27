@@ -147,7 +147,7 @@ namespace Niconicome.Models.Local.Addon
                 IAttemptResult result = item.Value.Initialize(info, engine =>
                 {
 
-                    entryPoint.Initialize(info, engine);
+                    //entryPoint.Initialize(info, engine);
                     engine.AddHostObject("application", entryPoint);
 
                     IFetch fetch = DIFactory.Provider.GetRequiredService<IFetch>();

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ClearScript.V8;
 
-namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
+namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.JavaScript
 {
     public static class JavaScriptEngineFlags
     {

@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core;
-using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Local.Addon.API.Local.IO;
@@ -15,6 +15,7 @@ using Niconicome.Models.Local.Addon.API.Local.Storage;
 using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Niconicome.Models.Local.Addon.API.Net.Hooks;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 
 namespace Niconicome.Models.Local.Addon.API
 {
@@ -50,7 +51,11 @@ namespace Niconicome.Models.Local.Addon.API
         /// </summary>
         ITabsManager? tab { get; }
 
-        void Initialize(AddonInfomation infomation, IJavaScriptExecuter engine);
+        /// <summary>
+        /// APIを初期化
+        /// </summary>
+        /// <param name="infomation"></param>
+        void Initialize(IAddonInfomation infomation);
     }
 
     public class APIEntryPoint : IAPIEntryPoint
@@ -84,9 +89,9 @@ namespace Niconicome.Models.Local.Addon.API
 
         #region methods
 
-        public void Initialize(AddonInfomation infomation, IJavaScriptExecuter engine)
+        public void Initialize(IAddonInfomation infomation)
         {
-            if (!infomation.HasPermission(PermissionNames.Output))
+            if (!infomation.HasPermission(Permissions.Output))
             {
                 this.output = null;
             }
@@ -95,12 +100,12 @@ namespace Niconicome.Models.Local.Addon.API
                 this.output!.SetInfo(infomation);
             }
 
-            if (!infomation.HasPermission(PermissionNames.Hooks))
+            if (!infomation.HasPermission(Permissions.Hooks))
             {
                 this.hooks = null;
             }
 
-            if (infomation.HasPermission(PermissionNames.Log))
+            if (infomation.HasPermission(Permissions.Log))
             {
                 this.log!.Initialize(infomation);
             }
@@ -109,7 +114,7 @@ namespace Niconicome.Models.Local.Addon.API
                 this.log = null;
             }
 
-            if (infomation.HasPermission(PermissionNames.Resource))
+            if (infomation.HasPermission(Permissions.Resource))
             {
                 this.resource!.Initialize(infomation);
             }
@@ -118,7 +123,7 @@ namespace Niconicome.Models.Local.Addon.API
                 this.resource = null;
             }
 
-            if (infomation.HasPermission(PermissionNames.Storage))
+            if (infomation.HasPermission(Permissions.Storage))
             {
                 this.storage!.localStorage.Initialize(infomation);
             }
@@ -127,7 +132,7 @@ namespace Niconicome.Models.Local.Addon.API
                 this.storage = null;
             }
 
-            if (infomation.HasPermission(PermissionNames.Tab))
+            if (infomation.HasPermission(Permissions.Tab))
             {
                 this.tab!.SetInfo(infomation);
             }

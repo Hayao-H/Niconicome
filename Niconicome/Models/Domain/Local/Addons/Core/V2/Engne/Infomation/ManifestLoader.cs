@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO.Compression;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Niconicome.Extensions;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 using Niconicome.Models.Domain.Local.IO;
@@ -9,8 +12,9 @@ using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using V1 = Niconicome.Models.Domain.Local.Addons.Manifest.V1;
+using Const = Niconicome.Models.Const;
 
-namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
+namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
 {
     public interface IManifestLoader
     {
@@ -18,8 +22,17 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
         /// マニフェストファイルを読み込む
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="directoryName"></param>
         /// <returns></returns>
-        IAttemptResult<IAddonInfomation> LoadManifest(string path);
+        IAttemptResult<IAddonInfomation> LoadManifest(string path, string directoryName);
+
+        /// <summary>
+        /// アドオンファイルからマニフェストを読み込む
+        /// </summary>
+        /// <param name="archiveFilePath"></param>
+        /// <param name="directoryName"></param>
+        /// <returns></returns>
+        IAttemptResult<IAddonInfomation> LoadManifestFromArchive(string archiveFilePath, string directoryName);
     }
 
     public class ManifestLoader : IManifestLoader
@@ -41,7 +54,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
 
         #endregion
 
-        public IAttemptResult<IAddonInfomation> LoadManifest(string path)
+        public IAttemptResult<IAddonInfomation> LoadManifest(string path, string directoryName)
         {
             if (!this._fileIO.Exists(path))
             {
@@ -60,6 +73,43 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
                 return AttemptResult<IAddonInfomation>.Fail("マニフェストファイルの読み込みに失敗しました。", e);
             }
 
+            return this.LoadFromString(content, directoryName);
+
+        }
+
+
+        public IAttemptResult<IAddonInfomation> LoadManifestFromArchive(string archiveFilePath, string directoryName)
+        {
+
+            try
+            {
+                using var archive = ZipFile.OpenRead(archiveFilePath);
+                ZipArchiveEntry? entry = archive.GetEntry(Const::FileFolder.ManifestFileName);
+
+                if (entry is null)
+                {
+                    return AttemptResult<IAddonInfomation>.Fail("アドオンファイル内にマニフェストファイルが存在しません。");
+                }
+
+                using var reader = new StreamReader(entry.Open(), Encoding.UTF8);
+                string content = reader.ReadToEnd();
+
+                return this.LoadFromString(content, directoryName);
+
+            }
+            catch (Exception ex)
+            {
+                this._logger.Error("アーカイブファイル内に存在するマニフェストファイルの読み込みに失敗。", ex);
+                return AttemptResult<IAddonInfomation>.Fail($"何らかの要因によりマニフェストファイルの読み混みに失敗しました。（詳細：${ex.Message}）");
+            }
+
+        }
+
+
+        #region private
+
+        private IAttemptResult<IAddonInfomation> LoadFromString(string content, string directoryName)
+        {
             V1::Manifest info;
             try
             {
@@ -67,23 +117,21 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
             }
             catch (Exception e)
             {
-                this._logger.Error($"マニフェストファイルの解析に失敗しました。({path})", e);
+                this._logger.Error($"マニフェストファイルの解析に失敗しました。", e);
                 return AttemptResult<IAddonInfomation>.Fail("マニフェストファイルの解析に失敗しました。", e);
             }
 
             IAttemptResult manifestResult = this.CheckManifest(info);
             if (!manifestResult.IsSucceeded)
             {
-                this._logger.Error($"不正なマニフェストファイルです。({path},{manifestResult.Message})");
+                this._logger.Error($"不正なマニフェストファイルです。({manifestResult.Message})");
                 return AttemptResult<IAddonInfomation>.Fail(manifestResult.Message);
             }
 
-            AddonInfomation addon = this.ConvertToAddonInfo(info);
+            AddonInfomation addon = this.ConvertToAddonInfo(info, directoryName);
 
             return AttemptResult<IAddonInfomation>.Succeeded(addon);
         }
-
-        #region private
 
         /// <summary>
         /// マニフェストをチェックする
@@ -150,7 +198,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
         /// </summary>
         /// <param name="manifest"></param>
         /// <returns></returns>
-        private AddonInfomation ConvertToAddonInfo(V1::Manifest manifest)
+        private AddonInfomation ConvertToAddonInfo(V1::Manifest manifest, string directoryName)
         {
 
             bool vResult = Version.TryParse(manifest.Version, out Version? version);
@@ -182,6 +230,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
                 Version = vResult && version is not null ? version : new Version(),
                 IconPath = GetIconPath(),
                 TargetAPIVersion = avResult && apiVerison is not null ? apiVerison : new Version(),
+                DirectoryName = directoryName,
             };
 
             return addon;

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core;
-using Niconicome.Models.Domain.Local.Addons.Core.Engine;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.ViewModels.Mainpage;
 
 namespace Niconicome.Models.Local.Addon.API.Local.IO
@@ -21,7 +22,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.IO
         /// 初期化する
         /// </summary>
         /// <param name="info"></param>
-        void Initialize(AddonInfomation info);
+        void Initialize(IAddonInfomation info);
     }
 
     class Log : ILog
@@ -36,17 +37,17 @@ namespace Niconicome.Models.Local.Addon.API.Local.IO
 
         private readonly IAddonLogger logger;
 
-        private AddonInfomation? info;
+        private IAddonInfomation? info;
 
         #endregion
 
         public void error(string message)
         {
             if (this.info is null) throw new InvalidOperationException();
-            this.logger.Error(message, this.info.Name.Value);
+            this.logger.Error(message, this.info.Name);
         }
 
-        public void Initialize(AddonInfomation info)
+        public void Initialize(IAddonInfomation info)
         {
             this.info = info;
         }

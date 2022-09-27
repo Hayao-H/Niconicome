@@ -71,7 +71,6 @@
 		</ItemGroup>
 
 		<ItemGroup>
-		  <Folder Include="Models\Domain\Local\Addons\Core\V2\Install\" />
 		  <Folder Include="Models\Domain\Local\Addons\Core\V2\Uninstall\" />
 		  <Folder Include="Models\Domain\Local\Addons\Manifest\V2\" />
 		</ItemGroup>

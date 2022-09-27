@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage;
 using Niconicome.Models.Domain.Local.Addons.Core;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Local.Addon.API.Local.Storage
@@ -15,7 +16,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.Storage
         string? getItem(string key);
         void removeItem(string key);
         void setItem(string key, string value);
-        void Initialize(AddonInfomation info);
+        void Initialize(IAddonInfomation info);
     }
 
     public class LocalStorage : ILocalStorage
@@ -58,10 +59,10 @@ namespace Niconicome.Models.Local.Addon.API.Local.Storage
             this._handler.Clear();
         }
 
-        public void Initialize(AddonInfomation info)
+        public void Initialize(IAddonInfomation info)
         {
             if (this._isInitialized) return;
-            this._handler.Initialize(info.Name.Value, info.PackageID.Value);
+            this._handler.Initialize(info.Name, info.DirectoryName);
             this._isInitialized = true;
         }
 

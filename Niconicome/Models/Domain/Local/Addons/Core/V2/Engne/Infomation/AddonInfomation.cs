@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 
-namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
+namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
 {
     public interface IAddonInfomation
     {
@@ -33,6 +33,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
         /// 説明
         /// </summary>
         string Description { get; }
+
+        /// <summary>
+        /// フォルダー名
+        /// </summary>
+        string DirectoryName { get; }
 
         /// <summary>
         /// 権限一覧
@@ -83,11 +88,19 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
         /// APIバージョン
         /// </summary>
         Version TargetAPIVersion { get; }
+
+        /// <summary>
+        /// 権限を持っているかどうか確認する
+        /// </summary>
+        /// <param name="permission"></param>
+        /// <returns></returns>
+        bool HasPermission(Permission permission);
+
     }
 
     public class AddonInfomation : IAddonInfomation
     {
-        public string ID { get; init; } = "";
+        public string ID { get; init; } = Guid.NewGuid().ToString("D");
 
         public string Name { get; init; } = "";
 
@@ -110,6 +123,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
 
         public string DllPath { get; init; } = "";
 
+        public string DirectoryName { get; init; } = "";
+
         public string UpdateJsonURL { get; init; } = "";
 
         public bool AutoUpdate { get; init; }
@@ -118,6 +133,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
 
         public Version TargetAPIVersion { get; init; } = new();
 
+        public bool HasPermission(Permission permission) => this.Permissions.Any(p => p == permission);
 
     }
 }

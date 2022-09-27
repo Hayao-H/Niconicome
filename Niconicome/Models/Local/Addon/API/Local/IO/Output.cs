@@ -39,7 +39,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.IO
 
         public void write(string content)
         {
-            this.messageHandler.AppendMessage($"[{this._addonInfomation!.Name.Value}]{content}");
+            this.messageHandler.AppendMessage($"[{this._addonInfomation!.Name}]{content}");
         }
 
         public void write(object content)

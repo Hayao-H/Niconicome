@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.JavaScript;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.Addon.API.Local.Tab;
 using TabAPI = Niconicome.Models.Local.Addon.API.Local.Tab;
 
-namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
+namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
 {
     public interface IAddonContext
     {
@@ -61,6 +65,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
 
         private bool _isExecuted;
 
+        private bool _isShutDown;
+
         private readonly List<Action<IAddonContext, Exception>> _exceptionHandlers = new();
 
         private APIObjectConatainer? _apiCOntainer;
@@ -83,15 +89,19 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
             this._exceptionHandlers.Add(handler);
         }
 
-        public IAttemptResult ExecuteAddon(IAddonInfomation infomation, APIObjectConatainer conatainer)
+        public IAttemptResult ExecuteAddon(IAddonInfomation infomation, APIObjectConatainer container)
         {
             if (this._isExecuted)
             {
                 return AttemptResult.Fail("すでに実行されています。");
             }
+            else if (this._isShutDown)
+            {
+                return AttemptResult.Fail("すでにシャットダウンされています。");
+            }
 
             this.AddonInfomation = infomation;
-            this._apiCOntainer = conatainer;
+            this._apiCOntainer = container;
 
             //スクリプト読み込み
             string script;
@@ -105,9 +115,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
                 return AttemptResult.Fail($"スクリプトの読み込みに失敗しました。（詳細：{ex.Message}）");
             }
 
+            //Tab APIにハンドラを設定
+            if (container.APIEntryPoint.tab is not null and ITabsManager tab)
+            {
+                tab.RegisterHandler(item => this.HandlingTabs.Add(item), item => this.HandlingTabs.RemoveAll(i => i == item));
+            }
+
             //APIを追加
-            this._engine.AddHostObject("application", conatainer.APIEntryPoint);
-            this._engine.AddHostObject("fetch", conatainer.FetchFunc);
+            this._engine.AddHostObject("application", container.APIEntryPoint);
+            this._engine.AddHostObject("fetch", container.FetchFunc);
 
             _ = Task.Run(() =>
             {
@@ -130,7 +146,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
 
         public void ShutDown()
         {
-            if (!this._isExecuted)
+            if (!this._isExecuted || this._isShutDown)
             {
                 return;
             }
@@ -142,7 +158,10 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engne
             }
 
             this._apiCOntainer?.APIEntryPoint.Dispose();
+            this._engine.Dispose();
+
             this._isExecuted = false;
+            this._isShutDown = true;
         }
 
 
