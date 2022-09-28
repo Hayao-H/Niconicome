@@ -120,13 +120,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Loader
         /// <returns></returns>
         private IAttemptResult<List<ManifestInfo>> GetManifests()
         {
-            List<string> addonDirs;
+            IEnumerable<string> addonDirs;
             string baseDir = AppContext.BaseDirectory;
             var manifests = new List<ManifestInfo>();
 
             try
             {
-                addonDirs = this._directoryIO.GetDirectorys(Const::FileFolder.AddonsFolder);
+                addonDirs = this._directoryIO.GetDirectorys(Const::FileFolder.AddonsFolder).Select(p=>Path.GetFileName(p));
             }
             catch (Exception ex)
             {
