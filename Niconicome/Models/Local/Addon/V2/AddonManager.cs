@@ -6,6 +6,7 @@ using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Loader;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Update;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Addon.API;
@@ -27,16 +28,23 @@ namespace Niconicome.Models.Local.Addon.V2
         /// <param name="id"></param>
         /// <returns></returns>
         IAttemptResult ShutDown(string id);
+
+        /// <summary>
+        /// アップデートを確認
+        /// </summary>
+        /// <returns></returns>
+        Task CheckForUpdates();
     }
 
     public class AddonManager : IAddonManager
     {
 
-        public AddonManager(IAddonLoader loader, IAddonContextsContainer contextsContainer, IAddonStatusContainer statusContainer)
+        public AddonManager(IAddonLoader loader, IAddonContextsContainer contextsContainer, IAddonStatusContainer statusContainer, IAddonUpdateChecker updateChecker)
         {
             this._loader = loader;
             this._contextsContainer = contextsContainer;
             this._statusContainer = statusContainer;
+            this._updateChecker = updateChecker;
         }
 
         #region field
@@ -46,6 +54,8 @@ namespace Niconicome.Models.Local.Addon.V2
         private readonly IAddonContextsContainer _contextsContainer;
 
         private readonly IAddonStatusContainer _statusContainer;
+
+        private readonly IAddonUpdateChecker _updateChecker;
 
         #endregion
 
@@ -98,6 +108,26 @@ namespace Niconicome.Models.Local.Addon.V2
 
             return result;
         }
+
+        public async Task CheckForUpdates()
+        {
+            this._statusContainer.ToBeUpdatedAddons.Clear();
+
+            foreach (var info in this._statusContainer.LoadedAddons)
+            {
+                if (!info.AutoUpdate) continue;
+
+                //アップデートを確認
+                IAttemptResult<bool> result = await this._updateChecker.CheckForUpdate(info);
+                if (!result.IsSucceeded) continue;
+
+                if (result.Data)
+                {
+                    this._statusContainer.ToBeUpdatedAddons.Add(info);
+                }
+            }
+        }
+
 
         #endregion
         #region private

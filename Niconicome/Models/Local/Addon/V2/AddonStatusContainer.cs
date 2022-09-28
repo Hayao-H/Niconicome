@@ -21,6 +21,11 @@ namespace Niconicome.Models.Local.Addon.V2
         /// 読み込みに失敗したアドオン
         /// </summary>
         ObservableCollection<FailedResult> LoadFailedAddons { get; }
+
+        /// <summary>
+        /// アップデートが存在するアドオン
+        /// </summary>
+        ObservableCollection<IAddonInfomation> ToBeUpdatedAddons { get; }
     }
 
     public class AddonStatusContainer : IAddonStatusContainer
@@ -30,5 +35,8 @@ namespace Niconicome.Models.Local.Addon.V2
 
 
         public ObservableCollection<FailedResult> LoadFailedAddons { get; init; } = new();
+
+        public ObservableCollection<IAddonInfomation> ToBeUpdatedAddons { get; init; } = new();
+
     }
 }
