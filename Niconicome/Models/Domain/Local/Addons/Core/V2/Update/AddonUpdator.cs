@@ -75,8 +75,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
             IAddonInfomation newInfomation = loadResult.Data;
             List<Permission> newPermissions = this.GetNewPermissions(infomation.Permissions, newInfomation.Permissions);
 
+            UpdateJSON json = infoResult.Data;
 
-            return AttemptResult<UpdateInfomation>.Succeeded(new UpdateInfomation(newPermissions, newPermissions.Count > 0, newInfomation, dlResult.Data));
+            return AttemptResult<UpdateInfomation>.Succeeded(new UpdateInfomation(json.Version, newPermissions, newPermissions.Count > 0, newInfomation, json.Changelog, dlResult.Data));
         }
 
         #endregion

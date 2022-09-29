@@ -10,6 +10,8 @@ using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Install;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Loader;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Update;
+using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Addon.API;
@@ -38,20 +40,29 @@ namespace Niconicome.Models.Local.Addon.V2
         /// </summary>
         /// <param name="ID"></param>
         /// <param name="archivePath"></param>
+        /// <param name="deleteArchiveFile"></param>
         /// <returns></returns>
-        IAttemptResult UpdateAndLoad(string ID, string archivePath);
+        IAttemptResult UpdateAndLoad(string ID, string archivePath, bool deleteArchiveFile = false);
+
+        /// <summary>
+        /// アップデートをダウンロードして情報を読み込む
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        Task<IAttemptResult<UpdateInfomation>> DownloadUpdate(string ID);
 
     }
 
 
     public class AddonInstallManager : IAddonInstallManager
     {
-        public AddonInstallManager(IAddonContextsContainer contextsContainer, IAddonInstaller installer, IAddonLoader addonLoader, IAddonStatusContainer statusContainer)
+        public AddonInstallManager(IAddonContextsContainer contextsContainer, IAddonInstaller installer, IAddonLoader addonLoader, IAddonStatusContainer statusContainer, IAddonUpdator updator)
         {
             this._contextsContainer = contextsContainer;
             this._installer = installer;
             this._addonLoader = addonLoader;
             this._statusContainer = statusContainer;
+            this._updator = updator;
         }
 
         #region field
@@ -63,6 +74,8 @@ namespace Niconicome.Models.Local.Addon.V2
         private readonly IAddonLoader _addonLoader;
 
         private readonly IAddonStatusContainer _statusContainer;
+
+        private readonly IAddonUpdator _updator;
 
         #endregion
 
@@ -87,23 +100,20 @@ namespace Niconicome.Models.Local.Addon.V2
 
         }
 
-       public IAttemptResult UpdateAndLoad(string ID, string archivePath)
+        public IAttemptResult UpdateAndLoad(string ID, string archivePath, bool deleteArchiveFile = false)
         {
-            IAttemptResult sResult = this._contextsContainer.ShutDown(ID);
-            if (!sResult.IsSucceeded)
+
+            //シャットダウンまで請け負う
+            IAttemptResult<IAddonContext> sResult = this._contextsContainer.ShutDown(ID);
+            if (!sResult.IsSucceeded || sResult.Data is null)
             {
                 return AttemptResult.Fail(sResult.Message);
             }
+            this._statusContainer.Remove(ID);
 
-            IAttemptResult<IAddonContext> cResult = this._contextsContainer.Get(ID);
-            if (!cResult.IsSucceeded||cResult.Data is null||cResult.Data.AddonInfomation is null)
-            {
-                return AttemptResult.Fail(cResult.Message); 
-            }
+            string dirName = sResult.Data.AddonInfomation!.DirectoryName;
 
-            string dirName = cResult.Data.AddonInfomation.DirectoryName;
-
-            IAttemptResult<InstallInfomation> iResult = this._installer.InstallToSpecifiedDiectory(archivePath, Path.Combine(AppContext.BaseDirectory, FileFolder.AddonsFolder, dirName));
+            IAttemptResult<InstallInfomation> iResult = this._installer.InstallToSpecifiedDiectory(archivePath, Path.Combine(AppContext.BaseDirectory, FileFolder.AddonsFolder, dirName), deleteArchiveFile);
 
             if (!iResult.IsSucceeded || iResult.Data is null)
             {
@@ -112,6 +122,19 @@ namespace Niconicome.Models.Local.Addon.V2
 
             return this.LoadInternal(iResult.Data);
         }
+
+        public async Task<IAttemptResult<UpdateInfomation>> DownloadUpdate(string ID)
+        {
+            IAttemptResult<IAddonContext> ctxResult = this._contextsContainer.Get(ID);
+            if (!ctxResult.IsSucceeded || ctxResult.Data is null)
+            {
+                return AttemptResult<UpdateInfomation>.Fail(ctxResult.Message);
+            }
+
+            IAttemptResult<UpdateInfomation> uResult = await this._updator.DownloadAndLoadUpdate(ctxResult.Data.AddonInfomation!);
+            return uResult;
+        }
+
 
 
         #endregion

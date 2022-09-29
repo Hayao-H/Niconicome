@@ -8,5 +8,5 @@ using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
 {
-    public record UpdateInfomation(List<Permission> NewPermissions, bool HasNewPermission, IAddonInfomation AddonInfomation, string archivePath);
+    public record UpdateInfomation(string Version, List<Permission> NewPermissions, bool HasNewPermission, IAddonInfomation AddonInfomation, string ChangeLogURL, string archivePath);
 }

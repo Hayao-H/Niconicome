@@ -32,8 +32,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Install
         /// </summary>
         /// <param name="archiveFilePath"></param>
         /// <param name="targetDirectory"></param>
+        /// <param name="deleteArchiveFile"></param>
         /// <returns></returns>
-        IAttemptResult<InstallInfomation> InstallToSpecifiedDiectory(string archiveFilePath, string targetDirectory);
+        IAttemptResult<InstallInfomation> InstallToSpecifiedDiectory(string archiveFilePath, string targetDirectory, bool deleteArchiveFile = false);
     }
 
     public class AddonInstaller : IAddonInstaller
@@ -44,7 +45,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Install
             this._manifestLoader = manifestLoader;
             this._logger = logger;
             this._fileIO = fileIO;
-            this._directoryIO = directoryIO;
         }
 
         #region field
@@ -56,8 +56,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Install
         private readonly ILogger _logger;
 
         private readonly INicoFileIO _fileIO;
-
-        private readonly INicoDirectoryIO _directoryIO;
 
         #endregion
 
@@ -79,7 +77,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Install
             return this.InstallToSpecifiedDiectory(archiveFilePath, targetDir);
         }
 
-        public IAttemptResult<InstallInfomation> InstallToSpecifiedDiectory(string archiveFilePath, string targetDirectory)
+        public IAttemptResult<InstallInfomation> InstallToSpecifiedDiectory(string archiveFilePath, string targetDirectory, bool deleteArchiveFile = false)
         {
             IAttemptResult extractResult = this._extractor.Extract(archiveFilePath, targetDirectory);
             if (!extractResult.IsSucceeded)
@@ -93,6 +91,18 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Install
             if (!this._fileIO.Exists(manifestPath))
             {
                 return AttemptResult<InstallInfomation>.Fail("アドオンファイル内にマニフェストファイルが存在しません。");
+            }
+
+            if (deleteArchiveFile)
+            {
+                try
+                {
+                    this._fileIO.Delete(archiveFilePath);
+                }
+                catch (Exception ex)
+                {
+                    this._logger.Error("インストールファイルの削除に失敗しました。", ex);
+                }
             }
 
             return AttemptResult<InstallInfomation>.Succeeded(new InstallInfomation(manifestPath, targetDirectory));
