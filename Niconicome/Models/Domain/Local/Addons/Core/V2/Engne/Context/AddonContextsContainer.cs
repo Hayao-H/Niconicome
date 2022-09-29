@@ -31,7 +31,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        IAttemptResult ShutDown(string ID);
+        IAttemptResult<IAddonContext> ShutDown(string ID);
 
         /// <summary>
         /// コンテキストを生成
@@ -88,12 +88,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
             }
         }
 
-        public IAttemptResult ShutDown(string ID)
+        public IAttemptResult<IAddonContext> ShutDown(string ID)
         {
             IAttemptResult<IAddonContext> getResult = this.Get(ID);
             if (!getResult.IsSucceeded || getResult.Data is null)
             {
-                return AttemptResult.Fail(getResult.Message);
+                return AttemptResult<IAddonContext>.Fail(getResult.Message);
             }
 
             IAddonContext context = getResult.Data;
@@ -101,7 +101,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
 
             this.contexts.Remove(context);
 
-            return AttemptResult.Succeeded();
+            return AttemptResult<IAddonContext>.Succeeded(context);
         }
 
         public IAttemptResult<IAddonContext> Create()

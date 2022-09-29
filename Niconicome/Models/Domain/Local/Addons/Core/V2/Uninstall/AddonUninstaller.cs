@@ -52,7 +52,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Uninstall
             }
 
             IAddonContext context = getResult.Data;
-            context.ShutDown();
+            this._container.ShutDown(ID);
 
             string directory = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, context.AddonInfomation!.DirectoryName);
             try

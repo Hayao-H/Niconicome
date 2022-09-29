@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
@@ -11,6 +13,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Addon.API;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Local.Addon.V2
 {
@@ -25,9 +28,16 @@ namespace Niconicome.Models.Local.Addon.V2
         /// <summary>
         /// アドオンを停止する
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="ID"></param>
         /// <returns></returns>
-        IAttemptResult ShutDown(string id);
+        IAttemptResult ShutDown(string ID);
+
+        /// <summary>
+        /// アドオンをリロード
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        IAttemptResult Reload(string ID);
 
         /// <summary>
         /// アップデートを確認
@@ -63,28 +73,7 @@ namespace Niconicome.Models.Local.Addon.V2
 
         public IAttemptResult InitializeAddons()
         {
-            IAttemptResult<LoadResult> loadResult = this._loader.LoadAddons(infomation =>
-            {
-                //API
-                var entryPont = DIFactory.Provider.GetRequiredService<IAPIEntryPoint>();
-                entryPont.Initialize(infomation);
-
-                //Fetch
-                var fetch = DIFactory.Provider.GetRequiredService<IFetch>();
-                Func<string, dynamic?, Task<Response>> fetchFunc = (url, optionObj) =>
-                {
-                    var option = new FetchOption()
-                    {
-                        method = optionObj?.method,
-                        body = optionObj?.body,
-                        credentials = optionObj?.credentials,
-                    };
-
-                    return fetch.FetchAsync(url, option);
-                };
-
-                return new APIObjectConatainer(entryPont, fetchFunc, fetch);
-            });
+            IAttemptResult<LoadResult> loadResult = this._loader.LoadAddons(this.FactoryFunction);
 
             if (!loadResult.IsSucceeded || loadResult.Data is null)
             {
@@ -105,6 +94,8 @@ namespace Niconicome.Models.Local.Addon.V2
         public IAttemptResult ShutDown(string ID)
         {
             IAttemptResult result = this._contextsContainer.ShutDown(ID);
+
+            this._statusContainer.Remove(ID);
 
             return result;
         }
@@ -128,9 +119,69 @@ namespace Niconicome.Models.Local.Addon.V2
             }
         }
 
+        public IAttemptResult Reload(string ID)
+        {
+
+            IAttemptResult<IAddonContext> stdResult = this._contextsContainer.ShutDown(ID);
+            if (!stdResult.IsSucceeded || stdResult.Data is null)
+            {
+                return stdResult;
+            }
+
+            IAddonInfomation infomation = stdResult.Data.AddonInfomation!;
+            this._statusContainer.Remove(ID);
+
+            string dirName = infomation.DirectoryName;
+            string manifestPath = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, dirName, Const::FileFolder.ManifestFileName);
+
+            IAttemptResult<LoadResult> loadResult = this._loader.LoadAddon(manifestPath, dirName, this.FactoryFunction);
+            if (!loadResult.IsSucceeded || loadResult.Data is null)
+            {
+                return AttemptResult.Fail(loadResult.Message);
+            }
+
+            if (loadResult.Data.Succeeded.Count == 1)
+            {
+                this._statusContainer.LoadedAddons.Add(loadResult.Data.Succeeded[0]);
+            }
+            else if (loadResult.Data.Failed.Count == 1)
+            {
+                this._statusContainer.LoadFailedAddons.Add(loadResult.Data.Failed[0]);
+            }
+
+            return loadResult.Data.Succeeded.Count == 1 ? AttemptResult.Succeeded() : AttemptResult.Fail();
+        }
+
+
 
         #endregion
+
         #region private
+
+        private APIObjectConatainer FactoryFunction(IAddonInfomation infomation)
+        {
+
+            //API
+            var entryPont = DIFactory.Provider.GetRequiredService<IAPIEntryPoint>();
+            entryPont.Initialize(infomation);
+
+            //Fetch
+            var fetch = DIFactory.Provider.GetRequiredService<IFetch>();
+            Func<string, dynamic?, Task<Response>> fetchFunc = (url, optionObj) =>
+            {
+                var option = new FetchOption()
+                {
+                    method = optionObj?.method,
+                    body = optionObj?.body,
+                    credentials = optionObj?.credentials,
+                };
+
+                return fetch.FetchAsync(url, option);
+            };
+
+            return new APIObjectConatainer(entryPont, fetchFunc, fetch);
+        }
+
         #endregion
     }
 
