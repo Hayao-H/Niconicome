@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Install;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Loader;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Uninstall;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Update;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Utils;
@@ -45,6 +46,13 @@ namespace Niconicome.Models.Local.Addon.V2
         IAttemptResult UpdateAndLoad(string ID, string archivePath, bool deleteArchiveFile = false);
 
         /// <summary>
+        /// アドオンをアンインストールする
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        IAttemptResult Uninstall(string ID);
+
+        /// <summary>
         /// アップデートをダウンロードして情報を読み込む
         /// </summary>
         /// <param name="ID"></param>
@@ -56,13 +64,14 @@ namespace Niconicome.Models.Local.Addon.V2
 
     public class AddonInstallManager : IAddonInstallManager
     {
-        public AddonInstallManager(IAddonContextsContainer contextsContainer, IAddonInstaller installer, IAddonLoader addonLoader, IAddonStatusContainer statusContainer, IAddonUpdator updator)
+        public AddonInstallManager(IAddonContextsContainer contextsContainer, IAddonInstaller installer, IAddonLoader addonLoader, IAddonStatusContainer statusContainer, IAddonUpdator updator,IAddonUninstaller uninstaller)
         {
             this._contextsContainer = contextsContainer;
             this._installer = installer;
             this._addonLoader = addonLoader;
             this._statusContainer = statusContainer;
             this._updator = updator;
+            this._uninstaller = uninstaller;
         }
 
         #region field
@@ -76,6 +85,8 @@ namespace Niconicome.Models.Local.Addon.V2
         private readonly IAddonStatusContainer _statusContainer;
 
         private readonly IAddonUpdator _updator;
+
+        private readonly IAddonUninstaller _uninstaller;
 
         #endregion
 
@@ -122,6 +133,13 @@ namespace Niconicome.Models.Local.Addon.V2
 
             return this.LoadInternal(iResult.Data);
         }
+
+        public IAttemptResult Uninstall(string ID)
+        {
+            this._statusContainer.Remove(ID);
+            return this._uninstaller.Uninstall(ID);
+        }
+
 
         public async Task<IAttemptResult<UpdateInfomation>> DownloadUpdate(string ID)
         {
