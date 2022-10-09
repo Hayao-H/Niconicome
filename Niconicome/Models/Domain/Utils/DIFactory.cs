@@ -1,7 +1,6 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
-using Reactive.Bindings.Extensions;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using Addons = Niconicome.Models.Local.Addon;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
@@ -42,6 +41,7 @@ using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
+using OS = Niconicome.Models.Local.OS;
 using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
@@ -58,10 +58,9 @@ using Timer = Niconicome.Models.Local.Timer;
 using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
-using Watch = Niconicome.Models.Network.Watch;
-using OS = Niconicome.Models.Local.OS;
-using System.Runtime.CompilerServices;
 using VM = Niconicome.ViewModels;
+using Watch = Niconicome.Models.Network.Watch;
+using AddonsV2 = Niconicome.Models.Local.Addon.V2;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -264,9 +263,24 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
             services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
             services.AddSingleton<OS::IClipbordManager, OS::ClipbordManager>();
-            services.AddTransient<AddonsCoreV2::Engine.IAddonLogger, AddonsCoreV2::Engine.AddonLogger>();
             services.AddTransient<VM::Blazor.TransitionViewModel>();
             services.AddSingleton<State::IBlazorPageManager, State::BlazorPageManager>();
+            services.AddTransient<AddonsV2::IAddonInstallManager, AddonsV2::AddonInstallManager>();
+            services.AddTransient<AddonsV2::IAddonManager, AddonsV2::AddonManager>();
+            services.AddSingleton<AddonsV2::IAddonStatusContainer, AddonsV2::AddonStatusContainer>();
+            services.AddTransient<AddonsCoreV2::Engine.IAddonLogger, AddonsCoreV2::Engine.AddonLogger>();
+            services.AddTransient<AddonsCoreV2::Engine.Context.IAddonContext, AddonsCoreV2::Engine.Context.AddonContext>();
+            services.AddSingleton<AddonsCoreV2::Engine.Context.IAddonContextsContainer, AddonsCoreV2::Engine.Context.AddonContextsContainer>();
+            services.AddTransient<AddonsCoreV2::Engine.Infomation.IManifestLoader, AddonsCoreV2::Engine.Infomation.ManifestLoader>();
+            services.AddTransient<AddonsCoreV2::Engine.JavaScript.IJavaScriptEngine, AddonsCoreV2::Engine.JavaScript.JavaScriptEngine>();
+            services.AddTransient<AddonsCoreV2::Install.IAddonExtractor, AddonsCoreV2::Install.AddonExtractor>();
+            services.AddTransient<AddonsCoreV2::Install.IAddonInstaller, AddonsCoreV2::Install.AddonInstaller>();
+            services.AddTransient<AddonsCoreV2::Loader.IAddonLoader, AddonsCoreV2::Loader.AddonLoader>();
+            services.AddTransient<AddonsCoreV2::Permisson.IPermissionsHandler, AddonsCoreV2::Permisson.PermissionsHandler>();
+            services.AddTransient<AddonsCoreV2::Uninstall.IAddonUninstaller, AddonsCoreV2::Uninstall.AddonUninstaller>();
+            services.AddTransient<AddonsCoreV2::Update.IAddonUpdateChecker, AddonsCoreV2::Update.AddonUpdateChecker>();
+            services.AddTransient<AddonsCoreV2::Update.IAddonUpdator, AddonsCoreV2::Update.AddonUpdator>();
+            services.AddTransient<AddonsCoreV2::Utils.IHostPermissionsHandler, AddonsCoreV2::Utils.HostPermissionsHandler>();
 
             return services.BuildServiceProvider();
         }

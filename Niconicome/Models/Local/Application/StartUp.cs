@@ -12,6 +12,7 @@ using NicoIO = Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Utils.InitializeAwaiter;
+using Niconicome.Models.Local.Addon.V2;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -25,10 +26,9 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonHandler addonHandler)
+        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager)
         {
 
-            this._videoStoreHandler = videoStoreHandler;
             this._playlistStoreHandler = playlistStoreHandler;
             this._fileStorehandler = fileStorehandler;
             this._backuphandler = backuphandler;
@@ -38,13 +38,11 @@ namespace Niconicome.Models.Local.Application
             this._settingHandler = settingHandler;
             this._streamResumer = streamResumer;
             this._nicoDirectoryIO = nicoDirectoryIO;
-            this._addonHandler = addonHandler;
+            this._addonManager = addonManager;
             this.DeleteInvalidbackup();
         }
 
         #region field
-
-        private readonly Store::IVideoStoreHandler _videoStoreHandler;
 
         private readonly Store::IPlaylistStoreHandler _playlistStoreHandler;
 
@@ -64,7 +62,7 @@ namespace Niconicome.Models.Local.Application
 
         private readonly NicoIO::INicoDirectoryIO _nicoDirectoryIO;
 
-        private readonly IAddonHandler _addonHandler;
+        private readonly IAddonManager _addonManager;
 
         #endregion
 
@@ -83,7 +81,7 @@ namespace Niconicome.Models.Local.Application
                 this.RemoveTmpFolder();
                 this.JustifyData();
                 this.DeleteInvalidFilePath();
-                //await this.LoadAddonAsync();
+                this.LoadAddon();
                 await this.Autologin();
             });
         }
@@ -181,9 +179,9 @@ namespace Niconicome.Models.Local.Application
         /// <summary>
         /// アドオンを読み込む
         /// </summary>
-        private async Task LoadAddonAsync()
+        private void LoadAddon()
         {
-            await this._addonHandler.InitializeAsync();
+            this._addonManager.InitializeAddons();
         }
     }
 }
