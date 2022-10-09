@@ -195,6 +195,5 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string CommentCountPerBlock { get; private set; } = "commentcountperblock";
         public static string IsAppendingToLocalCommentEnable { get; private set; } = "isappendingtolocalcommentenable";
         public static string IsOmittingXmlDeclarationIsEnable { get; private set; } = "isomittingxmldeclarationisenable";
-
     }
 }

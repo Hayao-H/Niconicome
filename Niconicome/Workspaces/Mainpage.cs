@@ -95,5 +95,10 @@ namespace Niconicome.Workspaces
         /// </summary>
         public static IClipbordManager ClipbordManager { get; private set; } = DIFactory.Provider.GetRequiredService<IClipbordManager>();
 
+        /// <summary>
+        /// ページ遷移管理クラス
+        /// </summary>
+        public static IBlazorPageManager BlazorPageManager { get; private set; }=DIFactory.Provider.GetRequiredService<IBlazorPageManager>();
+
     }
 }

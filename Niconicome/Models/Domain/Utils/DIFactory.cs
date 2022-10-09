@@ -5,6 +5,7 @@ using Reactive.Bindings.Extensions;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using Addons = Niconicome.Models.Local.Addon;
 using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
+using AddonsCoreV2 = Niconicome.Models.Domain.Local.Addons.Core.V2;
 using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
@@ -59,6 +60,8 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using Watch = Niconicome.Models.Network.Watch;
 using OS = Niconicome.Models.Local.OS;
+using System.Runtime.CompilerServices;
+using VM = Niconicome.ViewModels;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -66,8 +69,9 @@ namespace Niconicome.Models.Domain.Utils
     {
         private static ServiceProvider GetProvider()
         {
-
             var services = new ServiceCollection();
+            services.AddWpfBlazorWebView();
+            services.AddBlazorWebViewDeveloperTools();
             services.AddHttpClient<Niconico::INicoHttp, Niconico::NicoHttp>()
                 .ConfigureHttpMessageHandlerBuilder(builder =>
                 {
@@ -260,6 +264,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
             services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
             services.AddSingleton<OS::IClipbordManager, OS::ClipbordManager>();
+            services.AddTransient<AddonsCoreV2::Engine.IAddonLogger, AddonsCoreV2::Engine.AddonLogger>();
+            services.AddTransient<VM::Blazor.TransitionViewModel>();
+            services.AddSingleton<State::IBlazorPageManager, State::BlazorPageManager>();
+
             return services.BuildServiceProvider();
         }
 
@@ -277,6 +285,11 @@ namespace Niconicome.Models.Domain.Utils
 
                 return DIFactory.provider;
             }
+        }
+
+        public static T Resolve<T>() where T : notnull
+        {
+            return Provider.GetRequiredService<T>();
         }
     }
 }

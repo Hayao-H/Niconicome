@@ -83,7 +83,7 @@ namespace Niconicome.Models.Local.Application
                 this.RemoveTmpFolder();
                 this.JustifyData();
                 this.DeleteInvalidFilePath();
-                await this.LoadAddonAsync();
+                //await this.LoadAddonAsync();
                 await this.Autologin();
             });
         }

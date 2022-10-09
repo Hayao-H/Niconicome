@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
@@ -30,48 +30,48 @@
 		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
 
-		<ItemGroup>
-			<PackageReference Include="AngleSharp" Version="0.17.1" />
-			<PackageReference Include="CredentialManagement" Version="1.0.2" />
-			<PackageReference Include="LiteDB" Version="5.0.11" />
-			<PackageReference Include="MaterialDesignColors" Version="2.0.4" />
-			<PackageReference Include="MaterialDesignThemes" Version="4.3.0" />
-			<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.540" />
-			<PackageReference Include="Microsoft.ClearScript" Version="7.3.0" />
-			<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.5" />
-			<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-			<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-			<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1210.39" />
-			<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
-			<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
-			<PackageReference Include="Prism.Unity" Version="8.1.97" />
-			<PackageReference Include="ReactiveProperty" Version="8.1.2" />
-			<PackageReference Include="ReactiveProperty.WPF" Version="8.1.2" />
-			<PackageReference Include="System.Security.Permissions" Version="6.0.0" />
-			<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-			<PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
-		</ItemGroup>
+	<ItemGroup>
+	  <None Include="wwwroot\addon.html" />
+	</ItemGroup>
 
-		<ItemGroup>
-			<Resource Include="src\app.ico" />
-		</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AngleSharp" Version="0.17.1" />
+		<PackageReference Include="CredentialManagement" Version="1.0.2" />
+		<PackageReference Include="LiteDB" Version="5.0.11" />
+		<PackageReference Include="MaterialDesignColors" Version="2.0.4" />
+		<PackageReference Include="MaterialDesignThemes" Version="4.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.540" />
+		<PackageReference Include="Microsoft.ClearScript" Version="7.3.0" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.5" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1210.39" />
+		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
+		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+		<PackageReference Include="Prism.Unity" Version="8.1.97" />
+		<PackageReference Include="ReactiveProperty" Version="8.1.2" />
+		<PackageReference Include="ReactiveProperty.WPF" Version="8.1.2" />
+		<PackageReference Include="System.Security.Permissions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+		<PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
+	</ItemGroup>
 
-		<ItemGroup>
-			<Compile Update="Properties\Resources.Designer.cs">
-				<DesignTime>True</DesignTime>
-				<AutoGen>True</AutoGen>
-				<DependentUpon>Resources.resx</DependentUpon>
-			</Compile>
-		</ItemGroup>
+	<ItemGroup>
+		<Resource Include="src\app.ico" />
+	</ItemGroup>
 
-		<ItemGroup>
-			<EmbeddedResource Update="Properties\Resources.resx">
-				<Generator>ResXFileCodeGenerator</Generator>
-				<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-			</EmbeddedResource>
-		</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-		<ItemGroup>
-		  <Folder Include="Models\Domain\Local\Addons\Manifest\V2\" />
-		</ItemGroup>
-	</Project>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+</Project>

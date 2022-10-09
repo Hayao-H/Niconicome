@@ -29,5 +29,10 @@ namespace Niconicome.Workspaces
         /// ローカル情報
         /// </summary>
         public static ILocalState LocalState { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalState>();
+
+        /// <summary>
+        /// ページ遷移管理クラス
+        /// </summary>
+        public static IBlazorPageManager BlazorPageManager { get; private set; }=DIFactory.Provider.GetRequiredService<IBlazorPageManager>();
     }
 }

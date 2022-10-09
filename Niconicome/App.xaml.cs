@@ -9,6 +9,7 @@ using Niconicome.ViewModels;
 using Niconicome.Views;
 using Niconicome.Views.AddonPage;
 using Niconicome.Views.AddonPage.Install;
+using Niconicome.Views.AddonPage.V2;
 using Niconicome.Views.Controls.MVVM;
 using Prism.Ioc;
 using Prism.Mvvm;
@@ -31,6 +32,7 @@ namespace Niconicome
             TaskScheduler.UnobservedTaskException += this.TaskScheduler_UnobservedTaskException;
 #pragma warning restore CS8622
             AppDomain.CurrentDomain.UnhandledException += this.CurrentDomain_UnhandledException;
+
             this.RunStartUpTask();
         }
 
@@ -49,6 +51,7 @@ namespace Niconicome
             containerRegistry.RegisterForNavigation<AddonLoadPage>();
             containerRegistry.RegisterForNavigation<AddonInstallPage>();
             containerRegistry.RegisterForNavigation<AM::Pages.MainPage>();
+            containerRegistry.RegisterDialog<MainManager>(nameof(MainManager));
         }
 
         /// <summary>
