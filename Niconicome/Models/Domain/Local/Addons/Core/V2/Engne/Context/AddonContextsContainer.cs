@@ -34,6 +34,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
         IAttemptResult<IAddonContext> ShutDown(string ID);
 
         /// <summary>
+        /// 全てのコンテクストをシャットダウン
+        /// </summary>
+        void ShutDownAll();
+
+        /// <summary>
         /// コンテキストを生成
         /// </summary>
         /// <returns></returns>
@@ -103,6 +108,15 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
 
             return AttemptResult<IAddonContext>.Succeeded(context);
         }
+
+        public void ShutDownAll()
+        {
+            foreach(var id in this.contexts.Select(c => c.AddonInfomation!.ID).ToList())
+            {
+                this.ShutDown(id);
+            }
+        }
+
 
         public IAttemptResult<IAddonContext> Create()
         {

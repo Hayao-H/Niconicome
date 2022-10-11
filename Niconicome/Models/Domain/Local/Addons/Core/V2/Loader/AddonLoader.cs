@@ -126,7 +126,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Loader
 
             try
             {
-                addonDirs = this._directoryIO.GetDirectorys(Const::FileFolder.AddonsFolder).Select(p=>Path.GetFileName(p));
+                addonDirs = this._directoryIO.GetDirectorys(Const::FileFolder.AddonsFolder).Select(p => Path.GetFileName(p));
             }
             catch (Exception ex)
             {
@@ -137,7 +137,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Loader
 
             foreach (var directory in addonDirs)
             {
-                string manifestPath = Path.Combine(baseDir, directory, Const::FileFolder.ManifestFileName);
+                string manifestPath = Path.Combine(baseDir, Const::FileFolder.AddonsFolder, directory, Const::FileFolder.ManifestFileName);
                 if (this._fileIO.Exists(manifestPath))
                 {
                     manifests.Add(new ManifestInfo(manifestPath, directory));
@@ -163,7 +163,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Loader
 
             //コンテクスト生成
             IAttemptResult<IAddonContext> cResult = this._addonContextsContainer.Create();
-            if (!cResult.IsSucceeded||cResult.Data is null)
+            if (!cResult.IsSucceeded || cResult.Data is null)
             {
                 return AttemptResult<IAddonContext>.Fail("コンテクストの生成に失敗しました。");
             }

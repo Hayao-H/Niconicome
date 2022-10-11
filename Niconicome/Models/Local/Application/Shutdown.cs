@@ -1,6 +1,6 @@
 ﻿using System;
 using Niconicome.Models.Domain.Local;
-using Niconicome.Models.Domain.Local.Addons.Core.Engine.Context;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 
@@ -14,7 +14,7 @@ namespace Niconicome.Models.Local.Application
 
     public class Shutdown : IShutdown
     {
-        public Shutdown(IDataBase dataBase, IPlaylistHandler playlistHandler,IAddonContexts contexts)
+        public Shutdown(IDataBase dataBase, IPlaylistHandler playlistHandler,IAddonContextsContainer contexts)
         {
             this.dataBase = dataBase;
             this.playlistHandler = playlistHandler;
@@ -27,7 +27,7 @@ namespace Niconicome.Models.Local.Application
 
         private readonly IPlaylistHandler playlistHandler;
 
-        private readonly IAddonContexts _contexts;
+        private readonly IAddonContextsContainer _contexts;
 
         #endregion
 
@@ -40,7 +40,7 @@ namespace Niconicome.Models.Local.Application
         {
             if (this.IsShutdowned) throw new InvalidOperationException("終了処理は一度のみ可能です。");
             this.playlistHandler.SaveAllPlaylists();
-            this._contexts.KillAll();
+            this._contexts.ShutDownAll();
             this.dataBase.Dispose();
             this.IsShutdowned = true;
         }

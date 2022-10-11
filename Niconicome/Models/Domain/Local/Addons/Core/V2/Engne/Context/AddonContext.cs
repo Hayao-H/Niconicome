@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
+using AngleSharp.Dom;
+using Microsoft.ClearScript;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.JavaScript;
 using Niconicome.Models.Domain.Local.IO;
+using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Addon.API.Local.Tab;
@@ -121,6 +125,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
                 tab.RegisterHandler(item => this.HandlingTabs.Add(item), item => this.HandlingTabs.RemoveAll(i => i == item));
             }
 
+            this._engine.Initialize(false);
+
             //APIを追加
             this._engine.AddHostObject("application", container.APIEntryPoint);
             this._engine.AddHostObject("fetch", container.FetchFunc);
@@ -129,7 +135,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
             {
                 try
                 {
-                    this._engine.Execute(script);
+                    var result = this._engine.Execute(script);
+                    result.ToString();
                 }
                 catch (Exception ex)
                 {
@@ -180,7 +187,6 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
                 catch { }
             }
         }
-
         #endregion
 
         public void Dispose()

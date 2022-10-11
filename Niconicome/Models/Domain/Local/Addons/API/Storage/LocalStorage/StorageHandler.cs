@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Local.Addons.Core.Installer;
 using Niconicome.Models.Helper.Result;
-using Windows.UI.Composition;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 {

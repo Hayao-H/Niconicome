@@ -226,7 +226,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
                 HostPermissions = manifest.HostPermissions.AsReadOnly(),
                 AutoUpdate = manifest.AutoUpdatePolicy.AutoUpdate,
                 UpdateJsonURL = manifest.AutoUpdatePolicy.UpdateJsonUrl,
-                ScriptPath = manifest.Scripts.BackgroundScript,
+                ScriptPath = Path.Combine(AppContext.BaseDirectory,Const::FileFolder.AddonsFolder,directoryName,manifest.Scripts.BackgroundScript),
                 Version = vResult && version is not null ? version : new Version(),
                 IconPath = GetIconPath(),
                 TargetAPIVersion = avResult && apiVerison is not null ? apiVerison : new Version(),
