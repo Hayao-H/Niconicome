@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.ViewModels;
-using Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.V2;
+using Niconicome.ViewModels.Mainpage.Subwindows.AddonManager;
 
 namespace Niconicome.Views.AddonPage.V2
 {
@@ -23,12 +23,17 @@ namespace Niconicome.Views.AddonPage.V2
     /// MainManager.xaml の相互作用ロジック
     /// </summary>
     [ViewModel(typeof(MainManagerViewModel))]
-    public partial class MainManager : UserControl
+    public partial class MainManager : UserControl,IDisposable
     {
         public MainManager()
         {
             InitializeComponent();
             Resources.Add("services", DIFactory.Provider);
+        }
+
+        public void Dispose()
+        {
+            this.webview.DisposeAsync();
         }
     }
 }

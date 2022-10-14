@@ -127,7 +127,7 @@ namespace Niconicome.ViewModels.Mainpage
                     ///}
                     ///dialogService.Show(nameof(AddonManagerWindow));
 
-                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addon");
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons");
                     WS::Mainpage.WindowTabHelper.OpenAddonManager(this.RegionManager);
                 });
 

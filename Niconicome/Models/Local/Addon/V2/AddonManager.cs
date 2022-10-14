@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,11 +79,11 @@ namespace Niconicome.Models.Local.Addon.V2
             }
 
             //それぞれリストに追加
-            this._statusContainer.LoadedAddons.Clear();
-            this._statusContainer.LoadFailedAddons.Clear();
+            this._statusContainer.Clear(ListType.Loaded);
+            this._statusContainer.Clear(ListType.Failed);
 
-            this._statusContainer.LoadedAddons.AddRange(loadResult.Data.Succeeded);
-            this._statusContainer.LoadFailedAddons.AddRange(loadResult.Data.Failed);
+            foreach (var item in loadResult.Data.Succeeded) this._statusContainer.Add(item, ListType.Loaded);
+            foreach (var item in loadResult.Data.Failed) this._statusContainer.Add(item, ListType.Failed);
 
             return AttemptResult.Succeeded();
 
@@ -101,19 +100,19 @@ namespace Niconicome.Models.Local.Addon.V2
 
         public async Task CheckForUpdates()
         {
-            this._statusContainer.ToBeUpdatedAddons.Clear();
+            this._statusContainer.Clear(ListType.Update);
 
             foreach (var info in this._statusContainer.LoadedAddons)
             {
                 if (!info.AutoUpdate) continue;
 
                 //アップデートを確認
-                IAttemptResult<bool> result = await this._updateChecker.CheckForUpdate(info);
-                if (!result.IsSucceeded) continue;
+                IAttemptResult<UpdateCheckInfomation> result = await this._updateChecker.CheckForUpdate(info);
+                if (!result.IsSucceeded || result.Data is null) continue;
 
-                if (result.Data)
+                if (result.Data.HasUpdate)
                 {
-                    this._statusContainer.ToBeUpdatedAddons.Add(info);
+                    this._statusContainer.Add(result.Data, ListType.Update);
                 }
             }
         }
@@ -141,11 +140,11 @@ namespace Niconicome.Models.Local.Addon.V2
 
             if (loadResult.Data.Succeeded.Count == 1)
             {
-                this._statusContainer.LoadedAddons.Add(loadResult.Data.Succeeded[0]);
+                this._statusContainer.Add(loadResult.Data.Succeeded[0], ListType.Loaded);
             }
             else if (loadResult.Data.Failed.Count == 1)
             {
-                this._statusContainer.LoadFailedAddons.Add(loadResult.Data.Failed[0]);
+                this._statusContainer.Add(loadResult.Data.Failed[0], ListType.Failed);
             }
 
             return loadResult.Data.Succeeded.Count == 1 ? AttemptResult.Succeeded() : AttemptResult.Fail();

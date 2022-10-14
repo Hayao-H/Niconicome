@@ -2,10 +2,9 @@
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
-using Addons = Niconicome.Models.Local.Addon;
-using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
 using AddonsCoreV2 = Niconicome.Models.Domain.Local.Addons.Core.V2;
 using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
+using AddonsV2 = Niconicome.Models.Local.Addon.V2;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
 using CommentConverter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
@@ -59,7 +58,7 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
-using AddonsV2 = Niconicome.Models.Local.Addon.V2;
+using AddonVM = Niconicome.ViewModels.Mainpage.Subwindows.AddonManager;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -265,6 +264,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonsCoreV2::Update.IAddonUpdateChecker, AddonsCoreV2::Update.AddonUpdateChecker>();
             services.AddTransient<AddonsCoreV2::Update.IAddonUpdator, AddonsCoreV2::Update.AddonUpdator>();
             services.AddTransient<AddonsCoreV2::Utils.IHostPermissionsHandler, AddonsCoreV2::Utils.HostPermissionsHandler>();
+            services.AddTransient<AddonVM::Pages.IndexViewModel>();
 
             return services.BuildServiceProvider();
         }

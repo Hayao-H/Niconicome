@@ -192,12 +192,12 @@ namespace Niconicome.Models.Local.Addon.V2
 
             if (succeeded is null && failed is not null)
             {
-                this._statusContainer.LoadFailedAddons.Add(failed);
+                this._statusContainer.Add(failed, ListType.Failed);
                 return AttemptResult.Fail(failed.Message);
             }
             else if (succeeded is not null)
             {
-                this._statusContainer.LoadedAddons.Add(succeeded);
+                this._statusContainer.Add(succeeded,ListType.Loaded);
                 return AttemptResult.Succeeded();
             }
             else

@@ -17,7 +17,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <blazor:BlazorWebView HostPage="wwwroot/addon.html" Services="{DynamicResource services}">
+        <blazor:BlazorWebView x:Name="webview" HostPage="wwwroot/addon.html" Services="{DynamicResource services}">
             <blazor:BlazorWebView.RootComponents>
                 <blazor:RootComponent Selector="#app" ComponentType="{x:Type root:Main}" />
             </blazor:BlazorWebView.RootComponents>

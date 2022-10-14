@@ -10,16 +10,17 @@ using Niconicome.ViewModels.Mainpage.Tabs;
 using Prism.Regions;
 using WS = Niconicome.Workspaces;
 
-namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.V2
+namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager
 {
     public class MainManagerViewModel : TabViewModelBase
     {
-        public MainManagerViewModel(IRegionManager regionManager) : base("アドオンマネージャー", LocalConstant.AddonManagerTabID, true) {
+        public MainManagerViewModel(IRegionManager regionManager) : base("アドオンマネージャー", LocalConstant.AddonManagerTabID, true)
+        {
 
             this._regionManager = regionManager;
             this.CloseCommand.Subscribe(s =>
             {
-                IRegion region = this._regionManager.Regions[LocalConstant.TopTabRegionName]; 
+                IRegion region = this._regionManager.Regions[LocalConstant.TopTabRegionName];
                 IEnumerable<object> viewsToRemove = region.Views.Where(v =>
                 {
                     if (v is not UserControl control) return false;
@@ -30,6 +31,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.V2
                 foreach (var view in viewsToRemove)
                 {
                     region.Remove(view);
+                    if (view is IDisposable disposableView)
+                    {
+                        disposableView.Dispose();
+                    }
                 }
 
                 WS::Mainpage.LocalState.IsAddonManagerOpen = false;

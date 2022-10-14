@@ -19,7 +19,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
         /// </summary>
         /// <param name="infomation"></param>
         /// <returns></returns>
-        Task<IAttemptResult<bool>> CheckForUpdate(IAddonInfomation infomation);
+        Task<IAttemptResult<UpdateCheckInfomation>> CheckForUpdate(IAddonInfomation infomation);
     }
 
     public class AddonUpdateChecker : IAddonUpdateChecker
@@ -42,11 +42,11 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
         #endregion
 
         #region Method
-        public async Task<IAttemptResult<bool>> CheckForUpdate(IAddonInfomation infomation)
+        public async Task<IAttemptResult<UpdateCheckInfomation>> CheckForUpdate(IAddonInfomation infomation)
         {
             if (!Uri.IsWellFormedUriString(infomation.UpdateJsonURL, UriKind.Absolute))
             {
-                return AttemptResult<bool>.Fail("URLが不正です。");
+                return AttemptResult<UpdateCheckInfomation>.Fail("URLが不正です。");
             }
 
             var res = await this._http.GetAsync(new Uri(infomation.UpdateJsonURL));
@@ -61,13 +61,13 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
                 catch (Exception ex)
                 {
                     this._logger.Error("アップデート情報の解析に失敗しました。", ex);
-                    return AttemptResult<bool>.Fail($"アップデート情報の解析に失敗しました。(詳細：{ex.Message})");
+                    return AttemptResult<UpdateCheckInfomation>.Fail($"アップデート情報の解析に失敗しました。(詳細：{ex.Message})");
                 }
             }
             else
             {
                 this._logger.Error($"アップデート情報ダウンロードに失敗しました。(詳細：{this._netWorkHelper.GetHttpStatusForLog(res)} URL：{infomation.UpdateJsonURL})");
-                return AttemptResult<bool>.Fail($"アップデート情報ダウンロードに失敗しました。");
+                return AttemptResult<UpdateCheckInfomation>.Fail($"アップデート情報ダウンロードに失敗しました。");
             }
 
             UpdateJSON data;
@@ -79,17 +79,17 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
             catch (Exception ex)
             {
                 this._logger.Error($"アップデート情報の解析に失敗しました。", ex);
-                return AttemptResult<bool>.Fail($"アップデート情報の解析に失敗しました。(詳細：{ex.Message})");
+                return AttemptResult<UpdateCheckInfomation>.Fail($"アップデート情報の解析に失敗しました。(詳細：{ex.Message})");
             }
 
             Version.TryParse(data.Version, out Version? updateVersion);
             if (updateVersion is null)
             {
                 this._logger.Error($"バージョン文字列の解析に失敗しました。(content：{data.Version})");
-                return AttemptResult<bool>.Fail("バージョン文字列の解析に失敗しました。");
+                return AttemptResult<UpdateCheckInfomation>.Fail("バージョン文字列の解析に失敗しました。");
             }
 
-            return AttemptResult<bool>.Succeeded(updateVersion.CompareTo(infomation.Version) > 0);
+            return AttemptResult<UpdateCheckInfomation>.Succeeded(new UpdateCheckInfomation(updateVersion.CompareTo(infomation.Version) > 0,infomation,updateVersion,data.Changelog));
         }
 
         #endregion

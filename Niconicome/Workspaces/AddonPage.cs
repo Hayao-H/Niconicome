@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Local.Addon.V2;
 using Niconicome.Models.Local.Application;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
@@ -24,5 +25,10 @@ namespace Niconicome.Workspaces
         /// ページ遷移管理クラス
         /// </summary>
         public static IBlazorPageManager BlazorPageManager { get; private set; }=DIFactory.Provider.GetRequiredService<IBlazorPageManager>();
+
+        /// <summary>
+        /// アドオン情報
+        /// </summary>
+        public static IAddonStatusContainer AddonStatusContainer { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonStatusContainer>();
     }
 }
