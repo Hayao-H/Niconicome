@@ -57,6 +57,13 @@ namespace Niconicome.Models.Local.Addon.V2
         /// <returns></returns>
         Task<IAttemptResult<UpdateInfomation>> DownloadUpdate(string ID);
 
+        /// <summary>
+        /// インストール状況を確認
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        bool IsInstalled(string identifier);
+
     }
 
 
@@ -149,6 +156,11 @@ namespace Niconicome.Models.Local.Addon.V2
 
             IAttemptResult<UpdateInfomation> uResult = await this._updator.DownloadAndLoadUpdate(ctxResult.Data.AddonInfomation!);
             return uResult;
+        }
+
+        public bool IsInstalled(string identifier)
+        {
+            return this._statusContainer.LoadedAddons.Any(i => i.Identifier == identifier);
         }
 
 

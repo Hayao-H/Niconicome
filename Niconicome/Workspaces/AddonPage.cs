@@ -5,6 +5,7 @@ using Niconicome.Models.Local.Addon.V2;
 using Niconicome.Models.Local.Application;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Utils;
 
 namespace Niconicome.Workspaces
 {
@@ -30,5 +31,15 @@ namespace Niconicome.Workspaces
         /// アドオン情報
         /// </summary>
         public static IAddonStatusContainer AddonStatusContainer { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonStatusContainer>();
+
+        /// <summary>
+        /// インストーラー
+        /// </summary>
+        public static IAddonInstallManager AddonInstallManager { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonInstallManager>();
+
+        /// <summary>
+        /// Blazorヘルパークラス
+        /// </summary>
+        public static IBlazorHelper BlazorHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IBlazorHelper>();
     }
 }
