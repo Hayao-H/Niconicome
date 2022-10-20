@@ -22,6 +22,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared
             var stream = File.ReadAllBytes(iconPath);
             var base64 = Convert.ToBase64String(stream);
             this.IconData = $"data:image/png;base64,{base64}";
+            this.Version = infomation.Version.ToString();
         }
 
         /// <summary>
@@ -48,5 +49,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared
         /// アイコンのパス
         /// </summary>
         public string IconData { get; init; }
+
+        /// <summary>
+        /// バージョン
+        /// </summary>
+        public string Version { get; init; }
     }
 }

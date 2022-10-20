@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
@@ -84,6 +85,8 @@ namespace Niconicome.Models.Local.Addon.V2
 
             foreach (var item in loadResult.Data.Succeeded) this._statusContainer.Add(item, ListType.Loaded);
             foreach (var item in loadResult.Data.Failed) this._statusContainer.Add(item, ListType.Failed);
+
+            this._statusContainer.Add(new UpdateCheckInfomation(true, loadResult.Data.Succeeded.First(), new Version("3.0.0"), "https://example.com"),ListType.Update);
 
             return AttemptResult.Succeeded();
 

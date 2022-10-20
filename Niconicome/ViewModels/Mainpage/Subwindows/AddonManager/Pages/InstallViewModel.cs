@@ -18,6 +18,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
 
         private bool _isInstall;
 
+        private string _id = string.Empty;
+
         #endregion
 
         #region Method
@@ -96,6 +98,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         public void Initialize(string ID)
         {
             this._isInstall = ID == "0";
+            this._id = ID;
             this.InstallOrUpdate = this._isInstall ? "インストール" : "アップデート";
             this.SelectViewDisplay = this._displayBlock;
             this.InfomationViewDisplay = this._displayNone;
@@ -127,18 +130,18 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
             this.InstallViewDisplay = this._displayBlock;
             this.ModifyPath();
 
-            this.InstallInfomationText = "インストール中...";
+            this.InstallInfomationText = $"{this.InstallOrUpdate}中...";
 
-            IAttemptResult result = WS.AddonInstallManager.InstallAndLoad(this.SelectedFilePath);
+            IAttemptResult result = this._isInstall? WS.AddonInstallManager.InstallAndLoad(this.SelectedFilePath):WS.AddonInstallManager.UpdateAndLoad(this._id,this.SelectedFilePath);
 
             var builder = new StringBuilder();
             if (result.IsSucceeded)
             {
-                builder.AppendLine("インストールに成功しました！");
+                builder.AppendLine($"{this.InstallOrUpdate}に成功しました！");
             }
             else
             {
-                builder.AppendLine("インストールに失敗しました。");
+                builder.AppendLine($"{this.InstallOrUpdate}に失敗しました。");
                 builder.AppendLine($"詳細：{result.Message ?? "不明"}");
             }
 
