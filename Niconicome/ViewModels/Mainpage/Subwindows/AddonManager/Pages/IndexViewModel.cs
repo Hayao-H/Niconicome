@@ -42,6 +42,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
 
         public IEnumerable<UpdateCheckInfomationViewModel> ToBeUpdatedAddons { get; private set; } = new List<UpdateCheckInfomationViewModel>();
 
+        public IEnumerable<FailedResultViewModel> LoadFailedAddons { get; private set; } = new List<FailedResultViewModel>();
+
         /// <summary>
         /// アップデート情報
         /// </summary>
@@ -136,6 +138,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         {
             this.LoadedAddons = WS::AddonPage.AddonStatusContainer.LoadedAddons.Select(i => new AddonInfomationViewModel(i));
             this.ToBeUpdatedAddons = WS::AddonPage.AddonStatusContainer.ToBeUpdatedAddons.Select(i => new UpdateCheckInfomationViewModel(i));
+            this.LoadFailedAddons = WS::AddonPage.AddonStatusContainer.LoadFailedAddons.Select(i => new FailedResultViewModel(i));
         }
 
         #endregion

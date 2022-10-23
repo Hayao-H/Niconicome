@@ -27,7 +27,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-					<button type="button" class="btn btn-primary" @onclick="()=>DataContext.OnInstallUpdateClick(DataContext.UpdateInfomation.ID,DataContext.UpdateInfomation.ArchivePath)">更新</button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="()=>DataContext.OnInstallUpdateClick(DataContext.UpdateInfomation.ID,DataContext.UpdateInfomation.ArchivePath)">更新</button>
 				</div>
 			</div>
 		</div>
@@ -65,7 +65,7 @@
 							<img class="d-block mx-auto" height="32" width="32" src="@item.IconData" />
 						</div>
 						<div class="col-md-10 card-body p-2">
-							<h5 class="card-title">@item.Name <span class="text-muted fs-6">by @item.Author</span></h5>
+							<h5 class="card-title">@item.Name <span class="text-muted fs-6">by @(item.Author), Ver.@(item.Version)</span></h5>
 							<p class="fw-normal fs-6">@item.Description</p>
 						</div>
 						<div class="dropdown col-md-1 d-flex justify-content-centor align-items-center">
@@ -109,6 +109,21 @@
 					</div>
 				</div>
 			}
+		</div>
+
+		<div class="mt-5">
+			<h5 class="fw-bold">読み込みに失敗したアドオン</h5>
+			<div>
+				@foreach (var item in DataContext.LoadFailedAddons)
+				{
+					<div class="card mt-2">
+						<div class="card-body p-2">
+							<h5 class="card-title">@item.DirectoryName</h5>
+							<p class="fw-normal fs-6 m-0">@item.Message</p>
+						</div>
+					</div>
+				}
+			</div>
 		</div>
 	</div>
 </div>
