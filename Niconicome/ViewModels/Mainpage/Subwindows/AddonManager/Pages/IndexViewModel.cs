@@ -26,7 +26,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
 
         private List<Action> _alertChangedHandler = new();
 
-        private List<Action> _modalChangeHandler = new();
+        private List<Action<ModalType>> _modalChangeHandler = new();
 
         private List<Timer::Timer> _timers = new();
 
@@ -48,6 +48,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         /// アップデート情報
         /// </summary>
         public UpdateInfomationViewModel? UpdateInfomation { get; private set; }
+
+        /// <summary>
+        /// アンインストール予定のアドオン
+        /// </summary>
+        public AddonInfomationViewModel? ToBeUninstalledAddon { get; private set; }
 
         /// <summary>
         /// アラート部に表示するメッセージ
@@ -104,11 +109,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         /// <summary>
         /// モーダル部を表示する
         /// </summary>
-        private void ShowModal()
+        private void ShowModal(ModalType type)
         {
             foreach (var handler in this._modalChangeHandler)
             {
-                this._currentContext?.Post(_ => handler(), null);
+                this._currentContext?.Post(_ => handler(type), null);
             }
         }
 
@@ -176,7 +181,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         /// モーダル部表示イベントハンドラ
         /// </summary>
         /// <param name="handler"></param>
-        public void AddModalHandler(Action handler)
+        public void AddModalHandler(Action<ModalType> handler)
         {
             this._modalChangeHandler.Add(handler);
         }
@@ -197,7 +202,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
             else if (downloadResult.Data.HasNewPermission)
             {
                 this.UpdateInfomation = new UpdateInfomationViewModel(downloadResult.Data, id);
-                this.ShowModal();
+                this.ShowModal(ModalType.Update);
             }
             else
             {
@@ -217,7 +222,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
             {
                 this.AlertMessage = result.Message ?? "不明なエラーによりアップデートに失敗しました。";
                 this.ShowAlert();
-            } else
+            }
+            else
             {
                 this.AlertMessage = "更新が完了しました。";
                 this.ShowAlert(AlertType.Info);
@@ -239,6 +245,38 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
             this.ShowAlert(AlertType.Info);
         }
 
+        /// <summary>
+        /// アンインストールリンクがクリックされたとき
+        /// </summary>
+        /// <param name="id"></param>
+        public void OnUninstallClicled(AddonInfomationViewModel vm)
+        {
+            this.ToBeUninstalledAddon = vm;
+            this.ShowModal(ModalType.Uninstall);
+        }
+
+        /// <summary>
+        /// アンインストールの確認がされたとき
+        /// </summary>
+        public void OnUninstallConfirmed()
+        {
+            if (this.ToBeUninstalledAddon is null) return;
+
+            IAttemptResult result = WS::AddonPage.AddonInstallManager.Uninstall(this.ToBeUninstalledAddon.ID);
+            if (result.IsSucceeded)
+            {
+                this.AlertMessage = "アンインストールが完了しました。";
+                this.ShowAlert(AlertType.Info);
+            }
+            else
+            {
+                this.AlertMessage = $"アンインストールに失敗しました。(詳細：{result.Message ?? "不明"})";
+                this.ShowAlert();
+            }
+
+            this.ToBeUninstalledAddon = null;
+        }
+
         #endregion
 
 
@@ -250,4 +288,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
             this._modalChangeHandler.Clear();
         }
     }
+
+    public enum ModalType { Update, Uninstall }
 }

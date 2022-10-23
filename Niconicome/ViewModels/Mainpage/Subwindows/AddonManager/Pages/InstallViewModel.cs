@@ -25,73 +25,6 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         #region Method
 
         /// <summary>
-        /// アドオンの情報を読み込む
-        /// </summary>
-        /// <returns></returns>
-        public string GetInfomation()
-        {
-            this.ModifyPath();
-
-            IAttemptResult<IAddonInfomation> result = WS.AddonInstallManager.LoadInfomation(this.SelectedFilePath!);
-            if (!result.IsSucceeded || result.Data is null)
-            {
-                return result.Message ?? "読み込みに失敗しました。";
-            }
-
-
-            IAddonInfomation info = result.Data;
-
-            if (this._isInstall && WS.AddonInstallManager.IsInstalled(info.Identifier))
-            {
-                this.IsInstallDisabled = true;
-                IAddonInfomation? dupe = WS.AddonStatusContainer.LoadedAddons.FirstOrDefault(i => i.Identifier == info.Identifier);
-
-                var builder1 = new StringBuilder();
-                builder1.AppendLine("すでにインストールされているアドオンであるか、識別子が重複しているためインストールできません。");
-                builder1.AppendLine($"識別子：{info.Identifier}");
-                builder1.AppendLine($"重複しているアドオン：{dupe?.Name ?? "不明"}");
-
-                return WS.BlazorHelper.ConvertNewLine(builder1.ToString());
-            }
-            else
-            {
-                this.IsInstallDisabled = false;
-            }
-
-            var builder2 = new StringBuilder();
-            builder2.AppendLine($"名前：{info.Name}");
-            builder2.AppendLine($"作者：{info.Author}");
-            builder2.AppendLine($"説明：{info.Description}");
-            builder2.AppendLine($"バージョン：{info.Version}");
-            builder2.AppendLine($"識別子：{info.Identifier}");
-
-            if (info.Permissions.Count > 0)
-            {
-                builder2.AppendLine("権限一覧 " + "-".Repeat(60));
-
-                foreach (var permission in info.Permissions)
-                {
-                    builder2.AppendLine($"権限名：{permission.Name}");
-                    builder2.AppendLine($"説明：{permission.Description}");
-                }
-            }
-
-            if (info.HostPermissions.Count > 0)
-            {
-                builder2.AppendLine("ホスト権限一覧（アドオンが自由にデータを送受信できるURL）" + "-".Repeat(60));
-                builder2.AppendLine("！注意！：悪意のあるアドオンは、これらのURLにあなたの情報を送信することができます。適用範囲が広すぎるもの（たとえば、「http://*/」など）はできるだけ許可しないでください。アプリケーションはこのような攻撃に対する防御機構を持ちません。");
-
-                foreach (var host in info.HostPermissions)
-                {
-                    builder2.AppendLine(host);
-                    builder2.AppendLine("");
-                }
-            }
-
-            return WS.BlazorHelper.ConvertNewLine(builder2.ToString());
-        }
-
-        /// <summary>
         /// 初期化
         /// </summary>
         /// <param name="ID"></param>
@@ -103,6 +36,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
             this.SelectViewDisplay = this._displayBlock;
             this.InfomationViewDisplay = this._displayNone;
             this.InstallViewDisplay = this._displayNone;
+            this.IsInstallDisabled = true;
         }
 
         /// <summary>
@@ -110,6 +44,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         /// </summary>
         public void OnFileSelected()
         {
+            this.IsInstallDisabled = true;
+
             if (string.IsNullOrEmpty(this.SelectedFilePath)) return;
 
             this.SelectViewDisplay = _displayNone;
@@ -212,6 +148,69 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         #endregion
 
         #region private
+
+        /// <summary>
+        /// アドオンの情報を読み込む
+        /// </summary>
+        /// <returns></returns>
+        private string GetInfomation()
+        {
+            this.ModifyPath();
+
+            IAttemptResult<IAddonInfomation> result = WS.AddonInstallManager.LoadInfomation(this.SelectedFilePath!);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return result.Message ?? "読み込みに失敗しました。";
+            }
+
+
+            IAddonInfomation info = result.Data;
+
+            if (this._isInstall && WS.AddonInstallManager.IsInstalled(info.Identifier))
+            {
+                IAddonInfomation? dupe = WS.AddonStatusContainer.LoadedAddons.FirstOrDefault(i => i.Identifier == info.Identifier);
+
+                var builder1 = new StringBuilder();
+                builder1.AppendLine("すでにインストールされているアドオンであるか、識別子が重複しているためインストールできません。");
+                builder1.AppendLine($"識別子：{info.Identifier}");
+                builder1.AppendLine($"重複しているアドオン：{dupe?.Name ?? "不明"}");
+
+                return WS.BlazorHelper.ConvertNewLine(builder1.ToString());
+            }
+
+            var builder2 = new StringBuilder();
+            builder2.AppendLine($"名前：{info.Name}");
+            builder2.AppendLine($"作者：{info.Author}");
+            builder2.AppendLine($"説明：{info.Description}");
+            builder2.AppendLine($"バージョン：{info.Version}");
+            builder2.AppendLine($"識別子：{info.Identifier}");
+
+            if (info.Permissions.Count > 0)
+            {
+                builder2.AppendLine("権限一覧 " + "-".Repeat(60));
+
+                foreach (var permission in info.Permissions)
+                {
+                    builder2.AppendLine($"権限名：{permission.Name}");
+                    builder2.AppendLine($"説明：{permission.Description}");
+                }
+            }
+
+            if (info.HostPermissions.Count > 0)
+            {
+                builder2.AppendLine("ホスト権限一覧（アドオンが自由にデータを送受信できるURL）" + "-".Repeat(60));
+                builder2.AppendLine("！注意！：悪意のあるアドオンは、これらのURLにあなたの情報を送信することができます。適用範囲が広すぎるもの（たとえば、「http://*/」など）はできるだけ許可しないでください。アプリケーションはこのような攻撃に対する防御機構を持ちません。");
+
+                foreach (var host in info.HostPermissions)
+                {
+                    builder2.AppendLine(host);
+                    builder2.AppendLine("");
+                }
+            }
+
+                this.IsInstallDisabled = false;
+            return WS.BlazorHelper.ConvertNewLine(builder2.ToString());
+        }
 
         /// <summary>
         /// インストールファイルのパスを修正

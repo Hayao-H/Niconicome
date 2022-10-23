@@ -9,7 +9,7 @@
 
 @if (DataContext.UpdateInfomation is not null)
 {
-	<div class="modal fade" id="addonModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+	<div class="modal fade" id="addonUpdateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -28,6 +28,28 @@
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
 					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="()=>DataContext.OnInstallUpdateClick(DataContext.UpdateInfomation.ID,DataContext.UpdateInfomation.ArchivePath)">更新</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+
+@if (DataContext.ToBeUninstalledAddon is not null)
+{
+	<div class="modal fade" id="addonUninstallModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">アンインストールの確認</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p><span class="fw-bold">@(DataContext.ToBeUninstalledAddon.Name)</span>をアンインストールしますか？</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="DataContext.OnUninstallConfirmed">アンインストール</button>
 				</div>
 			</div>
 		</div>
@@ -74,6 +96,7 @@
 							</button>
 							<ul class="dropdown-menu" aria-labelledby="updateButton">
 								<li><a class="dropdown-item" href="/addons/install/@(item.ID)"><i class="fa-solid fa-arrow-rotate-right me-1"></i>更新する</a></li>
+								<li><a class="dropdown-item" href="" @onclick="()=>DataContext.OnUninstallClicled(item)"><i class="fa-solid fa-trash me-1"></i>アンインストール</a></li>
 							</ul>
 						</div>
 					</div>
@@ -139,10 +162,15 @@
 			this.StateHasChanged();
 			JS.InvokeVoidAsync("showTooltip", null);
 		});
-		DataContext.AddModalHandler(() =>
+		DataContext.AddModalHandler(type =>
 		{
+			var funcName = type switch
+			{
+				Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages.ModalType.Uninstall => "showUninstallModal",
+				_ => "showUpdateModal",
+			};
 			this.StateHasChanged();
-			JS.InvokeVoidAsync("showModal", null);
+			JS.InvokeVoidAsync(funcName, null);
 		});
 		DataContext.AddAlertHandler(() => this.StateHasChanged());
 
