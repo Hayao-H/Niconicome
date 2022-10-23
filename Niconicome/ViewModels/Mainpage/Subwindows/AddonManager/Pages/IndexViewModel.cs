@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared;
-using WS = Niconicome.Workspaces;
-using System.Collections.Specialized;
-using Niconicome.Extensions;
-using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
-using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Domain.Local.Addons.Core.V2.Update;
-using System.Timers;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Update;
+using Niconicome.Models.Helper.Result;
+using Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared;
+using Timer = System.Timers;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
 {
@@ -31,7 +28,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
 
         private List<Action> _modalChangeHandler = new();
 
-        private List<Timer> _timers = new();
+        private List<Timer::Timer> _timers = new();
+
+        private enum AlertType { Danger, Info };
+
+        private SynchronizationContext? _currentContext;
 
         #endregion
 
@@ -52,6 +53,11 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         public string AlertMessage { get; private set; } = string.Empty;
 
         /// <summary>
+        /// アラートの種類
+        /// </summary>
+        public string AlertTypeClass { get; private set; } = string.Empty;
+
+        /// <summary>
         /// アラート部の表示有無
         /// </summary>
         public bool DisplayAlertMessage { get; private set; }
@@ -63,22 +69,28 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         /// <summary>
         /// アラート部を表示する
         /// </summary>
-        private void ShowAlert()
+        private void ShowAlert(AlertType type = AlertType.Danger)
         {
             this.DisplayAlertMessage = true;
+            this.AlertTypeClass = type switch
+            {
+                AlertType.Info => "alert-info",
+                _ => "alert-danger"
+            };
+
             foreach (var handler in this._alertChangedHandler)
             {
-                handler();
+                this._currentContext?.Post(_ => handler(), null);
             }
 
-            var timer = new Timer(5000);
+            var timer = new Timer::Timer(5000);
             timer.AutoReset = false;
             timer.Elapsed += (_, _) =>
             {
                 this.DisplayAlertMessage = false;
                 foreach (var handler in this._alertChangedHandler)
                 {
-                    handler();
+                    this._currentContext?.Post(_ => handler(), null);
                 }
                 this._timers.Remove(timer);
             };
@@ -92,9 +104,9 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         /// </summary>
         private void ShowModal()
         {
-            foreach(var handler in this._modalChangeHandler)
+            foreach (var handler in this._modalChangeHandler)
             {
-                handler();
+                this._currentContext?.Post(_ => handler(), null);
             }
         }
 
@@ -124,13 +136,20 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         {
             this.LoadedAddons = WS::AddonPage.AddonStatusContainer.LoadedAddons.Select(i => new AddonInfomationViewModel(i));
             this.ToBeUpdatedAddons = WS::AddonPage.AddonStatusContainer.ToBeUpdatedAddons.Select(i => new UpdateCheckInfomationViewModel(i));
-
-            this.UpdateInfomation = new UpdateInfomationViewModel(new UpdateInfomation("", new List<Permission>() { Permissions.Hooks, Permissions.Hooks, Permissions.DownloadSettings },true, WS::AddonPage.AddonStatusContainer.LoadedAddons.First(), "", ""));
         }
 
         #endregion
 
         #region Method
+
+        /// <summary>
+        /// コンテキストを登録
+        /// </summary>
+        /// <param name="context"></param>
+        public void SetContext(SynchronizationContext context)
+        {
+            this._currentContext = context;
+        }
 
         /// <summary>
         /// リスト変更を通知する
@@ -174,16 +193,17 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
             }
             else if (downloadResult.Data.HasNewPermission)
             {
-                this.UpdateInfomation = new UpdateInfomationViewModel(downloadResult.Data);
+                this.UpdateInfomation = new UpdateInfomationViewModel(downloadResult.Data, id);
                 this.ShowModal();
-            } else
+            }
+            else
             {
                 this.OnInstallUpdateClick(id, downloadResult.Data.archivePath);
             }
         }
 
         /// <summary>
-        /// 更新確認ボタンがクリックされたとき
+        /// 更新実行ボタンがクリックされたとき
         /// </summary>
         /// <param name="id"></param>
         /// <param name="archivePath"></param>
@@ -194,7 +214,26 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
             {
                 this.AlertMessage = result.Message ?? "不明なエラーによりアップデートに失敗しました。";
                 this.ShowAlert();
+            } else
+            {
+                this.AlertMessage = "更新が完了しました。";
+                this.ShowAlert(AlertType.Info);
             }
+        }
+
+        /// <summary>
+        /// 更新確認ボタンがクリックされたとき
+        /// </summary>
+        /// <returns></returns>
+        public async Task OnCheckForUpdateClick()
+        {
+            this.AlertMessage = "更新を確認します。";
+            this.ShowAlert(AlertType.Info);
+
+            await WS::AddonPage.AddonManager.CheckForUpdates();
+
+            this.AlertMessage = "更新を確認しました。";
+            this.ShowAlert(AlertType.Info);
         }
 
         #endregion
@@ -204,6 +243,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         {
             WS::AddonPage.AddonStatusContainer.ListChanged -= this.OnListChanged;
             this._listChangedHandler.Clear();
+            this._alertChangedHandler.Clear();
+            this._modalChangeHandler.Clear();
         }
     }
 }

@@ -11,12 +11,6 @@ namespace Niconicome.Workspaces
 {
     public static class AddonPage
     {
-        public static ILocalSettingsContainer SettingsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingsContainer>();
-
-        public static IApplicationPowerManager PowerManager { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
-
-        public static ISnackbarHandler Queue { get; private set; } = Mainpage.SnackbarHandler.CreateNewHandler();
-
         /// <summary>
         /// ローカル情報
         /// </summary>
@@ -41,5 +35,10 @@ namespace Niconicome.Workspaces
         /// Blazorヘルパークラス
         /// </summary>
         public static IBlazorHelper BlazorHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IBlazorHelper>();
+
+        /// <summary>
+        /// マネージャー
+        /// </summary>
+        public static IAddonManager AddonManager { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonManager>();
     }
 }

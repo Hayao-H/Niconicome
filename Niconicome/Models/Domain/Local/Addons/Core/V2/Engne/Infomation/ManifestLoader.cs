@@ -157,7 +157,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
                 return new AttemptResult() { Message = "マニフェストバージョンが空白です。" };
             }
 
-            if (manifest.ManifestVersion != "1.0")
+            if (manifest.ManifestVersion != Const::AddonConstant.ManiestVersion)
             {
                 return new AttemptResult() { Message = $"対応していないマニフェストバージョンです。({manifest.ManifestVersion})" };
             }
@@ -216,17 +216,19 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
                 }
             }
 
+            var permissions = manifest.Permissions.Select(p => this._permissionsHandler.GetPermission(p)).Where(p => p is not null).ToList().As<List<Permission>>();
+
             var addon = new AddonInfomation()
             {
                 Name = manifest.Name,
                 Author = manifest.Author,
                 Description = manifest.Description,
                 Identifier = manifest.Identifier,
-                Permissions = manifest.Permissions.Select(p => this._permissionsHandler.GetPermission(p)).Where(p => p is not null).ToList().As<List<Permission>>().AsReadOnly(),
+                Permissions = permissions.AsReadOnly(),
                 HostPermissions = manifest.HostPermissions.AsReadOnly(),
-                AutoUpdate = manifest.AutoUpdatePolicy.AutoUpdate,
+                RemoteUpdate = permissions.Contains(Permissions.RemoteUpdate),
                 UpdateJsonURL = manifest.AutoUpdatePolicy.UpdateJsonUrl,
-                ScriptPath = Path.Combine(AppContext.BaseDirectory,Const::FileFolder.AddonsFolder,directoryName,manifest.Scripts.BackgroundScript),
+                ScriptPath = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, directoryName, manifest.Scripts.BackgroundScript),
                 Version = vResult && version is not null ? version : new Version(),
                 IconPath = GetIconPath(),
                 TargetAPIVersion = avResult && apiVerison is not null ? apiVerison : new Version(),

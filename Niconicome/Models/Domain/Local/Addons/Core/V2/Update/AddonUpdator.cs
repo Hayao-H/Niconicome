@@ -156,14 +156,19 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
                 return AttemptResult<string>.Fail("更新ファイルのダウンロードに失敗しました。");
             }
 
-            string path = Path.Combine(AppContext.BaseDirectory, FileFolder.AddonsTmpDirectory, Guid.NewGuid().ToString("D"), FileFolder.DefaultAddonExtension);
+            string path = Path.Combine(AppContext.BaseDirectory, FileFolder.AddonsTmpDirectory, Guid.NewGuid().ToString("D") + FileFolder.DefaultAddonExtension);
 
+            var info = new FileInfo(path);
+            if (info.Directory is not null && !info.Directory.Exists)
+            {
+                info.Directory.Create();
+            }
 
             try
             {
                 using var stream = await res.Content.ReadAsStreamAsync();
-                using var file = new FileStream(path, FileMode.OpenOrCreate);
-                file.CopyTo(stream);
+                using var file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                stream.CopyTo(file);
             }
             catch (Exception ex)
             {

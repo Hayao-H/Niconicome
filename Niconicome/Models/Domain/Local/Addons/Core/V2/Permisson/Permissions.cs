@@ -25,7 +25,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson
 
         public static Permission DownloadSettings { get; private set; } = new(PermissionNames.DownloadSettings, "Download Settings API。この権限を持つ拡張機能はダウンロード設定の変更、動画のステージング、ダウンロードの実行、ダウンロードのキャンセル及びダウンロード可否の読み取りが可能になります。");
 
-        public static Permission AutoUpdate { get; private set; } = new(PermissionNames.AutoUpdate, "Auto Update API。この権限を持つ拡張機能は自身の自動更新が可能になります。");
+        public static Permission RemoteUpdate { get; private set; } = new(PermissionNames.RemoteUpdate, "Remote Update API。この権限を持つ拡張機能は自身のリモート更新が可能になります。");
     }
 
     public static class PermissionNames
@@ -46,7 +46,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson
 
         public static string DownloadSettings { get; private set; } = "downloadSettings";
 
-        public static string AutoUpdate { get; private set; } = "autoUpdate";
+        public static string RemoteUpdate { get; private set; } = "remoteUpdate";
     }
 
     public class Permission

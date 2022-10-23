@@ -75,9 +75,9 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
         string UpdateJsonURL { get; }
 
         /// <summary>
-        /// 自動更新フラグ
+        /// リモート更新フラグ
         /// </summary>
-        bool AutoUpdate { get; }
+        bool RemoteUpdate { get; }
 
         /// <summary>
         /// バージョン
@@ -127,7 +127,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
 
         public string UpdateJsonURL { get; init; } = "";
 
-        public bool AutoUpdate { get; init; }
+        public bool RemoteUpdate { get; init; }
 
         public Version Version { get; init; } = new();
 

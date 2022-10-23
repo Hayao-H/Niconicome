@@ -8,6 +8,8 @@ namespace Niconicome.Models.Const
 {
     public class AddonConstant
     {
+        public const string ManiestVersion = "1.0";
+
         public static Version APIVersion { get; private set; } = new("1.2.0");
 
         public static string UninstalledAddonsFile { get; private set; } = "uninstalled.dat";

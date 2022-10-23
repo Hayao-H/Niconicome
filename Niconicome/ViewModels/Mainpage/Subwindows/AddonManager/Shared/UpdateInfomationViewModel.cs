@@ -10,9 +10,9 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared
 {
     public class UpdateInfomationViewModel
     {
-        public UpdateInfomationViewModel(UpdateInfomation infomation)
+        public UpdateInfomationViewModel(UpdateInfomation infomation,string ID)
         {
-            this.ID = infomation.AddonInfomation.ID;
+            this.ID = ID;
             this.Name = infomation.AddonInfomation.Name;
             this.NewPermissions = infomation.NewPermissions.AsReadOnly();
             this.ArchivePath = infomation.archivePath;

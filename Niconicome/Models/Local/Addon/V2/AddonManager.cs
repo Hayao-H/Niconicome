@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AngleSharp.Dom;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
@@ -66,12 +67,22 @@ namespace Niconicome.Models.Local.Addon.V2
 
         private readonly IAddonUpdateChecker _updateChecker;
 
+        private bool _isCheckingForUpdate;
+
         #endregion
 
         #region Method
 
         public IAttemptResult InitializeAddons()
         {
+            if (this._isCheckingForUpdate)
+            {
+                return AttemptResult.Fail("更新確認中です。");
+            } else
+            {
+                this._isCheckingForUpdate = true;
+            }
+
             IAttemptResult<LoadResult> loadResult = this._loader.LoadAddons(this.FactoryFunction);
 
             if (!loadResult.IsSucceeded || loadResult.Data is null)
@@ -86,7 +97,7 @@ namespace Niconicome.Models.Local.Addon.V2
             foreach (var item in loadResult.Data.Succeeded) this._statusContainer.Add(item, ListType.Loaded);
             foreach (var item in loadResult.Data.Failed) this._statusContainer.Add(item, ListType.Failed);
 
-            this._statusContainer.Add(new UpdateCheckInfomation(true, loadResult.Data.Succeeded.First(), new Version("3.0.0"), "https://example.com"),ListType.Update);
+            this._isCheckingForUpdate = false;
 
             return AttemptResult.Succeeded();
 
@@ -107,7 +118,7 @@ namespace Niconicome.Models.Local.Addon.V2
 
             foreach (var info in this._statusContainer.LoadedAddons)
             {
-                if (!info.AutoUpdate) continue;
+                if (!info.RemoteUpdate) continue;
 
                 //アップデートを確認
                 IAttemptResult<UpdateCheckInfomation> result = await this._updateChecker.CheckForUpdate(info);
