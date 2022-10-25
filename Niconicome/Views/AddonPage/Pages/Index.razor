@@ -58,7 +58,7 @@
 
 <div class="my-4">
 	<div class="px-1 text-muted d-flex justify-content-between align-items-stretch">
-		<h5 class="align-self-center">アドオンの管理</h5>
+		<h5 class="align-self-center">アドオンマネージャー</h5>
 		<div class="dropdown">
 			<button class="btn btn-light dropdown-toggle" type="button" id="configButton" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
 				<i class="fa-solid fa-gear" />
@@ -87,8 +87,10 @@
 							<img class="d-block mx-auto" height="32" width="32" src="@item.IconData" />
 						</div>
 						<div class="col-md-10 card-body p-2">
-							<h5 class="card-title">@item.Name <span class="text-muted fs-6">by @(item.Author), Ver.@(item.Version)</span></h5>
-							<p class="fw-normal fs-6">@item.Description</p>
+							<a class="text-reset text-decoration-none" href="/addons/about/@(item.ID)">
+								<h5 class="card-title">@item.Name <span class="text-muted fs-6">by @(item.Author), Ver.@(item.Version)</span></h5>
+								<p class="fw-normal fs-6">@item.Description</p>
+							</a>
 						</div>
 						<div class="dropdown col-md-1 d-flex justify-content-centor align-items-center">
 							<button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">

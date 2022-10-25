@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 using Const = Niconicome.Models.Const;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared
@@ -13,10 +14,12 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared
     {
         public AddonInfomationViewModel(IAddonInfomation infomation)
         {
-            this.ID=infomation.ID;
-            this.Name=infomation.Name;
-            this.Author=infomation.Author;
-            this.Description=infomation.Description;
+            this.ID = infomation.ID;
+            this.Name = infomation.Name;
+            this.Author = infomation.Author;
+            this.Description = infomation.Description;
+            this.HomePage = string.IsNullOrEmpty(infomation.HomePage) ? null : infomation.HomePage;
+            this.Permissions = infomation.Permissions;
 
             string iconPath = Path.Combine(AppContext.BaseDirectory, Const::FileFolder.AddonsFolder, infomation.DirectoryName, infomation.IconPath);
             var stream = File.ReadAllBytes(iconPath);
@@ -43,7 +46,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared
         /// <summary>
         /// 詳細情報
         /// </summary>
-        public string Description { get; init; } 
+        public string Description { get; init; }
 
         /// <summary>
         /// アイコンのパス
@@ -54,5 +57,15 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Shared
         /// バージョン
         /// </summary>
         public string Version { get; init; }
+
+        /// <summary>
+        /// ホームページ
+        /// </summary>
+        public string? HomePage { get; init; }
+
+        /// <summary>
+        /// 権限の一覧
+        /// </summary>
+        public IReadOnlyList<Permission> Permissions { get; init; }
     }
 }

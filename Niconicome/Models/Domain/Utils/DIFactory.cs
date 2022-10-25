@@ -266,6 +266,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonsCoreV2::Utils.IHostPermissionsHandler, AddonsCoreV2::Utils.HostPermissionsHandler>();
             services.AddTransient<AddonVM::Pages.IndexViewModel>();
             services.AddTransient<AddonVM::Pages.InstallViewModel>();
+            services.AddTransient<AddonVM::Pages.AboutViewModel>();
             services.AddTransient<Utils::IBlazorHelper, Utils::BlazorHelper>();
 
             return services.BuildServiceProvider();

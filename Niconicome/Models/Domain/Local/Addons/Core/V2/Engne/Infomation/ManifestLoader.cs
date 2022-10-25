@@ -223,6 +223,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
                 Name = manifest.Name,
                 Author = manifest.Author,
                 Description = manifest.Description,
+                HomePage = manifest.Homepage,
                 Identifier = manifest.Identifier,
                 Permissions = permissions.AsReadOnly(),
                 HostPermissions = manifest.HostPermissions.AsReadOnly(),
