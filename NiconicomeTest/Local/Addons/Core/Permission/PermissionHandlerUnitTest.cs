@@ -1,5 +1,5 @@
 ﻿using System;
-using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 using NUnit.Framework;
 
 namespace NiconicomeTest.Local.Addons.Core.Permission

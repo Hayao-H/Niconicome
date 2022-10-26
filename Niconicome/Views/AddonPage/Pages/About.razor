@@ -1,0 +1,82 @@
+﻿@inject VM::Mainpage.Subwindows.AddonManager.Pages.AboutViewModel DataContext
+@page "/addons/about/{ID}"
+
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="/addons">アドオンマネージャー</a></li>
+		<li class="breadcrumb-item active">アドオン情報</li>
+	</ol>
+</nav>
+
+@if (DataContext.Infomation is not null)
+{
+	<div class="card">
+		<div class="card-header">
+			<ul class="nav nav-tabs card-header-tabs" role="tablist">
+				<li class="nav-item" role="presentation">
+					<a class="nav-link active" href="#about" aria-current="true" data-bs-toggle="tab" data-bs-target="#about">情報</a>
+				</li>
+				<li class="nav-item" role="presentation">
+					<a class="nav-link" href="#permissons" data-bs-toggle="tab" data-bs-target="#permissions">権限</a>
+				</li>
+			</ul>
+		</div>
+		<div class="card-body tab-content">
+			<div class="tab-pane active" id="about" role="tabpanel">
+				<div class="row">
+					<div class="col-md-1 d-flex align-items-center">
+						<img class="d-block mx-auto" height="32" width="32" src="@(DataContext.Infomation.IconData)" />
+					</div>
+					<div class="col-md-11">
+						<h5 class="card-title">@(DataContext.Infomation.Name)</h5>
+						<p class="fw-normal fs-6">@(DataContext.Infomation.Description)</p>
+					</div>
+				</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<p class="m-0">作者</p>
+						<p class="m-0">@(DataContext.Infomation.Author)</p>
+					</li>
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<p class="m-0">バージョン</p>
+						<p class="m-0">@(DataContext.Infomation.Version)</p>
+					</li>
+					@if (DataContext.Infomation.HomePage is not null)
+					{
+						<li class="list-group-item d-flex justify-content-between">
+							<p class="m-0">ホームページ</p>
+							<a href="@(DataContext.Infomation.HomePage)">@(DataContext.Infomation.HomePage)</a>
+						</li>
+					}
+				</ul>
+			</div>
+			<div class="tab-pane" id="permissions" role="tabpanel">
+				<ul class="list-group">
+					@foreach(var permission in DataContext.Infomation.Permissions)
+					{
+						<li class="list-group-item text-wrap"><i class="fa-solid fa-check me-2" style="color:lightgreen;"></i>@(permission.Description)</li>
+					}
+				</ul>
+			</div>
+		</div>
+	</div>
+}
+else
+{
+	<div class="alert alert-danger" role="alert">
+		アドオン情報の取得に失敗しました。
+	</div>
+}
+
+@code {
+
+	[Parameter]
+	public string? ID { get; set; }
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		DataContext.Initialize(this.ID!);
+		this.StateHasChanged();
+	}
+}

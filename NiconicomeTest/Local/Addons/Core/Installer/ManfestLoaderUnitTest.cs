@@ -5,8 +5,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core;
-using Niconicome.Models.Domain.Local.Addons.Core.Installer;
-using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 using Niconicome.Models.Domain.Local.Addons.Manifest.V1;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Helper.Result;
@@ -39,15 +39,15 @@ namespace NiconicomeTest.Local.Addons.Core.Installer
         [Test]
         public void マニフェストを読み込む()
         {
-            IAttemptResult<AddonInfomation> result = this.manifestLoader!.LoadManifest("");
+            IAttemptResult<IAddonInfomation> result = this.manifestLoader!.LoadManifest("","");
 
             Assert.That(result.IsSucceeded, Is.True);
             Assert.That(result.Data, Is.Not.Null);
-            Assert.That(result.Data!.Name.Value, Is.EqualTo("Test"));
-            Assert.That(result.Data!.Author.Value, Is.EqualTo("Test"));
-            Assert.That(result.Data!.Description.Value, Is.EqualTo("Test"));
-            Assert.That(result.Data!.Identifier.Value, Is.EqualTo("Test_ID"));
-            Assert.That(result.Data!.Version.Value.ToString(), Is.EqualTo("1.0.0"));
+            Assert.That(result.Data!.Name, Is.EqualTo("Test"));
+            Assert.That(result.Data!.Author, Is.EqualTo("Test"));
+            Assert.That(result.Data!.Description, Is.EqualTo("Test"));
+            Assert.That(result.Data!.Identifier, Is.EqualTo("Test_ID"));
+            Assert.That(result.Data!.Version.ToString(), Is.EqualTo("1.0.0"));
 
         }
     }

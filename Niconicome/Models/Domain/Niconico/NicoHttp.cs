@@ -37,6 +37,14 @@ namespace Niconicome.Models.Domain.Niconico
         /// <param name="uri"></param>
         /// <returns></returns>
         Task<HttpResponseMessage> OptionAsync(Uri uri);
+
+        /// <summary>
+        /// カスタムリクエスト
+        /// </summary>
+        /// <param name="requestMessage"></param>
+        /// <param name="optn"></param>
+        /// <returns></returns>
+        Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, HttpCompletionOption optn = HttpCompletionOption.ResponseContentRead);
     }
 
     public class NicoHttp : INicoHttp
@@ -94,6 +102,10 @@ namespace Niconicome.Models.Domain.Niconico
             return await this._client.SendAsync(request);
         }
 
+        public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
+        {
+            return await this._client.SendAsync(requestMessage, completionOption);
+        }
 
         #endregion
 

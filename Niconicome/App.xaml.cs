@@ -7,13 +7,11 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.Application;
 using Niconicome.ViewModels;
 using Niconicome.Views;
-using Niconicome.Views.AddonPage;
-using Niconicome.Views.AddonPage.Install;
+using Niconicome.Views.AddonPage.V2;
 using Niconicome.Views.Controls.MVVM;
 using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.Unity;
-using AM = Niconicome.Views.AddonPage;
 
 namespace Niconicome
 {
@@ -31,6 +29,7 @@ namespace Niconicome
             TaskScheduler.UnobservedTaskException += this.TaskScheduler_UnobservedTaskException;
 #pragma warning restore CS8622
             AppDomain.CurrentDomain.UnhandledException += this.CurrentDomain_UnhandledException;
+
             this.RunStartUpTask();
         }
 
@@ -41,14 +40,9 @@ namespace Niconicome
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterDialog<AddonManagerWindow>(nameof(AddonManagerWindow));
-            containerRegistry.RegisterDialog<AddonInstallWindow>(nameof(AddonInstallWindow));
             containerRegistry.RegisterDialog<CommonMessageBox>(nameof(CommonMessageBox));
             containerRegistry.RegisterDialog<DownloadTasksWindows>(nameof(DownloadTasksWindows));
-            containerRegistry.RegisterForNavigation<FileOpenPage>();
-            containerRegistry.RegisterForNavigation<AddonLoadPage>();
-            containerRegistry.RegisterForNavigation<AddonInstallPage>();
-            containerRegistry.RegisterForNavigation<AM::Pages.MainPage>();
+            containerRegistry.RegisterDialog<MainManager>(nameof(MainManager));
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Niconicome.Models.Domain.Local.Addons.Core.Utils;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Utils;
 using NUnit.Framework;
 
 namespace NiconicomeTest.Local.Addons.Core.Utils

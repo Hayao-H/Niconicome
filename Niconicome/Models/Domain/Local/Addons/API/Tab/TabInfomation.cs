@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Local.Addons.Core;
-using Niconicome.Models.Domain.Local.Addons.Core.Utils;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Utils;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Tab
 {
@@ -13,7 +13,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         /// <summary>
         /// アドオン情報
         /// </summary>
-        AddonInfomation AddonInfomation { get; }
+        IAddonInfomation AddonInfomation { get; }
 
         /// <summary>
         /// タイトル
@@ -41,7 +41,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
         /// 初期化
         /// </summary>
         /// <param name="infomation"></param>
-        void Initialize(AddonInfomation infomation, string title, TabType tabType);
+        void Initialize(IAddonInfomation infomation, string title, TabType tabType);
     }
 
     public class TabInfomation : ITabInfomation
@@ -61,7 +61,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
 
         #region Props
 
-        public AddonInfomation AddonInfomation { get; private set; } = new();
+        public IAddonInfomation AddonInfomation { get; private set; } = new AddonInfomation();
 
         public string Title { get; private set; } = string.Empty;
 
@@ -73,7 +73,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Tab
 
         #region Methods
 
-        public void Initialize(AddonInfomation infomation, string title,TabType tabType)
+        public void Initialize(IAddonInfomation infomation, string title,TabType tabType)
         {
             if (this.isInitialized) return;
 

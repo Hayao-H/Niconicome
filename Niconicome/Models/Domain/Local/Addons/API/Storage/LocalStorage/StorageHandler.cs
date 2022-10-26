@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Local.Addons.Core.Installer;
 using Niconicome.Models.Helper.Result;
-using Windows.UI.Composition;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 {
@@ -16,9 +14,9 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
         /// 初期化する
         /// </summary>
         /// <param name="addonName"></param>
-        /// <param name="packageID"></param>
+        /// <param name="directoryName"></param>
         /// <returns></returns>
-        void Initialize(string addonName, string packageID);
+        void Initialize(string addonName, string directoryName);
 
         /// <summary>
         /// 値をセットする
@@ -58,16 +56,16 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 
         private readonly IStorageHelper _helper;
 
-        private string? _packageID;
+        private string? _directoryName;
 
         #endregion
 
         #region Method
 
-        public void Initialize(string addonName, string packageID)
+        public void Initialize(string addonName, string directoryName)
         {
-            this._helper.Initialize(addonName, packageID);
-            this._packageID = packageID;
+            this._helper.Initialize(addonName, directoryName);
+            this._directoryName = directoryName;
         }
 
         public IAttemptResult SetItem(string key, string value)
@@ -105,7 +103,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage
 
         private void CheckIfInitialized()
         {
-            if (this._packageID is null) throw new InvalidOperationException("NOT_INITIALIZED");
+            if (this._directoryName is null) throw new InvalidOperationException("NOT_INITIALIZED");
         }
 
         #endregion

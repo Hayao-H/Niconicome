@@ -8,6 +8,7 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 using Niconicome.Views;
+using Niconicome.Views.AddonPage.V2;
 using Prism.Ioc;
 using Prism.Regions;
 using Prism.Services.Dialogs;
@@ -23,6 +24,12 @@ namespace Niconicome.Models.Utils
         /// <param name="regionManager"></param>
         /// <param name="dialogService"></param>
         void OpenDownloadTaskWindow(IRegionManager regionManager, IDialogService dialogService);
+
+        /// <summary>
+        /// アドオンマネージャーを新しいタブで開く
+        /// </summary>
+        /// <param name="regionManager"></param>
+        void OpenAddonManager(IRegionManager regionManager);
     }
 
     public class WindowTabHelper : IWindowTabHelper
@@ -68,6 +75,26 @@ namespace Niconicome.Models.Utils
                 dialogService.Show(nameof(DownloadTasksWindows));
             }
         }
+
+        public void OpenAddonManager(IRegionManager regionManager)
+        {
+
+            if (Application.Current is not PrismApplication app) return;
+
+            IContainerProvider container = app.Container;
+
+            if (this._localState.IsAddonManagerOpen && this._settingHandler.GetBoolSetting(SettingsEnum.SingletonWindows))
+            {
+                return;
+            }
+
+            IRegion region = regionManager.Regions[LocalConstant.TopTabRegionName];
+            var view = container.Resolve<MainManager>();
+            region.Add(view);
+            region.Activate(view);
+            this._localState.IsAddonManagerOpen = true;
+        }
+
 
         #endregion
     }

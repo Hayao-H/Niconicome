@@ -16,6 +16,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Manifest
 
         public string Description { get; set; } = string.Empty;
 
+        public string Homepage { get; set; } = string.Empty;
+
         public string Version { get; set; } = "1.0.0";
 
         public string Identifier { get; set; } = string.Empty;

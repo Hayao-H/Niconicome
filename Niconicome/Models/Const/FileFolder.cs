@@ -21,10 +21,16 @@ namespace Niconicome.Models.Const
 
         public const string DefaultJpegFileExt = ".jpg";
 
+        public const string DefaultAddonExtension = ".zip";
+
         public const string UserChromePath = @"chrome\userChrome.json";
 
         public const string UserChromeFileName = @"userChrome.json";
 
         public const string AddonsFolder = @"addons";
+
+        public const string ManifestFileName = "manifest.json";
+
+        public const string AddonsTmpDirectory = @"tmp\addons";
     }
 }

@@ -1,14 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.IO.Packaging;
 using LiteDB;
-using Niconicome.Models.Domain.Local.Addons.Core.Engine;
-using Niconicome.Models.Domain.Local.IO;
-using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
-using Reactive.Bindings.ObjectExtensions;
-using Windows.ApplicationModel;
 using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Storage.LocalStorage

@@ -1,0 +1,16 @@
+﻿@page "/"
+@inject Niconicome.ViewModels.Blazor.TransitionViewModel dataContext;
+@inject NavigationManager navigation;
+
+<h3>転送</h3>
+
+@code {
+	protected override void OnInitialized()
+	{
+		var url = dataContext.PageToNavigate;
+		if (!string.IsNullOrEmpty(url))
+		{
+			navigation.NavigateTo(url);
+		}
+	}
+}

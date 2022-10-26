@@ -23,6 +23,7 @@ using Niconicome.Models.Utils.InitializeAwaiter;
 using Niconicome.Models.Network.Download.DLTask;
 using System.Windows.Controls;
 using Niconicome.Models.Local.OS;
+using Niconicome.Models.Local.Addon.V2;
 
 namespace Niconicome.Workspaces
 {
@@ -94,6 +95,16 @@ namespace Niconicome.Workspaces
         /// クリップボード管理
         /// </summary>
         public static IClipbordManager ClipbordManager { get; private set; } = DIFactory.Provider.GetRequiredService<IClipbordManager>();
+
+        /// <summary>
+        /// ページ遷移管理クラス
+        /// </summary>
+        public static IBlazorPageManager BlazorPageManager { get; private set; }=DIFactory.Provider.GetRequiredService<IBlazorPageManager>();
+
+        /// <summary>
+        /// アドンマネージャー
+        /// </summary>
+        public static IAddonManager AddonManager { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonManager>();
 
     }
 }

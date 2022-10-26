@@ -121,11 +121,14 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenAddonManagerCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    if (WS::Mainpage.LocalState.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
-                    {
-                        return;
-                    }
-                    dialogService.Show(nameof(AddonManagerWindow));
+                    ///if (WS::Mainpage.LocalState.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
+                    ///{
+                    ///    return;
+                    ///}
+                    ///dialogService.Show(nameof(AddonManagerWindow));
+
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons");
+                    WS::Mainpage.WindowTabHelper.OpenAddonManager(this.RegionManager);
                 });
 
 

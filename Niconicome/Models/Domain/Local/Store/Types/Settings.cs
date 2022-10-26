@@ -181,7 +181,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string ThumbnailSuffix { get; private set; } = "thumbnailsuffix";
         public static string OwnerCommentSuffix { get; private set; } = "ownercommentsuffix";
         public static string IsDeveloppersMode { get; private set; } = "isdeveloppersmode";
-        public static string IsAddonDebuggingEnable { get; private set; } = "isaddondebuggingenable";
         public static string IsDlTImerEveryDayEnable { get; private set; } = "isdltimereverydayenable";
         public static string PostDownloadAction { get; private set; } = "postdownloadaction";
         public static string EnonomyQualitySuffix { get; private set; } = "enonomyqualitysuffix";
@@ -195,6 +194,5 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string CommentCountPerBlock { get; private set; } = "commentcountperblock";
         public static string IsAppendingToLocalCommentEnable { get; private set; } = "isappendingtolocalcommentenable";
         public static string IsOmittingXmlDeclarationIsEnable { get; private set; } = "isomittingxmldeclarationisenable";
-
     }
 }

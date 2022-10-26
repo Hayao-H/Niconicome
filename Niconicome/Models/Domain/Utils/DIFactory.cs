@@ -1,11 +1,11 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
-using Reactive.Bindings.Extensions;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
-using Addons = Niconicome.Models.Local.Addon;
-using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
+using AddonsCoreV2 = Niconicome.Models.Domain.Local.Addons.Core.V2;
 using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
+using AddonsV2 = Niconicome.Models.Local.Addon.V2;
+using AddonVM = Niconicome.ViewModels.Mainpage.Subwindows.AddonManager;
 using Auth = Niconicome.Models.Auth;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
 using CommentConverter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
@@ -41,7 +41,7 @@ using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
 using Niconico = Niconicome.Models.Domain.Niconico;
-using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using OS = Niconicome.Models.Local.OS;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using Register = Niconicome.Models.Network.Register;
@@ -57,8 +57,8 @@ using Timer = Niconicome.Models.Local.Timer;
 using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
+using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
-using OS = Niconicome.Models.Local.OS;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -66,8 +66,9 @@ namespace Niconicome.Models.Domain.Utils
     {
         private static ServiceProvider GetProvider()
         {
-
             var services = new ServiceCollection();
+            services.AddWpfBlazorWebView();
+            services.AddBlazorWebViewDeveloperTools();
             services.AddHttpClient<Niconico::INicoHttp, Niconico::NicoHttp>()
                 .ConfigureHttpMessageHandlerBuilder(builder =>
                 {
@@ -202,24 +203,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
             services.AddSingleton<Playlist::IVideoInfoContainer, Playlist::VideoInfoContainer>();
             services.AddSingleton<Playlist::ILightVideoListinfoHandler, Playlist::LightVideoListinfoHandler>();
-            services.AddTransient<Permissions::IPermissionsHandler, Permissions::PermissionsHandler>();
-            services.AddTransient<AddonsCore::IJavaScriptExecuter, AddonsCore::JavaScriptExecuter>();
-            services.AddTransient<AddonsCore::AutoUpdate.Github.IReleaseChecker, AddonsCore::AutoUpdate.Github.ReleaseChecker>();
-            services.AddSingleton<AddonsCore::IAddonInfomationsContainer, AddonsCore::AddonInfomationsContainer>();
-            services.AddSingleton<AddonsCore::Engine.Context.IAddonContexts, AddonsCore::Engine.Context.AddonContexts>();
-            services.AddSingleton<AddonsCore::Engine.Context.IAddonContext, AddonsCore::Engine.Context.AddonContext>();
-            services.AddSingleton<AddonsCore::Engine.IAddonEngine, AddonsCore::Engine.AddonEngine>();
-            services.AddTransient<AddonsCore::Engine.IAddonLogger, AddonsCore::Engine.AddonLogger>();
-            services.AddTransient<AddonsCore::Installer.IAddonStoreHandler, AddonsCore::Installer.AddonStoreHandler>();
-            services.AddTransient<AddonsCore::Installer.IAddonInstaller, AddonsCore::Installer.AddonInstaller>();
-            services.AddTransient<AddonsCore::Installer.IManifestLoader, AddonsCore::Installer.ManifestLoader>();
-            services.AddSingleton<Addons::IAddonHandler, Addons::AddonHandler>();
-            services.AddSingleton<Addons::IAddonInstallManager, Addons::AddonInstallManager>();
             services.AddTransient<AddonAPI.Local.IO.IOutput, AddonAPI.Local.IO.Output>();
             services.AddTransient<AddonAPI.Net.Http.Fetch.IFetch, AddonAPI.Net.Http.Fetch.Fetch>();
             services.AddTransient<AddonAPI.Net.Http.Fetch.IAddonHttp, AddonAPI.Net.Http.Fetch.AddonHttp>();
             services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
-            services.AddTransient<AddonsCore::Installer.IAddonUninstaller, AddonsCore::Installer.AddonUninstaller>();
             services.AddSingleton<AddonsDomainAPI::Hooks.IHooksManager, AddonsDomainAPI::Hooks.HooksManager>();
             services.AddTransient<AddonAPI::Net.Hooks.IHooks, AddonAPI::Net.Hooks.Hooks>();
             services.AddTransient<AddonAPI::Local.IO.ILog, AddonAPI::Local.IO.Log>();
@@ -233,7 +220,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonAPI::Local.Storage.ILocalStorage, AddonAPI::Local.Storage.LocalStorage>();
             services.AddTransient<AddonsDomainAPI::Resource.IResourceHander, AddonsDomainAPI::Resource.ResourceHander>();
             services.AddTransient<AddonAPI::Local.Resource.IPublicResourceHandler, AddonAPI::Local.Resource.PublicResourceHandler>();
-            services.AddTransient<AddonsCore::Utils.IHostPermissionsHandler, AddonsCore::Utils.HostPermissionsHandler>();
             services.AddTransient<AddonsDomainAPI::Tab.ITabInfomation, AddonsDomainAPI::Tab.TabInfomation>();
             services.AddSingleton<AddonAPI::Local.Tab.ITabsContainer, AddonAPI::Local.Tab.TabsContainer>();
             services.AddTransient<AddonAPI::Local.Tab.ITabItem, AddonAPI::Local.Tab.TabItem>();
@@ -260,6 +246,30 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
             services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
             services.AddSingleton<OS::IClipbordManager, OS::ClipbordManager>();
+            services.AddTransient<VM::Blazor.TransitionViewModel>();
+            services.AddSingleton<State::IBlazorPageManager, State::BlazorPageManager>();
+            services.AddTransient<AddonsV2::IAddonInstallManager, AddonsV2::AddonInstallManager>();
+            services.AddTransient<AddonsV2::IAddonManager, AddonsV2::AddonManager>();
+            services.AddSingleton<AddonsV2::IAddonStatusContainer, AddonsV2::AddonStatusContainer>();
+            services.AddTransient<AddonsCoreV2::Engine.IAddonLogger, AddonsCoreV2::Engine.AddonLogger>();
+            services.AddTransient<AddonsCoreV2::Engine.Context.IAddonContext, AddonsCoreV2::Engine.Context.AddonContext>();
+            services.AddSingleton<AddonsCoreV2::Engine.Context.IAddonContextsContainer, AddonsCoreV2::Engine.Context.AddonContextsContainer>();
+            services.AddTransient<AddonsCoreV2::Engine.Infomation.IManifestLoader, AddonsCoreV2::Engine.Infomation.ManifestLoader>();
+            services.AddTransient<AddonsCoreV2::Engine.JavaScript.IJavaScriptEngine, AddonsCoreV2::Engine.JavaScript.JavaScriptEngine>();
+            services.AddTransient<AddonsCoreV2::Install.IAddonExtractor, AddonsCoreV2::Install.AddonExtractor>();
+            services.AddTransient<AddonsCoreV2::Install.IAddonInstaller, AddonsCoreV2::Install.AddonInstaller>();
+            services.AddTransient<AddonsCoreV2::Loader.IAddonLoader, AddonsCoreV2::Loader.AddonLoader>();
+            services.AddTransient<AddonsCoreV2::Permisson.IPermissionsHandler, AddonsCoreV2::Permisson.PermissionsHandler>();
+            services.AddTransient<AddonsCoreV2::Uninstall.IAddonUninstaller, AddonsCoreV2::Uninstall.AddonUninstaller>();
+            services.AddTransient<AddonsCoreV2::Update.IAddonUpdateChecker, AddonsCoreV2::Update.AddonUpdateChecker>();
+            services.AddTransient<AddonsCoreV2::Update.IAddonUpdator, AddonsCoreV2::Update.AddonUpdator>();
+            services.AddTransient<AddonsCoreV2::Utils.IHostPermissionsHandler, AddonsCoreV2::Utils.HostPermissionsHandler>();
+            services.AddTransient<AddonsCoreV2::Utils.IAddonSettingsHandler, AddonsCoreV2::Utils.AddonSettingsHandler>();
+            services.AddTransient<AddonVM::Pages.IndexViewModel>();
+            services.AddTransient<AddonVM::Pages.InstallViewModel>();
+            services.AddTransient<AddonVM::Pages.AboutViewModel>();
+            services.AddTransient<Utils::IBlazorHelper, Utils::BlazorHelper>();
+
             return services.BuildServiceProvider();
         }
 
@@ -277,6 +287,11 @@ namespace Niconicome.Models.Domain.Utils
 
                 return DIFactory.provider;
             }
+        }
+
+        public static T Resolve<T>() where T : notnull
+        {
+            return Provider.GetRequiredService<T>();
         }
     }
 }

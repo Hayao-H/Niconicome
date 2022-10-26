@@ -42,6 +42,12 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         void AddMessageHandler(Action<string> handler);
 
         /// <summary>
+        /// タブを閉じた際のハンドラを追加
+        /// </summary>
+        /// <param name="handler"></param>
+        void AddCloseHandler(Action<ITabItem> handler);
+
+        /// <summary>
         /// 初期化処理が完了するまで待機
         /// </summary>
         /// <returns></returns>
@@ -96,6 +102,8 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
 
         private Action<string>? _messageHandler;
 
+        private event Action<ITabItem>? _closeHandler;
+
         private bool _isInitialized;
 
         #endregion
@@ -125,6 +133,15 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
             if (!this._isInitialized) throw new InvalidOperationException("Not Initialized");
         }
 
+        private void OnClose()
+        {
+            try
+            {
+                this._closeHandler?.Invoke(this);
+            }
+            catch { }
+        }
+
         #endregion
 
         #region Methods
@@ -132,7 +149,15 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
         public bool Close()
         {
             if (this.IsClosed) return false;
-            return this.IsClosed = this._closeFunc(this);
+            bool result = this._closeFunc(this);
+
+            if (result)
+            {
+                this.OnClose();
+            }
+
+            return this.IsClosed = result;
+
         }
 
         public void NavigateString(string html)
@@ -179,6 +204,12 @@ namespace Niconicome.Models.Local.Addon.API.Local.Tab
             this.CheckIfInitialized();
             this._webView2Handler.PostMessage(message);
         }
+
+        public void AddCloseHandler(Action<ITabItem> handler)
+        {
+            this._closeHandler += handler;
+        }
+
 
         #endregion
 
