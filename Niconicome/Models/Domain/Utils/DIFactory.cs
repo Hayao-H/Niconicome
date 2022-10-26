@@ -264,6 +264,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonsCoreV2::Update.IAddonUpdateChecker, AddonsCoreV2::Update.AddonUpdateChecker>();
             services.AddTransient<AddonsCoreV2::Update.IAddonUpdator, AddonsCoreV2::Update.AddonUpdator>();
             services.AddTransient<AddonsCoreV2::Utils.IHostPermissionsHandler, AddonsCoreV2::Utils.HostPermissionsHandler>();
+            services.AddTransient<AddonsCoreV2::Utils.IAddonSettingsHandler, AddonsCoreV2::Utils.AddonSettingsHandler>();
             services.AddTransient<AddonVM::Pages.IndexViewModel>();
             services.AddTransient<AddonVM::Pages.InstallViewModel>();
             services.AddTransient<AddonVM::Pages.AboutViewModel>();

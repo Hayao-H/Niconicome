@@ -13,6 +13,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Addon.API;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
+using Niconicome.Models.Local.Settings;
 using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Local.Addon.V2
@@ -44,17 +45,23 @@ namespace Niconicome.Models.Local.Addon.V2
         /// </summary>
         /// <returns></returns>
         Task CheckForUpdates();
+
+        /// <summary>
+        /// デバッグモード
+        /// </summary>
+        bool IsDevelopperMode { get; set; }
     }
 
     public class AddonManager : IAddonManager
     {
 
-        public AddonManager(IAddonLoader loader, IAddonContextsContainer contextsContainer, IAddonStatusContainer statusContainer, IAddonUpdateChecker updateChecker)
+        public AddonManager(IAddonLoader loader, IAddonContextsContainer contextsContainer, IAddonStatusContainer statusContainer, IAddonUpdateChecker updateChecker, ILocalSettingsContainer settingsContainer)
         {
             this._loader = loader;
             this._contextsContainer = contextsContainer;
             this._statusContainer = statusContainer;
             this._updateChecker = updateChecker;
+            this._settingsContainer = settingsContainer;
         }
 
         #region field
@@ -67,7 +74,11 @@ namespace Niconicome.Models.Local.Addon.V2
 
         private readonly IAddonUpdateChecker _updateChecker;
 
+        private readonly ILocalSettingsContainer _settingsContainer;
+
         private bool _isCheckingForUpdate;
+
+        private bool _isDebugEnable;
 
         #endregion
 
@@ -78,7 +89,8 @@ namespace Niconicome.Models.Local.Addon.V2
             if (this._isCheckingForUpdate)
             {
                 return AttemptResult.Fail("更新確認中です。");
-            } else
+            }
+            else
             {
                 this._isCheckingForUpdate = true;
             }
@@ -162,6 +174,17 @@ namespace Niconicome.Models.Local.Addon.V2
             }
 
             return loadResult.Data.Succeeded.Count == 1 ? AttemptResult.Succeeded() : AttemptResult.Fail();
+        }
+
+
+
+        #endregion
+
+        #region Props
+        public bool IsDevelopperMode
+        {
+            get => this._settingsContainer.GetReactiveBoolSetting(SettingsEnum.IsDevMode).Value;
+            set => this._settingsContainer.GetReactiveBoolSetting(SettingsEnum.IsDevMode).Value = value;
         }
 
 

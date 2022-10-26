@@ -67,9 +67,9 @@
 				<li><a class="dropdown-item" href="/addons/install/0">インストール</a></li>
 				<li><a class="dropdown-item" @onclick="DataContext.OnCheckForUpdateClick">更新確認</a></li>
 				<li class="form-check">
-					<input class="form-check-input" type="checkbox" value="" id="flexCheckIndeterminate">
+					<input class="form-check-input" type="checkbox" @bind="@(DataContext.IsDevModeEnable)" id="flexCheckIndeterminate">
 					<label class="form-check-label" for="flexCheckIndeterminate">
-						デバッグモード
+						開発者モード
 					</label>
 				</li>
 			</ul>
@@ -176,11 +176,5 @@
 		});
 		DataContext.AddAlertHandler(() => this.StateHasChanged());
 
-	}
-
-	protected override async Task OnInitializedAsync()
-	{
-		await base.OnInitializedAsync();
-		await DataContext.OnCheckForUpdateClick();
 	}
 }

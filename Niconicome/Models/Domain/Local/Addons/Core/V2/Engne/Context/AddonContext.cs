@@ -9,6 +9,7 @@ using Microsoft.ClearScript;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.JavaScript;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Utils;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Niconico.Net.Html;
 using Niconicome.Models.Domain.Utils;
@@ -52,11 +53,12 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
     public class AddonContext : IAddonContext, IDisposable
     {
         public AddonContext(
-            IJavaScriptEngine engine, INicoFileIO fileIO, ILogger logger)
+            IJavaScriptEngine engine, INicoFileIO fileIO, ILogger logger,IAddonSettingsHandler settingsHandler)
         {
             this._engine = engine;
             this._fileIO = fileIO;
             this._logger = logger;
+            this._settingsHandler = settingsHandler;
         }
 
         #region field
@@ -66,6 +68,8 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
         private readonly INicoFileIO _fileIO;
 
         private readonly ILogger _logger;
+
+        private readonly IAddonSettingsHandler _settingsHandler;
 
         private bool _isExecuted;
 
@@ -125,7 +129,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context
                 tab.RegisterHandler(item => this.HandlingTabs.Add(item), item => this.HandlingTabs.RemoveAll(i => i == item));
             }
 
-            this._engine.Initialize(false);
+            this._engine.Initialize(this._settingsHandler.IsDevelopperMode);
 
             //APIを追加
             this._engine.AddHostObject("application", container.APIEntryPoint);

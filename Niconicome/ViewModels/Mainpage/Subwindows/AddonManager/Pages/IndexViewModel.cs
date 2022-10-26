@@ -69,6 +69,15 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages
         /// </summary>
         public bool DisplayAlertMessage { get; private set; }
 
+        /// <summary>
+        /// デバッグモード
+        /// </summary>
+        public bool IsDevModeEnable
+        {
+            get => WS::AddonPage.AddonManager.IsDevelopperMode;
+            set => WS::AddonPage.AddonManager.IsDevelopperMode = value;
+        }
+
         #endregion
 
         #region private
