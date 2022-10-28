@@ -292,7 +292,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 return AttemptResult<string>.Fail();
             }
 
-            var urls = stream.StreamUrls.Where(u => info.ExistsFileNames.Contains(u.FileName)).Copy();
+            var urls = stream.StreamUrls.Where(u => !info.ExistsFileNames.Contains(u.FileName)).Copy();
             stream.StreamUrls.Clear();
             stream.StreamUrls.AddRange(urls);
             return AttemptResult<string>.Succeeded(info.DirectoryName);
