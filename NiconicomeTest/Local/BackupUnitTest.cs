@@ -17,9 +17,10 @@ namespace NiconicomeTest.Local.Backup
         public void Setup()
         {
             this.backuphandler = new BackupHandler(new LoggerStub(),Static.DataBaseInstance);
-            if (Directory.Exists("backups"))
+            string path = Path.Combine(AppContext.BaseDirectory, "backups");
+            if (Directory.Exists(path))
             {
-                Directory.Delete("backups", true);
+                Directory.Delete(path, true);
             }
         }
 

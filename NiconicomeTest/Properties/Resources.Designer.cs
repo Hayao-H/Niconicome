@@ -79,20 +79,15 @@ namespace NiconicomeTest.Properties {
         ///&lt;html class=&quot;gecko &quot;&gt;
         ///
         ///&lt;head&gt;
-        ///&lt;script type=&quot;text/javascript&quot;&gt;
-        ///  try {
-        ///    window.NicoGoogleTagManagerDataLayer = [];
         ///
-        ///    var data = {};
         ///
-        ///        data.user = (function () {
-        ///      var user = {};
+        ///&lt;!-- Google Tag Manager For Channel Access Analytics --&gt;
         ///
-        ///                  user.user_id = parseInt(&apos;74537208&apos;, 10) || null;
-        ///      user.login_status = &apos;login&apos;;
-        ///      user.member_status = &apos;premium&apos;;
-        ///      user.birthday = &apos;1990-03-01&apos;;
-        ///             [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///
+        ///    &lt;script&gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({&apos;gtm.start&apos;:
+        ///                new Date().getTime(),event:&apos;gtm.js&apos;});var f=d.getElementsByTagName(s)[0],
+        ///            j=d.createElement(s),dl=l!=&apos;dataLayer&apos;?&apos;&amp;l=&apos;+l:&apos;&apos;;j.async=true;j.src=
+        ///            &apos;https://www.googletagmanager.com/gtm.js?i [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string Channel_7 {
             get {
@@ -119,20 +114,15 @@ namespace NiconicomeTest.Properties {
         ///&lt;html class=&quot;gecko &quot;&gt;
         ///
         ///&lt;head&gt;
-        ///&lt;script type=&quot;text/javascript&quot;&gt;
-        ///  try {
-        ///    window.NicoGoogleTagManagerDataLayer = [];
         ///
-        ///    var data = {};
         ///
-        ///        data.user = (function () {
-        ///      var user = {};
+        ///&lt;!-- Google Tag Manager For Channel Access Analytics --&gt;
         ///
-        ///                  user.user_id = parseInt(&apos;74537208&apos;, 10) || null;
-        ///      user.login_status = &apos;login&apos;;
-        ///      user.member_status = &apos;premium&apos;;
-        ///      user.birthday = &apos;1990-03-01&apos;;
-        ///             [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///
+        ///    &lt;script&gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({&apos;gtm.start&apos;:
+        ///                new Date().getTime(),event:&apos;gtm.js&apos;});var f=d.getElementsByTagName(s)[0],
+        ///            j=d.createElement(s),dl=l!=&apos;dataLayer&apos;?&apos;&amp;l=&apos;+l:&apos;&apos;;j.async=true;j.src=
+        ///            &apos;https://www.googletagmanager.com/gtm.js?i [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string Elfenlied_Channel {
             get {
@@ -188,7 +178,7 @@ namespace NiconicomeTest.Properties {
         
         /// <summary>
         ///       {
-        ///      &quot;manifest_version&quot;: &quot;1.0&quot;,
+        ///      &quot;manifest_version&quot;: &quot;1.1&quot;,
         ///      &quot;auto_update_policy&quot;: {
         ///        &quot;auto_update&quot;: false,
         ///        &quot;github_release&quot;: false,
@@ -199,17 +189,17 @@ namespace NiconicomeTest.Properties {
         ///      &quot;scripts&quot;: {
         ///        &quot;background_script&quot;: &quot;&quot;
         ///      },
-        ///      &quot;manifestVersion&quot;: &quot;1.0&quot;,
         ///      &quot;name&quot;: &quot;Test&quot;,
         ///      &quot;author&quot;: &quot;Test&quot;,
         ///      &quot;description&quot;: &quot;Test&quot;,
         ///      &quot;version&quot;: &quot;1.0.0&quot;,
         ///      &quot;identifier&quot;: &quot;Test_ID&quot;,
-        ///      &quot;permissions [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
+        ///      &quot;permissions&quot;: []
+        ///    } に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string ManifestV1 {
+        internal static string ManifestV2 {
             get {
-                return ResourceManager.GetString("ManifestV1", resourceCulture);
+                return ResourceManager.GetString("ManifestV2", resourceCulture);
             }
         }
         

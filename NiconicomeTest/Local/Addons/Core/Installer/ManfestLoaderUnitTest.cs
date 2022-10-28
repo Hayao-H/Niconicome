@@ -23,7 +23,7 @@ namespace NiconicomeTest.Local.Addons.Core.Installer
         [SetUp]
         public void SetUp()
         {
-            this.manifestLoader = new ManifestLoader(new NicoFileIOMock(() => true, () => Properties.Resources.ManifestV1), new LoggerStub(), new PermissionsHandler());
+            this.manifestLoader = new ManifestLoader(new NicoFileIOMock(() => true, () => Properties.Resources.ManifestV2), new LoggerStub(), new PermissionsHandler());
         }
 
         [Test]
