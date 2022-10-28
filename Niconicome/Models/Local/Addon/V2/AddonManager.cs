@@ -78,8 +78,6 @@ namespace Niconicome.Models.Local.Addon.V2
 
         private bool _isCheckingForUpdate;
 
-        private bool _isDebugEnable;
-
         #endregion
 
         #region Method
@@ -175,8 +173,6 @@ namespace Niconicome.Models.Local.Addon.V2
 
             return loadResult.Data.Succeeded.Count == 1 ? AttemptResult.Succeeded() : AttemptResult.Fail();
         }
-
-
 
         #endregion
 

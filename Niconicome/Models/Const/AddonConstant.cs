@@ -19,5 +19,12 @@ namespace Niconicome.Models.Const
         public static string ResourceDirectoryName { get; private set; } = "resource";
 
         public static string ResourceHost { get; private set; } = "nc-resource.nico";
+
+        public static List<EssensialAddon> EssensialAddons { get; private set; } = new()
+        {
+            new EssensialAddon("page-analyze-plugi", @"https://raw.githubusercontent.com/Hayao-H/PageAnalyzePlugin/update/update.json")
+        };
     }
+
+    public record EssensialAddon(string Identifier, string UpdateJSON);
 }

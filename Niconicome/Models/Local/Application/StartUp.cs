@@ -26,7 +26,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager)
+        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager,IAddonInstallManager installManager)
         {
 
             this._playlistStoreHandler = playlistStoreHandler;
@@ -39,6 +39,7 @@ namespace Niconicome.Models.Local.Application
             this._streamResumer = streamResumer;
             this._nicoDirectoryIO = nicoDirectoryIO;
             this._addonManager = addonManager;
+            this._installManager = installManager;
             this.DeleteInvalidbackup();
         }
 
@@ -64,6 +65,8 @@ namespace Niconicome.Models.Local.Application
 
         private readonly IAddonManager _addonManager;
 
+        private readonly IAddonInstallManager _installManager;
+
         #endregion
 
         /// <summary>
@@ -81,7 +84,7 @@ namespace Niconicome.Models.Local.Application
                 this.RemoveTmpFolder();
                 this.JustifyData();
                 this.DeleteInvalidFilePath();
-                this.LoadAddon();
+                await this.LoadAddon();
                 await this.Autologin();
             });
         }
@@ -179,9 +182,11 @@ namespace Niconicome.Models.Local.Application
         /// <summary>
         /// アドオンを読み込む
         /// </summary>
-        private void LoadAddon()
+        private async Task LoadAddon()
         {
             this._addonManager.InitializeAddons();
+            await this._installManager.InstallEssensialAddons();
+            await this._addonManager.CheckForUpdates();
         }
     }
 }
