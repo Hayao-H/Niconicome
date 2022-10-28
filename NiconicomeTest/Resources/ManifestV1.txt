@@ -1,5 +1,5 @@
     {
-      "manifest_version": "1.0",
+      "manifest_version": "1.1",
       "auto_update_policy": {
         "auto_update": false,
         "github_release": false,
@@ -10,7 +10,6 @@
       "scripts": {
         "background_script": ""
       },
-      "manifestVersion": "1.0",
       "name": "Test",
       "author": "Test",
       "description": "Test",
