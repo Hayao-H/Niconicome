@@ -152,7 +152,7 @@ namespace Niconicome.Models.Network
                 }
             }
 
-            onMessage($"{videos.AddRange}件の動画を取得しました。");
+            onMessage($"{videos.Count}件の動画を取得しました。");
 
             this.FinishProcessing();
             return AttemptResult<IEnumerable<IListVideoInfo>>.Succeeded(videos);

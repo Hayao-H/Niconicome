@@ -1,6 +1,7 @@
 name: niconicome-nightly-build
 on: 
   pull_request:
+    types: [closed]
     branches:
       - develop
 jobs:
@@ -73,7 +74,7 @@ jobs:
       id: date
       env:
         TZ: 'Asia/Tokyo'
-      run: echo "::set-output name=date::$('%Y-%m-%d')"
+      run: echo "::set-output name=date::$(date '+%Y-%m-%d-%-H-%-M')"
     - name: Upload Release Artifact(x64)
       uses: actions/upload-artifact@v3
       with:
