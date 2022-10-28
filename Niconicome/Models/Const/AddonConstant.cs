@@ -22,7 +22,7 @@ namespace Niconicome.Models.Const
 
         public static List<EssensialAddon> EssensialAddons { get; private set; } = new()
         {
-            new EssensialAddon("page-analyze-plugi", @"https://raw.githubusercontent.com/Hayao-H/PageAnalyzePlugin/update/update.json")
+            new EssensialAddon("page-analyze-plugin", @"https://raw.githubusercontent.com/Hayao-H/PageAnalyzePlugin/update/update.json")
         };
     }
 
