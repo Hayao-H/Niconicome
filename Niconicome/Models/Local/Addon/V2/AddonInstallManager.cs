@@ -15,6 +15,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Addon.API;
 using Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
+using Niconicome.Models.Network.Download;
 
 namespace Niconicome.Models.Local.Addon.V2
 {
@@ -56,6 +57,12 @@ namespace Niconicome.Models.Local.Addon.V2
         /// <param name="ID"></param>
         /// <returns></returns>
         Task<IAttemptResult<UpdateInfomation>> DownloadUpdate(string ID);
+
+        /// <summary>
+        /// インストールが必須のアドオンをインストールする
+        /// </summary>
+        /// <returns></returns>
+        Task InstallEssensialAddons();
 
         /// <summary>
         /// インストール状況を確認
@@ -157,6 +164,22 @@ namespace Niconicome.Models.Local.Addon.V2
             IAttemptResult<UpdateInfomation> uResult = await this._updator.DownloadAndLoadUpdate(ctxResult.Data.AddonInfomation!);
             return uResult;
         }
+
+        public async Task InstallEssensialAddons()
+        {
+            foreach (var addon in AddonConstant.EssensialAddons)
+            {
+                bool isInstalled = this._statusContainer.LoadedAddons.Any(i => i.Identifier == addon.Identifier);
+                if (isInstalled) continue;
+
+                //ファイルをダウンロード
+                IAttemptResult<string> dlResult = await this._updator.DownloadAddonAsync(addon.UpdateJSON);
+                if (!dlResult.IsSucceeded || dlResult.Data is null) continue;
+
+                this.InstallAndLoad(dlResult.Data);
+            }
+        }
+
 
         public bool IsInstalled(string identifier)
         {

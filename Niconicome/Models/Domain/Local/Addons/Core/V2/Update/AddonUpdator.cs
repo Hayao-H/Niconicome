@@ -23,6 +23,14 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
         /// <param name="infomation"></param>
         /// <returns></returns>
         Task<IAttemptResult<UpdateInfomation>> DownloadAndLoadUpdate(IAddonInfomation infomation);
+
+        /// <summary>
+        /// アドオンインストールファイルをダウンロードする
+        /// ・主に必須アドオンの自動インストールを想定
+        /// </summary>
+        /// <param name="updateJSON"></param>
+        /// <returns></returns>
+        Task<IAttemptResult<string>> DownloadAddonAsync(string updateJSON);
     }
 
     public class AddonUpdator : IAddonUpdator
@@ -79,6 +87,19 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
 
             return AttemptResult<UpdateInfomation>.Succeeded(new UpdateInfomation(json.Version, newPermissions, newPermissions.Count > 0, newInfomation, json.Changelog, dlResult.Data));
         }
+
+        public async Task<IAttemptResult<string>> DownloadAddonAsync(string updateJSON)
+        {
+            IAttemptResult<UpdateJSON> infoResult = await this.DownloadInfomation(updateJSON);
+            if (!infoResult.IsSucceeded || infoResult.Data is null)
+            {
+                return AttemptResult<string>.Fail(infoResult.Message);
+            }
+
+            IAttemptResult<string> dlResult = await this.DownloadUpdate(infoResult.Data.ApplicationFile);
+            return dlResult;
+        }
+
 
         #endregion
 
