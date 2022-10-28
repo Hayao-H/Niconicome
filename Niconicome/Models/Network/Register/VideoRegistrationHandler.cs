@@ -55,7 +55,6 @@ namespace Niconicome.Models.Network.Register
         public async Task<IAttemptResult<IEnumerable<IListVideoInfo>>> ResgisterVideoAsync(string inputText, bool extractIDsFromText)
         {
             return await this.RegisterVideosInternalAsync(inputText, extractIDsFromText);
-
         }
 
         #endregion
@@ -76,8 +75,13 @@ namespace Niconicome.Models.Network.Register
             {
                 return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("現在処理中です。");
             }
+            else if (this._currrent.SelectedPlaylist.Value is null)
+            {
+                return AttemptResult<IEnumerable<IListVideoInfo>>.Fail("プレイリストが選択されていません。");
+            }
 
-            int? playlistID = this._currrent.SelectedPlaylist.Value?.Id;
+            int playlistID = this._currrent.SelectedPlaylist.Value.Id;
+            bool commit = !this._currrent.SelectedPlaylist.Value.IsTemporary;
 
             IAttemptResult<IEnumerable<IListVideoInfo>> fetchResult = await this._idHandler.GetVideoListInfosAsync(inputText, m => this._messageHandler.AppendMessage(m), extractFromText);
 
@@ -86,7 +90,7 @@ namespace Niconicome.Models.Network.Register
                 return AttemptResult<IEnumerable<IListVideoInfo>>.Fail($"動画の取得に失敗しました。（詳細：{fetchResult.Message}）");
             }
 
-            IAttemptResult addResult = this._container.AddRange(fetchResult.Data, playlistID);
+            IAttemptResult addResult = this._container.AddRange(fetchResult.Data, playlistID, commit);
 
             if (!addResult.IsSucceeded)
             {

@@ -1385,7 +1385,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             if (!result.IsSucceeded || result.Data is null)
             {
-                this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
+                this.SnackbarMessageQueue.Enqueue(result.Message?? "動画情報の取得に失敗しました");
                 return;
             }
 
