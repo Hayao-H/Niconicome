@@ -84,7 +84,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                 _ => n4,
             }, x => x.Value);
 
-            this.FetchSleepInterval = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.MaxFetchCount).ToReactivePropertyAsSynchronized(x => x.Value, x => x switch
+            this.FetchSleepInterval = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.FetchSleepInterval).ToReactivePropertyAsSynchronized(x => x.Value, x => x switch
             {
                 1 => n1,
                 2 => n2,
