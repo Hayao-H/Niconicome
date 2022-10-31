@@ -269,6 +269,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonVM::Pages.InstallViewModel>();
             services.AddTransient<AddonVM::Pages.AboutViewModel>();
             services.AddTransient<Utils::IBlazorHelper, Utils::BlazorHelper>();
+            services.AddTransient<Store::IApplicationDBHandler, Store::ApplicationDBHandler>();
 
             return services.BuildServiceProvider();
         }
