@@ -59,6 +59,7 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
+using DB = Niconicome.Models.Infrastructure.Database;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -269,7 +270,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonVM::Pages.InstallViewModel>();
             services.AddTransient<AddonVM::Pages.AboutViewModel>();
             services.AddTransient<Utils::IBlazorHelper, Utils::BlazorHelper>();
-            services.AddTransient<Store::IApplicationDBHandler, Store::ApplicationDBHandler>();
+            services.AddTransient<Store::V2.IApplicationStore, DB::ApplicationDBHandler>();
 
             return services.BuildServiceProvider();
         }

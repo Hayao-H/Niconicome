@@ -3,20 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local;
+using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Helper.Result;
 
-namespace Niconicome.Models.Domain.Local.Store
+namespace Niconicome.Models.Infrastructure.Database
 {
-    public interface IApplicationDBHandler
-    {
-        /// <summary>
-        /// データベースのバージョンを取得
-        /// </summary>
-        /// <returns></returns>
-        IAttemptResult<Version> GetDBVersion();
-    }
 
-    public class ApplicationDBHandler : IApplicationDBHandler
+    public class ApplicationDBHandler: IApplicationStore
     {
         public ApplicationDBHandler(IDataBase dataBase)
         {

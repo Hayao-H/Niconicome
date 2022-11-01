@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local;
 
-namespace Niconicome.Models.Domain.Local.Store.Types
+namespace Niconicome.Models.Infrastructure.Database.Types
 {
     public class App : IStorable
     {
