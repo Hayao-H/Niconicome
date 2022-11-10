@@ -1,5 +1,6 @@
 using System;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Helper.Result;
 
 namespace NiconicomeTest.Stabs.Models.Domain.Utils
@@ -49,16 +50,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Utils
     }
 
 
-    class LogstreamStab : ILogStream
+    class LogstreamStab : ILogWriter
     {
         public string logContent = string.Empty;
 
-        public string FileName { get => string.Empty; }
-
-        public void WriteAsync(string source)
-        {
-            this.Write(source);
-        }
+        public string LogFilePath { get => string.Empty; }
 
         public void Write(string source)
         {

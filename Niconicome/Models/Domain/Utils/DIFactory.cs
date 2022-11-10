@@ -14,6 +14,7 @@ using CommentIntegrate = Niconicome.Models.Domain.Niconico.Download.Comment.V2.I
 using CommentLocal = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local;
 using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
+using DB = Niconicome.Models.Infrastructure.Database;
 using DLActions = Niconicome.Models.Network.Download.Actions;
 using DlComment = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DlDescription = Niconicome.Models.Domain.Niconico.Download.Description;
@@ -33,6 +34,7 @@ using Fetch = Niconicome.Models.Network.Fetch;
 using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Ichiba = Niconicome.Models.Domain.Niconico.Video.Ichiba;
+using Infla = Niconicome.Models.Infrastructure;
 using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
@@ -59,7 +61,6 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
-using DB = Niconicome.Models.Infrastructure.Database;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -90,8 +91,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Auth::ISession, Auth::Session>();
             services.AddSingleton<Niconico::INiconicoContext, Niconico::NiconicoContext>();
             services.AddTransient<IErrorHandler, ErrorHandler>();
-            services.AddSingleton<ILogStream, LogStream>();
             services.AddTransient<ILogger, Logger>();
+            services.AddSingleton<NicoLogger.ILogWriter, Infla::Log.LogStream>();
             services.AddSingleton<DataBase::IDataBase, DataBase::DataBase>();
             services.AddTransient<Store::IPlaylistStoreHandler, Store::PlaylistStoreHandler>();
             services.AddTransient<Store::IVideoStoreHandler, Store::VideoStoreHandler>();

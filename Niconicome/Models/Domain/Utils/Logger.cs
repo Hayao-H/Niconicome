@@ -9,6 +9,7 @@ using Niconicome.Extensions.System;
 using Niconicome.Extensions;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Domain.Utils.NicoLogger;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -29,13 +30,6 @@ namespace Niconicome.Models.Domain.Utils
         void Error(string message, IAttemptResult result);
     }
 
-    public interface ILogStream
-    {
-        void WriteAsync(string source);
-        void Write(string source);
-        string FileName { get; }
-    }
-
     public interface IErrorHandler
     {
         string GetErrorInfo(string message, Exception e);
@@ -44,13 +38,13 @@ namespace Niconicome.Models.Domain.Utils
     public class Logger : ILogger
     {
 
-        private readonly ILogStream logStream;
+        private readonly ILogWriter logStream;
 
         private readonly IErrorHandler errorHandler;
 
         private readonly ILocalState localState;
 
-        public Logger(ILogStream logStream, IErrorHandler errorHandler, ILocalState localState)
+        public Logger(ILogWriter logStream, IErrorHandler errorHandler, ILocalState localState)
         {
             this.logStream = logStream;
             this.errorHandler = errorHandler;
@@ -124,12 +118,13 @@ namespace Niconicome.Models.Domain.Utils
             this.Write($"[Error]{source}", true);
         }
 
-        public void Error(string message,IAttemptResult result)
+        public void Error(string message, IAttemptResult result)
         {
             if (result.Exception is not null)
             {
                 this.Error(message, result.Exception);
-            } else
+            }
+            else
             {
                 this.Error(message);
             }
@@ -198,134 +193,5 @@ namespace Niconicome.Models.Domain.Utils
         }
     }
 
-    public class LogStream : ILogStream
-    {
-        public LogStream()
-        {
-            this.FileName = $"log\\niconicome-log-{DateTime.Now:yy-MM-dd-HH-mm-ss}.log";
-            if (!Directory.Exists("log"))
-            {
-                Directory.CreateDirectory("log");
-            }
-        }
 
-        public string FileName { get; init; }
-
-        private bool isInitialized;
-
-        /// <summary>
-        /// ログファイルに書き込む
-        /// </summary>
-        /// <param name="source"></param>
-        public async void WriteAsync(string source)
-        {
-            if (!this.isInitialized) this.Initialize();
-            try
-            {
-                using var fs = new StreamWriter(this.FileName, true);
-                await fs.WriteLineAsync(source);
-            }
-            catch { return; }
-        }
-
-        /// <summary>
-        /// ログファイルに同期的に書き込む
-        /// </summary>
-        /// <param name="source"></param>
-        public void Write(string source)
-        {
-            if (!this.isInitialized) this.Initialize();
-            try
-            {
-                using var fs = new StreamWriter(this.FileName, true);
-                fs.WriteLine(source);
-            }
-            catch { return; }
-        }
-
-        /// <summary>
-        /// システム情報を書き込む
-        /// </summary>
-        private void Initialize()
-        {
-            var systemInfo = new StringBuilder();
-            string is64bit = Environment.Is64BitOperatingSystem ? "64" : "32";
-            string is64bitProcess = Environment.Is64BitProcess ? "64" : "32";
-
-            systemInfo.AppendLine("Niconicomeログ");
-            systemInfo.AppendLine($"App Version : {Assembly.GetExecutingAssembly().GetName().Version}");
-            systemInfo.AppendLine($"App Path : {Process.GetCurrentProcess().MainModule?.FileName}");
-            systemInfo.AppendLine($"OS : {this.GetOs()}");
-            systemInfo.AppendLine($"OS Version : {this.GetOsVer()}");
-            systemInfo.AppendLine($"OS Architecture : {is64bit}bit Operating System");
-            systemInfo.AppendLine($"Process : {is64bitProcess}bit Process");
-            systemInfo.AppendLine($"Date : {DateTime.Now:yy/MM/dd H:mm:ss}");
-            systemInfo.AppendLine("-".Repeat(50));
-
-            this.isInitialized = true;
-            this.Write(systemInfo.ToString());
-        }
-
-        /// <summary>
-        /// OSのバージョンを取得する
-        /// </summary>
-        /// <returns></returns>
-        private string GetOsVer()
-        {
-            string v = Environment.OSVersion.VersionString;
-            return v;
-        }
-
-        /// <summary>
-        /// OS名を取得する
-        /// </summary>
-        /// <returns></returns>
-        private string GetOs()
-        {
-            Version v = Environment.OSVersion.Version;
-            PlatformID platform = Environment.OSVersion.Platform;
-            string osversion = $"{v.Major}.{v.Minor}";
-
-            if (platform == PlatformID.Win32NT)
-            {
-                if (osversion == "10.0")
-                {
-                    return "Windows 10";
-                }
-                else if (osversion == "6.3")
-                {
-                    return "Windows 8.1";
-                }
-                else if (osversion == "6.2")
-                {
-                    return "Windows 8";
-                }
-                else if (osversion == "6.1")
-                {
-                    return "Windows 7";
-                }
-                else if (osversion == "6.0")
-                {
-                    return "Windows Vista";
-                }
-                else if (osversion == "5.1")
-                {
-                    return "Windows XP";
-                }
-                else
-                {
-                    return "unknown OS (Windows)";
-                }
-            }
-            else if (platform == PlatformID.Unix)
-            {
-                return "Unix";
-            }
-            else
-            {
-                return "unknown OS";
-            }
-        }
-
-    }
 }
