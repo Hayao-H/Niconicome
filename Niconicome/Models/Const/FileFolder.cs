@@ -32,5 +32,7 @@ namespace Niconicome.Models.Const
         public const string ManifestFileName = "manifest.json";
 
         public const string AddonsTmpDirectory = @"tmp\addons";
+
+        public const string LogFolderName = "log";
     }
 }

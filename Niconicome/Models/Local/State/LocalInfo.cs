@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Local.Settings;
 using Reactive.Bindings;
 using Utils = Niconicome.Models.Domain.Utils;
@@ -35,9 +36,9 @@ namespace Niconicome.Models.Local.State
         {
             get
             {
-                var logStraem = Utils::DIFactory.Provider.GetRequiredService<Utils::ILogStream>();
+                var logStraem = Utils::DIFactory.Provider.GetRequiredService<ILogWriter>();
 
-                return Path.Combine(AppContext.BaseDirectory, logStraem.FileName);
+                return logStraem.LogFilePath;
             }
         }
 

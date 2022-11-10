@@ -18,6 +18,7 @@ namespace Niconicome.Models.Domain.Local
     public interface IStorable
     {
         public int Id { get; }
+
         public static string TableName { get; set; } = string.Empty;
     }
 
