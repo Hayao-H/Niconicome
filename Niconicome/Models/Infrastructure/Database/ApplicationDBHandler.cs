@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Infrastructure.Database.LiteDB;
 
 namespace Niconicome.Models.Infrastructure.Database
 {
 
-    public class ApplicationDBHandler: IApplicationStore
+    public class ApplicationDBHandler : IApplicationStore
     {
-        public ApplicationDBHandler(IDataBase dataBase)
+        public ApplicationDBHandler(ILiteDBHandler dataBase)
         {
             this._dataBase = dataBase;
         }
 
         #region field
 
-        private readonly IDataBase _dataBase;
+        private readonly ILiteDBHandler _dataBase;
 
         #endregion
 
@@ -30,7 +30,7 @@ namespace Niconicome.Models.Infrastructure.Database
             IAttemptResult init = this.Initialize();
             if (!init.IsSucceeded) return AttemptResult<Version>.Fail(init.Message);
 
-            IAttemptResult<List<Types.App>> apps = this._dataBase.GetAllRecords<Types.App>(Types.App.TableName);
+            IAttemptResult<IReadOnlyList<Types.App>> apps = this._dataBase.GetAllRecords<Types.App>(TableNames.AppInfomation);
             if (!apps.IsSucceeded || apps.Data is null) return AttemptResult<Version>.Fail(apps.Message);
 
             Types.App app = apps.Data.First();
@@ -48,13 +48,13 @@ namespace Niconicome.Models.Infrastructure.Database
         /// </summary>
         private IAttemptResult Initialize()
         {
-            IAttemptResult<List<Types.App>> apps = this._dataBase.GetAllRecords<Types.App>(Types.App.TableName);
+            IAttemptResult<IReadOnlyList<Types.App>> apps = this._dataBase.GetAllRecords<Types.App>(TableNames.AppInfomation);
             if (!apps.IsSucceeded || apps.Data is null) return AttemptResult.Fail($"アプリケーション情報データベースの初期化に失敗しました。(詳細：{apps.Message})");
 
             if (apps.Data.Count > 0) return AttemptResult.Succeeded();
 
             var app = new Types.App();
-            return this._dataBase.Store(app, Types.App.TableName);
+            return this._dataBase.Insert(app);
         }
 
         #endregion

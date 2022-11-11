@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local;
+using Niconicome.Models.Infrastructure.Database.LiteDB;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Infrastructure.Database.Types
 {
-    public class App : IStorable
+    public class App : IBaseStoreClass
     {
         public int Id { get; set; }
 
-        public static string TableName { get; set; } = "applicationinfomation";
+        public string TableName { get; set; } = TableNames.AppInfomation;
 
         /// <summary>
         /// データベースのバージョン

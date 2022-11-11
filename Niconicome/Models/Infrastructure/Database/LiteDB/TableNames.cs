@@ -9,5 +9,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
     public static class TableNames
     {
         public static string Playlist = "v2_playlist";
+
+        public static string AppInfomation = "applicationinfomation";
     }
 }
