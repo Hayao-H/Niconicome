@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
+using Niconicome.Models.Playlist.V2.Manager.Error;
 
 namespace Niconicome.Models.Domain.Utils.Error
 {
@@ -14,7 +15,8 @@ namespace Niconicome.Models.Domain.Utils.Error
         /// </summary>
         public static Dictionary<int, Type> ErrorEnums = new()
         {
-            { 1,typeof(LiteDBError) }
+            { 1,typeof(LiteDBError) },
+            {2,typeof(PlaylistManagerError) },
         };
     }
 }

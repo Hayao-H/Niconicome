@@ -40,6 +40,14 @@ namespace Niconicome.Models.Domain.Utils.Error
         /// <returns></returns>
         string GetMessageForResult<T>(T value, Exception ex, params object[]? items) where T : struct, Enum;
 
+        /// <summary>
+        /// 例外情報を文字列で取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        string GetMessageForResult<T>(T value, params object[]? items) where T : struct, Enum;
     }
 
     public class ErrorHandler

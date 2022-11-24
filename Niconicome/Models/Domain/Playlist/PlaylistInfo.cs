@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Playlist
@@ -19,7 +21,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// 親プレイリストのID
         /// </summary>
-        int ParentPlaylistID { get; }
+        int ParentID { get; set; }
 
         /// <summary>
         /// フォルダーパス
@@ -42,9 +44,14 @@ namespace Niconicome.Models.Domain.Playlist
         string RemoteParameter { get; set; }
 
         /// <summary>
-        /// 子プレイリスト
+        /// 子プレイリスト(デフォルトでは空)
         /// </summary>
         ReadOnlyObservableCollection<IPlaylistInfo> Children { get; }
+
+        /// <summary>
+        /// 子プレイリストのID
+        /// </summary>
+        IReadOnlyList<int> ChildrenID { get; }
 
         /// <summary>
         /// 動画一覧
@@ -62,12 +69,13 @@ namespace Niconicome.Models.Domain.Playlist
         /// 子プレイリストを削除
         /// </summary>
         /// <param name="playlistInfo"></param>
-        void RemoveChild(IPlaylistInfo playlistInfo);
+        /// <returns></returns>
+        IAttemptResult RemoveChild(IPlaylistInfo playlistInfo);
     }
 
     public class PlaylistInfo : UpdatableInfoBase<IPlaylistStore, IPlaylistInfo>, IPlaylistInfo
     {
-        public PlaylistInfo(string name,List<IVideoInfo> videos, IPlaylistStore playlistStore) : base(playlistStore)
+        public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore) : base(playlistStore)
         {
             this.Children = new ReadOnlyObservableCollection<IPlaylistInfo>(this._children);
             this.Name = new ReactiveProperty<string>(name);
@@ -91,7 +99,7 @@ namespace Niconicome.Models.Domain.Playlist
 
         public int ID { get; init; }
 
-        public int ParentPlaylistID { get; init; }
+        public int ParentID { get; set; }
 
         public string FolderPath
         {
@@ -128,6 +136,8 @@ namespace Niconicome.Models.Domain.Playlist
 
         public ReadOnlyObservableCollection<IPlaylistInfo> Children { get; init; }
 
+        public IReadOnlyList<int> ChildrenID { get; init; } = new List<int>().AsReadOnly();
+
         public IReadOnlyList<IVideoInfo> Videos { get; init; }
 
 
@@ -141,10 +151,10 @@ namespace Niconicome.Models.Domain.Playlist
             if (commit) this.Update(this);
         }
 
-        public void RemoveChild(IPlaylistInfo playlistInfo)
+        public IAttemptResult RemoveChild(IPlaylistInfo playlistInfo)
         {
             this._children.Remove(playlistInfo);
-            this.Update(this);
+            return this.Update(this);
         }
 
         #endregion

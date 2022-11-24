@@ -8,6 +8,7 @@ namespace Niconicome.Models.Domain.Utils.Error
 {
     public enum ErrorEnums
     {
-        LiteDBHandler
+        LiteDBHandler,
+        PlaylistManager,
     }
 }

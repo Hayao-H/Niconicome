@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AngleSharp.Text;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Helper.Result;
@@ -30,9 +31,12 @@ namespace Niconicome.Models.Infrastructure.Database
 
         #region Method
 
-        public IAttemptResult<int> Create(IPlaylistInfo playlist)
+        public IAttemptResult<int> Create(string name)
         {
-            Types::Playlist data = this.Convert(playlist);
+            var data = new Types.Playlist()
+            {
+                Name = name,
+            };
             return this._database.Insert(data);
         }
 
@@ -54,7 +58,6 @@ namespace Niconicome.Models.Infrastructure.Database
             var info = new PlaylistInfo(playlist.Name, videos, this)
             {
                 ID = playlist.Id,
-                ParentPlaylistID = playlist.Id,
                 FolderPath = playlist.FolderPath,
                 PlaylistType = playlist.PlaylistType switch
                 {
@@ -71,10 +74,30 @@ namespace Niconicome.Models.Infrastructure.Database
                     _ => PlaylistType.Local,
                 },
                 RemoteParameter = playlist.RemoteParameter,
+                ChildrenID = playlist.Children.AsReadOnly(),
             };
 
             return AttemptResult<IPlaylistInfo>.Succeeded(info);
         }
+
+        public IAttemptResult<IReadOnlyList<IPlaylistInfo>> GetAllPlaylist()
+        {
+
+            IAttemptResult<IReadOnlyList<Types::Playlist>> dbResult = this._database.GetAllRecords<Types::Playlist>(TableNames.Playlist);
+            if (!dbResult.IsSucceeded || dbResult.Data is null) return AttemptResult<IReadOnlyList<IPlaylistInfo>>.Fail(dbResult.Message);
+
+            var infos = new List<IPlaylistInfo>();
+
+            foreach (var id in dbResult.Data.Select(p => p.Id))
+            {
+                IAttemptResult<IPlaylistInfo> pResult = this.GetPlaylist(id);
+                if (!pResult.IsSucceeded || pResult.Data is null) continue;
+                infos.Add(pResult.Data);
+            }
+
+            return AttemptResult<IReadOnlyList<IPlaylistInfo>>.Succeeded(infos.AsReadOnly());
+        }
+
 
         public IAttemptResult Update(IPlaylistInfo playlist)
         {

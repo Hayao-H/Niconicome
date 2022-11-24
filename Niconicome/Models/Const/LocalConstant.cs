@@ -14,6 +14,8 @@ namespace Niconicome.Models.Const
 
         public static string DefaultErrorCode = "0";
 
+        public static string DefaultPlaylistName = "新しいプレイリスト";
+
         public static string BottomTabRegionName = "BottomTabResion";
 
         public static string TopTabRegionName = "TopTabRegion";

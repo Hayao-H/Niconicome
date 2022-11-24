@@ -11,6 +11,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
     public interface IPlaylistStore : IStoreUpdater<IPlaylistInfo>
     {
         /// <summary>
+        /// 全てのプレイリストを取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IReadOnlyList<IPlaylistInfo>> GetAllPlaylist();
+
+        /// <summary>
         /// 指定したIDのプレイリストを取得する
         /// </summary>
         /// <returns></returns>
@@ -19,9 +25,9 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <summary>
         /// プレイリストを作成
         /// </summary>
-        /// <param name="playlist"></param>
+        /// <param name="name"></param>
         /// <returns></returns>
-        IAttemptResult<int> Create(IPlaylistInfo playlist);
+        IAttemptResult<int> Create(string name);
 
         /// <summary>
         /// プレイリストを削除

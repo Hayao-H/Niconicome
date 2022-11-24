@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Playlist
 {
@@ -21,9 +22,9 @@ namespace Niconicome.Models.Domain.Playlist
 
         #endregion
 
-        protected void Update(TInfo infomation)
+        protected IAttemptResult Update(TInfo infomation)
         {
-            this._updater.Update(infomation);
+           return this._updater.Update(infomation);
         }
     }
 }
