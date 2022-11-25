@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AngleSharp.Text;
+using Niconicome.Extensions;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Helper.Result;
@@ -45,40 +46,22 @@ namespace Niconicome.Models.Infrastructure.Database
             IAttemptResult<Types::Playlist> dbResult = this._database.GetRecord<Types::Playlist>(TableNames.Playlist, ID);
             if (!dbResult.IsSucceeded || dbResult.Data is null) return AttemptResult<IPlaylistInfo>.Fail(dbResult.Message);
 
-            Types::Playlist playlist = dbResult.Data;
-
-            var videos = new List<IVideoInfo>();
-            foreach (var videoID in playlist.Videos)
-            {
-                IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(videoID);
-                if (!vResult.IsSucceeded || vResult.Data is null) continue;
-                videos.Add(vResult.Data);
-            }
-
-            var info = new PlaylistInfo(playlist.Name, videos, this)
-            {
-                ID = playlist.Id,
-                FolderPath = playlist.FolderPath,
-                PlaylistType = playlist.PlaylistType switch
-                {
-                    DBPlaylistType.Mylist => PlaylistType.Mylist,
-                    DBPlaylistType.Series => PlaylistType.Series,
-                    DBPlaylistType.WatchLater => PlaylistType.WatchLater,
-                    DBPlaylistType.UserVideos => PlaylistType.UserVideos,
-                    DBPlaylistType.Channel => PlaylistType.Channel,
-                    DBPlaylistType.Root => PlaylistType.Root,
-                    DBPlaylistType.Temporary => PlaylistType.Temporary,
-                    DBPlaylistType.DownloadSucceededHistory => PlaylistType.DownloadSucceededHistory,
-                    DBPlaylistType.DownloadFailedHistory => PlaylistType.DownloadFailedHistory,
-                    DBPlaylistType.PlaybackHistory => PlaylistType.PlaybackHistory,
-                    _ => PlaylistType.Local,
-                },
-                RemoteParameter = playlist.RemoteParameter,
-                ChildrenID = playlist.Children.AsReadOnly(),
-            };
+            IPlaylistInfo info = this.Convert(dbResult.Data);
 
             return AttemptResult<IPlaylistInfo>.Succeeded(info);
         }
+
+        public IAttemptResult<IPlaylistInfo> GetPlaylistByType(PlaylistType type)
+        {
+            DBPlaylistType pType = this.Convert(type);
+            IAttemptResult<Types::Playlist> dbResult = this._database.GetRecord<Types::Playlist>(TableNames.Playlist, p => p.PlaylistType == pType);
+            if (!dbResult.IsSucceeded || dbResult.Data is null) return AttemptResult<IPlaylistInfo>.Fail(dbResult.Message);
+
+            IPlaylistInfo info = this.Convert(dbResult.Data);
+
+            return AttemptResult<IPlaylistInfo>.Succeeded(info);
+        }
+
 
         public IAttemptResult<IReadOnlyList<IPlaylistInfo>> GetAllPlaylist()
         {
@@ -144,6 +127,69 @@ namespace Niconicome.Models.Infrastructure.Database
                 Videos = data.Videos.Select(v => v.ID).ToList(),
                 Children = data.Children.Select(v => v.ID).ToList(),
             };
+        }
+
+        /// <summary>
+        /// プレイリストの種類についてローカル情報をデータベースの型に変換
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private DBPlaylistType Convert(PlaylistType type)
+        {
+            return type switch
+            {
+                PlaylistType.Mylist => DBPlaylistType.Mylist,
+                PlaylistType.Series => DBPlaylistType.Series,
+                PlaylistType.WatchLater => DBPlaylistType.WatchLater,
+                PlaylistType.UserVideos => DBPlaylistType.UserVideos,
+                PlaylistType.Channel => DBPlaylistType.Channel,
+                PlaylistType.Root => DBPlaylistType.Root,
+                PlaylistType.Temporary => DBPlaylistType.Temporary,
+                PlaylistType.DownloadSucceededHistory => DBPlaylistType.DownloadSucceededHistory,
+                PlaylistType.DownloadFailedHistory => DBPlaylistType.DownloadFailedHistory,
+                PlaylistType.PlaybackHistory => DBPlaylistType.PlaybackHistory,
+                _ => DBPlaylistType.Local
+            };
+        }
+
+        /// <summary>
+        /// データベースの型をローカル情報に変換
+        /// </summary>
+        /// <param name="playlist"></param>
+        /// <returns></returns>
+        private IPlaylistInfo Convert(Types::Playlist playlist)
+        {
+            var videos = new List<IVideoInfo>();
+            foreach (var videoID in playlist.Videos)
+            {
+                IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(videoID);
+                if (!vResult.IsSucceeded || vResult.Data is null) continue;
+                videos.Add(vResult.Data);
+            }
+
+            var info = new PlaylistInfo(playlist.Name, videos, this)
+            {
+                ID = playlist.Id,
+                FolderPath = playlist.FolderPath,
+                PlaylistType = playlist.PlaylistType switch
+                {
+                    DBPlaylistType.Mylist => PlaylistType.Mylist,
+                    DBPlaylistType.Series => PlaylistType.Series,
+                    DBPlaylistType.WatchLater => PlaylistType.WatchLater,
+                    DBPlaylistType.UserVideos => PlaylistType.UserVideos,
+                    DBPlaylistType.Channel => PlaylistType.Channel,
+                    DBPlaylistType.Root => PlaylistType.Root,
+                    DBPlaylistType.Temporary => PlaylistType.Temporary,
+                    DBPlaylistType.DownloadSucceededHistory => PlaylistType.DownloadSucceededHistory,
+                    DBPlaylistType.DownloadFailedHistory => PlaylistType.DownloadFailedHistory,
+                    DBPlaylistType.PlaybackHistory => PlaylistType.PlaybackHistory,
+                    _ => PlaylistType.Local,
+                },
+                RemoteParameter = playlist.RemoteParameter,
+                ChildrenID = playlist.Children.AsReadOnly(),
+            };
+
+            return info;
         }
 
         #endregion

@@ -23,6 +23,13 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult<IPlaylistInfo> GetPlaylist(int ID);
 
         /// <summary>
+        /// プレイリストの種類を指定して取得
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        IAttemptResult<IPlaylistInfo> GetPlaylistByType(PlaylistType type);
+
+        /// <summary>
         /// プレイリストを作成
         /// </summary>
         /// <param name="name"></param>
