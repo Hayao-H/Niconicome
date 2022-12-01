@@ -50,7 +50,7 @@ namespace Niconicome.Models.Domain.Utils.Error
         string GetMessageForResult<T>(T value, params object[]? items) where T : struct, Enum;
     }
 
-    public class ErrorHandler
+    public class ErrorHandler : IErrorHandler
     {
         public ErrorHandler(INiconicomeLogger logger)
         {
@@ -92,8 +92,21 @@ namespace Niconicome.Models.Domain.Utils.Error
         {
             if (this.TryGetAttr(value, out ErrorEnumAttribute? attr))
             {
-                return $"{this.GetErrorMessage(attr, items ?? new object[0])}{Environment.NewLine}(詳細：{ex.Message})";
-            } else
+                return $"{this.GetErrorMessage(attr, items ?? new object[0])}(詳細：{ex.Message})";
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        public string GetMessageForResult<T>(T value, params object[]? items) where T : struct, Enum
+        {
+            if (this.TryGetAttr(value, out ErrorEnumAttribute? attr))
+            {
+                return $"{this.GetErrorMessage(attr, items ?? new object[0])}";
+            }
+            else
             {
                 return string.Empty;
             }
