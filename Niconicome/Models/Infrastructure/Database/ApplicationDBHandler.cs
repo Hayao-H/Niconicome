@@ -36,7 +36,20 @@ namespace Niconicome.Models.Infrastructure.Database
             Types.App app = apps.Data.First();
             Version.TryParse(app.DBVersion, out Version? version);
             return version is null ? AttemptResult<Version>.Fail("DBバージョン文字列の解析に失敗しました。") : AttemptResult<Version>.Succeeded(version);
+        }
 
+        public IAttemptResult SetDBVersion(string version)
+        {
+            IAttemptResult init = this.Initialize();
+            if (!init.IsSucceeded) return AttemptResult<string>.Fail(init.Message);
+
+            IAttemptResult<IReadOnlyList<Types.App>> apps = this._dataBase.GetAllRecords<Types.App>(TableNames.AppInfomation);
+            if (!apps.IsSucceeded || apps.Data is null) return AttemptResult.Fail(apps.Message);
+
+            Types.App app = apps.Data.First();
+            app.DBVersion = version;
+
+            return this._dataBase.Update(app);
         }
 
         #endregion
@@ -49,7 +62,7 @@ namespace Niconicome.Models.Infrastructure.Database
         private IAttemptResult Initialize()
         {
             IAttemptResult<IReadOnlyList<Types.App>> apps = this._dataBase.GetAllRecords<Types.App>(TableNames.AppInfomation);
-            if (!apps.IsSucceeded || apps.Data is null) return AttemptResult.Fail($"アプリケーション情報データベースの初期化に失敗しました。(詳細：{apps.Message})");
+            if (!apps.IsSucceeded || apps.Data is null) return AttemptResult.Fail(apps.Message);
 
             if (apps.Data.Count > 0) return AttemptResult.Succeeded();
 

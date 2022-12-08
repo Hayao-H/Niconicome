@@ -16,7 +16,7 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
         /// <returns></returns>
-        IAttemptResult<ISettingInfo<T>> GetSetting<T>(string name) where T : notnull, IComparable<T>;
+        IAttemptResult<ISettingInfo<T>> GetSetting<T>(string name) where T : notnull;
 
         /// <summary>
         /// 設定を変更
@@ -25,7 +25,17 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <param name="name"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        IAttemptResult SetSetting<T>(ISettingInfo<T> setting) where T : notnull, IComparable<T>;
+        IAttemptResult SetSetting<T>(ISettingInfo<T> setting) where T : notnull;
+
+        /// <summary>
+        /// 設定名を指定して設定を変更
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        IAttemptResult SetSetting<T>(string name, T value) where T : notnull;
+
 
         /// <summary>
         /// 設定ファイルを再読み込みしてキャッシュを更新する

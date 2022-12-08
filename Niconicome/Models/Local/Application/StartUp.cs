@@ -13,6 +13,7 @@ using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Utils.InitializeAwaiter;
 using Niconicome.Models.Local.Addon.V2;
+using Niconicome.Models.Local.Migration;
 
 namespace Niconicome.Models.Local.Application
 {

@@ -118,7 +118,7 @@ namespace Niconicome.Models.Infrastructure.Log
 
             try
             {
-                using var writer = new StreamWriter(this.LogFilePath);
+                using var writer = new StreamWriter(this.LogFilePath, true);
                 writer.WriteLine(message);
             }
             catch { }

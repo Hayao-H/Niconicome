@@ -61,6 +61,7 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
+using DomainSettings = Niconicome.Models.Domain.Local.Settings;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -93,6 +94,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<IErrorHandler, ErrorHandler>();
             services.AddTransient<ILogger, Logger>();
             services.AddSingleton<NicoLogger.ILogWriter, Infla::Log.LogStream>();
+            services.AddTransient<NicoLogger.INiconicomeLogger, NicoLogger.NiconicomeLogger>();
             services.AddSingleton<DataBase::IDataBase, DataBase::DataBase>();
             services.AddTransient<Store::IPlaylistStoreHandler, Store::PlaylistStoreHandler>();
             services.AddTransient<Store::IVideoStoreHandler, Store::VideoStoreHandler>();
@@ -272,6 +274,14 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonVM::Pages.AboutViewModel>();
             services.AddTransient<Utils::IBlazorHelper, Utils::BlazorHelper>();
             services.AddTransient<Store::V2.IApplicationStore, DB::ApplicationDBHandler>();
+            services.AddSingleton<NicoLogger.ILogWriter, Infla::Log.LogStream>();
+            services.AddTransient<AppEnvironment.IAppInfomationHandler, Infla::AppEnvironment.NiconicomeInfomationHandler>();
+            services.AddTransient<AppEnvironment.IOSInfomationHandler, Infla::AppEnvironment.WindowsInfomationHandler>();
+            services.AddTransient<Store::V2.ISettingsStore, DB::Json.SettingJsonHandler>();
+            services.AddTransient<DomainSettings::ISettingsConainer, DomainSettings::SettingsConainer>();
+            services.AddTransient<Local::Migration.ISettingMigratioin, Local::Migration.SettingMigratioin>();
+            services.AddSingleton<DB::LiteDB.ILiteDBHandler, DB::LiteDB.LiteDBHandler>();
+            services.AddTransient<Error.IErrorHandler, Error.ErrorHandler>();
 
             return services.BuildServiceProvider();
         }

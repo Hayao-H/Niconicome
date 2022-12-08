@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Net.Json;
@@ -34,7 +36,7 @@ namespace Niconicome.Models.Infrastructure.Database.Json
 
         #region Method
 
-        public IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName) where T : notnull, IComparable<T>
+        public IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName) where T : notnull
         {
             IAttemptResult iResult = this.Initialize();
             if (!iResult.IsSucceeded) return AttemptResult<ISettingInfo<T>>.Fail(iResult.Message);
@@ -54,7 +56,12 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             }
 
             object value = data[settingName];
-            if (value is T typedValue)
+
+            if (value is int && typeof(T).IsEnum)
+            {
+                return AttemptResult<ISettingInfo<T>>.Succeeded(new SettingInfo<T>(settingName, (T)Enum.ToObject(typeof(T), value), this));
+            }
+            else if (value is T typedValue)
             {
                 return AttemptResult<ISettingInfo<T>>.Succeeded(new SettingInfo<T>(settingName, typedValue, this));
             }
@@ -65,7 +72,12 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             }
         }
 
-        public IAttemptResult SetSetting<T>(ISettingInfo<T> setting) where T : notnull, IComparable<T>
+        public IAttemptResult SetSetting<T>(ISettingInfo<T> setting) where T : notnull
+        {
+            return this.SetSetting(setting.SettingName, setting.Value);
+        }
+
+        public IAttemptResult SetSetting<T>(string name, T value) where T : notnull
         {
             IAttemptResult iResult = this.Initialize();
             if (!iResult.IsSucceeded) return AttemptResult<T>.Fail(iResult.Message);
@@ -77,20 +89,28 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             }
 
             Dictionary<string, object> data = dResult.Data;
-            string name = setting.SettingName;
-            object value = setting.Value;
+            object settingValue;
 
-            if (data.ContainsKey(setting.SettingName))
+            if (value.GetType().IsEnum)
             {
-                data[name] = value;
+                settingValue = Convert.ToInt32(value);
+            } else
+            {
+                settingValue = value;
+            }
+
+            if (data.ContainsKey(name))
+            {
+                data[name] = settingValue;
             }
             else
             {
-                data.Add(name, value);
+                data.Add(name, settingValue);
             }
 
             return this.Update(data);
         }
+
 
         public IAttemptResult Flush()
         {
@@ -131,14 +151,14 @@ namespace Niconicome.Models.Infrastructure.Database.Json
 
             var fileInfo = new FileInfo(Path.Combine(AppContext.BaseDirectory, FileFolder.SettingJSONPath));
 
-            if (fileInfo.Exists) return AttemptResult.Succeeded();
+            if (fileInfo.Exists && fileInfo.Length > 0) return AttemptResult.Succeeded();
 
             if (fileInfo.Directory is null)
             {
                 this._errorHandler.HandleError(SettingJSONError.SettingDirectoryDetectionFailed);
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingDirectoryDetectionFailed));
             }
-            else if (fileInfo.Directory.Exists)
+            else if (!fileInfo.Directory.Exists)
             {
                 try
                 {
@@ -153,7 +173,7 @@ namespace Niconicome.Models.Infrastructure.Database.Json
 
             try
             {
-                fileInfo.Create();
+                using var _ = fileInfo.Create();
             }
             catch (Exception ex)
             {
@@ -164,7 +184,7 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             var initial = "{}";
             try
             {
-                using FileStream fs = fileInfo.Open(FileMode.Open);
+                using FileStream fs = fileInfo.OpenWrite();
                 using var writer = new StreamWriter(fs);
                 writer.Write(initial);
             }
@@ -223,10 +243,15 @@ namespace Niconicome.Models.Infrastructure.Database.Json
         /// <returns></returns>
         private IAttemptResult Update(Dictionary<string, object> data)
         {
+            data = data.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+
             string content;
+            JsonSerializerOptions oprions = JsonParser.DefaultOption;
+            oprions.WriteIndented = true;
+
             try
             {
-                content = JsonParser.Serialize(data);
+                content = JsonParser.Serialize(data, oprions);
             }
             catch (Exception ex)
             {

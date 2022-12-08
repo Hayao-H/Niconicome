@@ -20,6 +20,8 @@ namespace Niconicome.Models.Const
 
         public static string TopTabRegionName = "TopTabRegion";
 
+        public static Version CurrentDBVersion = new("1.0.0");
+
         public const string TabPositionTop = "top";
 
         public const string TabPositionBottom = "bottom";
@@ -27,6 +29,7 @@ namespace Niconicome.Models.Const
         public const string TaskTabID = "CB85F0CE-BCE3-4B46-BB33-B285843223EC";
 
         public const string AddonManagerTabID = "374f903a-3a94-4000-a9a4-3203aa0712a2";
+
 
     }
 }

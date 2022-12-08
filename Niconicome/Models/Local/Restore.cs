@@ -81,8 +81,8 @@ namespace Niconicome.Models.Local
         /// </summary>
         public void ResetSettings()
         {
-            this.dataBase.Clear(STypes::AppSettingString.TableName);
-            this.dataBase.Clear(STypes::AppSettingBool.TableName);
+            this.dataBase.Clear(STypes::AppSettingString.TableNameS);
+            this.dataBase.Clear(STypes::AppSettingBool.TableNameS);
         }
 
         /// <summary>

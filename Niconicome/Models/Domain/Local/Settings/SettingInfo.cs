@@ -9,7 +9,7 @@ using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Local.Settings
 {
-    public interface ISettingInfo<T> where T : notnull, IComparable<T>
+    public interface ISettingInfo<T> where T : notnull
     {
         /// <summary>
         /// 設定名
@@ -27,7 +27,7 @@ namespace Niconicome.Models.Domain.Local.Settings
         ReactiveProperty<T> ReactiveValue { get; }
     }
 
-    public class SettingInfo<T> : ISettingInfo<T> where T : notnull, IComparable<T>
+    public class SettingInfo<T> : ISettingInfo<T> where T : notnull
     {
         public SettingInfo(string settingName, T initialValue, ISettingsStore store)
         {

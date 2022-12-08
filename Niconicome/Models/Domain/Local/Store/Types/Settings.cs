@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.Storage;
+using Niconicome.Models.Infrastructure.Database.LiteDB;
 
 namespace Niconicome.Models.Domain.Local.Store.Types
 {
@@ -43,9 +44,14 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     /// <summary>
     /// アプリケーションの設定(真偽値)
     /// </summary>
-    public record AppSettingBool : IStorable
+    public record AppSettingBool : IStorable, IBaseStoreClass
     {
-        public static string TableName { get; } = "appsettingsbool";
+        [BsonIgnore]
+        public string TableName { get; } = "appsettingsbool";
+
+        [BsonIgnore]
+        public static string TableNameS { get; } = "appsettingsbool";
+
 
         [BsonId]
         public int Id { get; set; }
@@ -65,9 +71,13 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     /// <summary>
     /// アプリケーションの設定(文字列)
     /// </summary>
-    public record AppSettingString : IStorable
+    public record AppSettingString : IStorable, IBaseStoreClass
     {
-        public static string TableName { get; } = "appsettingsstr";
+        [BsonIgnore]
+        public static string TableNameS { get; } = "appsettingsstr";
+
+        [BsonIgnore]
+        public string TableName { get; } = "appsettingsstr";
 
         [BsonId]
         public int Id { get; set; }
@@ -86,9 +96,13 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     /// <summary>
     /// アプリケーションの設定(整数値)
     /// </summary>
-    public record AppSettingInt : IStorable
+    public record AppSettingInt : IStorable, IBaseStoreClass
     {
-        public static string TableName { get; } = "appsettingsint";
+        [BsonIgnore]
+        public static string TableNameS { get; } = "appsettingsint";
+
+        public string TableName { get; } = "appsettingsint";
+
 
         [BsonId]
         public int Id { get; set; }
