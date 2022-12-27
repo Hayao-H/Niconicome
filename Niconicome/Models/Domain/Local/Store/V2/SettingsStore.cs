@@ -48,5 +48,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// </summary>
         bool IsEmpty { get; }
 
+        /// <summary>
+        /// 設定が存在するかどうかを返す
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        bool Exists(string name);
+
     }
 }

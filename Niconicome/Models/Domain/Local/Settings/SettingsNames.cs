@@ -201,6 +201,8 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string ShowDownloadTasksAsTab { get; private set; } = "Application.ShowDownloadTasksAsTab";
 
+        public static string IsDebugMode { get; private set; } = "Application.IsDebugMode";
+
         //Addons
         public static string IsDeveloppersMode { get; private set; } = "Addons.IsDeveloppersModeEnabled";
 

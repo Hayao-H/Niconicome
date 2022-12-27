@@ -17,17 +17,20 @@ namespace Niconicome.Models.Domain.Local.Settings
         /// <typeparam name="T"></typeparam>
         /// <param name="settingName"></param>
         /// <returns></returns>
-        IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName) where T : notnull, IComparable<T>;
+        IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName, T defaultValue) where T : notnull;
     }
 
     public class SettingsConainer : ISettingsConainer
     {
-        public SettingsConainer(ISettingsStore store)
+        public SettingsConainer(ISettingsStore store, ISettingMigratioin settingMigratioin)
         {
             this._store = store;
+            this._settingMigratioin= settingMigratioin;
         }
 
         #region field
+
+        private readonly ISettingMigratioin _settingMigratioin;
 
         private readonly ISettingsStore _store;
 
@@ -35,8 +38,19 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         #region Method
 
-        public IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName) where T : notnull, IComparable<T>
+        public IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName, T defaultValue) where T : notnull
         {
+            if (this._settingMigratioin.IsMigrationNeeded)
+            {
+                IAttemptResult result = this._settingMigratioin.Migrate();
+                if (!result.IsSucceeded) return AttemptResult<ISettingInfo<T>>.Fail(result.Message);
+            }
+
+            if (!this._store.Exists(settingName))
+            {
+                this._store.SetSetting(settingName, defaultValue);
+            }
+
             return this._store.GetSetting<T>(settingName);
         }
 

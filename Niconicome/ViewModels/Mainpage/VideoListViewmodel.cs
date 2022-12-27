@@ -1,30 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Media;
 using System.Reactive.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Extensions.System.Windows;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
-using Niconicome.Models.Utils;
 using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Converter.KeyDown;
 using Niconicome.ViewModels.Mainpage.Tabs;
@@ -37,9 +34,9 @@ using EnumSettings = Niconicome.Models.Local.Settings.EnumSettingsValue;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 using Net = Niconicome.Models.Domain.Network;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
-using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
+using Settings = Niconicome.Models.Domain.Local.Settings;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -846,7 +843,11 @@ namespace Niconicome.ViewModels.Mainpage
                     if (e.Source is not FrameworkElement source) return;
                     if (source.DataContext is not VideoInfoViewModel videoInfo) return;
 
-                    var setting = WS::Mainpage.EnumSettingsHandler.GetSetting<EnumSettings::VideodbClickSettings>();
+                    IAttemptResult<ISettingInfo<EnumSettings::VideodbClickSettings>> result = WS::Mainpage.SettingsConainer.GetSetting(Settings::SettingNames.VideoListItemdbClickAction, EnumSettings::VideodbClickSettings.NotConfigured);
+
+                    if (!result.IsSucceeded || result.Data is null) return;
+
+                    var setting = result.Data.Value;
 
                     if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
                     {

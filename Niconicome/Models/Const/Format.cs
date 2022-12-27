@@ -22,6 +22,8 @@ namespace Niconicome.Models.Const
 
         public const string DefaultOwnerCommentSuffix = "[owner]";
 
+        public const string DefaultEconomyVideoSuffix = "[economy]";
+
         public const string DefaultThumbnailSuffix = "";
     }
 }

@@ -34,31 +34,19 @@ namespace Niconicome.Models.Network.Download
 
     public class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter, IEnumSettingsHandler enumSettingsHander, IPathOrganizer pathOrganizer, IVideoInfoContainer container)
+        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, IDomainModelConverter converter)
         {
             this.localContentHandler = localContentHandler;
-            this.settingHandler = localSettingHandler;
             this.converter = converter;
             this.logger = logger;
-            this.enumSettingsHandler = enumSettingsHander;
-            this.pathOrganizer = pathOrganizer;
-            this.container = container;
         }
 
         #region DI
         private readonly ILogger logger;
 
-        private readonly ILocalSettingHandler settingHandler;
-
         private readonly ILocalContentHandler localContentHandler;
 
         private readonly IDomainModelConverter converter;
-
-        private readonly IEnumSettingsHandler enumSettingsHandler;
-
-        private readonly IPathOrganizer pathOrganizer;
-
-        private readonly IVideoInfoContainer container;
 
         #endregion
 

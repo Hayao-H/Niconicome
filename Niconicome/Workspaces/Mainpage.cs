@@ -24,6 +24,7 @@ using Niconicome.Models.Network.Download.DLTask;
 using System.Windows.Controls;
 using Niconicome.Models.Local.OS;
 using Niconicome.Models.Local.Addon.V2;
+using Niconicome.Models.Domain.Local.Settings;
 
 namespace Niconicome.Workspaces
 {
@@ -47,7 +48,6 @@ namespace Niconicome.Workspaces
         public static VideoList::ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::ICurrent>();
         public static VideoList::IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::IVideoListContainer>();
         public static Ext::IExternalAppUtils ExternalAppUtils { get; private set; } = DIFactory.Provider.GetRequiredService<Ext::IExternalAppUtils>();
-        public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
         public static IDownloadSettingsHandler DownloadSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IDownloadSettingsHandler>();
         public static ISortInfoHandler SortInfoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ISortInfoHandler>();
         public static IPlaylistTreeHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistTreeHandler>();
@@ -56,7 +56,6 @@ namespace Niconicome.Workspaces
         public static IApplicationPowerManager ApplicationPower { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
         public static IStyleHandler StyleHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IStyleHandler>();
         public static ILocalSettingsContainer SettingsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingsContainer>();
-
         public static IPostDownloadActionssManager PostDownloadTasksManager { get; private set; } = DIFactory.Provider.GetRequiredService<IPostDownloadActionssManager>();
         public static IDlTimer DlTimer { get; private set; } = DIFactory.Provider.GetRequiredService<IDlTimer>();
         public static ITabsContainerHandler TabHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ITabsContainerHandler>();
@@ -99,12 +98,17 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// ページ遷移管理クラス
         /// </summary>
-        public static IBlazorPageManager BlazorPageManager { get; private set; }=DIFactory.Provider.GetRequiredService<IBlazorPageManager>();
+        public static IBlazorPageManager BlazorPageManager { get; private set; } = DIFactory.Provider.GetRequiredService<IBlazorPageManager>();
 
         /// <summary>
         /// アドンマネージャー
         /// </summary>
         public static IAddonManager AddonManager { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonManager>();
+
+        /// <summary>
+        /// 設定コンテナ
+        /// </summary>
+        public static ISettingsConainer SettingsConainer { get; private set; } = DIFactory.Resolve<ISettingsConainer>();
 
     }
 }

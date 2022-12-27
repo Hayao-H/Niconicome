@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Niconicome.ViewModels.Setting.Utils;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
-    class VideoListSettingsPageViewModel : SettingaBase
+    class VideoListSettingsPageViewModel
     {
         public VideoListSettingsPageViewModel()
         {
@@ -26,8 +28,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             var none = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.NotConfigured, "何もしない");
 
             this.SelectableVideodbClickAction = new List<ComboboxItem<VideodbClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download };
-            var settingdbClickvalue = WS::SettingPage.EnumSettingsHandler.GetSetting<VideodbClickSettings>();
-            this.videodbClickActionField = settingdbClickvalue switch
+            this.VideodbClickAction = new ConvertableSettingInfoViewModel<VideodbClickSettings, ComboboxItem<VideodbClickSettings>>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.VideoListItemdbClickAction,VideodbClickSettings.NotConfigured), none, x => x switch
             {
                 VideodbClickSettings.OpenInPlayerA => openInPlayerA,
                 VideodbClickSettings.OpenInPlayerB => openInPlayerB,
@@ -35,25 +36,18 @@ namespace Niconicome.ViewModels.Setting.Pages
                 VideodbClickSettings.SendToAppB => sendToAppB,
                 VideodbClickSettings.Download => download,
                 _ => none,
-            };
+            }, x => x.Value);
 
-            this.IsRestoreingColumnWidthDisabled = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.NoRestoreClumnWIdth));
-            this.IsRestoreingColumnWidthDisabled.Subscribe(value =>
-            {
-                this.SaveSetting(value, SettingsEnum.NoRestoreClumnWIdth);
-            });
+            this.IsRestoreingColumnWidthDisabled = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.IsRestoringColumnWidthDisabled,false), false);
 
-            this.IsDownloadSucceededHistoryDisabled = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.DisableDLSucceededHistory));
-            this.IsDownloadSucceededHistoryDisabled.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.DisableDLSucceededHistory)).AddTo(this.disposables);
-            this.IsDownloadFailedHistoryDisabled = new ReactiveProperty<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.DisableDLFailedHistory));
-            this.IsDownloadFailedHistoryDisabled.Subscribe(value => WS::SettingPage.SettingHandler.SaveSetting(value, SettingsEnum.DisableDLFailedHistory)).AddTo(this.disposables);
-            this.IsRestoringScrollPosDisabled = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DisableScrollRestore);
+            this.IsDownloadSucceededHistoryDisabled = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.DisableDownloadSucceededHistory,false), false);
+            this.IsDownloadFailedHistoryDisabled = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.DisableDownloadFailedHistory,false), false);
+            this.IsRestoringScrollPosDisabled = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.DisableScrollRestore, false), false);
 
             #endregion
         }
 
         #region フィールド
-        private ComboboxItem<VideodbClickSettings> videodbClickActionField;
         #endregion
 
         /// <summary>
@@ -64,27 +58,27 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// ダブルクリックアクション
         /// </summary>
-        public ComboboxItem<VideodbClickSettings> VideodbClickAction { get => this.videodbClickActionField; set => this.SaveEnumSetting(ref this.videodbClickActionField, value); }
+        public ConvertableSettingInfoViewModel<VideodbClickSettings, ComboboxItem<VideodbClickSettings>> VideodbClickAction { get; init; }
 
         /// <summary>
         /// 幅を継承しない
         /// </summary>
-        public ReactiveProperty<bool> IsRestoreingColumnWidthDisabled { get; init; }
+        public SettingInfoViewModel<bool> IsRestoreingColumnWidthDisabled { get; init; }
 
         /// <summary>
         /// DL成功履歴を無効にする
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadSucceededHistoryDisabled { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadSucceededHistoryDisabled { get; init; }
 
         /// <summary>
         /// DL失敗履歴を無効にする
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadFailedHistoryDisabled { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadFailedHistoryDisabled { get; init; }
 
         /// <summary>
         /// スクロール一復元を無効にする
         /// </summary>
-        public ReactiveProperty<bool> IsRestoringScrollPosDisabled { get; init; }
+        public SettingInfoViewModel<bool> IsRestoringScrollPosDisabled { get; init; }
 
     }
 
@@ -109,13 +103,13 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public ComboboxItem<VideodbClickSettings> VideodbClickAction { get; set; }
 
-        public ReactiveProperty<bool> IsRestoreingColumnWidthDisabled { get; init; } = new(false);
+        public SettingInfoViewModelD<bool> IsRestoreingColumnWidthDisabled { get; init; } = new(false);
 
-        public ReactiveProperty<bool> IsDownloadSucceededHistoryDisabled { get; init; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadSucceededHistoryDisabled { get; init; } = new(true);
 
-        public ReactiveProperty<bool> IsDownloadFailedHistoryDisabled { get; init; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadFailedHistoryDisabled { get; init; } = new(true);
 
-        public ReactiveProperty<bool> IsRestoringScrollPosDisabled { get; init; } = new(true);
+        public SettingInfoViewModelD<bool> IsRestoringScrollPosDisabled { get; init; } = new(true);
 
     }
 }

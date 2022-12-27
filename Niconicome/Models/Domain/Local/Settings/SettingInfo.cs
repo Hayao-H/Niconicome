@@ -25,6 +25,20 @@ namespace Niconicome.Models.Domain.Local.Settings
         /// 設定値(RP)
         /// </summary>
         ReactiveProperty<T> ReactiveValue { get; }
+
+        /// <summary>
+        /// フィルター関数を登録
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="function"></param>
+        void RegisterWhereFunc(Func<T, bool> predicate);
+
+        /// <summary>
+        /// 変換関数を登録
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="function"></param>
+        void RegisterSelectFunc(Func<T, T> converter);
     }
 
     public class SettingInfo<T> : ISettingInfo<T> where T : notnull
@@ -52,6 +66,10 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         private readonly ISettingsStore _store;
 
+        private Func<T, bool>? _predicate;
+
+        private Func<T, T>? _converter;
+
         #endregion
 
         #region Props
@@ -64,6 +82,12 @@ namespace Niconicome.Models.Domain.Local.Settings
             get => this._value;
             set
             {
+                if (this._predicate is not null && !this._predicate(value)) return;
+                if (this._converter is not null)
+                {
+                    value = this._converter(value);
+                }
+
                 this._value = value;
                 this.ReactiveValue.Value = value;
                 this._store.SetSetting(this);
@@ -71,6 +95,21 @@ namespace Niconicome.Models.Domain.Local.Settings
         }
 
         public ReactiveProperty<T> ReactiveValue { get; init; }
+
+
+        #endregion
+
+        #region Method
+
+        public void RegisterWhereFunc(Func<T, bool> predicate)
+        {
+            this._predicate = predicate;
+        }
+
+        public void RegisterSelectFunc(Func<T, T> converter)
+        {
+            this._converter = converter;
+        }
 
 
         #endregion

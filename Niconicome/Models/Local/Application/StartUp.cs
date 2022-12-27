@@ -13,7 +13,9 @@ using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Utils.InitializeAwaiter;
 using Niconicome.Models.Local.Addon.V2;
-using Niconicome.Models.Local.Migration;
+using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Const;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -27,7 +29,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager)
+        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsConainer settingsConainer)
         {
 
             this._playlistStoreHandler = playlistStoreHandler;
@@ -36,11 +38,11 @@ namespace Niconicome.Models.Local.Application
             this._autoLogin = autoLogin;
             this._snackbarHandler = snackbarHandler;
             this._logger = logger;
-            this._settingHandler = settingHandler;
             this._streamResumer = streamResumer;
             this._nicoDirectoryIO = nicoDirectoryIO;
             this._addonManager = addonManager;
             this._installManager = installManager;
+            this._settingsConainer = settingsConainer;
             this.DeleteInvalidbackup();
         }
 
@@ -58,8 +60,6 @@ namespace Niconicome.Models.Local.Application
 
         private readonly ILogger _logger;
 
-        private readonly ILocalSettingHandler _settingHandler;
-
         private readonly Resume::IStreamResumer _streamResumer;
 
         private readonly NicoIO::INicoDirectoryIO _nicoDirectoryIO;
@@ -67,6 +67,8 @@ namespace Niconicome.Models.Local.Application
         private readonly IAddonManager _addonManager;
 
         private readonly IAddonInstallManager _installManager;
+
+        private readonly ISettingsConainer _settingsConainer;
 
         #endregion
 
@@ -82,7 +84,6 @@ namespace Niconicome.Models.Local.Application
         {
             Task.Run(async () =>
             {
-                var v = Environment.OSVersion;
                 this.RemoveTmpFolder();
                 this.JustifyData();
                 this.DeleteInvalidFilePath();
@@ -98,7 +99,11 @@ namespace Niconicome.Models.Local.Application
         {
             if (this._nicoDirectoryIO.Exists("tmp"))
             {
-                var maxTmp = this._settingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
+                IAttemptResult<ISettingInfo<int>> result = this._settingsConainer.GetSetting<int>(SettingNames.MaxTmpSegmentsDirCount, 20);
+                if (!result.IsSucceeded || result.Data is null) return;
+
+                int maxTmp = result.Data.Value;
+
                 if (maxTmp < 0) maxTmp = 20;
                 var infos = this._streamResumer.GetAllSegmentsDirectoryInfo().ToList();
                 if (infos.Count <= maxTmp) return;

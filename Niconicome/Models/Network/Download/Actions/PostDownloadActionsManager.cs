@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Local.Machine;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
-using Reactive.Bindings;
+using Niconicome.ViewModels.Setting.Utils;
 
 namespace Niconicome.Models.Network.Download.Actions
 {
@@ -15,7 +18,7 @@ namespace Niconicome.Models.Network.Download.Actions
         /// <summary>
         /// DL完了後のアクション
         /// </summary>
-        ReactiveProperty<PostDownloadActions> PostDownloadAction { get; }
+        SettingInfoViewModel<PostDownloadActions> PostDownloadAction { get; }
 
         /// <summary>
         /// 設定されたアクションを実行する
@@ -25,24 +28,16 @@ namespace Niconicome.Models.Network.Download.Actions
 
     class PostDownloadActionsManager : IPostDownloadActionssManager
     {
-        public PostDownloadActionsManager(IComPowerManager comPowerManager, ILogger logger, IEnumSettingsHandler settingsHandler)
+        public PostDownloadActionsManager(IComPowerManager comPowerManager, ILogger logger,ISettingsConainer conainer)
         {
             this.comPowerManager = comPowerManager;
             this.logger = logger;
-            this.settingsHandler = settingsHandler;
-
-            this.PostDownloadAction = new ReactiveProperty<PostDownloadActions>(this.settingsHandler.GetSetting<PostDownloadActions>());
-            this.PostDownloadAction.Subscribe(value =>
-            {
-                this.settingsHandler.SaveSetting(value);
-            });
+            this.PostDownloadAction = new SettingInfoViewModel<PostDownloadActions>(conainer.GetSetting(SettingNames.PostDownloadAction, PostDownloadActions.None),PostDownloadActions.None);
         }
 
         #region field
 
         private readonly IComPowerManager comPowerManager;
-
-        private readonly IEnumSettingsHandler settingsHandler;
 
         private readonly ILogger logger;
 
@@ -50,7 +45,7 @@ namespace Niconicome.Models.Network.Download.Actions
 
         #region Props
 
-        public ReactiveProperty<PostDownloadActions> PostDownloadAction { get; init; }
+        public SettingInfoViewModel<PostDownloadActions> PostDownloadAction { get; init; }
 
         #endregion
 

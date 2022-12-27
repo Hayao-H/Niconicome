@@ -12,132 +12,108 @@ using Reactive.Bindings.Extensions;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using System.ComponentModel.DataAnnotations;
 using Niconicome.Models.Const;
+using Niconicome.ViewModels.Setting.Utils;
+using Niconicome.Models.Domain.Local.Settings;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
-    class DownloadSettingPageViewModel : SettingaBase, IDisposable
+    class DownloadSettingPageViewModel
     {
         public DownloadSettingPageViewModel()
         {
-            var cOffset = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.CommentOffset);
-            if (cOffset == -1)
+            this.CommentOffset = new SettingInfoViewModel<int>(WS::SettingPage.SettingsConainer.GetSetting<int>(SettingNames.CommentOffset, 40), 40);
+            if (this.CommentOffset.Value < 0)
             {
-                this.CommentOffset = new ReactiveProperty<int>(40);
-            }
-            else
-            {
-                this.CommentOffset = new ReactiveProperty<int>(cOffset);
-            }
-            this.CommentOffset.Subscribe(value => this.SaveSetting(value, SettingsEnum.CommentOffset));
-
-            this.isAutoSwitchOffsetEnableField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.SwitchOffset);
-
-            var maxP = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.MaxParallelDL);
-            var maxSP = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.MaxParallelSegDl);
-
-            if (maxP <= 0)
-            {
-                maxP = NetConstant.DefaultMaxParallelDownloadCount;
-            }
-            if (maxSP <= 0)
-            {
-                maxSP = NetConstant.DefaultMaxParallelSegmentDownloadCount;
+                this.CommentOffset.Value = 40;
             }
 
-            this.IsDownloadVideoInfoInJsonEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.VideoInfoInJson)).AddTo(this.disposables);
-            this.IsDownloadVideoInfoInJsonEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.VideoInfoInJson));
+            this.IsAutoSwitchOffsetEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.IsAutoSwitchOffsetEnable, false), false);
 
-            this.IsDownloadFromQueueEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.DLAllFromQueue)).AddTo(this.disposables);
-            this.IsDownloadFromQueueEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.DLAllFromQueue));
+            this.IsDownloadVideoInfoInJsonEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.IsDownloadingVideoInfoInJsonEnable, false), false);
 
-            this.IsDupeOnStageAllowed = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.AllowDupeOnStage)).AddTo(this.disposables);
-            this.IsDupeOnStageAllowed.Subscribe(value => this.SaveSetting(value, SettingsEnum.AllowDupeOnStage));
+            this.IsDownloadFromQueueEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.DownloadAllWhenPushDLButton, false), false);
 
-            this.IsOverrideVideoFileDTToUploadedDT = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT)).AddTo(this.disposables);
-            this.IsOverrideVideoFileDTToUploadedDT.Subscribe(value => this.SaveSetting(value, SettingsEnum.OverrideVideoFileDTToUploadedDT));
+            this.IsDupeOnStageAllowed = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.AllowDupeOnStage, false), false);
 
-            this.IsUnsafeCommentHandleEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle)).AddTo(this.disposables);
-            this.IsUnsafeCommentHandleEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.UnsafeCommentHandle));
+            this.IsOverrideVideoFileDTToUploadedDT = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.OverideVideoFileDTToUploadedDT, false), false);
 
-            this.IsDownloadResumingEnable = new ReactivePropertySlim<bool>(WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.EnableResume)).AddTo(this.disposables);
-            this.IsDownloadResumingEnable.Subscribe(value => this.SaveSetting(value, SettingsEnum.EnableResume));
+            this.IsUnsafeCommentHandleEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.EnableUnsafeCommentHandle, false), false);
 
-            this.IsOmitXmlDeclarationEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.OmitXmlDeclaration);
-            this.CommentCountPerBlock = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.CommentCountPerBlock, selectFunc: v => v <= 0 ? NetConstant.DefaultCommentCountPerBlock : v);
+            this.IsDownloadResumingEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.IsResumeEnable, false), false);
+
+            this.IsOmitXmlDeclarationEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.IsOmittingXmlDeclarationIsEnable, false), false);
+
+            var maxPResult = WS::SettingPage.SettingsConainer.GetSetting(SettingNames.MaxParallelDownloadCount, NetConstant.DefaultMaxParallelDownloadCount);
+            var maxSPResult = WS::SettingPage.SettingsConainer.GetSetting(SettingNames.MaxParallelSegmentDownloadCount, NetConstant.DefaultMaxParallelDownloadCount);
+
 
             var n1 = new ComboboxItem<int>(1, "1");
             var n2 = new ComboboxItem<int>(2, "2");
             var n3 = new ComboboxItem<int>(3, "3");
             var n4 = new ComboboxItem<int>(4, "4");
-            var nq = new ComboboxItem<int>(maxSP, maxSP.ToString());
 
             this.SelectableMaxParallelDownloadCount = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
-            if (maxSP > 4)
+            this.MaxParallelDownloadCount = new ConvertableSettingInfoViewModel<int, ComboboxItem<int>>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.MaxParallelDownloadCount, NetConstant.DefaultMaxParallelDownloadCount), n2, x =>
             {
-                this.SelectableMaxParallelDownloadCount.Add(nq);
-            }
+                if (this.SelectableMaxParallelDownloadCount.Any(box => box.Value == x))
+                {
+                    return this.SelectableMaxParallelDownloadCount.First(box => box.Value == x);
+                }
+                else
+                {
+                    var nx = new ComboboxItem<int>(x, x.ToString());
+                    this.SelectableMaxParallelDownloadCount.Add(nx);
+                    return nx;
+                }
+            }, x => x.Value);
 
-            this.MaxParallelDownloadCount = maxP switch
+
+            this.MaxParallelSegmentDownloadCount = new ConvertableSettingInfoViewModel<int, ComboboxItem<int>>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.MaxParallelSegmentDownloadCount, NetConstant.DefaultMaxParallelSegmentDownloadCount), n3, x =>
             {
-                1 => new ReactivePropertySlim<ComboboxItem<int>>(n1),
-                2 => new ReactivePropertySlim<ComboboxItem<int>>(n2),
-                3 => new ReactivePropertySlim<ComboboxItem<int>>(n3),
-                4 => new ReactivePropertySlim<ComboboxItem<int>>(n4),
-                _ => new ReactivePropertySlim<ComboboxItem<int>>(n4),
-            };
-            this.MaxParallelDownloadCount.Subscribe(value => this.SaveSetting(value, SettingsEnum.MaxParallelDL)).AddTo(this.disposables);
+                if (this.SelectableMaxParallelDownloadCount.Any(box => box.Value == x))
+                {
+                    return this.SelectableMaxParallelDownloadCount.First(box => box.Value == x);
+                }
+                else
+                {
+                    var nx = new ComboboxItem<int>(x, x.ToString());
+                    this.SelectableMaxParallelDownloadCount.Add(nx);
+                    return nx;
+                }
+            }, x => x.Value);
 
-            this.MaxParallelSegmentDownloadCount = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.MaxParallelSegDl)
-                .ToReactivePropertySlimAsSynchronized(value => value.Value, value =>
-                    value switch
-                    {
-                        1 => n1,
-                        2 => n2,
-                        3 => n3,
-                        4 => n4,
-                        _ => nq,
-
-                    }, value => value.Value);
-
-            var maxTmp = WS::SettingPage.SettingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
-            this.MaxTmpDirCount = new ReactiveProperty<int>(maxTmp < 0 ? 20 : maxTmp).AddTo(this.disposables);
-            this.MaxTmpDirCount.Subscribe(value => this.SaveSetting(value, SettingsEnum.MaxTmpDirCount));
+            this.MaxTmpDirCount = new SettingInfoViewModel<int>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.MaxParallelSegmentDownloadCount, 20), 20);
 
             var t1 = new ComboboxItem<VideoInfoTypeSettings>(VideoInfoTypeSettings.Text, "テキスト(Xeno互換)");
             var t2 = new ComboboxItem<VideoInfoTypeSettings>(VideoInfoTypeSettings.Json, "JSON");
             var t3 = new ComboboxItem<VideoInfoTypeSettings>(VideoInfoTypeSettings.Xml, "XML");
 
             this.SelectableVideoInfoType = new List<ComboboxItem<VideoInfoTypeSettings>>() { t1, t2, t3 };
-            this.VideoInfoType = WS::SettingPage.EnumSettingsHandler.GetSetting<VideoInfoTypeSettings>() switch
+            this.VideoInfoType = new ConvertableSettingInfoViewModel<VideoInfoTypeSettings, ComboboxItem<VideoInfoTypeSettings>>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.VideoInfoType, VideoInfoTypeSettings.Text), t1, x => x switch
             {
-                VideoInfoTypeSettings.Json => new ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>>(t2),
-                VideoInfoTypeSettings.Xml => new ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>>(t3),
-                _ => new ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>>(t1),
-            };
-            this.VideoInfoType.Subscribe(value => this.SaveEnumSetting(value)).AddTo(this.disposables);
-
+                VideoInfoTypeSettings.Json => t2,
+                VideoInfoTypeSettings.Xml => t3,
+                _ => t1
+            }, x => x.Value);
 
             var i1 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Html, "html");
             var i2 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Json, "json");
             var i3 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Xml, "xml");
             this.SelectableIchibaInfoType = new List<ComboboxItem<IchibaInfoTypeSettings>>() { i1, i2, i3 };
-            this.IchibaInfoType = WS::SettingPage.EnumSettingsHandler.GetSetting<IchibaInfoTypeSettings>() switch
+            this.IchibaInfoType = new ConvertableSettingInfoViewModel<IchibaInfoTypeSettings, ComboboxItem<IchibaInfoTypeSettings>>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.IchibaInfoType, IchibaInfoTypeSettings.Html), i1, x => x switch
             {
-                IchibaInfoTypeSettings.Xml => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i3),
-                IchibaInfoTypeSettings.Json => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i2),
-                _ => new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i1),
-            };
-            this.IchibaInfoType.Subscribe(value => this.SaveEnumSetting(value)).AddTo(this.disposables);
+                IchibaInfoTypeSettings.Json => i2,
+                IchibaInfoTypeSettings.Xml => i3,
+                _ => i1
+            }, x => x.Value);
 
-            this.IsExperimentalCommentSafetySystemEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.ExperimentalSafety);
-            this.CommentFetchWaitSpan = WS::SettingPage.SettingsContainer.GetReactiveIntSetting(SettingsEnum.CommentWaitSpan, null, value => value < 0 ? LocalConstant.DefaultCommetFetchWaitSpan : value);
-            this.IsDeletingExistingEconomyFileEnable = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.DeleteEcoFile);
+            this.IsExperimentalCommentSafetySystemEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.IsExperimentalCommentSafetySystemEnable, false), false);
+            this.CommentFetchWaitSpan = new ConvertableSettingInfoViewModel<int, int>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.CommentFetchWaitSpan, LocalConstant.DefaultCommetFetchWaitSpan), LocalConstant.DefaultCommetFetchWaitSpan, x => x < 0 ? LocalConstant.DefaultCommetFetchWaitSpan : x, x => x < 0 ? LocalConstant.DefaultCommetFetchWaitSpan : x);
+            this.IsDeletingExistingEconomyFileEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.DeleteExistingEconomyFile, false), false);
+
+            this.CommentCountPerBlock = new SettingInfoViewModel<int>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.CommentCountPerBlock, NetConstant.DefaultCommentCountPerBlock), NetConstant.DefaultCommentCountPerBlock);
 
         }
-
-        #region 設定値のフィールド
-        private bool isAutoSwitchOffsetEnableField;
-        #endregion
 
         /// <summary>
         /// 選択可能な並列ダウンロード数
@@ -158,93 +134,93 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// コメントのオフセット
         /// </summary>
-        public ReactiveProperty<int> CommentOffset { get; init; }
+        public SettingInfoViewModel<int> CommentOffset { get; init; }
 
         /// <summary>
         /// オフセット調節
         /// </summary>
-        public bool IsAutoSwitchOffsetEnable { get => this.isAutoSwitchOffsetEnableField; set => this.Savesetting(ref this.isAutoSwitchOffsetEnableField, value, SettingsEnum.SwitchOffset); }
+        public SettingInfoViewModel<bool> IsAutoSwitchOffsetEnable { get; init; }
 
         /// <summary>
         /// 最大並列DL数
         /// </summary>
-        public ReactivePropertySlim<ComboboxItem<int>> MaxParallelDownloadCount { get; init; }
+        public ConvertableSettingInfoViewModel<int, ComboboxItem<int>> MaxParallelDownloadCount { get; init; }
 
         /// <summary>
         /// 最大セグメント並列DL数
         /// </summary>
-        public ReactivePropertySlim<ComboboxItem<int>> MaxParallelSegmentDownloadCount { get; init; }
+        public ConvertableSettingInfoViewModel<int, ComboboxItem<int>> MaxParallelSegmentDownloadCount { get; init; }
 
         /// <summary>
         /// 動画情報ファイルの保存形式
         /// </summary>
-        public ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>> VideoInfoType { get; init; }
+        public ConvertableSettingInfoViewModel<VideoInfoTypeSettings, ComboboxItem<VideoInfoTypeSettings>> VideoInfoType { get; init; }
 
         /// <summary>
         /// 市場情報の保存形式
         /// </summary>
-        public ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>> IchibaInfoType { get; init; }
+        public ConvertableSettingInfoViewModel<IchibaInfoTypeSettings, ComboboxItem<IchibaInfoTypeSettings>> IchibaInfoType { get; init; }
 
         /// <summary>
         /// キューからもDLする
         /// </summary>
-        public ReactivePropertySlim<bool> IsDownloadFromQueueEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadFromQueueEnable { get; init; }
 
         /// <summary>
         /// ステージングの際の重複を許可する
         /// </summary>
-        public ReactivePropertySlim<bool> IsDupeOnStageAllowed { get; init; }
+        public SettingInfoViewModel<bool> IsDupeOnStageAllowed { get; init; }
 
         /// <summary>
         /// 動画ファイルの更新日時を投稿日時にする
         /// </summary>
-        public ReactivePropertySlim<bool> IsOverrideVideoFileDTToUploadedDT { get; init; }
+        public SettingInfoViewModel<bool> IsOverrideVideoFileDTToUploadedDT { get; init; }
 
         /// <summary>
         /// JSONでDLする
         /// </summary>
-        public ReactivePropertySlim<bool> IsDownloadVideoInfoInJsonEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadVideoInfoInJsonEnable { get; init; }
 
         /// <summary>
         /// レジュームを有効にする
         /// </summary>
-        public ReactivePropertySlim<bool> IsDownloadResumingEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadResumingEnable { get; init; }
 
         /// <summary>
         /// 安全でないコメントハンドルを有効にする
         /// </summary>
-        public ReactivePropertySlim<bool> IsUnsafeCommentHandleEnable { get; init; }
+        public SettingInfoViewModel<bool> IsUnsafeCommentHandleEnable { get; init; }
 
         /// <summary>
         /// /試験的な安全システムを有効にする
         /// </summary>
-        public ReactiveProperty<bool> IsExperimentalCommentSafetySystemEnable { get; set; }
+        public SettingInfoViewModel<bool> IsExperimentalCommentSafetySystemEnable { get; set; }
 
         /// <summary>
         /// Xml宣言を出力
         /// </summary>
-        public ReactiveProperty<bool> IsOmitXmlDeclarationEnable { get; init; }
+        public SettingInfoViewModel<bool> IsOmitXmlDeclarationEnable { get; init; }
 
         /// <summary>
         /// 1ブロックあたりのコメント数
         /// </summary>
-        public ReactiveProperty<int> CommentCountPerBlock { get; init; }
+        public SettingInfoViewModel<int> CommentCountPerBlock { get; init; }
 
         /// <summary>
         /// エコノミーファイル削除
         /// </summary>
-        public ReactiveProperty<bool> IsDeletingExistingEconomyFileEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDeletingExistingEconomyFileEnable { get; init; }
 
         /// <summary>
         /// 一時フォルダーの最大保持数
         /// </summary>
-        public ReactiveProperty<int> MaxTmpDirCount { get; init; }
+        public SettingInfoViewModel<int> MaxTmpDirCount { get; init; }
 
         /// <summary>
         /// コメント取得時の待機時間
         /// </summary>
         [RegularExpression(@"^\d$", ErrorMessage = "整数値を入力してください。")]
-        public ReactiveProperty<int> CommentFetchWaitSpan { get; init; }
+        public ConvertableSettingInfoViewModel<int, int> CommentFetchWaitSpan { get; init; }
 
 
     }
@@ -260,21 +236,21 @@ namespace Niconicome.ViewModels.Setting.Pages
             var n4 = new ComboboxItem<int>(4, "4");
 
             this.SelectableMaxParallelDownloadCount = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
-            this.MaxParallelDownloadCount = new ReactivePropertySlim<ComboboxItem<int>>(n3);
-            this.MaxParallelSegmentDownloadCount = new ReactivePropertySlim<ComboboxItem<int>>(n4);
+            this.MaxParallelDownloadCount = new ConvertableSettingInfoViewModelD<ComboboxItem<int>>(n3);
+            this.MaxParallelSegmentDownloadCount = new ConvertableSettingInfoViewModelD<ComboboxItem<int>>(n4);
 
             var t1 = new ComboboxItem<VideoInfoTypeSettings>(VideoInfoTypeSettings.Text, "テキスト(Xeno互換)");
             var t2 = new ComboboxItem<VideoInfoTypeSettings>(VideoInfoTypeSettings.Json, "JSON");
             var t3 = new ComboboxItem<VideoInfoTypeSettings>(VideoInfoTypeSettings.Xml, "XML");
 
             this.SelectableVideoInfoType = new List<ComboboxItem<VideoInfoTypeSettings>>() { t1, t2, t3 };
-            this.VideoInfoType = new ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>>(t2);
+            this.VideoInfoType = new ConvertableSettingInfoViewModelD<ComboboxItem<VideoInfoTypeSettings>>(t1);
 
             var i1 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Html, "html");
             var i2 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Json, "json");
             var i3 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Xml, "xml");
             this.SelectableIchibaInfoType = new List<ComboboxItem<IchibaInfoTypeSettings>>() { i1, i2, i3 };
-            this.IchibaInfoType = new ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>>(i1);
+            this.IchibaInfoType = new ConvertableSettingInfoViewModelD<ComboboxItem<IchibaInfoTypeSettings>>(i1);
         }
 
 
@@ -284,40 +260,40 @@ namespace Niconicome.ViewModels.Setting.Pages
 
         public List<ComboboxItem<IchibaInfoTypeSettings>> SelectableIchibaInfoType { get; init; }
 
-        public ReactivePropertySlim<ComboboxItem<int>> MaxParallelDownloadCount { get; init; }
+        public ConvertableSettingInfoViewModelD<ComboboxItem<int>> MaxParallelDownloadCount { get; init; }
 
-        public ReactivePropertySlim<ComboboxItem<int>> MaxParallelSegmentDownloadCount { get; init; }
+        public ConvertableSettingInfoViewModelD<ComboboxItem<int>> MaxParallelSegmentDownloadCount { get; init; }
 
-        public ReactivePropertySlim<ComboboxItem<VideoInfoTypeSettings>> VideoInfoType { get; init; }
+        public ConvertableSettingInfoViewModelD<ComboboxItem<VideoInfoTypeSettings>> VideoInfoType { get; init; }
 
-        public ReactiveProperty<ComboboxItem<IchibaInfoTypeSettings>> IchibaInfoType { get; init; }
+        public ConvertableSettingInfoViewModelD<ComboboxItem<IchibaInfoTypeSettings>> IchibaInfoType { get; init; }
 
-        public ReactivePropertySlim<int> CommentOffset { get; set; } = new(200);
+        public SettingInfoViewModelD<int> CommentOffset { get; set; } = new(200);
 
-        public ReactivePropertySlim<bool> IsAutoSwitchOffsetEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsAutoSwitchOffsetEnable { get; set; } = new(true);
 
-        public ReactivePropertySlim<bool> IsDownloadFromQueueEnable { get; set; } = new();
+        public SettingInfoViewModelD<bool> IsDownloadFromQueueEnable { get; set; } = new(false);
 
-        public ReactivePropertySlim<bool> IsDupeOnStageAllowed { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDupeOnStageAllowed { get; set; } = new(true);
 
-        public ReactivePropertySlim<bool> IsOverrideVideoFileDTToUploadedDT { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsOverrideVideoFileDTToUploadedDT { get; set; } = new(true);
 
-        public ReactivePropertySlim<bool> IsDownloadVideoInfoInJsonEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadVideoInfoInJsonEnable { get; set; } = new(true);
 
-        public ReactivePropertySlim<bool> IsDownloadResumingEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadResumingEnable { get; set; } = new(true);
 
-        public ReactivePropertySlim<bool> IsUnsafeCommentHandleEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsUnsafeCommentHandleEnable { get; set; } = new(true);
 
-        public ReactivePropertySlim<bool> IsExperimentalCommentSafetySystemEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsExperimentalCommentSafetySystemEnable { get; set; } = new(true);
 
-        public ReactivePropertySlim<bool> IsDeletingExistingEconomyFileEnable { get; init; } = new(true);
+        public SettingInfoViewModelD<bool> IsDeletingExistingEconomyFileEnable { get; init; } = new(true);
 
-        public ReactiveProperty<bool> IsOmitXmlDeclarationEnable { get; init; } = new(true);
+        public SettingInfoViewModelD<bool> IsOmitXmlDeclarationEnable { get; init; } = new(true);
 
-        public ReactiveProperty<int> CommentCountPerBlock { get; init; } = new(NetConstant.DefaultCommentCountPerBlock);
+        public SettingInfoViewModelD<int> CommentCountPerBlock { get; init; } = new(NetConstant.DefaultCommentCountPerBlock);
 
-        public ReactiveProperty<int> MaxTmpDirCount { get; set; } = new(20);
+        public SettingInfoViewModelD<int> MaxTmpDirCount { get; set; } = new(20);
 
-        public ReactiveProperty<int> CommentFetchWaitSpan { get; init; } = new(0);
+        public SettingInfoViewModelD<int> CommentFetchWaitSpan { get; init; } = new(0);
     }
 }

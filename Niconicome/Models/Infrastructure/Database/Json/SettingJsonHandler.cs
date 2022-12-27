@@ -55,7 +55,7 @@ namespace Niconicome.Models.Infrastructure.Database.Json
                 return AttemptResult<ISettingInfo<T>>.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingNotFound, settingName));
             }
 
-            object value = data[settingName];
+            dynamic value = data[settingName];
 
             if (value is int && typeof(T).IsEnum)
             {
@@ -94,7 +94,8 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             if (value.GetType().IsEnum)
             {
                 settingValue = Convert.ToInt32(value);
-            } else
+            }
+            else
             {
                 settingValue = value;
             }
@@ -109,6 +110,22 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             }
 
             return this.Update(data);
+        }
+
+        public bool Exists(string settingName)
+        {
+            IAttemptResult iResult = this.Initialize();
+            if (!iResult.IsSucceeded) return false;
+
+            IAttemptResult<Dictionary<string, object>> dResult = this.Read();
+            if (!dResult.IsSucceeded || dResult.Data is null)
+            {
+                return false;
+            }
+
+            Dictionary<string, object> data = dResult.Data;
+
+            return data.ContainsKey(settingName);
         }
 
 
@@ -220,16 +237,33 @@ namespace Niconicome.Models.Infrastructure.Database.Json
                 return AttemptResult<Dictionary<string, object>>.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonReadingFailed, ex));
             }
 
-            Dictionary<string, object> data;
+            Dictionary<string, object> rawData;
 
             try
             {
-                data = JsonParser.DeSerialize<Dictionary<string, object>>(content);
+                rawData = JsonParser.DeSerialize<Dictionary<string, object>>(content);
             }
             catch (Exception ex)
             {
                 this._errorHandler.HandleError(SettingJSONError.SettingJsonDeserializationFailed, ex);
                 return AttemptResult<Dictionary<string, object>>.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonDeserializationFailed, ex));
+            }
+
+            var data = new Dictionary<string, object>();
+
+            foreach (var x in rawData)
+            {
+                if (x.Value is JsonElement element)
+                {
+                    data.Add(x.Key, element.ValueKind switch
+                    {
+                        JsonValueKind.True => true,
+                        JsonValueKind.False => false,
+                        JsonValueKind.Number => element.GetInt32(),
+                        JsonValueKind.String => element.GetString() ?? string.Empty,
+                        _ => throw new NotSupportedException()
+                    });
+                }
             }
 
             this._cache = data;

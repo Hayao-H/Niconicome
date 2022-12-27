@@ -135,7 +135,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<MyApplication::IStartUp, MyApplication::StartUp>();
             services.AddTransient<Store::ISettingHandler, Store::SettingHandler>();
             services.AddTransient<Settings::ILocalSettingHandler, Settings::LocalSettingHandler>();
-            services.AddTransient<Settings.IEnumSettingsHandler, Settings::EnumSettingsHandler>();
             services.AddTransient<INiconicoUtils, NiconicoUtils>();
             services.AddSingleton<State::ILocalState, State::LocalState>();
             services.AddTransient<LocalFile::IEncodeutility, LocalFile::Encodeutility>();
@@ -279,7 +278,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AppEnvironment.IOSInfomationHandler, Infla::AppEnvironment.WindowsInfomationHandler>();
             services.AddTransient<Store::V2.ISettingsStore, DB::Json.SettingJsonHandler>();
             services.AddTransient<DomainSettings::ISettingsConainer, DomainSettings::SettingsConainer>();
-            services.AddTransient<Local::Migration.ISettingMigratioin, Local::Migration.SettingMigratioin>();
+            services.AddTransient<DomainSettings::ISettingMigratioin, DomainSettings::SettingMigratioin>();
             services.AddSingleton<DB::LiteDB.ILiteDBHandler, DB::LiteDB.LiteDBHandler>();
             services.AddTransient<Error.IErrorHandler, Error.ErrorHandler>();
 

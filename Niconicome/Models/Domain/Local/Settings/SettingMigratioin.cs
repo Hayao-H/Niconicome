@@ -2,15 +2,13 @@
 using System.Linq;
 using System.Reflection;
 using Niconicome.Extensions;
-using Niconicome.Models.Domain.Local;
-using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
-namespace Niconicome.Models.Local.Migration
+namespace Niconicome.Models.Domain.Local.Settings
 {
     public interface ISettingMigratioin
     {
@@ -128,8 +126,6 @@ namespace Niconicome.Models.Local.Migration
 
                 this._store.SetSetting(settingName, stringSetting.Data);
             }
-
-            var setting = this._store.GetSetting<VideoInfoTypeSettings>(SettingNames.VideoInfoType);
 
             return AttemptResult<IReadOnlyList<string>>.Succeeded(failed.AsReadOnly());
         }
