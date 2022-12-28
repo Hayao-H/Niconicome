@@ -30,6 +30,8 @@ namespace Niconicome.Models.Infrastructure.Database.Json
 
         private bool _isEmpty;
 
+        private readonly object _lockObj = new object();
+
         private Dictionary<string, object>? _cache;
 
         #endregion
@@ -168,7 +170,11 @@ namespace Niconicome.Models.Infrastructure.Database.Json
 
             var fileInfo = new FileInfo(Path.Combine(AppContext.BaseDirectory, FileFolder.SettingJSONPath));
 
-            if (fileInfo.Exists && fileInfo.Length > 0) return AttemptResult.Succeeded();
+            if (fileInfo.Exists && fileInfo.Length > 0)
+            {
+                this._isInitialized = true;
+                return AttemptResult.Succeeded();
+            }
 
             if (fileInfo.Directory is null)
             {
@@ -199,16 +205,19 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             }
 
             var initial = "{}";
-            try
+            lock (this._lockObj)
             {
-                using FileStream fs = fileInfo.OpenWrite();
-                using var writer = new StreamWriter(fs);
-                writer.Write(initial);
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(SettingJSONError.SettingJsonInitializationFailed, ex);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonInitializationFailed, ex));
+                try
+                {
+                    using FileStream fs = fileInfo.OpenWrite();
+                    using var writer = new StreamWriter(fs);
+                    writer.Write(initial);
+                }
+                catch (Exception ex)
+                {
+                    this._errorHandler.HandleError(SettingJSONError.SettingJsonInitializationFailed, ex);
+                    return AttemptResult.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonInitializationFailed, ex));
+                }
             }
 
             this._isEmpty = true;
@@ -221,20 +230,28 @@ namespace Niconicome.Models.Infrastructure.Database.Json
         /// 設定データを読み込む
         /// </summary>
         /// <returns></returns>
-        private IAttemptResult<Dictionary<string, object>> Read()
+        private IAttemptResult<Dictionary<string, object>> Read(int retryCount = 0)
         {
             if (this._cache is not null) return AttemptResult<Dictionary<string, object>>.Succeeded(this._cache);
 
             string content;
-            try
+            lock (this._lockObj)
             {
-                var reader = new StreamReader(Path.Combine(AppContext.BaseDirectory, FileFolder.SettingJSONPath));
-                content = reader.ReadToEnd();
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(SettingJSONError.SettingJsonReadingFailed, ex);
-                return AttemptResult<Dictionary<string, object>>.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonReadingFailed, ex));
+                try
+                {
+                    var reader = new StreamReader(Path.Combine(AppContext.BaseDirectory, FileFolder.SettingJSONPath));
+                    content = reader.ReadToEnd();
+                }
+                catch (Exception ex)
+                {
+                    if (retryCount < LocalConstant.MaxSettingsJsonRetry)
+                    {
+                        return this.Read(retryCount++);
+                    }
+
+                    this._errorHandler.HandleError(SettingJSONError.SettingJsonReadingFailed, ex);
+                    return AttemptResult<Dictionary<string, object>>.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonReadingFailed, ex));
+                }
             }
 
             Dictionary<string, object> rawData;
@@ -275,7 +292,7 @@ namespace Niconicome.Models.Infrastructure.Database.Json
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private IAttemptResult Update(Dictionary<string, object> data)
+        private IAttemptResult Update(Dictionary<string, object> data, int retryCount = 0)
         {
             data = data.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
 
@@ -293,15 +310,23 @@ namespace Niconicome.Models.Infrastructure.Database.Json
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonSerializationFailed, ex));
             }
 
-            try
+            lock (this._lockObj)
             {
-                using var writer = new StreamWriter(Path.Combine(AppContext.BaseDirectory, FileFolder.SettingJSONPath), false);
-                writer.WriteLine(content);
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(SettingJSONError.SettingJsonWritingFailed, ex);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonWritingFailed, ex));
+                try
+                {
+                    using var writer = new StreamWriter(Path.Combine(AppContext.BaseDirectory, FileFolder.SettingJSONPath), false);
+                    writer.WriteLine(content);
+                }
+                catch (Exception ex)
+                {
+                    if (retryCount <= LocalConstant.MaxSettingsJsonRetry)
+                    {
+                        return this.Update(data, retryCount++);
+                    }
+
+                    this._errorHandler.HandleError(SettingJSONError.SettingJsonWritingFailed, ex);
+                    return AttemptResult.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingJsonWritingFailed, ex));
+                }
             }
 
             this._cache = data;

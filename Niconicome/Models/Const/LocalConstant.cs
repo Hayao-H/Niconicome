@@ -12,6 +12,8 @@ namespace Niconicome.Models.Const
 
         public static int DefaultCommetFetchWaitSpan = 0;
 
+        public static int MaxSettingsJsonRetry = 3;
+
         public static string DefaultErrorCode = "0";
 
         public static string DefaultPlaylistName = "新しいプレイリスト";

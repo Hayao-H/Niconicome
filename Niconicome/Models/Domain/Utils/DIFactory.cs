@@ -276,8 +276,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<NicoLogger.ILogWriter, Infla::Log.LogStream>();
             services.AddTransient<AppEnvironment.IAppInfomationHandler, Infla::AppEnvironment.NiconicomeInfomationHandler>();
             services.AddTransient<AppEnvironment.IOSInfomationHandler, Infla::AppEnvironment.WindowsInfomationHandler>();
-            services.AddTransient<Store::V2.ISettingsStore, DB::Json.SettingJsonHandler>();
-            services.AddTransient<DomainSettings::ISettingsConainer, DomainSettings::SettingsConainer>();
+            services.AddSingleton<Store::V2.ISettingsStore, DB::Json.SettingJsonHandler>();
+            services.AddSingleton<DomainSettings::ISettingsConainer, DomainSettings::SettingsConainer>();
             services.AddTransient<DomainSettings::ISettingMigratioin, DomainSettings::SettingMigratioin>();
             services.AddSingleton<DB::LiteDB.ILiteDBHandler, DB::LiteDB.LiteDBHandler>();
             services.AddTransient<Error.IErrorHandler, Error.ErrorHandler>();
