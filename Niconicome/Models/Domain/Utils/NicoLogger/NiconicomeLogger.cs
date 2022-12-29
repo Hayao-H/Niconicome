@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Utils.NicoLogger
 {
@@ -25,6 +27,11 @@ namespace Niconicome.Models.Domain.Utils.NicoLogger
         /// </summary>
         /// <param name="message"></param>
         void Log(string message);
+
+        /// <summary>
+        /// デバッグフラグ
+        /// </summary>
+        bool IsDebugMode { get; set; }
     }
 
     public class NiconicomeLogger : INiconicomeLogger
@@ -32,6 +39,9 @@ namespace Niconicome.Models.Domain.Utils.NicoLogger
         public NiconicomeLogger(ILogWriter writer)
         {
             this._writer = writer;
+#if DEBUG
+            this.IsDebugMode = true;
+#endif
         }
 
         #region field
@@ -54,8 +64,15 @@ namespace Niconicome.Models.Domain.Utils.NicoLogger
 
         public void Log(string message)
         {
+            if (!this.IsDebugMode) return;
             this.WriteInternal($"[log]{message}");
         }
+
+        #endregion
+
+        #region Props
+
+        public bool IsDebugMode { get; set; }
 
         #endregion
 

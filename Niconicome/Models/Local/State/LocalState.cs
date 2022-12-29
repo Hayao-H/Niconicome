@@ -1,4 +1,7 @@
-﻿using Niconicome.Models.Local.Settings;
+﻿using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Utils.NicoLogger;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Local.State
 {
@@ -33,14 +36,41 @@ namespace Niconicome.Models.Local.State
 
     public class LocalState : ILocalState
     {
+        public LocalState(INiconicomeLogger logger)
+        {
+            this._logger = logger;
+#if DEBUG
+            this._isDebugMode = true;
+#endif
+        }
+
+        #region field
+
+        private readonly INiconicomeLogger _logger;
+
+        private bool _isDebugMode;
+
+        #endregion
+
+        #region Props
         public bool IsSettingWindowOpen { get; set; }
 
-        public bool IsDebugMode { get; set; }
+        public bool IsDebugMode
+        {
+            get => this._isDebugMode;
+            set
+            {
+                this._isDebugMode = value;
+                this._logger.IsDebugMode = value;
+            }
+        }
 
         public bool IsImportingFromXeno { get; set; }
 
         public bool IsAddonManagerOpen { get; set; }
 
         public bool IsTaskWindowOpen { get; set; }
+
+        #endregion
     }
 }

@@ -16,6 +16,7 @@ using Niconicome.Models.Local.Addon.V2;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Utils.NicoLogger;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -69,7 +70,6 @@ namespace Niconicome.Models.Local.Application
         private readonly IAddonInstallManager _installManager;
 
         private readonly ISettingsConainer _settingsConainer;
-
         #endregion
 
         /// <summary>
