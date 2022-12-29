@@ -9,10 +9,19 @@ namespace Niconicome.Models.Domain.Playlist
 {
     public interface ITagInfo
     {
+        /// <summary>
+        /// ID
+        /// </summary>
         public int ID { get; }
 
+        /// <summary>
+        /// タグ名
+        /// </summary>
         public string Name { get; }
 
+        /// <summary>
+        /// 大百科記事存在フラウ
+        /// </summary>
         public bool IsNicodicExist { get; set; }
     }
 

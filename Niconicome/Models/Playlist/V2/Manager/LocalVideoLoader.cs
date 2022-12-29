@@ -1,0 +1,168 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Niconicome.Extensions.System;
+using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.IO;
+using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Domain.Utils.Error;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Network.Video;
+using Niconicome.Models.Playlist.V2.Manager.Error;
+
+namespace Niconicome.Models.Playlist.V2.Manager
+{
+
+    public interface ILocalVideoLoader
+    {
+        /// <summary>
+        /// 非同期で動画のサムネパスとファイルパスを設定
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <returns></returns>
+        Task<IAttemptResult> SetPathAsync(IEnumerable<IVideoInfo> videos);
+    }
+
+    public class LocalVideoLoader : ILocalVideoLoader
+    {
+        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsConainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler)
+        {
+            this._directoryIO = directoryIO;
+            this._thumbnailUtility = thumbnailUtility;
+            this._settingsContainer = settingsConainer;
+            this._playlistVideoContainer = playlistVideoContainer;
+            this._errorHandler = errorHandler;
+        }
+
+        #region field
+
+        private readonly INicoDirectoryIO _directoryIO;
+
+        private readonly IThumbnailUtility _thumbnailUtility;
+
+        private readonly ISettingsConainer _settingsContainer;
+
+        private readonly IPlaylistVideoContainer _playlistVideoContainer;
+
+        private readonly IErrorHandler _errorHandler;
+
+        private List<string>? _cachedFiles;
+
+        #endregion
+
+        #region Method
+        public async Task<IAttemptResult> SetPathAsync(IEnumerable<IVideoInfo> videos)
+        {
+            if (this._playlistVideoContainer.CurrentSelectedPlaylist is null)
+            {
+                this._errorHandler.HandleError(LocalVideoLoaderError.PlaylistIsNotSelected);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(LocalVideoLoaderError.PlaylistIsNotSelected));
+            }
+
+            this._cachedFiles = null;
+
+            int playlistID = this._playlistVideoContainer.CurrentSelectedPlaylist.ID;
+            string folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.FolderPath;
+            string economy = this._settingsContainer.GetSetting(SettingNames.EnonomyQualitySuffix, "").Data?.Value ?? "";
+
+            ///削除動画のサムネを保存
+            await this._thumbnailUtility.DownloadDeletedVideoThumbAsync();
+
+            foreach (var video in videos)
+            {
+                if (playlistID != (this._playlistVideoContainer.CurrentSelectedPlaylist?.ID ?? -1))
+                {
+                    this._errorHandler.HandleError(LocalVideoLoaderError.PlaylistChanged);
+                    return AttemptResult.Fail(this._errorHandler.GetMessageForResult(LocalVideoLoaderError.PlaylistChanged));
+                }
+
+                IAttemptResult<string> pathResult = this.GetFilePath(video.NiconicoId, folderPath);
+                if (pathResult.IsSucceeded && pathResult.Data is not null)
+                {
+                    video.FilePath = pathResult.Data;
+                    video.IsDownloaded = true;
+
+                    if (!economy.IsNullOrEmpty())
+                    {
+                        if (pathResult.Data.Contains(economy))
+                        {
+                            video.IsEconomy = true;
+                        }
+                        else
+                        {
+                            video.IsEconomy = false;
+                        }
+                    }
+                }
+
+                //サムネイル
+                bool hasCache = this._thumbnailUtility.IsThumbExists(video.NiconicoId);
+
+                if (!hasCache)
+                {
+                    await this._thumbnailUtility.DownloadThumbAsync(video.NiconicoId, video.ThumbUrl);
+                }
+
+                IAttemptResult<string> tResult = this._thumbnailUtility.GetThumbPath(video.NiconicoId);
+                if (tResult.IsSucceeded && tResult.Data is not null)
+                {
+                    video.ThumbPath = tResult.Data;
+                }
+
+            }
+
+            return AttemptResult.Succeeded();
+        }
+
+        #endregion
+
+        #region private
+
+        /// <summary>
+        /// 動画ファイルのパスを取得
+        /// </summary>
+        /// <param name="niconicoID"></param>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        private IAttemptResult<string> GetFilePath(string niconicoID, string folderPath)
+        {
+
+            if (!Path.IsPathRooted(folderPath))
+            {
+                folderPath = Path.Combine(AppContext.BaseDirectory, folderPath);
+            }
+
+            if (this._cachedFiles is null)
+            {
+                this._cachedFiles = new List<string>();
+                if (this._directoryIO.Exists(folderPath))
+                {
+                    this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.Mp4FileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
+                    this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.TsFileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
+                }
+
+            }
+
+            string? firstMp4 = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
+            //.mp4ファイルを確認
+            if (firstMp4 is not null)
+            {
+                return AttemptResult<string>.Succeeded(firstMp4);
+            }
+            else
+            //.tsファイルを確認
+            {
+                string? firstTS = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
+                if (firstTS is not null) return AttemptResult<string>.Succeeded(firstTS);
+            }
+
+            return AttemptResult<string>.Fail();
+
+        }
+
+        #endregion
+    }
+}

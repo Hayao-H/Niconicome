@@ -32,6 +32,8 @@ namespace Niconicome.Models.Const
 
         public const string AddonManagerTabID = "374f903a-3a94-4000-a9a4-3203aa0712a2";
 
+        public const string VideoListV2TabID = "8E112E95-9B7A-4F0A-98FA-A63E42BC8850";
+
 
     }
 }

@@ -1,30 +1,29 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Auth;
-using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local;
+using Niconicome.Models.Local.Addon.API.Local.Tab;
+using Niconicome.Models.Local.Addon.V2;
 using Niconicome.Models.Local.Application;
+using Niconicome.Models.Local.OS;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Local.Timer;
 using Niconicome.Models.Network;
 using Niconicome.Models.Network.Download;
-using Niconicome.Models.Network.Watch;
-using Niconicome.Models.Playlist;
-using Ext = Niconicome.Models.Local.External;
-using VideoList = Niconicome.Models.Playlist.VideoList;
-using Niconicome.Models.Utils;
-using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Network.Download.Actions;
-using Niconicome.Models.Local.Timer;
-using Niconicome.Models.Local.Addon.API.Local.Tab;
+using Niconicome.Models.Network.Download.DLTask;
 using Niconicome.Models.Network.Fetch;
 using Niconicome.Models.Network.Register;
+using Niconicome.Models.Network.Watch;
+using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Utils;
 using Niconicome.Models.Utils.InitializeAwaiter;
-using Niconicome.Models.Network.Download.DLTask;
-using System.Windows.Controls;
-using Niconicome.Models.Local.OS;
-using Niconicome.Models.Local.Addon.V2;
-using Niconicome.Models.Domain.Local.Settings;
+using Ext = Niconicome.Models.Local.External;
+using VideoList = Niconicome.Models.Playlist.VideoList;
+using Playlist = Niconicome.Models.Playlist.V2;
 
 namespace Niconicome.Workspaces
 {
@@ -109,6 +108,11 @@ namespace Niconicome.Workspaces
         /// 設定コンテナ
         /// </summary>
         public static ISettingsConainer SettingsConainer { get; private set; } = DIFactory.Resolve<ISettingsConainer>();
+
+        /// <summary>
+        /// 動画・プレイリストコンテナ
+        /// </summary>
+        public static Playlist::IPlaylistVideoContainer PlaylistVideoContainer { get; private set; } = DIFactory.Resolve<Playlist::IPlaylistVideoContainer>();
 
     }
 }

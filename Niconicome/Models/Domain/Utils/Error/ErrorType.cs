@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Infrastructure.Database.Json;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
+using Niconicome.Models.Network.Video.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 
 namespace Niconicome.Models.Domain.Utils.Error
@@ -18,7 +19,10 @@ namespace Niconicome.Models.Domain.Utils.Error
         {
             { 1,typeof(LiteDBError) },
             {2,typeof(PlaylistManagerError) },
-            {3,typeof(SettingJSONError) }
+            {3,typeof(SettingJSONError) },
+            {4,typeof(ThumbnailUtilityError) },
+            {5,typeof(LocalVideoLoaderError) },
+            { 4, typeof(VideoListManagerError) }
         };
     }
 }

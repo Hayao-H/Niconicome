@@ -75,6 +75,11 @@ namespace Niconicome.Models.Domain.Playlist
         string ThumbPath { get; set; }
 
         /// <summary>
+        /// ファイルパス
+        /// </summary>
+        string FilePath { get; set; }
+
+        /// <summary>
         /// 長さ
         /// </summary>
         int Duration { get; set; }
@@ -93,6 +98,16 @@ namespace Niconicome.Models.Domain.Playlist
         /// 選択フラグ
         /// </summary>
         bool IsSelected { get; set; }
+
+        /// <summary>
+        /// DL済みフラグ
+        /// </summary>
+        bool IsDownloaded { get; set; }
+
+        /// <summary>
+        /// エコノミーフラグ
+        /// </summary>
+        bool IsEconomy { get; set; }
 
         /// <summary>
         /// タグを追加
@@ -275,6 +290,9 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
+        public string FilePath { get; set; } = string.Empty;
+
+
         public int Duration
         {
             get => this._duration;
@@ -306,6 +324,10 @@ namespace Niconicome.Models.Domain.Playlist
                 this.Update(this);
             }
         }
+
+        public bool IsDownloaded { get; set; }
+
+        public bool IsEconomy { get; set; }
 
         #endregion
 
