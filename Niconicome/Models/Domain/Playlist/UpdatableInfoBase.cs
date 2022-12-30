@@ -8,13 +8,12 @@ using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Playlist
 {
-    public class UpdatableInfoBase<TUpdater, TInfo> where TUpdater : IStoreUpdater<TInfo>
+    public class UpdatableInfoBase<TUpdater, TInfo> : IUpdatable where TUpdater : IStoreUpdater<TInfo>
     {
         public UpdatableInfoBase(IStoreUpdater<TInfo> updater)
         {
             this._updater = updater;
         }
-
 
         #region field
 
@@ -24,7 +23,9 @@ namespace Niconicome.Models.Domain.Playlist
 
         protected IAttemptResult Update(TInfo infomation)
         {
-           return this._updater.Update(infomation);
+            return this._updater.Update(infomation);
         }
+
+        public bool IsAutoUpdateEnabled { get; set; }
     }
 }

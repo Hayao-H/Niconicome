@@ -39,8 +39,11 @@ namespace Niconicome.Models.Infrastructure.Database
             {
                 ID = result.Data.Id,
                 Name = result.Data.Name,
-                IsNicodicExist = result.Data.IsNicodicExist,
             };
+
+            tag.IsAutoUpdateEnabled = false;
+            tag.IsNicodicExist = result.Data.IsNicodicExist;
+            tag.IsAutoUpdateEnabled = true;
 
             return AttemptResult<ITagInfo>.Succeeded(tag);
         }

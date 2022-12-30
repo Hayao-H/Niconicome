@@ -23,7 +23,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
         {
             this._container = container;
             this._loader = loader;
-            this._errorHandler = errorHandler;
+            this._errorHandler = errorHandler; 
         }
 
         #region field
@@ -55,6 +55,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 this._errorHandler.HandleError(VideoListManagerError.PlaylistChanged);
                 return;
             }
+
+            this._container.Videos.Clear();
+            this._container.Videos.AddRange(this._container.CurrentSelectedPlaylist!.Videos);
 
         }
 

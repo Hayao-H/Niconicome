@@ -12,6 +12,8 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 
         public static string AppInfomation = "applicationinfomation";
 
+        public static string SharedVideo = "v2_video_shared";
+
         public static string Video = "v2_video";
 
         public static string Tag = "v2_tag";

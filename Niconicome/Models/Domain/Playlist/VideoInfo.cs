@@ -7,12 +7,17 @@ using Niconicome.Models.Domain.Local.Store.V2;
 
 namespace Niconicome.Models.Domain.Playlist
 {
-    public interface IVideoInfo
+    public interface IVideoInfo : IUpdatable
     {
         /// <summary>
         /// ID
         /// </summary>
         int ID { get; }
+
+        /// <summary>
+        /// プレイリストのID
+        /// </summary>
+        int PlaylistID { get; }
 
         /// <summary>
         /// 動画ID
@@ -155,6 +160,8 @@ namespace Niconicome.Models.Domain.Playlist
 
         private string _thumbPath = string.Empty;
 
+        private string _filePath = string.Empty;
+
         private int _duration;
 
         private readonly List<ITagInfo> _tags = new();
@@ -163,11 +170,17 @@ namespace Niconicome.Models.Domain.Playlist
 
         private bool _isSelected;
 
+        private bool _isEconomy;
+
+        private bool _isDownloaded;
+
         #endregion
 
         #region Props
 
         public int ID { get; init; }
+
+        public int PlaylistID { get; init; }
 
         public string NiconicoId
         {
@@ -175,6 +188,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._niconicoId = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -185,6 +199,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._title = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -195,6 +210,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._uploadedOn = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -205,6 +221,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._viewCount = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -215,6 +232,8 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._commentCount = value;
+                if (!this.IsAutoUpdateEnabled) return;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -225,6 +244,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._mylistCount = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -235,6 +255,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._likeCount = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -245,6 +266,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._ownerID = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -255,6 +277,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._ownerName = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -266,6 +289,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._largeThumbUrl = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -276,6 +300,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._thumbUrl = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -286,11 +311,21 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._title = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
 
-        public string FilePath { get; set; } = string.Empty;
+        public string FilePath
+        {
+            get => this._filePath;
+            set
+            {
+                this._filePath = value;
+                if (!this.IsAutoUpdateEnabled) return;
+                this.Update(this);
+            }
+        }
 
 
         public int Duration
@@ -299,6 +334,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._duration = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -311,6 +347,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._isDeleted = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
@@ -321,13 +358,32 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._isSelected = value;
+                if (!this.IsAutoUpdateEnabled) return;
                 this.Update(this);
             }
         }
 
-        public bool IsDownloaded { get; set; }
+        public bool IsDownloaded
+        {
+            get => this._isDownloaded;
+            set
+            {
+                this._isDownloaded = value;
+                if (!this.IsAutoUpdateEnabled) return;
+                this.Update(this);
+            }
+        }
 
-        public bool IsEconomy { get; set; }
+        public bool IsEconomy
+        {
+            get => this._isEconomy;
+            set
+            {
+                this._isEconomy = value;
+                if (!this.IsAutoUpdateEnabled) return;
+                this.Update(this);
+            }
+        }
 
         #endregion
 

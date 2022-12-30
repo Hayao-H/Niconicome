@@ -13,36 +13,16 @@ namespace Niconicome.Models.Infrastructure.Database.Types
 
         public string TableName { get; set; } = TableNames.Video;
 
-        public string NiconicoId { get; set; } = string.Empty;
+        public int SharedVideoID { get; set; }
 
-        public string Title { get; set; } = string.Empty;
-
-        public DateTime UploadedOn { get; set; }
-
-        public int ViewCount { get; set; }
-
-        public int CommentCount { get; set; }
-
-        public int MylistCount { get; set; }
-
-        public int LikeCount { get; set; }
-
-        public int OwnerID { get; set; }
-
-        public string OwnerName { get; set; } = string.Empty;
-
-        public string LargeThumbUrl { get; set; } = string.Empty;
-
-        public string ThumbUrl { get; set; } = string.Empty;
-
-        public string ThumbPath { get; set; } = string.Empty;
-
-        public int Duration { get; set; }
-
-        public List<int> Tags { get; set; } = new();
-
-        public bool IsDeleted { get; set; }
+        public int PlaylistID { get; set; }
 
         public bool IsSelected { get; set; }
+
+        public bool IsDownloaded { get; set; }
+
+        public bool IsEconomy { get; set; }
+
+        public string VideoFilePath { get; set; } = string.Empty;
     }
 }

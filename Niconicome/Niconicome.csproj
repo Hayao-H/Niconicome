@@ -74,8 +74,4 @@
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Models\Network\Video\Error\" />
-	</ItemGroup>
 </Project>

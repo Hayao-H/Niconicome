@@ -162,7 +162,7 @@ namespace Niconicome.Models.Infrastructure.Database
             var videos = new List<IVideoInfo>();
             foreach (var videoID in playlist.Videos)
             {
-                IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(videoID);
+                IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(videoID, playlist.Id);
                 if (!vResult.IsSucceeded || vResult.Data is null) continue;
                 videos.Add(vResult.Data);
             }
@@ -170,25 +170,29 @@ namespace Niconicome.Models.Infrastructure.Database
             var info = new PlaylistInfo(playlist.Name, videos, this)
             {
                 ID = playlist.Id,
-                FolderPath = playlist.FolderPath,
-                PlaylistType = playlist.PlaylistType switch
-                {
-                    DBPlaylistType.Mylist => PlaylistType.Mylist,
-                    DBPlaylistType.Series => PlaylistType.Series,
-                    DBPlaylistType.WatchLater => PlaylistType.WatchLater,
-                    DBPlaylistType.UserVideos => PlaylistType.UserVideos,
-                    DBPlaylistType.Channel => PlaylistType.Channel,
-                    DBPlaylistType.Root => PlaylistType.Root,
-                    DBPlaylistType.Temporary => PlaylistType.Temporary,
-                    DBPlaylistType.DownloadSucceededHistory => PlaylistType.DownloadSucceededHistory,
-                    DBPlaylistType.DownloadFailedHistory => PlaylistType.DownloadFailedHistory,
-                    DBPlaylistType.PlaybackHistory => PlaylistType.PlaybackHistory,
-                    _ => PlaylistType.Local,
-                },
-                RemoteParameter = playlist.RemoteParameter,
                 ChildrenID = playlist.Children.AsReadOnly(),
             };
 
+            info.IsAutoUpdateEnabled = false;
+
+            info.FolderPath = playlist.FolderPath;
+            info.PlaylistType = playlist.PlaylistType switch
+            {
+                DBPlaylistType.Mylist => PlaylistType.Mylist,
+                DBPlaylistType.Series => PlaylistType.Series,
+                DBPlaylistType.WatchLater => PlaylistType.WatchLater,
+                DBPlaylistType.UserVideos => PlaylistType.UserVideos,
+                DBPlaylistType.Channel => PlaylistType.Channel,
+                DBPlaylistType.Root => PlaylistType.Root,
+                DBPlaylistType.Temporary => PlaylistType.Temporary,
+                DBPlaylistType.DownloadSucceededHistory => PlaylistType.DownloadSucceededHistory,
+                DBPlaylistType.DownloadFailedHistory => PlaylistType.DownloadFailedHistory,
+                DBPlaylistType.PlaybackHistory => PlaylistType.PlaybackHistory,
+                _ => PlaylistType.Local,
+            };
+            info.RemoteParameter = playlist.RemoteParameter;
+
+            info.IsAutoUpdateEnabled = true;
             return info;
         }
 

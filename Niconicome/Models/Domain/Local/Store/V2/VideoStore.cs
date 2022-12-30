@@ -13,8 +13,10 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <summary>
         /// 動画を取得
         /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="playlistID"></param>
         /// <returns></returns>
-        IAttemptResult<IVideoInfo> GetVideo(int ID);
+        IAttemptResult<IVideoInfo> GetVideo(int ID, int playlistID);
 
         /// <summary>
         /// 動画を作成
@@ -28,13 +30,14 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        IAttemptResult Delete(int ID);
+        IAttemptResult Delete(int ID, int playlistID);
 
         /// <summary>
         /// 指定したIDで動画の存在を確認
         /// </summary>
         /// <param name="ID"></param>
+        /// <param name="playlistID"></param>
         /// <returns></returns>
-        bool Exist(int ID);
+        bool Exist(int ID, int playlistID);
     }
 }
