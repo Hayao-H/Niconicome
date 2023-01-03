@@ -20,6 +20,6 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// </summary>
         /// <param name="version"></param>
         /// <returns></returns>
-        IAttemptResult SetDBVersion(string version);
+        IAttemptResult SetDBVersion(Version version);
     }
 }

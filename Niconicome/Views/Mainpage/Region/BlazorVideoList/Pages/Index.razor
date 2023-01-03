@@ -1,0 +1,13 @@
+﻿@page "/videos"
+@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.IndexViewModel DataContext;
+
+<h3>動画一覧</h3>
+
+@code {
+
+	protected override async Task OnParametersSetAsync()
+	{
+		DataContext.RegisterListChangedEventHandler(() => this.StateHasChanged());
+		await DataContext.Initialize();
+	}
+}

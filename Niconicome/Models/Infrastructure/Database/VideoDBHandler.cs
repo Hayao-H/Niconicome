@@ -4,8 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LiteDB;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Infrastructure.Database.Types;
@@ -14,10 +16,11 @@ namespace Niconicome.Models.Infrastructure.Database
 {
     public class VideoDBHandler : IVideoStore
     {
-        public VideoDBHandler(ILiteDBHandler database, ITagStore tagStore)
+        public VideoDBHandler(ILiteDBHandler database, ITagStore tagStore, IErrorHandler errorHandler)
         {
             this._database = database;
             this._tagStore = tagStore;
+            this._errorHandler = errorHandler;
         }
 
         #region field
@@ -25,6 +28,10 @@ namespace Niconicome.Models.Infrastructure.Database
         private readonly ILiteDBHandler _database;
 
         private readonly ITagStore _tagStore;
+
+        private readonly IErrorHandler _errorHandler;
+
+        private const int DefaultVideoID = -1;
 
         #endregion
 
@@ -46,37 +53,11 @@ namespace Niconicome.Models.Infrastructure.Database
 
             SharedVideo sharedData = sharedResult.Data;
             Video data = result.Data;
-            var tags = new List<ITagInfo>();
 
-            foreach (var t in sharedData.Tags)
-            {
-                IAttemptResult<ITagInfo> tagResult = this._tagStore.GetTag(t);
-                if (!tagResult.IsSucceeded || tagResult.Data is null) continue;
-                tags.Add(tagResult.Data);
-            }
-
-
-            var video = new VideoInfo(this, tags)
-            {
-                ID = sharedData.Id
-            };
+            var video = this.ConvertToVideoInfo(sharedData, data.Id);
 
             video.IsAutoUpdateEnabled = false;
 
-            video.NiconicoId = sharedData.NiconicoId;
-            video.Title = sharedData.Title;
-            video.UploadedOn = sharedData.UploadedOn;
-            video.ViewCount = sharedData.ViewCount;
-            video.CommentCount = sharedData.CommentCount;
-            video.MylistCount = sharedData.MylistCount;
-            video.LikeCount = sharedData.LikeCount;
-            video.OwnerID = sharedData.OwnerID;
-            video.OwnerName = sharedData.OwnerName;
-            video.LargeThumbUrl = sharedData.LargeThumbUrl;
-            video.ThumbUrl = sharedData.ThumbUrl;
-            video.ThumbPath = sharedData.ThumbPath;
-            video.Duration = sharedData.Duration;
-            video.IsDeleted = sharedData.IsDeleted;
             video.IsSelected = data.IsSelected;
             video.IsDownloaded = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
@@ -86,38 +67,90 @@ namespace Niconicome.Models.Infrastructure.Database
             return AttemptResult<IVideoInfo>.Succeeded(video);
         }
 
-        public IAttemptResult<int> Create(IVideoInfo video)
+        public IAttemptResult<IVideoInfo> GetVideo(string niconicoID, int playlistID)
         {
-            int id;
-
-            //SharedVideoの方が存在しない場合、そちらも作成
-            if (!this._database.Exists<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == video.NiconicoId))
+            IAttemptResult<SharedVideo> sharedResult = this._database.GetRecord<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID);
+            if (!sharedResult.IsSucceeded || sharedResult.Data is null)
             {
-                SharedVideo sharedData = this.ConvertToSharedVideo(video);
-                IAttemptResult<int> sharedResult = this._database.Insert(sharedData);
+                return AttemptResult<IVideoInfo>.Fail(sharedResult.Message);
+            }
+            SharedVideo sharedData = sharedResult.Data;
+
+            IAttemptResult<Video> result = this._database.GetRecord<Video>(TableNames.Video, v => v.SharedVideoID == sharedData.Id && v.PlaylistID == playlistID);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return AttemptResult<IVideoInfo>.Fail(result.Message);
+            }
+
+            Video data = result.Data;
+
+            var video = this.ConvertToVideoInfo(sharedData, data.Id);
+
+            video.IsAutoUpdateEnabled = false;
+
+            video.IsSelected = data.IsSelected;
+            video.IsDownloaded = data.IsDownloaded;
+            video.IsEconomy = data.IsEconomy;
+
+            video.IsAutoUpdateEnabled = false;
+
+            return AttemptResult<IVideoInfo>.Succeeded(video);
+        }
+
+        public IAttemptResult<IVideoInfo> GetOnlySharedVideoVideo(int ID)
+        {
+            IAttemptResult<SharedVideo> sharedResult = this._database.GetRecord<SharedVideo>(TableNames.SharedVideo, ID);
+            if (!sharedResult.IsSucceeded || sharedResult.Data is null)
+            {
+                return AttemptResult<IVideoInfo>.Fail(sharedResult.Message);
+            }
+
+            SharedVideo sharedData = sharedResult.Data;
+
+            var video = this.ConvertToVideoInfo(sharedData);
+
+            return AttemptResult<IVideoInfo>.Succeeded(video);
+        }
+
+        public IAttemptResult<int> Create(string niconicoID)
+        {
+            SharedVideo data = new SharedVideo() { NiconicoId = niconicoID };
+            IAttemptResult<int> result = this._database.Insert(data);
+            return result;
+        }
+
+        public IAttemptResult<int> Create(string niconicoID, int playlistID)
+        {
+
+            int id;
+            //SharedVideoの方が存在しない場合、そちらも作成
+            if (!this._database.Exists<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID))
+            {
+                IAttemptResult<int> sharedResult = this.Create(niconicoID);
                 if (!sharedResult.IsSucceeded) return sharedResult;
                 id = sharedResult.Data;
             }
             else
             {
-                IAttemptResult<SharedVideo> getResult = this._database.GetRecord<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == v.NiconicoId);
+                IAttemptResult<SharedVideo> getResult = this._database.GetRecord<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID);
                 if (!getResult.IsSucceeded || getResult.Data is null) return AttemptResult<int>.Fail(getResult.Message);
                 id = getResult.Data.Id;
             }
 
-            Video data = this.ConvertToVideo(video);
-            data.SharedVideoID = id;
 
-            return this._database.Insert(data);
+            var data = new Video() { SharedVideoID = id, PlaylistID = playlistID };
+
+            IAttemptResult<int> result = this._database.Insert(data);
+            return result.IsSucceeded ? AttemptResult<int>.Succeeded(id) : result;
 
         }
 
         public IAttemptResult Update(IVideoInfo video)
         {
             SharedVideo shareData = this.ConvertToSharedVideo(video);
-            IAttemptResult sharedResult =  this._database.Update(shareData);
+            IAttemptResult sharedResult = this._database.Update(shareData);
 
-            if (!sharedResult.IsSucceeded) return sharedResult;
+            if (!sharedResult.IsSucceeded || video.ID == DefaultVideoID) return sharedResult;
 
             Video data = this.ConvertToVideo(video);
             return this._database.Update(data);
@@ -130,14 +163,20 @@ namespace Niconicome.Models.Infrastructure.Database
             IAttemptResult sharedResult = this._database.DeleteAll<Video>(TableNames.Video, v => v.SharedVideoID == ID && v.PlaylistID == playlistID);
             if (!sharedResult.IsSucceeded) return sharedResult;
 
+            //まだSharedVideoを参照するVideoが残っている場合終了
             if (this._database.Exists<Video>(TableNames.Video, v => v.SharedVideoID == ID)) return AttemptResult.Succeeded();
 
             return this._database.Delete(TableNames.SharedVideo, ID);
         }
 
+        public IAttemptResult Clear()
+        {
+            return this._database.Clear(TableNames.Video);
+        }
+
         public bool Exist(int ID, int playlistID)
         {
-            return this._database.Exists<Video>(TableNames.SharedVideo, v => v.SharedVideoID == ID && v.PlaylistID == playlistID);
+            return this._database.Exists<Video>(TableNames.Video, v => v.SharedVideoID == ID && v.PlaylistID == playlistID);
         }
 
 
@@ -155,7 +194,7 @@ namespace Niconicome.Models.Infrastructure.Database
         {
             return new SharedVideo()
             {
-                Id = video.ID,
+                Id = video.SharedID,
                 NiconicoId = video.NiconicoId,
                 Title = video.Title,
                 UploadedOn = video.UploadedOn,
@@ -167,7 +206,6 @@ namespace Niconicome.Models.Infrastructure.Database
                 OwnerName = video.OwnerName,
                 LargeThumbUrl = video.LargeThumbUrl,
                 ThumbUrl = video.ThumbUrl,
-                ThumbPath = video.ThumbPath,
                 Duration = video.Duration,
                 IsDeleted = video.IsDeleted,
                 Tags = video.Tags.Select(v => v.ID).ToList()
@@ -185,6 +223,45 @@ namespace Niconicome.Models.Infrastructure.Database
                 IsEconomy = video.IsEconomy,
                 VideoFilePath = video.FilePath
             };
+        }
+
+        private IVideoInfo ConvertToVideoInfo(SharedVideo sharedData, int videoID = DefaultVideoID)
+        {
+            var tags = new List<ITagInfo>();
+
+            foreach (var t in sharedData.Tags)
+            {
+                IAttemptResult<ITagInfo> tagResult = this._tagStore.GetTag(t);
+                if (!tagResult.IsSucceeded || tagResult.Data is null) continue;
+                tags.Add(tagResult.Data);
+            }
+
+
+            var video = new VideoInfo(this, tags)
+            {
+                SharedID = sharedData.Id,
+                ID = videoID
+            };
+
+            video.IsAutoUpdateEnabled = false;
+
+            video.NiconicoId = sharedData.NiconicoId;
+            video.Title = sharedData.Title;
+            video.UploadedOn = sharedData.UploadedOn;
+            video.ViewCount = sharedData.ViewCount;
+            video.CommentCount = sharedData.CommentCount;
+            video.MylistCount = sharedData.MylistCount;
+            video.LikeCount = sharedData.LikeCount;
+            video.OwnerID = sharedData.OwnerID;
+            video.OwnerName = sharedData.OwnerName;
+            video.LargeThumbUrl = sharedData.LargeThumbUrl;
+            video.ThumbUrl = sharedData.ThumbUrl;
+            video.Duration = sharedData.Duration;
+            video.IsDeleted = sharedData.IsDeleted;
+
+            video.IsAutoUpdateEnabled = false;
+
+            return video;
         }
 
         #endregion

@@ -30,6 +30,13 @@ namespace Niconicome.Models.Playlist.V2
         /// </summary>
         /// <param name="handler"></param>
         void AddPlaylistChangeEventHandler(Action<IPlaylistInfo> handler);
+
+        /// <summary>
+        /// プレイリスト変更イベントのハンドラを削除
+        /// </summary>
+        /// <param name="handler"></param>
+        void RemovePlaylistChangeEventHandler(Action<IPlaylistInfo> handler);
+
     }
 
     public class PlaylistVideoContainer : IPlaylistVideoContainer
@@ -66,6 +73,12 @@ namespace Niconicome.Models.Playlist.V2
         {
             this._playlistChangeHandlers.Add(handler);
         }
+
+        public　void RemovePlaylistChangeEventHandler(Action<IPlaylistInfo> handler)
+        {
+            this._playlistChangeHandlers.RemoveAll(h => h == handler);
+        }
+
 
         #endregion
 

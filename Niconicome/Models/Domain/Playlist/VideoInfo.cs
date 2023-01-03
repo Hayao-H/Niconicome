@@ -12,6 +12,11 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// ID
         /// </summary>
+        int SharedID { get; }
+
+        /// <summary>
+        /// ID
+        /// </summary>
         int ID { get; }
 
         /// <summary>
@@ -158,8 +163,6 @@ namespace Niconicome.Models.Domain.Playlist
 
         private string _thumbUrl = string.Empty;
 
-        private string _thumbPath = string.Empty;
-
         private string _filePath = string.Empty;
 
         private int _duration;
@@ -177,6 +180,8 @@ namespace Niconicome.Models.Domain.Playlist
         #endregion
 
         #region Props
+
+        public int SharedID { get; init; }
 
         public int ID { get; init; }
 
@@ -305,16 +310,7 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public string ThumbPath
-        {
-            get => this._thumbPath;
-            set
-            {
-                this._title = value;
-                if (!this.IsAutoUpdateEnabled) return;
-                this.Update(this);
-            }
-        }
+        public string ThumbPath { get; set; } = string.Empty;
 
         public string FilePath
         {

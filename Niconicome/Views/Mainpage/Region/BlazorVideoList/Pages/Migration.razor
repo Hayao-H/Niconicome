@@ -1,0 +1,120 @@
+﻿@page "/migration/videos"
+@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.MigrationViewModel DataContext;
+
+<h4 class="fw-bold">動画・プレイリストデータの移行</h4>
+<p class="text-muted">動画管理システムの移行に伴い、動画およびプレイリストデータを移行します。</p>
+
+@if (!DataContext.IsMigrated.Value)
+{
+		<div class="d-flex justify-content-between align-items-center m-2 p-3 bg-light">
+			<div>
+				<p>
+					「移行を始める」をクリックすると、データの移行を開始します。<br/>
+					<span class="text-danger"><i class="fa-regular fa-triangle-exclamation me-1"></i>移行中は絶対にアプリケーションを終了させないでください。</span>
+				</p>
+			</div>
+			<div>
+			@if (DataContext.IsMigrating.Value)
+			{
+				<p class="text-info d-inline">移行中<i class="fa-solid fa-spinner fa-spin mx-2"></i></p>
+				<button type="button" class="btn btn-secondary" disabled>移行を始める</button>
+			}
+			else
+			{		
+				<button type="button" class="btn btn-secondary"  @onclick="()=>DataContext.Migrate()">移行を始める</button>
+			}
+			</div>
+		</div>
+	@if (DataContext.IsMigrating.Value)
+	{
+		<p class="m-2 text-muted">処理中の項目：@(DataContext.CurrentlyMigratingData.Value)</p>
+	}
+}
+
+@if (DataContext.IsMigrated.Value && DataContext.MigrationResult is not null)
+{
+		<div class="alert alert-info my-2 d-flex align-items-center" role="alert">
+			<i class="fa-regular fa-circle-info me-2"></i>
+			<p>移行が完了しました。ページ下部の「完了」をクリックすると動画リストを表示します。移行に失敗したデータがある場合、下に詳細が表示されます。</p>
+		</div>
+		<div class="m-3">
+			<h5>移行に失敗した動画</h5>
+			<table class="table table-striped">
+					<thead>
+						<tr>
+							<td>動画ID</td>
+							<td>エラー詳細</td>
+						</tr>
+					</thead>
+					<tbody>
+				@foreach (var video in DataContext.MigrationResult.FailedVideos)
+				{
+							<tr>
+								<td>@(video.Title)</td>
+								<td>@(video.Message)</td>
+							</tr>
+				}
+					</tbody>
+			</table>
+			<h5>移行に失敗したプレイリスト</h5>
+			<table class="table table-striped">
+					<thead>
+						<tr>
+							<td>プレイリスト名</td>
+							<td>エラー詳細</td>
+						</tr>
+					</thead>
+					<tbody>
+				@foreach (var video in DataContext.MigrationResult.FailedPlaylist)
+				{
+							<tr>
+								<td>@(video.Title)</td>
+								<td>@(video.Message)</td>
+							</tr>
+				}
+					</tbody>
+				</table>
+			<h5>動画データの移行に失敗したプレイリスト</h5>
+			<table class="table table-striped">
+					<thead>
+						<tr>
+							<td>プレイリスト名</td>
+							<td>移行に失敗した動画</td>
+						</tr>
+					</thead>
+					<tbody>
+				@foreach (var video in DataContext.MigrationResult.PartlyFailedPlaylist)
+				{
+								<tr>
+									<td>@(video.Title)</td>
+									<td>@(video.Message)</td>
+								</tr>
+				}
+					</tbody>
+			</table>
+		</div>
+		<div class="my-5 d-flex justify-content-center">
+			<button class="btn btn-secondary" role="button" @onclick="DataContext.OnDone">完了</button>
+		</div>
+}
+
+@if (DataContext.IsMigrationFailed.Value && !DataContext.IsMigrating.Value)
+{
+		<div class="m-4">
+			<div class="alert alert-danger">
+					移行に失敗しました。「移行を始める」をクリックすると再試行できます。
+			</div>
+			<h5>エラー詳細</h5>
+			<p class="p-3 border rounded">@(DataContext.Message.Value)</p>
+		</div>
+}
+
+
+@code {
+
+	protected override void OnParametersSet()
+	{
+		DataContext.Bindables.RegisterPropertyChangeHandler(() => this.StateHasChanged());
+	}
+
+}

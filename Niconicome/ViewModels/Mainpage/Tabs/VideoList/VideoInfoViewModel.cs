@@ -25,7 +25,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// <summary>
         /// ID
         /// </summary>
-        public int ID => this._video.ID;
+        public int ID => this._video.SharedID;
 
         /// <summary>
         /// 動画ID

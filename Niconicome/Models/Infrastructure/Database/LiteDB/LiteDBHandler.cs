@@ -8,6 +8,8 @@ using LiteDB;
 using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Infrastructure.Database.Types;
+using Type = Niconicome.Models.Infrastructure.Database.Types;
 
 namespace Niconicome.Models.Infrastructure.Database.LiteDB
 {
@@ -20,7 +22,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         /// <param name="tableName"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        IAttemptResult<T> GetRecord<T>(string tableName, Func<T, bool> predicate) where T : IBaseStoreClass;
+        IAttemptResult<T> GetRecord<T>(string tableName, Expression<Func<T, bool>> predicate) where T : IBaseStoreClass;
 
         /// <summary>
         /// IDを指定してレコードを取得
@@ -54,7 +56,8 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         /// <param name="tableName"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        bool Exists<T>(string tableName, Func<T, bool> predicate) where T : IBaseStoreClass;
+        bool Exists<T>(string tableName, Expression<Func<T, bool>> predicate);
+
 
         /// <summary>
         /// 追加
@@ -90,6 +93,12 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         /// <param name="tableName"></param>
         /// <returns></returns>
         IAttemptResult Update<T>(T data) where T : IBaseStoreClass;
+
+        /// <summary>
+        /// 全てのレコードを削除
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult Clear(string tableName);
     }
 
     public class LiteDBHandler : ILiteDBHandler
@@ -113,7 +122,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 
         #region Method
 
-        public IAttemptResult<T> GetRecord<T>(string tableName, Func<T, bool> predicate) where T : IBaseStoreClass
+        public IAttemptResult<T> GetRecord<T>(string tableName, Expression<Func<T, bool>> predicate) where T : IBaseStoreClass
         {
             IAttemptResult<ILiteCollection<T>> cResult = this.GetCollection<T>(tableName);
 
@@ -125,7 +134,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
             T? record;
             try
             {
-                record = cResult.Data.FindOne(item => predicate(item));
+                record = cResult.Data.FindOne(predicate);
             }
             catch (Exception ex)
             {
@@ -136,7 +145,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
             if (record is null)
             {
                 this._errorHandler.HandleError(LiteDBError.RecordNotFound);
-                return AttemptResult<T>.Fail();
+                return AttemptResult<T>.Fail(this._errorHandler.GetMessageForResult(LiteDBError.RecordNotFound));
             }
             else
             {
@@ -223,22 +232,18 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 
         }
 
-        public bool Exists<T>(string tableName, Func<T, bool> predicate) where T : IBaseStoreClass
+        public bool Exists<T>(string tableName, Expression<Func<T, bool>> predicate)
         {
             IAttemptResult<ILiteCollection<T>> cResult = this.GetCollection<T>(tableName);
-
-            if (!cResult.IsSucceeded || cResult.Data is null)
-            {
-                return false;
-            }
+            if (!cResult.IsSucceeded || cResult.Data is null) return false;
 
             try
             {
-                return cResult.Data.Exists(record => predicate(record));
+                return cResult.Data.Exists(predicate);
             }
             catch (Exception ex)
             {
-                this._errorHandler.HandleError(LiteDBError.AccessFailed, ex, tableName);
+                this._errorHandler.HandleError(LiteDBError.AccessFailed, ex, TableNames.SharedVideo);
                 return false;
             }
         }
@@ -366,6 +371,30 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
             }
         }
 
+        public IAttemptResult Clear(string tableName)
+        {
+            IAttemptResult<ILiteCollection<IBaseStoreClass>> cResult = this.GetCollection<IBaseStoreClass>(tableName);
+
+            if (!cResult.IsSucceeded || cResult.Data is null)
+            {
+                return AttemptResult.Fail(cResult.Message);
+            }
+
+            int count = 0;
+
+            try
+            {
+                count = cResult.Data.DeleteAll();
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(LiteDBError.DeletingAllRecordFailed, ex, tableName);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(LiteDBError.DeletingAllRecordFailed, tableName));
+            }
+
+            this._errorHandler.HandleError(LiteDBError.AllRecordDeleted, tableName, count);
+            return AttemptResult.Succeeded();
+        }
 
         #endregion
 

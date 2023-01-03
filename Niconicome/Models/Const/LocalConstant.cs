@@ -22,8 +22,6 @@ namespace Niconicome.Models.Const
 
         public static string TopTabRegionName = "TopTabRegion";
 
-        public static Version CurrentDBVersion = new("1.0.0");
-
         public const string TabPositionTop = "top";
 
         public const string TabPositionBottom = "bottom";

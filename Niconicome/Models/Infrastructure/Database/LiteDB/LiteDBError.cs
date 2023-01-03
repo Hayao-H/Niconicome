@@ -9,17 +9,17 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 {
     public enum LiteDBError
     {
-        [ErrorEnum(ErrorLevel.Error,"[{0}]テーブルへのアクセスに失敗しました。")]
+        [ErrorEnum(ErrorLevel.Error, "[{0}]テーブルへのアクセスに失敗しました。")]
         AccessFailed,
-        [ErrorEnum(ErrorLevel.Log,"データベースが初期化されました。")]
+        [ErrorEnum(ErrorLevel.Log, "データベースが初期化されました。")]
         Initialized,
-        [ErrorEnum(ErrorLevel.Log,"[{0}]テーブルが作成されました。")]
+        [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルが作成されました。")]
         TableCreated,
-        [ErrorEnum(ErrorLevel.Log,"[{0}]テーブルを取得しました。")]
+        [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルを取得しました。")]
         TableRetrieved,
         [ErrorEnum(ErrorLevel.Error, "[{0}]テーブルの取得に失敗しました。")]
         TableRetrieveFailed,
-        [ErrorEnum(ErrorLevel.Log,"[{0}]テーブルからID{1}のレコードを取得しました。")]
+        [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルからID{1}のレコードを取得しました。")]
         RecordRetrieved,
         [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルから全てのレコードを取得しました。")]
         AllRecordsRetrieved,
@@ -29,15 +29,21 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         RecordDeleted,
         [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルから{1}件のレコードを削除しました。")]
         RecordsDeleted,
-        [ErrorEnum(ErrorLevel.Warning, "[{0}]テーブルからのレコード削除に失敗しました。")]
+        [ErrorEnum(ErrorLevel.Error, "[{0}]テーブルからのレコード削除に失敗しました。")]
         RecordsDeleteFailed,
-        [ErrorEnum(ErrorLevel.Warning, "[{0}]テーブルからID{1}のレコード削除に失敗しました。")]
+        [ErrorEnum(ErrorLevel.Error, "[{0}]テーブルからID{1}のレコード削除に失敗しました。")]
         RecordDeleteFailed,
-        [ErrorEnum(ErrorLevel.Warning, "[{0}]テーブルには更新対象となるID{1}のレコードが存在しません。")]
+        [ErrorEnum(ErrorLevel.Error, "[{0}]テーブルには更新対象となるID{1}のレコードが存在しません。")]
         RecordUpdated,
         [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルでID{1}のレコードを更新しました。")]
         UpdateTargetRecordNotExists,
-        [ErrorEnum(ErrorLevel.Warning,"指定されたレコードが存在しません。")]
+        [ErrorEnum(ErrorLevel.Error, "指定されたレコードが存在しません。")]
         RecordNotFound,
+        [ErrorEnum(ErrorLevel.Error, "[{0}]テーブルのレコード全削除に失敗しました。")]
+        DeletingAllRecordFailed,
+        [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルのレコードを全て削除しました。({1}件)")]
+        AllRecordDeleted,
     }
+
+
 }

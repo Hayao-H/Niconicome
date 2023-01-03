@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Infrastructure.Database.Error;
 using Niconicome.Models.Infrastructure.Database.Json;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Network.Video.Error;
@@ -17,12 +18,13 @@ namespace Niconicome.Models.Domain.Utils.Error
         /// </summary>
         public static Dictionary<int, Type> ErrorEnums = new()
         {
-            { 1,typeof(LiteDBError) },
-            {2,typeof(PlaylistManagerError) },
-            {3,typeof(SettingJSONError) },
-            {4,typeof(ThumbnailUtilityError) },
-            {5,typeof(LocalVideoLoaderError) },
-            { 4, typeof(VideoListManagerError) }
+            { 1, typeof(LiteDBError) },
+            { 2, typeof(PlaylistManagerError) },
+            { 3, typeof(SettingJSONError) },
+            { 4, typeof(ThumbnailUtilityError) },
+            { 5, typeof(LocalVideoLoaderError) },
+            { 6, typeof(VideoListManagerError) },
+            { 7, typeof(ApplicationDBHandlerError) }
         };
     }
 }

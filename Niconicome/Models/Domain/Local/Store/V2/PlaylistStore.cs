@@ -37,6 +37,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult<int> Create(string name);
 
         /// <summary>
+        /// 全てのプレイリストを削除
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult Clear();
+
+        /// <summary>
         /// プレイリストを削除
         /// </summary>
         /// <param name="ID"></param>

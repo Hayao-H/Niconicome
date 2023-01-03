@@ -62,6 +62,8 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
 using DomainSettings = Niconicome.Models.Domain.Local.Settings;
+using PlaylistV2 = Niconicome.Models.Playlist.V2;
+using TabsVM = Niconicome.ViewModels.Mainpage.Tabs;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -277,10 +279,21 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AppEnvironment.IAppInfomationHandler, Infla::AppEnvironment.NiconicomeInfomationHandler>();
             services.AddTransient<AppEnvironment.IOSInfomationHandler, Infla::AppEnvironment.WindowsInfomationHandler>();
             services.AddSingleton<Store::V2.ISettingsStore, DB::Json.SettingJsonHandler>();
+            services.AddSingleton<Store::V2.IPlaylistStore, DB::PlaylistDBHandler>();
+            services.AddSingleton<Store::V2.IVideoStore, DB::VideoDBHandler>();
+            services.AddSingleton<Store::V2.ITagStore, DB::TagDBHandler>();
             services.AddSingleton<DomainSettings::ISettingsConainer, DomainSettings::SettingsConainer>();
             services.AddTransient<DomainSettings::ISettingMigratioin, DomainSettings::SettingMigratioin>();
             services.AddSingleton<DB::LiteDB.ILiteDBHandler, DB::LiteDB.LiteDBHandler>();
             services.AddTransient<Error.IErrorHandler, Error.ErrorHandler>();
+            services.AddSingleton<Net::Video.IThumbnailUtility, Net::Video.ThumbnailUtility>();
+            services.AddSingleton<PlaylistV2::IPlaylistVideoContainer, PlaylistV2::PlaylistVideoContainer>();
+            services.AddSingleton<PlaylistV2::Manager.ILocalVideoLoader, PlaylistV2::Manager.LocalVideoLoader>();
+            services.AddTransient<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
+            services.AddTransient<PlaylistV2::Manager.IVideoListManager, PlaylistV2::Manager.VideoListManager>();
+            services.AddTransient<PlaylistV2::Migration.VideoAndPlayListMigration, PlaylistV2::Migration.VideoAndPlayListMigration>();
+            services.AddTransient<TabsVM::VideoList.Pages.IndexViewModel>();
+            services.AddTransient<TabsVM::VideoList.Pages.MigrationViewModel>();
 
             return services.BuildServiceProvider();
         }

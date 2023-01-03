@@ -17,13 +17,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
         Task LoadVideosAsync();
     }
 
-    public class VideoListManager
+    public class VideoListManager : IVideoListManager
     {
         public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler)
         {
             this._container = container;
             this._loader = loader;
-            this._errorHandler = errorHandler; 
+            this._errorHandler = errorHandler;
         }
 
         #region field

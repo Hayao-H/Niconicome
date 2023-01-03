@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.V2;
@@ -11,7 +12,7 @@ using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Playlist
 {
-    public interface IPlaylistInfo
+    public interface IPlaylistInfo : IUpdatable
     {
         /// <summary>
         /// ID
@@ -26,7 +27,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// フォルダーパス
         /// </summary>
-        string FolderPath { get; }
+        string FolderPath { get; set; }
 
         /// <summary>
         /// プレイリスト名
@@ -63,7 +64,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// </summary>
         /// <param name="playlistInfo"></param>
         /// <param name="commit"></param>
-        void AddChild(IPlaylistInfo playlistInfo, bool commit = true);
+        IAttemptResult AddChild(IPlaylistInfo playlistInfo, bool commit = true);
 
         /// <summary>
         /// 子プレイリストを削除
@@ -71,6 +72,20 @@ namespace Niconicome.Models.Domain.Playlist
         /// <param name="playlistInfo"></param>
         /// <returns></returns>
         IAttemptResult RemoveChild(IPlaylistInfo playlistInfo);
+
+        /// <summary>
+        /// 動画を追加
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        IAttemptResult AddVideo(IVideoInfo video);
+
+        /// <summary>
+        /// 動画を削除
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        IAttemptResult RemoveVideo(IVideoInfo video);
     }
 
     public class PlaylistInfo : UpdatableInfoBase<IPlaylistStore, IPlaylistInfo>, IPlaylistInfo
@@ -79,13 +94,16 @@ namespace Niconicome.Models.Domain.Playlist
         {
             this.Children = new ReadOnlyObservableCollection<IPlaylistInfo>(this._children);
             this.Name = new ReactiveProperty<string>(name);
-            this.Name.Subscribe(_ => this.Update(this));
+            this.Name.Skip(1).Subscribe(_ => this.Update(this));
+            this._videos = videos;
             this.Videos = videos.AsReadOnly();
         }
 
         #region field
 
         private readonly ObservableCollection<IPlaylistInfo> _children = new();
+
+        private readonly List<IVideoInfo> _videos = new();
 
         private string _folderPath = string.Empty;
 
@@ -145,10 +163,11 @@ namespace Niconicome.Models.Domain.Playlist
 
         #region Method
 
-        public void AddChild(IPlaylistInfo playlistInfo, bool commit = true)
+        public IAttemptResult AddChild(IPlaylistInfo playlistInfo, bool commit = true)
         {
             this._children.Add(playlistInfo);
-            if (commit) this.Update(this);
+
+            return commit ? this.Update(this) : AttemptResult.Succeeded();
         }
 
         public IAttemptResult RemoveChild(IPlaylistInfo playlistInfo)
@@ -156,6 +175,18 @@ namespace Niconicome.Models.Domain.Playlist
             this._children.Remove(playlistInfo);
             return this.Update(this);
         }
+
+        public IAttemptResult AddVideo(IVideoInfo video)
+        {
+            this._videos.Add(video);
+            return this.Update(this);
+        }
+        public IAttemptResult RemoveVideo(IVideoInfo video)
+        {
+            this._videos.RemoveAll(v => v.ID == video.ID);
+            return this.Update(this);
+        }
+
 
         #endregion
     }

@@ -93,6 +93,11 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._database.Delete(TableNames.Playlist, ID);
         }
 
+        public IAttemptResult Clear()
+        {
+            return this._database.Clear(TableNames.Playlist);
+        }
+
         #endregion
 
         #region prvate
@@ -124,7 +129,7 @@ namespace Niconicome.Models.Infrastructure.Database
                     PlaylistType.PlaybackHistory => DBPlaylistType.PlaybackHistory,
                     _ => DBPlaylistType.Local
                 },
-                Videos = data.Videos.Select(v => v.ID).ToList(),
+                Videos = data.Videos.Select(v => v.SharedID).ToList(),
                 Children = data.Children.Select(v => v.ID).ToList(),
             };
         }

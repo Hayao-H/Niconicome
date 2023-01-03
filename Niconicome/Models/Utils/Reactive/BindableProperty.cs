@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Niconicome.Models.Utils.Reactive
 {
 
-    public interface IBindableProperty<T> : IDisposable
+    public interface IBindableProperty<T> : IBindable
     {
         /// <summary>
         /// 値
@@ -29,9 +29,16 @@ namespace Niconicome.Models.Utils.Reactive
         /// <param name="handler"></param>
         void UnRegisterPropertyChangeHandler(Action<T> handler);
 
+        /// <summary>
+        /// Bndablesクラスで管理
+        /// </summary>
+        /// <param name="bindables"></param>
+        /// <returns></returns>
+        BindableProperty<T> AddTo(Bindables bindables);
+
     }
 
-    public class BindableProperty<T> : INotifyPropertyChanged, IBindableProperty<T>
+    public class BindableProperty<T> : BindablePropertyBase, INotifyPropertyChanged, IBindableProperty<T>
     {
         public BindableProperty(T initialValue)
         {
@@ -71,6 +78,11 @@ namespace Niconicome.Models.Utils.Reactive
             this._handlers.RemoveAll(x => x == handler);
         }
 
+        public BindableProperty<T> AddTo(Bindables bindables)
+        {
+            bindables.Add(this);
+            return this;
+        }
 
 
         #endregion
@@ -97,6 +109,8 @@ namespace Niconicome.Models.Utils.Reactive
         /// <param name="name"></param>
         private void OnPropertyChanged([CallerMemberName] string? name = null)
         {
+            base.OnPropertyChanged();
+
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             try
             {
@@ -110,10 +124,13 @@ namespace Niconicome.Models.Utils.Reactive
 
         #endregion
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             if (this._hasDisposed) return;
             this._hasDisposed = true;
+
+            this._handlers.Clear();
+            base.Dispose();
             GC.SuppressFinalize(this);
         }
 

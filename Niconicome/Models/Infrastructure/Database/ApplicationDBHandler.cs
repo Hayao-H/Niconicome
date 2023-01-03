@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Infrastructure.Database.Error;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 
 namespace Niconicome.Models.Infrastructure.Database
@@ -12,14 +14,17 @@ namespace Niconicome.Models.Infrastructure.Database
 
     public class ApplicationDBHandler : IApplicationStore
     {
-        public ApplicationDBHandler(ILiteDBHandler dataBase)
+        public ApplicationDBHandler(ILiteDBHandler dataBase,IErrorHandler errorHandler)
         {
             this._dataBase = dataBase;
+            this._errorHandler = errorHandler;
         }
 
         #region field
 
         private readonly ILiteDBHandler _dataBase;
+
+        private readonly IErrorHandler _errorHandler;
 
         #endregion
 
@@ -35,10 +40,12 @@ namespace Niconicome.Models.Infrastructure.Database
 
             Types.App app = apps.Data.First();
             Version.TryParse(app.DBVersion, out Version? version);
-            return version is null ? AttemptResult<Version>.Fail("DBバージョン文字列の解析に失敗しました。") : AttemptResult<Version>.Succeeded(version);
+            this._errorHandler.HandleError(ApplicationDBHandlerError.FailedToParseDBVersion, app.DBVersion);
+
+            return version is null ? AttemptResult<Version>.Fail(this._errorHandler.GetMessageForResult(ApplicationDBHandlerError.FailedToParseDBVersion, app.DBVersion)) : AttemptResult<Version>.Succeeded(version);
         }
 
-        public IAttemptResult SetDBVersion(string version)
+        public IAttemptResult SetDBVersion(Version version)
         {
             IAttemptResult init = this.Initialize();
             if (!init.IsSucceeded) return AttemptResult<string>.Fail(init.Message);
@@ -47,7 +54,7 @@ namespace Niconicome.Models.Infrastructure.Database
             if (!apps.IsSucceeded || apps.Data is null) return AttemptResult.Fail(apps.Message);
 
             Types.App app = apps.Data.First();
-            app.DBVersion = version;
+            app.DBVersion = version.ToString();
 
             return this._dataBase.Update(app);
         }

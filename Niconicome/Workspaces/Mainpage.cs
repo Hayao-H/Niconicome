@@ -114,5 +114,20 @@ namespace Niconicome.Workspaces
         /// </summary>
         public static Playlist::IPlaylistVideoContainer PlaylistVideoContainer { get; private set; } = DIFactory.Resolve<Playlist::IPlaylistVideoContainer>();
 
+        /// <summary>
+        /// 動画リスト
+        /// </summary>
+        public static Playlist::Manager.IVideoListManager VideoListManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.IVideoListManager>();
+
+        /// <summary>
+        /// プレリストの管理
+        /// </summary>
+        public static Playlist::Manager.IPlaylistManager PlaylistManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.IPlaylistManager>();
+
+        /// <summary>
+        /// プレイリストと動画の移行
+        /// </summary>
+        public static Playlist::Migration.VideoAndPlayListMigration VideoAndPlayListMigration { get; private set; }=DIFactory.Resolve<Playlist::Migration.VideoAndPlayListMigration>();
+
     }
 }

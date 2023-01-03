@@ -53,6 +53,8 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.Themehandler.Initialize();
             WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
+            WS::Mainpage.PlaylistManager.Initialize();
 
             this.LoginCommand = new ReactiveCommand()
                 .WithSubscribe(async () =>
@@ -373,7 +375,7 @@ namespace Niconicome.ViewModels.Mainpage
             bottomTabRegion.Add(containerProvider.Resolve<TimerSettings>());
 
             IRegion topTabRegion = regionManager.Regions[LocalConstant.TopTabRegionName];
-            var videoListView = containerProvider.Resolve<VideoList>();
+            var videoListView = containerProvider.Resolve<MainVideoList>();
             topTabRegion.Add(videoListView);
             topTabRegion.Activate(videoListView);
         }

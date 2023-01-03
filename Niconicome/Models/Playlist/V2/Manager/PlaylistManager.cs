@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
-using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 
@@ -35,12 +31,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
         public IAttemptResult Create(int parentID);
     }
 
-    public class PlaylistManager
+    public class PlaylistManager : IPlaylistManager
     {
-        public PlaylistManager(IPlaylistStore playlistStore, IErrorHandler errorHandler)
+        public PlaylistManager(IPlaylistStore playlistStore, IErrorHandler errorHandler, IPlaylistVideoContainer container)
         {
             this._playlistStore = playlistStore;
             this._errorHandler = errorHandler;
+            this._container = container;
         }
 
         #region field
@@ -48,6 +45,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
         private readonly IPlaylistStore _playlistStore;
 
         private readonly IErrorHandler _errorHandler;
+
+        private readonly IPlaylistVideoContainer _container;
 
         private Dictionary<int, IPlaylistInfo> _playlists = new();
 
@@ -68,6 +67,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
             if (root is null) return;
 
             this.SetChild(root);
+
+            this._container.Playlist.Clear();
+            this._container.Playlist.Add(root);
         }
 
         public IAttemptResult Delete(int ID)
@@ -117,7 +119,6 @@ namespace Niconicome.Models.Playlist.V2.Manager
         #endregion
 
         #region private
-
 
         private void SetChild(IPlaylistInfo current)
         {
