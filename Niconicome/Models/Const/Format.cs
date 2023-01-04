@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,5 +26,7 @@ namespace Niconicome.Models.Const
         public const string DefaultEconomyVideoSuffix = "[economy]";
 
         public const string DefaultThumbnailSuffix = "";
+
+        public const string FolderAutoMapSymbol = "<autoMap>";
     }
 }

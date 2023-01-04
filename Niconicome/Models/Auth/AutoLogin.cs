@@ -43,7 +43,7 @@ namespace Niconicome.Models.Auth
 
     class AutoLogin : IAutoLogin
     {
-        public AutoLogin(ISession session, IAccountManager accountManager, IWebview2SharedLogin webview2SharedLogin, IFirefoxSharedLogin firefoxSharedLogin, IStoreFirefoxSharedLogin storeFirefoxSharedLogin, ISettingsConainer settingsConainer)
+        public AutoLogin(ISession session, IAccountManager accountManager, IWebview2SharedLogin webview2SharedLogin, IFirefoxSharedLogin firefoxSharedLogin, IStoreFirefoxSharedLogin storeFirefoxSharedLogin, ISettingsContainer settingsConainer)
         {
             this._session = session;
             this._accountManager = accountManager;
@@ -59,7 +59,7 @@ namespace Niconicome.Models.Auth
 
         private readonly IAccountManager _accountManager;
 
-        private readonly ISettingsConainer _settingsConainer;
+        private readonly ISettingsContainer _settingsConainer;
 
         private readonly IWebview2SharedLogin _webview2SharedLogin;
 

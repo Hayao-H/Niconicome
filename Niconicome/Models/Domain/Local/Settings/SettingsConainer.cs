@@ -9,7 +9,7 @@ using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Domain.Local.Settings
 {
-    public interface ISettingsConainer
+    public interface ISettingsContainer
     {
         /// <summary>
         /// 指定した設定を取得する
@@ -20,7 +20,7 @@ namespace Niconicome.Models.Domain.Local.Settings
         IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName, T defaultValue) where T : notnull;
     }
 
-    public class SettingsConainer : ISettingsConainer
+    public class SettingsConainer : ISettingsContainer
     {
         public SettingsConainer(ISettingsStore store, ISettingMigratioin settingMigratioin)
         {

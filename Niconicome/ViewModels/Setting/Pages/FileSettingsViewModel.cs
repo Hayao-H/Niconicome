@@ -12,7 +12,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public FileSettingsViewModel()
         {
             this.FileFormat = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FileNameFormat, ""), "");
-            this.DefaultFolder = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FileNameFormat, FileFolder.DefaultDownloadDir), FileFolder.DefaultDownloadDir);
+            this.DefaultFolder = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.DefaultFolder, FileFolder.DefaultDownloadDir), FileFolder.DefaultDownloadDir);
             this.IsReplaceSBToSBEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.ReplaceSingleByteToMultiByte, false), false);
             this.HtmlFileExt = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.HtmlFileExtension, FileFolder.DefaultHtmlFileExt), FileFolder.DefaultHtmlFileExt);
             this.JpegFileExt = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.JpegFileExtension, FileFolder.DefaultJpegFileExt), FileFolder.DefaultJpegFileExt);

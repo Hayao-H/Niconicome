@@ -112,7 +112,7 @@ namespace Niconicome.Models.Network.Download
 
     public class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
     {
-        public DownloadSettingsHandler(ISettingsConainer settingsConainer, ICurrent current)
+        public DownloadSettingsHandler(ISettingsContainer settingsConainer, ICurrent current)
         {
             this._current = current;
             this._container = settingsConainer;
@@ -146,7 +146,7 @@ namespace Niconicome.Models.Network.Download
 
         private readonly ICurrent _current;
 
-        private readonly ISettingsConainer _container;
+        private readonly ISettingsContainer _container;
         #endregion
 
         public DownloadSettings CreateDownloadSettings()

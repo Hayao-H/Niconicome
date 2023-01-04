@@ -28,7 +28,7 @@ namespace Niconicome.Models.Network.Download.Actions
 
     class PostDownloadActionsManager : IPostDownloadActionssManager
     {
-        public PostDownloadActionsManager(IComPowerManager comPowerManager, ILogger logger,ISettingsConainer conainer)
+        public PostDownloadActionsManager(IComPowerManager comPowerManager, ILogger logger,ISettingsContainer conainer)
         {
             this.comPowerManager = comPowerManager;
             this.logger = logger;

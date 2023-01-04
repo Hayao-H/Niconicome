@@ -282,7 +282,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Store::V2.IPlaylistStore, DB::PlaylistDBHandler>();
             services.AddSingleton<Store::V2.IVideoStore, DB::VideoDBHandler>();
             services.AddSingleton<Store::V2.ITagStore, DB::TagDBHandler>();
-            services.AddSingleton<DomainSettings::ISettingsConainer, DomainSettings::SettingsConainer>();
+            services.AddSingleton<DomainSettings::ISettingsContainer, DomainSettings::SettingsConainer>();
             services.AddTransient<DomainSettings::ISettingMigratioin, DomainSettings::SettingMigratioin>();
             services.AddSingleton<DB::LiteDB.ILiteDBHandler, DB::LiteDB.LiteDBHandler>();
             services.AddTransient<Error.IErrorHandler, Error.ErrorHandler>();

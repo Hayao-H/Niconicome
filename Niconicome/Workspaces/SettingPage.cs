@@ -26,6 +26,6 @@ namespace Niconicome.Workspaces
         public static IStyleHandler StyleHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IStyleHandler>();
         public static IApplicationPowerManager PowerManager { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
 
-        public static ISettingsConainer SettingsConainer { get; private set; } = DIFactory.Resolve<ISettingsConainer>();
+        public static ISettingsContainer SettingsConainer { get; private set; } = DIFactory.Resolve<ISettingsContainer>();
     }
 }

@@ -136,7 +136,7 @@ namespace Niconicome.Models.Infrastructure.Database
                     _ => DBPlaylistType.Local
                 },
                 Videos = data.Videos.Select(v => v.SharedID).ToList(),
-                Children = data.Children.Select(v => v.ID).ToList(),
+                Children = data.Children.Where(p => p.PlaylistType != PlaylistType.Temporary && p.PlaylistType != PlaylistType.DownloadSucceededHistory && p.PlaylistType != PlaylistType.DownloadFailedHistory).Select(v => v.ID).ToList(),
             };
         }
 

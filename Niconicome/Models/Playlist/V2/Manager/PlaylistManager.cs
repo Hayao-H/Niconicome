@@ -15,26 +15,28 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <summary>
         /// ツリーを初期化
         /// </summary>
-        public void Initialize();
+        void Initialize();
 
         /// <summary>
         /// プレイリストを削除
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public IAttemptResult Delete(int ID);
+        IAttemptResult Delete(int ID);
 
         /// <summary>
         /// プレイリストを作成
         /// </summary>
         /// <param name="parentID"></param>
         /// <returns></returns>
-        public IAttemptResult Create(int parentID);
+        IAttemptResult Create(int parentID);
+
+
     }
 
     public class PlaylistManager : IPlaylistManager
     {
-        public PlaylistManager(IPlaylistStore playlistStore, IErrorHandler errorHandler, IPlaylistVideoContainer container,IVideoAndPlayListMigration migration)
+        public PlaylistManager(IPlaylistStore playlistStore, IErrorHandler errorHandler, IPlaylistVideoContainer container, IVideoAndPlayListMigration migration)
         {
             this._playlistStore = playlistStore;
             this._errorHandler = errorHandler;
@@ -82,7 +84,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             root.AddChild(temp, false);
 
-            this.SetChild(root);
+            this.SetChild(root, new List<string>().AsReadOnly());
 
             this._container.Playlist.Clear();
             this._container.Playlist.Add(root);
@@ -97,6 +99,18 @@ namespace Niconicome.Models.Playlist.V2.Manager
             }
 
             IPlaylistInfo playlist = this._playlists[ID];
+            if (playlist.PlaylistType == PlaylistType.Root || playlist.PlaylistType == PlaylistType.Temporary || playlist.PlaylistType == PlaylistType.DownloadFailedHistory || playlist.PlaylistType == PlaylistType.DownloadSucceededHistory)
+            {
+                this._errorHandler.HandleError(PlaylistManagerError.PlaylistCannotBeDeleted, nameof(playlist.PlaylistType));
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(PlaylistManagerError.PlaylistCannotBeDeleted, nameof(playlist.PlaylistType)));
+            }
+
+            //DBから削除
+            IAttemptResult deleteResult = this._playlistStore.Delete(ID);
+            if (!deleteResult.IsSucceeded) return deleteResult;
+
+            //キャッシュから削除
+            this._playlists.Remove(ID);
 
             if (!this._playlists.ContainsKey(playlist.ParentID))
             {
@@ -136,7 +150,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         #region private
 
-        private void SetChild(IPlaylistInfo current)
+        private void SetChild(IPlaylistInfo current, IReadOnlyList<string> parents)
         {
             foreach (var childID in current.ChildrenID)
             {
@@ -147,8 +161,15 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 //削除処理用に親のIDを追加
                 child.ParentID = current.ID;
 
+                //親プレイリストの名前を設定
+                var list = new List<string>(parents)
+                {
+                    child.Name.Value
+                };
+                child.SetParentNamesList(list);
+
                 //再帰的にツリーを構築
-                this.SetChild(child);
+                this.SetChild(child, list.AsReadOnly());
             }
         }
 

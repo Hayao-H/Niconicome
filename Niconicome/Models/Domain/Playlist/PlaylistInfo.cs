@@ -57,6 +57,11 @@ namespace Niconicome.Models.Domain.Playlist
         IReadOnlyList<int> ChildrenID { get; }
 
         /// <summary>
+        /// 親プレイリストの名前一覧
+        /// </summary>
+        IReadOnlyList<string> ParentNames { get; }
+
+        /// <summary>
         /// 動画一覧
         /// </summary>
         IReadOnlyList<IVideoInfo> Videos { get; }
@@ -88,6 +93,12 @@ namespace Niconicome.Models.Domain.Playlist
         /// <param name="video"></param>
         /// <returns></returns>
         IAttemptResult RemoveVideo(IVideoInfo video);
+
+        /// <summary>
+        /// 親プレイリストの名前一覧をセットする
+        /// </summary>
+        /// <param name="names"></param>
+        void SetParentNamesList(List<string> names);
     }
 
     public class PlaylistInfo : UpdatableInfoBase<IPlaylistStore, IPlaylistInfo>, IPlaylistInfo
@@ -109,6 +120,8 @@ namespace Niconicome.Models.Domain.Playlist
         private readonly ObservableCollection<IPlaylistInfo> _children = new();
 
         private readonly List<IVideoInfo> _videos = new();
+
+        private List<string> _parentNames = new();
 
         private string _folderPath = string.Empty;
 
@@ -146,7 +159,6 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-
         public string RemoteParameter
         {
             get => this._remoteParameter;
@@ -163,6 +175,7 @@ namespace Niconicome.Models.Domain.Playlist
 
         public IReadOnlyList<IVideoInfo> Videos { get; init; }
 
+        public IReadOnlyList<string> ParentNames => this._parentNames.AsReadOnly();
 
         #endregion
 
@@ -192,6 +205,10 @@ namespace Niconicome.Models.Domain.Playlist
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 
+        public void SetParentNamesList(List<string> names)
+        {
+            this._parentNames = names;
+        }
 
         #endregion
     }

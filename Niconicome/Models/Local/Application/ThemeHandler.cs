@@ -17,7 +17,7 @@ namespace Niconicome.Models.Local.Application
 
     public class ThemeHandler : IThemehandler
     {
-        public ThemeHandler(ISettingsConainer settingsConainer, ILogger logger)
+        public ThemeHandler(ISettingsContainer settingsConainer, ILogger logger)
         {
             this.logger = logger;
             this._settingsConainer = settingsConainer;
@@ -25,7 +25,7 @@ namespace Niconicome.Models.Local.Application
 
         #region field
 
-        private readonly ISettingsConainer _settingsConainer;
+        private readonly ISettingsContainer _settingsConainer;
 
         private readonly ILogger logger;
 

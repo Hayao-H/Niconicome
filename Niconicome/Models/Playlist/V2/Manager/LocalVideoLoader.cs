@@ -28,7 +28,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class LocalVideoLoader : ILocalVideoLoader
     {
-        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsConainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler)
+        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler)
         {
             this._directoryIO = directoryIO;
             this._thumbnailUtility = thumbnailUtility;
@@ -43,7 +43,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         private readonly IThumbnailUtility _thumbnailUtility;
 
-        private readonly ISettingsConainer _settingsContainer;
+        private readonly ISettingsContainer _settingsContainer;
 
         private readonly IPlaylistVideoContainer _playlistVideoContainer;
 
@@ -67,6 +67,11 @@ namespace Niconicome.Models.Playlist.V2.Manager
             int playlistID = this._playlistVideoContainer.CurrentSelectedPlaylist.ID;
             string folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.FolderPath;
             string economy = this._settingsContainer.GetSetting(SettingNames.EnonomyQualitySuffix, "").Data?.Value ?? "";
+
+            if (string.IsNullOrEmpty(folderPath))
+            {
+                folderPath = this.GetDownlaodDirectory(this._playlistVideoContainer.CurrentSelectedPlaylist);
+            }
 
             ///削除動画のサムネを保存
             await this._thumbnailUtility.DownloadDeletedVideoThumbAsync();
@@ -161,6 +166,28 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             return AttemptResult<string>.Fail();
 
+        }
+
+        private string GetDownlaodDirectory(IPlaylistInfo playlist)
+        {
+            string pathOfPlaylist = playlist.FolderPath;
+
+            //そもそもプレイリストにパスが設定されている
+            if (!string.IsNullOrEmpty(pathOfPlaylist)) return pathOfPlaylist;
+
+            //デフォルト設定を取得
+            IAttemptResult<ISettingInfo<string>> settingResult = this._settingsContainer.GetSetting(SettingNames.DefaultFolder, FileFolder.DefaultDownloadDir);
+            if (!settingResult.IsSucceeded || settingResult.Data is null) return Path.Combine(AppContext.BaseDirectory, FileFolder.DefaultDownloadDir);
+
+            if (settingResult.Data.Value.Contains(Format.FolderAutoMapSymbol))
+            {
+                string path = settingResult.Data.Value.Replace(Format.FolderAutoMapSymbol, string.Join(@"\", playlist.ParentNames));
+                return path;
+            }
+            else
+            {
+                return settingResult.Data.Value;
+            }
         }
 
         #endregion

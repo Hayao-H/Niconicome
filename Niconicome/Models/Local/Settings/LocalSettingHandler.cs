@@ -16,12 +16,12 @@ namespace Niconicome.Models.Local.Settings
 
     public class LocalSettingHandler : ILocalSettingHandler
     {
-        public LocalSettingHandler(ISettingsConainer settingsConainer)
+        public LocalSettingHandler(ISettingsContainer settingsConainer)
         {
             this._settingsConainer = settingsConainer;
         }
 
-        private readonly ISettingsConainer _settingsConainer;
+        private readonly ISettingsContainer _settingsConainer;
 
         /// <summary>
         /// 文字列の設定を取得する

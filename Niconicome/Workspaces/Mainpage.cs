@@ -107,7 +107,7 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// 設定コンテナ
         /// </summary>
-        public static ISettingsConainer SettingsConainer { get; private set; } = DIFactory.Resolve<ISettingsConainer>();
+        public static ISettingsContainer SettingsConainer { get; private set; } = DIFactory.Resolve<ISettingsContainer>();
 
         /// <summary>
         /// 動画・プレイリストコンテナ
