@@ -55,6 +55,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
         #region Method
         public void Initialize()
         {
+            //特殊なプレイリストを作成
+            IAttemptResult specialResult = this.CreateSpecialPlaylist();
+            if (!specialResult.IsSucceeded) return;
 
             IAttemptResult<IReadOnlyList<IPlaylistInfo>> result = this._playlistStore.GetAllPlaylist();
             if (!result.IsSucceeded || result.Data is null) return;
@@ -65,6 +68,11 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             //ルートプレイリストが見つからない
             if (root is null) return;
+
+            IPlaylistInfo? temp = result.Data.FirstOrDefault(p => p.PlaylistType == PlaylistType.Temporary);
+            if (temp is null) return;
+
+            root.AddChild(temp, false);
 
             this.SetChild(root);
 
@@ -134,6 +142,59 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 //再帰的にツリーを構築
                 this.SetChild(child);
             }
+        }
+
+        /// <summary>
+        /// 特殊なプレイリストを作成する
+        /// </summary>
+        /// <returns></returns>
+        private IAttemptResult CreateSpecialPlaylist()
+        {
+            if (!this._playlistStore.Exist(PlaylistType.Root))
+            {
+                IAttemptResult<int> rootCreationResult = this._playlistStore.Create("プレイリスト一覧");
+                if (!rootCreationResult.IsSucceeded) return AttemptResult.Fail(rootCreationResult.Message);
+
+                IAttemptResult<IPlaylistInfo> rootGetResult = this._playlistStore.GetPlaylist(rootCreationResult.Data);
+                if (!rootGetResult.IsSucceeded || rootGetResult.Data is null) return AttemptResult.Fail(rootGetResult.Message);
+
+                rootGetResult.Data.PlaylistType = PlaylistType.Root;
+            }
+
+            if (!this._playlistStore.Exist(PlaylistType.Temporary))
+            {
+                IAttemptResult<int> tempCreationResult = this._playlistStore.Create("一時プレイリスト");
+                if (!tempCreationResult.IsSucceeded) return AttemptResult.Fail(tempCreationResult.Message);
+
+                IAttemptResult<IPlaylistInfo> tempGetResult = this._playlistStore.GetPlaylist(tempCreationResult.Data);
+                if (!tempGetResult.IsSucceeded || tempGetResult.Data is null) return AttemptResult.Fail(tempGetResult.Message);
+
+                tempGetResult.Data.PlaylistType = PlaylistType.Temporary;
+            }
+
+            if (!this._playlistStore.Exist(PlaylistType.DownloadFailedHistory))
+            {
+                IAttemptResult<int> dlFailedCreationResult = this._playlistStore.Create("ダウンロードに失敗した動画");
+                if (!dlFailedCreationResult.IsSucceeded) return AttemptResult.Fail(dlFailedCreationResult.Message);
+
+                IAttemptResult<IPlaylistInfo> dlFailedGetResult = this._playlistStore.GetPlaylist(dlFailedCreationResult.Data);
+                if (!dlFailedGetResult.IsSucceeded || dlFailedGetResult.Data is null) return AttemptResult.Fail(dlFailedGetResult.Message);
+
+                dlFailedGetResult.Data.PlaylistType = PlaylistType.DownloadFailedHistory;
+            }
+
+            if (!this._playlistStore.Exist(PlaylistType.DownloadSucceededHistory))
+            {
+                IAttemptResult<int> dlSucceededCreationResult = this._playlistStore.Create("ダウンロードに成功した動画");
+                if (!dlSucceededCreationResult.IsSucceeded) return AttemptResult.Fail(dlSucceededCreationResult.Message);
+
+                IAttemptResult<IPlaylistInfo> dlSucceededGetResult = this._playlistStore.GetPlaylist(dlSucceededCreationResult.Data);
+                if (!dlSucceededGetResult.IsSucceeded || dlSucceededGetResult.Data is null) return AttemptResult.Fail(dlSucceededGetResult.Message);
+
+                dlSucceededGetResult.Data.PlaylistType = PlaylistType.DownloadSucceededHistory;
+            }
+
+            return AttemptResult.Succeeded();
         }
 
         #endregion

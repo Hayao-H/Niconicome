@@ -48,5 +48,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <param name="ID"></param>
         /// <returns></returns>
         IAttemptResult Delete(int ID);
+
+        /// <summary>
+        /// プレイリストの存在を確認する
+        /// </summary>
+        /// <param name="playlistType"></param>
+        /// <returns></returns>
+        bool Exist(PlaylistType playlistType);
     }
 }

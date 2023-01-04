@@ -98,6 +98,12 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._database.Clear(TableNames.Playlist);
         }
 
+        public bool Exist(PlaylistType playlistType)
+        {
+            DBPlaylistType dBPlaylistType = this.Convert(playlistType);
+            return this._database.Exists<Types::Playlist>(TableNames.Playlist, p => p.PlaylistType == dBPlaylistType);
+        }
+
         #endregion
 
         #region prvate

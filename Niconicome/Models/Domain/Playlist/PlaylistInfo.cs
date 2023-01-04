@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Utils.Reactive;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Playlist
@@ -32,7 +33,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// プレイリスト名
         /// </summary>
-        ReactiveProperty<string> Name { get; }
+        BindableProperty<string> Name { get; }
 
         /// <summary>
         /// プレイリストの種別
@@ -93,8 +94,8 @@ namespace Niconicome.Models.Domain.Playlist
         public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore) : base(playlistStore)
         {
             this.Children = new ReadOnlyObservableCollection<IPlaylistInfo>(this._children);
-            this.Name = new ReactiveProperty<string>(name);
-            this.Name.Skip(1).Subscribe(_ => this.Update(this));
+            this.Name = new BindableProperty<string>(name);
+            this.Name.RegisterPropertyChangeHandler(_ => this.Update(this));
             this._videos = videos;
             this.Videos = videos.AsReadOnly();
         }
@@ -129,7 +130,7 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public ReactiveProperty<string> Name { get; init; } = new();
+        public BindableProperty<string> Name { get; init; }
 
         public PlaylistType PlaylistType
         {

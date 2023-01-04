@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Niconicome.Models.Utils.Reactive
+{
+    public class BindableCollection<TItem, TOrigin> : ObservableCollection<TItem>
+    {
+        public BindableCollection(ObservableCollection<TOrigin> baseCollection, Func<TOrigin, TItem> converter)
+        {
+            this._baseCollection = baseCollection;
+            this._converter = converter;
+
+            baseCollection.CollectionChanged += this.OnBaseCollecitonChanged;
+        }
+
+        #region field
+
+        private readonly ObservableCollection<TOrigin> _baseCollection;
+
+        private readonly Func<TOrigin, TItem> _converter;
+
+        #endregion
+
+        #region Method
+
+        /// <summary>
+        /// 読み取り専用のコレクションを取得する
+        /// </summary>
+        /// <returns></returns>
+        public ReadOnlyObservableCollection<TItem> AsReadOnly()
+        {
+            return new ReadOnlyObservableCollection<TItem>(this);
+        }
+
+        #endregion
+
+        #region private
+
+        private void OnBaseCollecitonChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems?[0] is TOrigin item) this.Insert(e.NewStartingIndex, this._converter(item));
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldStartingIndex >= 0)
+            {
+                this.RemoveAt(e.OldStartingIndex);
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                if (e.NewItems?[0] is TOrigin item) this[e.OldStartingIndex] = this._converter(item);
+            } else if (e.Action == NotifyCollectionChangedAction.Move)
+            {
+                this.Move(e.OldStartingIndex, e.NewStartingIndex);
+            } else if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                this.Clear();
+                foreach (var item in this._baseCollection) this.Add(this._converter(item));
+            }
+        }
+
+        #endregion
+    }
+}

@@ -35,7 +35,7 @@
     </Window.Resources>
     <materialDesign:DialogHost Identifier="default">
         <DockPanel>
-            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" d:DataContext="{d:DesignInstance {x:Type vm:MainWindowViewModel}}">
+            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" d:DataContext="{d:DesignInstance {x:Type vm:MainWindowViewModel}}" OpenMode="Standard">
                 <materialDesign:DrawerHost.LeftDrawerContent>
                     <Grid Width="250">
                         <Grid.RowDefinitions>
@@ -90,73 +90,11 @@
                         <ColumnDefinition Width="{Binding TreeWidth.Value}"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Column= "0" 
-                          Background="#323232">
-                        <Grid.DataContext>
-                            <vm:PlaylistTreeViewModel/>
-                        </Grid.DataContext>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="16*"/>
-                        </Grid.RowDefinitions>
-                        <DockPanel Grid.Row="0">
-                            <Button Width="auto" Margin="6" HorizontalAlignment="Left" Command="{Binding PlaylistRefreshcommand}" ToolTip="プレイリストを更新する">
-                                <materialDesign:PackIcon Kind="Refresh" />
-                            </Button>
-                        </DockPanel>
-                        <TreeView ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
-                            <i:Interaction.Behaviors>
-                                <vm:PlaylistTreeBehavior/>
-                            </i:Interaction.Behaviors>
-                            <TreeView.ItemTemplate>
-                                <HierarchicalDataTemplate DataType="tree:ITreePlaylistInfo" ItemsSource="{Binding Children}">
-                                    <StackPanel>
-                                        <Grid>
-                                            <Grid.ToolTip>
-                                                <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
-                                            </Grid.ToolTip>
-                                            <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                            <TextBlock Foreground="#FAFAFA" Text="{Binding Name.Value}"/>
-                                            <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </HierarchicalDataTemplate>
-                            </TreeView.ItemTemplate>
-                            <TreeView.ItemContainerStyle>
-                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                                    <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}}"/>
-                                    <Setter Property="ContextMenu">
-                                        <Setter.Value>
-                                            <ContextMenu StaysOpen="False" DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}" >
-                                                <MenuItem Header="プレイリストを追加する"
-                                                  Command="{Binding AddPlaylist}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Plus"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem Header="このプレイリストを削除する"
-                                                  Command="{Binding RemovePlaylist}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Delete"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem Header="このプレイリストを編集する"
-                                                  Command="{Binding EditPlaylistCommand}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Edit"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                            </ContextMenu>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                </Style>
-                            </TreeView.ItemContainerStyle>
-                        </TreeView>
-                    </Grid>
+                    <ContentControl 
+                        Grid.Column= "0" 
+                        prism:RegionManager.RegionName="PlaylistTree"
+                        >
+                    </ContentControl>
                     <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
@@ -185,7 +123,8 @@
                                     </Style>
                                 </TabControl.Resources>
                             </TabControl>
-                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="1" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A">
+                            <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="0" MessageQueue="{Binding SnackbarHandler.Queue}"/>
+                            <TabControl Background="{DynamicResource MaterialDesignPaper}" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A" Grid.Row="1">
                                 <TabControl.Resources>
                                     <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
                                     </Style>
