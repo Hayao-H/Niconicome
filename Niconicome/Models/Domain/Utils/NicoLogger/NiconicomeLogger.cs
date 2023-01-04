@@ -40,7 +40,7 @@ namespace Niconicome.Models.Domain.Utils.NicoLogger
         {
             this._writer = writer;
 #if DEBUG
-            this.IsDebugMode = true;
+            //this.IsDebugMode = true;
 #endif
         }
 

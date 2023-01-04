@@ -26,6 +26,6 @@ namespace Niconicome.Models.Domain.Playlist
             return this._updater.Update(infomation);
         }
 
-        public bool IsAutoUpdateEnabled { get; set; }
+        public bool IsAutoUpdateEnabled { get; set; } = true;
     }
 }

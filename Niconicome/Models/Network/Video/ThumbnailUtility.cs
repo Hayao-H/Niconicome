@@ -55,16 +55,19 @@ namespace Niconicome.Models.Network.Video
 
     public class ThumbnailUtility : IThumbnailUtility
     {
-        public ThumbnailUtility(INicoFileIO fileIO,IErrorHandler errorHandler,INicoHttp http)
+        public ThumbnailUtility(INicoFileIO fileIO, IErrorHandler errorHandler, INicoHttp http,INicoDirectoryIO directoryIO)
         {
             this._fileIO = fileIO;
             this._errorHandler = errorHandler;
             this._http = http;
+            this._directoryIO = directoryIO;
         }
 
         #region field
 
         private readonly INicoFileIO _fileIO;
+
+        private readonly INicoDirectoryIO _directoryIO;
 
         private readonly IErrorHandler _errorHandler;
 
@@ -122,6 +125,21 @@ namespace Niconicome.Models.Network.Video
             byte[] data = await res.Content.ReadAsByteArrayAsync();
 
             string path = this.GetThumbPathInternal(niconicoID);
+
+            string? dirPath = Path.GetDirectoryName(path);
+            if (dirPath is not null && !this._directoryIO.Exists(dirPath))
+            {
+                try
+                {
+                    this._directoryIO.Create(dirPath);
+                }
+                catch (Exception ex)
+                {
+                    this._errorHandler.HandleError(ThumbnailUtilityError.ThumbDirectoryCreationFailed, ex, dirPath);
+                    return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(ThumbnailUtilityError.ThumbDirectoryCreationFailed, ex, dirPath));
+                }
+            }
+
             try
             {
                 using var stream = new FileStream(path, FileMode.OpenOrCreate);
@@ -149,10 +167,10 @@ namespace Niconicome.Models.Network.Video
         /// <returns></returns>
         private string GetThumbPathInternal(string niconicoID)
         {
-            string numberStr = Regex.Replace(niconicoID, @"/D", "");
+            string numberStr = Regex.Replace(niconicoID, @"\D", "");
             int number = int.Parse(numberStr);
 
-            return Path.Combine(AppContext.BaseDirectory, "thumb", "cache", $"{number % 10}.jpg");
+            return Path.Combine(AppContext.BaseDirectory, "cache", "thumb", $"{number % 10}.jpg");
         }
 
         #endregion

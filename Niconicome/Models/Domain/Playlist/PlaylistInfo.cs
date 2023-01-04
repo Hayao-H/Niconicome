@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Automation.Text;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -95,7 +96,10 @@ namespace Niconicome.Models.Domain.Playlist
         {
             this.Children = new ReadOnlyObservableCollection<IPlaylistInfo>(this._children);
             this.Name = new BindableProperty<string>(name);
-            this.Name.RegisterPropertyChangeHandler(_ => this.Update(this));
+            this.Name.RegisterPropertyChangeHandler(_ =>
+            {
+                if (this.IsAutoUpdateEnabled) this.Update(this);
+            });
             this._videos = videos;
             this.Videos = videos.AsReadOnly();
         }
@@ -126,7 +130,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._folderPath = value;
-                this.Update(this);
+                if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
 
@@ -138,7 +142,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._playlistType = value;
-                this.Update(this);
+                if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
 
@@ -149,7 +153,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._remoteParameter = value;
-                this.Update(this);
+                if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
 
@@ -168,24 +172,24 @@ namespace Niconicome.Models.Domain.Playlist
         {
             this._children.Add(playlistInfo);
 
-            return commit ? this.Update(this) : AttemptResult.Succeeded();
+            return commit && this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 
         public IAttemptResult RemoveChild(IPlaylistInfo playlistInfo)
         {
             this._children.Remove(playlistInfo);
-            return this.Update(this);
+            return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 
         public IAttemptResult AddVideo(IVideoInfo video)
         {
             this._videos.Add(video);
-            return this.Update(this);
+            return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
         public IAttemptResult RemoveVideo(IVideoInfo video)
         {
             this._videos.RemoveAll(v => v.ID == video.ID);
-            return this.Update(this);
+            return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 
 

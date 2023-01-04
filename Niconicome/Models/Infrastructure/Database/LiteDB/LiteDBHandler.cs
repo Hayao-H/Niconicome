@@ -110,6 +110,9 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 
             this._errorHandler = errorHandler;
             this._errorHandler.HandleError(LiteDBError.Initialized);
+
+            //空の文字列をnullに変換しない
+            BsonMapper.Global.EmptyStringToNull = false;
         }
 
         #region field
@@ -380,11 +383,9 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
                 return AttemptResult.Fail(cResult.Message);
             }
 
-            int count = 0;
-
             try
             {
-                count = cResult.Data.DeleteAll();
+                this._database.DropCollection(tableName);
             }
             catch (Exception ex)
             {
@@ -392,7 +393,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(LiteDBError.DeletingAllRecordFailed, tableName));
             }
 
-            this._errorHandler.HandleError(LiteDBError.AllRecordDeleted, tableName, count);
+            this._errorHandler.HandleError(LiteDBError.AllRecordDeleted, tableName);
             return AttemptResult.Succeeded();
         }
 

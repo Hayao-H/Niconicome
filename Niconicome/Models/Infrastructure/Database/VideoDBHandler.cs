@@ -16,11 +16,10 @@ namespace Niconicome.Models.Infrastructure.Database
 {
     public class VideoDBHandler : IVideoStore
     {
-        public VideoDBHandler(ILiteDBHandler database, ITagStore tagStore, IErrorHandler errorHandler)
+        public VideoDBHandler(ILiteDBHandler database, ITagStore tagStore)
         {
             this._database = database;
             this._tagStore = tagStore;
-            this._errorHandler = errorHandler;
         }
 
         #region field
@@ -28,8 +27,6 @@ namespace Niconicome.Models.Infrastructure.Database
         private readonly ILiteDBHandler _database;
 
         private readonly ITagStore _tagStore;
-
-        private readonly IErrorHandler _errorHandler;
 
         private const int DefaultVideoID = -1;
 
@@ -62,7 +59,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsDownloaded = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
 
-            video.IsAutoUpdateEnabled = false;
+            video.IsAutoUpdateEnabled = true;
 
             return AttemptResult<IVideoInfo>.Succeeded(video);
         }
@@ -92,7 +89,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsDownloaded = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
 
-            video.IsAutoUpdateEnabled = false;
+            video.IsAutoUpdateEnabled = true;
 
             return AttemptResult<IVideoInfo>.Succeeded(video);
         }
@@ -171,7 +168,10 @@ namespace Niconicome.Models.Infrastructure.Database
 
         public IAttemptResult Clear()
         {
-            return this._database.Clear(TableNames.Video);
+            IAttemptResult videoResult = this._database.Clear(TableNames.Video);
+            if (!videoResult.IsSucceeded) return videoResult;
+
+            return this._database.Clear(TableNames.SharedVideo);
         }
 
         public bool Exist(int ID, int playlistID)
@@ -179,6 +179,11 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._database.Exists<Video>(TableNames.Video, v => v.SharedVideoID == ID && v.PlaylistID == playlistID);
         }
 
+        public bool Test(string niconicoID)
+        {
+            return this._database.Exists<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID);
+
+        }
 
 
         #endregion
@@ -259,7 +264,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.Duration = sharedData.Duration;
             video.IsDeleted = sharedData.IsDeleted;
 
-            video.IsAutoUpdateEnabled = false;
+            video.IsAutoUpdateEnabled = true;
 
             return video;
         }

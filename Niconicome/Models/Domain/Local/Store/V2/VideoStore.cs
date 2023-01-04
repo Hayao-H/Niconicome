@@ -68,5 +68,7 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <param name="playlistID"></param>
         /// <returns></returns>
         bool Exist(int ID, int playlistID);
+
+        bool Test(string niconicoID);
     }
 }

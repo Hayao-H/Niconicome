@@ -95,10 +95,16 @@ namespace Niconicome.Models.Playlist.V2.Migration
             if (!videosResult.IsSucceeded || videosResult.Data is null) return AttemptResult<IReadOnlyList<DetailedMigrationResult>>.Fail(videosResult.Message);
 
             var failed = new List<DetailedMigrationResult>();
+            var migrated = new List<string>();
 
             foreach (var video in videosResult.Data)
             {
                 listner(video.ToString());
+
+                if (migrated.Contains(video.NiconicoId))
+                {
+                    continue;
+                }
 
                 IAttemptResult<int> videoCreationResult = this._videoStore.Create(video.NiconicoId);
                 if (!videoCreationResult.IsSucceeded)
@@ -115,19 +121,25 @@ namespace Niconicome.Models.Playlist.V2.Migration
                 }
 
                 IVideoInfo videoInfo = videoResult.Data;
+                videoInfo.IsAutoUpdateEnabled = false;
+
                 videoInfo.ViewCount = video.ViewCount;
                 videoInfo.CommentCount = video.CommentCount;
                 videoInfo.MylistCount = video.MylistCount;
                 videoInfo.LikeCount = video.LikeCount;
                 videoInfo.Duration = video.Duration;
                 videoInfo.OwnerID = video.OwnerID;
-                videoInfo.NiconicoId = video.NiconicoId;
-                videoInfo.Title = video.Title;
                 videoInfo.LargeThumbUrl = video.LargeThumbUrl;
                 videoInfo.ThumbUrl = video.ThumbUrl;
                 videoInfo.OwnerName = video.OwnerName;
                 videoInfo.IsDeleted = video.IsDeleted;
                 videoInfo.UploadedOn = video.UploadedOn;
+                videoInfo.Title = video.Title;
+
+                videoInfo.IsAutoUpdateEnabled = true;
+
+                videoInfo.NiconicoId = video.NiconicoId;
+                migrated.Add(video.NiconicoId);
             }
 
             return AttemptResult<IReadOnlyList<DetailedMigrationResult>>.Succeeded(failed.AsReadOnly());
@@ -224,9 +236,10 @@ namespace Niconicome.Models.Playlist.V2.Migration
                     partlyFailed.Add(new DetailedMigrationResult(playlist.PlaylistName ?? LocalConstant.DefaultPlaylistName, string.Join(",", failedVideos)));
                 }
 
+                info.IsAutoUpdateEnabled = true;
+
                 info.Name.Value = info.Name.Value;
 
-                info.IsAutoUpdateEnabled = true;
 
                 newPlaylistsDict.Add(playlist.Id, info);
             }

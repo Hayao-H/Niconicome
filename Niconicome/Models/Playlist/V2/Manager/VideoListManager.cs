@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
+using Niconicome.Models.Playlist.V2.Migration;
 
 namespace Niconicome.Models.Playlist.V2.Manager
 {
@@ -19,11 +20,12 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class VideoListManager : IVideoListManager
     {
-        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler)
+        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration)
         {
             this._container = container;
             this._loader = loader;
             this._errorHandler = errorHandler;
+            this._migration = migration;
         }
 
         #region field
@@ -34,12 +36,18 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         private readonly IErrorHandler _errorHandler;
 
+        private readonly IVideoAndPlayListMigration _migration;
+
         #endregion
 
         #region Method
 
         public async Task LoadVideosAsync()
         {
+            //移行が必要な場合は処理を中止
+            if (this._migration.IsMigrationNeeded) return;
+
+            //プレイリストが選択されていない場合はエラー
             if (this._container.CurrentSelectedPlaylist is null)
             {
                 this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);

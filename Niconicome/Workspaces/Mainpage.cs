@@ -127,7 +127,7 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// プレイリストと動画の移行
         /// </summary>
-        public static Playlist::Migration.VideoAndPlayListMigration VideoAndPlayListMigration { get; private set; }=DIFactory.Resolve<Playlist::Migration.VideoAndPlayListMigration>();
+        public static Playlist::Migration.IVideoAndPlayListMigration VideoAndPlayListMigration { get; private set; }=DIFactory.Resolve<Playlist::Migration.IVideoAndPlayListMigration>();
 
     }
 }

@@ -6,6 +6,7 @@ using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist.V2.Manager.Error;
+using Niconicome.Models.Playlist.V2.Migration;
 
 namespace Niconicome.Models.Playlist.V2.Manager
 {
@@ -33,11 +34,12 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class PlaylistManager : IPlaylistManager
     {
-        public PlaylistManager(IPlaylistStore playlistStore, IErrorHandler errorHandler, IPlaylistVideoContainer container)
+        public PlaylistManager(IPlaylistStore playlistStore, IErrorHandler errorHandler, IPlaylistVideoContainer container,IVideoAndPlayListMigration migration)
         {
             this._playlistStore = playlistStore;
             this._errorHandler = errorHandler;
             this._container = container;
+            this._migration = migration;
         }
 
         #region field
@@ -48,6 +50,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         private readonly IPlaylistVideoContainer _container;
 
+        private readonly IVideoAndPlayListMigration _migration;
+
         private Dictionary<int, IPlaylistInfo> _playlists = new();
 
         #endregion
@@ -55,6 +59,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
         #region Method
         public void Initialize()
         {
+            //移行が必要な場合は処理を中止
+            if (this._migration.IsMigrationNeeded) return;
+
             //特殊なプレイリストを作成
             IAttemptResult specialResult = this.CreateSpecialPlaylist();
             if (!specialResult.IsSucceeded) return;

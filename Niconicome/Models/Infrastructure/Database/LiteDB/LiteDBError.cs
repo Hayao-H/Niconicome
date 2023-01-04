@@ -41,7 +41,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         RecordNotFound,
         [ErrorEnum(ErrorLevel.Error, "[{0}]テーブルのレコード全削除に失敗しました。")]
         DeletingAllRecordFailed,
-        [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルのレコードを全て削除しました。({1}件)")]
+        [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルのレコードを全て削除しました。")]
         AllRecordDeleted,
     }
 
