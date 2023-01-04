@@ -14,7 +14,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
     public class ApplicationDBHandler : IApplicationStore
     {
-        public ApplicationDBHandler(ILiteDBHandler dataBase,IErrorHandler errorHandler)
+        public ApplicationDBHandler(ILiteDBHandler dataBase, IErrorHandler errorHandler)
         {
             this._dataBase = dataBase;
             this._errorHandler = errorHandler;
@@ -39,10 +39,15 @@ namespace Niconicome.Models.Infrastructure.Database
             if (!apps.IsSucceeded || apps.Data is null) return AttemptResult<Version>.Fail(apps.Message);
 
             Types.App app = apps.Data.First();
-            Version.TryParse(app.DBVersion, out Version? version);
-            this._errorHandler.HandleError(ApplicationDBHandlerError.FailedToParseDBVersion, app.DBVersion);
 
-            return version is null ? AttemptResult<Version>.Fail(this._errorHandler.GetMessageForResult(ApplicationDBHandlerError.FailedToParseDBVersion, app.DBVersion)) : AttemptResult<Version>.Succeeded(version);
+            if (!Version.TryParse(app.DBVersion, out Version? version))
+            {
+                this._errorHandler.HandleError(ApplicationDBHandlerError.FailedToParseDBVersion, app.DBVersion);
+                return AttemptResult<Version>.Fail(this._errorHandler.GetMessageForResult(ApplicationDBHandlerError.FailedToParseDBVersion, app.DBVersion));
+            } else
+            {
+                return AttemptResult<Version>.Succeeded(version);
+            }
         }
 
         public IAttemptResult SetDBVersion(Version version)

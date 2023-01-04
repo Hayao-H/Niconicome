@@ -209,34 +209,39 @@ namespace Niconicome.Models.Playlist.V2.Migration
 
                 info.RemoteParameter = playlist.RemoteId ?? "";
 
-                info.IsAutoUpdateEnabled = false;
-
-                var failedVideos = new List<string>();
-
-                foreach (var video in playlist.Videos)
+                //動画を追加(一時プレイリストの場合は無視)
+                if (!playlist.IsTemporary)
                 {
-                    IAttemptResult<int> videoCreationResult = this._videoStore.Create(video.NiconicoId, info.ID);
-                    if (!videoCreationResult.IsSucceeded)
+
+                    info.IsAutoUpdateEnabled = false;
+
+                    var failedVideos = new List<string>();
+
+                    foreach (var video in playlist.Videos)
                     {
-                        failedVideos.Add(video.ToString());
-                        continue;
+                        IAttemptResult<int> videoCreationResult = this._videoStore.Create(video.NiconicoId, info.ID);
+                        if (!videoCreationResult.IsSucceeded)
+                        {
+                            failedVideos.Add(video.ToString());
+                            continue;
+                        }
+
+                        IAttemptResult<IVideoInfo> videoGetResult = this._videoStore.GetVideo(videoCreationResult.Data, info.ID);
+                        if (!videoGetResult.IsSucceeded || videoGetResult.Data is null)
+                        {
+                            failedVideos.Add(video.ToString());
+                            continue;
+                        }
+                        info.AddVideo(videoGetResult.Data);
                     }
 
-                    IAttemptResult<IVideoInfo> videoGetResult = this._videoStore.GetVideo(videoCreationResult.Data, info.ID);
-                    if (!videoGetResult.IsSucceeded || videoGetResult.Data is null)
+                    if (failedVideos.Count > 0)
                     {
-                        failedVideos.Add(video.ToString());
-                        continue;
+                        partlyFailed.Add(new DetailedMigrationResult(playlist.PlaylistName ?? LocalConstant.DefaultPlaylistName, string.Join(",", failedVideos)));
                     }
-                    info.AddVideo(videoGetResult.Data);
-                }
 
-                if (failedVideos.Count > 0)
-                {
-                    partlyFailed.Add(new DetailedMigrationResult(playlist.PlaylistName ?? LocalConstant.DefaultPlaylistName, string.Join(",", failedVideos)));
+                    info.IsAutoUpdateEnabled = true;
                 }
-
-                info.IsAutoUpdateEnabled = true;
 
                 info.Name.Value = info.Name.Value;
 
