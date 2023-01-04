@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Models.Playlist.Playlist;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.PlaylistTree
 {
@@ -39,21 +40,21 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
             if (this.AssociatedObject.SelectedItem is null) return;
 
             //キャストできない場合はキャンセル
-            if (this.AssociatedObject.SelectedItem  is not PlaylistInfoViewModel playlistInfo) return;
+            if (this.AssociatedObject.SelectedItem  is not PlaylistInfoViewModel vm) return;
 
             //nullの場合はキャンセル
-            if (playlistInfo is null) return;
+            if (vm is null) return;
 
             //変更がない場合はキャンセル
-            //if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value?.Id == playlistInfo.Id) return;
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is not null && WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist.ID == vm.ID) return;
 
             //ルートプレイリストは選択禁止
-            if (playlistInfo.IsRoot) return;
+            if (vm.IsRoot) return;
 
             //末端プレイリストでない場合はキャンセル
-            if (playlistInfo.Children.Count > 0) return;
+            if (vm.Children.Count > 0) return;
 
-            //WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value = playlistInfo;
+            WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist = vm.PlaylistInfo;
         }
     }
 }

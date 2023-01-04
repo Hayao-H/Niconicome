@@ -14,41 +14,40 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
     {
         public PlaylistInfoViewModel(IPlaylistInfo info)
         {
-            this._info = info;
+            this.PlaylistInfo = info;
         }
-
-        #region field
-
-        private readonly IPlaylistInfo _info;
-
-        #endregion
 
         #region Props
 
         /// <summary>
+        /// IPlaylistInfo
+        /// </summary>
+        public IPlaylistInfo PlaylistInfo { get; init; }
+
+        /// <summary>
         /// ID
         /// </summary>
-        public int ID => this._info.ID;
+        public int ID => this.PlaylistInfo.ID;
 
         /// <summary>
         /// プレイリスト名
         /// </summary>
-        public BindableProperty<string> Name => this._info.Name;
+        public BindableProperty<string> Name => this.PlaylistInfo.Name;
 
         /// <summary>
         /// 動画数
         /// </summary>
-        public int VideosCount =>this._info.Videos.Count;
+        public int VideosCount =>this.PlaylistInfo.Videos.Count;
 
         /// <summary>
         /// ルートプレイリストであるかどうか
         /// </summary>
-        public bool IsRoot => this._info.PlaylistType == PlaylistType.Root;
+        public bool IsRoot => this.PlaylistInfo.PlaylistType == PlaylistType.Root;
 
         /// <summary>
         /// 子プレイリスト(デフォルトでは空)
         /// </summary>
-        public ReadOnlyObservableCollection<IPlaylistInfo> Children => this._info.Children;
+        public ReadOnlyObservableCollection<IPlaylistInfo> Children => this.PlaylistInfo.Children;
 
         #endregion
 

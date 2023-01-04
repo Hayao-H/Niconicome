@@ -42,6 +42,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public List<VideoInfoViewModel> Videos { get; init; } = new List<VideoInfoViewModel>();
 
+        /// <summary>
+        /// プレイリスト名
+        /// </summary>
+        public string PlaylistName => WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist?.Name.Value ?? "";
+
         #endregion
 
         #region Method

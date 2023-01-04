@@ -71,6 +71,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             IPlaylistInfo? temp = result.Data.FirstOrDefault(p => p.PlaylistType == PlaylistType.Temporary);
             if (temp is null) return;
+            this._container.CurrentSelectedPlaylist = temp;
 
             root.AddChild(temp, false);
 
