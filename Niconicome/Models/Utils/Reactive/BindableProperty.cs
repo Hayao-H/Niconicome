@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Reactive.Bindings;
+using SQLitePCL;
 
 namespace Niconicome.Models.Utils.Reactive
 {
@@ -30,6 +33,13 @@ namespace Niconicome.Models.Utils.Reactive
         void UnRegisterPropertyChangeHandler(Action<T> handler);
 
         /// <summary>
+        /// 値の変更を監視する
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        BindableProperty<T> Subscribe(Action<T> handler);
+
+        /// <summary>
         /// Bndablesクラスで管理
         /// </summary>
         /// <param name="bindables"></param>
@@ -37,6 +47,8 @@ namespace Niconicome.Models.Utils.Reactive
         BindableProperty<T> AddTo(Bindables bindables);
 
     }
+
+
 
     public class BindableProperty<T> : BindablePropertyBase, INotifyPropertyChanged, IBindableProperty<T>
     {
@@ -78,12 +90,18 @@ namespace Niconicome.Models.Utils.Reactive
             this._handlers.RemoveAll(x => x == handler);
         }
 
+        public BindableProperty<T> Subscribe(Action<T> handler)
+        {
+            this.RegisterPropertyChangeHandler(handler);
+            return this;
+        }
+
+
         public BindableProperty<T> AddTo(Bindables bindables)
         {
             bindables.Add(this);
             return this;
         }
-
 
         #endregion
 

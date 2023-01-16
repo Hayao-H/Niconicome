@@ -1,13 +1,77 @@
 ﻿@page "/videos"
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.IndexViewModel DataContext;
+@inject IJSRuntime JS;
 
-<h3>@(DataContext.PlaylistName)</h3>
+<div class="PageContent">
+	<h3>@(DataContext.PlaylistName)</h3>
+
+	<div class="VideoList">
+		<div id="VideoListHeader">
+			<span id="CheckBoxColumn" class="HeaderItem"></span>
+			<hr id="CheckBoxColumnSeparator" data-index="0" class="Separator"/>
+			<span id="ThumbnailColumn" class="HeaderItem"></span>
+			<hr id="ThumbnailColumnSeparator" data-index="1" class="Separator"/>
+			<span id="TitleColumn" class="HeaderItem">タイトル</span>
+			<hr id="TitleColumnSeparator" data-index="2" class="Separator"/>
+			<span id="UploadedDateTimeColumn" class="HeaderItem">投稿日時</span>
+			<hr id="UploadedDateTimeColumnSeparator" data-index="3" class="Separator"/>
+			<span id="ViewCountColumn" class="HeaderItem">再生回数</span>
+			<hr id="ViewCountColumnSeparator" data-index="4" class="Separator"/>
+			<span id="CommentCountColumn" class="HeaderItem">コメント数</span>
+			<hr id="CommentCountColumnSeparator" data-index="5" class="Separator"/>
+			<span id="MylistCountColumn" class="HeaderItem">マイリスト数</span>
+			<hr id="MylistCountColumnSeparator" data-index="6" class="Separator"/>
+			<span id="LikeCountColumn" class="HeaderItem">いいね数</span>
+		</div>
+		<div class="VideoListBody">
+			@foreach (var video in DataContext.Videos)
+			{
+					<div class="VideoListRow">
+						<div class="CheckBoxColumn">
+								<input type="checkbox"  checked="@(video.IsSelected.Value)"/>
+						</div>
+						<div class="ThumbnailWrapper">
+								<img class="Thumbnail" src="data:image/jpeg;base64,@(video.Base64ThumbData.Value)"/>
+						</div>
+						<div class="VideoInfoContainer">
+							<div class="TitleColumn">
+								<p class="fw-bold">@(video.Title)</p>
+								<p class="text-muted ms-3">投稿者：@(video.OwnerName)</p>
+							</div>
+							<div class="UploadedDateTimeColumn">
+								<p>投稿日時：@(video.UploadedOn)</p>
+							</div>
+							<div class="ViewCountColumn">
+								<p>@(video.ViewCount)</p>
+							</div>
+							<div class="CommentCountColumn">
+								<p>@(video.CommentCount)</p>
+							</div>
+							<div class="MylistCountColumn">
+								<p>@(video.MylistCount)</p>
+							</div>
+							<div class="LikeCountColumn">
+								<p>@(video.LikeCount)</p>
+							</div>
+						</div>
+				</div>
+			}
+		</div>
+	</div>
+</div>
 
 @code {
 
 	protected override async Task OnParametersSetAsync()
 	{
 		DataContext.RegisterListChangedEventHandler(() => this.StateHasChanged());
+		DataContext.Bindables.RegisterPropertyChangeHandler(() => this.StateHasChanged());
 		await DataContext.Initialize();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+		await JS.InvokeVoidAsync("main");
 	}
 }

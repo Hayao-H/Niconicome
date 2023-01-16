@@ -55,7 +55,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
             video.IsAutoUpdateEnabled = false;
 
-            video.IsSelected = data.IsSelected;
+            video.IsSelected.Value = data.IsSelected;
             video.IsDownloaded = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
 
@@ -85,7 +85,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
             video.IsAutoUpdateEnabled = false;
 
-            video.IsSelected = data.IsSelected;
+            video.IsSelected.Value = data.IsSelected;
             video.IsDownloaded = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
 
@@ -223,7 +223,7 @@ namespace Niconicome.Models.Infrastructure.Database
             {
                 Id = video.ID,
                 PlaylistID = video.PlaylistID,
-                IsSelected = video.IsSelected,
+                IsSelected = video.IsSelected.Value,
                 IsDownloaded = video.IsDownloaded,
                 IsEconomy = video.IsEconomy,
                 VideoFilePath = video.FilePath

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Utils.Reactive;
 
 namespace Niconicome.Models.Domain.Playlist
 {
@@ -82,7 +83,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// サムネファイルパス
         /// </summary>
-        string ThumbPath { get; set; }
+        BindableProperty<string> ThumbPath { get; set; }
 
         /// <summary>
         /// ファイルパス
@@ -107,7 +108,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// 選択フラグ
         /// </summary>
-        bool IsSelected { get; set; }
+        BindableProperty<bool> IsSelected { get; }
 
         /// <summary>
         /// DL済みフラグ
@@ -137,6 +138,10 @@ namespace Niconicome.Models.Domain.Playlist
         public VideoInfo(IStoreUpdater<IVideoInfo> updater, List<ITagInfo> tags) : base(updater)
         {
             this._tags = tags;
+            this.IsSelected = new BindableProperty<bool>(false).Subscribe(value =>
+            {
+                if (this.IsAutoUpdateEnabled) this.Update(this);
+            });
         }
 
         #region field
@@ -301,7 +306,7 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public string ThumbPath { get; set; } = string.Empty;
+        public BindableProperty<string> ThumbPath { get; set; } = new(string.Empty);
 
         public string FilePath
         {
@@ -336,15 +341,7 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public bool IsSelected
-        {
-            get => this._isSelected;
-            set
-            {
-                this._isSelected = value;
-                if (this.IsAutoUpdateEnabled) this.Update(this);
-            }
-        }
+        public BindableProperty<bool> IsSelected { get; init; }
 
         public bool IsDownloaded
         {

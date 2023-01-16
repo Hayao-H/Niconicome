@@ -1,26 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Utils.Reactive;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
 {
-    public class VideoInfoViewModel
+    public class VideoInfoViewModel : IDisposable
     {
         public VideoInfoViewModel(IVideoInfo video)
         {
+            var bindable = new Bindables();
+
             this._video = video;
+            this._thumbConverter = path =>
+            {
+                byte[] thumbData = File.ReadAllBytes(path);
+                return Convert.ToBase64String(thumbData);
+            };
+
+            if (video.ThumbPath.Value.IsNullOrEmpty())
+            {
+                this.Base64ThumbData = new BindableProperty<string>(string.Empty).AddTo(bindable);
+            }
+            else
+            {
+                this.Base64ThumbData = new BindableProperty<string>(this._thumbConverter(video.ThumbPath.Value)).AddTo(bindable);
+            }
+
+            this._thumbHandler = p =>
+            {
+                if (this._video.ThumbPath.Value.IsNullOrEmpty()) return;
+                this.Base64ThumbData.Value = this._thumbConverter(this._video.ThumbPath.Value);
+            };
+
+            video.ThumbPath.RegisterPropertyChangeHandler(this._thumbHandler);
+
+            this.IsSelected = video.IsSelected.AddTo(bindable);
+
+            this.Bindable = bindable;
+
+        }
+
+        ~VideoInfoViewModel()
+        {
+            this.Dispose();
         }
 
         #region field
 
         private readonly IVideoInfo _video;
 
+        private readonly Func<string, string> _thumbConverter;
+
+        private readonly Action<string> _thumbHandler;
+
         #endregion
 
         #region Props
+
+        /// <summary>
+        /// 変更監視オブジェクト
+        /// </summary>
+        public Bindables Bindable { get; init; }
+
 
         /// <summary>
         /// ID
@@ -40,7 +87,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// <summary>
         /// 投稿日時
         /// </summary>
-        public DateTime UploadedOn => this._video.UploadedOn;
+        public string UploadedOn => this._video.UploadedOn.ToString("yyyy/M/dd HH:mm");
 
         /// <summary>
         /// 閲覧数
@@ -70,7 +117,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// <summary>
         /// 投稿者名
         /// </summary>
-        public string OwnerName => this._video.OwnerName;
+        public string OwnerName => this._video.OwnerName.IsNullOrEmpty() ? "不明" : this._video.OwnerName;
 
         /// <summary>
         /// サムネURL(大)
@@ -83,9 +130,9 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         public string ThumbUrl => this._video.ThumbUrl;
 
         /// <summary>
-        /// サムネファイルパス
+        /// サムネファイルデータ
         /// </summary>
-        public string ThumbPath => this._video.ThumbPath;
+        public BindableProperty<string> Base64ThumbData { get; init; }
 
         /// <summary>
         /// 長さ
@@ -105,8 +152,14 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// <summary>
         /// 選択フラグ
         /// </summary>
-        public bool IsSelected => this._video.IsSelected;
+        public BindableProperty<bool> IsSelected { get; init; }
 
         #endregion
+
+        public void Dispose()
+        {
+            this._video.ThumbPath.UnRegisterPropertyChangeHandler(this._thumbHandler);
+            this.Bindable.Dispose();
+        }
     }
 }

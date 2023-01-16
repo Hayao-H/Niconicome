@@ -1,0 +1,237 @@
+@use "sass:math";
+
+$VideoListRowHeight: 100;
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 5px;
+    box-shadow: inset 0 0 6px #e7e7e7e7;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #737575;
+    border-radius: 5px;
+}
+
+.PageContent {
+
+    .VideoList {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        $HeaderHeight: 35px;
+        $CheckBoxWidth: 50;
+        $ThumbWidth : math.div($VideoListRowHeight - 16, 9)* 16+16;
+        $TitleWidth: 700;
+        $UploadedDateTimeWidth: 250;
+        $CountColumnWidth: 110;
+
+        #VideoListHeader {
+            background-color: #f2f3f5;
+            display: flex;
+            justify-content: start;
+            position: relative;
+            height: $HeaderHeight;
+            color: #001835;
+
+            .HeaderItem {
+                display: inline-block;
+                padding-left: 8px;
+                height: $HeaderHeight;
+                line-height: $HeaderHeight;
+                user-select: none;
+            }
+
+            .Separator {
+                position: absolute;
+                opacity: 0;
+                width: 20px;
+                height: 100%;
+                margin: 0;
+                cursor: col-resize;
+            }
+
+            #CheckBoxColumn {
+                width: #{$CheckBoxWidth}px;
+                border-right: 1px solid #e5e8ea;
+                padding: 0;
+            }
+
+            #CheckBoxColumnSeparator {
+                left: #{$CheckBoxWidth - 10}px;
+            }
+
+            #ThumbnailColumn {
+                width: #{$ThumbWidth}px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #ThumbnailColumnSeparator {
+                left: #{$CheckBoxWidth + $ThumbWidth - 10}px;
+            }
+
+            #TitleColumn {
+                width: #{$TitleWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #TitleColumnSeparator {
+                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth - 10}px;
+            }
+
+            #UploadedDateTimeColumn {
+                width: #{$UploadedDateTimeWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #UploadedDateTimeColumnSeparator {
+                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth - 10}px;
+            }
+
+            #ViewCountColumn {
+                width: #{$CountColumnWidth}px;
+                height: 100%;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #ViewCountColumnSeparator {
+                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $CountColumnWidth - 10}px;
+            }
+
+            #CommentCountColumn {
+                width: #{$CountColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #CommentCountColumnSeparator {
+                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $CountColumnWidth * 2 - 10}px;
+            }
+
+            #MylistCountColumn {
+                width: #{$CountColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #MylistCountColumnSeparator {
+                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $CountColumnWidth * 3 - 10}px;
+            }
+
+            #LikeCountColumn {
+                width: #{$CountColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+        }
+
+        .VideoListBody {
+            border: solid 1px #e5e8ea;
+            height: #{$VideoListRowHeight * 4}px;
+            overflow-y: scroll;
+
+            .VideoListRow {
+                height: #{$VideoListRowHeight}px;
+                display: flex;
+                border-bottom: 1px solid #e5e8ea;
+
+                .CheckBoxColumn {
+                    display: flex;
+                    justify-content: center;
+                    flex-direction: column;
+                    width: #{$CheckBoxWidth}px;
+                    border-right: 1px solid #e5e8ea;
+                }
+
+                .ThumbnailWrapper {
+                    height: 100%;
+                    width: #{$ThumbWidth}px;
+                    border-right: 1px solid #e5e8ea;
+                    padding: 8px;
+
+                    .Thumbnail {
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+
+                .VideoInfoContainer {
+                    display: flex;
+                    justify-content: flex-start;
+                    height: 100%;
+
+                    .TitleColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        width: 700px;
+                        padding-left: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .UploadedDateTimeColumn {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        flex-direction: column;
+                        width: 250px;
+                        padding-left: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .ViewCountColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        width: 110px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .CommentCountColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        width: 110px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .MylistCountColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        width: 110px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .LikeCountColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        width: 110px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+                }
+            }
+
+            .VideoListRow:hover {
+                background: #f4f4f4f4;
+            }
+        }
+    }
+}

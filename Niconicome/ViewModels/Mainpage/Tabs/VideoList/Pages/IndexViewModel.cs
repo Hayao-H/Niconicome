@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Utils.Reactive;
+using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
@@ -41,6 +43,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         #region Props
 
         public List<VideoInfoViewModel> Videos { get; init; } = new List<VideoInfoViewModel>();
+
+        /// <summary>
+        /// 変更監視オブジェクト
+        /// </summary>
+        public Bindables Bindables { get; init; } = new();
 
         /// <summary>
         /// プレイリスト名
@@ -100,11 +107,14 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             await WS::Mainpage.VideoListManager.LoadVideosAsync();
 
             this.Videos.Clear();
-            this.Videos.AddRange(WS::Mainpage.PlaylistVideoContainer.Videos.Select(v => new VideoInfoViewModel(v)));
+            this.Videos.AddRange(WS::Mainpage.PlaylistVideoContainer.Videos.Select(v => this.Convert(v)));
 
             this.OnListChanged();
         }
 
+        /// <summary>
+        /// 動画リスト変更イベントハンドラ
+        /// </summary>
         private void OnListChanged()
         {
             if (this._context is null) return;
@@ -117,6 +127,18 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 }, null);
             }
             catch { }
+        }
+
+        /// <summary>
+        /// 動画情報をVMに変換
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        private VideoInfoViewModel Convert(IVideoInfo video)
+        {
+            var vm = new VideoInfoViewModel(video);
+            this.Bindables.Add(vm.Bindable);
+            return vm;
         }
 
         #endregion

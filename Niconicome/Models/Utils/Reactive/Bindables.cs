@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Utils.Reactive
 {
-    public class Bindables : IDisposable
+    public class Bindables : IDisposable, IBindable
     {
         #region field
 
@@ -28,14 +28,16 @@ namespace Niconicome.Models.Utils.Reactive
             bindable.RegisterPropertyChangeHandler(this.OnProprtyChange);
         }
 
-        /// <summary>
-        /// 値の変更を一括で監視する
-        /// </summary>
-        /// <param name="handler"></param>
         public void RegisterPropertyChangeHandler(Action handler)
         {
             this._handlers.Add(handler);
         }
+
+        public void UnRegisterPropertyChangeHandler(Action handler)
+        {
+            this._handlers.Remove(handler);
+        }
+
 
         #endregion
 
@@ -54,10 +56,12 @@ namespace Niconicome.Models.Utils.Reactive
         }
 
         #endregion
+
         public void Dispose()
         {
-            foreach (var bindable in this._bindables) {
-                bindable.Dispose();
+            foreach (var bindable in this._bindables)
+            {
+                bindable.UnRegisterPropertyChangeHandler(this.OnProprtyChange);
             }
 
             this._bindables.Clear();

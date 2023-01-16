@@ -13,6 +13,13 @@ namespace Niconicome.Models.Utils.Reactive
         /// </summary>
         /// <param name="handler"></param>
         void RegisterPropertyChangeHandler(Action handler);
+
+        /// <summary>
+        /// 値の変更の監視を停止する
+        /// </summary>
+        /// <param name="handler"></param>
+        void UnRegisterPropertyChangeHandler(Action handler);
+
     }
 
     public class BindablePropertyBase : IBindable
@@ -29,6 +36,12 @@ namespace Niconicome.Models.Utils.Reactive
         {
             this._nonParamHandlers.Add(handler);
         }
+
+        public void UnRegisterPropertyChangeHandler(Action handler)
+        {
+            this._nonParamHandlers.Remove(handler);
+        }
+
 
         #endregion
 

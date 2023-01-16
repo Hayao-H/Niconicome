@@ -15,6 +15,7 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
         public PlaylistInfoViewModel(IPlaylistInfo info)
         {
             this.PlaylistInfo = info;
+            this.Children = new BindableCollection<PlaylistInfoViewModel, IPlaylistInfo>(info.Children, info => new PlaylistInfoViewModel(info)).AsReadOnly();
         }
 
         #region Props
@@ -37,7 +38,7 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
         /// <summary>
         /// 動画数
         /// </summary>
-        public int VideosCount =>this.PlaylistInfo.Videos.Count;
+        public int VideosCount => this.PlaylistInfo.Videos.Count;
 
         /// <summary>
         /// ルートプレイリストであるかどうか
@@ -47,7 +48,7 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
         /// <summary>
         /// 子プレイリスト(デフォルトでは空)
         /// </summary>
-        public ReadOnlyObservableCollection<IPlaylistInfo> Children => this.PlaylistInfo.Children;
+        public ReadOnlyObservableCollection<PlaylistInfoViewModel> Children { get; init; }
 
         #endregion
 

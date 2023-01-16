@@ -19,5 +19,7 @@ namespace Niconicome.Models.Network.Video.Error
         ThumbWritingFailed,
         [ErrorEnum(ErrorLevel.Error, "ディレクトリの作成に失敗しました。(path:{0})")]
         ThumbDirectoryCreationFailed,
+        [ErrorEnum(ErrorLevel.Warning, "ダウンロードキューが空です。")]
+        QueueIsEMpty,
     }
 }

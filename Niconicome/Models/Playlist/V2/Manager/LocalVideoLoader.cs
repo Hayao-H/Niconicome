@@ -108,13 +108,29 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
                 if (!hasCache)
                 {
-                    await this._thumbnailUtility.DownloadThumbAsync(video.NiconicoId, video.ThumbUrl);
+                    this._thumbnailUtility.DownloadThumb(video.NiconicoId, video.ThumbUrl, result =>
+                    {
+                        if (result.IsSucceeded && result.Data is not null)
+                        {
+                            video.ThumbPath.Value = result.Data;
+                        }
+                        else
+                        {
+                            video.ThumbPath.Value = this._thumbnailUtility.GetDeletedVideoThumb();
+                        }
+                    });
                 }
-
-                IAttemptResult<string> tResult = this._thumbnailUtility.GetThumbPath(video.NiconicoId);
-                if (tResult.IsSucceeded && tResult.Data is not null)
+                else
                 {
-                    video.ThumbPath = tResult.Data;
+                    IAttemptResult<string> tResult = this._thumbnailUtility.GetThumbPath(video.NiconicoId);
+                    if (tResult.IsSucceeded && tResult.Data is not null)
+                    {
+                        video.ThumbPath.Value = tResult.Data;
+                    }
+                    else
+                    {
+                        video.ThumbPath.Value = this._thumbnailUtility.GetDeletedVideoThumb();
+                    }
                 }
 
             }

@@ -6,6 +6,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions;
+using Reactive.Bindings.Extensions;
 
 namespace Niconicome.Models.Utils.Reactive
 {
@@ -15,13 +17,23 @@ namespace Niconicome.Models.Utils.Reactive
         {
             this._baseCollection = baseCollection;
             this._converter = converter;
+            this.AddRange(baseCollection.Select(x => converter(x)));
 
             baseCollection.CollectionChanged += this.OnBaseCollecitonChanged;
         }
 
+        public BindableCollection(ReadOnlyObservableCollection<TOrigin> baseCollection, Func<TOrigin, TItem> converter)
+        {
+            this._converter = converter;
+            this._baseCollection = baseCollection;
+            this.AddRange(baseCollection.Select(x => converter(x)));
+
+            baseCollection.As<INotifyCollectionChanged>().CollectionChanged += this.OnBaseCollecitonChanged;
+        }
+
         #region field
 
-        private readonly ObservableCollection<TOrigin> _baseCollection;
+        private readonly object _baseCollection;
 
         private readonly Func<TOrigin, TItem> _converter;
 
@@ -55,13 +67,15 @@ namespace Niconicome.Models.Utils.Reactive
             else if (e.Action == NotifyCollectionChangedAction.Replace)
             {
                 if (e.NewItems?[0] is TOrigin item) this[e.OldStartingIndex] = this._converter(item);
-            } else if (e.Action == NotifyCollectionChangedAction.Move)
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Move)
             {
                 this.Move(e.OldStartingIndex, e.NewStartingIndex);
-            } else if (e.Action == NotifyCollectionChangedAction.Reset)
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 this.Clear();
-                foreach (var item in this._baseCollection) this.Add(this._converter(item));
+                foreach (var item in this._baseCollection.As<IEnumerable<TOrigin>>()) this.Add(this._converter(item));
             }
         }
 
