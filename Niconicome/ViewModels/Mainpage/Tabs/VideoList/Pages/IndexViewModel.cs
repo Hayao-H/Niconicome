@@ -17,6 +17,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public IndexViewModel(NavigationManager navigation)
         {
             this._navigation = navigation;
+            this.InputText = new BindableProperty<string>("").AddTo(this.Bindables);
+            this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
         }
 
         ~IndexViewModel()
@@ -54,6 +56,16 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public string PlaylistName => WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist?.Name.Value ?? "";
 
+        /// <summary>
+        /// 入力値
+        /// </summary>
+        public BindableProperty<string> InputText { get; init; }
+
+        /// <summary>
+        /// 処理中フラグ
+        /// </summary>
+        public BindableProperty<bool> IsProcessing { get; init; }
+
         #endregion
 
         #region Method
@@ -90,6 +102,25 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             WS::Mainpage.PlaylistVideoContainer.AddPlaylistChangeEventHandler(this._playlistChangeEventHandler);
 
             await this.LoadVideoAsync();
+        }
+
+        /// <summary>
+        /// 動画を登録する
+        /// </summary>
+        /// <returns></returns>
+        public async Task AddVideoAsync()
+        {
+            if (this.IsProcessing.Value || string.IsNullOrEmpty(this.InputText.Value)) return;
+
+            this.IsProcessing.Value = true;
+
+            await WS::Mainpage.VideoListManager.RegisterVideoAsync(this.InputText.Value, m => WS::Mainpage.Messagehandler.AppendMessage(m));
+
+            this.Videos.Clear();
+            this.Videos.AddRange(WS::Mainpage.PlaylistVideoContainer.Videos.Select(v => this.Convert(v)));
+
+            this.InputText.Value = string.Empty;
+            this.IsProcessing.Value = false;
         }
 
         #endregion

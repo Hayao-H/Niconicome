@@ -22,8 +22,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// 非同期で動画のサムネパスとファイルパスを設定
         /// </summary>
         /// <param name="videos"></param>
+        /// <param name="quick"></param>
         /// <returns></returns>
-        Task<IAttemptResult> SetPathAsync(IEnumerable<IVideoInfo> videos);
+        Task<IAttemptResult> SetPathAsync(IEnumerable<IVideoInfo> videos, bool quick);
     }
 
     public class LocalVideoLoader : ILocalVideoLoader
@@ -54,7 +55,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
         #endregion
 
         #region Method
-        public async Task<IAttemptResult> SetPathAsync(IEnumerable<IVideoInfo> videos)
+        public async Task<IAttemptResult> SetPathAsync(IEnumerable<IVideoInfo> videos, bool quick)
         {
             if (this._playlistVideoContainer.CurrentSelectedPlaylist is null)
             {
@@ -84,24 +85,28 @@ namespace Niconicome.Models.Playlist.V2.Manager
                     return AttemptResult.Fail(this._errorHandler.GetMessageForResult(LocalVideoLoaderError.PlaylistChanged));
                 }
 
-                IAttemptResult<string> pathResult = this.GetFilePath(video.NiconicoId, folderPath);
-                if (pathResult.IsSucceeded && pathResult.Data is not null)
+                if (!quick || video.FilePath.IsNullOrEmpty())
                 {
-                    video.FilePath = pathResult.Data;
-                    video.IsDownloaded = true;
-
-                    if (!economy.IsNullOrEmpty())
+                    IAttemptResult<string> pathResult = this.GetFilePath(video.NiconicoId, folderPath);
+                    if (pathResult.IsSucceeded && pathResult.Data is not null)
                     {
-                        if (pathResult.Data.Contains(economy))
+                        video.FilePath = pathResult.Data;
+                        video.IsDownloaded = true;
+
+                        if (!economy.IsNullOrEmpty())
                         {
-                            video.IsEconomy = true;
-                        }
-                        else
-                        {
-                            video.IsEconomy = false;
+                            if (pathResult.Data.Contains(economy))
+                            {
+                                video.IsEconomy = true;
+                            }
+                            else
+                            {
+                                video.IsEconomy = false;
+                            }
                         }
                     }
                 }
+
 
                 //サムネイル
                 bool hasCache = this._thumbnailUtility.IsThumbExists(video.NiconicoId);

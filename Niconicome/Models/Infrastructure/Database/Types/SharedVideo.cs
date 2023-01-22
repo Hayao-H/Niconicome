@@ -27,7 +27,7 @@ namespace Niconicome.Models.Infrastructure.Database.Types
 
         public int LikeCount { get; set; }
 
-        public int OwnerID { get; set; }
+        public string OwnerID { get; set; } = string.Empty;
 
         public string OwnerName { get; set; } = string.Empty;
 

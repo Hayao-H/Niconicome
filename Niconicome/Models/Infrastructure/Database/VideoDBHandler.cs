@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +30,8 @@ namespace Niconicome.Models.Infrastructure.Database
         private readonly ITagStore _tagStore;
 
         private const int DefaultVideoID = -1;
+
+        private readonly Dictionary<int, Dictionary<string, IVideoInfo>> _cache = new();
 
         #endregion
 
@@ -61,11 +64,19 @@ namespace Niconicome.Models.Infrastructure.Database
 
             video.IsAutoUpdateEnabled = true;
 
+            if (!this._cache.ContainsKey(playlistID)) this._cache.Add(playlistID, new Dictionary<string, IVideoInfo>());
+            if (!this._cache[playlistID].ContainsKey(sharedData.NiconicoId)) this._cache[playlistID].Add(sharedData.NiconicoId, video);
+
             return AttemptResult<IVideoInfo>.Succeeded(video);
         }
 
         public IAttemptResult<IVideoInfo> GetVideo(string niconicoID, int playlistID)
         {
+            if (this.TryGetCache(playlistID,niconicoID,out IVideoInfo? cachedVideo))
+            {
+                return AttemptResult<IVideoInfo>.Succeeded(cachedVideo);
+            }
+
             IAttemptResult<SharedVideo> sharedResult = this._database.GetRecord<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID);
             if (!sharedResult.IsSucceeded || sharedResult.Data is null)
             {
@@ -90,6 +101,9 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsEconomy = data.IsEconomy;
 
             video.IsAutoUpdateEnabled = true;
+
+            if (!this._cache.ContainsKey(playlistID)) this._cache.Add(playlistID, new Dictionary<string, IVideoInfo>());
+            if (!this._cache[playlistID].ContainsKey(niconicoID)) this._cache[playlistID].Add(sharedData.NiconicoId, video);
 
             return AttemptResult<IVideoInfo>.Succeeded(video);
         }
@@ -116,7 +130,7 @@ namespace Niconicome.Models.Infrastructure.Database
             return result;
         }
 
-        public IAttemptResult<int> Create(string niconicoID, int playlistID)
+        public IAttemptResult Create(string niconicoID, int playlistID)
         {
 
             int id;
@@ -137,8 +151,9 @@ namespace Niconicome.Models.Infrastructure.Database
 
             var data = new Video() { SharedVideoID = id, PlaylistID = playlistID };
 
-            IAttemptResult<int> result = this._database.Insert(data);
-            return result.IsSucceeded ? AttemptResult<int>.Succeeded(id) : result;
+            IAttemptResult result = this._database.Insert(data);
+
+            return result.IsSucceeded ? AttemptResult.Succeeded() : result;
 
         }
 
@@ -174,15 +189,14 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._database.Clear(TableNames.SharedVideo);
         }
 
-        public bool Exist(int ID, int playlistID)
+        public bool Exist(string niconicoID, int playlistID)
         {
-            return this._database.Exists<Video>(TableNames.Video, v => v.SharedVideoID == ID && v.PlaylistID == playlistID);
-        }
+            if (!this._database.Exists<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID)) return false;
 
-        public bool Test(string niconicoID)
-        {
-            return this._database.Exists<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID);
+            IAttemptResult<SharedVideo> sharedResult = this._database.GetRecord<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID);
+            if (!sharedResult.IsSucceeded || sharedResult.Data is null) return false;
 
+            return this._database.Exists<Video>(TableNames.Video, v => v.SharedVideoID == sharedResult.Data.Id && v.PlaylistID == playlistID);
         }
 
 
@@ -242,7 +256,7 @@ namespace Niconicome.Models.Infrastructure.Database
             }
 
 
-            var video = new VideoInfo(this, tags)
+            var video = new VideoInfo(sharedData.NiconicoId, this, tags)
             {
                 SharedID = sharedData.Id,
                 ID = videoID
@@ -250,7 +264,6 @@ namespace Niconicome.Models.Infrastructure.Database
 
             video.IsAutoUpdateEnabled = false;
 
-            video.NiconicoId = sharedData.NiconicoId;
             video.Title = sharedData.Title;
             video.UploadedOn = sharedData.UploadedOn;
             video.ViewCount = sharedData.ViewCount;
@@ -267,6 +280,31 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsAutoUpdateEnabled = true;
 
             return video;
+        }
+
+        /// <summary>
+        /// キャッシュされたデータを取得する
+        /// </summary>
+        /// <param name="playlistID"></param>
+        /// <param name="niconicoID"></param>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        private bool TryGetCache(int playlistID, string niconicoID, [NotNullWhen(true)] out IVideoInfo? video)
+        {
+            if (!this._cache.ContainsKey(playlistID))
+            {
+                video = null;
+                return false;
+            }  else if (!this._cache[playlistID].ContainsKey(niconicoID))
+            {
+                video = null;
+                return false;
+            } else
+            {
+                video = this._cache[playlistID][niconicoID];
+                return true;
+            }
+
         }
 
         #endregion

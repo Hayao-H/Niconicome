@@ -10,8 +10,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 {
     public interface IThumbInfo
     {
-        string? Large { get; set; }
-        string? Normal { get; set; }
         string GetSpecifiedThumbnail(ThumbSize size);
     }
 

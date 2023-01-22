@@ -19,6 +19,37 @@ $VideoListRowHeight: 100;
 
 .PageContent {
 
+    .ControlsContainer{
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        width: 100%;
+        height: 40px;
+        margin:10px 0;
+
+        .InputBoxWrapper{
+            width: 40%;
+            height: 100%;
+
+            #InputBox{
+                width: 80%;
+                height: 100%;
+                border-top: none;
+                border-left: none;
+                border-right: none;
+                border-bottom: solid 2px #e7e7e7e7;
+                padding: 5px 0;
+                outline: none;
+                display: inline-block;
+            }
+
+            #RegisterButton{
+                margin-left: 5px;
+                padding: 5px 20px;
+            }
+        }
+    }
+    
     .VideoList {
         display: flex;
         flex-direction: column;

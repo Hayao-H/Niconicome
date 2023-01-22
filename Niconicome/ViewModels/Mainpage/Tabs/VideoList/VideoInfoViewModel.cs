@@ -112,7 +112,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// <summary>
         /// 投稿者ID
         /// </summary>
-        public int OwnerID => this._video.OwnerID;
+        public string OwnerID => this._video.OwnerID;
 
         /// <summary>
         /// 投稿者名

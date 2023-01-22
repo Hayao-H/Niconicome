@@ -25,6 +25,8 @@ using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
 using DomainExt = Niconicome.Models.Domain.Local.External;
 using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
+using DomainSettings = Niconicome.Models.Domain.Local.Settings;
+using DomainUtils = Niconicome.Models.Domain.Utils;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
@@ -42,11 +44,14 @@ using Machine = Niconicome.Models.Domain.Local.Machine;
 using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
+using NetworkVideo = Niconicome.Models.Network.Video;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using OS = Niconicome.Models.Local.OS;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
+using PlaylistV2 = Niconicome.Models.Playlist.V2;
 using Register = Niconicome.Models.Network.Register;
+using RemoteV2 = Niconicome.Models.Domain.Niconico.Remote.V2;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
@@ -55,15 +60,14 @@ using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Style = Niconicome.Models.Domain.Local.Style;
+using TabsVM = Niconicome.ViewModels.Mainpage.Tabs;
 using Timer = Niconicome.Models.Local.Timer;
 using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
-using DomainSettings = Niconicome.Models.Domain.Local.Settings;
-using PlaylistV2 = Niconicome.Models.Playlist.V2;
-using TabsVM = Niconicome.ViewModels.Mainpage.Tabs;
+using DomainWatchV2 = Niconicome.Models.Domain.Niconico.Watch.V2;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -286,7 +290,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainSettings::ISettingMigratioin, DomainSettings::SettingMigratioin>();
             services.AddSingleton<DB::LiteDB.ILiteDBHandler, DB::LiteDB.LiteDBHandler>();
             services.AddTransient<Error.IErrorHandler, Error.ErrorHandler>();
-            services.AddSingleton<Net::Video.IThumbnailUtility, Net::Video.ThumbnailUtility>();
+            services.AddSingleton<NetworkVideo::IThumbnailUtility, NetworkVideo::ThumbnailUtility>();
             services.AddSingleton<PlaylistV2::IPlaylistVideoContainer, PlaylistV2::PlaylistVideoContainer>();
             services.AddSingleton<PlaylistV2::Manager.ILocalVideoLoader, PlaylistV2::Manager.LocalVideoLoader>();
             services.AddTransient<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
@@ -294,7 +298,20 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<PlaylistV2::Migration.IVideoAndPlayListMigration, PlaylistV2::Migration.VideoAndPlayListMigration>();
             services.AddTransient<TabsVM::VideoList.Pages.IndexViewModel>();
             services.AddTransient<TabsVM::VideoList.Pages.MigrationViewModel>();
-
+            services.AddTransient<RemoteV2::Mylist.IMylistHandler, RemoteV2::Mylist.MylistHandler>();
+            services.AddTransient<RemoteV2::Mylist.IWatchLaterHandler, RemoteV2::Mylist.WatchLaterHandler>();
+            services.AddTransient<RemoteV2::Channel.IChannelVideoHandler, RemoteV2::Channel.ChannelVideoHandler>();
+            services.AddTransient<RemoteV2::Channel.IChannelPageHtmlParser, RemoteV2::Channel.ChannelPageHtmlParser>();
+            services.AddTransient<RemoteV2::Series.ISeriesHandler, RemoteV2::Series.SeriesHandler>();
+            services.AddTransient<RemoteV2::Series.ISeriesPageHtmlParser, RemoteV2::Series.SeriesPageHtmlParser>();
+            services.AddTransient<RemoteV2::UserVideo.IUserVideoHandler, RemoteV2::UserVideo.UserVideoHandler>();
+            services.AddTransient<RemoteV2::Search.ISearch, RemoteV2::Search.Search>();
+            services.AddTransient<RemoteV2::Search.ISearchUrlConstructor, RemoteV2::Search.SearchUrlConstructor>();
+            services.AddTransient<NetworkVideo::IInputTextParser, NetworkVideo::InputTextParser>();
+            services.AddSingleton<NetworkVideo::INetVideosInfomationHandler, NetworkVideo::NetVideosInfomationHandler>();
+            services.AddTransient<StringHandler.IStringHandler, StringHandler.StringHandler>();
+            services.AddTransient<DomainWatchV2::IWatchPageInfomationHandler, DomainWatchV2::WatchPageInfomationHandler>();
+            
             return services.BuildServiceProvider();
         }
 

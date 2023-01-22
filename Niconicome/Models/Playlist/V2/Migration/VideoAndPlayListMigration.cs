@@ -129,17 +129,16 @@ namespace Niconicome.Models.Playlist.V2.Migration
                 videoInfo.MylistCount = video.MylistCount;
                 videoInfo.LikeCount = video.LikeCount;
                 videoInfo.Duration = video.Duration;
-                videoInfo.OwnerID = video.OwnerID;
+                videoInfo.OwnerID = video.OwnerID.ToString();
                 videoInfo.LargeThumbUrl = video.LargeThumbUrl;
                 videoInfo.ThumbUrl = video.ThumbUrl;
                 videoInfo.OwnerName = video.OwnerName;
                 videoInfo.IsDeleted = video.IsDeleted;
                 videoInfo.UploadedOn = video.UploadedOn;
-                videoInfo.Title = video.Title;
 
                 videoInfo.IsAutoUpdateEnabled = true;
 
-                videoInfo.NiconicoId = video.NiconicoId;
+                videoInfo.Title = video.Title;
                 migrated.Add(video.NiconicoId);
             }
 
@@ -220,14 +219,14 @@ namespace Niconicome.Models.Playlist.V2.Migration
 
                     foreach (var video in playlist.Videos)
                     {
-                        IAttemptResult<int> videoCreationResult = this._videoStore.Create(video.NiconicoId, info.ID);
+                        IAttemptResult videoCreationResult = this._videoStore.Create(video.NiconicoId, info.ID);
                         if (!videoCreationResult.IsSucceeded)
                         {
                             failedVideos.Add(video.ToString());
                             continue;
                         }
 
-                        IAttemptResult<IVideoInfo> videoGetResult = this._videoStore.GetVideo(videoCreationResult.Data, info.ID);
+                        IAttemptResult<IVideoInfo> videoGetResult = this._videoStore.GetVideo(video.NiconicoId, info.ID);
                         if (!videoGetResult.IsSucceeded || videoGetResult.Data is null)
                         {
                             failedVideos.Add(video.ToString());

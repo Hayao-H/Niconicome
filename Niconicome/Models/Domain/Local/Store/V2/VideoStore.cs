@@ -46,7 +46,7 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// </summary>
         /// <param name="niconicoID"></param>
         /// <returns></returns>
-        IAttemptResult<int> Create(string niconicoID, int playlistID);
+        IAttemptResult Create(string niconicoID, int playlistID);
 
         /// <summary>
         /// 動画を削除
@@ -64,11 +64,9 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <summary>
         /// 指定したIDで動画の存在を確認
         /// </summary>
-        /// <param name="ID"></param>
+        /// <param name="niconicoID"></param>
         /// <param name="playlistID"></param>
         /// <returns></returns>
-        bool Exist(int ID, int playlistID);
-
-        bool Test(string niconicoID);
+        bool Exist(string niconicoID, int playlistID);
     }
 }

@@ -28,7 +28,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// 動画ID
         /// </summary>
-        string NiconicoId { get; set; }
+        string NiconicoId { get; }
 
         /// <summary>
         /// タイトル
@@ -63,7 +63,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// 投稿者ID
         /// </summary>
-        int OwnerID { get; set; }
+        string OwnerID { get; set; }
 
         /// <summary>
         /// 投稿者名
@@ -135,8 +135,9 @@ namespace Niconicome.Models.Domain.Playlist
 
     internal class VideoInfo : UpdatableInfoBase<IVideoStore, IVideoInfo>, IVideoInfo
     {
-        public VideoInfo(IStoreUpdater<IVideoInfo> updater, List<ITagInfo> tags) : base(updater)
+        public VideoInfo(string niconicoID,IStoreUpdater<IVideoInfo> updater, List<ITagInfo> tags) : base(updater)
         {
+            this.NiconicoId = niconicoID;
             this._tags = tags;
             this.IsSelected = new BindableProperty<bool>(false).Subscribe(value =>
             {
@@ -145,8 +146,6 @@ namespace Niconicome.Models.Domain.Playlist
         }
 
         #region field
-
-        private string _niconicoId = string.Empty;
 
         private string _title = string.Empty;
 
@@ -160,7 +159,7 @@ namespace Niconicome.Models.Domain.Playlist
 
         private int _likeCount;
 
-        private int _ownerID;
+        private string _ownerID = string.Empty;
 
         private string _ownerName = string.Empty;
 
@@ -192,15 +191,7 @@ namespace Niconicome.Models.Domain.Playlist
 
         public int PlaylistID { get; init; }
 
-        public string NiconicoId
-        {
-            get => this._niconicoId;
-            set
-            {
-                this._niconicoId = value;
-                if (this.IsAutoUpdateEnabled) this.Update(this);
-            }
-        }
+        public string NiconicoId { get; init; }
 
         public string Title
         {
@@ -265,7 +256,7 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public int OwnerID
+        public string OwnerID
         {
             get => this._ownerID;
             set

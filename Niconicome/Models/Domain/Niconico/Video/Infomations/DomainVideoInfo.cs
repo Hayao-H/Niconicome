@@ -200,7 +200,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
             }
         }
 
-        public dynamic RawDmcInfo { get; set; } = new object();
+        public dynamic RawDmcInfo { get; init; } = new object();
 
     }
 }
