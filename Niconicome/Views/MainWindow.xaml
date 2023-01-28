@@ -123,7 +123,6 @@
                                     </Style>
                                 </TabControl.Resources>
                             </TabControl>
-                            <materialDesign:Snackbar HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="300 0" Grid.Row="0" MessageQueue="{Binding SnackbarHandler.Queue}"/>
                             <TabControl Background="{DynamicResource MaterialDesignPaper}" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A" Grid.Row="1">
                                 <TabControl.Resources>
                                     <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">

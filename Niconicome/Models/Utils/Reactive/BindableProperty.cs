@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Reactive.Bindings;
-using SQLitePCL;
 
 namespace Niconicome.Models.Utils.Reactive
 {
 
-    public interface IBindableProperty<T> : IBindable
+    public interface IBindableProperty<T> : IBindablePropertyBase<T>, IDisposable
     {
         /// <summary>
         /// 値
@@ -24,37 +14,30 @@ namespace Niconicome.Models.Utils.Reactive
         /// 値の変更を監視する
         /// </summary>
         /// <param name="handler"></param>
-        void RegisterPropertyChangeHandler(Action<T> handler);
-
-        /// <summary>
-        /// 値の変更の監視を停止する
-        /// </summary>
-        /// <param name="handler"></param>
-        void UnRegisterPropertyChangeHandler(Action<T> handler);
-
-        /// <summary>
-        /// 値の変更を監視する
-        /// </summary>
-        /// <param name="handler"></param>
         /// <returns></returns>
-        BindableProperty<T> Subscribe(Action<T> handler);
+        IBindableProperty<T> Subscribe(Action<T> handler);
 
         /// <summary>
         /// Bndablesクラスで管理
         /// </summary>
         /// <param name="bindables"></param>
         /// <returns></returns>
-        BindableProperty<T> AddTo(Bindables bindables);
+        IBindableProperty<T> AddTo(Bindables bindables);
+
+        /// <summary>
+        /// Read-Only化
+        /// </summary>
+        /// <returns></returns>
+        IReadonlyBindablePperty<T> AsReadOnly();
 
     }
 
 
 
-    public class BindableProperty<T> : BindablePropertyBase, INotifyPropertyChanged, IBindableProperty<T>
+    public class BindableProperty<T> : BindablePropertyBase<T>, IBindableProperty<T>
     {
-        public BindableProperty(T initialValue)
+        public BindableProperty(T initialValue) : base(initialValue)
         {
-            this._value = initialValue;
         }
 
         ~BindableProperty()
@@ -66,42 +49,27 @@ namespace Niconicome.Models.Utils.Reactive
 
         private bool _hasDisposed;
 
-        private readonly List<Action<T>> _handlers = new();
-
-        private T _value;
-
-        #endregion
-
-        #region INotifyPropertyChanged
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         #endregion
 
         #region Method
 
-        public void RegisterPropertyChangeHandler(Action<T> handler)
+        public IBindableProperty<T> AddTo(Bindables bindables)
         {
-            this._handlers.Add(handler);
+            bindables.Add(this);
+            return this;
         }
 
-        public void UnRegisterPropertyChangeHandler(Action<T> handler)
-        {
-            this._handlers.RemoveAll(x => x == handler);
-        }
-
-        public BindableProperty<T> Subscribe(Action<T> handler)
+        public IBindableProperty<T> Subscribe(Action<T> handler)
         {
             this.RegisterPropertyChangeHandler(handler);
             return this;
         }
 
-
-        public BindableProperty<T> AddTo(Bindables bindables)
+        public　IReadonlyBindablePperty<T> AsReadOnly()
         {
-            bindables.Add(this);
-            return this;
+            return new ReadonlyBindablePperty<T>(this);
         }
+
 
         #endregion
 
@@ -119,35 +87,11 @@ namespace Niconicome.Models.Utils.Reactive
 
         #endregion
 
-        #region private
-
-        /// <summary>
-        /// プロパティの変更をハンドルする
-        /// </summary>
-        /// <param name="name"></param>
-        private void OnPropertyChanged([CallerMemberName] string? name = null)
-        {
-            base.OnPropertyChanged();
-
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-            try
-            {
-                foreach (var handler in this._handlers)
-                {
-                    handler(this._value);
-                };
-            }
-            catch { }
-        }
-
-        #endregion
-
         public override void Dispose()
         {
             if (this._hasDisposed) return;
             this._hasDisposed = true;
 
-            this._handlers.Clear();
             base.Dispose();
             GC.SuppressFinalize(this);
         }

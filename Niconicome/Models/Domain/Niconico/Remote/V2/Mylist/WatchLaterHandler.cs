@@ -24,7 +24,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Mylist
 
     class WatchLaterHandler : IWatchLaterHandler
     {
-        public WatchLaterHandler(INicoHttp http,IErrorHandler errorHandler) {
+        public WatchLaterHandler(INicoHttp http, IErrorHandler errorHandler)
+        {
             this._http = http;
             this._errorHandler = errorHandler;
         }
@@ -59,7 +60,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Mylist
         {
             var url = $"https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&pageSize=100&page={page}";
 
-            this._errorHandler.HandleError(WatchLaterError.AccessToAPI);
+            this._errorHandler.HandleError(WatchLaterError.AccessToAPI, url);
             var res = await this._http.GetAsync(new Uri(url));
 
             if (!res.IsSuccessStatusCode)
@@ -72,7 +73,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Mylist
 
             try
             {
-                data = JsonParser.DeSerialize<WatchLater::WatchLaterResponse>(await res.Content.ReadAsStringAsync());
+                var content = await res.Content.ReadAsStringAsync();
+                data = JsonParser.DeSerialize<WatchLater::WatchLaterResponse>(content);
             }
             catch (Exception ex)
             {
@@ -132,8 +134,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Mylist
                     Title = item.Video.Title,
                     OwnerName = item.Video.Owner.Name,
                     OwnerID = item.Video.Owner.Id,
-                    ThumbUrl = item.Video.Thumbnail.LargeUrl,
-                    UploadedDT = item.AddtedAt,
+                    ThumbUrl = item.Video.Thumbnail.GetURL(),
+                    UploadedDT = item.Video.RegisteredAt,
                     ViewCount = item.Video.Count.View,
                     CommentCount = item.Video.Count.Comment,
                     MylistCount = item.Video.Count.Mylist,

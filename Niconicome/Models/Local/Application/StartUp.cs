@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Models.Auth;
-using Niconicome.Models.Local.State;
 using Niconicome.Models.Domain.Utils;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
@@ -17,6 +16,7 @@ using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Utils.NicoLogger;
+using Niconicome.Models.Local.State.Toast;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -30,7 +30,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer)
+        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer)
         {
 
             this._playlistStoreHandler = playlistStoreHandler;
@@ -57,7 +57,7 @@ namespace Niconicome.Models.Local.Application
 
         private readonly IAutoLogin _autoLogin;
 
-        private readonly ISnackbarHandler _snackbarHandler;
+        private readonly IToastHandler _snackbarHandler;
 
         private readonly ILogger _logger;
 

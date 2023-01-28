@@ -22,6 +22,16 @@ namespace Niconicome.Models.Network.Video
         Task<IAttemptResult<Remote::RemotePlaylistInfo>> GetRemotePlaylistAsync(InputInfomation inputInfomation, Action<string> onMessage);
 
         /// <summary>
+        /// リモートプレイリストを取得する
+        /// </summary>
+        /// <param name="remoteType"></param>
+        /// <param name="remoteParameter"></param>
+        /// <param name="onMessage"></param>
+        /// <returns></returns>
+        Task<IAttemptResult<Remote::RemotePlaylistInfo>> GetRemotePlaylistAsync(RemoteType remoteType, string remoteParameter, Action<string> onMessage);
+
+
+        /// <summary>
         /// 動画IDから動画を取得する
         /// </summary>
         /// <param name="niconicoID"></param>
@@ -71,29 +81,35 @@ namespace Niconicome.Models.Network.Video
 
         public async Task<IAttemptResult<Remote::RemotePlaylistInfo>> GetRemotePlaylistAsync(InputInfomation inputInfomation, Action<string> onMessage)
         {
-            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasStarted, inputInfomation.RemoteType, inputInfomation.Parameter));
-
             if (!inputInfomation.IsRemote)
             {
                 this._errorHandler.HandleError(NetVideosInfomationHandlerError.NotRemotePlaylist, inputInfomation.InputType.ToString());
                 return AttemptResult<Remote::RemotePlaylistInfo>.Fail(this._errorHandler.GetMessageForResult(NetVideosInfomationHandlerError.NotRemotePlaylist, inputInfomation.InputType.ToString()));
             }
 
-            IAttemptResult<Remote::RemotePlaylistInfo> result = inputInfomation.RemoteType switch
+            return await this.GetRemotePlaylistAsync(inputInfomation.RemoteType, inputInfomation.Parameter, onMessage);
+        }
+
+        public async Task<IAttemptResult<Remote::RemotePlaylistInfo>> GetRemotePlaylistAsync(RemoteType remoteType, string remoteParameter, Action<string> onMessage)
+        {
+
+            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasStarted, remoteType, remoteParameter));
+
+
+            IAttemptResult<Remote::RemotePlaylistInfo> result = remoteType switch
             {
-                RemoteType.Mylist => await this._mylistHandler.GetVideosAsync(inputInfomation.Parameter),
+                RemoteType.WatchLater => await this._watchLaterHandler.GetVideosAsync(),
+                RemoteType.Mylist => await this._mylistHandler.GetVideosAsync(remoteParameter),
                 RemoteType.WatchPage => await this._watchLaterHandler.GetVideosAsync(),
-                RemoteType.Series => await this._seriesHandler.GetSeries(inputInfomation.Parameter),
-                RemoteType.Channel => await this._channelVideoHandler.GetVideosAsync(inputInfomation.Parameter, onMessage),
-                RemoteType.UserVideos => await this._userVideoHandler.GetVideosAsync(inputInfomation.Parameter),
-                _ => await this._search.SearchAsync(new Remote::Search.SearchQuery(Remote::Search.SearchType.Keyword, Remote::Search.Genre.All, new Remote::Search.SortOption(Remote::Search.Sort.ViewCount, false), inputInfomation.Parameter))
+                RemoteType.Series => await this._seriesHandler.GetSeries(remoteParameter),
+                RemoteType.Channel => await this._channelVideoHandler.GetVideosAsync(remoteParameter, onMessage),
+                RemoteType.UserVideos => await this._userVideoHandler.GetVideosAsync(remoteParameter),
+                _ => await this._search.SearchAsync(new Remote::Search.SearchQuery(Remote::Search.SearchType.Keyword, Remote::Search.Genre.All, new Remote::Search.SortOption(Remote::Search.Sort.ViewCount, false), remoteParameter))
             };
 
-
-            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasCompleted, inputInfomation.RemoteType, result.Data?.Videos.Count ?? 0, inputInfomation.Parameter));
+            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasCompleted, remoteType, result.Data?.Videos.Count ?? 0, remoteParameter));
 
             return result;
-
         }
 
         public async Task<IAttemptResult<Remote::VideoInfo>> GetVideoInfoAsync(string niconicoID, Action<string> onMessage)

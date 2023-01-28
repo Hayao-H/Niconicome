@@ -5,8 +5,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Utils.Reactive;
+using Niconicome.ViewModels.Shared;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 
@@ -27,6 +31,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             {
                 WS::Mainpage.PlaylistVideoContainer.RemovePlaylistChangeEventHandler(this._playlistChangeEventHandler);
             }
+
+            WS::Mainpage.SnackbarHandler.UnRegisterToastHandler(this.ToastMessageChangeHandler);
         }
 
 
@@ -35,6 +41,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         private readonly NavigationManager _navigation;
 
         private Action? _listChangedEventHandler;
+
+        private Action? _toastMessageChangeHandler;
 
         private Action<IPlaylistInfo>? _playlistChangeEventHandler;
 
@@ -59,12 +67,17 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <summary>
         /// 入力値
         /// </summary>
-        public BindableProperty<string> InputText { get; init; }
+        public IBindableProperty<string> InputText { get; init; }
 
         /// <summary>
         /// 処理中フラグ
         /// </summary>
-        public BindableProperty<bool> IsProcessing { get; init; }
+        public IBindableProperty<bool> IsProcessing { get; init; }
+
+        /// <summary>
+        /// トーストのメッセージ
+        /// </summary>
+        public ToastMessageViewModel? ToastMessage { get; private set; }
 
         #endregion
 
@@ -83,6 +96,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this._listChangedEventHandler += handler;
         }
 
+        public void RegisterToastMessageChangeEventHandler(Action handler)
+        {
+            this._toastMessageChangeHandler += handler;
+        }
+
         /// <summary>
         /// 初期化
         /// </summary>
@@ -93,6 +111,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/migration/videos");
                 this._navigation.NavigateTo("/migration/videos");
             }
+
+            WS::Mainpage.SnackbarHandler.RegisterToastHandler(this.ToastMessageChangeHandler);
 
             this._playlistChangeEventHandler = p =>
             {
@@ -121,6 +141,46 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.InputText.Value = string.Empty;
             this.IsProcessing.Value = false;
+        }
+
+        /// <summary>
+        /// エンターキー入力時
+        /// </summary>
+        /// <param name="e"></param>
+        public void OnKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Code == "Enter")
+            {
+                _ = this.AddVideoAsync();
+            }
+        }
+
+        /// <summary>
+        /// プレイリスト編集ボタンがクリックされたとき
+        /// </summary>
+        public void OnPlaylistEditButtonClick()
+        {
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/playlist");
+            this._navigation.NavigateTo("/playlist");
+        }
+
+        /// <summary>
+        /// リモートプレイリスト同期ボタンがクリックされたとき
+        /// </summary>
+        public async Task OnSyncWithRemotePlaylistButtonClick()
+        {
+            this.IsProcessing.Value = true;
+
+            IAttemptResult result = await WS::Mainpage.VideoListManager.SyncWithRemotePlaylistAsync(m =>
+            {
+                WS::Mainpage.Messagehandler.AppendMessage(m);
+            });
+
+            if (result.IsSucceeded) WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
+
+            this.IsProcessing.Value = false;
+
+            await this.LoadVideoAsync();
         }
 
         #endregion
@@ -170,6 +230,16 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             var vm = new VideoInfoViewModel(video);
             this.Bindables.Add(vm.Bindable);
             return vm;
+        }
+
+        /// <summary>
+        /// トースト監視
+        /// </summary>
+        /// <param name="message"></param>
+        private void ToastMessageChangeHandler(IToastMessage message)
+        {
+            this.ToastMessage = new ToastMessageViewModel(message);
+            this._toastMessageChangeHandler?.Invoke();
         }
 
         #endregion

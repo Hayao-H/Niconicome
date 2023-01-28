@@ -26,7 +26,6 @@ using DomainExt = Niconicome.Models.Domain.Local.External;
 using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using DomainSettings = Niconicome.Models.Domain.Local.Settings;
-using DomainUtils = Niconicome.Models.Domain.Utils;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
@@ -171,7 +170,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Download::IDownloadSettingsHandler, Download::DownloadSettingsHandler>();
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
             services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();
-            services.AddSingleton<State::ISnackbarHandler, State::SnackbarHandler>();
+            services.AddSingleton<State::Toast.IToastHandler, State::Toast.ToastHandler>();
             services.AddTransient<SQlite::ISQliteLoader, SQlite::SQliteLoader>();
             services.AddTransient<SQlite::ISqliteCookieLoader, SQlite::SqliteCookieLoader>();
             services.AddTransient<Cookies::IChromeCookieDecryptor, Cookies::ChromeCookieDecryptor>();
@@ -298,6 +297,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<PlaylistV2::Migration.IVideoAndPlayListMigration, PlaylistV2::Migration.VideoAndPlayListMigration>();
             services.AddTransient<TabsVM::VideoList.Pages.IndexViewModel>();
             services.AddTransient<TabsVM::VideoList.Pages.MigrationViewModel>();
+            services.AddTransient<TabsVM::VideoList.Pages.PlaylistViewModel>();
             services.AddTransient<RemoteV2::Mylist.IMylistHandler, RemoteV2::Mylist.MylistHandler>();
             services.AddTransient<RemoteV2::Mylist.IWatchLaterHandler, RemoteV2::Mylist.WatchLaterHandler>();
             services.AddTransient<RemoteV2::Channel.IChannelVideoHandler, RemoteV2::Channel.ChannelVideoHandler>();

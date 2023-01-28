@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
 using Windows.Devices.Input;
 
 namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist
@@ -30,7 +31,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist
     {
         public string WatchId { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
-        public DateTime AddtedAt { get; set; } = new();
+        public DateTime AddedAt { get; set; } = new();
         public Video Video { get; set; } = new();
     }
 
@@ -49,6 +50,22 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist
         public string Url { get; set; } = string.Empty;
         public string MiddleUrl { get; set; } = string.Empty;
         public string LargeUrl { get; set; } = string.Empty;
+
+        public string GetURL()
+        {
+            if (!this.LargeUrl.IsNullOrEmpty())
+            {
+                return this.LargeUrl;
+            }
+            else if (!this.MiddleUrl.IsNullOrEmpty())
+            {
+                return this.MiddleUrl;
+            }
+            else
+            {
+                return this.Url;
+            }
+        }
     }
 
     public class Count

@@ -182,11 +182,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveProperty<string> LoginBtnVal { get; init; }
 
-        /// <summary>
-        /// スナックバー
-        /// </summary>
-        public ISnackbarHandler SnackbarHandler => WS::Mainpage.SnackbarHandler;
-
         #endregion
 
         #region Command

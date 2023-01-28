@@ -83,7 +83,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// サムネファイルパス
         /// </summary>
-        BindableProperty<string> ThumbPath { get; set; }
+        IBindableProperty<string> ThumbPath { get; set; }
 
         /// <summary>
         /// ファイルパス
@@ -108,7 +108,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// 選択フラグ
         /// </summary>
-        BindableProperty<bool> IsSelected { get; }
+        IBindableProperty<bool> IsSelected { get; }
 
         /// <summary>
         /// DL済みフラグ
@@ -297,7 +297,7 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public BindableProperty<string> ThumbPath { get; set; } = new(string.Empty);
+        public IBindableProperty<string> ThumbPath { get; set; } = new BindableProperty<string>(string.Empty);
 
         public string FilePath
         {
@@ -332,7 +332,7 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public BindableProperty<bool> IsSelected { get; init; }
+        public IBindableProperty<bool> IsSelected { get; init; }
 
         public bool IsDownloaded
         {

@@ -90,27 +90,27 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <summary>
         /// 移行中フラグ
         /// </summary>
-        public BindableProperty<bool> IsMigrating { get; init; }
+        public IBindableProperty<bool> IsMigrating { get; init; }
 
         /// <summary>
         /// 移行完了フラグ
         /// </summary>
-        public BindableProperty<bool> IsMigrated { get; init; }
+        public IBindableProperty<bool> IsMigrated { get; init; }
 
         /// <summary>
         /// 移行失敗フラグ
         /// </summary>
-        public BindableProperty<bool> IsMigrationFailed { get; init; }
+        public IBindableProperty<bool> IsMigrationFailed { get; init; }
 
         /// <summary>
         /// メッセージ
         /// </summary>
-        public BindableProperty<string> Message { get; init; }
+        public IBindableProperty<string> Message { get; init; }
 
         /// <summary>
         /// 移行中のデータ
         /// </summary>
-        public BindableProperty<string> CurrentlyMigratingData { get; init; }
+        public IBindableProperty<string> CurrentlyMigratingData { get; init; }
 
         /// <summary>
         /// 変更通知

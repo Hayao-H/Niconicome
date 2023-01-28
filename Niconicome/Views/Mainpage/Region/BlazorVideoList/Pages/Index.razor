@@ -7,16 +7,19 @@
 
 	<div class="ControlsContainer">
 		<div class="InputBoxWrapper">
-			<input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @bind="@(DataContext.InputText.Value)" />
+			<input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDown" />
 			@if (DataContext.IsProcessing.Value)
 			{
 				<button type="button" id="RegisterButton" class="btn btn-primary" disabled>登録</button>
-
 			}
 			else
 			{
 				<button type="button" id="RegisterButton" class="btn btn-primary" @onclick="async ()=>await DataContext.AddVideoAsync()">登録</button>
 			}
+		</div>
+		<div class="ButtonsWrapper">
+			<button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="プレイリスト情報を編集" @onclick="DataContext.OnPlaylistEditButtonClick"><i class="fa-solid fa-pen"></i></button>
+			<button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="リモートプレイリストと同期" @onclick="DataContext.OnSyncWithRemotePlaylistButtonClick"><i class="fa-solid fa-cloud-arrow-down"></i></button>
 		</div>
 	</div>
 
@@ -73,6 +76,23 @@
 			}
 		</div>
 	</div>
+
+	@if (DataContext.ToastMessage is not null)
+	{
+		<div class="ToastContent toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="ToastHeader toast-header">
+				<div class="ToastImage"></div>
+				<strong class="me-auto">@(DataContext.ToastMessage.Dispatcher)</strong>
+				<small>@(DataContext.ToastMessage.AddedAt)</small>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				@(DataContext.ToastMessage.Message)
+			</div>
+		</div>
+	}
+
+
 </div>
 
 @code {
@@ -80,6 +100,11 @@
 	protected override async Task OnParametersSetAsync()
 	{
 		DataContext.RegisterListChangedEventHandler(() => this.StateHasChanged());
+		DataContext.RegisterToastMessageChangeEventHandler(() =>
+		{
+			this.StateHasChanged();
+			JS.InvokeVoidAsync("showToast");
+		});
 		DataContext.Bindables.RegisterPropertyChangeHandler(() => this.StateHasChanged());
 		await DataContext.Initialize();
 	}
@@ -87,6 +112,7 @@
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		await base.OnAfterRenderAsync(firstRender);
+		await JS.InvokeVoidAsync("showTooltip");
 		await JS.InvokeVoidAsync("main");
 	}
 }

@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Const;
-using Niconicome.Models.Local.State;
+using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Network.Download;
 using Niconicome.Models.Network.Download.DLTask;
 using Niconicome.Models.Playlist;
@@ -138,7 +140,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// メッセージキュー
         /// </summary>
-        public ISnackbarHandler Queue { get; init; } = WS::Mainpage.SnackbarHandler.CreateNewHandler();
+        public IToastHandler Queue { get; init; } = DIFactory.Provider.GetRequiredService<IToastHandler>();
 
         /// <summary>
         /// 幅
@@ -208,7 +210,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         public ReactiveCommand RemoveStagedTaskCommand { get; init; } = new();
 
-        public ISnackbarHandler? Queue { get; init; } = null;
+        public IToastHandler? Queue { get; init; } = null;
     }
 
     enum TaskPoolType

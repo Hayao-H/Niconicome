@@ -13,5 +13,9 @@ namespace Niconicome.Models.Playlist.V2.Manager.Error
         PlaylistIsNotSelected,
         [ErrorEnum(ErrorLevel.Log, "動画を読み込み中に選択されているプレイリストが変更されました。")]
         PlaylistChanged,
+        [ErrorEnum(ErrorLevel.Error,"選択されているプレイリストはリモートプレイリストではありません。(PlaylistType:{0})")]
+        NotARemotePlaylist,
+        [ErrorEnum(ErrorLevel.Log,"リモートプレイリストとの同期が完了しました。(Type:{0}, 追加：{1}, 削除{2}, 更新：{3})")]
+        SyncWithRemotePlaylistHasCompleted,
     }
 }

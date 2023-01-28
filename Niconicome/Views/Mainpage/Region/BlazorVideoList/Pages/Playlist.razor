@@ -1,0 +1,53 @@
+﻿@page "/playlist";
+@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.PlaylistViewModel DataContext;
+
+<div class="PlaylistInfoContainer">
+	<div class="PlaylistInfoRow">
+		<p>プレイリスト名</p>
+		<input class="InputBox" @bind="DataContext.Name" />
+	</div>
+	<div class="PlaylistInfoRow">
+		<p>動画数</p>
+		<p>@(DataContext.VideosCount)</p>
+	</div>
+	<div class="PlaylistInfoRow">
+		<p>保存先パス</p>
+		<input class="InputBox" @bind="DataContext.DirectoryPath"/>
+	</div>
+	@if (DataContext.CanEditPlaylisType.Value)
+	{
+		<div class="PlaylistInfoRow">
+			<p>プレイリストタイプ</p>
+			<select class="PlaylistTypeBox form-select" @bind="DataContext.CurrentPlaylistType.Value">
+				@foreach (var value in DataContext.SelectablePlaylistType)
+				{
+					<option>@(value)</option>
+				}
+			</select>
+		</div>
+	}
+	@if (DataContext.IsRemotePlaylist.Value)
+	{
+		<div class="PlaylistInfoRow Last">
+			<p>リモートプレイリストのID</p>
+			<input class="InputBox" @bind="DataContext.RemotePlaylistParam"/>
+		</div>
+	}
+</div>
+
+<div class="ControlsWrapper">
+	<button class="ControlItem btn btn-primary" role="button" @onclick="DataContext.Update">保存</button>
+	<button class="ControlItem btn btn-primary" role="button" @onclick="DataContext.ReurnToIndex">戻る</button>
+</div>
+
+@code {
+	protected override void OnParametersSet()
+	{
+		base.OnParametersSet();
+		DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+		{
+			this.StateHasChanged();
+		});
+		DataContext.Initialize();
+	}
+}

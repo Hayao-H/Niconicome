@@ -22,11 +22,13 @@
   margin: 10px 0;
 }
 .PageContent .ControlsContainer .InputBoxWrapper {
+  display: flex;
+  justify-content: space-between;
   width: 40%;
   height: 100%;
 }
 .PageContent .ControlsContainer .InputBoxWrapper #InputBox {
-  width: 80%;
+  width: 85%;
   height: 100%;
   border-top: none;
   border-left: none;
@@ -37,8 +39,12 @@
   display: inline-block;
 }
 .PageContent .ControlsContainer .InputBoxWrapper #RegisterButton {
+  width: 15;
   margin-left: 5px;
   padding: 5px 20px;
+}
+.PageContent .ControlsContainer .ButtonsWrapper {
+  margin-left: 8px;
 }
 .PageContent .VideoList {
   display: flex;
@@ -136,6 +142,7 @@
   border: solid 1px #e5e8ea;
   height: 400px;
   overflow-y: scroll;
+  position: relative;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow {
   height: 100px;
@@ -220,8 +227,21 @@
 .PageContent .VideoList .VideoListBody .VideoListRow:hover {
   background: rgba(244, 244, 244, 0.9568627451);
 }
-
-.PlaylistInfoContainer.PlaylistInfoRow {
+.PageContent .ToastContent {
+  position: fixed;
+  margin: auto;
+  right: 0;
+  left: 0;
+  bottom: 10px;
+}
+.PageContent .ToastContent .ToastHeader {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+}
+.PageContent .ToastContent .ToastHeader .ToastImage {
+  height: 20px;
+  width: 20px;
+  margin-right: 5px;
+  background: #007aff;
+  border-radius: 5px;
 }

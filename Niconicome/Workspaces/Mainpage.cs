@@ -24,6 +24,7 @@ using Niconicome.Models.Utils.InitializeAwaiter;
 using Ext = Niconicome.Models.Local.External;
 using VideoList = Niconicome.Models.Playlist.VideoList;
 using Playlist = Niconicome.Models.Playlist.V2;
+using Niconicome.Models.Local.State.Toast;
 
 namespace Niconicome.Workspaces
 {
@@ -40,7 +41,7 @@ namespace Niconicome.Workspaces
         public static IVideoFilter VideoFilter { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoFilter>();
         public static ILocalSettingHandler SettingHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingHandler>();
         public static IPlaylistCreator PlaylistCreator { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistCreator>();
-        public static ISnackbarHandler SnackbarHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ISnackbarHandler>();
+        public static IToastHandler SnackbarHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IToastHandler>();
         public static IShutdown Shutdown { get; private set; } = DIFactory.Provider.GetRequiredService<IShutdown>();
         public static IStartUp StartUp { get; private set; } = DIFactory.Provider.GetRequiredService<IStartUp>();
         public static IVideoIDHandler VideoIDHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoIDHandler>();

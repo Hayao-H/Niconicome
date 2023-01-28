@@ -99,8 +99,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             #endregion
 
-            this.SnackbarMessageQueue = WS::Mainpage.SnackbarHandler.Queue;
-
             this.IsDownloading = new BindableProperty<bool>(false);
             WS::Mainpage.DownloadManager.IsProcessing.Subscribe(x => this.IsDownloading.Value = x);
 
@@ -122,13 +120,13 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ステージできません");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、ステージできません");
                     return;
                 }
 
                 if (!this.IsDownloadingCommentEnable.Value && (this.IsDownloadingCommentLogEnable.Value || this.IsDownloadingEasyComment.Value || this.IsDownloadingOwnerComment.Value))
                 {
-                    this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
                     return;
                 }
 
@@ -136,7 +134,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 WS::Mainpage.DownloadManager.StageVIdeo();
 
-                this.SnackbarMessageQueue.Enqueue($"選択された動画をステージしました。", "管理画面を開く", () =>
+                WS::Mainpage.SnackbarHandler.Enqueue($"選択された動画をステージしました。", "管理画面を開く", () =>
                 {
                     WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager, this._dialogService);
                 });
@@ -288,11 +286,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public List<ComboboxItem<VideoInfo::ThumbSize>> ThumbSizes { get; init; }
 
-        /// <summary>
-        /// スナックバー
-        /// </summary>
-        public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; }
-
         #region private
 
         /// <summary>
@@ -304,19 +297,19 @@ namespace Niconicome.ViewModels.Mainpage
         {
             if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
             {
-                this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
+                WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
                 return;
             }
 
             if (!WS::Mainpage.Session.IsLogin.Value)
             {
-                this.SnackbarMessageQueue.Enqueue("動画をダウンロードするにはログインが必要です。");
+                WS::Mainpage.SnackbarHandler.Enqueue("動画をダウンロードするにはログインが必要です。");
                 return;
             }
 
             if (!this.IsDownloadingCommentEnable.Value && (this.IsDownloadingCommentLogEnable.Value || this.IsDownloadingEasyComment.Value || this.IsDownloadingOwnerComment.Value))
             {
-                this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
+                WS::Mainpage.SnackbarHandler.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
                 return;
             }
 
@@ -324,7 +317,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.DownloadManager.StageVIdeo();
 
-            await WS::Mainpage.DownloadManager.StartDownloadAsync(m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+            await WS::Mainpage.DownloadManager.StartDownloadAsync(m => WS::Mainpage.SnackbarHandler.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
             WS::Mainpage.PostDownloadTasksManager.HandleAction();
         }
 

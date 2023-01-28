@@ -132,7 +132,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// <summary>
         /// サムネファイルデータ
         /// </summary>
-        public BindableProperty<string> Base64ThumbData { get; init; }
+        public IBindableProperty<string> Base64ThumbData { get; init; }
 
         /// <summary>
         /// 長さ
@@ -152,7 +152,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// <summary>
         /// 選択フラグ
         /// </summary>
-        public BindableProperty<bool> IsSelected { get; init; }
+        public IBindableProperty<bool> IsSelected { get; init; }
 
         #endregion
 
