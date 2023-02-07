@@ -201,7 +201,7 @@ namespace Niconicome.Models.Domain.Playlist
         }
         public IAttemptResult RemoveVideo(IVideoInfo video)
         {
-            this._videos.RemoveAll(v => v.ID == video.ID);
+            this._videos.RemoveAll(v => v.NiconicoId == video.NiconicoId);
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 

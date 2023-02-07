@@ -139,6 +139,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Mylist
                 CommentCount = video.Video.Count.Comment,
                 MylistCount = video.Video.Count.Mylist,
                 LikeCount = video.Video.Count.Like,
+                AddedAt = video.AddedAt,
             }).ToList());
 
             return new RemotePlaylistInfo()

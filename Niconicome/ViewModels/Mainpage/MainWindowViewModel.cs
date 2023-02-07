@@ -58,7 +58,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.Themehandler.Initialize();
             WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
 
             this.LoginCommand = new ReactiveCommand()
                 .WithSubscribe(async () =>
@@ -133,7 +133,7 @@ namespace Niconicome.ViewModels.Mainpage
                     ///}
                     ///dialogService.Show(nameof(AddonManagerWindow));
 
-                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons");
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons", BlazorWindows.Addon);
                     WS::Mainpage.WindowTabHelper.OpenAddonManager(this.RegionManager);
                 });
 

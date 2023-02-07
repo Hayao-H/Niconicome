@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Shared;
@@ -108,7 +109,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             if (WS::Mainpage.VideoAndPlayListMigration.IsMigrationNeeded)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/migration/videos");
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/migration/videos", BlazorWindows.MainPage);
                 this._navigation.NavigateTo("/migration/videos");
             }
 
@@ -160,7 +161,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public void OnPlaylistEditButtonClick()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/playlist");
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/playlist",BlazorWindows.MainPage);
             this._navigation.NavigateTo("/playlist");
         }
 

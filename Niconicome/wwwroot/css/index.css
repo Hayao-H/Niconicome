@@ -245,3 +245,62 @@
   background: #007aff;
   border-radius: 5px;
 }
+.PageContent .ContextMenuWrapper {
+  position: relative;
+}
+.PageContent .ContextMenuWrapper .ContextMenu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  background: #fff;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  width: 200px;
+  background: #fff;
+  z-index: 9999;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem .ContextMenuIcon {
+  margin-right: 8px;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem.Clickable {
+  cursor: pointer;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem .ContextMenuItemTriangle {
+  width: 0;
+  height: 0;
+  border-left: 6px solid black;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem:hover {
+  background: rgba(231, 231, 231, 0.9058823529);
+}
+.PageContent .ContextMenuWrapper .ContextMenu .RootMenu {
+  position: relative;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.One {
+  top: 0;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Two {
+  top: -100%;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Three {
+  top: -200%;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Many {
+  top: -300%;
+}
+.PageContent .ContextMenuWrapper .ContextMenu .RootMenu:hover .SubMenu {
+  display: block;
+}

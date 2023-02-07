@@ -1,3 +1,7 @@
 ﻿p {
-    margin-bottom: 0!important;
+    margin-bottom: 0 !important;
+}
+
+.PageContainer {
+    outline: none;
 }

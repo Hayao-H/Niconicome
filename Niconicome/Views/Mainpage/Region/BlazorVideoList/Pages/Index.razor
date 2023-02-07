@@ -1,8 +1,10 @@
 ﻿@page "/videos"
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.IndexViewModel DataContext;
 @inject IJSRuntime JS;
+@inherits BlazorBase;
 
-<div class="PageContent">
+<div tabindex="0" @ref="container" class="PageContent PageContainer" @onkeydown="OnKeyDown">
+
 	<h3>@(DataContext.PlaylistName)</h3>
 
 	<div class="ControlsContainer">
@@ -23,7 +25,7 @@
 		</div>
 	</div>
 
-	<div class="VideoList">
+	<div class="VideoList ContextMenuWrapper">
 		<div id="VideoListHeader">
 			<span id="CheckBoxColumn" class="HeaderItem"></span>
 			<hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
@@ -75,6 +77,82 @@
 				</div>
 			}
 		</div>
+		<div class="ContextMenu">
+			<div class="ContextMenuItem Clickable">
+				<p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>動画を削除する</p>
+			</div>
+			<div class="ContextMenuItem Clickable">
+				<p><i class="fa-solid fa-play fa-sm ContextMenuIcon"></i>ニコニコで視聴する</p>
+			</div>
+			<div class="ContextMenuItem Clickable">
+				<p><i class="fa-solid fa-folder fa-sm ContextMenuIcon"></i>保存フォルダーを開く</p>
+			</div>
+			<div class="RootMenu">
+				<div class="ContextMenuItem">
+					<p><i class="fa-solid fa-file-video fa-sm ContextMenuIcon"></i>開く</p>
+					<div class="ContextMenuItemTriangle"></div>
+				</div>
+				<div class="SubMenu Two">
+					<p class="ContextMenuItem Clickable">アプリで開く(A)</p>
+					<p class="ContextMenuItem Clickable">アプリで開く(B)</p>
+				</div>
+			</div>
+			<div class="RootMenu">
+				<div class="ContextMenuItem">
+					<p><i class="fa-solid fa-paper-plane fa-sm ContextMenuIcon"></i>送る</p>
+					<div class="ContextMenuItemTriangle"></div>
+				</div>
+				<div class="SubMenu Two">
+					<p class="ContextMenuItem Clickable">アプリに送る(A)</p>
+					<p class="ContextMenuItem Clickable">アプリに送る(B)</p>
+				</div>
+			</div>
+			<div class="RootMenu">
+				<div class="ContextMenuItem">
+					<p><i class="fa-solid fa-check fa-sm ContextMenuIcon"></i>選択</p>
+					<div class="ContextMenuItemTriangle"></div>
+				</div>
+				<div class="SubMenu Many">
+					<p class="ContextMenuItem Clickable">全て選択する</p>
+					<p class="ContextMenuItem Clickable">全て選択解除する</p>
+					<p class="ContextMenuItem Clickable">ダウンロード済みの動画を選択する</p>
+					<p class="ContextMenuItem Clickable">ダウンロード済みの動画を選択解除する</p>
+					<p class="ContextMenuItem Clickable">未ダウンロードの動画を選択する</p>
+					<p class="ContextMenuItem Clickable">未ダウンロードの動画を選択解除する</p>
+				</div>
+			</div>
+			<div class="RootMenu Three">
+				<div class="ContextMenuItem">
+					<p><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>コピー</p>
+					<div class="ContextMenuItemTriangle"></div>
+				</div>
+				<div class="SubMenu Three">
+					<p class="ContextMenuItem Clickable">ID</p>
+					<p class="ContextMenuItem Clickable">タイトル</p>
+					<p class="ContextMenuItem Clickable">URL</p>
+				</div>
+			</div>
+			<div class="RootMenu">
+				<div class="ContextMenuItem">
+					<p><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>全てコピー</p>
+					<div class="ContextMenuItemTriangle"></div>
+				</div>
+				<div class="SubMenu Three">
+					<p class="ContextMenuItem Clickable">ID</p>
+					<p class="ContextMenuItem Clickable">タイトル</p>
+					<p class="ContextMenuItem Clickable">URL</p>
+				</div>
+			</div>
+			<div class="RootMenu">
+				<div class="ContextMenuItem">
+					<p><i class="fa-solid fa-music fa-sm ContextMenuIcon"></i>プレイリストを作成</p>
+					<div class="ContextMenuItemTriangle"></div>
+				</div>
+				<div class="SubMenu One">
+					<p class="ContextMenuItem Clickable">.aimppl4形式のプレイリストを作成する</p>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	@if (DataContext.ToastMessage is not null)
@@ -91,7 +169,6 @@
 			</div>
 		</div>
 	}
-
 
 </div>
 
@@ -113,6 +190,7 @@
 	{
 		await base.OnAfterRenderAsync(firstRender);
 		await JS.InvokeVoidAsync("showTooltip");
-		await JS.InvokeVoidAsync("main");
+		var module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
+		await module.InvokeVoidAsync("main");
 	}
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Utils.Reactive;
 using WS = Niconicome.Workspaces;
 
@@ -88,7 +89,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
                 this._navigation.NavigateTo("/videos");
                 return;
             }
@@ -111,7 +112,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
                 this._navigation.NavigateTo("/videos");
                 return;
             }
@@ -128,7 +129,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public void ReurnToIndex()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
             this._navigation.NavigateTo("/videos");
         }
 

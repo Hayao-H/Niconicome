@@ -274,7 +274,7 @@ $VideoListRowHeight: 100;
 
         }
     }
-    
+
     .ToastContent {
         position: fixed;
         margin: auto;
@@ -295,6 +295,81 @@ $VideoListRowHeight: 100;
             }
         }
 
+    }
+
+    .ContextMenuWrapper {
+        position: relative;
+
+        .ContextMenu {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            background: #fff;
+
+            .ContextMenuItem {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px;
+                width: 200px;
+                background: #fff;
+                z-index: 9999;
+
+                .ContextMenuIcon {
+                    margin-right: 8px;
+                }
+
+                &.Clickable {
+                    cursor: pointer;
+                }
+
+                .ContextMenuItemTriangle {
+                    width: 0;
+                    height: 0;
+                    border-left: 6px solid black;
+                    border-top: 6px solid transparent;
+                    border-bottom: 6px solid transparent;
+                }
+            }
+
+            .ContextMenuItem:hover {
+                background: #e7e7e7e7;
+            }
+
+            .RootMenu {
+                position: relative;
+
+                >.SubMenu {
+                    display: none;
+                    position: absolute;
+                    left: 100%;
+
+                    &.One {
+                        top: 0;
+                    }
+
+                    &.Two {
+                        top: -100%
+                    }
+
+                    &.Three {
+                        top: -200%
+                    }
+
+                    &.Many {
+                        top: -300%
+                    }
+                }
+            }
+
+            .RootMenu:hover {
+                .SubMenu {
+                    display: block;
+                }
+            }
+        }
     }
 
 }

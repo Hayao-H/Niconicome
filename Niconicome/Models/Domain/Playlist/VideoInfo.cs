@@ -41,6 +41,11 @@ namespace Niconicome.Models.Domain.Playlist
         DateTime UploadedOn { get; set; }
 
         /// <summary>
+        /// リモートプレイリストへの登録日時
+        /// </summary>
+        DateTime AddedAt { get; set; }
+
+        /// <summary>
         /// 閲覧数
         /// </summary>
         int ViewCount { get; set; }
@@ -151,6 +156,9 @@ namespace Niconicome.Models.Domain.Playlist
 
         private DateTime _uploadedOn;
 
+        private DateTime _registeredAt;
+
+
         private int _viewCount;
 
         private int _commentCount;
@@ -212,6 +220,16 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._uploadedOn = value;
+                if (this.IsAutoUpdateEnabled) this.Update(this);
+            }
+        }
+
+        public DateTime AddedAt
+        {
+            get => this._registeredAt;
+            set
+            {
+                this._registeredAt = value;
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }

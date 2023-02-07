@@ -23,7 +23,7 @@ namespace Niconicome.Models.Infrastructure.Database.Types
 
         public DBPlaylistType PlaylistType { get; set; }
 
-        public List<int> Videos { get; set; } = new();
+        public List<string> Videos { get; set; } = new();
 
         public List<int> Children { get; set; } = new();
 

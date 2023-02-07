@@ -26,6 +26,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2
 
         public DateTime UploadedDT { get; set; } = DateTime.Now;
 
+        public DateTime AddedAt { get; set; } = DateTime.Now;
+
         public string OwnerID { get; set; } = string.Empty;
 
         public int ViewCount { get; set; }

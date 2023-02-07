@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist.V2.Migration;
 using Niconicome.Models.Utils.Reactive;
 using WS = Niconicome.Workspaces;
@@ -73,7 +74,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public void OnDone()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos",BlazorWindows.MainPage);
             this._navigation.NavigateTo("/videos");
         }
 

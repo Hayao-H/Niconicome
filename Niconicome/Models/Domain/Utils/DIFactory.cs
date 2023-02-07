@@ -311,6 +311,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<NetworkVideo::INetVideosInfomationHandler, NetworkVideo::NetVideosInfomationHandler>();
             services.AddTransient<StringHandler.IStringHandler, StringHandler.StringHandler>();
             services.AddTransient<DomainWatchV2::IWatchPageInfomationHandler, DomainWatchV2::WatchPageInfomationHandler>();
+            services.AddTransient<VM::Blazor.BlazorBaseViewModel>();
             
             return services.BuildServiceProvider();
         }

@@ -7,6 +7,7 @@ esbuild.build({
     bundle: true,
     minify: !isDevelopment,
     sourcemap: isDevelopment ? 'inline' : false,
-    outdir: process.env.SCRIPT_DIR,
+    outdir: process.env.VIDEOLIST_DIR,
     target: "es2021",
+    format:"esm",
 }).catch((e) => console.error(e));

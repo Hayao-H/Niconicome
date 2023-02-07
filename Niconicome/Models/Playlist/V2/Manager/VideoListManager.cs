@@ -46,7 +46,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class VideoListManager : IVideoListManager
     {
-        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser,IStringHandler stringHandler)
+        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, IStringHandler stringHandler)
         {
             this._container = container;
             this._loader = loader;
@@ -269,6 +269,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             video.CommentCount = source.CommentCount;
             video.MylistCount = source.MylistCount;
             video.LikeCount = source.LikeCount;
+            video.AddedAt = source.AddedAt;
 
             video.IsAutoUpdateEnabled = true;
 

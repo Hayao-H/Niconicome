@@ -24,5 +24,7 @@ namespace Niconicome.Models.Infrastructure.Database.Types
         public bool IsEconomy { get; set; }
 
         public string VideoFilePath { get; set; } = string.Empty;
+
+        public DateTime AddedAt { get; set; }
     }
 }

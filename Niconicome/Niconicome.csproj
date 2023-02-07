@@ -31,6 +31,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Views\AddonPage\Pages\About.razor~RF12a1b7ab.TMP" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Include="wwwroot\addon.html" />
 	</ItemGroup>
 

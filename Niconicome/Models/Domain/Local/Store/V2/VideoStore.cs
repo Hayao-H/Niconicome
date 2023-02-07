@@ -11,14 +11,6 @@ namespace Niconicome.Models.Domain.Local.Store.V2
     public interface IVideoStore : IStoreUpdater<IVideoInfo>
     {
         /// <summary>
-        /// 動画を取得
-        /// </summary>
-        /// <param name="ID"></param>
-        /// <param name="playlistID"></param>
-        /// <returns></returns>
-        IAttemptResult<IVideoInfo> GetVideo(int ID, int playlistID);
-
-        /// <summary>
         /// ニコニコのIDで動画を取得
         /// </summary>
         /// <param name="niconicoID"></param>
