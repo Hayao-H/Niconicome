@@ -35,104 +35,51 @@
     </Window.Resources>
     <materialDesign:DialogHost Identifier="default">
         <DockPanel>
-            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" d:DataContext="{d:DesignInstance {x:Type vm:MainWindowViewModel}}" OpenMode="Standard">
-                <materialDesign:DrawerHost.LeftDrawerContent>
-                    <Grid Width="250">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="3*"/>
-                            <RowDefinition Height="17*"/>
-                        </Grid.RowDefinitions>
-                        <materialDesign:ColorZone materialDesign:ShadowAssist.ShadowDepth="Depth1" Padding="8" >
-                            <StackPanel Orientation="Vertical">
-                                <DockPanel>
-                                    <Image Source="{Binding UserImage.Value}" Height="40"  Margin="5 0">
-                                        <i:Interaction.Behaviors>
-                                            <vm:UserImageBehavior/>
-                                        </i:Interaction.Behaviors>
-                                    </Image>
-                                    <TextBlock Text="{Binding Username.Value}" Style="{DynamicResource MaterialDesignBody1TextBlock}" VerticalAlignment="Center" />
-                                </DockPanel>
-                                <Button Content="{Binding LoginBtnVal.Value}"  Command="{Binding LoginCommand}" Margin="8 10" ToolTip="{Binding LoginBtnTooltip.Value}"/>
-                            </StackPanel>
-                        </materialDesign:ColorZone>
-                        <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">
-                            <MenuItem Header="設定" Height="40" Command="{Binding OpenSettingCommand}" >
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="CogOutline"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="ダウンロード" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenDownloadTaskWindowsCommand}">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="Download"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="アドオン" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenAddonManagerCommand}">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="Puzzle"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="再起動" Command="{Binding Restart}" Height="40">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="Restart"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="終了" Command="{Binding ShutDown}"  Height="40">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="Power"/>
-                                </MenuItem.Icon>
-
-                            </MenuItem>
-                        </StackPanel>
-                    </Grid>
-                </materialDesign:DrawerHost.LeftDrawerContent>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding TreeWidth.Value}"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <ContentControl 
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{Binding TreeWidth.Value}"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <ContentControl 
                         Grid.Column= "0" 
                         prism:RegionManager.RegionName="PlaylistTree"
                         >
-                    </ContentControl>
-                    <Grid Grid.Column="1">
+                </ContentControl>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="37*"/>
+                    </Grid.RowDefinitions>
+                    <ToolBarTray>
+                        <ToolBar ClipToBounds="False"
+                                     Style="{StaticResource MaterialDesignToolBar}">
+                            <Image Source="{Binding UserImage.Value}" Height="40" Width="40"/>
+                            <TextBlock Text="{Binding Username.Value}" VerticalAlignment="Center" Margin="2 0"/>
+                            <Button Content="{Binding LoginBtnVal.Value}" Command="{Binding LoginCommand}"/>
+                            <Separator />
+                            <Menu>
+                                <MenuItem Header="アプリケーション">
+                                    <MenuItem Header="再起動" Icon="{materialDesign:PackIcon Kind=Restart}" Command="{Binding Restart}"/>
+                                    <MenuItem Header="終了" Icon="{materialDesign:PackIcon Kind=ExitToApp}" Command="{Binding ShutDown}"/>
+                                </MenuItem>
+                            </Menu>
+                            <Separator />
+                            <Button Content="{materialDesign:PackIcon Kind=Cog}" ToolTip="設定" Command="{Binding OpenSettingCommand}"/>
+                            <Button Content="{materialDesign:PackIcon Kind=Puzzle}" ToolTip="アドオン管理" Command="{Binding OpenAddonManagerCommand}"/>
+                            <Button Content="{materialDesign:PackIcon Kind=Download}" ToolTip="ダウンロード一覧" Command="{Binding OpenDownloadTaskWindowsCommand}"/>
+                        </ToolBar>
+                    </ToolBarTray>
+                    <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="19*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="{Binding TabsHeight.Value}"/>
                         </Grid.RowDefinitions>
-                        <DockPanel >
-                            <ToggleButton Margin="10 0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignHamburgerToggleButton}" x:Name="MenuToggleButton" Foreground="{DynamicResource MaterialDesignBody}"/>
-                            <DockPanel HorizontalAlignment="Right">
-                                <Button Margin="10,0" Grid.Column="0" Width="60" VerticalAlignment="Center" ToolTip="アプリケーション設定" Command="{Binding OpenSettingCommand}">
-                                    <materialDesign:PackIcon Kind="cog">
-                                        <materialDesign:PackIcon.RenderTransform>
-                                            <ScaleTransform CenterY="8" CenterX="7" ScaleX="1.7" ScaleY="1.7"/>
-                                        </materialDesign:PackIcon.RenderTransform>
-                                    </materialDesign:PackIcon>
-                                </Button>
-                            </DockPanel>
-                        </DockPanel>
-                        <Grid Grid.Row="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="{Binding TabsHeight.Value}"/>
-                            </Grid.RowDefinitions>
-                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion" BorderBrush="#4A4A4A">
-                                <TabControl.Resources>
-                                    <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
-                                    </Style>
-                                </TabControl.Resources>
-                            </TabControl>
-                            <TabControl Background="{DynamicResource MaterialDesignPaper}" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A" Grid.Row="1">
-                                <TabControl.Resources>
-                                    <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
-                                    </Style>
-                                </TabControl.Resources>
-                            </TabControl >
-                        </Grid>
+                        <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion" BorderBrush="#4A4A4A" ItemTemplate="{StaticResource TabItemTemplate}"/>
+                        <TabControl Background="{DynamicResource MaterialDesignPaper}" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A" Grid.Row="1" ItemTemplate="{StaticResource TabItemTemplate}" />
+
                     </Grid>
                 </Grid>
-            </materialDesign:DrawerHost>
+            </Grid>
         </DockPanel>
     </materialDesign:DialogHost>
 </Window>

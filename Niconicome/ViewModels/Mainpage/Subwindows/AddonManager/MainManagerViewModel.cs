@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using Niconicome.Models.Const;
-using Niconicome.ViewModels.Mainpage.BottomTabs;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Prism.Regions;
 using WS = Niconicome.Workspaces;
