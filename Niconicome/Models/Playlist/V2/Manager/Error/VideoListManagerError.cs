@@ -17,5 +17,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Error
         NotARemotePlaylist,
         [ErrorEnum(ErrorLevel.Log,"リモートプレイリストとの同期が完了しました。(Type:{0}, 追加：{1}, 削除{2}, 更新：{3})")]
         SyncWithRemotePlaylistHasCompleted,
+        [ErrorEnum(ErrorLevel.Error,"指定された動画は現在のプレイリストに存在しません。(playlist:{0}, id:{1})")]
+        VideoDoesNotExistInCurrentPlaylist,
     }
 }

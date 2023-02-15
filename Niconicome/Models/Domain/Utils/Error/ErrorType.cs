@@ -39,6 +39,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 15, typeof(WatchPageInfomationHandlerError) },
             { 16, typeof(ExternalProcessUtilsError) },
             { 17, typeof(ClipboardManagerError) },
+            { 18, typeof(ExternalAppUtilsV2Error) },
         };
     }
 }

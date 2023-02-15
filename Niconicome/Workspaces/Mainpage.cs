@@ -147,5 +147,10 @@ namespace Niconicome.Workspaces
         /// </summary>
         public static MessageV2::IMessageHandler MessageHandler { get; private set; } = DIFactory.Resolve<MessageV2::IMessageHandler>();
 
+        /// <summary>
+        /// 外部アプリハンドラ
+        /// </summary>
+        public static Ext::IExternalAppUtilsV2 ExternalAppUtilsV2 { get; private set; } = DIFactory.Resolve<Ext::IExternalAppUtilsV2>();
+
     }
 }

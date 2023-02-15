@@ -140,13 +140,13 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string PlayerBPath { get; private set; } = "Local.PlayerBPath";
 
-        public static string AppUrlPath { get; private set; } = "Local.SendURLAppPath";
+        public static string AppUrlPath { get; private set; } = "Local.SendToAppBPath";
 
-        public static string AppIdPath { get; private set; } = "Local.SendIDAppPath";
+        public static string AppIdPath { get; private set; } = "Local.SendToAppPath";
 
-        public static string AppUrlParam { get; private set; } = "Local.SendURLAppParam";
+        public static string AppUrlParam { get; private set; } = "Local.SendToAppBParam";
 
-        public static string AppIdParam { get; private set; } = "Local.SendIDAppParam";
+        public static string AppIdParam { get; private set; } = "Local.SendToAppAParam";
 
         //Playlist
         public static string SaveTreePrevExpandedState { get; private set; } = "Playlist.SavePlaylistTreePreviousExpandedState";

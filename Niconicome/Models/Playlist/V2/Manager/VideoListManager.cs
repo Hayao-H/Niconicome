@@ -41,6 +41,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// </summary>
         /// <returns></returns>
         Task<IAttemptResult> SyncWithRemotePlaylistAsync(Action<string> onMessage);
+
+        /// <summary>
+        /// 現在のプレイリストから動画を取得
+        /// </summary>
+        /// <param name="niconicoID"></param>
+        /// <returns></returns>
+        IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID);
     }
 
     public class VideoListManager : IVideoListManager
@@ -232,6 +239,27 @@ namespace Niconicome.Models.Playlist.V2.Manager
             this._errorHandler.HandleError(VideoListManagerError.SyncWithRemotePlaylistHasCompleted, remoteType, addedVideos, removedVideos, videos.Count - addedVideos);
 
             return AttemptResult.Succeeded(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos));
+        }
+
+        public IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID)
+        {
+            if (this._container.CurrentSelectedPlaylist is null)
+            {
+                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
+                return AttemptResult<IVideoInfo>.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
+            }
+
+            IVideoInfo? video = this._container.Videos.FirstOrDefault(v => v.NiconicoId == niconicoID);
+
+            if (video is null)
+            {
+                this._errorHandler.HandleError(VideoListManagerError.VideoDoesNotExistInCurrentPlaylist, this._container.CurrentSelectedPlaylist.ID, niconicoID);
+                return AttemptResult<IVideoInfo>.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.VideoDoesNotExistInCurrentPlaylist, this._container.CurrentSelectedPlaylist.ID, niconicoID));
+            }
+            else
+            {
+                return AttemptResult<IVideoInfo>.Succeeded(video);
+            }
         }
 
 

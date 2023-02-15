@@ -110,8 +110,8 @@
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
                 <div class="SubMenu Two">
-                    <p class="ContextMenuItem Clickable">アプリで開く(A)</p>
-                    <p class="ContextMenuItem Clickable">アプリで開く(B)</p>
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.OpenInPlayerA">アプリで開く(A)</p>
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.OpenInPlayerA">アプリで開く(B)</p>
                 </div>
             </div>
             <div class="RootMenu">
@@ -120,8 +120,8 @@
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
                 <div class="SubMenu Two">
-                    <p class="ContextMenuItem Clickable">アプリに送る(A)</p>
-                    <p class="ContextMenuItem Clickable">アプリに送る(B)</p>
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.SendToAppA">アプリに送る(A)</p>
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.SendToAppB">アプリに送る(B)</p>
                 </div>
             </div>
             <div class="RootMenu">

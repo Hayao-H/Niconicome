@@ -314,6 +314,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<VM::Blazor.BlazorBaseViewModel>();
             services.AddTransient<Ext::IExternalProcessUtils, Ext::ExternalProcessUtils>();
             services.AddSingleton<State::MessageV2.IMessageHandler, State::MessageV2.MessageHandler>();
+            services.AddTransient<Ext::IExternalAppUtilsV2, Ext::ExternalAppUtilsV2>();
             
             return services.BuildServiceProvider();
         }

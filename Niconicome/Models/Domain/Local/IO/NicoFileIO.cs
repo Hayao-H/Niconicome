@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Automation;
 using System.Windows.Input;
+using Niconicome.Models.Domain.Utils;
 using Windows.Foundation;
 
 namespace Niconicome.Models.Domain.Local.IO
@@ -50,7 +51,7 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <returns></returns>
         public bool Exists(string path)
         {
-            return File.Exists(path);
+            return File.Exists(IOUtils.GetPrefixedPath(path));
         }
 
         /// <summary>

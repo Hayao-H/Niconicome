@@ -107,6 +107,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
                                 video.IsEconomy = false;
                             }
                         }
+                    } else
+                    {
+                        video.IsDownloaded.Value = false;
                     }
                 }
 

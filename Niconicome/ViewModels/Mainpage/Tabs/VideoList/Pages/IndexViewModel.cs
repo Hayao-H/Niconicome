@@ -6,7 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Local.State.Toast;
@@ -272,8 +274,13 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.IsMenuVisible = new BindableProperty<bool>(false).AddTo(this.Bindables);
         }
 
+        #region field
 
         private string? targetNiconicoID;
+
+        #endregion
+
+        #region Prop
 
         public Bindables Bindables { get; init; } = new();
 
@@ -282,6 +289,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public IBindableProperty<double> MouseLeft { get; init; }
 
         public IBindableProperty<bool> IsMenuVisible { get; init; }
+
+        #endregion
+
+        #region Method
 
         public void OnClick(MouseEventArgs e, string niconicoID)
         {
@@ -304,6 +315,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public void OpenInNiconico()
         {
+            this.HideMenu();
+
             if (this.targetNiconicoID is null)
             {
                 return;
@@ -323,6 +336,85 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 WS::Mainpage.SnackbarHandler.Enqueue(message);
                 return;
             }
+        }
+
+        public void OpenInPlayerA()
+        {
+            this.HideMenu();
+            this.OpenInExternalApp(AppKind.PlayerA);
+        }
+
+        public void OpenInPlayerB()
+        {
+            this.HideMenu();
+            this.OpenInExternalApp(AppKind.PlayerB);
+        }
+
+        public void SendToAppA()
+        {
+            this.HideMenu();
+            this.OpenInExternalApp(AppKind.AppA);
+        }
+        public void SendToAppB()
+        {
+            this.HideMenu();
+            this.OpenInExternalApp(AppKind.AppB);
+        }
+
+        #endregion
+
+        #region prvate
+
+        private void OpenInExternalApp(AppKind appKind)
+        {
+
+            if (this.targetNiconicoID is null)
+            {
+                return;
+            }
+
+            IAttemptResult<IVideoInfo> videoResult = WS::Mainpage.VideoListManager.GetVideoFromCurrentPlaylist(this.targetNiconicoID);
+            if (!videoResult.IsSucceeded || videoResult.Data is null)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(OutputViewModelStringContent.VideoIsNotDownloaded);
+                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+
+            IAttemptResult result = appKind switch
+            {
+                AppKind.PlayerA => WS::Mainpage.ExternalAppUtilsV2.OpenInPlayerA(videoResult.Data),
+                AppKind.PlayerB => WS::Mainpage.ExternalAppUtilsV2.OpenInPlayerB(videoResult.Data),
+                AppKind.AppA => WS::Mainpage.ExternalAppUtilsV2.SendToAppA(videoResult.Data),
+                _ => WS::Mainpage.ExternalAppUtilsV2.SendToAppB(videoResult.Data),
+            };
+            if (!result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(appKind switch
+                {
+                    AppKind.PlayerA or AppKind.PlayerA => OutputViewModelStringContent.FailedToOpenInPlayer,
+                    _ => OutputViewModelStringContent.FailedToLaunchApp,
+                });
+                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+        }
+
+        private void HideMenu()
+        {
+            this.IsMenuVisible.Value = false;
+        }
+
+        #endregion
+
+        enum AppKind
+        {
+            PlayerA,
+            PlayerB,
+            AppA,
+            AppB,
         }
     }
 }
