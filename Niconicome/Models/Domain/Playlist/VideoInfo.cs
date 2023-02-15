@@ -118,7 +118,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// DL済みフラグ
         /// </summary>
-        bool IsDownloaded { get; set; }
+        IBindableProperty<bool> IsDownloaded { get; }
 
         /// <summary>
         /// エコノミーフラグ
@@ -140,11 +140,15 @@ namespace Niconicome.Models.Domain.Playlist
 
     internal class VideoInfo : UpdatableInfoBase<IVideoStore, IVideoInfo>, IVideoInfo
     {
-        public VideoInfo(string niconicoID,IStoreUpdater<IVideoInfo> updater, List<ITagInfo> tags) : base(updater)
+        public VideoInfo(string niconicoID, IStoreUpdater<IVideoInfo> updater, List<ITagInfo> tags) : base(updater)
         {
             this.NiconicoId = niconicoID;
             this._tags = tags;
             this.IsSelected = new BindableProperty<bool>(false).Subscribe(value =>
+            {
+                if (this.IsAutoUpdateEnabled) this.Update(this);
+            });
+            this.IsDownloaded = new BindableProperty<bool>(false).Subscribe(_ =>
             {
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             });
@@ -352,15 +356,7 @@ namespace Niconicome.Models.Domain.Playlist
 
         public IBindableProperty<bool> IsSelected { get; init; }
 
-        public bool IsDownloaded
-        {
-            get => this._isDownloaded;
-            set
-            {
-                this._isDownloaded = value;
-                if (this.IsAutoUpdateEnabled) this.Update(this);
-            }
-        }
+        public IBindableProperty<bool> IsDownloaded { get; init; }
 
         public bool IsEconomy
         {

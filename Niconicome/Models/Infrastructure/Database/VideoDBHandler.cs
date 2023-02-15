@@ -66,7 +66,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsAutoUpdateEnabled = false;
 
             video.IsSelected.Value = data.IsSelected;
-            video.IsDownloaded = data.IsDownloaded;
+            video.IsDownloaded.Value = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
             video.AddedAt = data.AddedAt;
 
@@ -209,7 +209,7 @@ namespace Niconicome.Models.Infrastructure.Database
                 SharedVideoID = video.SharedID,
                 PlaylistID = video.PlaylistID,
                 IsSelected = video.IsSelected.Value,
-                IsDownloaded = video.IsDownloaded,
+                IsDownloaded = video.IsDownloaded.Value,
                 IsEconomy = video.IsEconomy,
                 VideoFilePath = video.FilePath,
                 AddedAt = video.AddedAt,

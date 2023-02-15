@@ -25,6 +25,8 @@ using Ext = Niconicome.Models.Local.External;
 using VideoList = Niconicome.Models.Playlist.VideoList;
 using Playlist = Niconicome.Models.Playlist.V2;
 using Niconicome.Models.Local.State.Toast;
+using Niconicome.Models.Domain.Utils.StringHandler;
+using MessageV2 = Niconicome.Models.Local.State.MessageV2;
 
 namespace Niconicome.Workspaces
 {
@@ -128,7 +130,22 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// プレイリストと動画の移行
         /// </summary>
-        public static Playlist::Migration.IVideoAndPlayListMigration VideoAndPlayListMigration { get; private set; }=DIFactory.Resolve<Playlist::Migration.IVideoAndPlayListMigration>();
+        public static Playlist::Migration.IVideoAndPlayListMigration VideoAndPlayListMigration { get; private set; } = DIFactory.Resolve<Playlist::Migration.IVideoAndPlayListMigration>();
+
+        /// <summary>
+        /// プロセス
+        /// </summary>
+        public static Ext::IExternalProcessUtils ExternalProcessUtils { get; private set; } = DIFactory.Resolve<Ext::IExternalProcessUtils>();
+
+        /// <summary>
+        /// 文字列生成
+        /// </summary>
+        public static IStringHandler StringHandler { get; private set; }=DIFactory.Resolve<IStringHandler>();
+
+        /// <summary>
+        /// メッセージハンドラ
+        /// </summary>
+        public static MessageV2::IMessageHandler MessageHandler { get; private set; } = DIFactory.Resolve<MessageV2::IMessageHandler>();
 
     }
 }

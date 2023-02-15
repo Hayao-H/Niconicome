@@ -29,9 +29,10 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class LocalVideoLoader : ILocalVideoLoader
     {
-        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler)
+        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler, INicoFileIO fileIO)
         {
             this._directoryIO = directoryIO;
+            this._fileIO = fileIO;
             this._thumbnailUtility = thumbnailUtility;
             this._settingsContainer = settingsConainer;
             this._playlistVideoContainer = playlistVideoContainer;
@@ -41,6 +42,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
         #region field
 
         private readonly INicoDirectoryIO _directoryIO;
+
+        private readonly INicoFileIO _fileIO;
 
         private readonly IThumbnailUtility _thumbnailUtility;
 
@@ -85,13 +88,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
                     return AttemptResult.Fail(this._errorHandler.GetMessageForResult(LocalVideoLoaderError.PlaylistChanged));
                 }
 
-                if (!quick || video.FilePath.IsNullOrEmpty())
+                if (CheckWhetherSetDownloadPathOrNot(quick, video))
                 {
                     IAttemptResult<string> pathResult = this.GetFilePath(video.NiconicoId, folderPath);
                     if (pathResult.IsSucceeded && pathResult.Data is not null)
                     {
                         video.FilePath = pathResult.Data;
-                        video.IsDownloaded = true;
+                        video.IsDownloaded.Value = true;
 
                         if (!economy.IsNullOrEmpty())
                         {
@@ -209,6 +212,33 @@ namespace Niconicome.Models.Playlist.V2.Manager
             {
                 return settingResult.Data.Value;
             }
+        }
+
+        /// <summary>
+        /// ファイルパスをセットする必要があるかどうか
+        /// </summary>
+        /// <param name="quick"></param>
+        /// <param name="videoInfo"></param>
+        /// <returns></returns>
+        private bool CheckWhetherSetDownloadPathOrNot(bool quick, IVideoInfo videoInfo)
+        {
+            if (quick)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(videoInfo.FilePath))
+            {
+                return true;
+            }
+
+            if (!this._fileIO.Exists(videoInfo.FilePath))
+            {
+                return true;
+            }
+
+
+            return false;
         }
 
         #endregion

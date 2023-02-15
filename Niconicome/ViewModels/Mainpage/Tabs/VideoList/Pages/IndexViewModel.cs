@@ -11,6 +11,7 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Utils.Reactive;
+using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent;
 using Niconicome.ViewModels.Shared;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
@@ -24,6 +25,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this._navigation = navigation;
             this.InputText = new BindableProperty<string>("").AddTo(this.Bindables);
             this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
+
+            this.ContextMenu = new ContextMenuViewModel();
+            this.Bindables.Add(this.ContextMenu.Bindables);
+
+            this.OutputViewModel = new OutputViewModel();
+            this.Bindables.Add(this.OutputViewModel.Bindables);
         }
 
         ~IndexViewModel()
@@ -79,6 +86,16 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// トーストのメッセージ
         /// </summary>
         public ToastMessageViewModel? ToastMessage { get; private set; }
+
+        /// <summary>
+        /// コンテクストメニュー
+        /// </summary>
+        public ContextMenuViewModel ContextMenu { get; init; }
+
+        /// <summary>
+        /// 出力
+        /// </summary>
+        public OutputViewModel OutputViewModel { get; init; }
 
         #endregion
 
@@ -161,7 +178,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public void OnPlaylistEditButtonClick()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/playlist",BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/playlist", BlazorWindows.MainPage);
             this._navigation.NavigateTo("/playlist");
         }
 
@@ -244,5 +261,68 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         }
 
         #endregion
+    }
+
+    public class ContextMenuViewModel
+    {
+        public ContextMenuViewModel()
+        {
+            this.MouseTop = new BindableProperty<double>(0).AddTo(this.Bindables);
+            this.MouseLeft = new BindableProperty<double>(0).AddTo(this.Bindables);
+            this.IsMenuVisible = new BindableProperty<bool>(false).AddTo(this.Bindables);
+        }
+
+
+        private string? targetNiconicoID;
+
+        public Bindables Bindables { get; init; } = new();
+
+        public IBindableProperty<double> MouseTop { get; init; }
+
+        public IBindableProperty<double> MouseLeft { get; init; }
+
+        public IBindableProperty<bool> IsMenuVisible { get; init; }
+
+        public void OnClick(MouseEventArgs e, string niconicoID)
+        {
+            if (e.Button == 2)
+            {
+                this.MouseLeft.Value = e.ClientX;
+                this.MouseTop.Value = e.ClientY - 100;
+                this.IsMenuVisible.Value = true;
+                this.targetNiconicoID = niconicoID;
+                return;
+            }
+
+            if (e.Button == 0)
+            {
+                this.IsMenuVisible.Value = false;
+                this.targetNiconicoID = null;
+                return;
+            }
+        }
+
+        public void OpenInNiconico()
+        {
+            if (this.targetNiconicoID is null)
+            {
+                return;
+            }
+
+            IAttemptResult result = WS::Mainpage.ExternalProcessUtils.StartProcess($"https://nico.ms/{this.targetNiconicoID}");
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.VideoOpenedInBrowser);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+            else
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.FailedToOpenVideoInBrowser);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+        }
     }
 }

@@ -11,32 +11,25 @@ export class WidthHandlerImpl implements WidthHandler {
 
     constructor(elementHandler: ElementHandler) {
         this._elmHandler = elementHandler;
-        this._headerColumnIDs = {
-            '0': '#CheckBoxColumn',
-            '1': '#ThumbnailColumn',
-            '2': '#TitleColumn',
-            '3': '#UploadedDateTimeColumn',
-            '4': '#ViewCountColumn',
-            '5': '#CommentCountColumn',
-            '6': '#MylistCountColumn',
-        };
-        this._columnClassNames = {
-            '0': '.CheckBoxColumn',
-            '1': '.ThumbnailWrapper',
-            '2': '.TitleColumn',
-            '3': '.UploadedDateTimeColumn',
-            '4': '.ViewCountColumn',
-            '5': '.CommentCountColumn',
-            '6': '.MylistCountColumn',
+        this._columnIDs = {
+            '0': 'CheckBoxColumn',
+            '1': 'ThumbnailColumn',
+            '2': 'TitleColumn',
+            '3': 'UploadedDateTimeColumn',
+            '4': 'IsDownloadedColumn',
+            '5': 'ViewCountColumn',
+            '6': 'CommentCountColumn',
+            '7': 'MylistCountColumn',
         };
         this._separatorIDs = {
             '0': '#CheckBoxColumnSeparator',
             '1': '#ThumbnailColumnSeparator',
             '2': '#TitleColumnSeparator',
             '3': '#UploadedDateTimeColumnSeparator',
-            '4': '#ViewCountColumnSeparator',
-            '5': '#CommentCountColumnSeparator',
-            '6': '#MylistCountColumnSeparator',
+            '4': '#IsDownloadedColumnSeparator',
+            '5': '#ViewCountColumnSeparator',
+            '6': '#CommentCountColumnSeparator',
+            '7': '#MylistCountColumnSeparator',
         };
     }
 
@@ -44,11 +37,9 @@ export class WidthHandlerImpl implements WidthHandler {
 
     private readonly _elmHandler: ElementHandler;
 
-    private readonly _headerColumnIDs: Dictionary<string>;
+    private readonly _columnIDs: Dictionary<string>;
 
     private readonly _separatorIDs: Dictionary<string>;
-
-    private readonly _columnClassNames: Dictionary<string>;
 
     private _isResizing = false;
 
@@ -98,11 +89,11 @@ export class WidthHandlerImpl implements WidthHandler {
 
         const nextIndex = Number(this._resizingIndex) + 1;
 
-        const headerResult = this._elmHandler.Get(this._headerColumnIDs[this._resizingIndex]);
-        const nextHeaderResult = this._elmHandler.Get(this._headerColumnIDs[`${nextIndex}`]);
+        const headerResult = this._elmHandler.Get(`#${this._columnIDs[this._resizingIndex]}`);
+        const nextHeaderResult = this._elmHandler.Get(`#${this._columnIDs[`${nextIndex}`]}`);
         const headerWrapperResult = this._elmHandler.Get(ElementIDs.VideoListHeader);
-        const columnResult = this._elmHandler.GetAll(this._columnClassNames[this._resizingIndex]);
-        const nextColumnResult = this._elmHandler.GetAll(this._columnClassNames[`${nextIndex}`]);
+        const columnResult = this._elmHandler.GetAll(`.${this._columnIDs[this._resizingIndex]}`);
+        const nextColumnResult = this._elmHandler.GetAll(`.${this._columnIDs[`${nextIndex}`]}`);
         const sepResult = this._elmHandler.Get(this._separatorIDs[this._resizingIndex]);
 
         if (!headerResult.IsSucceeded || headerResult.Data === null || !columnResult.IsSucceeded || columnResult.Data === null || !sepResult.IsSucceeded || sepResult.Data === null || !headerWrapperResult.IsSucceeded || headerWrapperResult.Data === null || !nextHeaderResult.IsSucceeded || nextHeaderResult.Data === null || !nextColumnResult.IsSucceeded || nextColumnResult.Data === null) return;

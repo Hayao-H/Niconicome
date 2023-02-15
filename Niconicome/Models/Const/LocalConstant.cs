@@ -22,6 +22,8 @@ namespace Niconicome.Models.Const
 
         public static string TopTabRegionName = "TopTabRegion";
 
+        public static string SystemMessageDispacher = "System";
+
         public const string TabPositionTop = "top";
 
         public const string TabPositionBottom = "bottom";

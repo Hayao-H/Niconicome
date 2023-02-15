@@ -13,6 +13,9 @@
   border-radius: 5px;
 }
 
+.PageContent {
+  position: relative;
+}
 .PageContent .ControlsContainer {
   display: flex;
   align-items: center;
@@ -66,7 +69,6 @@
   line-height: 35px;
   -webkit-user-select: none;
      -moz-user-select: none;
-      -ms-user-select: none;
           user-select: none;
 }
 .PageContent .VideoList #VideoListHeader .Separator {
@@ -108,6 +110,14 @@
 .PageContent .VideoList #VideoListHeader #UploadedDateTimeColumnSeparator {
   left: 1155.3333333333px;
 }
+.PageContent .VideoList #VideoListHeader #IsDownloadedColumn {
+  width: 50px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #IsDownloadedColumnSeparator {
+  left: 1205.3333333333px;
+}
 .PageContent .VideoList #VideoListHeader #ViewCountColumn {
   width: 110px;
   height: 100%;
@@ -115,7 +125,7 @@
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #ViewCountColumnSeparator {
-  left: 1265.3333333333px;
+  left: 1315.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #CommentCountColumn {
   width: 110px;
@@ -123,7 +133,7 @@
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #CommentCountColumnSeparator {
-  left: 1375.3333333333px;
+  left: 1425.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #MylistCountColumn {
   width: 110px;
@@ -131,7 +141,7 @@
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #MylistCountColumnSeparator {
-  left: 1485.3333333333px;
+  left: 1535.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #LikeCountColumn {
   width: 110px;
@@ -187,6 +197,19 @@
   width: 250px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .IsDownloadedColumn {
+  display: flex;
+  color: #7bd889;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 50px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .IsDownloadedColumn .NotDownloaded {
+  color: #ff3300;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .ViewCountColumn {
   display: flex;
@@ -245,18 +268,87 @@
   background: #007aff;
   border-radius: 5px;
 }
-.PageContent .ContextMenuWrapper {
+.PageContent .OutputContainer {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  background-color: #fff;
+  overflow-y: auto;
+  border-left: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.PageContent .OutputContainer .ToolBar {
+  display: flex;
+  justify-content: flex-end;
+  background-color: #f9f9fa;
+}
+.PageContent .OutputContainer .ToolBar .CloseButton {
+  margin-right: 8px;
+}
+.PageContent .OutputContainer .ToolBar .CloseButton:hover {
+  color: #d70022;
+}
+.PageContent .OutputContainer .Controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+.PageContent .OutputContainer .MessageBox {
+  padding: 5px;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow {
+  display: flex;
+  padding: 3px;
+  border-bottom: 1px solid rgba(231, 231, 231, 0.9058823529);
+  word-wrap: break-word;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow .MessageIcon {
+  color: #1e90ff;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow .MessageContent {
+  margin-left: 5px;
+  flex-grow: 1;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow .MessageInfomation {
+  color: #3161b8;
+  width: 20%;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow.Yellow {
+  background-color: #fffbd6;
+  color: #be9b00;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow.Yellow .MessageIcon {
+  color: #be9b00;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow.Red {
+  background-color: #fdf2f5;
+  color: #d70022;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow.Red .MessageIcon {
+  color: #d70022;
+}
+.PageContent .OutputContainer.Show {
+  display: block;
+}
+
+.ContextMenuWrapper {
   position: relative;
 }
-.PageContent .ContextMenuWrapper .ContextMenu {
+.ContextMenuWrapper .ContextMenu {
   display: none;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 9999;
   background: #fff;
+  padding: 5px;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
 }
-.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem {
+.ContextMenuWrapper .ContextMenu .ContextMenuItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -264,43 +356,48 @@
   width: 200px;
   background: #fff;
   z-index: 9999;
+  border-bottom: 1px solid rgba(231, 231, 231, 0.9058823529);
 }
-.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem .ContextMenuIcon {
+.ContextMenuWrapper .ContextMenu .ContextMenuItem .ContextMenuIcon {
   margin-right: 8px;
 }
-.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem.Clickable {
+.ContextMenuWrapper .ContextMenu .ContextMenuItem.Clickable {
   cursor: pointer;
 }
-.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem .ContextMenuItemTriangle {
+.ContextMenuWrapper .ContextMenu .ContextMenuItem .ContextMenuItemTriangle {
   width: 0;
   height: 0;
   border-left: 6px solid black;
   border-top: 6px solid transparent;
   border-bottom: 6px solid transparent;
 }
-.PageContent .ContextMenuWrapper .ContextMenu .ContextMenuItem:hover {
+.ContextMenuWrapper .ContextMenu .ContextMenuItem:hover {
   background: rgba(231, 231, 231, 0.9058823529);
 }
-.PageContent .ContextMenuWrapper .ContextMenu .RootMenu {
+.ContextMenuWrapper .ContextMenu .RootMenu {
   position: relative;
 }
-.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu {
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu {
   display: none;
   position: absolute;
   left: 100%;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
 }
-.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.One {
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.One {
   top: 0;
 }
-.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Two {
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Two {
   top: -100%;
 }
-.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Three {
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Three {
   top: -200%;
 }
-.PageContent .ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Many {
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Many {
   top: -300%;
 }
-.PageContent .ContextMenuWrapper .ContextMenu .RootMenu:hover .SubMenu {
+.ContextMenuWrapper .ContextMenu .RootMenu:hover .SubMenu {
+  display: block;
+}
+.ContextMenuWrapper .ContextMenu.Show {
   display: block;
 }

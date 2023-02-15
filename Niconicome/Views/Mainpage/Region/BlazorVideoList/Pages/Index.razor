@@ -3,194 +3,239 @@
 @inject IJSRuntime JS;
 @inherits BlazorBase;
 
-<div tabindex="0" @ref="container" class="PageContent PageContainer" @onkeydown="OnKeyDown">
+<div tabindex="0" @ref="container" class="PageContent PageContainer ContextMenuWrapper" @onkeydown="OnKeyDown">
 
-	<h3>@(DataContext.PlaylistName)</h3>
+    <h3>@(DataContext.PlaylistName)</h3>
 
-	<div class="ControlsContainer">
-		<div class="InputBoxWrapper">
-			<input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDown" />
-			@if (DataContext.IsProcessing.Value)
-			{
-				<button type="button" id="RegisterButton" class="btn btn-primary" disabled>登録</button>
-			}
-			else
-			{
-				<button type="button" id="RegisterButton" class="btn btn-primary" @onclick="async ()=>await DataContext.AddVideoAsync()">登録</button>
-			}
-		</div>
-		<div class="ButtonsWrapper">
-			<button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="プレイリスト情報を編集" @onclick="DataContext.OnPlaylistEditButtonClick"><i class="fa-solid fa-pen"></i></button>
-			<button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="リモートプレイリストと同期" @onclick="DataContext.OnSyncWithRemotePlaylistButtonClick"><i class="fa-solid fa-cloud-arrow-down"></i></button>
-		</div>
-	</div>
+    <div class="ControlsContainer">
+        <div class="InputBoxWrapper">
+            <input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDown" />
+            @if (DataContext.IsProcessing.Value)
+            {
+                <button type="button" id="RegisterButton" class="btn btn-primary" disabled>登録</button>
+            }
+            else
+            {
+                <button type="button" id="RegisterButton" class="btn btn-primary" @onclick="async ()=>await DataContext.AddVideoAsync()">登録</button>
+            }
+        </div>
+        <div class="ButtonsWrapper">
+            <button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="プレイリスト情報を編集" @onclick="DataContext.OnPlaylistEditButtonClick"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="リモートプレイリストと同期" @onclick="DataContext.OnSyncWithRemotePlaylistButtonClick"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+            <button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="出力を開く" @onclick="DataContext.OutputViewModel.OnOutputButtonClicked"><i class="fa-solid fa-message"></i></button>
+        </div>
+    </div>
 
-	<div class="VideoList ContextMenuWrapper">
-		<div id="VideoListHeader">
-			<span id="CheckBoxColumn" class="HeaderItem"></span>
-			<hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
-			<span id="ThumbnailColumn" class="HeaderItem"></span>
-			<hr id="ThumbnailColumnSeparator" data-index="1" class="Separator" />
-			<span id="TitleColumn" class="HeaderItem">タイトル</span>
-			<hr id="TitleColumnSeparator" data-index="2" class="Separator" />
-			<span id="UploadedDateTimeColumn" class="HeaderItem">投稿日時</span>
-			<hr id="UploadedDateTimeColumnSeparator" data-index="3" class="Separator" />
-			<span id="ViewCountColumn" class="HeaderItem">再生回数</span>
-			<hr id="ViewCountColumnSeparator" data-index="4" class="Separator" />
-			<span id="CommentCountColumn" class="HeaderItem">コメント数</span>
-			<hr id="CommentCountColumnSeparator" data-index="5" class="Separator" />
-			<span id="MylistCountColumn" class="HeaderItem">マイリスト数</span>
-			<hr id="MylistCountColumnSeparator" data-index="6" class="Separator" />
-			<span id="LikeCountColumn" class="HeaderItem">いいね数</span>
-		</div>
-		<div class="VideoListBody">
-			@foreach (var video in DataContext.Videos)
-			{
-				<div class="VideoListRow">
-					<div class="CheckBoxColumn">
-						<input type="checkbox" checked="@(video.IsSelected.Value)" />
-					</div>
-					<div class="ThumbnailWrapper">
-						<img class="Thumbnail" src="data:image/jpeg;base64,@(video.Base64ThumbData.Value)" />
-					</div>
-					<div class="VideoInfoContainer">
-						<div class="TitleColumn">
-							<p class="fw-bold">@(video.Title)</p>
-							<p class="text-muted ms-3">投稿者：@(video.OwnerName)</p>
-						</div>
-						<div class="UploadedDateTimeColumn">
-							<p>投稿日時：@(video.UploadedOn)</p>
-						</div>
-						<div class="ViewCountColumn">
-							<p>@(video.ViewCount)</p>
-						</div>
-						<div class="CommentCountColumn">
-							<p>@(video.CommentCount)</p>
-						</div>
-						<div class="MylistCountColumn">
-							<p>@(video.MylistCount)</p>
-						</div>
-						<div class="LikeCountColumn">
-							<p>@(video.LikeCount)</p>
-						</div>
-					</div>
-				</div>
-			}
-		</div>
-		<div class="ContextMenu">
-			<div class="ContextMenuItem Clickable">
-				<p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>動画を削除する</p>
-			</div>
-			<div class="ContextMenuItem Clickable">
-				<p><i class="fa-solid fa-play fa-sm ContextMenuIcon"></i>ニコニコで視聴する</p>
-			</div>
-			<div class="ContextMenuItem Clickable">
-				<p><i class="fa-solid fa-folder fa-sm ContextMenuIcon"></i>保存フォルダーを開く</p>
-			</div>
-			<div class="RootMenu">
-				<div class="ContextMenuItem">
-					<p><i class="fa-solid fa-file-video fa-sm ContextMenuIcon"></i>開く</p>
-					<div class="ContextMenuItemTriangle"></div>
-				</div>
-				<div class="SubMenu Two">
-					<p class="ContextMenuItem Clickable">アプリで開く(A)</p>
-					<p class="ContextMenuItem Clickable">アプリで開く(B)</p>
-				</div>
-			</div>
-			<div class="RootMenu">
-				<div class="ContextMenuItem">
-					<p><i class="fa-solid fa-paper-plane fa-sm ContextMenuIcon"></i>送る</p>
-					<div class="ContextMenuItemTriangle"></div>
-				</div>
-				<div class="SubMenu Two">
-					<p class="ContextMenuItem Clickable">アプリに送る(A)</p>
-					<p class="ContextMenuItem Clickable">アプリに送る(B)</p>
-				</div>
-			</div>
-			<div class="RootMenu">
-				<div class="ContextMenuItem">
-					<p><i class="fa-solid fa-check fa-sm ContextMenuIcon"></i>選択</p>
-					<div class="ContextMenuItemTriangle"></div>
-				</div>
-				<div class="SubMenu Many">
-					<p class="ContextMenuItem Clickable">全て選択する</p>
-					<p class="ContextMenuItem Clickable">全て選択解除する</p>
-					<p class="ContextMenuItem Clickable">ダウンロード済みの動画を選択する</p>
-					<p class="ContextMenuItem Clickable">ダウンロード済みの動画を選択解除する</p>
-					<p class="ContextMenuItem Clickable">未ダウンロードの動画を選択する</p>
-					<p class="ContextMenuItem Clickable">未ダウンロードの動画を選択解除する</p>
-				</div>
-			</div>
-			<div class="RootMenu Three">
-				<div class="ContextMenuItem">
-					<p><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>コピー</p>
-					<div class="ContextMenuItemTriangle"></div>
-				</div>
-				<div class="SubMenu Three">
-					<p class="ContextMenuItem Clickable">ID</p>
-					<p class="ContextMenuItem Clickable">タイトル</p>
-					<p class="ContextMenuItem Clickable">URL</p>
-				</div>
-			</div>
-			<div class="RootMenu">
-				<div class="ContextMenuItem">
-					<p><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>全てコピー</p>
-					<div class="ContextMenuItemTriangle"></div>
-				</div>
-				<div class="SubMenu Three">
-					<p class="ContextMenuItem Clickable">ID</p>
-					<p class="ContextMenuItem Clickable">タイトル</p>
-					<p class="ContextMenuItem Clickable">URL</p>
-				</div>
-			</div>
-			<div class="RootMenu">
-				<div class="ContextMenuItem">
-					<p><i class="fa-solid fa-music fa-sm ContextMenuIcon"></i>プレイリストを作成</p>
-					<div class="ContextMenuItemTriangle"></div>
-				</div>
-				<div class="SubMenu One">
-					<p class="ContextMenuItem Clickable">.aimppl4形式のプレイリストを作成する</p>
-				</div>
-			</div>
-		</div>
-	</div>
 
-	@if (DataContext.ToastMessage is not null)
-	{
-		<div class="ToastContent toast" role="alert" aria-live="assertive" aria-atomic="true">
-			<div class="ToastHeader toast-header">
-				<div class="ToastImage"></div>
-				<strong class="me-auto">@(DataContext.ToastMessage.Dispatcher)</strong>
-				<small>@(DataContext.ToastMessage.AddedAt)</small>
-				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-			</div>
-			<div class="toast-body">
-				@(DataContext.ToastMessage.Message)
-			</div>
-		</div>
-	}
+    <div class="VideoList">
+        <div id="VideoListHeader">
+            <span id="CheckBoxColumn" class="HeaderItem"></span>
+            <hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
+            <span id="ThumbnailColumn" class="HeaderItem"></span>
+            <hr id="ThumbnailColumnSeparator" data-index="1" class="Separator" />
+            <span id="TitleColumn" class="HeaderItem">タイトル</span>
+            <hr id="TitleColumnSeparator" data-index="2" class="Separator" />
+            <span id="UploadedDateTimeColumn" class="HeaderItem">投稿日時</span>
+            <hr id="UploadedDateTimeColumnSeparator" data-index="3" class="Separator" />
+            <span id="IsDownloadedColumn" class="HeaderItem">DL済</span>
+            <hr id="IsDownloadedColumnSeparator" data-index="4" class="Separator" />
+            <span id="ViewCountColumn" class="HeaderItem">再生回数</span>
+            <hr id="ViewCountColumnSeparator" data-index="5" class="Separator" />
+            <span id="CommentCountColumn" class="HeaderItem">コメント数</span>
+            <hr id="CommentCountColumnSeparator" data-index="6" class="Separator" />
+            <span id="MylistCountColumn" class="HeaderItem">マイリスト数</span>
+            <hr id="MylistCountColumnSeparator" data-index="7" class="Separator" />
+            <span id="LikeCountColumn" class="HeaderItem">いいね数</span>
+        </div>
+        <div class="VideoListBody">
+            @foreach (var video in DataContext.Videos)
+            {
+                <div class="VideoListRow" @onmouseup="e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId)">
+                    <div class="CheckBoxColumn">
+                        <input type="checkbox" @bind="@(video.IsSelected.Value)" />
+                    </div>
+                    <div class="ThumbnailWrapper">
+                        <img class="Thumbnail" src="data:image/jpeg;base64,@(video.Base64ThumbData.Value)" />
+                    </div>
+                    <div class="VideoInfoContainer">
+                        <div class="TitleColumn">
+                            <p class="fw-bold">@(video.Title)</p>
+                            <p class="text-muted ms-3">投稿者：@(video.OwnerName)</p>
+                        </div>
+                        <div class="UploadedDateTimeColumn">
+                            <p>投稿日時：@(video.UploadedOn)</p>
+                        </div>
+                        <div class="IsDownloadedColumn">
+                            <p class="@(video.IsDownloaded.Value ? "":"NotDownloaded")">
+                                @if (video.IsDownloaded.Value)
+                                {
+                                    <i class="fa-solid fa-check"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-xmark"></i>
+                                }
+                            </p>
+                        </div>
+                        <div class="ViewCountColumn">
+                            <p>@(video.ViewCount)</p>
+                        </div>
+                        <div class="CommentCountColumn">
+                            <p>@(video.CommentCount)</p>
+                        </div>
+                        <div class="MylistCountColumn">
+                            <p>@(video.MylistCount)</p>
+                        </div>
+                        <div class="LikeCountColumn">
+                            <p>@(video.LikeCount)</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="ContextMenu @(DataContext.ContextMenu.IsMenuVisible.Value?"Show":"")" style="top:@(DataContext.ContextMenu.MouseTop.Value)px; left:@(DataContext.ContextMenu.MouseLeft.Value)px;">
+            <div class="ContextMenuItem Clickable">
+                <p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>動画を削除する</p>
+            </div>
+            <div class="ContextMenuItem Clickable">
+                <p @onclick="DataContext.ContextMenu.OpenInNiconico"><i class="fa-solid fa-play fa-sm ContextMenuIcon"></i>ニコニコで視聴する</p>
+            </div>
+            <div class="ContextMenuItem Clickable">
+                <p><i class="fa-solid fa-folder fa-sm ContextMenuIcon"></i>保存フォルダーを開く</p>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-file-video fa-sm ContextMenuIcon"></i>開く</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Two">
+                    <p class="ContextMenuItem Clickable">アプリで開く(A)</p>
+                    <p class="ContextMenuItem Clickable">アプリで開く(B)</p>
+                </div>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-paper-plane fa-sm ContextMenuIcon"></i>送る</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Two">
+                    <p class="ContextMenuItem Clickable">アプリに送る(A)</p>
+                    <p class="ContextMenuItem Clickable">アプリに送る(B)</p>
+                </div>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-check fa-sm ContextMenuIcon"></i>選択</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Many">
+                    <p class="ContextMenuItem Clickable">全て選択する</p>
+                    <p class="ContextMenuItem Clickable">全て選択解除する</p>
+                    <p class="ContextMenuItem Clickable">ダウンロード済みの動画を選択する</p>
+                    <p class="ContextMenuItem Clickable">ダウンロード済みの動画を選択解除する</p>
+                    <p class="ContextMenuItem Clickable">未ダウンロードの動画を選択する</p>
+                    <p class="ContextMenuItem Clickable">未ダウンロードの動画を選択解除する</p>
+                </div>
+            </div>
+            <div class="RootMenu Three">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>コピー</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Three">
+                    <p class="ContextMenuItem Clickable">ID</p>
+                    <p class="ContextMenuItem Clickable">タイトル</p>
+                    <p class="ContextMenuItem Clickable">URL</p>
+                </div>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>全てコピー</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Three">
+                    <p class="ContextMenuItem Clickable">ID</p>
+                    <p class="ContextMenuItem Clickable">タイトル</p>
+                    <p class="ContextMenuItem Clickable">URL</p>
+                </div>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-music fa-sm ContextMenuIcon"></i>プレイリストを作成</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu One">
+                    <p class="ContextMenuItem Clickable">.aimppl4形式のプレイリストを作成する</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="OutputContainer @(DataContext.OutputViewModel.IsEnabled.Value ?"Show":"")">
+        <div class="ToolBar">
+            <div class="CloseButton" @onclick="DataContext.OutputViewModel.OnOutputButtonClicked"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="Controls">
+            <h4>出力</h4>
+            <div>
+                <button type="button" class="btn btn-primary" title="コピー" @onclick="DataContext.OutputViewModel.OnCopyButtonClicked"><i class="fa-solid fa-copy"></i></button>
+                <button type="button" class="btn btn-primary" title="出力をクリア" @onclick="DataContext.OutputViewModel.OnClearButtonClicked"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+        <div class="MessageBox">
+            @foreach (var message in DataContext.OutputViewModel.Messages)
+            {
+                <div class="MessageRow @(message.ColorClass)">
+                    <div class="MessageIcon"><i class="fa-solid @(message.ErrorIcon)"></i></div>
+                    <div class="MessageContent">
+                        <p>@(message.Content)</p>
+                    </div>
+                    <div class="MessageInfomation">
+                        @(message.AddedAt),<br />@(message.Dispacher)
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (DataContext.ToastMessage is not null)
+    {
+        <div class="ToastContent toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="ToastHeader toast-header">
+                <div class="ToastImage"></div>
+                <strong class="me-auto">@(DataContext.ToastMessage.Dispatcher)</strong>
+                <small>@(DataContext.ToastMessage.AddedAt)</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @(DataContext.ToastMessage.Message)
+            </div>
+        </div>
+    }
 
 </div>
 
 @code {
 
-	protected override async Task OnParametersSetAsync()
-	{
-		DataContext.RegisterListChangedEventHandler(() => this.StateHasChanged());
-		DataContext.RegisterToastMessageChangeEventHandler(() =>
-		{
-			this.StateHasChanged();
-			JS.InvokeVoidAsync("showToast");
-		});
-		DataContext.Bindables.RegisterPropertyChangeHandler(() => this.StateHasChanged());
-		await DataContext.Initialize();
-	}
+    protected override async Task OnParametersSetAsync()
+    {
+        DataContext.RegisterListChangedEventHandler(() => this.StateHasChanged());
+        DataContext.RegisterToastMessageChangeEventHandler(() =>
+        {
+            this.StateHasChanged();
+            JS.InvokeVoidAsync("showToast");
+        });
+        DataContext.Bindables.RegisterPropertyChangeHandler(() => this.StateHasChanged());
+        await DataContext.Initialize();
+    }
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		await base.OnAfterRenderAsync(firstRender);
-		await JS.InvokeVoidAsync("showTooltip");
-		var module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
-		await module.InvokeVoidAsync("main");
-	}
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        await JS.InvokeVoidAsync("showTooltip");
+        var module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
+        await module.InvokeVoidAsync("main");
+    }
 }

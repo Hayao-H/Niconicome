@@ -1,7 +1,7 @@
 
 function showTooltip() {
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(elm => {
-        new bootstrap.Tooltip(elm);
+        //new bootstrap.Tooltip(elm);
     })
 }
 

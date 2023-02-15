@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using V2 = Niconicome.Models.Local.State.MessageV2;
 using Reactive.Bindings;
+using System.Collections.Specialized;
+using Niconicome.Models.Const;
 
 namespace Niconicome.Models.Local.State
 {
@@ -16,10 +19,17 @@ namespace Niconicome.Models.Local.State
 
     public class MessageHandler : IMessageHandler
     {
+        public MessageHandler(V2::IMessageHandler messageHandler)
+        {
+            this._messageHandler = messageHandler;
+        }
+
+
         private readonly StringBuilder messagefield = new();
 
         private readonly List<Action> changeEventHandlers = new();
 
+        private readonly V2::IMessageHandler _messageHandler;
 
         /// <summary>
         /// イベントを発火する
@@ -64,8 +74,7 @@ namespace Niconicome.Models.Local.State
         /// <param name="message"></param>
         public void AppendMessage(string message)
         {
-            this.messagefield.AppendLine(message);
-            this.OnMessageChanged();
+            this._messageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, Domain.Utils.Error.ErrorLevel.Log);
         }
 
         /// <summary>

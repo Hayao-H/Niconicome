@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Utils;
 using Reactive.Bindings;
@@ -25,6 +25,13 @@ namespace Niconicome.Models.Local.OS
         IAttemptResult<string> GetClipboardContent();
 
         /// <summary>
+        /// クリップボードに書き込む
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        IAttemptResult SetToClipBoard(string content);
+
+        /// <summary>
         /// クリップボード監視を開始
         /// </summary>
         IAttemptResult StartMonitoring();
@@ -43,19 +50,19 @@ namespace Niconicome.Models.Local.OS
 
     public class ClipbordManager : IClipbordManager
     {
-        public ClipbordManager(ILogger logger)
+        public ClipbordManager(IErrorHandler errorHandler)
         {
-            this._logger = logger;
             this.IsMonitoring = this._isMonitoringSource.ToReadOnlyReactiveProperty();
+            this._errorHandler = errorHandler;
         }
 
         #region field
 
-        private readonly ILogger _logger;
-
         private readonly ReactiveProperty<bool> _isMonitoringSource = new();
 
         private event Action<string>? _changeHandler;
+
+        private readonly IErrorHandler _errorHandler;
 
         #endregion
 
@@ -77,12 +84,29 @@ namespace Niconicome.Models.Local.OS
             }
             catch (Exception ex)
             {
-                this._logger.Error("クリップボードからのデータ取得に失敗しました。", ex);
-                return AttemptResult<string>.Fail($"クリップボードからのデータ取得に失敗しました。(詳細:{ex.Message})");
+                this._errorHandler.HandleError(ClipboardManagerError.FailedToGetClipboardData, ex);
+                return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(ClipboardManagerError.FailedToGetClipboardData, ex));
             }
 
             return AttemptResult<string>.Succeeded(data);
         }
+
+        public IAttemptResult SetToClipBoard(string content)
+        {
+            try
+            {
+                Clipboard.SetText(content);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(ClipboardManagerError.FailedToSetDataToClipboard, ex);
+                return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(ClipboardManagerError.FailedToSetDataToClipboard, ex));
+            }
+
+            return AttemptResult.Succeeded();
+
+        }
+
 
         public void RegisterClipboardChangeHandler(Action<string> handler)
         {
@@ -94,13 +118,15 @@ namespace Niconicome.Models.Local.OS
             //二重監視防止
             if (this.IsMonitoring.Value)
             {
-                return AttemptResult.Fail("すでに監視しています");
+                this._errorHandler.HandleError(ClipboardManagerError.AlreadyMonitoring);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ClipboardManagerError.AlreadyMonitoring));
             }
 
             //OSバージョンチェック
             if (!Compatibility.IsOsVersionLargerThan(10, 0, 10240))
             {
-                return AttemptResult.Fail("この機能は'Windows10 1507'以降のOSでのみ利用可能です。");
+                this._errorHandler.HandleError(ClipboardManagerError.OSVersionOlderThanMinimum);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ClipboardManagerError.OSVersionOlderThanMinimum));
             }
 
             try
@@ -109,8 +135,8 @@ namespace Niconicome.Models.Local.OS
             }
             catch (Exception ex)
             {
-                this._logger.Error("クリップボードの監視に失敗しました。", ex);
-                return AttemptResult.Fail($"クリップボードの監視に失敗しました。(詳細:{ex.Message})");
+                this._errorHandler.HandleError(ClipboardManagerError.FailedToStartMonitoringClipboard, ex);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ClipboardManagerError.FailedToStartMonitoringClipboard, ex));
             }
 
             this._isMonitoringSource.Value = true;
@@ -132,7 +158,7 @@ namespace Niconicome.Models.Local.OS
             }
             catch (Exception ex)
             {
-                this._logger.Error("クリップボードの監視終了に失敗しました。", ex);
+                this._errorHandler.HandleError(ClipboardManagerError.FailedToStopMonitoringClipboard, ex);
                 return;
             }
 

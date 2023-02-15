@@ -41,6 +41,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
             video.ThumbPath.RegisterPropertyChangeHandler(this._thumbHandler);
 
             this.IsSelected = video.IsSelected.AddTo(bindable);
+            this.IsDownloaded = video.IsDownloaded.AddTo(bindable);
 
             this.Bindable = bindable;
 
@@ -153,6 +154,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// 選択フラグ
         /// </summary>
         public IBindableProperty<bool> IsSelected { get; init; }
+
+        /// <summary>
+        /// DLフラグ
+        /// </summary>
+        public IBindableProperty<bool> IsDownloaded { get; init; }
 
         #endregion
 

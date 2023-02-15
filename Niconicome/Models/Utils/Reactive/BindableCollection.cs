@@ -11,7 +11,7 @@ using Reactive.Bindings.Extensions;
 
 namespace Niconicome.Models.Utils.Reactive
 {
-    public class BindableCollection<TItem, TOrigin> : ObservableCollection<TItem>
+    public class BindableCollection<TItem, TOrigin> : ObservableCollection<TItem>, IBindable
     {
         public BindableCollection(ObservableCollection<TOrigin> baseCollection, Func<TOrigin, TItem> converter)
         {
@@ -31,11 +31,23 @@ namespace Niconicome.Models.Utils.Reactive
             baseCollection.As<INotifyCollectionChanged>().CollectionChanged += this.OnBaseCollecitonChanged;
         }
 
+        public void RegisterPropertyChangeHandler(Action handler)
+        {
+            this._handler += handler;
+        }
+
+        public void UnRegisterPropertyChangeHandler(Action handler)
+        {
+            this._handler -= handler;
+        }
+
         #region field
 
         private readonly object _baseCollection;
 
         private readonly Func<TOrigin, TItem> _converter;
+
+        private Action? _handler;
 
         #endregion
 
@@ -77,8 +89,19 @@ namespace Niconicome.Models.Utils.Reactive
                 this.Clear();
                 foreach (var item in this._baseCollection.As<IEnumerable<TOrigin>>()) this.Add(this._converter(item));
             }
+
+            try
+            {
+                this._handler?.Invoke();
+            }
+            catch { }
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            this._handler = null;
+        }
     }
 }

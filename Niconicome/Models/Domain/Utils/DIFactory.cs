@@ -312,6 +312,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<StringHandler.IStringHandler, StringHandler.StringHandler>();
             services.AddTransient<DomainWatchV2::IWatchPageInfomationHandler, DomainWatchV2::WatchPageInfomationHandler>();
             services.AddTransient<VM::Blazor.BlazorBaseViewModel>();
+            services.AddTransient<Ext::IExternalProcessUtils, Ext::ExternalProcessUtils>();
+            services.AddSingleton<State::MessageV2.IMessageHandler, State::MessageV2.MessageHandler>();
             
             return services.BuildServiceProvider();
         }
