@@ -11,17 +11,24 @@ namespace Niconicome.Models.Domain.Local.Store.V2
     public interface ITagStore : IStoreUpdater<ITagInfo>
     {
         /// <summary>
-        /// 指定したIDのタグを取得する
+        /// 指定した名前のタグを取得する
         /// </summary>
         /// <returns></returns>
-        IAttemptResult<ITagInfo> GetTag(int ID);
+        IAttemptResult<ITagInfo> GetTag(string tag);
+
+        /// <summary>
+        /// 指定したIDのタグを取得する
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IAttemptResult<ITagInfo> GetTag(int id);
 
         /// <summary>
         /// タグを作成
         /// </summary>
         /// <param name="tag"></param>
         /// <returns></returns>
-        IAttemptResult Create(ITagInfo tag);
+        IAttemptResult Create(string tag);
 
         /// <summary>
         /// タグを削除

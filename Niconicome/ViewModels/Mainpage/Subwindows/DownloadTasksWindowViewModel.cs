@@ -5,12 +5,15 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Network.Download;
 using Niconicome.Models.Network.Download.DLTask;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Utils.Reactive;
+using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Prism.Regions;
@@ -224,10 +227,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         public DownloadTaskViewModel(IDownloadTask task)
         {
             this.associatedTask = task;
-            this.Message = task.Message.ToReadOnlyReactiveProperty();
-            this.IsProcessing = task.IsProcessing.ToReadOnlyReactiveProperty();
-            this.IsCanceled = task.IsCanceled.ToReadOnlyReactiveProperty();
-            this.IsCompleted = task.IsCompleted.ToReadOnlyReactiveProperty();
+            this.Message = task.Message;
+            this.IsProcessing = task.IsProcessing;
+            this.IsCanceled = task.IsCanceled;
+            this.IsCompleted = task.IsCompleted;
 
             var r1 = new ComboboxItem<int>(1080, "1080p");
             var r2 = new ComboboxItem<int>(720, "720p");
@@ -250,12 +253,10 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     this.IsCanceled,
                     this.IsCompleted,
                 }
-                .CombineLatestValuesAreAllFalse()
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
+                .CombineLatestAreAllTrue(() =>
                 {
                     this.associatedTask.Cancel();
-                }).AddTo(this.disposables);
+                });
 
         }
         #region field
@@ -289,22 +290,22 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// 処理中フラグ
         /// </summary>
-        public ReadOnlyReactiveProperty<bool> IsProcessing { get; }
+        public IBindableProperty<bool> IsProcessing { get; }
 
         /// <summary>
         /// 終了フラグ
         /// </summary>
-        public ReadOnlyReactiveProperty<bool> IsCompleted { get; init; }
+        public IBindableProperty<bool> IsCompleted { get; init; }
 
         /// <summary>
         /// キャンセルフラグ
         /// </summary>
-        public ReadOnlyReactiveProperty<bool> IsCanceled { get; }
+        public IBindableProperty<bool> IsCanceled { get; }
 
         /// <summary>
         /// 状態
         /// </summary>
-        public ReadOnlyReactiveProperty<string?> Message { get; }
+        public IBindableProperty<string> Message { get; }
 
         /// <summary>
         /// 選択フラグ
@@ -321,7 +322,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// 処理をキャンセル
         /// </summary>
-        public ReactiveCommand CancelCommand { get; init; }
+        public IBindableCommand CancelCommand { get; init; }
 
 
     }

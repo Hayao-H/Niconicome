@@ -35,6 +35,10 @@ namespace Niconicome.Models.Infrastructure.Database.Types
 
         public string ThumbUrl { get; set; } = string.Empty;
 
+        public string ChannelName { get; set; } = string.Empty;
+
+        public string ChannelID { get; set; } = string.Empty;
+
         public int Duration { get; set; }
 
         public List<int> Tags { get; set; } = new();

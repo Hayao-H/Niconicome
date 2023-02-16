@@ -147,7 +147,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Local::IRestore, Local::Restore>();
             services.AddTransient<Local::IBackuphandler, Local::BackupHandler>();
             services.AddTransient<DomainPlaylist::IPlaylistFileFactory, DomainPlaylist::PlaylistFileFactory>();
-            services.AddTransient<Local::IPlaylistCreator, Local::PlaylistCreator>();
+            services.AddTransient<Ext.Playlist.IPlaylistCreator, Ext::Playlist.PlaylistCreator>();
             services.AddSingleton<MyApplication::IShutdown, MyApplication::Shutdown>();
             services.AddTransient<DlComment::ICommentDownloader, DlComment::CommentDownloader>();
             services.AddTransient<DlComment::ICommentConverter, DlComment::CommentConverter>();
@@ -315,7 +315,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Ext::IExternalProcessUtils, Ext::ExternalProcessUtils>();
             services.AddSingleton<State::MessageV2.IMessageHandler, State::MessageV2.MessageHandler>();
             services.AddTransient<Ext::IExternalAppUtilsV2, Ext::ExternalAppUtilsV2>();
-            
+            services.AddTransient<IO::V2.INiconicomeFileIO, Infla::IO.WindowsFileIO>();
+            services.AddTransient<IO::V2.INiconicomeDirectoryIO, Infla::IO.WindowsDirectoryIO>();
+            services.AddTransient<Store::V2.IVideoFileStore, DB::VideoFileDBHandler>();
+
             return services.BuildServiceProvider();
         }
 

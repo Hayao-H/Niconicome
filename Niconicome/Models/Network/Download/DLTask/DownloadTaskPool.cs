@@ -85,8 +85,8 @@ namespace Niconicome.Models.Network.Download.DLTask
         {
             this._innerList.Add(task);
 
-            task.IsCanceled.Skip(1).Subscribe(_ => this.Refresh());
-            task.IsCompleted.Skip(1).Subscribe(_ => this.Refresh());
+            task.IsCanceled.Subscribe(_ => this.Refresh());
+            task.IsCompleted.Subscribe(_ => this.Refresh());
 
             //設定を参照してコレクションに追加するかどうか判断
             if (!this.DisplayCanceled.Value && task.IsCanceled.Value) return;

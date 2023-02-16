@@ -8,7 +8,9 @@ using Niconicome.Models.Domain.Niconico.Watch.V2.Error;
 using Niconicome.Models.Infrastructure.Database.Error;
 using Niconicome.Models.Infrastructure.Database.Json;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
+using Niconicome.Models.Infrastructure.IO;
 using Niconicome.Models.Local.External.Error;
+using Niconicome.Models.Local.External.Playlist;
 using Niconicome.Models.Local.OS;
 using Niconicome.Models.Network.Video.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
@@ -40,6 +42,9 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 16, typeof(ExternalProcessUtilsError) },
             { 17, typeof(ClipboardManagerError) },
             { 18, typeof(ExternalAppUtilsV2Error) },
+            { 19, typeof(WindowsFileIOError) },
+            { 20, typeof(WindowsDirectoryIOError) },
+            { 21, typeof(PlaylistCreatorError) },
         };
     }
 }

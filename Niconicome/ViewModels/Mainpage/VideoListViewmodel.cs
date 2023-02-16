@@ -803,35 +803,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.CreatePlaylistCommand = new CommandBase<string>(_ => true, arg =>
             {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
-                {
-                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
-                    return;
-                }
-
-                if (arg is null || arg is not string || arg.IsNullOrEmpty()) return;
-                Playlist::PlaylistType type = arg switch
-                {
-                    "aimp" => Playlist::PlaylistType.Aimp,
-                    _ => Playlist::PlaylistType.Aimp,
-                };
-
-                IEnumerable<IListVideoInfo> videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.IsDownloaded.Value);
-
-                if (!videos.Any()) return;
-
-                IAttemptResult<int> result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, type);
-
-                if (result.IsSucceeded)
-                {
-                    WS::Mainpage.Messagehandler.AppendMessage($"プレイリストを保存フォルダーに作成しました。({result.Data}件失敗)");
-                    WS::Mainpage.SnackbarHandler.Enqueue($"プレイリストを保存フォルダーに作成しました。({result.Data}件失敗)");
-                }
-                else
-                {
-                    WS::Mainpage.Messagehandler.AppendMessage($"プレイリストの作成に失敗しました。");
-                    WS::Mainpage.SnackbarHandler.Enqueue($"プレイリストの作成に失敗しました。（{result.Message}）");
-                }
             });
 
             this.VideoDoubleClickCommand = new ReactiveCommand<MouseEventArgs>()

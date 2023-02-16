@@ -32,6 +32,11 @@ namespace Niconicome.Models.Domain.Playlist
         string FolderPath { get; set; }
 
         /// <summary>
+        /// 起動中のみ保持されるフォルダーパス
+        /// </summary>
+        string TemporaryFolderPath { get; set; }
+
+        /// <summary>
         /// プレイリスト名
         /// </summary>
         BindableProperty<string> Name { get; }
@@ -146,6 +151,8 @@ namespace Niconicome.Models.Domain.Playlist
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
+
+        public string TemporaryFolderPath { get; set; } = string.Empty;
 
         public BindableProperty<string> Name { get; init; }
 

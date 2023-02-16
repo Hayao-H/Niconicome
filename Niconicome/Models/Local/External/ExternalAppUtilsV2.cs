@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.External;
 using Niconicome.Models.Domain.Local.Settings;
@@ -42,11 +43,18 @@ namespace Niconicome.Models.Local.External
         /// <param name="videoInfo"></param>
         /// <returns></returns>
         IAttemptResult SendToAppB(IVideoInfo videoInfo);
+
+        /// <summary>
+        /// エクスプローラーで開く
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        IAttemptResult OpenExplorer(string path);
     }
 
     public class ExternalAppUtilsV2 : IExternalAppUtilsV2
     {
-        public ExternalAppUtilsV2(IErrorHandler errorHandler,ICommandExecuter commandExecuter,ISettingsContainer settingsContainer)
+        public ExternalAppUtilsV2(IErrorHandler errorHandler, ICommandExecuter commandExecuter, ISettingsContainer settingsContainer)
         {
             this._errorHandler = errorHandler;
             this._commandExecuter = commandExecuter;
@@ -134,6 +142,22 @@ namespace Niconicome.Models.Local.External
             return this.SendToAppCommand(path.Data.Value, param.Data.Value, videoInfo);
         }
 
+        public IAttemptResult OpenExplorer(string path)
+        {
+            try
+            {
+                ProcessEx.StartWithShell("explorer.exe", path);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(ExternalAppUtilsV2Error.FailedToOpenExplorer, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ExternalAppUtilsV2Error.FailedToOpenExplorer, ex, path));
+            }
+
+            return AttemptResult.Succeeded();
+        }
+
+
         #endregion
 
         #region private
@@ -185,7 +209,7 @@ namespace Niconicome.Models.Local.External
             if (videoInfo.IsDownloaded.Value) return false;
 
             IAttemptResult<ISettingInfo<bool>> result = this._settingsContainer.GetSetting(SettingNames.ReAllocateIfVideoisNotSaved, false);
-            if (!result.IsSucceeded||result.Data is null)
+            if (!result.IsSucceeded || result.Data is null)
             {
                 return false;
             }

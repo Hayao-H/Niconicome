@@ -148,6 +148,14 @@
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
+.PageContent .VideoList #VideoListHeader #LikeCountColumnSeparator {
+  left: 1645.3333333333px;
+}
+.PageContent .VideoList #VideoListHeader #MessageColumn {
+  width: 150px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
 .PageContent .VideoList .VideoListBody {
   border: solid 1px #e5e8ea;
   height: 400px;
@@ -166,13 +174,13 @@
   width: 50px;
   border-right: 1px solid #e5e8ea;
 }
-.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailWrapper {
+.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn {
   height: 100%;
   width: 165.3333333333px;
   border-right: 1px solid #e5e8ea;
   padding: 8px;
 }
-.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailWrapper .Thumbnail {
+.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn .Thumbnail {
   width: 100%;
   height: 100%;
 }
@@ -246,6 +254,14 @@
   width: 110px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .MessageColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+  width: 150px;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow:hover {
   background: rgba(244, 244, 244, 0.9568627451);
@@ -352,8 +368,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
-  width: 200px;
+  padding: 4px;
+  width: 250px;
+  height: 37px;
+  font-size: 13px;
   background: #fff;
   z-index: 9999;
   border-bottom: 1px solid rgba(231, 231, 231, 0.9058823529);

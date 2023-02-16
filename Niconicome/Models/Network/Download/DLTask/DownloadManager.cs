@@ -7,9 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Playlist.V2;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
 using Reactive.Bindings;
@@ -74,7 +77,7 @@ namespace Niconicome.Models.Network.Download.DLTask
     public class DownloadManager : IDownloadManager
     {
 
-        public DownloadManager(ILocalSettingsContainer settingsContainer, IVideoListContainer videoListContainer, IDownloadSettingsHandler settingHandler, ILogger logger, ICurrent current)
+        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, ILogger logger, ICurrent current)
         {
             this.Queue = this._queuePool.Tasks;
             this.Staged = this._stagedPool.Tasks;
@@ -95,13 +98,13 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         private readonly ILogger _logger;
 
-        private readonly ILocalSettingsContainer _settingsContainer;
+        private readonly ISettingsContainer _settingsContainer;
 
         private readonly ICurrent _current;
 
         private readonly IDownloadSettingsHandler _settingsHandler;
 
-        private readonly IVideoListContainer _videoListContainer;
+        private readonly IPlaylistVideoContainer _videoListContainer;
 
         private readonly List<IDownloadTask> _processingTasks = new();
 
@@ -147,9 +150,9 @@ namespace Niconicome.Models.Network.Download.DLTask
                 DownloadSettings settings = this._settingsHandler.CreateDownloadSettings();
 
                 //動画固有の情報を設定
-                settings.NiconicoId = video.NiconicoId.Value;
-                settings.IsEconomy = video.IsEconomy.Value;
-                settings.FilePath = video.FileName.Value;
+                settings.NiconicoId = video.NiconicoId;
+                settings.IsEconomy = video.IsEconomy;
+                settings.FilePath = video.FilePath;
 
                 //タスクを作成
                 IDownloadTask task = DIFactory.Provider.GetRequiredService<IDownloadTask>();
@@ -275,7 +278,7 @@ namespace Niconicome.Models.Network.Download.DLTask
         /// </summary>
         private void MoveStagedToQueue()
         {
-            bool downloadFromAnotherPlaylist = this._settingsContainer.GetReactiveBoolSetting(SettingsEnum.DLAllFromQueue).Value;
+            bool downloadFromAnotherPlaylist = this._settingsContainer.GetSetting(SettingNames.DownloadAllWhenPushDLButton, false).Data?.Value ?? false;
             int playlistID = this._current.SelectedPlaylist.Value?.Id ?? -1;
 
             if (downloadFromAnotherPlaylist || playlistID == -1)
@@ -305,17 +308,49 @@ namespace Niconicome.Models.Network.Download.DLTask
         /// </summary>
         private void RegisterParallelTasksHandler()
         {
-            this._maxParallelDL = this._settingsContainer.GetReactiveIntSetting(SettingsEnum.MaxParallelDL, null, value => value < 0 ? NetConstant.DefaultMaxParallelDownloadCount : value);
+            IAttemptResult<ISettingInfo<int>> parallelResult = this._settingsContainer.GetSetting(SettingNames.MaxParallelDownloadCount, NetConstant.DefaultMaxParallelDownloadCount);
 
-            this._sleepInterval = this._settingsContainer.GetReactiveIntSetting(SettingsEnum.FetchSleepInterval, null, value => value < 0 ? NetConstant.DefaultFetchWaitInterval : value);
+            IAttemptResult<ISettingInfo<int>> sleepResult = this._settingsContainer.GetSetting(SettingNames.FetchSleepInterval, NetConstant.DefaultFetchWaitInterval);
 
-            this._tasksHandler = new ParallelTasksHandler<IDownloadTask>(this._maxParallelDL.Value, this._sleepInterval.Value, 15, untilEmpty: true);
-
-            Observable.Merge(this._maxParallelDL, this._sleepInterval).Subscribe(_ =>
+            if (this.CheckWhetherGetSettingSucceededOrNot(parallelResult, sleepResult))
             {
-                if (this._tasksHandler.IsProcessing) return;
-                this._tasksHandler = new ParallelTasksHandler<IDownloadTask>(this._maxParallelDL.Value, this._sleepInterval.Value, 15, untilEmpty: true);
-            });
+                this._tasksHandler = new ParallelTasksHandler<IDownloadTask>(parallelResult.Data!.Value, sleepResult.Data!.Value, 15, untilEmpty: true);
+
+                this._sleepInterval = sleepResult.Data.ReactiveValue!;
+                this._maxParallelDL = parallelResult.Data.ReactiveValue!;
+
+                Observable.Merge(this._maxParallelDL, this._sleepInterval).Subscribe(_ =>
+                {
+                    if (this._tasksHandler.IsProcessing) return;
+                    this._tasksHandler = new ParallelTasksHandler<IDownloadTask>(this._maxParallelDL.Value, this._sleepInterval.Value, 15, untilEmpty: true);
+                });
+            }
+
+        }
+
+        private bool CheckWhetherGetSettingSucceededOrNot(IAttemptResult<ISettingInfo<int>> parallelResult, IAttemptResult<ISettingInfo<int>> sleepResult)
+        {
+            if (!parallelResult.IsSucceeded)
+            {
+                return false;
+            }
+
+            if (parallelResult.Data is null)
+            {
+                return false;
+            }
+
+            if (!sleepResult.IsSucceeded)
+            {
+                return false;
+            }
+
+            if (sleepResult.Data is null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

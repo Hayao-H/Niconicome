@@ -36,7 +36,7 @@
                     <StackPanel>
                         <Grid>
                             <Grid.ToolTip>
-                                <TextBlock Text="{Binding VideosCount,StringFormat={}{0}件の動画}"/>
+                                <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
                             </Grid.ToolTip>
                             <TextBlock Foreground="#FAFAFA" Text="{Binding Name.Value}"/>
                         </Grid>

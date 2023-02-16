@@ -20,6 +20,8 @@ export class WidthHandlerImpl implements WidthHandler {
             '5': 'ViewCountColumn',
             '6': 'CommentCountColumn',
             '7': 'MylistCountColumn',
+            '8': 'LikeCountColumn',
+            '9': 'MessageColumn',
         };
         this._separatorIDs = {
             '0': '#CheckBoxColumnSeparator',
@@ -30,6 +32,7 @@ export class WidthHandlerImpl implements WidthHandler {
             '5': '#ViewCountColumnSeparator',
             '6': '#CommentCountColumnSeparator',
             '7': '#MylistCountColumnSeparator',
+            '8': '#LikeCountColumnSeparator',
         };
     }
 

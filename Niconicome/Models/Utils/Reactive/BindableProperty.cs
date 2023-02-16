@@ -30,6 +30,13 @@ namespace Niconicome.Models.Utils.Reactive
         /// <returns></returns>
         IReadonlyBindablePperty<T> AsReadOnly();
 
+        /// <summary>
+        /// プロパティーを変換
+        /// </summary>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        IBindableProperty<U> Select<U>(Func<T, U> selector);
     }
 
 
@@ -65,15 +72,29 @@ namespace Niconicome.Models.Utils.Reactive
             return this;
         }
 
-        public　IReadonlyBindablePperty<T> AsReadOnly()
+        public IReadonlyBindablePperty<T> AsReadOnly()
         {
             return new ReadonlyBindablePperty<T>(this);
         }
 
+        public IBindableProperty<U> Select<U>(Func<T, U> selector)
+        {
+            var p = new BindableProperty<U>(selector(this.Value));
+
+            Action<T> subscriber = x => p.Value = selector(x);
+
+            this.Subscribe(subscriber);
+            p.PropertyChanged += (_, _) => this.UnRegisterPropertyChangeHandler(subscriber);
+
+            return p;
+        }
 
         #endregion
 
         #region Props
+
+        public event EventHandler? PropertyDisposed;
+
 
         public T Value
         {
@@ -91,6 +112,8 @@ namespace Niconicome.Models.Utils.Reactive
         {
             if (this._hasDisposed) return;
             this._hasDisposed = true;
+
+            this.PropertyDisposed?.Invoke(this, EventArgs.Empty);
 
             base.Dispose();
             GC.SuppressFinalize(this);

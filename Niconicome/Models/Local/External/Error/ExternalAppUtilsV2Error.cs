@@ -11,5 +11,7 @@ namespace Niconicome.Models.Local.External.Error
     {
         [ErrorEnum(ErrorLevel.Error,"指定された動画はダウンロードされていません。(id:{0})")]
         VideoIsNotDownloaded,
+        [ErrorEnum(ErrorLevel.Error,"エクスプローラーの起動に失敗しました。。(path:{0})")]
+        FailedToOpenExplorer,
     }
 }

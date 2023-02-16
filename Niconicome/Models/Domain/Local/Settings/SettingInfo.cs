@@ -27,6 +27,19 @@ namespace Niconicome.Models.Domain.Local.Settings
         ReactiveProperty<T> ReactiveValue { get; }
 
         /// <summary>
+        /// 変更監視
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        ISettingInfo<T> WithSubscribe(Action<T> handler);
+
+        /// <summary>
+        ///変更監視を停止 
+        /// </summary>
+        /// <param name="handler"></param>
+        void UnSubscribe(Action<T> handler);
+
+        /// <summary>
         /// フィルター関数を登録
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -55,6 +68,7 @@ namespace Niconicome.Models.Domain.Local.Settings
                 if (EqualityComparer<T>.Default.Equals(value, this._value)) return;
 
                 this._value = value;
+                this.OnChange(value);
                 this._store.SetSetting(this);
             });
 
@@ -69,6 +83,8 @@ namespace Niconicome.Models.Domain.Local.Settings
         private Func<T, bool>? _predicate;
 
         private Func<T, T>? _converter;
+
+        private Action<T>? _handlers;
 
         #endregion
 
@@ -89,6 +105,7 @@ namespace Niconicome.Models.Domain.Local.Settings
                 }
 
                 this._value = value;
+                this.OnChange(value);
                 this.ReactiveValue.Value = value;
                 this._store.SetSetting(this);
             }
@@ -111,6 +128,29 @@ namespace Niconicome.Models.Domain.Local.Settings
             this._converter = converter;
         }
 
+        public ISettingInfo<T> WithSubscribe(Action<T> handler)
+        {
+            this._handlers += handler;
+            return this;
+        }
+
+        public void UnSubscribe(Action<T> handler)
+        {
+            this._handlers -= handler;
+        }
+
+        #endregion
+
+        #region private
+
+        private void OnChange(T value)
+        {
+            try
+            {
+                this._handlers?.Invoke(value);
+            }
+            catch { }
+        }
 
         #endregion
     }

@@ -29,31 +29,53 @@ namespace Niconicome.Models.Infrastructure.Database
 
         #region Method
 
-        public IAttemptResult<ITagInfo> GetTag(int ID)
+        public IAttemptResult<ITagInfo> GetTag(string tag)
         {
-            IAttemptResult<Tag> result = this._database.GetRecord<Tag>(TableNames.Tag, ID);
+            IAttemptResult<Tag> result = this._database.GetRecord<Tag>(TableNames.Tag, t => t.Name == tag);
             if (!result.IsSucceeded || result.Data is null)
             {
                 return AttemptResult<ITagInfo>.Fail(result.Message);
             }
 
-            var tag = new TagInfo(this)
+            var data = new TagInfo(this)
             {
                 ID = result.Data.Id,
                 Name = result.Data.Name,
             };
 
-            tag.IsAutoUpdateEnabled = false;
-            tag.IsNicodicExist = result.Data.IsNicodicExist;
-            tag.IsAutoUpdateEnabled = true;
+            data.IsAutoUpdateEnabled = false;
+            data.IsNicodicExist = result.Data.IsNicodicExist;
+            data.IsAutoUpdateEnabled = true;
 
-            return AttemptResult<ITagInfo>.Succeeded(tag);
+            return AttemptResult<ITagInfo>.Succeeded(data);
         }
 
-        public IAttemptResult Create(ITagInfo tag)
+        public IAttemptResult<ITagInfo> GetTag(int id)
         {
-            Tag data = this.Convert(tag);
-            return this._database.Update(data);
+            IAttemptResult<Tag> result = this._database.GetRecord<Tag>(TableNames.Tag, id);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return AttemptResult<ITagInfo>.Fail(result.Message);
+            }
+
+            var data = new TagInfo(this)
+            {
+                ID = result.Data.Id,
+                Name = result.Data.Name,
+            };
+
+            data.IsAutoUpdateEnabled = false;
+            data.IsNicodicExist = result.Data.IsNicodicExist;
+            data.IsAutoUpdateEnabled = true;
+
+            return AttemptResult<ITagInfo>.Succeeded(data);
+        }
+
+
+        public IAttemptResult Create(string tag)
+        {
+            Tag data = new Tag() { Name = tag };
+            return this._database.Insert(data);
         }
 
         public IAttemptResult Update(ITagInfo tag)

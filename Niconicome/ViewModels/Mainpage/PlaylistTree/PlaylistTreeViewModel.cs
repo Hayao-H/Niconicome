@@ -25,5 +25,8 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
 
         #endregion
 
+        #region Method
+        #endregion
+
     }
 }

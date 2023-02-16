@@ -76,6 +76,16 @@ namespace Niconicome.Models.Domain.Playlist
         string OwnerName { get; set; }
 
         /// <summary>
+        /// チャンネル名
+        /// </summary>
+        string ChannelName { get; set; }
+
+        /// <summary>
+        /// チャンネルID
+        /// </summary>
+        string ChannelID { get; set; }
+
+        /// <summary>
         /// サムネURL(大)
         /// </summary>
         string LargeThumbUrl { get; set; }
@@ -94,6 +104,11 @@ namespace Niconicome.Models.Domain.Playlist
         /// ファイルパス
         /// </summary>
         string FilePath { get; set; }
+
+        /// <summary>
+        /// メッセージ
+        /// </summary>
+        IBindableProperty<string> Message { get; init; }
 
         /// <summary>
         /// 長さ
@@ -162,7 +177,6 @@ namespace Niconicome.Models.Domain.Playlist
 
         private DateTime _registeredAt;
 
-
         private int _viewCount;
 
         private int _commentCount;
@@ -181,17 +195,17 @@ namespace Niconicome.Models.Domain.Playlist
 
         private string _filePath = string.Empty;
 
+        private string _channnelName = string.Empty;
+
+        private string _channnelID = string.Empty;
+
         private int _duration;
 
         private readonly List<ITagInfo> _tags = new();
 
         private bool _isDeleted;
 
-        private bool _isSelected;
-
         private bool _isEconomy;
-
-        private bool _isDownloaded;
 
         #endregion
 
@@ -331,6 +345,27 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
+        public string ChannelName
+        {
+            get => this._channnelName;
+            set
+            {
+                this._channnelName = value;
+                this.Update(this);
+            }
+        }
+
+        public string ChannelID
+        {
+            get => this._channnelID;
+            set
+            {
+                this._channnelID = value;
+                this.Update(this);
+            }
+        }
+
+        public IBindableProperty<string> Message { get; init; } = new BindableProperty<string>(string.Empty);
 
         public int Duration
         {

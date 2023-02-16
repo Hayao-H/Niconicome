@@ -2,7 +2,6 @@
 using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Local;
 using Niconicome.Models.Local.Addon.API.Local.Tab;
 using Niconicome.Models.Local.Addon.V2;
 using Niconicome.Models.Local.Application;
@@ -27,6 +26,7 @@ using Playlist = Niconicome.Models.Playlist.V2;
 using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using MessageV2 = Niconicome.Models.Local.State.MessageV2;
+using Niconicome.Models.Local.External.Playlist;
 
 namespace Niconicome.Workspaces
 {

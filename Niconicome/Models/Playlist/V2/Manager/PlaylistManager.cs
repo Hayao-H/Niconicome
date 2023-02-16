@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.V2;
@@ -31,7 +32,12 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <returns></returns>
         IAttemptResult Create(int parentID);
 
-
+        /// <summary>
+        /// 特殊なプレイリストを取得する
+        /// </summary>
+        /// <param name="playlist"></param>
+        /// <returns></returns>
+        IAttemptResult<IPlaylistInfo> GetSpecialPlaylistByType(SpecialPlaylists playlist);
     }
 
     public class PlaylistManager : IPlaylistManager
@@ -145,6 +151,17 @@ namespace Niconicome.Models.Playlist.V2.Manager
             return AttemptResult.Succeeded();
         }
 
+        public IAttemptResult<IPlaylistInfo> GetSpecialPlaylistByType(SpecialPlaylists playlist)
+        {
+            PlaylistType type = playlist switch
+            {
+                SpecialPlaylists.PlaybackHistory => PlaylistType.PlaybackHistory,
+                SpecialPlaylists.DownloadSucceededHistory => PlaylistType.DownloadSucceededHistory,
+                _ => PlaylistType.DownloadFailedHistory,
+            };
+
+            return this._playlistStore.GetPlaylistByType(type);
+        }
 
         #endregion
 
@@ -227,5 +244,12 @@ namespace Niconicome.Models.Playlist.V2.Manager
         }
 
         #endregion
+    }
+
+    public enum SpecialPlaylists
+    {
+        DownloadSucceededHistory,
+        DownloadFailedHistory,
+        PlaybackHistory,
     }
 }

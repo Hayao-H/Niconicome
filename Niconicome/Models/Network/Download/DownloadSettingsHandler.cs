@@ -6,6 +6,7 @@ using Niconicome.Models.Domain.Niconico.Download.Comment;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
+using Niconicome.Models.Playlist.V2;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels;
@@ -112,9 +113,9 @@ namespace Niconicome.Models.Network.Download
 
     public class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
     {
-        public DownloadSettingsHandler(ISettingsContainer settingsConainer, ICurrent current)
+        public DownloadSettingsHandler(ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer)
         {
-            this._current = current;
+            this._playlistVideoContainer = playlistVideoContainer;
             this._container = settingsConainer;
 
             this.IsDownloadingVideoInfoEnable = settingsConainer.GetSetting(SettingNames.IsDownloadingVideoInfoEnable, false).Data!;
@@ -144,7 +145,7 @@ namespace Niconicome.Models.Network.Download
 
         #region field
 
-        private readonly ICurrent _current;
+        private readonly IPlaylistVideoContainer _playlistVideoContainer;
 
         private readonly ISettingsContainer _container;
         #endregion
@@ -152,7 +153,7 @@ namespace Niconicome.Models.Network.Download
         public DownloadSettings CreateDownloadSettings()
         {
 
-            if (this._current.SelectedPlaylist.Value is null) throw new InvalidOperationException("");
+            if (this._playlistVideoContainer.CurrentSelectedPlaylist is null) throw new InvalidOperationException("");
 
             //フラグ系
             bool replaceStricted = this._container.GetSetting(SettingNames.ReplaceSingleByteToMultiByte, false).Data!.Value;
@@ -164,7 +165,7 @@ namespace Niconicome.Models.Network.Download
             bool omitXmlDec = this._container.GetSetting(SettingNames.IsOmittingXmlDeclarationIsEnable, false).Data!.Value;
 
             //ファイル系
-            string folderPath = this._current.PlaylistFolderPath;
+            string folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.FolderPath;
             string fileFormat = this._container.GetSetting(SettingNames.FileNameFormat, Format.DefaultFileNameFormat).Data!.Value;
             string thumbExt = this._container.GetSetting(SettingNames.JpegFileExtension, FileFolder.DefaultJpegFileExt).Data!.Value;
             string videoInfoSuffix = this._container.GetSetting(SettingNames.VideoInfoSuffix, Format.DefaultVideoInfoSuffix).Data!.Value;
@@ -172,6 +173,11 @@ namespace Niconicome.Models.Network.Download
             string thumbSuffix = this._container.GetSetting(SettingNames.ThumbnailSuffix, Format.DefaultThumbnailSuffix).Data!.Value;
             string ownerComSuffix = this._container.GetSetting(SettingNames.OwnerCommentSuffix, Format.DefaultOwnerCommentSuffix).Data!.Value;
             string economySuffix = this._container.GetSetting(SettingNames.EnonomyQualitySuffix, Format.DefaultEconomyVideoSuffix).Data!.Value;
+
+            if (string.IsNullOrEmpty(folderPath))
+            {
+                folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath;
+            }
 
             //動画情報
             VideoInfoTypeSettings videoInfoT = this._container.GetSetting(SettingNames.VideoInfoType, VideoInfoTypeSettings.Text).Data!.Value;
@@ -231,7 +237,7 @@ namespace Niconicome.Models.Network.Download
                 OmittingXmlDeclaration = omitXmlDec,
                 FolderPath = folderPath,
                 VerticalResolution = this.Resolution.Value.Vertical,
-                PlaylistID = this._current.SelectedPlaylist.Value.Id,
+                PlaylistID = this._playlistVideoContainer.CurrentSelectedPlaylist.ID,
                 IsReplaceStrictedEnable = replaceStricted,
                 OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                 MaxCommentsCount = this.IsLimittingCommentCountEnable.Value ? this.MaxCommentsCount.Value : 0,

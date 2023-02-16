@@ -42,6 +42,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
 
             this.IsSelected = video.IsSelected.AddTo(bindable);
             this.IsDownloaded = video.IsDownloaded.AddTo(bindable);
+            this.Message = video.Message.AddTo(bindable);
 
             this.Bindable = bindable;
 
@@ -89,6 +90,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// 投稿日時
         /// </summary>
         public string UploadedOn => this._video.UploadedOn.ToString("yyyy/M/dd HH:mm");
+
+        /// <summary>
+        /// メッセージ
+        /// </summary>
+        public IBindableProperty<string> Message { get; init; }
 
         /// <summary>
         /// 閲覧数

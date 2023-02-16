@@ -26,7 +26,7 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class DownloadSettingsViewModel : TabViewModelBase, IDisposable
     {
-        public DownloadSettingsViewModel(IEventAggregator ea, IDialogService dialogService, IRegionManager regionManager) : base("設定", "")
+        public DownloadSettingsViewModel(IEventAggregator ea, IDialogService dialogService, IRegionManager regionManager) : base("ダウンロード", "")
         {
 
             this._dialogService = dialogService;
@@ -102,23 +102,16 @@ namespace Niconicome.ViewModels.Mainpage
             this.IsDownloading = new BindableProperty<bool>(false);
             WS::Mainpage.DownloadManager.IsProcessing.Subscribe(x => this.IsDownloading.Value = x);
 
-            this.DownloadCommand = new[] {
-                WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(p=>p is not null),
+            this.DownloadCommand =
                 WS::Mainpage.DownloadManager.IsProcessing
-                .Select(x=>!x)
-            }
-            .CombineLatestValuesAreAllTrue()
+                .Select(x => !x)
             .ToReactiveCommand()
             .WithSubscribe(async () => await this.DownloadVideo(null))
             .AddTo(this.disposables);
 
-            this.StageVideosCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(p => p is not null)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
+            this.StageVideosCommand = new ReactiveCommand().WithSubscribe(() =>
             {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
+                if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
                 {
                     WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、ステージできません");
                     return;
@@ -295,7 +288,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <returns></returns>
         private async Task DownloadVideo(VideoInfoViewModel? vm)
         {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
             {
                 WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
                 return;

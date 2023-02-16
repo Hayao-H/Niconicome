@@ -70,6 +70,7 @@ $VideoListRowHeight: 100;
         $UploadedDateTimeWidth: 250;
         $IsDownloadedColumnWidth: 50;
         $CountColumnWidth: 110;
+        $MessageColumnWidth: 150;
 
         #VideoListHeader {
             background-color: #f2f3f5;
@@ -181,6 +182,16 @@ $VideoListRowHeight: 100;
                 padding-left: 8px;
                 border-right: 1px solid #e5e8ea;
             }
+
+            #LikeCountColumnSeparator {
+                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $IsDownloadedColumnWidth + $CountColumnWidth * 4 - 10}px;
+            }
+
+            #MessageColumn {
+                width: #{$MessageColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
         }
 
         .VideoListBody {
@@ -202,7 +213,7 @@ $VideoListRowHeight: 100;
                     border-right: 1px solid #e5e8ea;
                 }
 
-                .ThumbnailWrapper {
+                .ThumbnailColumn {
                     height: 100%;
                     width: #{$ThumbWidth}px;
                     border-right: 1px solid #e5e8ea;
@@ -292,6 +303,16 @@ $VideoListRowHeight: 100;
                         padding-right: 8px;
                         border-right: 1px solid #e5e8ea;
                     }
+
+                    .MessageColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                        width: #{$MessageColumnWidth}px;
+                    }
+
                 }
             }
 
@@ -426,8 +447,10 @@ $VideoListRowHeight: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px;
-            width: 200px;
+            padding: 4px;
+            width: 250px;
+            height: 37px;
+            font-size: 13px;
             background: #fff;
             z-index: 9999;
             border-bottom: 1px solid #e7e7e7e7;

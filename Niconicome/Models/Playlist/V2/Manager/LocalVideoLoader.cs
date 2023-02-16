@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
+using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
@@ -29,7 +30,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class LocalVideoLoader : ILocalVideoLoader
     {
-        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler, INicoFileIO fileIO)
+        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler, INiconicomeFileIO fileIO)
         {
             this._directoryIO = directoryIO;
             this._fileIO = fileIO;
@@ -43,7 +44,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         private readonly INicoDirectoryIO _directoryIO;
 
-        private readonly INicoFileIO _fileIO;
+        private readonly INiconicomeFileIO _fileIO;
 
         private readonly IThumbnailUtility _thumbnailUtility;
 
@@ -74,7 +75,15 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             if (string.IsNullOrEmpty(folderPath))
             {
-                folderPath = this.GetDownlaodDirectory(this._playlistVideoContainer.CurrentSelectedPlaylist);
+                if (string.IsNullOrEmpty(this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath))
+                {
+                    folderPath = this.GetDownlaodDirectory(this._playlistVideoContainer.CurrentSelectedPlaylist);
+                    this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath = folderPath;
+                }
+                else
+                {
+                    folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath;
+                }
             }
 
             ///削除動画のサムネを保存
@@ -88,7 +97,11 @@ namespace Niconicome.Models.Playlist.V2.Manager
                     return AttemptResult.Fail(this._errorHandler.GetMessageForResult(LocalVideoLoaderError.PlaylistChanged));
                 }
 
-                if (CheckWhetherSetDownloadPathOrNot(quick, video))
+                if (this.IsDownloaded(video))
+                {
+                    video.IsDownloaded.Value = true;
+                }
+                else if (CheckWhetherSetDownloadPathOrNot(quick, video))
                 {
                     IAttemptResult<string> pathResult = this.GetFilePath(video.NiconicoId, folderPath);
                     if (pathResult.IsSucceeded && pathResult.Data is not null)
@@ -107,7 +120,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
                                 video.IsEconomy = false;
                             }
                         }
-                    } else
+                    }
+                    else
                     {
                         video.IsDownloaded.Value = false;
                     }
@@ -235,13 +249,18 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 return true;
             }
 
-            if (!this._fileIO.Exists(videoInfo.FilePath))
-            {
-                return true;
-            }
-
 
             return false;
+        }
+
+        /// <summary>
+        /// ダウンロード状態をチェック
+        /// </summary>
+        /// <param name="videoInfo"></param>
+        /// <returns></returns>
+        private bool IsDownloaded(IVideoInfo videoInfo)
+        {
+            return this._fileIO.Exist(videoInfo.FilePath);
         }
 
         #endregion

@@ -11,3 +11,7 @@ function showToast() {
         toast.show();
     })
 }
+
+function getBodyHeight() {
+    return document.body.clientHeight;
+}

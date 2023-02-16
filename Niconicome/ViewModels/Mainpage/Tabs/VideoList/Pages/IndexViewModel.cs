@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
@@ -15,7 +16,7 @@ using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent;
 using Niconicome.ViewModels.Shared;
-using Reactive.Bindings.Extensions;
+using ExternalPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
@@ -55,8 +56,6 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         private Action? _toastMessageChangeHandler;
 
         private Action<IPlaylistInfo>? _playlistChangeEventHandler;
-
-        private SynchronizationContext? _context;
 
         #endregion
 
@@ -109,10 +108,6 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <param name="handler"></param>
         public void RegisterListChangedEventHandler(Action handler)
         {
-            if (this._context is null)
-            {
-                this._context = SynchronizationContext.Current;
-            }
             this._listChangedEventHandler += handler;
         }
 
@@ -228,14 +223,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         private void OnListChanged()
         {
-            if (this._context is null) return;
 
             try
             {
-                this._context.Post(_ =>
-                {
-                    this._listChangedEventHandler?.Invoke();
-                }, null);
+                this._listChangedEventHandler?.Invoke();
             }
             catch { }
         }
@@ -294,12 +285,19 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         #region Method
 
-        public void OnClick(MouseEventArgs e, string niconicoID)
+        public void OnClick(MouseEventArgs e, string niconicoID, int bodyHeight)
         {
             if (e.Button == 2)
             {
+                if (bodyHeight < e.ClientY + 37 * 9)
+                {
+                    this.MouseTop.Value = bodyHeight - 38 * 9;
+                }
+                else
+                {
+                    this.MouseTop.Value = e.ClientY - 100;
+                }
                 this.MouseLeft.Value = e.ClientX;
-                this.MouseTop.Value = e.ClientY - 100;
                 this.IsMenuVisible.Value = true;
                 this.targetNiconicoID = niconicoID;
                 return;
@@ -355,10 +353,95 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.HideMenu();
             this.OpenInExternalApp(AppKind.AppA);
         }
+
         public void SendToAppB()
         {
             this.HideMenu();
             this.OpenInExternalApp(AppKind.AppB);
+        }
+
+        public void Select(SelectTarget target)
+        {
+            this.HideMenu();
+
+            foreach (var video in WS::Mainpage.PlaylistVideoContainer.Videos.Where(video => target switch
+            {
+                SelectTarget.NotDownloaded => !video.IsDownloaded.Value,
+                SelectTarget.Downloaded => video.IsDownloaded.Value,
+                _ => true
+            }))
+            {
+                video.IsSelected.Value = true;
+            }
+        }
+
+        public void UnSelect(SelectTarget target)
+        {
+            this.HideMenu();
+
+            foreach (var video in WS::Mainpage.PlaylistVideoContainer.Videos.Where(video => target switch
+            {
+                SelectTarget.NotDownloaded => !video.IsDownloaded.Value,
+                SelectTarget.Downloaded => video.IsDownloaded.Value,
+                _ => true
+            }))
+            {
+                video.IsSelected.Value = false;
+            }
+        }
+
+        public void OpenDownloadDirectory()
+        {
+            this.HideMenu();
+
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null) return;
+
+            IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
+            if (this.TryGetFolderPath(playlist, out string path))
+            {
+                IAttemptResult result = WS::Mainpage.ExternalAppUtilsV2.OpenExplorer(path);
+                if (result.IsSucceeded)
+                {
+                    WS::Mainpage.MessageHandler.AppendMessage(WS::Mainpage.StringHandler.GetContent(ContextMenuViewModelStringContent.SucceededToOpenExplorer), LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                    WS::Mainpage.SnackbarHandler.Enqueue(WS::Mainpage.StringHandler.GetContent(ContextMenuViewModelStringContent.SucceededToOpenExplorer));
+                }
+                else
+                {
+                    WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? string.Empty, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+                }
+            }
+
+        }
+
+        public void CreatePlaylist(PlaylistType type)
+        {
+
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null) return;
+
+            IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
+            if (this.TryGetFolderPath(playlist, out string path))
+            {
+                ExternalPlaylist::PlaylistType pType = type switch
+                {
+                    PlaylistType.AIMP => ExternalPlaylist.PlaylistType.Aimp,
+                    _ => ExternalPlaylist.PlaylistType.Aimp,
+                };
+
+
+
+                IAttemptResult<int> result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(WS::Mainpage.PlaylistVideoContainer.Videos.Where(v => v.IsSelected.Value).ToList().AsReadOnly(), playlist.Name.Value, path, pType);
+
+                if (result.IsSucceeded)
+                {
+                    WS::Mainpage.MessageHandler.AppendMessage(WS::Mainpage.StringHandler.GetContent(ContextMenuViewModelStringContent.PlaylistCreated, result.Data), LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                    WS::Mainpage.SnackbarHandler.Enqueue(WS::Mainpage.StringHandler.GetContent(ContextMenuViewModelStringContent.PlaylistCreated, result.Data));
+                }
+                else
+                {
+                    WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? string.Empty, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+                }
+            }
+
         }
 
         #endregion
@@ -407,6 +490,24 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.IsMenuVisible.Value = false;
         }
 
+        private bool TryGetFolderPath(IPlaylistInfo playlistInfo, out string path)
+        {
+            if (!playlistInfo.FolderPath.IsNullOrEmpty())
+            {
+                path = playlistInfo.FolderPath;
+                return true;
+            }
+
+            if (!playlistInfo.TemporaryFolderPath.IsNullOrEmpty())
+            {
+                path = playlistInfo.TemporaryFolderPath;
+                return true;
+            }
+
+            path = string.Empty;
+            return false;
+        }
+
         #endregion
 
         enum AppKind
@@ -415,6 +516,18 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             PlayerB,
             AppA,
             AppB,
+        }
+
+        public enum SelectTarget
+        {
+            All,
+            Downloaded,
+            NotDownloaded,
+        }
+
+        public enum PlaylistType
+        {
+            AIMP
         }
     }
 }

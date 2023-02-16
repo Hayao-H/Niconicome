@@ -3,6 +3,10 @@
 @inject IJSRuntime JS;
 @inherits BlazorBase;
 
+@using System.Threading;
+@using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages;
+
+
 <div tabindex="0" @ref="container" class="PageContent PageContainer ContextMenuWrapper" @onkeydown="OnKeyDown">
 
     <h3>@(DataContext.PlaylistName)</h3>
@@ -46,15 +50,17 @@
             <span id="MylistCountColumn" class="HeaderItem">マイリスト数</span>
             <hr id="MylistCountColumnSeparator" data-index="7" class="Separator" />
             <span id="LikeCountColumn" class="HeaderItem">いいね数</span>
+            <hr id="LikeCountColumnSeparator" data-index="8" class="Separator" />
+            <span id="MessageColumn" class="HeaderItem">メッセージ</span>
         </div>
         <div class="VideoListBody">
             @foreach (var video in DataContext.Videos)
             {
-                <div class="VideoListRow" @onmouseup="e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId)">
+                <div class="VideoListRow" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())">
                     <div class="CheckBoxColumn">
                         <input type="checkbox" @bind="@(video.IsSelected.Value)" />
                     </div>
-                    <div class="ThumbnailWrapper">
+                    <div class="ThumbnailColumn">
                         <img class="Thumbnail" src="data:image/jpeg;base64,@(video.Base64ThumbData.Value)" />
                     </div>
                     <div class="VideoInfoContainer">
@@ -89,6 +95,9 @@
                         <div class="LikeCountColumn">
                             <p>@(video.LikeCount)</p>
                         </div>
+                        <div class="MessageColumn">
+                            <p>@(video.Message.Value)</p>
+                        </div>
                     </div>
                 </div>
             }
@@ -102,7 +111,7 @@
                 <p @onclick="DataContext.ContextMenu.OpenInNiconico"><i class="fa-solid fa-play fa-sm ContextMenuIcon"></i>ニコニコで視聴する</p>
             </div>
             <div class="ContextMenuItem Clickable">
-                <p><i class="fa-solid fa-folder fa-sm ContextMenuIcon"></i>保存フォルダーを開く</p>
+                <p><i class="fa-solid fa-folder fa-sm ContextMenuIcon" @onclick="DataContext.ContextMenu.OpenDownloadDirectory"></i>保存フォルダーを開く</p>
             </div>
             <div class="RootMenu">
                 <div class="ContextMenuItem">
@@ -130,12 +139,12 @@
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
                 <div class="SubMenu Many">
-                    <p class="ContextMenuItem Clickable">全て選択する</p>
-                    <p class="ContextMenuItem Clickable">全て選択解除する</p>
-                    <p class="ContextMenuItem Clickable">ダウンロード済みの動画を選択する</p>
-                    <p class="ContextMenuItem Clickable">ダウンロード済みの動画を選択解除する</p>
-                    <p class="ContextMenuItem Clickable">未ダウンロードの動画を選択する</p>
-                    <p class="ContextMenuItem Clickable">未ダウンロードの動画を選択解除する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.Select(ContextMenuViewModel.SelectTarget.All)">全て選択する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.UnSelect(ContextMenuViewModel.SelectTarget.All)">全て選択解除する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.Select(ContextMenuViewModel.SelectTarget.Downloaded)">ダウンロード済みの動画を選択する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.UnSelect(ContextMenuViewModel.SelectTarget.Downloaded)">ダウンロード済みの動画を選択解除する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.Select(ContextMenuViewModel.SelectTarget.NotDownloaded)">未ダウンロードの動画を選択する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.UnSelect(ContextMenuViewModel.SelectTarget.NotDownloaded)">未ダウンロードの動画を選択解除する</p>
                 </div>
             </div>
             <div class="RootMenu Three">
@@ -166,7 +175,7 @@
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
                 <div class="SubMenu One">
-                    <p class="ContextMenuItem Clickable">.aimppl4形式のプレイリストを作成する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CreatePlaylist(ContextMenuViewModel.PlaylistType.AIMP)">.aimppl4形式のプレイリストを作成する</p>
                 </div>
             </div>
         </div>
@@ -221,13 +230,18 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        DataContext.RegisterListChangedEventHandler(() => this.StateHasChanged());
+        this._ctx = SynchronizationContext.Current;
+
+        DataContext.RegisterListChangedEventHandler(() => this.ExecuteInCurrentThread(this.StateHasChanged));
         DataContext.RegisterToastMessageChangeEventHandler(() =>
         {
-            this.StateHasChanged();
-            JS.InvokeVoidAsync("showToast");
+            this.ExecuteInCurrentThread(() =>
+            {
+                this.StateHasChanged();
+                JS.InvokeVoidAsync("showToast");
+            });
         });
-        DataContext.Bindables.RegisterPropertyChangeHandler(() => this.StateHasChanged());
+        DataContext.Bindables.RegisterPropertyChangeHandler(() => this.ExecuteInCurrentThread(this.StateHasChanged));
         await DataContext.Initialize();
     }
 
@@ -238,4 +252,21 @@
         var module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
         await module.InvokeVoidAsync("main");
     }
+
+    private void ExecuteInCurrentThread(Action action)
+    {
+        this._ctx?.Post(_ =>
+        {
+            action();
+        }
+        , null);
+    }
+
+    private async Task<int> GetBodyHeight()
+    {
+        return await JS.InvokeAsync<int>("getBodyHeight");
+    }
+
+
+    private SynchronizationContext? _ctx;
 }
