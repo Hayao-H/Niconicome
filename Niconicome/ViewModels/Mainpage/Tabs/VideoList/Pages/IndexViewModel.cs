@@ -6,9 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
@@ -34,6 +36,13 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.OutputViewModel = new OutputViewModel();
             this.Bindables.Add(this.OutputViewModel.Bindables);
+
+            this.SortViewModel = new SortViewModel();
+            this.SortViewModel.RegisterSortEventHandler(() =>
+            {
+                _ = this.LoadVideoAsync(true);
+            });
+            this.Bindables.Add(this.SortViewModel.Bindables);
         }
 
         ~IndexViewModel()
@@ -98,6 +107,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public OutputViewModel OutputViewModel { get; init; }
 
+        /// <summary>
+        /// 並び替え
+        /// </summary>
+        public SortViewModel SortViewModel { get; init; }
+
         #endregion
 
         #region Method
@@ -131,12 +145,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this._playlistChangeEventHandler = p =>
             {
-                _ = this.LoadVideoAsync();
+                _ = this.LoadVideoAsync(false);
             };
 
             WS::Mainpage.PlaylistVideoContainer.AddPlaylistChangeEventHandler(this._playlistChangeEventHandler);
 
-            await this.LoadVideoAsync();
+            await this.LoadVideoAsync(false);
         }
 
         /// <summary>
@@ -195,7 +209,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.IsProcessing.Value = false;
 
-            await this.LoadVideoAsync();
+            await this.LoadVideoAsync(false);
         }
 
         #endregion
@@ -206,11 +220,13 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// 動画リストを更新する
         /// </summary>
         /// <returns></returns>
-        private async Task LoadVideoAsync()
+        private async Task LoadVideoAsync(bool afterSort)
         {
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null) return;
 
-            await WS::Mainpage.VideoListManager.LoadVideosAsync();
+            this.SortViewModel.SetValue(WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist);
+
+            await WS::Mainpage.VideoListManager.LoadVideosAsync(setPath: !afterSort);
 
             this.Videos.Clear();
             this.Videos.AddRange(WS::Mainpage.PlaylistVideoContainer.Videos.Select(v => this.Convert(v)));
@@ -530,4 +546,134 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             AIMP
         }
     }
+
+    public class SortViewModel
+    {
+        public SortViewModel()
+        {
+            var bindables = new Bindables();
+
+            this.Visibility = new Dictionary<SortType, IBindableProperty<bool>>
+            {
+                { SortType.Title, new BindableProperty<bool>(false).AddTo(bindables) },
+                { SortType.UploadedOn, new BindableProperty<bool>(false).AddTo(bindables) },
+                { SortType.ViewCount, new BindableProperty<bool>(false).AddTo(bindables) },
+                { SortType.CommentCount, new BindableProperty<bool>(false).AddTo(bindables) },
+                { SortType.MylistCount, new BindableProperty<bool>(false).AddTo(bindables) },
+                { SortType.LikeCount, new BindableProperty<bool>(false).AddTo(bindables) },
+                { SortType.IsDownlaoded, new BindableProperty<bool>(false).AddTo(bindables) },
+            };
+
+            this.SortOption = new BindableProperty<string>("Ascendant").AddTo(bindables);
+
+            this.Bindables = bindables;
+        }
+
+        #region field
+
+        private Action? _sortEventHandler;
+
+        #endregion
+
+        #region Props
+
+        public Dictionary<SortType, IBindableProperty<bool>> Visibility { get; init; }
+
+        public IBindableProperty<string> SortOption { get; init; }
+
+        public Bindables Bindables { get; init; }
+
+        #endregion
+
+        #region Method
+
+        /// <summary>
+        /// ヘッダークリック時
+        /// </summary>
+        /// <param name="target"></param>
+        public void OnHeaderClick(SortType target)
+        {
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
+            {
+                return;
+            }
+
+            IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
+
+            if (playlist.SortType == target)
+            {
+                playlist.IsAscendant = !playlist.IsAscendant;
+            }
+            else
+            {
+                playlist.SortType = target;
+            }
+
+            this.SetValue(playlist);
+            this.OnSort();
+        }
+
+        /// <summary>
+        /// ヘッダーの表示を更新
+        /// </summary>
+        /// <param name="playlist"></param>
+        public void SetValue(IPlaylistInfo playlist)
+        {
+
+            foreach (var visibility in this.Visibility)
+            {
+                if (!visibility.Value.Value)
+                {
+                    continue;
+                }
+
+                visibility.Value.Value = false;
+            }
+
+            if (this.Visibility.ContainsKey(playlist.SortType))
+            {
+                this.Visibility[playlist.SortType].Value = true;
+                this.SortOption.Value = playlist.IsAscendant ? "Ascendant" : "Descendant";
+            }
+        }
+
+        /// <summary>
+        /// 動画を移動
+        /// </summary>
+        /// <param name="sourceID"></param>
+        /// <param name="targetID"></param>
+        public void MoveVideo(string sourceID, string targetID)
+        {
+
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
+            {
+                return;
+            }
+
+            WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist.MoveVideo(sourceID, targetID);
+        }
+
+        /// <summary>
+        /// ソート状態を監視
+        /// </summary>
+        /// <param name="handler"></param>
+        public void RegisterSortEventHandler(Action handler)
+        {
+            this._sortEventHandler += handler;
+        }
+
+        #endregion
+
+        #region private
+
+        private void OnSort()
+        {
+            this._sortEventHandler?.Invoke();
+        }
+
+        #endregion
+
+    }
+
+
 }

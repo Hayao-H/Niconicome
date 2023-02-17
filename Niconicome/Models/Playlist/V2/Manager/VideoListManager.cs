@@ -25,8 +25,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// </summary>
         /// <param name="quick"></param>
         /// <param name="refresh"></param>
+        /// <param name="setPath"></param>
         /// <returns></returns>
-        Task LoadVideosAsync(bool quick = false, bool refresh = true);
+        Task LoadVideosAsync(bool quick = false, bool refresh = true, bool setPath = true);
 
         /// <summary>
         /// 動画を登録する
@@ -86,7 +87,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         #region Method
 
-        public async Task LoadVideosAsync(bool quick = false, bool refresh = true)
+        public async Task LoadVideosAsync(bool quick = false, bool refresh = true, bool setPath = true)
         {
             //移行が必要な場合は処理を中止
             if (this._migration.IsMigrationNeeded) return;
@@ -100,7 +101,10 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             int playlistID = this._container.CurrentSelectedPlaylist.ID;
 
-            await this._loader.SetPathAsync(refresh ? this._container.CurrentSelectedPlaylist.Videos : this._container.Videos, quick);
+            if (setPath)
+            {
+                await this._loader.SetPathAsync(refresh ? this._container.CurrentSelectedPlaylist.Videos : this._container.Videos, quick);
+            }
 
             if (playlistID != (this._container.CurrentSelectedPlaylist?.ID ?? -1))
             {

@@ -65,11 +65,29 @@
 .PageContent .VideoList #VideoListHeader .HeaderItem {
   display: inline-block;
   padding-left: 8px;
+  font-size: 14px;
   height: 35px;
   line-height: 35px;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon {
+  display: none;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon.Show {
+  display: inline-block;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon.Ascendant {
+  border-bottom: 6px solid black;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon.Descendant {
+  border-top: 6px solid black;
 }
 .PageContent .VideoList #VideoListHeader .Separator {
   position: absolute;
@@ -111,45 +129,45 @@
   left: 1155.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #IsDownloadedColumn {
-  width: 50px;
+  width: 70px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #IsDownloadedColumnSeparator {
-  left: 1205.3333333333px;
+  left: 1225.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #ViewCountColumn {
-  width: 110px;
+  width: 125px;
   height: 100%;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #ViewCountColumnSeparator {
-  left: 1315.3333333333px;
+  left: 1350.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #CommentCountColumn {
-  width: 110px;
+  width: 125px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #CommentCountColumnSeparator {
-  left: 1425.3333333333px;
+  left: 1475.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #MylistCountColumn {
-  width: 110px;
+  width: 125px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #MylistCountColumnSeparator {
-  left: 1535.3333333333px;
+  left: 1600.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #LikeCountColumn {
-  width: 110px;
+  width: 125px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #LikeCountColumnSeparator {
-  left: 1645.3333333333px;
+  left: 1725.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #MessageColumn {
   width: 150px;
@@ -166,6 +184,12 @@
   height: 100px;
   display: flex;
   border-bottom: 1px solid #e5e8ea;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow.DropTarget {
+  border-top: 1px solid #222222;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .CheckBoxColumn {
   display: flex;
@@ -212,7 +236,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  width: 50px;
+  width: 70px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }
@@ -224,7 +248,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: flex-end;
-  width: 110px;
+  width: 125px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }
@@ -233,7 +257,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: flex-end;
-  width: 110px;
+  width: 125px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }
@@ -242,7 +266,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: flex-end;
-  width: 110px;
+  width: 125px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }
@@ -251,7 +275,7 @@
   justify-content: center;
   flex-direction: column;
   align-items: flex-end;
-  width: 110px;
+  width: 125px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }

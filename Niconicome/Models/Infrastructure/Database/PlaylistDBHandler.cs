@@ -7,7 +7,9 @@ using AngleSharp.Text;
 using Niconicome.Extensions;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Infrastructure.Database.Error;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Infrastructure.Database.Types;
 using Types = Niconicome.Models.Infrastructure.Database.Types;
@@ -16,10 +18,11 @@ namespace Niconicome.Models.Infrastructure.Database
 {
     public class PlaylistDBHandler : IPlaylistStore
     {
-        public PlaylistDBHandler(ILiteDBHandler database, IVideoStore videoStore)
+        public PlaylistDBHandler(ILiteDBHandler database, IVideoStore videoStore, IErrorHandler errorHandler)
         {
             this._database = database;
             this._videoStore = videoStore;
+            this._errorHandler = errorHandler;
         }
 
         #region field
@@ -27,6 +30,8 @@ namespace Niconicome.Models.Infrastructure.Database
         private readonly ILiteDBHandler _database;
 
         private readonly IVideoStore _videoStore;
+
+        private readonly IErrorHandler _errorHandler;
 
         #endregion
 
@@ -85,6 +90,14 @@ namespace Niconicome.Models.Infrastructure.Database
         public IAttemptResult Update(IPlaylistInfo playlist)
         {
             Types::Playlist data = this.Convert(playlist);
+
+            bool dupeVideoExist = data.Videos.GroupBy(v => v).Where(v => v.Count() > 1).Any();
+            if (dupeVideoExist)
+            {
+                this._errorHandler.HandleError(PlaylistDBHandlerError.VideoDuplicated, data.Id);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(PlaylistDBHandlerError.VideoDuplicated, data.Id));
+            }
+
             return this._database.Update(data);
         }
 
@@ -135,6 +148,20 @@ namespace Niconicome.Models.Infrastructure.Database
                     PlaylistType.PlaybackHistory => DBPlaylistType.PlaybackHistory,
                     _ => DBPlaylistType.Local
                 },
+                SortType = data.SortType switch
+                {
+                    SortType.Title => DBSortType.Title,
+                    SortType.UploadedOn => DBSortType.UploadedOn,
+                    SortType.AddedAt => DBSortType.AddedAt,
+                    SortType.ViewCount => DBSortType.ViewCount,
+                    SortType.CommentCount => DBSortType.CommentCount,
+                    SortType.MylistCount => DBSortType.MylistCount,
+                    SortType.LikeCount => DBSortType.LikeCount,
+                    SortType.IsDownlaoded => DBSortType.IsDownlaoded,
+                    SortType.Custom => DBSortType.Custom,
+                    _ => DBSortType.NiconicoID,
+                },
+                IsAscendant = data.IsAscendant,
                 Videos = data.Videos.Select(v => v.NiconicoId).ToList(),
                 Children = data.Children.Where(p => p.PlaylistType != PlaylistType.Temporary && p.PlaylistType != PlaylistType.DownloadSucceededHistory && p.PlaylistType != PlaylistType.DownloadFailedHistory).Select(v => v.ID).ToList(),
             };
@@ -201,6 +228,20 @@ namespace Niconicome.Models.Infrastructure.Database
                 DBPlaylistType.PlaybackHistory => PlaylistType.PlaybackHistory,
                 _ => PlaylistType.Local,
             };
+            info.SortType = playlist.SortType switch
+            {
+                DBSortType.Title => SortType.Title,
+                DBSortType.UploadedOn => SortType.UploadedOn,
+                DBSortType.AddedAt => SortType.AddedAt,
+                DBSortType.ViewCount => SortType.ViewCount,
+                DBSortType.CommentCount => SortType.CommentCount,
+                DBSortType.MylistCount => SortType.MylistCount,
+                DBSortType.LikeCount => SortType.LikeCount,
+                DBSortType.IsDownlaoded => SortType.IsDownlaoded,
+                DBSortType.Custom => SortType.Custom,
+                _ => SortType.NiconicoID,
+            };
+            info.IsAscendant = playlist.IsAscendant;
             info.RemoteParameter = playlist.RemoteParameter;
 
             info.IsAutoUpdateEnabled = true;

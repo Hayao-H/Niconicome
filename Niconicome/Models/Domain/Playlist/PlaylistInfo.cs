@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Automation.Text;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Playlist;
 using Niconicome.Models.Utils.Reactive;
 using Reactive.Bindings;
 
@@ -50,6 +52,16 @@ namespace Niconicome.Models.Domain.Playlist
         /// リモートプレイリストの場合はパラメーター
         /// </summary>
         string RemoteParameter { get; set; }
+
+        /// <summary>
+        /// 並び替え形式
+        /// </summary>
+        SortType SortType { get; set; }
+
+        /// <summary>
+        /// 昇順・降順
+        /// </summary>
+        bool IsAscendant { get; set; }
 
         /// <summary>
         /// 子プレイリスト(デフォルトでは空)
@@ -100,6 +112,13 @@ namespace Niconicome.Models.Domain.Playlist
         IAttemptResult RemoveVideo(IVideoInfo video);
 
         /// <summary>
+        /// 動画を並び替える(移動先はtargetの直前)
+        /// </summary>
+        /// <param name="sourceVideo"></param>
+        /// <param name="TargetVideo"></param>
+        void MoveVideo(string sourceVideoID, string targetVideoID);
+
+        /// <summary>
         /// 親プレイリストの名前一覧をセットする
         /// </summary>
         /// <param name="names"></param>
@@ -131,6 +150,10 @@ namespace Niconicome.Models.Domain.Playlist
         private string _folderPath = string.Empty;
 
         private string _remoteParameter = string.Empty;
+
+        private SortType _sortType;
+
+        private bool _isAscendant;
 
         private PlaylistType _playlistType = PlaylistType.Local;
 
@@ -166,6 +189,28 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
+        public SortType SortType
+        {
+            get => this._sortType;
+            set
+            {
+                this._sortType = value;
+                this.SortVideos();
+                if (this.IsAutoUpdateEnabled) this.Update(this);
+            }
+        }
+
+        public bool IsAscendant
+        {
+            get => this._isAscendant;
+            set
+            {
+                this._isAscendant = value;
+                this.SortVideos();
+                if (this.IsAutoUpdateEnabled) this.Update(this);
+            }
+        }
+
         public string RemoteParameter
         {
             get => this._remoteParameter;
@@ -174,6 +219,32 @@ namespace Niconicome.Models.Domain.Playlist
                 this._remoteParameter = value;
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             }
+        }
+
+        public void MoveVideo(string sourceVideoID, string targetVideoID)
+        {
+            IVideoInfo source = this.Videos.First(v => v.NiconicoId == sourceVideoID);
+            IVideoInfo target = this.Videos.First(v => v.NiconicoId == targetVideoID);
+
+            int sourceIndex = this._videos.IndexOf(source);
+            int targetIndex = this._videos.IndexOf(target);
+
+            this._videos.Remove(source);
+
+            //上⇒下
+            if (sourceIndex < targetIndex)
+            {
+                this._videos.Insert(targetIndex - 1, source);
+            }
+            //下⇒上
+            else
+            {
+                this._videos.Insert(targetIndex, source);
+            }
+
+            this.SortType = SortType.Custom;
+            this.Update(this);
+
         }
 
         public ReadOnlyObservableCollection<IPlaylistInfo> Children { get; init; }
@@ -218,6 +289,65 @@ namespace Niconicome.Models.Domain.Playlist
         }
 
         #endregion
+
+        #region private
+
+        private void SortVideos()
+        {
+            if (this.SortType == SortType.Custom)
+            {
+                return;
+            }
+
+            var sortedList = new List<IVideoInfo>();
+
+            if (this.IsAscendant)
+            {
+                var sorted = this.SortType switch
+                {
+                    SortType.Title => this.Videos.OrderBy(v => v.Title),
+                    SortType.UploadedOn => this.Videos.OrderBy(v => v.UploadedOn),
+                    SortType.AddedAt => this.Videos.OrderBy(v => v.AddedAt),
+                    SortType.ViewCount => this.Videos.OrderBy(v => v.ViewCount),
+                    SortType.CommentCount => this.Videos.OrderBy(v => v.CommentCount),
+                    SortType.MylistCount => this.Videos.OrderBy(v => v.MylistCount),
+                    SortType.LikeCount => this.Videos.OrderBy(v => v.LikeCount),
+                    SortType.IsDownlaoded => this.Videos.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
+                    _ => this.Videos.OrderBy(v => v.NiconicoId)
+                };
+
+                sortedList.AddRange(sorted.ToList());
+            }
+            else
+            {
+                var sorted = this.SortType switch
+                {
+                    SortType.Title => this.Videos.OrderByDescending(v => v.Title),
+                    SortType.UploadedOn => this.Videos.OrderByDescending(v => v.UploadedOn),
+                    SortType.AddedAt => this.Videos.OrderByDescending(v => v.AddedAt),
+                    SortType.ViewCount => this.Videos.OrderByDescending(v => v.ViewCount),
+                    SortType.CommentCount => this.Videos.OrderByDescending(v => v.CommentCount),
+                    SortType.MylistCount => this.Videos.OrderByDescending(v => v.MylistCount),
+                    SortType.LikeCount => this.Videos.OrderByDescending(v => v.LikeCount),
+                    SortType.IsDownlaoded => this.Videos.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
+                    _ => this.Videos.OrderByDescending(v => v.NiconicoId)
+                };
+
+                sortedList.AddRange(sorted.ToList());
+            }
+
+            this._videos.Clear();
+            this._videos.AddRange(sortedList);
+
+            this.Update(this);
+        }
+
+        #endregion
+
+        public override string ToString()
+        {
+            return this.Name.Value;
+        }
     }
 
     public enum PlaylistType
@@ -233,5 +363,19 @@ namespace Niconicome.Models.Domain.Playlist
         DownloadSucceededHistory,
         DownloadFailedHistory,
         PlaybackHistory,
+    }
+
+    public enum SortType
+    {
+        NiconicoID,
+        Title,
+        UploadedOn,
+        AddedAt,
+        ViewCount,
+        CommentCount,
+        MylistCount,
+        LikeCount,
+        IsDownlaoded,
+        Custom,
     }
 }

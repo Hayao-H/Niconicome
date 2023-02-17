@@ -421,5 +421,10 @@ namespace Niconicome.Models.Domain.Playlist
 
         #endregion
 
+        public override string ToString()
+        {
+            return $"[{this.NiconicoId}]{this.Title}";
+        }
+
     }
 }

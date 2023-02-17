@@ -23,6 +23,10 @@ namespace Niconicome.Models.Infrastructure.Database.Types
 
         public DBPlaylistType PlaylistType { get; set; }
 
+        public DBSortType SortType { get; set; }
+
+        public bool IsAscendant { get; set; }
+
         public List<string> Videos { get; set; } = new();
 
         public List<int> Children { get; set; } = new();

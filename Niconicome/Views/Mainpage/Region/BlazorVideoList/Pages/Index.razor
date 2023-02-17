@@ -1,13 +1,12 @@
 ﻿@page "/videos"
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.IndexViewModel DataContext;
 @inject IJSRuntime JS;
-@inherits BlazorBase;
 
 @using System.Threading;
 @using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages;
+@using Niconicome.Models.Domain.Playlist;
 
-
-<div tabindex="0" @ref="container" class="PageContent PageContainer ContextMenuWrapper" @onkeydown="OnKeyDown">
+<div class="PageContent PageContainer ContextMenuWrapper">
 
     <h3>@(DataContext.PlaylistName)</h3>
 
@@ -37,26 +36,47 @@
             <hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
             <span id="ThumbnailColumn" class="HeaderItem"></span>
             <hr id="ThumbnailColumnSeparator" data-index="1" class="Separator" />
-            <span id="TitleColumn" class="HeaderItem">タイトル</span>
+            <span id="TitleColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.Title)">
+                タイトル
+                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.Title].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+            </span>
             <hr id="TitleColumnSeparator" data-index="2" class="Separator" />
-            <span id="UploadedDateTimeColumn" class="HeaderItem">投稿日時</span>
+            <span id="UploadedDateTimeColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.UploadedOn)">
+                投稿日時
+                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.UploadedOn].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+            </span>
             <hr id="UploadedDateTimeColumnSeparator" data-index="3" class="Separator" />
-            <span id="IsDownloadedColumn" class="HeaderItem">DL済</span>
+            <span id="IsDownloadedColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.IsDownlaoded)">
+                DL済
+                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.IsDownlaoded].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+            </span>
             <hr id="IsDownloadedColumnSeparator" data-index="4" class="Separator" />
-            <span id="ViewCountColumn" class="HeaderItem">再生回数</span>
+            <span id="ViewCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.ViewCount)">
+                再生回数
+                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.ViewCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+            </span>
             <hr id="ViewCountColumnSeparator" data-index="5" class="Separator" />
-            <span id="CommentCountColumn" class="HeaderItem">コメント数</span>
+            <span id="CommentCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.CommentCount)">
+                コメント数
+                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.CommentCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+            </span>
             <hr id="CommentCountColumnSeparator" data-index="6" class="Separator" />
-            <span id="MylistCountColumn" class="HeaderItem">マイリスト数</span>
+            <span id="MylistCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.MylistCount)">
+                マイリスト数
+                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.MylistCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+            </span>
             <hr id="MylistCountColumnSeparator" data-index="7" class="Separator" />
-            <span id="LikeCountColumn" class="HeaderItem">いいね数</span>
+            <span id="LikeCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.LikeCount)">
+                いいね数
+                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.LikeCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+            </span>
             <hr id="LikeCountColumnSeparator" data-index="8" class="Separator" />
             <span id="MessageColumn" class="HeaderItem">メッセージ</span>
         </div>
         <div class="VideoListBody">
             @foreach (var video in DataContext.Videos)
             {
-                <div class="VideoListRow" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())">
+                <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" draggable="true">
                     <div class="CheckBoxColumn">
                         <input type="checkbox" @bind="@(video.IsSelected.Value)" />
                     </div>
@@ -227,6 +247,19 @@
 </div>
 
 @code {
+    private DotNetObjectReference<Index>? refToThis;
+
+    [JSInvokable]
+    public void MoveVideo(string sourceID, string targetID)
+    {
+        DataContext.SortViewModel.MoveVideo(sourceID, targetID);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.refToThis = DotNetObjectReference.Create<Index>(this);
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -250,7 +283,7 @@
         await base.OnAfterRenderAsync(firstRender);
         await JS.InvokeVoidAsync("showTooltip");
         var module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
-        await module.InvokeVoidAsync("main");
+        await module.InvokeVoidAsync("main", this.refToThis);
     }
 
     private void ExecuteInCurrentThread(Action action)
@@ -269,4 +302,9 @@
 
 
     private SynchronizationContext? _ctx;
+
+    public void Didpose()
+    {
+        this.refToThis?.Dispose();
+    }
 }
