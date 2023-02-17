@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Automation;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
@@ -108,7 +109,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             if (playlist.PlaylistType == PlaylistType.Root || playlist.PlaylistType == PlaylistType.Temporary || playlist.PlaylistType == PlaylistType.DownloadFailedHistory || playlist.PlaylistType == PlaylistType.DownloadSucceededHistory)
             {
                 this._errorHandler.HandleError(PlaylistManagerError.PlaylistCannotBeDeleted, nameof(playlist.PlaylistType));
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(PlaylistManagerError.PlaylistCannotBeDeleted, nameof(playlist.PlaylistType)));
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(PlaylistManagerError.PlaylistCannotBeDeleted, nameof(playlist.PlaylistType)), errorLevel: ErrorLevel.Warning);
             }
 
             //DBから削除
@@ -126,11 +127,34 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             IPlaylistInfo parent = this._playlists[playlist.ParentID];
 
-            return parent.RemoveChild(playlist);
+            IAttemptResult removeResult = parent.RemoveChild(playlist);
+            if (!removeResult.IsSucceeded)
+            {
+                return removeResult;
+            }
+
+            if (this._container.CurrentSelectedPlaylist is null || this._container.CurrentSelectedPlaylist.ID != ID)
+            {
+                return AttemptResult.Succeeded();
+            }
+
+            IPlaylistInfo temp = this._playlists.First(p => p.Value.PlaylistType == PlaylistType.Temporary).Value;
+            this._container.CurrentSelectedPlaylist = temp;
+
+            return AttemptResult.Succeeded();
         }
 
         public IAttemptResult Create(int parentID)
         {
+            IPlaylistInfo parent = this._playlists[parentID];
+
+            //動画を保持しているプレイリストは子プレイリストを持てない
+            if (parent.Videos.Count > 0)
+            {
+                this._errorHandler.HandleError(PlaylistManagerError.ParentPlaylistContainsVideo);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(PlaylistManagerError.ParentPlaylistContainsVideo), errorLevel: ErrorLevel.Warning);
+            }
+
             IAttemptResult<int> cResult = this._playlistStore.Create(LocalConstant.DefaultPlaylistName);
             if (!cResult.IsSucceeded)
             {
@@ -148,7 +172,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             playlist.ParentID = parentID;
             this._playlists.Add(playlist.ID, playlist);
 
-            return AttemptResult.Succeeded();
+            return parent.AddChild(playlist);
         }
 
         public IAttemptResult<IPlaylistInfo> GetSpecialPlaylistByType(SpecialPlaylists playlist)

@@ -50,13 +50,15 @@
                         <Setter.Value>
                             <ContextMenu StaysOpen="False" DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}" >
                                 <MenuItem Header="プレイリストを追加する"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                          Command="{Binding Path=DataContext.AddPlaylist, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandParameter="{Binding  Path=PlacementTarget.DataContext.ID, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                     <MenuItem.Icon>
                                         <materialDesign:PackIcon Kind="Plus"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="このプレイリストを削除する"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                          Command="{Binding Path=DataContext.RemovePlaylist, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandParameter="{Binding  Path=PlacementTarget.DataContext.ID, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                     <MenuItem.Icon>
                                         <materialDesign:PackIcon Kind="Delete"/>
                                     </MenuItem.Icon>

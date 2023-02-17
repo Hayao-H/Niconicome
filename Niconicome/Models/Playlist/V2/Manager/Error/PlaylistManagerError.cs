@@ -13,7 +13,9 @@ namespace Niconicome.Models.Playlist.V2.Manager.Error
         PlaylistNotFount,
         [ErrorEnum(ErrorLevel.Error,"指定した親プレイリスト(ID:{0})がキャッシュ内に存在しません。")]
         ParentPlaylistNotFount,
-        [ErrorEnum(ErrorLevel.Error,"指定したプレイリストは削除することができません。(type:{0})")]
+        [ErrorEnum(ErrorLevel.Warning,"指定したプレイリストは削除することができません。(type:{0})")]
         PlaylistCannotBeDeleted,
+        [ErrorEnum(ErrorLevel.Warning,"指定したプレイリストは子プレイリストを持つことができません。")]
+        ParentPlaylistContainsVideo,
     }
 }
