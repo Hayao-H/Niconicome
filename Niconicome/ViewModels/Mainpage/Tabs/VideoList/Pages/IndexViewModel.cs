@@ -564,7 +564,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 { SortType.IsDownlaoded, new BindableProperty<bool>(false).AddTo(bindables) },
             };
 
-            this.SortOption = new BindableProperty<string>("Ascendant").AddTo(bindables);
+            this.IsAscending = new BindableProperty<bool>(false).AddTo(bindables);
+            this.SortOption = this.IsAscending.Select(x => x ? "Ascendant" : "Descendant").AsReadOnly();
+            this.IsMenuVisible = new BindableProperty<bool>(false).AddTo(bindables);
+            this.MenuLeft = new BindableProperty<double>(0);
 
             this.Bindables = bindables;
         }
@@ -579,7 +582,13 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public Dictionary<SortType, IBindableProperty<bool>> Visibility { get; init; }
 
-        public IBindableProperty<string> SortOption { get; init; }
+        public IReadonlyBindablePperty<string> SortOption { get; init; }
+
+        public IBindableProperty<bool> IsAscending { get; init; }
+
+        public IBindableProperty<bool> IsMenuVisible { get; init; }
+
+        public IBindableProperty<double> MenuLeft { get; init; }
 
         public Bindables Bindables { get; init; }
 
@@ -593,6 +602,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <param name="target"></param>
         public void OnHeaderClick(SortType target)
         {
+            this.IsMenuVisible.Value = false;
+
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
             {
                 return;
@@ -633,8 +644,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             if (this.Visibility.ContainsKey(playlist.SortType))
             {
                 this.Visibility[playlist.SortType].Value = true;
-                this.SortOption.Value = playlist.IsAscendant ? "Ascendant" : "Descendant";
             }
+
+            this.IsAscending.Value = playlist.IsAscendant;
+
         }
 
         /// <summary>
@@ -660,6 +673,43 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public void RegisterSortEventHandler(Action handler)
         {
             this._sortEventHandler += handler;
+        }
+
+        /// <summary>
+        /// ヘッダークリック時(コンテキストメニュー)
+        /// </summary>
+        /// <param name="e"></param>
+        public void OnMenuClick(MouseEventArgs e)
+        {
+            if (e.Button == 2)
+            {
+                this.IsMenuVisible.Value = true;
+                this.MenuLeft.Value = e.ClientX - 50;
+            } else
+            {
+                this.IsMenuVisible.Value = false;
+            }
+        }
+
+        /// <summary>
+        /// ソート順を変更
+        /// </summary>
+        /// <param name="isAscendant"></param>
+        public void SetSortDirection(bool isAscendant)
+        {
+            this.IsMenuVisible.Value = false;
+
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
+            {
+                return;
+            }
+
+            IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
+
+            playlist.IsAscendant = isAscendant;
+
+            this.SetValue(playlist);
+            this.OnSort();
         }
 
         #endregion

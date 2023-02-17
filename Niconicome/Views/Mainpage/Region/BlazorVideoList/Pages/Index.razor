@@ -31,47 +31,64 @@
 
 
     <div class="VideoList">
-        <div id="VideoListHeader">
-            <span id="CheckBoxColumn" class="HeaderItem"></span>
-            <hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
-            <span id="ThumbnailColumn" class="HeaderItem"></span>
-            <hr id="ThumbnailColumnSeparator" data-index="1" class="Separator" />
-            <span id="TitleColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.Title)">
-                タイトル
-                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.Title].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
-            </span>
-            <hr id="TitleColumnSeparator" data-index="2" class="Separator" />
-            <span id="UploadedDateTimeColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.UploadedOn)">
-                投稿日時
-                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.UploadedOn].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
-            </span>
-            <hr id="UploadedDateTimeColumnSeparator" data-index="3" class="Separator" />
-            <span id="IsDownloadedColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.IsDownlaoded)">
-                DL済
-                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.IsDownlaoded].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
-            </span>
-            <hr id="IsDownloadedColumnSeparator" data-index="4" class="Separator" />
-            <span id="ViewCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.ViewCount)">
-                再生回数
-                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.ViewCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
-            </span>
-            <hr id="ViewCountColumnSeparator" data-index="5" class="Separator" />
-            <span id="CommentCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.CommentCount)">
-                コメント数
-                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.CommentCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
-            </span>
-            <hr id="CommentCountColumnSeparator" data-index="6" class="Separator" />
-            <span id="MylistCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.MylistCount)">
-                マイリスト数
-                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.MylistCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
-            </span>
-            <hr id="MylistCountColumnSeparator" data-index="7" class="Separator" />
-            <span id="LikeCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.LikeCount)">
-                いいね数
-                <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.LikeCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
-            </span>
-            <hr id="LikeCountColumnSeparator" data-index="8" class="Separator" />
-            <span id="MessageColumn" class="HeaderItem">メッセージ</span>
+        <div class="SortContextMenuWrapper">
+            <div id="VideoListHeader" @onmousedown="DataContext.SortViewModel.OnMenuClick">
+                <span id="CheckBoxColumn" class="HeaderItem"></span>
+                <hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
+                <span id="ThumbnailColumn" class="HeaderItem"></span>
+                <hr id="ThumbnailColumnSeparator" data-index="1" class="Separator" />
+                <span id="TitleColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.Title)">
+                    タイトル
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.Title].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="TitleColumnSeparator" data-index="2" class="Separator" />
+                <span id="UploadedDateTimeColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.UploadedOn)">
+                    投稿日時
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.UploadedOn].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="UploadedDateTimeColumnSeparator" data-index="3" class="Separator" />
+                <span id="IsDownloadedColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.IsDownlaoded)">
+                    DL済
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.IsDownlaoded].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="IsDownloadedColumnSeparator" data-index="4" class="Separator" />
+                <span id="ViewCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.ViewCount)">
+                    再生回数
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.ViewCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="ViewCountColumnSeparator" data-index="5" class="Separator" />
+                <span id="CommentCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.CommentCount)">
+                    コメント数
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.CommentCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="CommentCountColumnSeparator" data-index="6" class="Separator" />
+                <span id="MylistCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.MylistCount)">
+                    マイリスト数
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.MylistCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="MylistCountColumnSeparator" data-index="7" class="Separator" />
+                <span id="LikeCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.LikeCount)">
+                    いいね数
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.LikeCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="LikeCountColumnSeparator" data-index="8" class="Separator" />
+                <span id="MessageColumn" class="HeaderItem">メッセージ</span>
+            </div>
+
+            <div class="SortContextMenu @(DataContext.SortViewModel.IsMenuVisible.Value?"Show":"")" style="left:@(DataContext.SortViewModel.MenuLeft.Value)px;">
+                <div class="MenuItem OptionMenu" @onclick="()=>DataContext.SortViewModel.SetSortDirection(true)">昇順<span class="Circle @(DataContext.SortViewModel.IsAscending.Value?"Show":"")"></span></div>
+                <div class="MenuItem OptionMenu" @onclick="()=>DataContext.SortViewModel.SetSortDirection(false)">降順<span class="Circle @(DataContext.SortViewModel.IsAscending.Value?"":"Show")"></span></div>
+                <div class="Separator"></div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.Title)">タイトルで並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.UploadedOn)">投稿日時で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.AddedAt)">追加日時で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.NiconicoID)">IDで並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.IsDownlaoded)">DL状態で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.ViewCount)">再生回数で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.CommentCount)">コメント数で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.MylistCount)">マイリスト数で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.LikeCount)">いいね数で並び替え</div>
+            </div>
         </div>
         <div class="VideoListBody">
             @foreach (var video in DataContext.Videos)

@@ -89,7 +89,7 @@
 .PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon.Descendant {
   border-top: 6px solid black;
 }
-.PageContent .VideoList #VideoListHeader .Separator {
+.PageContent .VideoList #VideoListHeader > .Separator {
   position: absolute;
   opacity: 0;
   width: 20px;
@@ -173,6 +173,46 @@
   width: 150px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .SortContextMenuWrapper {
+  position: relative;
+  z-index: 9999;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu {
+  display: none;
+  position: absolute;
+  top: 0;
+  background-color: #2d2c2d;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu.Show {
+  display: block;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .MenuItem {
+  width: 200px;
+  color: #f7f1ff;
+  padding: 2px 5px;
+  border-bottom: 1px solid rgba(83, 83, 83, 0.9058823529);
+  cursor: pointer;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .Separator {
+  height: 0;
+  width: 200px;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .OptionMenu {
+  display: flex;
+  justify-content: space-between;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .OptionMenu .Circle {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #202020;
+  border: 1px solid rgba(126, 126, 126, 0.9058823529);
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .OptionMenu .Circle.Show {
+  display: inline;
 }
 .PageContent .VideoList .VideoListBody {
   border: solid 1px #e5e8ea;

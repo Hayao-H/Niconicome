@@ -84,7 +84,7 @@ namespace Niconicome.Models.Utils.Reactive
             Action<T> subscriber = x => p.Value = selector(x);
 
             this.Subscribe(subscriber);
-            p.PropertyChanged += (_, _) => this.UnRegisterPropertyChangeHandler(subscriber);
+            p.PropertyDisposed += (_, _) => this.UnRegisterPropertyChangeHandler(subscriber);
 
             return p;
         }

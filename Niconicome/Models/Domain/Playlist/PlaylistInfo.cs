@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Automation.Text;
 using Niconicome.Models.Domain.Local.Store.V2;
@@ -313,7 +314,7 @@ namespace Niconicome.Models.Domain.Playlist
                     SortType.MylistCount => this.Videos.OrderBy(v => v.MylistCount),
                     SortType.LikeCount => this.Videos.OrderBy(v => v.LikeCount),
                     SortType.IsDownlaoded => this.Videos.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
-                    _ => this.Videos.OrderBy(v => v.NiconicoId)
+                    _ => this.Videos.OrderBy(v => Regex.Match(v.NiconicoId,@"\d+").Value)
                 };
 
                 sortedList.AddRange(sorted.ToList());
@@ -330,7 +331,7 @@ namespace Niconicome.Models.Domain.Playlist
                     SortType.MylistCount => this.Videos.OrderByDescending(v => v.MylistCount),
                     SortType.LikeCount => this.Videos.OrderByDescending(v => v.LikeCount),
                     SortType.IsDownlaoded => this.Videos.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
-                    _ => this.Videos.OrderByDescending(v => v.NiconicoId)
+                    _ => this.Videos.OrderByDescending(v => Regex.Match(v.NiconicoId, @"\d+").Value)
                 };
 
                 sortedList.AddRange(sorted.ToList());
