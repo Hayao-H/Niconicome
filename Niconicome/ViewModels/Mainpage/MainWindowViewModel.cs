@@ -373,7 +373,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             IRegion bottomTabRegion = regionManager.Regions[LocalConstant.BottomTabRegionName];
             bottomTabRegion.Add(containerProvider.Resolve<DownloadSettings>());
-            //bottomTabRegion.Add(containerProvider.Resolve<Output>());
+            bottomTabRegion.Add(containerProvider.Resolve<Output>());
             bottomTabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
             bottomTabRegion.Add(containerProvider.Resolve<VideoListState>());
             bottomTabRegion.Add(containerProvider.Resolve<TimerSettings>());

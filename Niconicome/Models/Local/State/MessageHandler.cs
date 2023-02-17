@@ -5,6 +5,7 @@ using V2 = Niconicome.Models.Local.State.MessageV2;
 using Reactive.Bindings;
 using System.Collections.Specialized;
 using Niconicome.Models.Const;
+using Niconicome.Extensions;
 
 namespace Niconicome.Models.Local.State
 {
@@ -22,6 +23,13 @@ namespace Niconicome.Models.Local.State
         public MessageHandler(V2::IMessageHandler messageHandler)
         {
             this._messageHandler = messageHandler;
+
+            this._messageHandler.Messages.As<INotifyCollectionChanged>().CollectionChanged += this.OnCollectionChangedV2;
+        }
+
+        ~MessageHandler()
+        {
+            this._messageHandler.Messages.As<INotifyCollectionChanged>().CollectionChanged -= this.OnCollectionChangedV2;
         }
 
 
@@ -82,7 +90,34 @@ namespace Niconicome.Models.Local.State
         /// </summary>
         public void ClearMessage()
         {
-            this.messagefield.Clear();
+            this._messageHandler.ClearMessage();
+        }
+
+        private void OnCollectionChangedV2(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems is null)
+                {
+                    return;
+                }
+
+                if (e.NewItems.Count == 0)
+                {
+                    return;
+                }
+
+                if (e.NewItems[0] is V2::Message message)
+                {
+                    this.messagefield.AppendLine($"[{message.Dispacer}]{message.Content}");
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                this.messagefield.Clear();
+            }
+
+            this.Message.Value = this.messagefield.ToString();
             this.OnMessageChanged();
         }
     }
