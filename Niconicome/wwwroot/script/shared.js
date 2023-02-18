@@ -15,3 +15,9 @@ function showToast() {
 function getBodyHeight() {
     return document.body.clientHeight;
 }
+
+function showModal() {
+    const elm = document.querySelector("#Modal");
+    const modal = new bootstrap.Modal(elm);
+    modal.show();
+}

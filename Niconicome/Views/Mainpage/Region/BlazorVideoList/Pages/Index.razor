@@ -30,7 +30,6 @@
         </div>
     </div>
 
-
     <div class="VideoList">
         <div class="SortContextMenuWrapper">
             <div id="VideoListHeader" @onmousedown="DataContext.SortViewModel.OnMenuClick">
@@ -142,7 +141,7 @@
         </div>
 
         <div class="ContextMenu @(DataContext.ContextMenu.IsMenuVisible.Value?"Show":"")" style="top:@(DataContext.ContextMenu.MouseTop.Value)px; left:@(DataContext.ContextMenu.MouseLeft.Value)px;">
-            <div class="ContextMenuItem Clickable">
+            <div class="ContextMenuItem Clickable" @onclick="DataContext.ConfirmBeforeDeletion">
                 <p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>動画を削除する</p>
             </div>
             <div class="ContextMenuItem Clickable">
@@ -247,6 +246,25 @@
         </div>
     </div>
 
+    <div class="modal fade" id="Modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">本当に以下の動画を削除しますか？</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @(DataContext.ConfirmMessage.Value)
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="DataContext.DeleteVideos">はい</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @if (DataContext.ToastMessage is not null)
     {
         <div class="ToastContent toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -287,6 +305,7 @@
         this._ctx = SynchronizationContext.Current;
 
         DataContext.RegisterListChangedEventHandler(() => this.ExecuteInCurrentThread(this.StateHasChanged));
+
         DataContext.RegisterToastMessageChangeEventHandler(() =>
         {
             this.ExecuteInCurrentThread(() =>
@@ -295,6 +314,15 @@
                 JS.InvokeVoidAsync("showToast");
             });
         });
+
+        DataContext.RegisterConfirmOfDeletionHandler(() =>
+        {
+            this.ExecuteInCurrentThread(() =>
+            {
+                JS.InvokeVoidAsync("showModal");
+            });
+        });
+
         DataContext.Bindables.RegisterPropertyChangeHandler(() => this.ExecuteInCurrentThread(this.StateHasChanged));
         await DataContext.Initialize();
     }

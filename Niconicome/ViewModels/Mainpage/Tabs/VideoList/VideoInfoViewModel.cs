@@ -66,6 +66,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         #region Props
 
         /// <summary>
+        /// IVIdeoInfoオブジェクト
+        /// </summary>
+        public IVideoInfo VideoInfo => this._video;
+
+        /// <summary>
         /// 変更監視オブジェクト
         /// </summary>
         public Bindables Bindable { get; init; }

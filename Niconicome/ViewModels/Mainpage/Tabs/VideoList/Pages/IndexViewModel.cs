@@ -20,6 +20,7 @@ using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent;
 using Niconicome.ViewModels.Shared;
+using Windows.Networking.Vpn;
 using ExternalPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using WS = Niconicome.Workspaces;
 
@@ -32,6 +33,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this._navigation = navigation;
             this.InputText = new BindableProperty<string>("").AddTo(this.Bindables);
             this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
+            this.ConfirmMessage = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
 
             this.ContextMenu = new ContextMenuViewModel();
             this.Bindables.Add(this.ContextMenu.Bindables);
@@ -57,6 +59,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         private Action? _toastMessageChangeHandler;
 
+        private Action? _deletionHandler;
+
         private Action<IPlaylistInfo>? _playlistChangeEventHandler;
 
         #endregion
@@ -79,6 +83,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// 入力値
         /// </summary>
         public IBindableProperty<string> InputText { get; init; }
+
+        /// <summary>
+        /// 削除の確認メッセージ
+        /// </summary>
+        public IBindableProperty<string> ConfirmMessage { get; init; }
 
         /// <summary>
         /// 処理中フラグ
@@ -118,9 +127,22 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this._listChangedEventHandler += handler;
         }
 
+        /// <summary>
+        /// トーストメッセージハンドラを追加
+        /// </summary>
+        /// <param name="handler"></param>
         public void RegisterToastMessageChangeEventHandler(Action handler)
         {
             this._toastMessageChangeHandler += handler;
+        }
+
+        /// <summary>
+        /// 削除確認ハンドラを登録
+        /// </summary>
+        /// <param name="landler"></param>
+        public void RegisterConfirmOfDeletionHandler(Action landler)
+        {
+            this._deletionHandler += landler;
         }
 
         /// <summary>
@@ -203,6 +225,76 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/playlist", BlazorWindows.MainPage);
             this._navigation.NavigateTo("/playlist");
+        }
+
+        /// <summary>
+        /// 動画削除の確認を実施
+        /// </summary>
+        public void ConfirmBeforeDeletion()
+        {
+            this.ContextMenu.RemoveVideo();
+
+            var selected = this.Videos.Where(v => v.IsSelected.Value).ToList();
+
+            if (selected.Count == 0)
+            {
+                if (this.ContextMenu.TargetNiconicoID is null)
+                {
+                    return;
+                }
+
+                selected.Add(this.Videos.First(v => v.NiconicoId == this.ContextMenu.TargetNiconicoID));
+            }
+
+
+            if (selected.Count == 1)
+            {
+                this.ConfirmMessage.Value = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeletionConfitmMessageSingle, selected[0].Title);
+            }
+            else
+            {
+                this.ConfirmMessage.Value = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeletionConfitmMessageSingle, selected[0].Title, selected.Count - 1);
+            }
+
+            try
+            {
+                this._deletionHandler?.Invoke();
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// 動画を削除
+        /// </summary>
+        public void DeleteVideos()
+        {
+            var selected = this.Videos.Where(v => v.IsSelected.Value).ToList();
+            if (selected.Count == 0)
+            {
+                if (this.ContextMenu.TargetNiconicoID is null)
+                {
+                    return;
+                }
+
+                selected.Add(this.Videos.First(v=>v.NiconicoId==this.ContextMenu.TargetNiconicoID));
+            }
+
+            IAttemptResult result = WS::Mainpage.VideoListManager.RemoveVideosFromCurrentPlaylist(selected.Select(v=>v.VideoInfo).ToList().AsReadOnly());
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.VideoDeleted, selected.Count);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+            }
+            else
+            {
+                WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
+                WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? "", LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+            }
+
+            _ = this.LoadVideoAsync(false);
+
         }
 
         /// <summary>
@@ -295,14 +387,13 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
     {
         public ContextMenuViewModel()
         {
-            this.MouseTop = new BindableProperty<double>(0).AddTo(this.Bindables);
-            this.MouseLeft = new BindableProperty<double>(0).AddTo(this.Bindables);
+            this.MouseTop = new BindableProperty<double>(0);
+            this.MouseLeft = new BindableProperty<double>(0);
             this.IsMenuVisible = new BindableProperty<bool>(false).AddTo(this.Bindables);
         }
 
         #region field
 
-        private string? targetNiconicoID;
 
         #endregion
 
@@ -315,6 +406,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public IBindableProperty<double> MouseLeft { get; init; }
 
         public IBindableProperty<bool> IsMenuVisible { get; init; }
+
+        public string? TargetNiconicoID { get; private set; }
 
         #endregion
 
@@ -334,28 +427,34 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 }
                 this.MouseLeft.Value = e.ClientX;
                 this.IsMenuVisible.Value = true;
-                this.targetNiconicoID = niconicoID;
+                this.TargetNiconicoID = niconicoID;
                 return;
             }
 
             if (e.Button == 0)
             {
                 this.IsMenuVisible.Value = false;
-                this.targetNiconicoID = null;
+                this.TargetNiconicoID = null;
                 return;
             }
+        }
+
+        public void RemoveVideo()
+        {
+            //実処理はIndexViewModelが担当
+            this.HideMenu();
         }
 
         public void OpenInNiconico()
         {
             this.HideMenu();
 
-            if (this.targetNiconicoID is null)
+            if (this.TargetNiconicoID is null)
             {
                 return;
             }
 
-            IAttemptResult result = WS::Mainpage.ExternalProcessUtils.StartProcess($"https://nico.ms/{this.targetNiconicoID}");
+            IAttemptResult result = WS::Mainpage.ExternalProcessUtils.StartProcess($"https://nico.ms/{this.TargetNiconicoID}");
 
             if (result.IsSucceeded)
             {
@@ -486,12 +585,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         private void OpenInExternalApp(AppKind appKind)
         {
 
-            if (this.targetNiconicoID is null)
+            if (this.TargetNiconicoID is null)
             {
                 return;
             }
 
-            IAttemptResult<IVideoInfo> videoResult = WS::Mainpage.VideoListManager.GetVideoFromCurrentPlaylist(this.targetNiconicoID);
+            IAttemptResult<IVideoInfo> videoResult = WS::Mainpage.VideoListManager.GetVideoFromCurrentPlaylist(this.TargetNiconicoID);
             if (!videoResult.IsSucceeded || videoResult.Data is null)
             {
                 string message = WS::Mainpage.StringHandler.GetContent(OutputViewModelStringContent.VideoIsNotDownloaded);

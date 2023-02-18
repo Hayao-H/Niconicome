@@ -142,13 +142,21 @@ namespace Niconicome.Models.Infrastructure.Database
 
         public IAttemptResult Delete(int ID, int playlistID)
         {
-            IAttemptResult sharedResult = this._database.DeleteAll<Video>(TableNames.Video, v => v.SharedVideoID == ID && v.PlaylistID == playlistID);
-            if (!sharedResult.IsSucceeded) return sharedResult;
+            IAttemptResult<Video> targetResult = this._database.GetRecord<Video>(TableNames.Video, ID);
+            if (!targetResult.IsSucceeded || targetResult.Data is null)
+            {
+                return AttemptResult.Fail(targetResult.Message);
+            }
+
+            int sharedID = targetResult.Data.SharedVideoID;
+
+            IAttemptResult deleteResult = this._database.Delete(TableNames.Video, ID);
+            if (!deleteResult.IsSucceeded) return deleteResult;
 
             //まだSharedVideoを参照するVideoが残っている場合終了
-            if (this._database.Exists<Video>(TableNames.Video, v => v.SharedVideoID == ID)) return AttemptResult.Succeeded();
+            if (this._database.Exists<Video>(TableNames.Video, v => v.SharedVideoID == sharedID)) return AttemptResult.Succeeded();
 
-            return this._database.Delete(TableNames.SharedVideo, ID);
+            return this._database.Delete(TableNames.SharedVideo, sharedID);
         }
 
         public IAttemptResult Clear()

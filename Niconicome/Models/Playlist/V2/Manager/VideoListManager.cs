@@ -50,6 +50,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <param name="niconicoID"></param>
         /// <returns></returns>
         IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID);
+
+        /// <summary>
+        /// 現在のプレイリストから動画を削除
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <returns></returns>
+        IAttemptResult RemoveVideosFromCurrentPlaylist(IReadOnlyList<IVideoInfo> videos);
     }
 
     public class VideoListManager : IVideoListManager
@@ -260,7 +267,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 }
             }
 
-            onMessage(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos),ErrorLevel.Log);
+            onMessage(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos), ErrorLevel.Log);
             this._errorHandler.HandleError(VideoListManagerError.SyncWithRemotePlaylistHasCompleted, remoteType, addedVideos, removedVideos, videos.Count - addedVideos);
 
             return AttemptResult.Succeeded(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos));
@@ -287,7 +294,34 @@ namespace Niconicome.Models.Playlist.V2.Manager
             }
         }
 
+        public IAttemptResult RemoveVideosFromCurrentPlaylist(IReadOnlyList<IVideoInfo> videos)
+        {
+            if (this._container.CurrentSelectedPlaylist is null)
+            {
+                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
+            }
 
+            IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
+
+            foreach (var video in videos)
+            {
+                IAttemptResult deleteResult = this._videoStore.Delete(video.ID, playlist.ID);
+                if (!deleteResult.IsSucceeded)
+                {
+                    return deleteResult;
+                }
+
+                IAttemptResult playlistResult = playlist.RemoveVideo(video);
+                if (!playlistResult.IsSucceeded)
+                {
+                    return playlistResult;
+                }
+            }
+
+            return AttemptResult.Succeeded();
+
+        }
         #endregion
 
         #region private

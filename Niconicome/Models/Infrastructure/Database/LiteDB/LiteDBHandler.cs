@@ -75,7 +75,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         /// <param name="tableName"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        IAttemptResult DeleteAll<T>(string tableName, Func<T, bool> predicate) where T : IBaseStoreClass;
+        IAttemptResult DeleteAll<T>(string tableName, Expression<Func<T, bool>> predicate) where T : IBaseStoreClass;
 
         /// <summary>
         /// レコードを削除
@@ -276,7 +276,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
             return AttemptResult<int>.Succeeded(id);
         }
 
-        public IAttemptResult DeleteAll<T>(string tableName, Func<T, bool> predicate) where T : IBaseStoreClass
+        public IAttemptResult DeleteAll<T>(string tableName, Expression<Func<T, bool>> predicate) where T : IBaseStoreClass
         {
             IAttemptResult<ILiteCollection<T>> cResult = this.GetCollection<T>(tableName);
 
@@ -289,7 +289,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 
             try
             {
-                count = cResult.Data.DeleteMany(record => predicate(record));
+                count = cResult.Data.DeleteMany(predicate);
             }
             catch (Exception ex)
             {

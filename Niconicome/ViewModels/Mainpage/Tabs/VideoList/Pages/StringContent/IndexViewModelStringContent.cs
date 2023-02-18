@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Domain.Utils.StringHandler;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent
@@ -19,5 +20,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent
         NotifyChannelID,
         [StringEnum("IDをコピー")]
         CopyChannelIDAction,
+        [StringEnum("「{0}」")]
+        DeletionConfitmMessageSingle,
+        [StringEnum("「{0}」ほか{1}件")]
+        DeletionConfitmMessageMulti,
+        [StringEnum("{0}件の動画を削除しました。")]
+        VideoDeleted,
     }
 }

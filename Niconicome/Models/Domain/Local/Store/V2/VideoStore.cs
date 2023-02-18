@@ -44,6 +44,7 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// 動画を削除
         /// </summary>
         /// <param name="ID"></param>
+        /// <param name="playlistID"></param>
         /// <returns></returns>
         IAttemptResult Delete(int ID, int playlistID);
 
