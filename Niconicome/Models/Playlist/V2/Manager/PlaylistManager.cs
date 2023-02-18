@@ -172,6 +172,10 @@ namespace Niconicome.Models.Playlist.V2.Manager
             playlist.ParentID = parentID;
             this._playlists.Add(playlist.ID, playlist);
 
+            //親の名前リスト
+            var parentNames = new List<string>(parent.ParentNames) { parent.Name.Value };
+            playlist.SetParentNamesList(parentNames);
+
             return parent.AddChild(playlist);
         }
 
@@ -203,10 +207,12 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 child.ParentID = current.ID;
 
                 //親プレイリストの名前を設定
-                var list = new List<string>(parents)
+                var list = new List<string>(parents);
+                if (current.PlaylistType != PlaylistType.Root)
                 {
-                    child.Name.Value
-                };
+                    list.Add(current.Name.Value);
+                }
+
                 child.SetParentNamesList(list);
 
                 //再帰的にツリーを構築

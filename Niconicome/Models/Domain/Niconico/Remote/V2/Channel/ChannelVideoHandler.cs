@@ -24,7 +24,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Channel
         /// <param name="channelId"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        Task<IAttemptResult<RemotePlaylistInfo>> GetVideosAsync(string channelId, Action<string> onMessage);
+        Task<IAttemptResult<RemotePlaylistInfo>> GetVideosAsync(string channelId, Action<string, ErrorLevel> onMessage);
     }
 
     class ChannelVideoHandler : IChannelVideoHandler
@@ -51,7 +51,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Channel
 
         #region Method
 
-        public async Task<IAttemptResult<RemotePlaylistInfo>> GetVideosAsync(string channelId, Action<string> onMessage)
+        public async Task<IAttemptResult<RemotePlaylistInfo>> GetVideosAsync(string channelId, Action<string, ErrorLevel> onMessage)
         {
 
             var videos = new List<VideoInfo>();
@@ -69,11 +69,11 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Channel
             {
                 if ((index + 1) % fetchWaitSpan == 0)
                 {
-                    onMessage(this._stringHandler.GetContent(ChannelStringContents.Waiting, fetchWaitTime));
+                    onMessage(this._stringHandler.GetContent(ChannelStringContents.Waiting, fetchWaitTime), ErrorLevel.Log);
                     await Task.Delay(fetchWaitTime * 1000);
                 }
 
-                onMessage(this._stringHandler.GetContent(ChannelStringContents.ChannnelPageRetrievingHasStarted, index + 1));
+                onMessage(this._stringHandler.GetContent(ChannelStringContents.ChannnelPageRetrievingHasStarted, index + 1), ErrorLevel.Log);
 
                 IAttemptResult<string> pageResult = await this.GetChannelPageAsync(baseUrl + urlQuery);
                 if (!pageResult.IsSucceeded || pageResult.Data is null)
@@ -92,7 +92,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Channel
                 channelName = parseResult.Data.ChannnelName;
 
                 videos.AddRange(parseResult.Data.Videos);
-                onMessage(this._stringHandler.GetContent(ChannelStringContents.ChannnelPageRetrievingHasCompleted, index + 1, parseResult.Data.Videos.Count, videos.Count));
+                onMessage(this._stringHandler.GetContent(ChannelStringContents.ChannnelPageRetrievingHasCompleted, index + 1, parseResult.Data.Videos.Count, videos.Count), ErrorLevel.Log);
                 ++index;
             }
             while (hasNext);

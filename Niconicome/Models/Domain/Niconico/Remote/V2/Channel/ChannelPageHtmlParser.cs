@@ -60,7 +60,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Channel
                 return AttemptResult<ChannelPageInfo>.Fail(this._errorHandler.GetMessageForResult(ChannelError.FailedToAnalysis));
             }
 
-            var wrapper = document.QuerySelector("p-channelVideo__wrapper>ul.items");
+            var wrapper = document.QuerySelector(".p-channelVideo__wrapper>ul");
             if (wrapper is null)
             {
                 this._errorHandler.HandleError(ChannelError.FailedToAnalysis);

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using MS.WindowsAPICodePack.Internal;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
@@ -15,6 +16,7 @@ using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Local.State.Toast;
+using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent;
 using Niconicome.ViewModels.Shared;
@@ -23,7 +25,7 @@ using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 {
-    public class IndexViewModel
+    public class IndexViewModel : IDisposable
     {
         public IndexViewModel(NavigationManager navigation)
         {
@@ -43,16 +45,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 _ = this.LoadVideoAsync(true);
             });
             this.Bindables.Add(this.SortViewModel.Bindables);
-        }
 
-        ~IndexViewModel()
-        {
-            if (this._playlistChangeEventHandler is not null)
-            {
-                WS::Mainpage.PlaylistVideoContainer.RemovePlaylistChangeEventHandler(this._playlistChangeEventHandler);
-            }
-
-            WS::Mainpage.SnackbarHandler.UnRegisterToastHandler(this.ToastMessageChangeHandler);
         }
 
 
@@ -163,7 +156,26 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.IsProcessing.Value = true;
 
-            await WS::Mainpage.VideoListManager.RegisterVideoAsync(this.InputText.Value, m => WS::Mainpage.Messagehandler.AppendMessage(m));
+            IAttemptResult<VideoRegistrationResult> result = await WS::Mainpage.VideoListManager.RegisterVideoAsync(this.InputText.Value, (m, e) => WS::Mainpage.MessageHandler.AppendMessage(m, LocalConstant.SystemMessageDispacher, e));
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? string.Empty);
+                WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? string.Empty, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+            }
+            else
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.VideoAdded, result.Data.VideosCount);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+
+                if (result.Data.IsChannelVideo)
+                {
+                    string channelMessage = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.NotifyChannelID, result.Data.ChannelName);
+                    string action = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.CopyChannelIDAction);
+                    WS::Mainpage.SnackbarHandler.Enqueue(channelMessage, action, () => WS::Mainpage.ClipbordManager.SetToClipBoard(result.Data.ChannelID));
+                }
+            }
 
             this.Videos.Clear();
             this.Videos.AddRange(WS::Mainpage.PlaylistVideoContainer.Videos.Select(v => this.Convert(v)));
@@ -200,12 +212,9 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             this.IsProcessing.Value = true;
 
-            IAttemptResult result = await WS::Mainpage.VideoListManager.SyncWithRemotePlaylistAsync(m =>
-            {
-                WS::Mainpage.Messagehandler.AppendMessage(m);
-            });
+            IAttemptResult result = await WS::Mainpage.VideoListManager.SyncWithRemotePlaylistAsync((m, e) => WS::Mainpage.MessageHandler.AppendMessage(m, LocalConstant.SystemMessageDispacher, e));
 
-            if (result.IsSucceeded) WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
+            if (!result.IsSucceeded) WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
 
             this.IsProcessing.Value = false;
 
@@ -270,6 +279,16 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            if (this._playlistChangeEventHandler is not null)
+            {
+                WS::Mainpage.PlaylistVideoContainer.RemovePlaylistChangeEventHandler(this._playlistChangeEventHandler);
+            }
+
+            WS::Mainpage.SnackbarHandler.UnRegisterToastHandler(this.ToastMessageChangeHandler);
+        }
     }
 
     public class ContextMenuViewModel
@@ -685,7 +704,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             {
                 this.IsMenuVisible.Value = true;
                 this.MenuLeft.Value = e.ClientX - 50;
-            } else
+            }
+            else
             {
                 this.IsMenuVisible.Value = false;
             }

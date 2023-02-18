@@ -24,6 +24,10 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2
 
         public string ThumbUrl { get; set; } = string.Empty;
 
+        public string ChannelName { get; set; } = string.Empty;
+
+        public string ChannelID { get; set; } = string.Empty;
+
         public DateTime UploadedDT { get; set; } = DateTime.Now;
 
         public DateTime AddedAt { get; set; } = DateTime.Now;

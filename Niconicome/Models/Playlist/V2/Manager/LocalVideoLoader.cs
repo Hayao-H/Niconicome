@@ -75,15 +75,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             if (string.IsNullOrEmpty(folderPath))
             {
-                if (string.IsNullOrEmpty(this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath))
-                {
-                    folderPath = this.GetDownlaodDirectory(this._playlistVideoContainer.CurrentSelectedPlaylist);
-                    this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath = folderPath;
-                }
-                else
-                {
-                    folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath;
-                }
+                folderPath = this.GetDownlaodDirectory(this._playlistVideoContainer.CurrentSelectedPlaylist);
+                this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath = folderPath;
             }
 
             ///削除動画のサムネを保存
@@ -222,7 +215,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             if (settingResult.Data.Value.Contains(Format.FolderAutoMapSymbol))
             {
-                string path = settingResult.Data.Value.Replace(Format.FolderAutoMapSymbol, string.Join(@"\", playlist.ParentNames));
+                string path = settingResult.Data.Value.Replace(Format.FolderAutoMapSymbol, string.Join(@"\", new List<string>(playlist.ParentNames) { playlist.Name.Value }));
                 return path;
             }
             else

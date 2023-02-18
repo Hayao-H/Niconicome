@@ -13,5 +13,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent
         FailedToOpenVideoInBrowser,
         [StringEnum("ブラウザで視聴を開始しました。")]
         VideoOpenedInBrowser,
+        [StringEnum("動画の追加に成功しました。({0}件)")]
+        VideoAdded,
+        [StringEnum("この動画のチャンネルは「{0}」です")]
+        NotifyChannelID,
+        [StringEnum("IDをコピー")]
+        CopyChannelIDAction,
     }
 }

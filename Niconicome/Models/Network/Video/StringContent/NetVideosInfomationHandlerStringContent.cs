@@ -13,6 +13,8 @@ namespace Niconicome.Models.Network.Video.StringContent
         RetrievingRemotePlaylistHasStarted,
         [StringEnum("動画の取得が完了しました。;{0}(動画数:{1}, param:{2})")]
         RetrievingRemotePlaylistHasCompleted,
+        [StringEnum("動画の取得に失敗しました。;{0}(param:{0})")]
+        RetrievingRemotePlaylistHasFailed,
         [StringEnum("動画の取得を開始しました。(id:{0})")]
         RetrievingVideoHasStarted,
         [StringEnum("動画の取得が完了しました。(id:{0}, title:{1})")]

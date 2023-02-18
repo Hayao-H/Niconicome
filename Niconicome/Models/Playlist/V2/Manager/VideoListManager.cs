@@ -5,6 +5,7 @@ using System.Reactive.Joins;
 using System.Text;
 using System.Threading.Tasks;
 using MS.WindowsAPICodePack.Internal;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
@@ -35,13 +36,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <param name="inputText"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        Task<IAttemptResult> RegisterVideoAsync(string inputText, Action<string> onMessage);
+        Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoAsync(string inputText, Action<string, ErrorLevel> onMessage);
 
         /// <summary>
         /// リモートプレイリストと同期
         /// </summary>
         /// <returns></returns>
-        Task<IAttemptResult> SyncWithRemotePlaylistAsync(Action<string> onMessage);
+        Task<IAttemptResult> SyncWithRemotePlaylistAsync(Action<string, ErrorLevel> onMessage);
 
         /// <summary>
         /// 現在のプレイリストから動画を取得
@@ -120,26 +121,27 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         }
 
-        public async Task<IAttemptResult> RegisterVideoAsync(string inputText, Action<string> onMessage)
+        public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoAsync(string inputText, Action<string, ErrorLevel> onMessage)
         {
             if (this._container.CurrentSelectedPlaylist is null)
             {
                 this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
+                return AttemptResult<VideoRegistrationResult>.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
             }
 
             IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
             InputInfomation info = this._inputTextParser.GetInputInfomation(inputText);
             var videos = new List<IVideoInfo>();
+            VideoRegistrationResult? rResult = null;
 
             //ニコニコのID
             if (info.InputType == InputType.NiconicoID)
             {
                 IAttemptResult<Remote::VideoInfo> result = await this._netVideos.GetVideoInfoAsync(info.Parameter, onMessage);
-                if (!result.IsSucceeded || result.Data is null) return AttemptResult.Fail(result.Message);
+                if (!result.IsSucceeded || result.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(result.Message);
 
                 IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, result.Data);
-                if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult.Fail(vResult.Message);
+                if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
                 if (playlist.PlaylistType != PlaylistType.Temporary)
                 {
@@ -150,17 +152,26 @@ namespace Niconicome.Models.Playlist.V2.Manager
                     videos.Add(vResult.Data);
                 }
 
+
+                if (vResult.Data.ChannelName.IsNullOrEmpty())
+                {
+                    rResult = new VideoRegistrationResult(false, 1, string.Empty, string.Empty);
+                }
+                else
+                {
+                    rResult = new VideoRegistrationResult(true, 1, vResult.Data.ChannelName, vResult.Data.ChannelID);
+                }
             }
             //リモートプレイリスト
             else if (info.IsRemote)
             {
                 IAttemptResult<Remote::RemotePlaylistInfo> result = await this._netVideos.GetRemotePlaylistAsync(info, onMessage);
-                if (!result.IsSucceeded || result.Data is null) return AttemptResult.Fail(result.Message);
+                if (!result.IsSucceeded || result.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(result.Message);
 
                 foreach (var video in result.Data.Videos)
                 {
                     IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
-                    if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult.Fail(vResult.Message);
+                    if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
                     if (playlist.PlaylistType != PlaylistType.Temporary)
                     {
@@ -171,6 +182,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
                         videos.Add(vResult.Data);
                     }
                 }
+
+                rResult = new VideoRegistrationResult(false, result.Data.Videos.Count, string.Empty, string.Empty);
             }
 
             if (this._container.CurrentSelectedPlaylist?.ID == playlist.ID)
@@ -181,11 +194,19 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 await this.LoadVideosAsync(true, playlist.PlaylistType != PlaylistType.Temporary);
             }
 
-            return AttemptResult.Succeeded();
+            if (rResult is null)
+            {
+                return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, 0, string.Empty, string.Empty));
+            }
+            else
+            {
+                return AttemptResult<VideoRegistrationResult>.Succeeded(rResult);
+            }
+
 
         }
 
-        public async Task<IAttemptResult> SyncWithRemotePlaylistAsync(Action<string> onMessage)
+        public async Task<IAttemptResult> SyncWithRemotePlaylistAsync(Action<string, ErrorLevel> onMessage)
         {
             if (this._container.CurrentSelectedPlaylist is null)
             {
@@ -239,7 +260,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 }
             }
 
-            onMessage(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos));
+            onMessage(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos),ErrorLevel.Log);
             this._errorHandler.HandleError(VideoListManagerError.SyncWithRemotePlaylistHasCompleted, remoteType, addedVideos, removedVideos, videos.Count - addedVideos);
 
             return AttemptResult.Succeeded(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos));
@@ -301,6 +322,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
             video.MylistCount = source.MylistCount;
             video.LikeCount = source.LikeCount;
             video.AddedAt = source.AddedAt;
+            video.ChannelName = source.ChannelName;
+            video.ChannelID = source.ChannelID;
 
             video.IsAutoUpdateEnabled = true;
 
@@ -328,5 +351,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
         }
 
         #endregion
+
     }
+
+    public record VideoRegistrationResult(bool IsChannelVideo, int VideosCount, string ChannelName, string ChannelID);
+
 }

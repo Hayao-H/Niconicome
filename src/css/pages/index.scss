@@ -218,13 +218,13 @@ $VideoListRowHeight: 100;
 
         .SortContextMenuWrapper {
             position: relative;
-            z-index: 9999;
 
             .SortContextMenu {
                 display: none;
                 position: absolute;
                 top: 0;
                 background-color: #2d2c2d;
+                z-index: 9999;
 
                 &.Show {
                     display: block;

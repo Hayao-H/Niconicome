@@ -1,6 +1,7 @@
 ﻿@page "/videos"
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.IndexViewModel DataContext;
 @inject IJSRuntime JS;
+@implements IDisposable;
 
 @using System.Threading;
 @using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages;
@@ -258,6 +259,12 @@
             <div class="toast-body">
                 @(DataContext.ToastMessage.Message)
             </div>
+            @if (DataContext.ToastMessage.HasAction)
+            {
+                <div class="d-flex m-2 justify-content-end">
+                    <button type="button" class="btn btn-primary btnsm" @onclick="DataContext.ToastMessage.ActionObject">@(DataContext.ToastMessage.ActionString)</button>
+                </div>
+            }
         </div>
     }
 
@@ -272,14 +279,11 @@
         DataContext.SortViewModel.MoveVideo(sourceID, targetID);
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
         this.refToThis = DotNetObjectReference.Create<Index>(this);
-    }
 
-    protected override async Task OnParametersSetAsync()
-    {
         this._ctx = SynchronizationContext.Current;
 
         DataContext.RegisterListChangedEventHandler(() => this.ExecuteInCurrentThread(this.StateHasChanged));
@@ -320,8 +324,9 @@
 
     private SynchronizationContext? _ctx;
 
-    public void Didpose()
+    public void Dispose()
     {
         this.refToThis?.Dispose();
+        this.DataContext.Dispose();
     }
 }
