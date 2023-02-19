@@ -314,7 +314,7 @@ namespace Niconicome.Models.Domain.Playlist
                     SortType.MylistCount => this.Videos.OrderBy(v => v.MylistCount),
                     SortType.LikeCount => this.Videos.OrderBy(v => v.LikeCount),
                     SortType.IsDownlaoded => this.Videos.OrderBy(v => v.IsDownloaded.Value ? 1 : 0),
-                    _ => this.Videos.OrderBy(v => Regex.Match(v.NiconicoId,@"\d+").Value)
+                    _ => this.Videos.OrderBy(v => int.Parse(Regex.Replace(v.NiconicoId, @"\D", "")))
                 };
 
                 sortedList.AddRange(sorted.ToList());
@@ -331,7 +331,7 @@ namespace Niconicome.Models.Domain.Playlist
                     SortType.MylistCount => this.Videos.OrderByDescending(v => v.MylistCount),
                     SortType.LikeCount => this.Videos.OrderByDescending(v => v.LikeCount),
                     SortType.IsDownlaoded => this.Videos.OrderByDescending(v => v.IsDownloaded.Value ? 1 : 0),
-                    _ => this.Videos.OrderByDescending(v => Regex.Match(v.NiconicoId, @"\d+").Value)
+                    _ => this.Videos.OrderByDescending(v => int.Parse(Regex.Replace(v.NiconicoId, @"\D", "")))
                 };
 
                 sortedList.AddRange(sorted.ToList());
