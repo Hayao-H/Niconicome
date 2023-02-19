@@ -120,6 +120,8 @@ $VideoListRowHeight: 100;
             }
 
             #CheckBoxColumn {
+                display: flex;
+                justify-content: center;
                 width: #{$CheckBoxWidth}px;
                 border-right: 1px solid #e5e8ea;
                 padding: 0;

@@ -34,6 +34,15 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.InputText = new BindableProperty<string>("").AddTo(this.Bindables);
             this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
             this.ConfirmMessage = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
+            this.IsIntegratedCheckboxChecked = new BindableProperty<bool>(false)
+                .Subscribe(x =>
+                {
+                    foreach (var video in this.Videos)
+                    {
+                        video.IsSelected.Value = x;
+                    }
+                })
+                .AddTo(this.Bindables);
 
             this.ContextMenu = new ContextMenuViewModel();
             this.Bindables.Add(this.ContextMenu.Bindables);
@@ -93,6 +102,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// 処理中フラグ
         /// </summary>
         public IBindableProperty<bool> IsProcessing { get; init; }
+
+        /// <summary>
+        /// ヘッダーのチェックボックスのチェック状態
+        /// </summary>
+        public IBindableProperty<bool> IsIntegratedCheckboxChecked { get; init; }
 
         /// <summary>
         /// トーストのメッセージ

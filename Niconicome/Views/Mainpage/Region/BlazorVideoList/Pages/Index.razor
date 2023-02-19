@@ -33,7 +33,7 @@
     <div class="VideoList">
         <div class="SortContextMenuWrapper">
             <div id="VideoListHeader" @onmousedown="DataContext.SortViewModel.OnMenuClick">
-                <span id="CheckBoxColumn" class="HeaderItem"></span>
+                <span id="CheckBoxColumn" class="HeaderItem"><input type="checkbox" @bind="DataContext.IsIntegratedCheckboxChecked.Value"/></span>
                 <hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
                 <span id="ThumbnailColumn" class="HeaderItem"></span>
                 <hr id="ThumbnailColumnSeparator" data-index="1" class="Separator" />
