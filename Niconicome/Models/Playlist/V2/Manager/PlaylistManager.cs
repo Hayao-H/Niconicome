@@ -39,6 +39,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <param name="playlist"></param>
         /// <returns></returns>
         IAttemptResult<IPlaylistInfo> GetSpecialPlaylistByType(SpecialPlaylists playlist);
+
+        /// <summary>
+        /// プレイリストを取得する
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        IAttemptResult<IPlaylistInfo> GetPlaylist(int ID);
     }
 
     public class PlaylistManager : IPlaylistManager
@@ -190,6 +197,18 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             return this._playlistStore.GetPlaylistByType(type);
         }
+
+        public　IAttemptResult<IPlaylistInfo> GetPlaylist(int ID)
+        {
+            if (this._playlists.TryGetValue(ID,out IPlaylistInfo? playlist))
+            {
+                return AttemptResult<IPlaylistInfo>.Succeeded(playlist);
+            }
+
+            this._errorHandler.HandleError(PlaylistManagerError.ParentPlaylistNotFount, ID);
+            return AttemptResult<IPlaylistInfo>.Fail(this._errorHandler.GetMessageForResult(PlaylistManagerError.ParentPlaylistNotFount, ID));
+        }
+
 
         #endregion
 

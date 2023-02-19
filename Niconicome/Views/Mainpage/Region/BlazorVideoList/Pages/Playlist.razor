@@ -1,4 +1,4 @@
-﻿@page "/playlist";
+﻿@page "/playlist/{PlaylistID}";
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.PlaylistViewModel DataContext;
 
 <div class="PlaylistInfoContainer">
@@ -41,6 +41,10 @@
 </div>
 
 @code {
+
+	[Parameter]
+	public string PlaylistID { get; set; } = string.Empty;
+
 	protected override void OnParametersSet()
 	{
 		base.OnParametersSet();
@@ -48,6 +52,6 @@
 		{
 			this.StateHasChanged();
 		});
-		DataContext.Initialize();
+		DataContext.Initialize(this.PlaylistID);
 	}
 }

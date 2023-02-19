@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Utils.Reactive;
 using WS = Niconicome.Workspaces;
@@ -24,6 +25,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         }
 
         #region field
+
+        private IPlaylistInfo? _playlist;
 
         private readonly NavigationManager _navigation;
 
@@ -85,24 +88,32 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <summary>
         /// 初期化
         /// </summary>
-        public void Initialize()
+        public void Initialize(string playlistID)
         {
-            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
+            if (!int.TryParse(playlistID, out int id))
             {
                 WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
                 this._navigation.NavigateTo("/videos");
                 return;
             }
 
-            IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
+            IAttemptResult<IPlaylistInfo> pResult = WS::Mainpage.PlaylistManager.GetPlaylist(id);
+            if (!pResult.IsSucceeded || pResult.Data is null)
+            {
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+                this._navigation.NavigateTo("/videos");
+                return;
+            }
 
-            this.Name = playlist.Name.Value;
-            this.VideosCount = playlist.Videos.Count;
-            this.DirectoryPath = playlist.FolderPath;
-            this.RemotePlaylistParam = playlist.RemoteParameter;
-            this.CurrentPlaylistType.Value = this.Convert(playlist.PlaylistType);
+            this._playlist = pResult.Data;
+
+            this.Name = this._playlist.Name.Value;
+            this.VideosCount = this._playlist.Videos.Count;
+            this.DirectoryPath = this._playlist.FolderPath;
+            this.RemotePlaylistParam = this._playlist.RemoteParameter;
+            this.CurrentPlaylistType.Value = this.Convert(this._playlist.PlaylistType);
             this.IsRemotePlaylist.Value = this.CurrentPlaylistType.Value != PlaylistTypeString.Local;
-            this._canEditPlaylistType.Value = playlist.PlaylistType != PlaylistType.Root && playlist.PlaylistType != PlaylistType.Temporary && playlist.PlaylistType != PlaylistType.PlaybackHistory && playlist.PlaylistType != PlaylistType.DownloadSucceededHistory && playlist.PlaylistType != PlaylistType.DownloadFailedHistory;
+            this._canEditPlaylistType.Value = this._playlist.PlaylistType != PlaylistType.Root && this._playlist.PlaylistType != PlaylistType.Temporary && this._playlist.PlaylistType != PlaylistType.PlaybackHistory && this._playlist.PlaylistType != PlaylistType.DownloadSucceededHistory && this._playlist.PlaylistType != PlaylistType.DownloadFailedHistory;
         }
 
         /// <summary>
@@ -110,14 +121,14 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public void Update()
         {
-            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
+            if (this._playlist is null)
             {
                 WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
                 this._navigation.NavigateTo("/videos");
                 return;
             }
 
-            IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
+            IPlaylistInfo playlist = this._playlist;
             playlist.Name.Value = this.Name;
             playlist.FolderPath = this.DirectoryPath;
             playlist.PlaylistType = this.Convert(this.CurrentPlaylistType.Value, playlist.PlaylistType);

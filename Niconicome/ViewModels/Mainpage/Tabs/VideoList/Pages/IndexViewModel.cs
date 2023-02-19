@@ -35,6 +35,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public IndexViewModel(NavigationManager navigation)
         {
             this._navigation = navigation;
+            WS::Mainpage.BlazorPageManager.RegisterNavigationManager(BlazorWindows.MainPage, navigation);
             this.InputText = new BindableProperty<string>("").AddTo(this.Bindables);
             this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
             this.ConfirmMessage = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
@@ -60,6 +61,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 _ = this.LoadVideoAsync(true);
             });
             this.Bindables.Add(this.SortViewModel.Bindables);
+
 
         }
 
@@ -171,7 +173,6 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             if (WS::Mainpage.VideoAndPlayListMigration.IsMigrationNeeded)
             {
                 WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/migration/videos", BlazorWindows.MainPage);
-                this._navigation.NavigateTo("/migration/videos");
             }
 
             WS::Mainpage.SnackbarHandler.RegisterToastHandler(this.ToastMessageChangeHandler);
@@ -241,8 +242,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public void OnPlaylistEditButtonClick()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/playlist", BlazorWindows.MainPage);
-            this._navigation.NavigateTo("/playlist");
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null) return;
+            var playlistID = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist.ID;
+
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{playlistID}", BlazorWindows.MainPage);
         }
 
         /// <summary>
@@ -634,7 +637,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             var list = new List<IVideoInfo> { vResult.Data };
 
-            this.CopyDataToClipboard(list.AsReadOnly(),target);
+            this.CopyDataToClipboard(list.AsReadOnly(), target);
 
             this.HideMenu();
 
@@ -643,7 +646,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public void CopyDataToClipboardMulti(CopyTarget target)
         {
             IAttemptResult<IReadOnlyList<IVideoInfo>> vResult = WS::Mainpage.VideoListManager.GetSelectedVideoFromCurrentPlaylist();
-            if (!vResult.IsSucceeded||vResult.Data is null)
+            if (!vResult.IsSucceeded || vResult.Data is null)
             {
                 return;
             }
@@ -700,7 +703,6 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         private void HideMenu()
         {
-            this.TargetNiconicoID = null;
             this.IsMenuVisible.Value = false;
         }
 

@@ -8,10 +8,10 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Controls;
-using Windows.Devices.Printers;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.PlaylistTree
@@ -55,6 +55,11 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
                 }
             });
 
+            this.EditPlaylist = new BindableCommand<int>(id =>
+            {
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{id}", BlazorWindows.MainPage);
+            });
+
             WS::Mainpage.PlaylistManager.Initialize();
         }
 
@@ -65,6 +70,8 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
         public IBindableCommand<int> AddPlaylist { get; init; }
 
         public IBindableCommand<int> RemovePlaylist { get; init; }
+
+        public IBindableCommand<int> EditPlaylist { get; init; }
 
         #endregion
 

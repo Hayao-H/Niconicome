@@ -64,7 +64,8 @@
                                     </MenuItem.Icon>
                                 </MenuItem>
                                 <MenuItem Header="このプレイリストを編集する"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                          Command="{Binding Path=DataContext.EditPlaylist, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                          CommandParameter="{Binding  Path=PlacementTarget.DataContext.ID, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                     <MenuItem.Icon>
                                         <materialDesign:PackIcon Kind="Edit"/>
                                     </MenuItem.Icon>
