@@ -191,9 +191,9 @@
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
                 <div class="SubMenu Three">
-                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardSingle(CopyTarget.NiconicoID)">ID</p>
-                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardSingle(CopyTarget.Title)">タイトル</p>
-                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardSingle(CopyTarget.URL)">URL</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardSingle(CopyTarget.NiconicoID)">ID</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardSingle(CopyTarget.Title)">タイトル</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardSingle(CopyTarget.URL)">URL</p>
                 </div>
             </div>
             <div class="RootMenu">
@@ -202,9 +202,9 @@
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
                 <div class="SubMenu Three">
-                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardMulti(CopyTarget.NiconicoID)">ID</p>
-                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardMulti(CopyTarget.Title)">タイトル</p>
-                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardMulti(CopyTarget.URL)">URL</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardMulti(CopyTarget.NiconicoID)">ID</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardMulti(CopyTarget.Title)">タイトル</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardMulti(CopyTarget.URL)">URL</p>
                 </div>
             </div>
             <div class="RootMenu">

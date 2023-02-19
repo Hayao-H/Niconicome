@@ -18,6 +18,7 @@ using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Local.State.Toast;
+using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Playlist.V2.Utils;
 using Niconicome.Models.Utils.Reactive;
@@ -335,66 +336,6 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             await this.LoadVideoAsync(false);
         }
 
-        /// <summary>
-        /// コンテキストメニューで選択された単一動画の情報をコピー
-        /// </summary>
-        /// <param name="target"></param>
-        public void CopyDataToClipboardSingle(CopyTarget target)
-        {
-            this.ContextMenu.CopyDataToClipboard();
-
-            if (this.TryGetSelectedVideo(out VideoInfoViewModel? video))
-            {
-                var list = new List<IVideoInfo> { video.VideoInfo };
-                IAttemptResult result = WS::Mainpage.VideoInfoCopyManager.CopyInfomartion(list.AsReadOnly(), target);
-
-                if (result.IsSucceeded)
-                {
-                    string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.InfomationCopied);
-                    WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
-                    WS::Mainpage.SnackbarHandler.Enqueue(message);
-                }
-                else
-                {
-
-                    WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? "", LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
-                    WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
-                }
-            }
-        }
-
-        /// <summary>
-        /// 選択された複数動画の情報をコピー
-        /// </summary>
-        /// <param name="target"></param>
-        public void CopyDataToClipboardMulti(CopyTarget target)
-        {
-            this.ContextMenu.CopyDataToClipboard();
-
-            var selected = this.Videos.Where(v => v.IsSelected.Value).Select(v => v.VideoInfo).ToList().AsReadOnly();
-
-            if (selected.Count == 0)
-            {
-                this.CopyDataToClipboardSingle(target);
-                return;
-            }
-
-            IAttemptResult result = WS::Mainpage.VideoInfoCopyManager.CopyInfomartion(selected, target);
-
-            if (result.IsSucceeded)
-            {
-                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.InfomationCopied);
-                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
-                WS::Mainpage.SnackbarHandler.Enqueue(message);
-            }
-            else
-            {
-
-                WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? "", LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
-                WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
-            }
-        }
-
         #endregion
 
         #region private
@@ -678,9 +619,42 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         }
 
-        public void CopyDataToClipboard()
+        public void CopyDataToClipboardSingle(CopyTarget target)
         {
+            if (this.TargetNiconicoID is null)
+            {
+                return;
+            }
+
+            IAttemptResult<IVideoInfo> vResult = WS::Mainpage.VideoListManager.GetVideoFromCurrentPlaylist(this.TargetNiconicoID);
+            if (!vResult.IsSucceeded || vResult.Data is null)
+            {
+                return;
+            }
+
+            var list = new List<IVideoInfo> { vResult.Data };
+
+            this.CopyDataToClipboard(list.AsReadOnly(),target);
+
             this.HideMenu();
+
+        }
+
+        public void CopyDataToClipboardMulti(CopyTarget target)
+        {
+            IAttemptResult<IReadOnlyList<IVideoInfo>> vResult = WS::Mainpage.VideoListManager.GetSelectedVideoFromCurrentPlaylist();
+            if (!vResult.IsSucceeded||vResult.Data is null)
+            {
+                return;
+            }
+
+            if (vResult.Data.Count == 0)
+            {
+                this.CopyDataToClipboardSingle(target);
+                return;
+            }
+
+            this.CopyDataToClipboard(vResult.Data, target);
         }
 
         #endregion
@@ -726,6 +700,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         private void HideMenu()
         {
+            this.TargetNiconicoID = null;
             this.IsMenuVisible.Value = false;
         }
 
@@ -745,6 +720,24 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             path = string.Empty;
             return false;
+        }
+
+        private void CopyDataToClipboard(IReadOnlyList<IVideoInfo> source, CopyTarget target)
+        {
+            IAttemptResult result = WS::Mainpage.VideoInfoCopyManager.CopyInfomartion(source, target);
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.InfomationCopied);
+                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+            }
+            else
+            {
+
+                WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? "", LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
+            }
         }
 
         #endregion

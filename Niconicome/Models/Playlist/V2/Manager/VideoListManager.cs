@@ -52,6 +52,12 @@ namespace Niconicome.Models.Playlist.V2.Manager
         IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID);
 
         /// <summary>
+        /// 現在の動画から選択された動画を取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IReadOnlyList<IVideoInfo>> GetSelectedVideoFromCurrentPlaylist();
+
+        /// <summary>
         /// 現在のプレイリストから動画を削除
         /// </summary>
         /// <param name="videos"></param>
@@ -293,6 +299,21 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 return AttemptResult<IVideoInfo>.Succeeded(video);
             }
         }
+
+        public IAttemptResult<IReadOnlyList<IVideoInfo>> GetSelectedVideoFromCurrentPlaylist(){
+
+            if (this._container.CurrentSelectedPlaylist is null)
+            {
+                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
+                return AttemptResult<IReadOnlyList<IVideoInfo>>.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
+            }
+
+            var videos = this._container.Videos.Where(v=>v.IsSelected.Value).ToList().AsReadOnly();
+
+            return AttemptResult<IReadOnlyList<IVideoInfo>>.Succeeded(videos);
+
+        }
+
 
         public IAttemptResult RemoveVideosFromCurrentPlaylist(IReadOnlyList<IVideoInfo> videos)
         {
