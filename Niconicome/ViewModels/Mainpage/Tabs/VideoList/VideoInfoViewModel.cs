@@ -149,7 +149,16 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// <summary>
         /// 長さ
         /// </summary>
-        public int Duration => this._video.Duration;
+        public string Duration
+        {
+            get
+            {
+                string minute = Math.Floor((double)(this._video.Duration / 60)).ToString().PadLeft(2, '0');
+                string second = (this._video.Duration % 60).ToString().PadLeft(2, '0');
+                return $"{minute}:{second}";
+            }
+        }
+
 
         /// <summary>
         /// タグ

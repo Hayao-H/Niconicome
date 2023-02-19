@@ -39,6 +39,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist
     {
         public string Id { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
+        public int Duration { get; set; }
         public DateTime RegisteredAt { get; set; }
         public Thumbnail Thumbnail { get; set; } = new();
         public Owner Owner { get; set; } = new();

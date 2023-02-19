@@ -34,6 +34,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2
 
         public string OwnerID { get; set; } = string.Empty;
 
+        public int Duration { get; set; }
+
         public int ViewCount { get; set; }
 
         public int CommentCount { get; set; }

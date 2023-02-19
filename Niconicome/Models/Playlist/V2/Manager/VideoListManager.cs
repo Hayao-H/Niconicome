@@ -379,6 +379,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             video.AddedAt = source.AddedAt;
             video.ChannelName = source.ChannelName;
             video.ChannelID = source.ChannelID;
+            video.Duration = source.Duration;
 
             video.IsAutoUpdateEnabled = true;
 

@@ -241,6 +241,7 @@
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn {
+  position: relative;
   height: 100%;
   width: 165.3333333333px;
   border-right: 1px solid #e5e8ea;
@@ -249,6 +250,15 @@
 .PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn .Thumbnail {
   width: 100%;
   height: 100%;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn .Duration {
+  z-index: 100;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 1px 8px;
+  color: #fff;
+  background-color: rgba(34, 34, 34, 0.6901960784);
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer {
   display: flex;

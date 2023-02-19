@@ -141,6 +141,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Mylist
                     MylistCount = item.Video.Count.Mylist,
                     LikeCount = item.Video.Count.Like,
                     AddedAt = item.AddedAt,
+                    Duration = item.Video.Duration,
                 }).ToList()
             };
         }

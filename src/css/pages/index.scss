@@ -291,6 +291,7 @@ $VideoListRowHeight: 100;
                 }
 
                 .ThumbnailColumn {
+                    position: relative;
                     height: 100%;
                     width: #{$ThumbWidth}px;
                     border-right: 1px solid #e5e8ea;
@@ -299,6 +300,16 @@ $VideoListRowHeight: 100;
                     .Thumbnail {
                         width: 100%;
                         height: 100%;
+                    }
+
+                    .Duration{
+                        z-index: 100;
+                        position: absolute;
+                        right: 10px;
+                        bottom: 10px;
+                        padding: 1px 8px;
+                        color: #fff;
+                        background-color: #222222b0;
                     }
                 }
 
