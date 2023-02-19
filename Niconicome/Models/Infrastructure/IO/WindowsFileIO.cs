@@ -43,7 +43,9 @@ namespace Niconicome.Models.Infrastructure.IO
                 return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToGetShellType));
             }
 
-            Shell32.Shell? shell = Activator.CreateInstance(type)?.AsNullable<Shell32.Shell>();
+            var s = Activator.CreateInstance(type);
+
+            dynamic? shell = Activator.CreateInstance(type);
             if (shell is null)
             {
                 this._errorHandler.HandleError(WindowsFileIOError.FailedToCreateShellInstance);
@@ -52,10 +54,22 @@ namespace Niconicome.Models.Infrastructure.IO
 
             try
             {
-                Shell32.Folder folder = shell.NameSpace(Path.GetDirectoryName(path));
-                Shell32.FolderItem file = folder.ParseName(Path.GetFileName(path));
+                string name = Path.GetFileName(path);
+                string? dirName = Path.GetDirectoryName(path);
 
-                string result = folder.GetDetailsOf(file, 166);
+                Shell32.Folder folder = shell.NameSpace(dirName);
+                Shell32.FolderItem file = folder.ParseName(name);
+
+                List<string> arrHeaders = new List<string>();
+                for (int i = 0; i < 1000; i++)
+                {
+                    string header = folder.GetDetailsOf(null, i);
+                    arrHeaders.Add(header);
+                }
+
+                int index = arrHeaders.IndexOf("フレーム高");
+
+                string result = folder.GetDetailsOf(file, index);
 
                 if (string.IsNullOrEmpty(result))
                 {
