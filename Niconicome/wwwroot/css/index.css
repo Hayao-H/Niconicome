@@ -47,7 +47,11 @@
   padding: 5px 20px;
 }
 .PageContent .ControlsContainer .ButtonsWrapper {
+  display: flex;
   margin-left: 8px;
+}
+.PageContent .ControlsContainer .ButtonsWrapper > * {
+  margin-left: 5px;
 }
 .PageContent .VideoList {
   display: flex;

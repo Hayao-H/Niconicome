@@ -140,7 +140,7 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// 文字列生成
         /// </summary>
-        public static IStringHandler StringHandler { get; private set; }=DIFactory.Resolve<IStringHandler>();
+        public static IStringHandler StringHandler { get; private set; } = DIFactory.Resolve<IStringHandler>();
 
         /// <summary>
         /// メッセージハンドラ
@@ -155,7 +155,12 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// 動画情報のコピー
         /// </summary>
-        public static Playlist::Utils.IVideoInfoCopyManager VideoInfoCopyManager { get; private set; }=DIFactory.Resolve<Playlist::Utils.IVideoInfoCopyManager>();
+        public static Playlist::Utils.IVideoInfoCopyManager VideoInfoCopyManager { get; private set; } = DIFactory.Resolve<Playlist::Utils.IVideoInfoCopyManager>();
+
+        /// <summary>
+        /// 動画フィルター
+        /// </summary>
+        public static Playlist::Utils.IVideoInfoFilterManager VideoInfoFilterManager { get; private set; } = DIFactory.Resolve<Playlist::Utils.IVideoInfoFilterManager>();
 
     }
 }

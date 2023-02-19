@@ -28,13 +28,24 @@
             <button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="プレイリスト情報を編集" @onclick="DataContext.OnPlaylistEditButtonClick"><i class="fa-solid fa-pen"></i></button>
             <button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="リモートプレイリストと同期" @onclick="DataContext.OnSyncWithRemotePlaylistButtonClick"><i class="fa-solid fa-cloud-arrow-down"></i></button>
             <button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="出力を開く" @onclick="DataContext.OutputViewModel.OnOutputButtonClicked"><i class="fa-solid fa-message"></i></button>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle ControlButton" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" title="動画をフィルターする">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><button class="dropdown-item" type="button" @onclick="DataContext.FilterViewModel.FilterByKeyword">キーワードでフィルター</button></li>
+                    <li><button class="dropdown-item" type="button" @onclick="DataContext.FilterViewModel.FilterByTag">タグでフィルター</button></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item" type="button" @onclick="DataContext.FilterViewModel.ResetFilterState">フィルター解除</button></li>
+                </ul>
+            </div>
         </div>
     </div>
 
     <div class="VideoList">
         <div class="SortContextMenuWrapper">
             <div id="VideoListHeader" @onmousedown="DataContext.SortViewModel.OnMenuClick">
-                <span id="CheckBoxColumn" class="HeaderItem"><input type="checkbox" @bind="DataContext.IsIntegratedCheckboxChecked.Value"/></span>
+                <span id="CheckBoxColumn" class="HeaderItem"><input type="checkbox" @bind="DataContext.IsIntegratedCheckboxChecked.Value" /></span>
                 <hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
                 <span id="ThumbnailColumn" class="HeaderItem"></span>
                 <hr id="ThumbnailColumnSeparator" data-index="1" class="Separator" />

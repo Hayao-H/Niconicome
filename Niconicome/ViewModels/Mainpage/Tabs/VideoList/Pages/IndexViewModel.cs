@@ -58,11 +58,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.SortViewModel = new SortViewModel();
             this.SortViewModel.RegisterSortEventHandler(() =>
             {
-                _ = this.LoadVideoAsync(true);
+                _ = this.LoadVideoAsync(false);
             });
             this.Bindables.Add(this.SortViewModel.Bindables);
 
-
+            this.FilterViewModel = new FilterViewModel(this.InputText, this.Videos);
+            this.FilterViewModel.RegisterFilterEventHandler(this.OnListChanged);
         }
 
 
@@ -134,6 +135,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public SortViewModel SortViewModel { get; init; }
 
+        /// <summary>
+        /// フィルター
+        /// </summary>
+        public FilterViewModel FilterViewModel { get; init; }
+
         #endregion
 
         #region Method
@@ -179,12 +185,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this._playlistChangeEventHandler = p =>
             {
-                _ = this.LoadVideoAsync(false);
+                _ = this.LoadVideoAsync(true);
             };
 
             WS::Mainpage.PlaylistVideoContainer.AddPlaylistChangeEventHandler(this._playlistChangeEventHandler);
 
-            await this.LoadVideoAsync(false);
+            await this.LoadVideoAsync(true);
         }
 
         /// <summary>
@@ -336,7 +342,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.IsProcessing.Value = false;
 
-            await this.LoadVideoAsync(false);
+            await this.LoadVideoAsync(true);
         }
 
         #endregion
@@ -347,13 +353,13 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// 動画リストを更新する
         /// </summary>
         /// <returns></returns>
-        private async Task LoadVideoAsync(bool afterSort)
+        private async Task LoadVideoAsync(bool setPath)
         {
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null) return;
 
             this.SortViewModel.SetValue(WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist);
 
-            await WS::Mainpage.VideoListManager.LoadVideosAsync(setPath: !afterSort);
+            await WS::Mainpage.VideoListManager.LoadVideosAsync(setPath: setPath);
 
             this.Videos.Clear();
             this.Videos.AddRange(WS::Mainpage.PlaylistVideoContainer.Videos.Select(v => this.Convert(v)));
@@ -944,5 +950,85 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
     }
 
+    public class FilterViewModel
+    {
+        public FilterViewModel(IBindableProperty<string> inputText,List<VideoInfoViewModel> videos)
+        {
+            this._inputText = inputText;
+            this._videos = videos;
+        }
+
+        #region field
+
+        private readonly IBindableProperty<string> _inputText;
+
+        private readonly List<VideoInfoViewModel> _videos;
+
+        private Action? _filterEventHandler;
+
+        #endregion
+
+        #region Method
+
+        public void RegisterFilterEventHandler(Action handler)
+        {
+            this._filterEventHandler = handler;
+        }
+
+
+        public void FilterByTag()
+        {
+            if (string.IsNullOrEmpty(this._inputText.Value))
+            {
+                return;
+            }
+
+            IReadOnlyList<IVideoInfo> filtered = WS::Mainpage.VideoInfoFilterManager.FilterByTags(this._videos.Select(v => v.VideoInfo).ToList().AsReadOnly(), this._inputText.Value);
+
+            this._videos.Clear();
+            this._videos.AddRange(filtered.Select(v => new VideoInfoViewModel(v)));
+
+            this.OnFilter();
+        }
+
+        public void FilterByKeyword()
+        {
+            if (string.IsNullOrEmpty(this._inputText.Value))
+            {
+                return;
+            }
+
+            IReadOnlyList<IVideoInfo> filtered = WS::Mainpage.VideoInfoFilterManager.FilterByKeyWord(this._videos.Select(v => v.VideoInfo).ToList().AsReadOnly(), this._inputText.Value);
+
+            this._videos.Clear();
+            this._videos.AddRange(filtered.Select(v => new VideoInfoViewModel(v)));
+
+            this.OnFilter();
+        }
+
+        public void ResetFilterState()
+        {
+            this._videos.Clear();
+            this._videos.AddRange(WS::Mainpage.PlaylistVideoContainer.Videos.Select(v => new VideoInfoViewModel(v)));
+
+            this.OnFilter();
+        }
+
+        #endregion
+
+        #region private
+
+        private void OnFilter()
+        {
+            try
+            {
+                this._filterEventHandler?.Invoke();
+            }
+            catch { }
+        }
+
+
+        #endregion
+    }
 
 }
