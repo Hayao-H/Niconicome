@@ -318,6 +318,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<IO::V2.INiconicomeFileIO, Infla::IO.WindowsFileIO>();
             services.AddTransient<IO::V2.INiconicomeDirectoryIO, Infla::IO.WindowsDirectoryIO>();
             services.AddTransient<Store::V2.IVideoFileStore, DB::VideoFileDBHandler>();
+            services.AddTransient<PlaylistV2::Utils.IVideoInfoCopyManager, PlaylistV2::Utils.VideoInfoCopyManager>();
 
             return services.BuildServiceProvider();
         }

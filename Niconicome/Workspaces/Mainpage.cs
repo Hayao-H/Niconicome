@@ -152,5 +152,10 @@ namespace Niconicome.Workspaces
         /// </summary>
         public static Ext::IExternalAppUtilsV2 ExternalAppUtilsV2 { get; private set; } = DIFactory.Resolve<Ext::IExternalAppUtilsV2>();
 
+        /// <summary>
+        /// 動画情報のコピー
+        /// </summary>
+        public static Playlist::Utils.IVideoInfoCopyManager VideoInfoCopyManager { get; private set; }=DIFactory.Resolve<Playlist::Utils.IVideoInfoCopyManager>();
+
     }
 }

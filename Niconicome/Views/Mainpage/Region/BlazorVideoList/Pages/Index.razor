@@ -6,6 +6,7 @@
 @using System.Threading;
 @using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages;
 @using Niconicome.Models.Domain.Playlist;
+@using Niconicome.Models.Playlist.V2.Utils;
 
 <div class="PageContent PageContainer ContextMenuWrapper">
 
@@ -190,9 +191,9 @@
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
                 <div class="SubMenu Three">
-                    <p class="ContextMenuItem Clickable">ID</p>
-                    <p class="ContextMenuItem Clickable">タイトル</p>
-                    <p class="ContextMenuItem Clickable">URL</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardSingle(CopyTarget.NiconicoID)">ID</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardSingle(CopyTarget.Title)">タイトル</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardSingle(CopyTarget.URL)">URL</p>
                 </div>
             </div>
             <div class="RootMenu">
@@ -201,9 +202,9 @@
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
                 <div class="SubMenu Three">
-                    <p class="ContextMenuItem Clickable">ID</p>
-                    <p class="ContextMenuItem Clickable">タイトル</p>
-                    <p class="ContextMenuItem Clickable">URL</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardMulti(CopyTarget.NiconicoID)">ID</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardMulti(CopyTarget.Title)">タイトル</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.CopyDataToClipboardMulti(CopyTarget.URL)">URL</p>
                 </div>
             </div>
             <div class="RootMenu">

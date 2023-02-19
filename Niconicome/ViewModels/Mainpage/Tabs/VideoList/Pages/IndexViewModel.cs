@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,6 +19,7 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Playlist.V2.Manager;
+using Niconicome.Models.Playlist.V2.Utils;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent;
 using Niconicome.ViewModels.Shared;
@@ -252,12 +255,14 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             if (selected.Count == 0)
             {
-                if (this.ContextMenu.TargetNiconicoID is null)
+                if (this.TryGetSelectedVideo(out VideoInfoViewModel? video))
+                {
+                    selected.Add(video);
+                }
+                else
                 {
                     return;
                 }
-
-                selected.Add(this.Videos.First(v => v.NiconicoId == this.ContextMenu.TargetNiconicoID));
             }
 
 
@@ -283,17 +288,20 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public void DeleteVideos()
         {
             var selected = this.Videos.Where(v => v.IsSelected.Value).ToList();
+
             if (selected.Count == 0)
             {
-                if (this.ContextMenu.TargetNiconicoID is null)
+                if (this.TryGetSelectedVideo(out VideoInfoViewModel? video))
+                {
+                    selected.Add(video);
+                }
+                else
                 {
                     return;
                 }
-
-                selected.Add(this.Videos.First(v=>v.NiconicoId==this.ContextMenu.TargetNiconicoID));
             }
 
-            IAttemptResult result = WS::Mainpage.VideoListManager.RemoveVideosFromCurrentPlaylist(selected.Select(v=>v.VideoInfo).ToList().AsReadOnly());
+            IAttemptResult result = WS::Mainpage.VideoListManager.RemoveVideosFromCurrentPlaylist(selected.Select(v => v.VideoInfo).ToList().AsReadOnly());
 
             if (result.IsSucceeded)
             {
@@ -325,6 +333,66 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.IsProcessing.Value = false;
 
             await this.LoadVideoAsync(false);
+        }
+
+        /// <summary>
+        /// コンテキストメニューで選択された単一動画の情報をコピー
+        /// </summary>
+        /// <param name="target"></param>
+        public void CopyDataToClipboardSingle(CopyTarget target)
+        {
+            this.ContextMenu.CopyDataToClipboard();
+
+            if (this.TryGetSelectedVideo(out VideoInfoViewModel? video))
+            {
+                var list = new List<IVideoInfo> { video.VideoInfo };
+                IAttemptResult result = WS::Mainpage.VideoInfoCopyManager.CopyInfomartion(list.AsReadOnly(), target);
+
+                if (result.IsSucceeded)
+                {
+                    string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.InfomationCopied);
+                    WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                    WS::Mainpage.SnackbarHandler.Enqueue(message);
+                }
+                else
+                {
+
+                    WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? "", LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                    WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 選択された複数動画の情報をコピー
+        /// </summary>
+        /// <param name="target"></param>
+        public void CopyDataToClipboardMulti(CopyTarget target)
+        {
+            this.ContextMenu.CopyDataToClipboard();
+
+            var selected = this.Videos.Where(v => v.IsSelected.Value).Select(v => v.VideoInfo).ToList().AsReadOnly();
+
+            if (selected.Count == 0)
+            {
+                this.CopyDataToClipboardSingle(target);
+                return;
+            }
+
+            IAttemptResult result = WS::Mainpage.VideoInfoCopyManager.CopyInfomartion(selected, target);
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.InfomationCopied);
+                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+            }
+            else
+            {
+
+                WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? "", LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
+            }
         }
 
         #endregion
@@ -382,6 +450,23 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             this.ToastMessage = new ToastMessageViewModel(message);
             this._toastMessageChangeHandler?.Invoke();
+        }
+
+        /// <summary>
+        /// コンテクストメニューで選択された動画を取得
+        /// </summary>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        private bool TryGetSelectedVideo([NotNullWhen(true)] out VideoInfoViewModel? video)
+        {
+            if (this.ContextMenu.TargetNiconicoID is null)
+            {
+                video = null;
+                return false;
+            }
+
+            video = this.Videos.FirstOrDefault(v => v.NiconicoId == this.ContextMenu.TargetNiconicoID);
+            return video is not null;
         }
 
         #endregion
@@ -563,6 +648,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public void CreatePlaylist(PlaylistType type)
         {
+            this.HideMenu();
 
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null) return;
 
@@ -590,6 +676,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 }
             }
 
+        }
+
+        public void CopyDataToClipboard()
+        {
+            this.HideMenu();
         }
 
         #endregion

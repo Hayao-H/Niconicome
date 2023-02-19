@@ -26,5 +26,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent
         DeletionConfitmMessageMulti,
         [StringEnum("{0}件の動画を削除しました。")]
         VideoDeleted,
+        [StringEnum("クリップボードに情報をコピーしました。")]
+        InfomationCopied,
     }
 }
