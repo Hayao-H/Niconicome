@@ -20,6 +20,21 @@ namespace Niconicome.Models.Utils.Reactive
         /// <returns></returns>
         IReadonlyBindablePperty<T> AddTo(Bindables bindables);
 
+
+        /// <summary>
+        /// Disposableクラスで管理
+        /// </summary>
+        /// <param name="bindables"></param>
+        /// <returns></returns>
+        IReadonlyBindablePperty<T> AddTo(Disposable disposable);
+
+        /// <summary>
+        /// 値の変更を監視する
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        IReadonlyBindablePperty<T> Subscribe(Action<T> handler);
+
     }
 
 
@@ -61,6 +76,17 @@ namespace Niconicome.Models.Utils.Reactive
             return this;
         }
 
+        public IReadonlyBindablePperty<T> AddTo(Disposable disposable)
+        {
+            disposable.Add(this);
+            return this;
+        }
+
+        public IReadonlyBindablePperty<T> Subscribe(Action<T> handler)
+        {
+            this.RegisterPropertyChangeHandler(handler);
+            return this;
+        }
 
         #endregion
 

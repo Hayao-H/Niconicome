@@ -294,6 +294,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<PlaylistV2::Manager.ILocalVideoLoader, PlaylistV2::Manager.LocalVideoLoader>();
             services.AddTransient<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
             services.AddTransient<PlaylistV2::Manager.IVideoListManager, PlaylistV2::Manager.VideoListManager>();
+            services.AddTransient<PlaylistV2::Manager.Helper.IVideoListCRDHandler, PlaylistV2::Manager.Helper.VideoListCRDHandler>();
+            services.AddTransient<PlaylistV2::Manager.Helper.IVideoListUpdateHandler, PlaylistV2::Manager.Helper.VideoListUpdateHandler>();
             services.AddTransient<PlaylistV2::Migration.IVideoAndPlayListMigration, PlaylistV2::Migration.VideoAndPlayListMigration>();
             services.AddTransient<TabsVM::VideoList.Pages.IndexViewModel>();
             services.AddTransient<TabsVM::VideoList.Pages.MigrationViewModel>();

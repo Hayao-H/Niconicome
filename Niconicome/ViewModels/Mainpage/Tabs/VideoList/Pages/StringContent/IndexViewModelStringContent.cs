@@ -28,5 +28,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent
         VideoDeleted,
         [StringEnum("クリップボードに情報をコピーしました。")]
         InfomationCopied,
+        [StringEnum("動画情報の更新が完了しました。({0}件)")]
+        VideoUpdated,
     }
 }

@@ -39,6 +39,14 @@
                     <li><button class="dropdown-item" type="button" @onclick="DataContext.FilterViewModel.ResetFilterState">フィルター解除</button></li>
                 </ul>
             </div>
+            @if (DataContext.IsUpdating.Value)
+            {
+                <button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="更新をキャンセル" @onclick="DataContext.OnCancelUpdateButtonClick"><i class="fa-sharp fa-solid fa-xmark"></i></button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-primary ControlButton" data-bs-toggle="tooltip" data-bs-placement="bottom" title="動画情報を更新" @onclick="DataContext.OnUpdateButtonClick"><i class="fa-solid fa-arrows-rotate"></i></button>
+            }
         </div>
     </div>
 

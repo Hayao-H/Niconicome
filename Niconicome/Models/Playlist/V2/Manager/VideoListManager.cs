@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Joins;
 using System.Text;
@@ -13,8 +14,10 @@ using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Video;
 using Niconicome.Models.Playlist.V2.Manager.Error;
+using Niconicome.Models.Playlist.V2.Manager.Helper;
 using Niconicome.Models.Playlist.V2.Manager.StringContent;
 using Niconicome.Models.Playlist.V2.Migration;
+using Niconicome.Models.Utils.Reactive;
 using Remote = Niconicome.Models.Domain.Niconico.Remote.V2;
 
 namespace Niconicome.Models.Playlist.V2.Manager
@@ -63,21 +66,36 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <param name="videos"></param>
         /// <returns></returns>
         IAttemptResult RemoveVideosFromCurrentPlaylist(IReadOnlyList<IVideoInfo> videos);
+
+        /// <summary>
+        /// 動画情報を更新
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="onMessage"></param>
+        /// <returns></returns>
+        Task<IAttemptResult> UpdateVideosAsync(ReadOnlyCollection<IVideoInfo> source, Action<string, ErrorLevel> onMessage);
+
+        /// <summary>
+        /// 動画情報の更新をキャンセル
+        /// </summary>
+        void CancelUpdate();
+
+        /// <summary>
+        /// 更新フラグ
+        /// </summary>
+        IBindableProperty<bool> IsUpdating { get; }
     }
 
     public class VideoListManager : IVideoListManager
     {
-        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, IStringHandler stringHandler,ITagStore tagStore)
+        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoListUpdateHandler updateHandler, IVideoListCRDHandler cRDHandler)
         {
             this._container = container;
             this._loader = loader;
             this._errorHandler = errorHandler;
             this._migration = migration;
-            this._videoStore = videoStore;
-            this._tagStore = tagStore;
-            this._netVideos = netVideos;
-            this._inputTextParser = inputTextParser;
-            this._stringHandler = stringHandler;
+            this._updateHandler = updateHandler;
+            this._CRDHandler = cRDHandler;
         }
 
         #region field
@@ -90,15 +108,15 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         private readonly IVideoAndPlayListMigration _migration;
 
-        private readonly IVideoStore _videoStore;
+        private readonly IVideoListUpdateHandler _updateHandler;
 
-        private readonly ITagStore _tagStore;
+        private readonly IVideoListCRDHandler _CRDHandler;
 
-        private readonly INetVideosInfomationHandler _netVideos;
+        #endregion
 
-        private readonly IInputTextParser _inputTextParser;
+        #region Props
 
-        private readonly IStringHandler _stringHandler;
+        public IBindableProperty<bool> IsUpdating => this._updateHandler.IsUpdating;
 
         #endregion
 
@@ -146,292 +164,45 @@ namespace Niconicome.Models.Playlist.V2.Manager
             }
 
             IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
-            InputInfomation info = this._inputTextParser.GetInputInfomation(inputText);
-            var videos = new List<IVideoInfo>();
-            VideoRegistrationResult? rResult = null;
 
-            //ニコニコのID
-            if (info.InputType == InputType.NiconicoID)
-            {
-                IAttemptResult<Remote::VideoInfo> result = await this._netVideos.GetVideoInfoAsync(info.Parameter, onMessage);
-                if (!result.IsSucceeded || result.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(result.Message);
+            IAttemptResult<VideoRegistrationResult> result = await this._CRDHandler.RegisterVideoAsync(inputText, playlist, onMessage);
 
-                IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, result.Data);
-                if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
+            await this.LoadVideosAsync(true, playlist.PlaylistType != PlaylistType.Temporary);
 
-                if (playlist.PlaylistType != PlaylistType.Temporary)
-                {
-                    playlist.AddVideo(vResult.Data);
-                }
-                else
-                {
-                    videos.Add(vResult.Data);
-                }
-
-
-                if (vResult.Data.ChannelName.IsNullOrEmpty())
-                {
-                    rResult = new VideoRegistrationResult(false, 1, string.Empty, string.Empty);
-                }
-                else
-                {
-                    rResult = new VideoRegistrationResult(true, 1, vResult.Data.ChannelName, vResult.Data.ChannelID);
-                }
-            }
-            //リモートプレイリスト
-            else if (info.IsRemote)
-            {
-                IAttemptResult<Remote::RemotePlaylistInfo> result = await this._netVideos.GetRemotePlaylistAsync(info, onMessage);
-                if (!result.IsSucceeded || result.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(result.Message);
-
-                foreach (var video in result.Data.Videos)
-                {
-                    IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
-                    if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
-
-                    if (playlist.PlaylistType != PlaylistType.Temporary)
-                    {
-                        playlist.AddVideo(vResult.Data);
-                    }
-                    else
-                    {
-                        videos.Add(vResult.Data);
-                    }
-                }
-
-                rResult = new VideoRegistrationResult(false, result.Data.Videos.Count, string.Empty, string.Empty);
-            }
-
-            if (this._container.CurrentSelectedPlaylist?.ID == playlist.ID)
-            {
-                //一時プレイリストの場合は特殊処理
-                if (playlist.PlaylistType == PlaylistType.Temporary) this._container.Videos.AddRange(videos);
-
-                await this.LoadVideosAsync(true, playlist.PlaylistType != PlaylistType.Temporary);
-            }
-
-            if (rResult is null)
-            {
-                return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, 0, string.Empty, string.Empty));
-            }
-            else
-            {
-                return AttemptResult<VideoRegistrationResult>.Succeeded(rResult);
-            }
-
-
+            return result;
         }
 
         public async Task<IAttemptResult> SyncWithRemotePlaylistAsync(Action<string, ErrorLevel> onMessage)
         {
-            if (this._container.CurrentSelectedPlaylist is null)
-            {
-                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
-            }
-
-
-            IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
-            var videos = new List<IVideoInfo>();
-
-            RemoteType remoteType = this.ConvertToRemoteType(playlist.PlaylistType);
-            if (remoteType == RemoteType.None)
-            {
-                this._errorHandler.HandleError(VideoListManagerError.NotARemotePlaylist, playlist.PlaylistType);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.NotARemotePlaylist, playlist.PlaylistType));
-            }
-
-
-            IAttemptResult<Remote::RemotePlaylistInfo> result = await this._netVideos.GetRemotePlaylistAsync(remoteType, playlist.RemoteParameter, onMessage);
-            if (!result.IsSucceeded || result.Data is null) return AttemptResult.Fail(result.Message);
-
-            foreach (var video in result.Data.Videos)
-            {
-                IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
-                if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult.Fail(vResult.Message);
-
-                videos.Add(vResult.Data);
-            }
-
-            var removedVideos = 0;
-            var addedVideos = 0;
-
-            //リモートに存在しない動画は削除
-            foreach (var currentVideo in playlist.Videos.ToList())
-            {
-                if (!videos.Any(v => v.NiconicoId == currentVideo.NiconicoId))
-                {
-                    playlist.RemoveVideo(currentVideo);
-                    removedVideos++;
-                }
-            }
-
-            //ローカルに存在しない動画は追加
-            foreach (var video in videos)
-            {
-                if (!playlist.Videos.Any(v => v.NiconicoId == video.NiconicoId))
-                {
-                    playlist.AddVideo(video);
-                    addedVideos++;
-                }
-            }
-
-            onMessage(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos), ErrorLevel.Log);
-            this._errorHandler.HandleError(VideoListManagerError.SyncWithRemotePlaylistHasCompleted, remoteType, addedVideos, removedVideos, videos.Count - addedVideos);
-
-            return AttemptResult.Succeeded(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos));
+            return await this._updateHandler.SyncWithRemotePlaylistAsync(onMessage);
         }
 
         public IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID)
         {
-            if (this._container.CurrentSelectedPlaylist is null)
-            {
-                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
-                return AttemptResult<IVideoInfo>.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
-            }
-
-            IVideoInfo? video = this._container.Videos.FirstOrDefault(v => v.NiconicoId == niconicoID);
-
-            if (video is null)
-            {
-                this._errorHandler.HandleError(VideoListManagerError.VideoDoesNotExistInCurrentPlaylist, this._container.CurrentSelectedPlaylist.ID, niconicoID);
-                return AttemptResult<IVideoInfo>.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.VideoDoesNotExistInCurrentPlaylist, this._container.CurrentSelectedPlaylist.ID, niconicoID));
-            }
-            else
-            {
-                return AttemptResult<IVideoInfo>.Succeeded(video);
-            }
+            return this._CRDHandler.GetVideoFromCurrentPlaylist(niconicoID);
         }
 
-        public IAttemptResult<IReadOnlyList<IVideoInfo>> GetSelectedVideoFromCurrentPlaylist(){
+        public IAttemptResult<IReadOnlyList<IVideoInfo>> GetSelectedVideoFromCurrentPlaylist()
+        {
 
-            if (this._container.CurrentSelectedPlaylist is null)
-            {
-                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
-                return AttemptResult<IReadOnlyList<IVideoInfo>>.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
-            }
-
-            var videos = this._container.Videos.Where(v=>v.IsSelected.Value).ToList().AsReadOnly();
-
-            return AttemptResult<IReadOnlyList<IVideoInfo>>.Succeeded(videos);
+            return this._CRDHandler.GetSelectedVideoFromCurrentPlaylist();
 
         }
-
 
         public IAttemptResult RemoveVideosFromCurrentPlaylist(IReadOnlyList<IVideoInfo> videos)
         {
-            if (this._container.CurrentSelectedPlaylist is null)
-            {
-                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
-            }
-
-            IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
-
-            foreach (var video in videos)
-            {
-                IAttemptResult deleteResult = this._videoStore.Delete(video.ID, playlist.ID);
-                if (!deleteResult.IsSucceeded)
-                {
-                    return deleteResult;
-                }
-
-                IAttemptResult playlistResult = playlist.RemoveVideo(video);
-                if (!playlistResult.IsSucceeded)
-                {
-                    return playlistResult;
-                }
-            }
-
-            return AttemptResult.Succeeded();
+            return this._CRDHandler.RemoveVideosFromCurrentPlaylist(videos);
 
         }
-        #endregion
 
-        #region private
-
-        /// <summary>
-        /// 動画情報をローカル形式に変換
-        /// </summary>
-        /// <param name="playlistID"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        private IAttemptResult<IVideoInfo> ConvertToVideoInfo(int playlistID, Remote::VideoInfo source)
+        public async Task<IAttemptResult> UpdateVideosAsync(ReadOnlyCollection<IVideoInfo> source, Action<string, ErrorLevel> onMessage)
         {
-
-            if (!this._videoStore.Exist(source.NiconicoID, playlistID))
-            {
-                IAttemptResult cResult = this._videoStore.Create(source.NiconicoID, playlistID);
-                if (!cResult.IsSucceeded) return AttemptResult<IVideoInfo>.Fail(cResult.Message);
-            }
-
-            IAttemptResult<IVideoInfo> getResult = this._videoStore.GetVideo(source.NiconicoID, playlistID);
-            if (!getResult.IsSucceeded || getResult.Data is null) return AttemptResult<IVideoInfo>.Fail(getResult.Message);
-
-            IVideoInfo video = getResult.Data;
-            video.IsAutoUpdateEnabled = false;
-
-            video.OwnerName = source.OwnerName;
-            video.OwnerID = source.OwnerID;
-            video.ThumbUrl = source.ThumbUrl;
-            video.UploadedOn = source.UploadedDT;
-            video.ViewCount = source.ViewCount;
-            video.CommentCount = source.CommentCount;
-            video.MylistCount = source.MylistCount;
-            video.LikeCount = source.LikeCount;
-            video.AddedAt = source.AddedAt;
-            video.ChannelName = source.ChannelName;
-            video.ChannelID = source.ChannelID;
-            video.Duration = source.Duration;
-
-            foreach (var tag in source.Tags)
-            {
-                if (!this._tagStore.Exist(tag.Name))
-                {
-                    IAttemptResult cResult = this._tagStore.Create(tag.Name);
-                    if (!cResult.IsSucceeded)
-                    {
-                        continue;
-                    }
-                }
-
-                IAttemptResult<ITagInfo> tagResult = this._tagStore.GetTag(tag.Name);
-                if (!tagResult.IsSucceeded || tagResult.Data is null)
-                {
-                    continue;
-                }
-
-                tagResult.Data.IsNicodicExist = tag.IsNicodicExist;
-
-                if (!video.Tags.Any(t => t.Name == tag.Name))
-                {
-                    video.AddTag(tagResult.Data);
-                }
-            }
-
-            video.IsAutoUpdateEnabled = true;
-
-            video.Title = source.Title;
-
-            return AttemptResult<IVideoInfo>.Succeeded(video);
+            return await this._updateHandler.UpdateVideosAsync(source, onMessage);
         }
 
-        /// <summary>
-        /// リモートプレイリストの形式を取得
-        /// </summary>
-        /// <param name="playlistType"></param>
-        /// <returns></returns>
-        private RemoteType ConvertToRemoteType(PlaylistType playlistType)
+        public void CancelUpdate()
         {
-            return playlistType switch
-            {
-                PlaylistType.WatchLater => RemoteType.WatchLater,
-                PlaylistType.Mylist => RemoteType.Mylist,
-                PlaylistType.Series => RemoteType.Series,
-                PlaylistType.UserVideos => RemoteType.UserVideos,
-                PlaylistType.Channel => RemoteType.Channel,
-                _ => RemoteType.None,
-            };
+            this._updateHandler.CancelUpdate();
         }
 
         #endregion

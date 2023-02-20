@@ -34,7 +34,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
     {
         public IndexViewModel(NavigationManager navigation)
         {
-            this._navigation = navigation;
+            this._disposable = new Disposable();
+
             WS::Mainpage.BlazorPageManager.RegisterNavigationManager(BlazorWindows.MainPage, navigation);
             this.InputText = new BindableProperty<string>("").AddTo(this.Bindables);
             this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
@@ -48,6 +49,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                     }
                 })
                 .AddTo(this.Bindables);
+
+            this.IsUpdating = WS::Mainpage.VideoListManager.IsUpdating.AsReadOnly().Subscribe(x => this.IsProcessing.Value = x).AddTo(this.Bindables).AddTo(this._disposable);
 
             this.ContextMenu = new ContextMenuViewModel();
             this.Bindables.Add(this.ContextMenu.Bindables);
@@ -69,7 +72,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         #region field
 
-        private readonly NavigationManager _navigation;
+        private readonly Disposable _disposable;
 
         private Action? _listChangedEventHandler;
 
@@ -109,6 +112,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// 処理中フラグ
         /// </summary>
         public IBindableProperty<bool> IsProcessing { get; init; }
+
+        /// <summary>
+        /// 更新中フラグ
+        /// </summary>
+        public IReadonlyBindablePperty<bool> IsUpdating { get; init; }
 
         /// <summary>
         /// ヘッダーのチェックボックスのチェック状態
@@ -345,6 +353,43 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             await this.LoadVideoAsync(true);
         }
 
+        /// <summary>
+        /// 更新ボタンがクリックされたとき
+        /// </summary>
+        /// <returns></returns>
+        public async Task OnUpdateButtonClick()
+        {
+            if (this.IsUpdating.Value) return;
+
+            var selected = this.Videos.Where(v => v.IsSelected.Value).ToList();
+
+            if (selected.Count == 0)
+            {
+                return;
+            }
+
+            IAttemptResult result = await WS::Mainpage.VideoListManager.UpdateVideosAsync(selected.Where(v => v.IsSelected.Value).Select(v=>v.VideoInfo).ToList().AsReadOnly(), (s, e) => WS::Mainpage.MessageHandler.AppendMessage(s, LocalConstant.SystemMessageDispacher, e));
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.VideoUpdated, selected.Count);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+            }
+            else
+            {
+                WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "");
+                WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? "", LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+            }
+
+            _ = this.LoadVideoAsync(false);
+        }
+
+        public void OnCancelUpdateButtonClick()
+        {
+            WS::Mainpage.VideoListManager.CancelUpdate();
+        }
+
         #endregion
 
         #region private
@@ -423,6 +468,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public void Dispose()
         {
+            this._disposable.Dispose();
+
             if (this._playlistChangeEventHandler is not null)
             {
                 WS::Mainpage.PlaylistVideoContainer.RemovePlaylistChangeEventHandler(this._playlistChangeEventHandler);
@@ -952,7 +999,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
     public class FilterViewModel
     {
-        public FilterViewModel(IBindableProperty<string> inputText,List<VideoInfoViewModel> videos)
+        public FilterViewModel(IBindableProperty<string> inputText, List<VideoInfoViewModel> videos)
         {
             this._inputText = inputText;
             this._videos = videos;

@@ -70,7 +70,7 @@ namespace Niconicome.Models.Utils.Reactive
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                if (e.NewItems?[0] is TOrigin item) this.Insert(e.NewStartingIndex, this._converter(item));
+                if (e.NewItems?[0] is TOrigin item) this.Add(this._converter(item));
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldStartingIndex >= 0)
             {
