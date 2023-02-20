@@ -44,5 +44,14 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2
 
         public int LikeCount { get; init; }
 
+        public IReadOnlyList<Tag> Tags { get; init; } = new List<Tag>();
+
+    }
+
+    public class Tag
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public bool IsNicodicExist { get; set; }
     }
 }

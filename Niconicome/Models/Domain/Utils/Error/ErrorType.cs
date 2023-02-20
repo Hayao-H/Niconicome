@@ -45,6 +45,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 19, typeof(WindowsFileIOError) },
             { 20, typeof(WindowsDirectoryIOError) },
             { 21, typeof(PlaylistCreatorError) },
+            { 22, typeof(PlaylistDBHandlerError) },
         };
     }
 }

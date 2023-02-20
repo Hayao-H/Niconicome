@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Niconicome.Extensions;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
@@ -93,7 +95,7 @@ namespace Niconicome.Models.Network.Video
         public async Task<IAttemptResult<Remote::RemotePlaylistInfo>> GetRemotePlaylistAsync(RemoteType remoteType, string remoteParameter, Action<string, ErrorLevel> onMessage)
         {
 
-            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasStarted, remoteType, remoteParameter),ErrorLevel.Log);
+            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasStarted, remoteType, remoteParameter), ErrorLevel.Log);
 
 
             IAttemptResult<Remote::RemotePlaylistInfo> result = remoteType switch
@@ -109,8 +111,9 @@ namespace Niconicome.Models.Network.Video
 
             if (result.IsSucceeded)
             {
-                onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasCompleted, remoteType, result.Data?.Videos.Count ?? 0, remoteParameter),ErrorLevel.Log);
-            } else
+                onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasCompleted, remoteType, result.Data?.Videos.Count ?? 0, remoteParameter), ErrorLevel.Log);
+            }
+            else
             {
                 onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingRemotePlaylistHasFailed, remoteType, remoteParameter), ErrorLevel.Error);
             }
@@ -120,12 +123,12 @@ namespace Niconicome.Models.Network.Video
 
         public async Task<IAttemptResult<Remote::VideoInfo>> GetVideoInfoAsync(string niconicoID, Action<string, ErrorLevel> onMessage)
         {
-            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingVideoHasStarted, niconicoID),ErrorLevel.Log);
+            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingVideoHasStarted, niconicoID), ErrorLevel.Log);
 
             IAttemptResult<Info::IDomainVideoInfo> result = await this._watch.GetVideoInfoAsync(niconicoID);
             if (!result.IsSucceeded || result.Data is null) return AttemptResult<Remote::VideoInfo>.Fail(result.Message);
 
-            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingVideoHasCompleted, niconicoID, result.Data.Title),ErrorLevel.Log);
+            onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingVideoHasCompleted, niconicoID, result.Data.Title), ErrorLevel.Log);
 
             return AttemptResult<Remote::VideoInfo>.Succeeded(new Remote.VideoInfo()
             {
@@ -136,10 +139,12 @@ namespace Niconicome.Models.Network.Video
                 OwnerID = result.Data.OwnerID.ToString(),
                 ViewCount = result.Data.ViewCount,
                 CommentCount = result.Data.CommentCount,
+                LikeCount = result.Data.LikeCount,
                 MylistCount = result.Data.MylistCount,
                 ChannelID = result.Data.ChannelID,
                 ChannelName = result.Data.ChannelName,
                 AddedAt = DateTime.Now,
+                Tags = result.Data.Tags.Select(t => new Remote::Tag() { IsNicodicExist = t.IsNicodicExist, Name = t.Name }).ToList().AsReadOnly(),
             });
         }
 

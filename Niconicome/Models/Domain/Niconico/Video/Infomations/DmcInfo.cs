@@ -22,7 +22,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         int MylistCount { get; }
         int LikeCount { get; }
         int Duration { get; }
-        List<string> Tags { get; set; }
+        IReadOnlyList<ITag> Tags { get; }
         bool IsDownloadable { get; set; }
         bool IsEncrypted { get; set; }
         bool IsOfficial { get; set; }
@@ -54,6 +54,13 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         int PostkeyStatus { get; }
         string Server { get; }
         string VideoID { get; }
+    }
+
+    public interface ITag
+    {
+        string Name { get; }
+
+        bool IsNicodicExist { get; }
     }
 
 
@@ -92,7 +99,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public int OwnerID { get; set; }
 
-        public List<string> Tags { get; set; } = new List<string>();
+        public IReadOnlyList<ITag> Tags { get; set; } = new List<ITag>();
 
         public bool IsDownloadable { get; set; } = true;
 
@@ -167,5 +174,12 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public string VideoID { get; init; } = string.Empty;
 
+    }
+
+    public class Tag : ITag
+    {
+        public string Name { get; init; } = string.Empty;
+
+        public bool IsNicodicExist { get; init; }
     }
 }

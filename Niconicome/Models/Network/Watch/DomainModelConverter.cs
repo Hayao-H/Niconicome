@@ -63,7 +63,7 @@ namespace Niconicome.Models.Network.Watch
             info.NiconicoId.Value = domainVideoInfo.Id;
 
             //タグ
-            info.Tags = domainVideoInfo.Tags;
+            info.Tags = domainVideoInfo.Tags.Select(t => t.Name);
 
             //再生回数
             info.ViewCount.Value = domainVideoInfo.ViewCount;
@@ -106,17 +106,18 @@ namespace Niconicome.Models.Network.Watch
             //タグ
             foreach (var tag in domainVideoInfo.Tags)
             {
-                if (!this._tagStore.Exist(tag))
+                if (!this._tagStore.Exist(tag.Name))
                 {
-                    this._tagStore.Create(tag);
+                    this._tagStore.Create(tag.Name);
                 }
 
-                IAttemptResult<ITagInfo> result = this._tagStore.GetTag(tag);
+                IAttemptResult<ITagInfo> result = this._tagStore.GetTag(tag.Name);
                 if (!result.IsSucceeded || result.Data is null)
                 {
                     continue;
                 }
 
+                result.Data.IsNicodicExist = tag.IsNicodicExist;
                 info.AddTag(result.Data);
             }
 

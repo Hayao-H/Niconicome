@@ -103,7 +103,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             data.Thumb.LikeCounter = info.LikeCount;
             data.Thumb.MylistCounter = info.MylistCount;
             data.Thumb.WatchUrl = Const::NetConstant.NiconicoWatchUrl + info.Id;
-            data.Thumb.Tags.Tag.AddRange(info.Tags.Select(t => new Xml::Tag() { Text = t }));
+            data.Thumb.Tags.Tag.AddRange(info.Tags.Select(t => new Xml::Tag() { Text = t.Name }));
             data.Thumb.UserId = info.ChannelName.IsNullOrEmpty() ? info.OwnerID.ToString() : null;
             data.Thumb.UserNickname = info.ChannelName.IsNullOrEmpty() ? info.Owner : null;
             data.Thumb.ChName = info.ChannelName.IsNullOrEmpty() ? null : info.ChannelName;
@@ -122,7 +122,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
                 this.ID = info.Id;
                 this.Description = info.Description;
                 this.Tags = new List<string>();
-                this.Tags.AddRange(info.Tags);
+                this.Tags.AddRange(info.Tags.Select(t => t.Name));
                 this.ViewCount = info.ViewCount;
                 this.MylistCount = info.MylistCount;
                 this.CommentCount = info.CommentCount;

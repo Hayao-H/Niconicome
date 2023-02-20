@@ -67,13 +67,14 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class VideoListManager : IVideoListManager
     {
-        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, IStringHandler stringHandler)
+        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, IStringHandler stringHandler,ITagStore tagStore)
         {
             this._container = container;
             this._loader = loader;
             this._errorHandler = errorHandler;
             this._migration = migration;
             this._videoStore = videoStore;
+            this._tagStore = tagStore;
             this._netVideos = netVideos;
             this._inputTextParser = inputTextParser;
             this._stringHandler = stringHandler;
@@ -90,6 +91,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
         private readonly IVideoAndPlayListMigration _migration;
 
         private readonly IVideoStore _videoStore;
+
+        private readonly ITagStore _tagStore;
 
         private readonly INetVideosInfomationHandler _netVideos;
 
@@ -380,6 +383,31 @@ namespace Niconicome.Models.Playlist.V2.Manager
             video.ChannelName = source.ChannelName;
             video.ChannelID = source.ChannelID;
             video.Duration = source.Duration;
+
+            foreach (var tag in source.Tags)
+            {
+                if (!this._tagStore.Exist(tag.Name))
+                {
+                    IAttemptResult cResult = this._tagStore.Create(tag.Name);
+                    if (!cResult.IsSucceeded)
+                    {
+                        continue;
+                    }
+                }
+
+                IAttemptResult<ITagInfo> tagResult = this._tagStore.GetTag(tag.Name);
+                if (!tagResult.IsSucceeded || tagResult.Data is null)
+                {
+                    continue;
+                }
+
+                tagResult.Data.IsNicodicExist = tag.IsNicodicExist;
+
+                if (!video.Tags.Any(t => t.Name == tag.Name))
+                {
+                    video.AddTag(tagResult.Data);
+                }
+            }
 
             video.IsAutoUpdateEnabled = true;
 

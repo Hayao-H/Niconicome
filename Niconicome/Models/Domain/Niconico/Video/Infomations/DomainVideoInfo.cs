@@ -20,7 +20,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         int CommentCount { get; }
         int LikeCount { get; }
         int Duration { get; }
-        IEnumerable<string> Tags { get; }
+        IReadOnlyList<ITag> Tags { get; }
         IDmcInfo DmcInfo { get; }
         dynamic RawDmcInfo { get; }
     }
@@ -96,7 +96,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// <summary>
         /// タグ
         /// </summary>
-        public IEnumerable<string> Tags => this.DmcInfo.Tags;
+        public IReadOnlyList<ITag> Tags => this.DmcInfo.Tags;
 
         /// <summary>
         /// DMC情報
@@ -138,6 +138,20 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                     }
 
 
+                    List<dynamic> tags = JsUtils.ToClrArray<dynamic>(this.RawDmcInfo.Tags);
+                    var clrTags = new List<ITag>();
+
+                    foreach (var jsTag in tags)
+                    {
+                        var tag = new Tag()
+                        {
+                            IsNicodicExist = jsTag.IsNicodicExist,
+                            Name = jsTag.Name,
+                        };
+                        clrTags.Add(tag);
+                    }
+
+
                     this.cachedDmcInfo = new DmcInfo()
                     {
                         Title = this.RawDmcInfo.Title,
@@ -163,9 +177,9 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         SessionInfo = sessionInfo,
                         IsPremium = this.RawDmcInfo.IsPremium,
                         IsPeakTime = this.RawDmcInfo.IsPeakTime,
+                        Tags = clrTags,
                         CommentServer = this.RawDmcInfo.CommentServer is CS::Undefined ? string.Empty : this.RawDmcInfo.CommentServer,
                     };
-                    this.cachedDmcInfo.Tags.AddRange(JsUtils.ToClrArray<string>(this.RawDmcInfo.Tags));
 
 
                     List<dynamic> threads = JsUtils.ToClrArray<dynamic>(this.RawDmcInfo.CommentThreads);
