@@ -303,7 +303,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<RemoteV2::Channel.IChannelVideoHandler, RemoteV2::Channel.ChannelVideoHandler>();
             services.AddTransient<RemoteV2::Channel.IChannelPageHtmlParser, RemoteV2::Channel.ChannelPageHtmlParser>();
             services.AddTransient<RemoteV2::Series.ISeriesHandler, RemoteV2::Series.SeriesHandler>();
-            services.AddTransient<RemoteV2::Series.ISeriesPageHtmlParser, RemoteV2::Series.SeriesPageHtmlParser>();
             services.AddTransient<RemoteV2::UserVideo.IUserVideoHandler, RemoteV2::UserVideo.UserVideoHandler>();
             services.AddTransient<RemoteV2::Search.ISearch, RemoteV2::Search.Search>();
             services.AddTransient<RemoteV2::Search.ISearchUrlConstructor, RemoteV2::Search.SearchUrlConstructor>();

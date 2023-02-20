@@ -11,7 +11,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Error
     {
         [ErrorEnum(ErrorLevel.Error, "「あとで見る」の取得に失敗しました。(url:{0} status_code:{1})")]
         FailedToRetrieveData,
-        [ErrorEnum(ErrorLevel.Error, "「あとで見る」データの解析に失敗しました。(page:{1})")]
+        [ErrorEnum(ErrorLevel.Error, "「あとで見る」データの解析に失敗しました。(page:{0})")]
         DataAnalysisFailed,
         [ErrorEnum(ErrorLevel.Log, "「あとで見る」の取得を開始しました。")]
         FetchStarted,
