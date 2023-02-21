@@ -43,7 +43,7 @@ namespace Niconicome.Models.Utils.Reactive
         public ReadonlyBindablePperty(IBindableProperty<T> baseProperty) : base(baseProperty.Value)
         {
             this._base = baseProperty;
-            this._changeHandler = () => this.OnPropertyChanged(nameof(this.Value));
+            this._changeHandler = () => this.OnPropertyChanged(this.Value, nameof(this.Value));
             baseProperty.RegisterPropertyChangeHandler(this._changeHandler);
         }
 

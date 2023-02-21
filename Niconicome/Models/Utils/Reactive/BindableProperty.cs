@@ -103,7 +103,7 @@ namespace Niconicome.Models.Utils.Reactive
             set
             {
                 this._value = value;
-                this.OnPropertyChanged();
+                this.OnPropertyChanged(value);
             }
         }
 

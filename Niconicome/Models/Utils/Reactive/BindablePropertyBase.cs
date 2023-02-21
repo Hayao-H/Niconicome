@@ -88,7 +88,7 @@ namespace Niconicome.Models.Utils.Reactive
 
         #region private
 
-        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        protected void OnPropertyChanged(T newValue, [CallerMemberName] string? name = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
@@ -96,7 +96,7 @@ namespace Niconicome.Models.Utils.Reactive
             {
                 foreach (var handler in this._handlers)
                 {
-                    handler(this._value);
+                    handler(newValue);
                 };
             }
             catch { }
