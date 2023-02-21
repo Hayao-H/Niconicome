@@ -65,6 +65,16 @@ namespace Niconicome.Models.Domain.Playlist
         bool IsAscendant { get; set; }
 
         /// <summary>
+        /// 選択されている動画数
+        /// </summary>
+        IReadonlyBindablePperty<int> SelectedVideosCount { get; }
+
+        /// <summary>
+        /// 動画数
+        /// </summary>
+        IReadonlyBindablePperty<int> VideosCount { get; }
+
+        /// <summary>
         /// 子プレイリスト(デフォルトでは空)
         /// </summary>
         ReadOnlyObservableCollection<IPlaylistInfo> Children { get; }
@@ -138,6 +148,16 @@ namespace Niconicome.Models.Domain.Playlist
             });
             this._videos = videos;
             this.Videos = videos.AsReadOnly();
+
+            this._videosCount = new BindableProperty<int>(videos.Count);
+            this.VideosCount = this._videosCount.AsReadOnly();
+
+            this.SelectedVideosCount = this._selectedVideosCount.AsReadOnly();
+            foreach (var video in videos)
+            {
+                video.IsSelected.Subscribe(this.OnSelectedChange);
+            }
+
         }
 
         #region field
@@ -157,6 +177,11 @@ namespace Niconicome.Models.Domain.Playlist
         private bool _isAscendant;
 
         private PlaylistType _playlistType = PlaylistType.Local;
+
+        private readonly BindableProperty<int> _selectedVideosCount = new(0);
+
+        private readonly BindableProperty<int> _videosCount;
+
 
         #endregion
 
@@ -212,6 +237,11 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
+        public IReadonlyBindablePperty<int> SelectedVideosCount { get; init; }
+
+        public IReadonlyBindablePperty<int> VideosCount { get; init; }
+
+
         public string RemoteParameter
         {
             get => this._remoteParameter;
@@ -222,31 +252,6 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public void MoveVideo(string sourceVideoID, string targetVideoID)
-        {
-            IVideoInfo source = this.Videos.First(v => v.NiconicoId == sourceVideoID);
-            IVideoInfo target = this.Videos.First(v => v.NiconicoId == targetVideoID);
-
-            int sourceIndex = this._videos.IndexOf(source);
-            int targetIndex = this._videos.IndexOf(target);
-
-            this._videos.Remove(source);
-
-            //上⇒下
-            if (sourceIndex < targetIndex)
-            {
-                this._videos.Insert(targetIndex - 1, source);
-            }
-            //下⇒上
-            else
-            {
-                this._videos.Insert(targetIndex, source);
-            }
-
-            this.SortType = SortType.Custom;
-            this.Update(this);
-
-        }
 
         public ReadOnlyObservableCollection<IPlaylistInfo> Children { get; init; }
 
@@ -275,15 +280,49 @@ namespace Niconicome.Models.Domain.Playlist
 
         public IAttemptResult AddVideo(IVideoInfo video)
         {
+            this._videosCount.Value++;
+            video.IsSelected.Subscribe(this.OnSelectedChange);
+            this.SetSelectedVideos();
+
             this._videos.Add(video);
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
+
         public IAttemptResult RemoveVideo(IVideoInfo video)
         {
+            this._videosCount.Value--;
+            video.IsSelected.UnRegisterPropertyChangeHandler(this.OnSelectedChange);
+            this.SetSelectedVideos();
+
             this._videos.RemoveAll(v => v.NiconicoId == video.NiconicoId);
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 
+        public void MoveVideo(string sourceVideoID, string targetVideoID)
+        {
+            IVideoInfo source = this.Videos.First(v => v.NiconicoId == sourceVideoID);
+            IVideoInfo target = this.Videos.First(v => v.NiconicoId == targetVideoID);
+
+            int sourceIndex = this._videos.IndexOf(source);
+            int targetIndex = this._videos.IndexOf(target);
+
+            this._videos.Remove(source);
+
+            //上⇒下
+            if (sourceIndex < targetIndex)
+            {
+                this._videos.Insert(targetIndex - 1, source);
+            }
+            //下⇒上
+            else
+            {
+                this._videos.Insert(targetIndex, source);
+            }
+
+            this.SortType = SortType.Custom;
+            this.Update(this);
+
+        }
         public void SetParentNamesList(List<string> names)
         {
             this._parentNames = names;
@@ -341,6 +380,23 @@ namespace Niconicome.Models.Domain.Playlist
             this._videos.AddRange(sortedList);
 
             this.Update(this);
+        }
+
+        private void OnSelectedChange(bool value)
+        {
+            if (value)
+            {
+                this._selectedVideosCount.Value++;
+            }
+            else
+            {
+                this._selectedVideosCount.Value--;
+            }
+        }
+
+        private void SetSelectedVideos()
+        {
+            this._selectedVideosCount.Value = this.Videos.Select(v => v.IsSelected.Value).Count();
         }
 
         #endregion
