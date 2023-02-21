@@ -152,6 +152,20 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                     }
 
 
+                    List<dynamic> targets = JsUtils.ToClrArray<dynamic>(this.RawDmcInfo.CommentTargets);
+                    var clrTargets = new List<ITarget>();
+
+                    foreach (var rawThread in targets)
+                    {
+                        var target = new Target()
+                        {
+                            Id = rawThread.Id,
+                            Fork = rawThread.Fork,
+                        };
+                        clrTargets.Add(target);
+                    }
+
+
                     this.cachedDmcInfo = new DmcInfo()
                     {
                         Title = this.RawDmcInfo.Title,
@@ -179,6 +193,9 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         IsPeakTime = this.RawDmcInfo.IsPeakTime,
                         Tags = clrTags,
                         CommentServer = this.RawDmcInfo.CommentServer is CS::Undefined ? string.Empty : this.RawDmcInfo.CommentServer,
+                        Threadkey = this.RawDmcInfo.Threadkey,
+                        CommentLanguage = this.RawDmcInfo.CommentLanguage,
+                        CommentTargets = clrTargets.AsReadOnly(),
                     };
 
 

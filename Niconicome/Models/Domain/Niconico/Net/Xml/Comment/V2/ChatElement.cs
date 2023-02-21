@@ -15,7 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.Comment.V2
         public string Thread { get; set; } = string.Empty;
 
         [XmlAttribute("fork")]
-        public int Fork { get; set; }
+        public string Fork { get; set; } = string.Empty;
 
         [XmlAttribute("no")]
         public int No { get; set; }
@@ -27,30 +27,21 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml.Comment.V2
         public long Date { get; set; }
 
         [XmlAttribute("date_usec")]
-        public long DateUsec { get; set; }
-
-        [XmlAttribute("anonymity")]
-        public int Anonymity { get; set; }
-
-        [XmlAttribute("nicoru")]
-        public int Nicoru { get; set; }
+        public int DatUsec { get; set; } = 0;
 
         [XmlAttribute("user_id")]
-        public string? UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
         [XmlAttribute("mail")]
-        public string? Mail { get; set; }
+        public string Mail { get; set; } = string.Empty;
 
         [XmlText]
-        public string? Text { get; set; }
-
-        [XmlAttribute("premium")]
-        public int Premium { get; set; }
+        public string Text { get; set; } = string.Empty;
 
         [XmlAttribute("score")]
         public int Score { get; set; }
 
-        [XmlAttribute("deleted")]
-        public int Deleted { get; set; }
+        [XmlAttribute("anonymity")]
+        public int Anonimity { get; set; } = 1;
     }
 }

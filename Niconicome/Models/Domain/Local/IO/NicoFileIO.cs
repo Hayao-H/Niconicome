@@ -92,8 +92,7 @@ namespace Niconicome.Models.Domain.Local.IO
                 }
             }
 
-            using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-            using var writer = new StreamWriter(fs, encoding ?? Encoding.UTF8);
+            using var writer = new StreamWriter(path, append, encoding ?? Encoding.UTF8);
             writer.Write(content);
         }
 

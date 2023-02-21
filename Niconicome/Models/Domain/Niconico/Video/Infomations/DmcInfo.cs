@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Const = Niconicome.Models.Const;
 
@@ -17,6 +18,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         string ChannelName { get; }
         string Description { get; }
         string CommentServer { get; }
+        string Threadkey { get; }
+        string CommentLanguage { get; }
         int ViewCount { get; }
         int CommentCount { get; }
         int MylistCount { get; }
@@ -33,9 +36,9 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; set; }
         ISessionInfo SessionInfo { get; }
+        IReadOnlyCollection<ITarget> CommentTargets { get; }
         List<IThread> CommentThreads { get; }
     }
-
     public interface IThread
     {
         long ID { get; }
@@ -54,6 +57,13 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         int PostkeyStatus { get; }
         string Server { get; }
         string VideoID { get; }
+    }
+
+    public interface ITarget
+    {
+        string Id { get; }
+
+        string Fork { get; }
     }
 
     public interface ITag
@@ -86,6 +96,10 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         public string Description { get; set; } = string.Empty;
 
         public string CommentServer { get; set; } = string.Empty;
+
+        public string Threadkey { get; set; } = string.Empty;
+
+        public string CommentLanguage { get; set; } = string.Empty;
 
         public int ViewCount { get; set; }
 
@@ -135,10 +149,16 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         public ISessionInfo SessionInfo { get; init; } = new SessionInfo();
 
         /// <summary>
+        /// コメントターゲット
+        /// </summary>
+        public IReadOnlyCollection<ITarget> CommentTargets { get; set; } = (new List<ITarget>()).AsReadOnly();
+
+        /// <summary>
         /// コメントスレッド
         /// </summary>
         public List<IThread> CommentThreads { get; set; } = new();
     }
+
 
     public class Thread : IThread
     {
@@ -174,6 +194,13 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public string VideoID { get; init; } = string.Empty;
 
+    }
+
+    public class Target : ITarget
+    {
+        public string Id { get; set; } = string.Empty;
+
+        public string Fork { get; set; }= string.Empty;
     }
 
     public class Tag : ITag

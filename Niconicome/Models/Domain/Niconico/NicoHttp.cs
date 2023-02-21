@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Windows.Media.Protection.PlayReady;
 using Const = Niconicome.Models.Const;
 
 
@@ -56,8 +57,9 @@ namespace Niconicome.Models.Domain.Niconico
 
             client.DefaultRequestHeaders.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
             client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
-            client.DefaultRequestHeaders.Add("X-Frontend-Id", "6");
-            client.DefaultRequestHeaders.Add("X-Frontend-Version", "0");
+            client.DefaultRequestHeaders.Add("x-frontend-id", "6");
+            client.DefaultRequestHeaders.Add("x-frontend-version", "0");
+            client.DefaultRequestHeaders.Add("x-client-os-type", "others");
 
             this._client = client;
         }
@@ -70,8 +72,9 @@ namespace Niconicome.Models.Domain.Niconico
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             m.Headers.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
             m.Headers.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
-            m.Headers.Add("X-Frontend-Id", "6");
-            m.Headers.Add("X-Frontend-Version", "0");
+            m.Headers.Add("x-frontend-id", "6");
+            m.Headers.Add("x-frontend-version", "0");
+            m.Headers.Add("x-client-os-type", "others");
 
             return m;
         }

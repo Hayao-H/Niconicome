@@ -16,7 +16,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <summary>
         /// コマンド
         /// </summary>
-        string? Mail { get; }
+        List<string> Command { get; }
 
         /// <summary>
         /// ユーザーID
@@ -31,7 +31,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <summary>
         /// Fork
         /// </summary>
-        int Fork { get; }
+        string Fork { get; }
 
         /// <summary>
         /// コメ番
@@ -46,22 +46,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <summary>
         /// プレ垢フラグ
         /// </summary>
-        int? Premium { get; }
-
-        /// <summary>
-        /// ？
-        /// </summary>
-        int Anonimity { get; }
+        bool IsPremium { get; }
 
         /// <summary>
         /// ニコられ数
         /// </summary>
         int Nicoru { get; }
-
-        /// <summary>
-        /// 削除フラグ？
-        /// </summary>
-        int? Deleted { get; }
 
         /// <summary>
         /// 共有NGスコア
@@ -71,24 +61,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <summary>
         /// 投稿日時
         /// </summary>
-        long Date { get; }
+        DateTime Date { get; }
 
         /// <summary>
-        /// 投稿日時の秒以下
+        /// 投稿日時(Unix時間)
         /// </summary>
-        long DateUsec { get; }
-
-        /// <summary>
-        /// コメントの種別
-        /// </summary>
-        CommentType CommentType { get; }
+        long UnixDate { get; }
     }
 
     public class Comment : IComment
     {
         public string? Content { get; init; }
 
-        public string? Mail { get; init; }
+        public List<string> Command { get; init; } = new();
 
         public string? UserID { get; init; }
 
@@ -96,33 +81,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
         public string Thread { get; init; } = string.Empty;
 
-        public int Fork { get; init; }
+        public string Fork { get; init; } = string.Empty;
 
         public int Vpos { get; init; }
 
-        public int? Premium { get; init; }
-
-        public int Anonimity { get; init; }
+        public bool IsPremium { get; init; }
 
         public int Nicoru { get; init; }
 
-        public int? Deleted { get; init; }
-
         public int Score { get; init; }
 
-        public long Date { get; set; }
+        public DateTime Date { get; set; }
 
-        public long DateUsec { get; set; }
+        public long UnixDate => (new DateTimeOffset(this.Date, TimeSpan.FromHours(9))).ToUnixTimeSeconds();
 
-        public CommentType CommentType { get; init; }
 
-    }
-
-    public enum CommentType
-    {
-        Normal,
-        Owner,
-        Easy,
-        Channel
     }
 }

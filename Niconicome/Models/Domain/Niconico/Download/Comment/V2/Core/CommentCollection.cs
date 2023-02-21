@@ -34,7 +34,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <param name="fork"></param>
         /// <param name="no"></param>
         /// <returns></returns>
-        IAttemptResult<IComment> Get(string thread, int fork, int no);
+        IAttemptResult<IComment> Get(string thread, string fork, int no);
 
         /// <summary>
         /// コメントの欠け情報を取得する
@@ -48,7 +48,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <param name="trhead"></param>
         /// <param name="fork"></param>
         /// <returns></returns>
-        IAttemptResult<IComment> GetFirstComment(string trhead, int fork);
+        IAttemptResult<IComment> GetFirstComment(string trhead, string fork);
     }
 
     public class CommentCollection : ICommentCollection
@@ -82,14 +82,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         public IAttemptResult Add(IComment comment)
         {
             string thread = comment.Thread;
-            int fork = comment.Fork;
+            string fork = comment.Fork;
 
             IChildCommentCollection collection = this.GetCollection(thread, fork);
 
             return collection.Add(comment);
         }
 
-        public IAttemptResult<IComment> Get(string thread, int fork, int no)
+        public IAttemptResult<IComment> Get(string thread, string fork, int no)
         {
             var collection = this.GetCollection(thread, fork);
 
@@ -116,7 +116,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
             return list;
         }
 
-        public IAttemptResult<IComment> GetFirstComment(string thread, int fork)
+        public IAttemptResult<IComment> GetFirstComment(string thread, string fork)
         {
             IChildCommentCollection collection = this.GetCollection(thread, fork);
 
@@ -133,7 +133,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// </summary>
         /// <param name="thread"></param>
         /// <param name="fork"></param>
-        private void AddCollectionIfNotExists(string thread, int fork)
+        private void AddCollectionIfNotExists(string thread, string fork)
         {
             if (!this._children.Any(c => c.Thread == thread && c.Fork == fork))
             {
@@ -147,7 +147,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <param name="thread"></param>
         /// <param name="fork"></param>
         /// <returns></returns>
-        private IChildCommentCollection GetCollection(string thread, int fork)
+        private IChildCommentCollection GetCollection(string thread, string fork)
         {
             this.AddCollectionIfNotExists(thread, fork);
 
@@ -165,5 +165,5 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
     /// <param name="Count">欠けたコメントの数（コメント番号が小さい（=古い）方へ）</param>
     /// <param name="Thread">Thread</param>
     /// <param name="Fork">Fork</param>
-    public record UnFilledRange(IComment Start, int Count, string Thread, int Fork);
+    public record UnFilledRange(IComment Start, int Count, string Thread, string Fork);
 }

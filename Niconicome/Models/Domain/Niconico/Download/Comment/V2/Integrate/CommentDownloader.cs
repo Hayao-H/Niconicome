@@ -71,10 +71,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
             token.ThrowIfCancellationRequested();
 
             //コメント取得処理
-            var dlOption = new Fetch::CommentClientOption(originationSpecidied, origination);
-            IAttemptResult<(Core::ICommentCollection, Core::IThreadInfo)> dlResult = await this._commentClient.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
+            var dlOption = new Fetch::CommentClientOption(originationSpecidied, settings.MaxCommentsCount > 0, origination, settings.MaxCommentsCount);
+            IAttemptResult<Core::ICommentCollection> dlResult = await this._commentClient.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
 
-            if (!dlResult.IsSucceeded)
+            if (!dlResult.IsSucceeded || dlResult.Data is null)
             {
                 return AttemptResult.Fail(dlResult.Message);
             }
@@ -83,7 +83,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
             token.ThrowIfCancellationRequested();
 
             //コメント統合処理
-            var (collection, threadInfo) = dlResult.Data;
+            var collection = dlResult.Data;
             if (oldComments.Count > 0)
             {
                 foreach (var comment in oldComments) collection.Add(comment);
@@ -93,7 +93,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
             string path = this._path.GetFilePath(settings.FileNameFormat, dmcInfo, ".xml", settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
             var writerOption = new Local::CommentWriterOption(path, settings.OmittingXmlDeclaration, dmcInfo.Id);
 
-            IAttemptResult writeResult = this._commentWriter.WriteComment(collection.Comments, threadInfo, writerOption);
+            IAttemptResult writeResult = this._commentWriter.WriteComment(collection.Comments, writerOption);
 
             if (!writeResult.IsSucceeded)
             {
