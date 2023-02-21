@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Niconicome.Models.Utils.Reactive
 {
@@ -13,6 +14,8 @@ namespace Niconicome.Models.Utils.Reactive
         private readonly List<IBindable> _bindables = new();
 
         private readonly List<Action> _handlers = new();
+
+        private Timer? _timer;
 
         #endregion
 
@@ -45,14 +48,27 @@ namespace Niconicome.Models.Utils.Reactive
 
         private void OnProprtyChange()
         {
-            try
+
+            if (this._timer is not null)
             {
-                foreach (var handler in this._handlers)
-                {
-                    handler();
-                }
+                this._timer.Stop();
             }
-            catch { }
+
+            this._timer = new Timer(1000);
+            this._timer.AutoReset = false;
+            this._timer.Elapsed += (_, _) =>
+            {
+                try
+                {
+                    foreach (var handler in this._handlers)
+                    {
+                        handler();
+                    }
+                }
+                catch { }
+            };
+
+            this._timer.Enabled = true;
         }
 
         #endregion
