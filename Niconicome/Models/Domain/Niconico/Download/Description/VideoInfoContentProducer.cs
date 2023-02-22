@@ -46,7 +46,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
                 "[comment]",
                 info.Description+Environment.NewLine,
                 "[tags]",
-                String.Join(Environment.NewLine,info.Tags)+Environment.NewLine,
+                String.Join(Environment.NewLine,info.Tags.Select(t=>t.Name))+Environment.NewLine,
                 "[view_counter]",
                 info.ViewCount.ToString()+Environment.NewLine,
                 "[comment_num]",
