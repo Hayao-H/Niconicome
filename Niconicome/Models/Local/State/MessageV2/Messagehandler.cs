@@ -49,6 +49,8 @@ namespace Niconicome.Models.Local.State.MessageV2
 
         private readonly ObservableCollection<Message> _messages = new();
 
+        private readonly object _localObj = new();
+
         #endregion
 
         #region Props
@@ -62,7 +64,10 @@ namespace Niconicome.Models.Local.State.MessageV2
         public void AppendMessage(string content, string dispacer, ErrorLevel errorLevel = ErrorLevel.Log)
         {
             var message = new Message(content, dispacer, DateTime.Now, errorLevel);
-            this._messages.Add(message);
+            lock (this._localObj)
+            {
+                this._messages.Add(message);
+            }
         }
 
         public void ClearMessage()

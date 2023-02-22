@@ -49,6 +49,8 @@ namespace Niconicome.Models.Utils.Reactive
 
         private Action? _handler;
 
+        private readonly object _lockObj = new object();
+
         #endregion
 
         #region Method
@@ -68,33 +70,51 @@ namespace Niconicome.Models.Utils.Reactive
 
         private void OnBaseCollecitonChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == NotifyCollectionChangedAction.Add)
+            lock(this._lockObj)
             {
-                if (e.NewItems?[0] is TOrigin item) this.Add(this._converter(item));
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldStartingIndex >= 0)
-            {
-                this.RemoveAt(e.OldStartingIndex);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Replace)
-            {
-                if (e.NewItems?[0] is TOrigin item) this[e.OldStartingIndex] = this._converter(item);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Move)
-            {
-                this.Move(e.OldStartingIndex, e.NewStartingIndex);
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Reset)
-            {
-                this.Clear();
-                foreach (var item in this._baseCollection.As<IEnumerable<TOrigin>>()) this.Add(this._converter(item));
-            }
+                if (e.Action == NotifyCollectionChangedAction.Add)
+                {
+                    if (e.NewItems?[0] is TOrigin item)
+                    {
+                        TItem converted = this._converter(item);
+                        if (converted is null)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            this.Add(converted);
+                        }
+                    }
+                }
+                else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldStartingIndex >= 0)
+                {
+                    this.RemoveAt(e.OldStartingIndex);
+                }
+                else if (e.Action == NotifyCollectionChangedAction.Replace)
+                {
+                    if (e.NewItems?[0] is TOrigin item) this[e.OldStartingIndex] = this._converter(item);
+                }
+                else if (e.Action == NotifyCollectionChangedAction.Move)
+                {
+                    this.Move(e.OldStartingIndex, e.NewStartingIndex);
+                }
+                else if (e.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    this.Clear();
+                    foreach (var item in this._baseCollection.As<IEnumerable<TOrigin>>()) this.Add(this._converter(item));
+                }
+                else
+                {
+                    return;
+                }
 
-            try
-            {
-                this._handler?.Invoke();
+                try
+                {
+                    this._handler?.Invoke();
+                }
+                catch { }
             }
-            catch { }
         }
 
         #endregion

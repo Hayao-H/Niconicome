@@ -9,7 +9,9 @@ namespace Niconicome.Models.Network.Video.Error
 {
     public enum NetVideosInfomationHandlerError
     {
-        [ErrorEnum(ErrorLevel.Error,"リモートプレイリストではない形式です。({0})")]
+        [ErrorEnum(ErrorLevel.Error, "リモートプレイリストではない形式です。({0})")]
         NotRemotePlaylist,
+        [ErrorEnum(ErrorLevel.Error, "取得対象の動画が空です。")]
+        SourceIsEmpty,
     }
 }

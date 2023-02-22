@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using MS.WindowsAPICodePack.Internal;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Local.LocalFile;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
+using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Video;
 using Niconicome.Models.Playlist.V2.Manager.Error;
+using Niconicome.Models.Playlist.V2.Manager.StringContent;
 using Niconicome.Models.Playlist.V2.Migration;
 using Remote = Niconicome.Models.Domain.Niconico.Remote.V2;
 
@@ -48,12 +55,15 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
     public class VideoListCRDHandler : VideoListManagerHelperBase, IVideoListCRDHandler
     {
-        public VideoListCRDHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, ITagStore tagStore) : base(videoStore, tagStore)
+        public VideoListCRDHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, ITagStore tagStore, ILocalDirectoryHandler directoryHandler, IStringHandler stringHandler, ISettingsContainer settingsContainer) : base(videoStore, tagStore)
         {
             this._container = container;
             this._errorHandler = errorHandler;
             this._netVideos = netVideos;
             this._inputTextParser = inputTextParser;
+            this._directoryHandler = directoryHandler;
+            this._stringHandler = stringHandler;
+            this._settingsContainer = settingsContainer;
         }
 
         #region field
@@ -65,6 +75,12 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
         private readonly INetVideosInfomationHandler _netVideos;
 
         private readonly IInputTextParser _inputTextParser;
+
+        private readonly ILocalDirectoryHandler _directoryHandler;
+
+        private readonly IStringHandler _stringHandler;
+
+        private readonly ISettingsContainer _settingsContainer;
 
         #endregion
 
@@ -128,6 +144,26 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 }
 
                 rResult = new VideoRegistrationResult(false, result.Data.Videos.Count, string.Empty, string.Empty);
+            }
+            else if (info.InputType == InputType.LocalVideo)
+            {
+                IAttemptResult<IImmutableList<IVideoInfo>> result = await this.GetVIdeosFromLocalDirectory(info.Parameter, playlist.ID, onMessage);
+                if (!result.IsSucceeded || result.Data is null)
+                {
+                    return AttemptResult<VideoRegistrationResult>.Fail(result.Message);
+                }
+
+                if (playlist.PlaylistType != PlaylistType.Temporary)
+                {
+                    foreach (var video in result.Data)
+                    {
+                        playlist.AddVideo(video);
+                    }
+                }
+                else
+                {
+                    videos.AddRange(result.Data);
+                }
             }
 
             if (this._container.CurrentSelectedPlaylist?.ID == playlist.ID)
@@ -212,6 +248,70 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
             return AttemptResult.Succeeded();
 
+        }
+
+        #endregion
+
+        #region private
+
+        private async Task<IAttemptResult<IImmutableList<IVideoInfo>>> GetVIdeosFromLocalDirectory(string directoryPath, int playlistID, Action<string, ErrorLevel> onMessage)
+        {
+
+            IAttemptResult<IImmutableList<string>> idResult = this._directoryHandler.GetVideoIdsFromDirectory(directoryPath);
+            if (!idResult.IsSucceeded || idResult.Data is null)
+            {
+                return AttemptResult<IImmutableList<IVideoInfo>>.Fail(idResult.Message);
+            }
+
+            onMessage(this._stringHandler.GetContent(VideoListManagerString.VideosFoundInLocalDirectory, idResult.Data.Count), ErrorLevel.Log);
+
+            IAttemptResult<ISettingInfo<bool>> settingResult = this._settingsContainer.GetSetting(SettingNames.StoreOnlyNiconicoIDOnRegister, false);
+            if (!settingResult.IsSucceeded || settingResult.Data is null)
+            {
+                return AttemptResult<IImmutableList<IVideoInfo>>.Fail(settingResult.Message);
+            }
+
+            var videos = new List<IVideoInfo>();
+
+
+            if (settingResult.Data.Value)
+            {
+                foreach (var video in idResult.Data)
+                {
+                    if (!this._videoStore.Exist(video, playlistID))
+                    {
+                        IAttemptResult cResult = this._videoStore.Create(video,playlistID);
+                        if (!cResult.IsSucceeded)
+                        {
+                            return AttemptResult<IImmutableList<IVideoInfo>>.Fail(cResult.Message);
+                        }
+                    }
+
+                    IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(video, playlistID);
+                    if (!vResult.IsSucceeded || vResult.Data is null)
+                    {
+                        return AttemptResult<IImmutableList<IVideoInfo>>.Fail(vResult.Message);
+                    }
+
+                    videos.Add(vResult.Data);
+                }
+
+                return AttemptResult<IImmutableList<IVideoInfo>>.Succeeded(videos.ToImmutableList());
+            }
+
+            IAttemptResult<Remote::RemotePlaylistInfo> result = await this._netVideos.GetVideoInfoAsync(idResult.Data, onMessage);
+            if (!result.IsSucceeded || result.Data is null) return AttemptResult<IImmutableList<IVideoInfo>>.Fail(result.Message);
+
+            foreach (var video in result.Data.Videos)
+            {
+                IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlistID, video);
+                if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<IImmutableList<IVideoInfo>>.Fail(vResult.Message);
+
+                videos.Add(vResult.Data);
+            }
+
+
+            return AttemptResult<IImmutableList<IVideoInfo>>.Succeeded(videos.ToImmutableList());
         }
 
         #endregion

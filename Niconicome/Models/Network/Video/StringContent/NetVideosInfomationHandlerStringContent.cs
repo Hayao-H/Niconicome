@@ -17,7 +17,13 @@ namespace Niconicome.Models.Network.Video.StringContent
         RetrievingRemotePlaylistHasFailed,
         [StringEnum("動画の取得を開始しました。(id:{0})")]
         RetrievingVideoHasStarted,
+        [StringEnum("動画情報の取得に失敗しました。(id:{0})")]
+        RetrievingOfVideoHasFailed,
+        [StringEnum("詳細:{0}")]
+        RetrievingOfVideoHasFailedDetail,
         [StringEnum("動画の取得が完了しました。(id:{0}, title:{1})")]
         RetrievingVideoHasCompleted,
+        [StringEnum("待機中...(15s)")]
+        FetchSleeping,
     }
 }

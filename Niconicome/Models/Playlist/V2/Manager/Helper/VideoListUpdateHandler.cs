@@ -163,56 +163,29 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
             IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
 
-            IAttemptResult<ISettingInfo<int>> maxPResult = this._settingsContainer.GetSetting(SettingNames.MaxParallelFetchCount, NetConstant.DefaultMaxParallelFetchCount);
-            IAttemptResult<ISettingInfo<int>> waitResult = this._settingsContainer.GetSetting(SettingNames.FetchSleepInterval, NetConstant.DefaultFetchWaitInterval);
-
-            if (!maxPResult.IsSucceeded || maxPResult.Data is null)
-            {
-                this._errorHandler.HandleError(VideoListManagerError.FailedToGetSetting, SettingNames.MaxParallelFetchCount);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.FailedToGetSetting, SettingNames.MaxParallelFetchCount));
-            }
-
-            if (!waitResult.IsSucceeded || waitResult.Data is null)
-            {
-                this._errorHandler.HandleError(VideoListManagerError.FailedToGetSetting, SettingNames.FetchSleepInterval);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.FailedToGetSetting, SettingNames.FetchSleepInterval));
-            }
-
-            var handler = new ParallelTask::ParallelTasksHandler<IVideoInfo>(maxPResult.Data.Value, waitResult.Data.Value, 15);
             this.cts = new CancellationTokenSource();
 
             this.IsUpdating.Value = true;
+            onMessage(this._stringHandler.GetContent(VideoListManagerString.UpdateOfVideoHasStarted), ErrorLevel.Log);
 
-            foreach (var video in source)
+
+            IAttemptResult<Remote::RemotePlaylistInfo> result = await this._netVideos.GetVideoInfoAsync(source.Select(v => v.NiconicoId), onMessage, cts.Token);
+
+            if (!result.IsSucceeded || result.Data is null)
             {
-                handler.AddTaskToQueue(new VideoUpdateTask(video, async (v, _) =>
-                {
-                    if (this.cts?.IsCancellationRequested ?? true)
-                    {
-                        return;
-                    }
-
-                    onMessage(this._stringHandler.GetContent(VideoListManagerString.UpdateOfVideoHasStarted, v.NiconicoId), ErrorLevel.Log);
-
-                    IAttemptResult<Remote::VideoInfo> result = await this._netVideos.GetVideoInfoAsync(v.NiconicoId, onMessage);
-                    if (!result.IsSucceeded || result.Data is null)
-                    {
-
-                        onMessage(this._stringHandler.GetContent(VideoListManagerString.UpdateOfVideoHasFailed, v.NiconicoId), ErrorLevel.Error);
-                        onMessage(this._stringHandler.GetContent(VideoListManagerString.UpdateOfVideoHasFailedDetail, result.Message ?? string.Empty), ErrorLevel.Error);
-                        return;
-                    }
-
-                    this.ConvertToVideoInfo(playlist.ID, result.Data);
-
-                    v.IsSelected.Value = false;
-
-                    onMessage(this._stringHandler.GetContent(VideoListManagerString.UpdateOfVideoHasCompleted, v.NiconicoId), ErrorLevel.Log);
-
-                }, _ => onMessage(this._stringHandler.GetContent(VideoListManagerString.FetchSleepMessage), ErrorLevel.Log)));
+                return AttemptResult<Remote::RemotePlaylistInfo>.Fail(result.Message);
             }
 
-            await handler.ProcessTasksAsync(ct: cts.Token);
+            foreach (var video in result.Data.Videos)
+            {
+                IAttemptResult<IVideoInfo> cResult = this.ConvertToVideoInfo(playlist.ID, video);
+                if (!cResult.IsSucceeded || cResult.Data is null)
+                {
+                    continue;
+                }
+
+                cResult.Data.IsSelected.Value = false;
+            }
 
             this.IsUpdating.Value = false;
 

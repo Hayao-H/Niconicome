@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Error = Niconicome.Models.Domain.Utils.Error;
-using Niconicome.Models.Local.State.MessageV2;
-using WS = Niconicome.Workspaces;
-using Niconicome.Models.Utils.Reactive;
-using Niconicome.Models.Helper.Result;
-using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent;
+﻿using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Utils.Error;
-using Niconicome.Models.Const;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.State.MessageV2;
+using Niconicome.Models.Utils.Reactive;
+using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent;
+using Error = Niconicome.Models.Domain.Utils.Error;
+using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2
     public class RemotePlaylistInfo
     {
         public List<VideoInfo> Videos { get; init; } = new();
+
+        public IImmutableList<string> FailedVideos { get; init; } = (new List<string>()).ToImmutableList();
 
         public string PlaylistName { get; set; } = string.Empty;
     }
