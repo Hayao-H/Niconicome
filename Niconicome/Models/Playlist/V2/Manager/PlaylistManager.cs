@@ -78,6 +78,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
             //移行が必要な場合は処理を中止
             if (this._migration.IsMigrationNeeded) return;
 
+            this._playlists.Clear();
+
             //特殊なプレイリストを作成
             IAttemptResult specialResult = this.CreateSpecialPlaylist();
             if (!specialResult.IsSucceeded) return;

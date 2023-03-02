@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Settings;
@@ -137,6 +138,32 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             IAttemptResult<Dictionary<string, object>> result = this.Read();
             return result.IsSucceeded ? AttemptResult.Succeeded() : AttemptResult.Fail();
         }
+
+        public IAttemptResult Clear()
+        {
+            IAttemptResult iResult = this.Initialize();
+            if (!iResult.IsSucceeded)
+            {
+                return AttemptResult.Fail(iResult.Message);
+            }
+
+            IAttemptResult<Dictionary<string, object>> dResult = this.Read();
+            if (!dResult.IsSucceeded || dResult.Data is null)
+            {
+                return AttemptResult.Fail(dResult.Message);
+            }
+
+            Dictionary<string, object> data = dResult.Data;
+
+            IAttemptResult result = this.Update(data);
+            if (result.IsSucceeded)
+            {
+                this._errorHandler.HandleError(SettingJSONError.SettingCleared);
+            }
+
+            return result;
+        }
+
 
 
         #endregion
@@ -272,14 +299,31 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             {
                 if (x.Value is JsonElement element)
                 {
-                    data.Add(x.Key, element.ValueKind switch
+                    if (element.ValueKind == JsonValueKind.Array)
                     {
-                        JsonValueKind.True => true,
-                        JsonValueKind.False => false,
-                        JsonValueKind.Number => element.GetInt32(),
-                        JsonValueKind.String => element.GetString() ?? string.Empty,
-                        _ => throw new NotSupportedException()
-                    });
+                        var stringList = new List<string>();
+                        foreach (JsonElement elm in element.EnumerateArray())
+                        {
+                            stringList.Add(element.ValueKind switch
+                            {
+                                JsonValueKind.String => element.GetString() ?? string.Empty,
+                                _ => throw new NotSupportedException()
+                            });
+                        }
+
+
+                        data.Add(x.Key, stringList);
+                    } else
+                    {
+                        data.Add(x.Key, element.ValueKind switch
+                        {
+                            JsonValueKind.True => true,
+                            JsonValueKind.False => false,
+                            JsonValueKind.Number => element.GetInt32(),
+                            JsonValueKind.String => element.GetString() ?? string.Empty,
+                            _ => throw new NotSupportedException()
+                        });
+                    }
                 }
             }
 

@@ -32,10 +32,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="wwwroot\addon.html" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="1.0.1" />
 		<PackageReference Include="CredentialManagement" Version="1.0.2" />
 		<PackageReference Include="LiteDB" Version="5.0.15" />

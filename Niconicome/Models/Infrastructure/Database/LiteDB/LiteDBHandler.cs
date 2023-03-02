@@ -13,7 +13,7 @@ using Type = Niconicome.Models.Infrastructure.Database.Types;
 
 namespace Niconicome.Models.Infrastructure.Database.LiteDB
 {
-    public interface ILiteDBHandler
+    public interface ILiteDBHandler : IDisposable
     {
         /// <summary>
         /// 条件を指定してレコードを取得
@@ -58,7 +58,6 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         /// <returns></returns>
         bool Exists<T>(string tableName, Expression<Func<T, bool>> predicate);
 
-
         /// <summary>
         /// 追加
         /// </summary>
@@ -99,6 +98,12 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         /// </summary>
         /// <returns></returns>
         IAttemptResult Clear(string tableName);
+
+        /// <summary>
+        /// データベースファイルを開き直す
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult ReOpen();
     }
 
     public class LiteDBHandler : ILiteDBHandler
@@ -106,7 +111,8 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         public LiteDBHandler(IDataBase dataBase, IErrorHandler errorHandler)
         {
             //今のところ、LiteDBのインスタンスを共有する必要がある。
-            this._database = dataBase.DB!;
+            this._dataBase = dataBase;
+            this._liteDB = dataBase.DB!;
 
             this._errorHandler = errorHandler;
             this._errorHandler.HandleError(LiteDBError.Initialized);
@@ -117,7 +123,9 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 
         #region field
 
-        private readonly ILiteDatabase _database;
+        private readonly IDataBase _dataBase;
+
+        private ILiteDatabase _liteDB;
 
         private readonly IErrorHandler _errorHandler;
 
@@ -385,7 +393,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 
             try
             {
-                this._database.DropCollection(tableName);
+                this._liteDB.DropCollection(tableName);
             }
             catch (Exception ex)
             {
@@ -394,6 +402,18 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
             }
 
             this._errorHandler.HandleError(LiteDBError.AllRecordDeleted, tableName);
+            return AttemptResult.Succeeded();
+        }
+
+        public IAttemptResult ReOpen()
+        {
+            IAttemptResult result = this._dataBase.Open();
+            if (!result.IsSucceeded)
+            {
+                return result;
+            }
+
+            this._liteDB = this._dataBase.DB!;
             return AttemptResult.Succeeded();
         }
 
@@ -413,7 +433,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
 
             try
             {
-                collection = this._database.GetCollection<T>(tableName);
+                collection = this._liteDB.GetCollection<T>(tableName);
             }
             catch (Exception ex)
             {
@@ -434,5 +454,10 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            this._dataBase.Dispose();
+        }
     }
 }

@@ -148,6 +148,8 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string AppIdParam { get; private set; } = "Local.SendToAppAParam";
 
+        public static string VideoSearchDirectories { get; private set; } = "Local.VideoSearchDirectories";
+
         //Playlist
         public static string SaveTreePrevExpandedState { get; private set; } = "Playlist.SavePlaylistTreePreviousExpandedState";
 

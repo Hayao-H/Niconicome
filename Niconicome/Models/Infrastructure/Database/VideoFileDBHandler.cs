@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Automation.Text;
+using Niconicome.Extensions.System;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Infrastructure.Database.Types;
@@ -14,10 +16,11 @@ namespace Niconicome.Models.Infrastructure.Database
 {
     public class VideoFileDBHandler : IVideoFileStore
     {
-        public VideoFileDBHandler(ILiteDBHandler liteDB,INiconicomeFileIO fileIO)
+        public VideoFileDBHandler(ILiteDBHandler liteDB, INiconicomeFileIO fileIO, INiconicoUtils utils)
         {
             this._liteDB = liteDB;
             this._fileIO = fileIO;
+            this._utils = utils;
         }
 
         #region field
@@ -25,6 +28,8 @@ namespace Niconicome.Models.Infrastructure.Database
         private readonly ILiteDBHandler _liteDB;
 
         private readonly INiconicomeFileIO _fileIO;
+
+        private readonly INiconicoUtils _utils;
 
         #endregion
 
@@ -69,6 +74,33 @@ namespace Niconicome.Models.Infrastructure.Database
         {
             return this._liteDB.Exists<VideoFile>(TableNames.Video, v => v.NiconicoID == niconicoID && v.VerticalResolution == verticalResolution);
         }
+
+        public IAttemptResult<int> AddFilesFromDirectoryList(IEnumerable<string> directories)
+        {
+            var succeeded = 0;
+
+            foreach (var directory in directories)
+            {
+                this._fileIO.EnumerateFiles(directory, "*" + FileFolder.Mp4FileExt, path =>
+                {
+                    string id = this._utils.GetIdFromFIleName(path);
+                    if (id.IsNullOrEmpty())
+                    {
+                        return;
+                    }
+
+                    IAttemptResult result = this.AddFile(id, path);
+                    if (result.IsSucceeded)
+                    {
+                        succeeded++;
+                    }
+
+                }, true);
+            }
+
+            return AttemptResult<int>.Succeeded(succeeded);
+        }
+
 
 
         #endregion

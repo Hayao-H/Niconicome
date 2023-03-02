@@ -167,6 +167,11 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._database.Clear(TableNames.SharedVideo);
         }
 
+        public void Flush()
+        {
+            this._cache.Clear();
+        }
+
         public bool Exist(string niconicoID, int playlistID)
         {
             if (!this._database.Exists<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID)) return false;

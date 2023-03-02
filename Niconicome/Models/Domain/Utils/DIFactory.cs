@@ -67,6 +67,8 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
 using DomainWatchV2 = Niconicome.Models.Domain.Niconico.Watch.V2;
+using Restore = Niconicome.Models.Local.Restore;
+using Backup = Niconicome.Models.Domain.Local.DataBackup;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -144,8 +146,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<State::ILocalState, State::LocalState>();
             services.AddTransient<LocalFile::IEncodeutility, LocalFile::Encodeutility>();
             services.AddTransient<Store::IVideoFileStorehandler, Store::VideoFileStorehandler>();
-            services.AddTransient<Local::IRestore, Local::Restore>();
-            services.AddTransient<Local::IBackuphandler, Local::BackupHandler>();
+            services.AddTransient<Restore::IRestoreManager, Restore::RestoreManager>();
+            services.AddTransient<Backup::IBackupManager, Backup::BackupManager>();
             services.AddTransient<DomainPlaylist::IPlaylistFileFactory, DomainPlaylist::PlaylistFileFactory>();
             services.AddTransient<Ext.Playlist.IPlaylistCreator, Ext::Playlist.PlaylistCreator>();
             services.AddSingleton<MyApplication::IShutdown, MyApplication::Shutdown>();

@@ -141,6 +141,7 @@ namespace Niconicome.Models.Domain.Playlist
         public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore) : base(playlistStore)
         {
             this.Children = new ReadOnlyObservableCollection<IPlaylistInfo>(this._children);
+
             this.Name = new BindableProperty<string>(name);
             this.Name.RegisterPropertyChangeHandler(_ =>
             {
@@ -255,7 +256,7 @@ namespace Niconicome.Models.Domain.Playlist
 
         public ReadOnlyObservableCollection<IPlaylistInfo> Children { get; init; }
 
-        public IReadOnlyList<int> ChildrenID { get; init; } = new List<int>().AsReadOnly();
+        public IReadOnlyList<int> ChildrenID { get; init; } = (new List<int>()).AsReadOnly();
 
         public IReadOnlyList<IVideoInfo> Videos { get; init; }
 
@@ -275,6 +276,7 @@ namespace Niconicome.Models.Domain.Playlist
         public IAttemptResult RemoveChild(IPlaylistInfo playlistInfo)
         {
             this._children.Remove(playlistInfo);
+
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 
@@ -323,6 +325,7 @@ namespace Niconicome.Models.Domain.Playlist
             this.Update(this);
 
         }
+
         public void SetParentNamesList(List<string> names)
         {
             this._parentNames = names;

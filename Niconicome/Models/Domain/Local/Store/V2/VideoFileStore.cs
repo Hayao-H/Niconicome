@@ -30,7 +30,7 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// </summary>
         /// <param name="directories"></param>
         /// <returns></returns>
-        //IAttemptResult AddFilesFromDirectoryList(IEnumerable<string> directories);
+        IAttemptResult<int> AddFilesFromDirectoryList(IEnumerable<string> directories);
 
         /// <summary>
         /// ファイルの存在を確認

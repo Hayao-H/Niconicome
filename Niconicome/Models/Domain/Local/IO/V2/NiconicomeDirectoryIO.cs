@@ -21,6 +21,6 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        bool Exist(string path);
+        bool Exists(string path);
     }
 }

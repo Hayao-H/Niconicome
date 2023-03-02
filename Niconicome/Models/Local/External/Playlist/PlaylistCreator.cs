@@ -71,20 +71,17 @@ namespace Niconicome.Models.Local.External.Playlist
             }
 
             int allVideos = videos.Count;
-            List<string> videosPath = new();
-            string data;
-            try
+            List<PlaylistV2::IVideoInfo> existingVideos = new();
+
+            existingVideos = videos.Where(p => this._fileIO.Exists(p.FilePath)).ToList();
+            IAttemptResult<string> result = this._fileFactory.GetPlaylist(existingVideos, playlistName, type);
+
+            if (!result.IsSucceeded||result.Data  is null)
             {
-                videosPath = videos.Select(v => v.FilePath).Where(p => this._fileIO.Exist(p)).ToList();
-                data = this._fileFactory.GetPlaylist(videosPath, playlistName, type);
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(PlaylistCreatorError.FailedToCreatePlaylis, ex, type.ToString());
-                return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(PlaylistCreatorError.FailedToCreatePlaylis, ex, type.ToString()));
+                return AttemptResult<int>.Fail(result.Message);
             }
 
-            if (!this._directoryIO.Exist(folderPath))
+            if (!this._directoryIO.Exists(folderPath))
             {
                 IAttemptResult dirResult = this._directoryIO.CreateDirectory(folderPath);
                 if (!dirResult.IsSucceeded)
@@ -93,13 +90,13 @@ namespace Niconicome.Models.Local.External.Playlist
                 }
             }
 
-            IAttemptResult writeResult = this._fileIO.Write(Path.Combine(folderPath, $"playlist.{this.GetExt(type)}"), data, encoding: this.GetEncording(type));
+            IAttemptResult writeResult = this._fileIO.Write(Path.Combine(folderPath, $"playlist.{this.GetExt(type)}"), result.Data, encoding: this.GetEncording(type));
             if (!writeResult.IsSucceeded)
             {
                 return AttemptResult<int>.Fail(writeResult.Message);
             }
 
-            return AttemptResult<int>.Succeeded(allVideos - videosPath.Count);
+            return AttemptResult<int>.Succeeded(allVideos - existingVideos.Count);
         }
 
 

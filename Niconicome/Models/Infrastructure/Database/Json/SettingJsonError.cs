@@ -29,6 +29,8 @@ namespace Niconicome.Models.Infrastructure.Database.Json
         SettingNotFound,
         [ErrorEnum(ErrorLevel.Error,"設定値{0}の型({1})が指定された型({2})と一致しません。")]
         SettingTypeNotMatch,
+        [ErrorEnum(ErrorLevel.Warning, "設定がリセットされました。")]
+        SettingCleared,
 
     }
 }

@@ -44,6 +44,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult Flush();
 
         /// <summary>
+        /// 全ての設定を削除する
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult Clear();
+
+        /// <summary>
         /// 設定情報が空であるかどうかを返す
         /// </summary>
         bool IsEmpty { get; }

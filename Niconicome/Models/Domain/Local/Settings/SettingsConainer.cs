@@ -18,6 +18,12 @@ namespace Niconicome.Models.Domain.Local.Settings
         /// <param name="settingName"></param>
         /// <returns></returns>
         IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName, T defaultValue) where T : notnull;
+
+        /// <summary>
+        /// 全ての設定を削除する
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult ClearSettings();
     }
 
     public class SettingsConainer : ISettingsContainer
@@ -53,6 +59,12 @@ namespace Niconicome.Models.Domain.Local.Settings
 
             return this._store.GetSetting<T>(settingName);
         }
+
+        public　IAttemptResult ClearSettings()
+        {
+            return this._store.Clear();
+        }
+
 
 
         #endregion

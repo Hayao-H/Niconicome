@@ -40,7 +40,7 @@ namespace Niconicome.Models.Infrastructure.IO
             return AttemptResult.Succeeded();
         }
 
-        public bool Exist(string path)
+        public bool Exists(string path)
         {
             return Directory.Exists(path);
         }

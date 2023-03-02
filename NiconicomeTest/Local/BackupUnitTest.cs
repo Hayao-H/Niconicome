@@ -1,17 +1,17 @@
 using NUnit.Framework;
 using System;
-using Niconicome.Models.Local;
 using Niconicome.Models.Domain.Utils;
 using System.IO;
 using System.Linq;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
+using Niconicome.Models.Domain.Local.DataBackup;
 
 namespace NiconicomeTest.Local.Backup
 {
     [TestFixture]
     class BackupUnitTest
     {
-        private IBackuphandler? backuphandler;
+        private IBackupManager? backuphandler;
 
         [SetUp]
         public void Setup()

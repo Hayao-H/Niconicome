@@ -17,6 +17,7 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Local.State.Toast;
+using Niconicome.Models.Domain.Local.DataBackup;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -30,7 +31,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer)
+        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackupManager backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer)
         {
 
             this._playlistStoreHandler = playlistStoreHandler;
@@ -53,7 +54,7 @@ namespace Niconicome.Models.Local.Application
 
         private readonly Store::IVideoFileStorehandler _fileStorehandler;
 
-        private readonly IBackuphandler _backuphandler;
+        private readonly IBackupManager _backuphandler;
 
         private readonly IAutoLogin _autoLogin;
 

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Utils;
-using Error = Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Extensions;
+using Error = Niconicome.Models.Domain.Utils.Error;
 
 namespace Niconicome.Models.Infrastructure.IO
 {
@@ -29,7 +26,7 @@ namespace Niconicome.Models.Infrastructure.IO
 
         public IAttemptResult<int> GetVerticalResolution(string path)
         {
-            if (!this.Exist(path))
+            if (!this.Exists(path))
             {
                 this._errorHandler.HandleError(WindowsFileIOError.FileDoesNotExist, path);
                 return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FileDoesNotExist, path));
@@ -110,10 +107,61 @@ namespace Niconicome.Models.Infrastructure.IO
             return AttemptResult.Succeeded();
         }
 
-
-        public bool Exist(string path)
+        public void EnumerateFiles(string path, string searchPattern, Action<string> enumAction, bool searchSubDirectory)
         {
+            SearchOption option = searchSubDirectory ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(path, searchPattern, option))
+                {
+                    enumAction(file);
+                }
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.ErrorWhenEnumerateVideoFiles, ex, path);
+            }
+        }
+
+        public bool Exists(string path)
+        {
+            if (File.Exists(path))
+            {
+                return true;
+            }
+
             return File.Exists(IOUtils.GetPrefixedPath(path));
+        }
+
+        public IAttemptResult Delete(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.FailedToDeleteFile, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToDeleteFile, ex, path));
+            }
+
+            return AttemptResult.Succeeded();
+        }
+
+        public IAttemptResult Copy(string source, string target)
+        {
+            try
+            {
+                File.Copy(source, target);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.FailedToCopyFile, ex, source, target);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToCopyFile, ex, source, target));
+            }
+
+            return AttemptResult.Succeeded();
         }
 
         #endregion

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Helper.Result;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Local.Settings

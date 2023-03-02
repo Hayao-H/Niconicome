@@ -26,10 +26,34 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         IAttemptResult Write(string path, string content, Encoding? encoding = null);
 
         /// <summary>
+        /// ファイルを削除
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        IAttemptResult Delete(string path);
+
+        /// <summary>
+        /// ファイルをコピー
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        IAttemptResult Copy(string source, string target);
+
+        /// <summary>
+        /// ファイルを列挙してアクションを実行
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="searchPattern"></param>
+        /// <param name="enumAction"></param>
+        /// <param name="searchSubDirectory"></param>
+        void EnumerateFiles(string path, string searchPattern, Action<string> enumAction, bool searchSubDirectory);
+
+        /// <summary>
         /// ファイルが存在するかどうかを確認する
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        bool Exist(string path);
+        bool Exists(string path);
     }
 }

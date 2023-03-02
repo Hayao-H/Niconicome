@@ -430,7 +430,6 @@ namespace Niconicome.Models.Domain.Local
         {
             if (this.autoDispose) this.DbInstance?.Dispose();
             this.DbInstance = null;
-            GC.SuppressFinalize(this);
         }
 
         public IAttemptResult<List<T>> GetAllRecords<T>(string tableName) where T : IStorable

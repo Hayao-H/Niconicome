@@ -253,7 +253,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <returns></returns>
         private bool IsDownloaded(IVideoInfo videoInfo)
         {
-            return this._fileIO.Exist(videoInfo.FilePath);
+            return this._fileIO.Exists(videoInfo.FilePath);
         }
 
         #endregion

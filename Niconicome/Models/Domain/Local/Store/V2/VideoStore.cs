@@ -55,6 +55,11 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult Clear();
 
         /// <summary>
+        /// キャッシュをクリア
+        /// </summary>
+        void Flush();
+
+        /// <summary>
         /// 指定したIDで動画の存在を確認
         /// </summary>
         /// <param name="niconicoID"></param>

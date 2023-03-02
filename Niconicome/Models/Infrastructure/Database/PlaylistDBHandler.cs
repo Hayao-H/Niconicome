@@ -163,7 +163,7 @@ namespace Niconicome.Models.Infrastructure.Database
                 },
                 IsAscendant = data.IsAscendant,
                 Videos = data.Videos.Select(v => v.NiconicoId).ToList(),
-                Children = data.Children.Where(p => p.PlaylistType != PlaylistType.Temporary && p.PlaylistType != PlaylistType.DownloadSucceededHistory && p.PlaylistType != PlaylistType.DownloadFailedHistory).Select(v => v.ID).ToList(),
+                Children = this.CanUpdateChildren(data) ? data.Children.Where(p => p.PlaylistType != PlaylistType.Temporary && p.PlaylistType != PlaylistType.DownloadSucceededHistory && p.PlaylistType != PlaylistType.DownloadFailedHistory).Select(v => v.ID).ToList() : data.ChildrenID.ToList(),
             };
         }
 
@@ -246,6 +246,21 @@ namespace Niconicome.Models.Infrastructure.Database
 
             info.IsAutoUpdateEnabled = true;
             return info;
+        }
+
+        /// <summary>
+        /// Childrenプロパティーを参照可能かどうか
+        /// </summary>
+        /// <param name="playlistInfo"></param>
+        /// <returns></returns>
+        private bool CanUpdateChildren(IPlaylistInfo playlistInfo)
+        {
+            if (playlistInfo.Children.Count > 0)
+            {
+                return true;
+            }
+
+            return playlistInfo.ChildrenID.Count == 0;
         }
 
         #endregion

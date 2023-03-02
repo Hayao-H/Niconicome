@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.DataBackup;
 using Niconicome.Models.Domain.Niconico.Remote.V2.Error;
 using Niconicome.Models.Domain.Niconico.Watch.V2.Error;
 using Niconicome.Models.Infrastructure.Database.Error;
@@ -12,6 +13,7 @@ using Niconicome.Models.Infrastructure.IO;
 using Niconicome.Models.Local.External.Error;
 using Niconicome.Models.Local.External.Playlist;
 using Niconicome.Models.Local.OS;
+using Niconicome.Models.Local.Restore;
 using Niconicome.Models.Network.Video.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 
@@ -46,6 +48,9 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 20, typeof(WindowsDirectoryIOError) },
             { 21, typeof(PlaylistCreatorError) },
             { 22, typeof(PlaylistDBHandlerError) },
+            { 23, typeof(VideoFileDBHandlerError) },
+            { 24, typeof(RestoreManagerError) },
+            { 25, typeof(BackupManagerError) },
         };
     }
 }
