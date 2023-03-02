@@ -240,6 +240,37 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         }
 
         /// <summary>
+        /// クリップボードから動画を登録
+        /// </summary>
+        /// <returns></returns>
+        public async Task AddVideoFromClipbordAsync()
+        {
+            if (this.IsProcessing.Value) return;
+
+            this.IsProcessing.Value = true;
+
+            IAttemptResult<VideoRegistrationResult> result = await WS::Mainpage.VideoListManager.RegisterVideosFromClipbordAsync((m, e) => WS::Mainpage.MessageHandler.AppendMessage(m, LocalConstant.SystemMessageDispacher, e));
+
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? string.Empty);
+                WS::Mainpage.MessageHandler.AppendMessage(result.Message ?? string.Empty, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+            }
+            else
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.VideoAdded, result.Data.VideosCount);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                WS::Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+            }
+
+            this.Videos.Clear();
+            this.Videos.AddRange(WS::Mainpage.PlaylistVideoContainer.Videos.Select(v => this.Convert(v)));
+
+            this.IsProcessing.Value = false;
+
+        }
+
+        /// <summary>
         /// エンターキー入力時
         /// </summary>
         /// <param name="e"></param>

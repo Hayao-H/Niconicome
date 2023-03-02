@@ -20,5 +20,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.StringContent
         FetchSleepMessage,
         [StringEnum("ローカルディレクトリから{0}件の動画が見つかりました。")]
         VideosFoundInLocalDirectory,
+        [StringEnum("テキストから{0}件の動画が見つかりました。")]
+        VideosFoundFromText,
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.ClearScript;
 using MS.WindowsAPICodePack.Internal;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.LocalFile;
@@ -18,6 +19,7 @@ using Niconicome.Models.Playlist.V2.Manager.Error;
 using Niconicome.Models.Playlist.V2.Manager.StringContent;
 using Niconicome.Models.Playlist.V2.Migration;
 using Remote = Niconicome.Models.Domain.Niconico.Remote.V2;
+using Utils = Niconicome.Models.Domain.Utils;
 
 namespace Niconicome.Models.Playlist.V2.Manager.Helper
 {
@@ -31,6 +33,15 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
         /// <param name="onMessage"></param>
         /// <returns></returns>
         Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoAsync(string inputText, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage);
+
+        /// <summary>
+        /// ニコニコのIDが含まれたテキストから登録
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="playlist"></param>
+        /// <param name="onMessage"></param>
+        /// <returns></returns>
+        Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoFromTextAsync(string content, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage);
 
         /// <summary>
         /// 現在のプレイリストから動画を取得
@@ -55,7 +66,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
     public class VideoListCRDHandler : VideoListManagerHelperBase, IVideoListCRDHandler
     {
-        public VideoListCRDHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, ITagStore tagStore, ILocalDirectoryHandler directoryHandler, IStringHandler stringHandler, ISettingsContainer settingsContainer) : base(videoStore, tagStore)
+        public VideoListCRDHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, ITagStore tagStore, ILocalDirectoryHandler directoryHandler, IStringHandler stringHandler, ISettingsContainer settingsContainer,Utils::INiconicoUtils utils) : base(videoStore, tagStore)
         {
             this._container = container;
             this._errorHandler = errorHandler;
@@ -64,6 +75,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             this._directoryHandler = directoryHandler;
             this._stringHandler = stringHandler;
             this._settingsContainer = settingsContainer;
+            this._utils = utils;
         }
 
         #region field
@@ -81,6 +93,8 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
         private readonly IStringHandler _stringHandler;
 
         private readonly ISettingsContainer _settingsContainer;
+
+        private readonly Utils::INiconicoUtils _utils;
 
         #endregion
 
@@ -184,6 +198,91 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
         }
 
+        public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoFromTextAsync(string content, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage)
+        {
+            IEnumerable<string> ids = this._utils.GetNiconicoIdsFromText(content).Where(x => !string.IsNullOrEmpty(x));
+
+            onMessage(this._stringHandler.GetContent(VideoListManagerString.VideosFoundFromText, ids.Count()), ErrorLevel.Log);
+
+            IAttemptResult<ISettingInfo<bool>> settingResult = this._settingsContainer.GetSetting(SettingNames.StoreOnlyNiconicoIDOnRegister, false);
+            if (!settingResult.IsSucceeded || settingResult.Data is null)
+            {
+                return AttemptResult<VideoRegistrationResult>.Fail(settingResult.Message);
+            }
+
+            var videos = new List<IVideoInfo>();
+
+
+            if (settingResult.Data.Value)
+            {
+                foreach (var video in ids)
+                {
+                    if (!this._videoStore.Exist(video, playlist.ID))
+                    {
+                        IAttemptResult cResult = this._videoStore.Create(video, playlist.ID);
+                        if (!cResult.IsSucceeded)
+                        {
+                            return AttemptResult<VideoRegistrationResult>.Fail(cResult.Message);
+                        }
+                    }
+
+                    IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(video, playlist.ID);
+                    if (!vResult.IsSucceeded || vResult.Data is null)
+                    {
+                        return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
+                    }
+
+                    videos.Add(vResult.Data);
+                }
+
+                if (playlist.PlaylistType == PlaylistType.Temporary)
+                {
+                    if (playlist.ID == (this._container.CurrentSelectedPlaylist?.ID ?? -1))
+                    {
+                        this._container.Videos.AddRange(videos);
+                    }
+                }
+                else
+                {
+                    foreach (var video in videos)
+                    {
+                        playlist.AddVideo(video);
+                    }
+                }
+
+                return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, videos.Count, string.Empty, string.Empty));
+            }
+
+            IAttemptResult<Remote::RemotePlaylistInfo> result = await this._netVideos.GetVideoInfoAsync(ids, onMessage);
+            if (!result.IsSucceeded || result.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(result.Message);
+
+            foreach (var video in result.Data.Videos)
+            {
+                IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
+                if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
+
+                videos.Add(vResult.Data);
+            }
+
+            if (playlist.PlaylistType == PlaylistType.Temporary)
+            {
+                if (playlist.ID == (this._container.CurrentSelectedPlaylist?.ID ?? -1))
+                {
+                    this._container.Videos.AddRange(videos);
+                }
+            }
+            else
+            {
+                foreach (var video in videos)
+                {
+                    playlist.AddVideo(video);
+                }
+            }
+
+            return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, videos.Count, string.Empty, string.Empty));
+        }
+
+
         public IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID)
         {
             if (this._container.CurrentSelectedPlaylist is null)
@@ -280,7 +379,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 {
                     if (!this._videoStore.Exist(video, playlistID))
                     {
-                        IAttemptResult cResult = this._videoStore.Create(video,playlistID);
+                        IAttemptResult cResult = this._videoStore.Create(video, playlistID);
                         if (!cResult.IsSucceeded)
                         {
                             return AttemptResult<IImmutableList<IVideoInfo>>.Fail(cResult.Message);
