@@ -47,6 +47,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public int VideosCount { get; private set; }
 
         /// <summary>
+        /// プレイリストID
+        /// </summary>
+        public int PlaylistID { get; private set; }
+
+        /// <summary>
         /// 保存先パス
         /// </summary>
         public string DirectoryPath { get; set; } = string.Empty;
@@ -109,6 +114,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.Name = this._playlist.Name.Value;
             this.VideosCount = this._playlist.Videos.Count;
+            this.PlaylistID = this._playlist.ID;
             this.DirectoryPath = this._playlist.FolderPath;
             this.RemotePlaylistParam = this._playlist.RemoteParameter;
             this.CurrentPlaylistType.Value = this.Convert(this._playlist.PlaylistType);

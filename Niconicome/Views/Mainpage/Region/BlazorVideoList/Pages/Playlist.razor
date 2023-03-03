@@ -13,6 +13,10 @@
         <p>@(DataContext.VideosCount)</p>
     </div>
     <div class="PlaylistInfoRow">
+        <p>プレイリストのID</p>
+        <p>@(DataContext.PlaylistID)</p>
+    </div>
+    <div class="PlaylistInfoRow">
         <p>保存先パス</p>
         <input class="InputBox" @bind="DataContext.DirectoryPath" />
     </div>
