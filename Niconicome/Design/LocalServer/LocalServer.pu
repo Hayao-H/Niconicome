@@ -1,0 +1,34 @@
+@startuml LocalServer
+
+title LocalServer
+
+enum RequestType {
+    + None
+    + Video
+    + Thumbnail
+}
+
+interface IServer {
+    + void Start();
+    + void ShutDown();
+}
+
+interface IUrlHandler {
+    + RequestType GetReqyestType(Uri request);
+}
+
+interface IVideoRequestHandler {
+    + IattemptResult Handle(HttpListenerResponse res);
+}
+
+interface IThumbnailRequestHandler {
+    + IattemptResult Handle(HttpListenerResponse res);
+}
+
+IServer *-- IUrlHandler
+IServer *-- IVideoRequestHandler
+IServer *-- IThumbnailRequestHandler
+IServer ..> RequestType
+IVideoRequestHandler ..> RequestType
+
+@enduml
