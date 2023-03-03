@@ -15,4 +15,3 @@ C# (```HttpListener```)
 URL | コンテンツ
 -- | --
 /niconicome/video/```playlist ID```/```video ID```/video.mp4 | 動画ファイル
-/niconicome/thumbnail/```playlist ID```/```video ID```/thumb.jpeg | サムネイルファイル

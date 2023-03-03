@@ -18,17 +18,17 @@ interface IUrlHandler {
 }
 
 interface IVideoRequestHandler {
-    + IattemptResult Handle(HttpListenerResponse res);
+    + IAttemptResult Handle(Uri request,HttpListenerResponse res);
 }
 
-interface IThumbnailRequestHandler {
-    + IattemptResult Handle(HttpListenerResponse res);
+interface INotFoundRequestHandler {
+    + IAttemptResult Handle(HttpListenerResponse res);
 }
 
 IServer *-- IUrlHandler
 IServer *-- IVideoRequestHandler
-IServer *-- IThumbnailRequestHandler
+IServer *-- INotFoundRequestHandler
 IServer ..> RequestType
-IVideoRequestHandler ..> RequestType
+IUrlHandler ..> RequestType
 
 @enduml
