@@ -1,6 +1,7 @@
 ﻿using System;
 using Niconicome.Models.Domain.Local;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
+using Niconicome.Models.Domain.Local.Server.Core;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 
@@ -14,11 +15,12 @@ namespace Niconicome.Models.Local.Application
 
     public class Shutdown : IShutdown
     {
-        public Shutdown(IDataBase dataBase, IPlaylistHandler playlistHandler,IAddonContextsContainer contexts)
+        public Shutdown(IDataBase dataBase, IPlaylistHandler playlistHandler,IAddonContextsContainer contexts,IServer server)
         {
             this.dataBase = dataBase;
             this.playlistHandler = playlistHandler;
             this._contexts = contexts;
+            this._server = server;
         }
 
         #region field
@@ -28,6 +30,8 @@ namespace Niconicome.Models.Local.Application
         private readonly IPlaylistHandler playlistHandler;
 
         private readonly IAddonContextsContainer _contexts;
+
+        private readonly IServer _server;
 
         #endregion
 
@@ -42,6 +46,7 @@ namespace Niconicome.Models.Local.Application
             this.playlistHandler.SaveAllPlaylists();
             this._contexts.ShutDownAll();
             this.dataBase.Dispose();
+            this._server.ShutDown();
             this.IsShutdowned = true;
         }
     }

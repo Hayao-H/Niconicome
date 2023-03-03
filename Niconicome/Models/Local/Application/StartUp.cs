@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Utils;
-using Store = Niconicome.Models.Domain.Local.Store;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using NicoIO = Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Local.Settings;
@@ -18,6 +17,7 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Domain.Local.DataBackup;
+using Niconicome.Models.Domain.Local.Server.Core;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -31,11 +31,8 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackupManager backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer)
+        public StartUp( IBackupManager backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer,IServer server)
         {
-
-            this._playlistStoreHandler = playlistStoreHandler;
-            this._fileStorehandler = fileStorehandler;
             this._backuphandler = backuphandler;
             this._autoLogin = autoLogin;
             this._snackbarHandler = snackbarHandler;
@@ -45,14 +42,11 @@ namespace Niconicome.Models.Local.Application
             this._addonManager = addonManager;
             this._installManager = installManager;
             this._settingsConainer = settingsConainer;
+            this._server = server;
             this.DeleteInvalidbackup();
         }
 
         #region field
-
-        private readonly Store::IPlaylistStoreHandler _playlistStoreHandler;
-
-        private readonly Store::IVideoFileStorehandler _fileStorehandler;
 
         private readonly IBackupManager _backuphandler;
 
@@ -71,6 +65,9 @@ namespace Niconicome.Models.Local.Application
         private readonly IAddonInstallManager _installManager;
 
         private readonly ISettingsContainer _settingsConainer;
+
+        private readonly IServer _server;
+
         #endregion
 
         /// <summary>
@@ -85,9 +82,8 @@ namespace Niconicome.Models.Local.Application
         {
             Task.Run(async () =>
             {
+                this.StartServer();
                 this.RemoveTmpFolder();
-                this.JustifyData();
-                this.DeleteInvalidFilePath();
                 await this.LoadAddon();
                 await this.Autologin();
             });
@@ -118,27 +114,19 @@ namespace Niconicome.Models.Local.Application
         }
 
         /// <summary>
-        /// データを修復する
-        /// </summary>
-        private void JustifyData()
-        {
-            this._playlistStoreHandler.Initialize();
-        }
-
-        /// <summary>
-        /// 存在しない動画ファイルのパスを削除する
-        /// </summary>
-        private void DeleteInvalidFilePath()
-        {
-            this._fileStorehandler.Clean();
-        }
-
-        /// <summary>
         /// 存在しないバックアップを削除する
         /// </summary>
         private void DeleteInvalidbackup()
         {
             this._backuphandler.Clean();
+        }
+
+        /// <summary>
+        /// ローカルサーバーを起動する
+        /// </summary>
+        private void StartServer()
+        {
+            this._server.Start();
         }
 
         /// <summary>

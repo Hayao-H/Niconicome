@@ -7,6 +7,7 @@ using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
 using AddonsV2 = Niconicome.Models.Local.Addon.V2;
 using AddonVM = Niconicome.ViewModels.Mainpage.Subwindows.AddonManager;
 using Auth = Niconicome.Models.Auth;
+using Backup = Niconicome.Models.Domain.Local.DataBackup;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
 using CommentConverter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
 using CommentFetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
@@ -27,6 +28,7 @@ using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using DomainSettings = Niconicome.Models.Domain.Local.Settings;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
+using DomainWatchV2 = Niconicome.Models.Domain.Niconico.Watch.V2;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
 using DownloadTask = Niconicome.Models.Network.Download.DLTask;
@@ -51,9 +53,11 @@ using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using PlaylistV2 = Niconicome.Models.Playlist.V2;
 using Register = Niconicome.Models.Network.Register;
 using RemoteV2 = Niconicome.Models.Domain.Niconico.Remote.V2;
+using Restore = Niconicome.Models.Local.Restore;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
+using Server = Niconicome.Models.Domain.Local.Server;
 using Settings = Niconicome.Models.Local.Settings;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
@@ -66,9 +70,6 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
-using DomainWatchV2 = Niconicome.Models.Domain.Niconico.Watch.V2;
-using Restore = Niconicome.Models.Local.Restore;
-using Backup = Niconicome.Models.Domain.Local.DataBackup;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -323,6 +324,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Store::V2.IVideoFileStore, DB::VideoFileDBHandler>();
             services.AddTransient<PlaylistV2::Utils.IVideoInfoCopyManager, PlaylistV2::Utils.VideoInfoCopyManager>();
             services.AddTransient<PlaylistV2::Utils.IVideoInfoFilterManager, PlaylistV2::Utils.VideoInfoFilterManager>();
+            services.AddSingleton<Server::Core.IServer, Server::Core.Server>();
+            services.AddSingleton<Server::Core.IUrlHandler, Server::Core.UrlHandler>();
+            services.AddSingleton<Server::RequestHandler.Video.IVideoRequestHandler, Server::RequestHandler.Video.VideoRequestHandler>();
+            services.AddSingleton<Server::RequestHandler.NotFound.INotFoundRequestHandler, Server::RequestHandler.NotFound.NotFoundRequestHandler>();
 
             return services.BuildServiceProvider();
         }

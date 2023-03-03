@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.DataBackup;
+using Niconicome.Models.Domain.Local.Server.Core;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
 using Niconicome.Models.Domain.Niconico.Remote.V2.Error;
 using Niconicome.Models.Domain.Niconico.Watch.V2.Error;
 using Niconicome.Models.Infrastructure.Database.Error;
@@ -51,6 +54,9 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 23, typeof(VideoFileDBHandlerError) },
             { 24, typeof(RestoreManagerError) },
             { 25, typeof(BackupManagerError) },
+            { 26, typeof(VideoRequestHandlerError) },
+            { 27, typeof(NotFoundRequestHandlerError) },
+            { 28, typeof(ServerError) },
         };
     }
 }
