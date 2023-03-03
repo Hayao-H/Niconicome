@@ -90,6 +90,12 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                             continue;
                         }
 
+                        if (request.HttpMethod != "GET")
+                        {
+                            context.Response.Close();
+                            continue;
+                        }
+
 
                         RequestType type = this._urlHandler.GetReqyestType(request.Url);
                         IAttemptResult? result = null;
