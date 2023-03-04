@@ -89,9 +89,20 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                         HttpListenerRequest request = context.Request;
                         HttpListenerResponse response = context.Response;
 
+                        //CORS
+                        response.Headers.Add("Access-Control-Allow-Origin", "*");
+
                         if (request.Url is null)
                         {
                             context.Response.Close();
+                            continue;
+                        }
+
+                        if (request.HttpMethod == "OPTIONS")
+                        {
+                            response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
+                            response.StatusCode = (int)HttpStatusCode.OK;
+                            response.Close();
                             continue;
                         }
 

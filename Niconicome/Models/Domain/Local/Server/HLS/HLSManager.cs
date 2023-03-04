@@ -1,7 +1,11 @@
 ﻿using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO.V2;
+using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
@@ -18,17 +22,18 @@ namespace Niconicome.Models.Domain.Local.Server.HLS
         /// <param name="niconicoID"></param>
         /// <param name="playlistID"></param>
         /// <returns></returns>
-        IAttemptResult CreateFiles(string niconicoID, int playlistID);
+        Task<IAttemptResult> CreateFilesAsync(string niconicoID, int playlistID);
     }
 
     public class HLSManager : IHLSManager
     {
-        public HLSManager(INiconicomeDirectoryIO directoryIO,INiconicomeFileIO fileIO,ISettingsContainer settingsContainer,IErrorHandler errorHandler,IVideoStore store) {
+        public HLSManager(INiconicomeDirectoryIO directoryIO,INiconicomeFileIO fileIO,ISettingsContainer settingsContainer,IErrorHandler errorHandler,IVideoStore store,IEncodeutility encodeutility) {
             this._directoryIO = directoryIO;
             this._fileIO = fileIO;
             this._errorHandler = errorHandler;
             this._settingsContainer = settingsContainer;
             this._store = store;
+            this._encodeutility = encodeutility;
         }
 
         #region field
@@ -43,11 +48,13 @@ namespace Niconicome.Models.Domain.Local.Server.HLS
 
         private readonly IVideoStore _store;
 
+        private readonly IEncodeutility _encodeutility;
+
         #endregion
 
         #region Method
 
-       public IAttemptResult CreateFiles(string niconicoID, int playlistID)
+       public async Task<IAttemptResult> CreateFilesAsync(string niconicoID, int playlistID)
         {
             IAttemptResult<IVideoInfo> vResult = this._store.GetVideo(niconicoID, playlistID);
             if (!vResult.IsSucceeded||vResult.Data is null)
@@ -69,7 +76,7 @@ namespace Niconicome.Models.Domain.Local.Server.HLS
                 return dResult;
             }
 
-            return this.CreateHLSFiles(video.FilePath);
+            return await this.CreateHLSFilesAsync(video.FilePath);
         }
          
 
@@ -100,7 +107,7 @@ namespace Niconicome.Models.Domain.Local.Server.HLS
         /// </summary>
         /// <param name="videoFilePath"></param>
         /// <returns></returns>
-        private IAttemptResult CreateHLSFiles(string videoFilePath)
+        private async Task<IAttemptResult> CreateHLSFilesAsync(string videoFilePath)
         {
             if (!this._fileIO.Exists(videoFilePath))
             {
@@ -114,11 +121,12 @@ namespace Niconicome.Models.Domain.Local.Server.HLS
                 return AttemptResult.Fail(ffmpeg.Message);
             }
 
-            var command = $"ffmpeg -i \"{videoFilePath}\" -c:v copy -c:a copy -f hls -hls_time 9 -hls_playlist_type vod -hls_segment_filename \"video%3d.ts\" playlist.m3u8";
+            string output = Path.Combine(AppContext.BaseDirectory, "tmp", "hls");
+            var command = $"-i \"<source>\" -c:v copy -c:a copy -f hls -hls_time 9 -hls_playlist_type vod -hls_segment_filename \"{output}\\video%3d.ts\" \"<output>\"";
 
             try
             {
-                ProcessEx.StartWithShell(ffmpeg.Data.Value, command);
+                await this._encodeutility.EncodeAsync(videoFilePath, Path.Join(output, "playlist.m3u8"), command, CancellationToken.None);
             }
             catch (Exception ex)
             {

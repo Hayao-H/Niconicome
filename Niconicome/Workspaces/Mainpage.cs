@@ -27,6 +27,7 @@ using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using MessageV2 = Niconicome.Models.Local.State.MessageV2;
 using Niconicome.Models.Local.External.Playlist;
+using Server = Niconicome.Models.Domain.Local.Server;
 
 namespace Niconicome.Workspaces
 {
@@ -161,6 +162,11 @@ namespace Niconicome.Workspaces
         /// 動画フィルター
         /// </summary>
         public static Playlist::Utils.IVideoInfoFilterManager VideoInfoFilterManager { get; private set; } = DIFactory.Resolve<Playlist::Utils.IVideoInfoFilterManager>();
+
+        /// <summary>
+        /// HLS
+        /// </summary>
+        public static Server::HLS.IHLSManager HLSManager { get; private set; } = DIFactory.Resolve<Server::HLS.IHLSManager>();
 
     }
 }

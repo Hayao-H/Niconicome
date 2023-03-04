@@ -2,15 +2,17 @@
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.VideoDetailViewModel DataContext;
 @inject IJSRuntime JS;
 
+@using System.Threading;
+
 @if (DataContext.VideoInfo is not null)
 {
     <h3>@(DataContext.VideoInfo.Title)</h3>
 
-    @if (DataContext.VideoInfo.IsDownloaded.Value)
+    @if (DataContext.CanPlay.Value)
     {
         <div class="VideoElement">
             <video-js id="video-player" controls>
-                <source src="@(DataContext.VideoUrl)" type="video/mp4" />
+                <source src="http://localhost:2580/niconicome/hls/playlist.m3u8" type="application/x-mpegURL" />
             </video-js>
         </div>
     }
@@ -25,16 +27,27 @@
     [Parameter]
     public string NiconicoID { get; set; } = string.Empty;
 
+    private SynchronizationContext? _context;
+
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+
+        this._context = SynchronizationContext.Current;
+
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this._context?.Post(_ => this.StateHasChanged(), null);
+        });
+
         DataContext.Initialize(this.NiconicoID);
+
         this.StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (DataContext.VideoInfo?.IsDownloaded.Value ?? false)
+        if (DataContext.CanPlay.Value)
         {
             await JS.InvokeVoidAsync("initializeVideo");
         }
