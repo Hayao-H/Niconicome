@@ -8,7 +8,21 @@
 @if (DataContext.VideoInfo is not null)
 {
     <div class="VideotitleContainer">
-        <h3>@(DataContext.VideoInfo.Title)</h3>
+        @if (DataContext.VideoInfo.IsDownloaded.Value)
+        {
+            <h3>
+                @(DataContext.VideoInfo.Title)
+                <span class="DownloadStatus Downloaded"><i class="VideoInfoIcon fa-solid fa-download"></i>ダウンロード済み</span>
+            </h3>
+        }
+        else
+        {
+            <h3>
+                @(DataContext.VideoInfo.Title)
+                <span class="DownloadStatus NotDownloaded"><i class="VideoInfoIcon fa-solid fa-download"></i>未ダウンロード</span>
+            </h3>
+        }
+
     </div>
 
     <div class="VideoContentContainer">
@@ -55,16 +69,6 @@
             <div class="VideoInfoRow">
                 <p><i class="VideoInfoIcon fa-solid fa-globe"></i>動画ID</p>
                 <p><a href="https://nico.ms/@(DataContext.VideoInfo.NiconicoId)">@(DataContext.VideoInfo.NiconicoId)</a></p>
-            </div>
-            <div class="VideoInfoRow">
-                <p></p>
-                @if (DataContext.VideoInfo.IsDownloaded.Value)
-                {
-                    <p class="Downloaded"><i class="VideoInfoIcon fa-solid fa-download"></i>ダウンロード済み</p>
-                } else
-                {
-                    <p class="NotDownloaded"><i class="VideoInfoIcon fa-solid fa-download"></i>未ダウンロード</p>
-                }
             </div>
         </div>
     </div>
