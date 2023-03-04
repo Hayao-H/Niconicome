@@ -26,7 +26,7 @@
         </div>
         <div class="ButtonsWrapper">
             <button type="button" class="btn btn-primary ControlButton" title="プレイリスト情報を編集" @onclick="DataContext.OnPlaylistEditButtonClick"><i class="fa-solid fa-pen"></i></button>
-            <button type="button" class="btn btn-primary ControlButton"  title="リモートプレイリストと同期" @onclick="DataContext.OnSyncWithRemotePlaylistButtonClick"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+            <button type="button" class="btn btn-primary ControlButton" title="リモートプレイリストと同期" @onclick="DataContext.OnSyncWithRemotePlaylistButtonClick"><i class="fa-solid fa-cloud-arrow-down"></i></button>
             <button type="button" class="btn btn-primary ControlButton" title="出力を開く" @onclick="DataContext.OutputViewModel.OnOutputButtonClicked"><i class="fa-solid fa-message"></i></button>
             <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle ControlButton" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" title="動画をフィルターする">
@@ -53,7 +53,7 @@
             }
             else
             {
-                <button type="button" class="btn btn-primary ControlButton"　title="クリップボードから登録" @onclick="DataContext.AddVideoFromClipbordAsync"><i class="fa-solid fa-clipboard"></i></button>
+                <button type="button" class="btn btn-primary ControlButton" 　title="クリップボードから登録" @onclick="DataContext.AddVideoFromClipbordAsync"><i class="fa-solid fa-clipboard"></i></button>
             }
         </div>
     </div>
@@ -131,6 +131,9 @@
                     </div>
                     <div class="VideoInfoContainer">
                         <div class="TitleColumn">
+                            <div class="VideoInfoLinkWrapper" @onclick="()=>DataContext.OnVideoDetailButtonClick(video.NiconicoId)">
+                                <i class="fa-solid fa-info"></i>
+                            </div>
                             <p class="fw-bold">@(video.Title)</p>
                             <p class="text-muted ms-3">投稿者：@(video.OwnerName)</p>
                         </div>
@@ -359,9 +362,12 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        await JS.InvokeVoidAsync("showTooltip");
-        var module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
-        await module.InvokeVoidAsync("main", this.refToThis);
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("showTooltip");
+            var module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
+            await module.InvokeVoidAsync("main", this.refToThis);
+        }
     }
 
     private void ExecuteInCurrentThread(Action action)

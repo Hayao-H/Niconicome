@@ -399,7 +399,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 return;
             }
 
-            IAttemptResult result = await WS::Mainpage.VideoListManager.UpdateVideosAsync(selected.Where(v => v.IsSelected.Value).Select(v=>v.VideoInfo).ToList().AsReadOnly(), (s, e) => WS::Mainpage.MessageHandler.AppendMessage(s, LocalConstant.SystemMessageDispacher, e));
+            IAttemptResult result = await WS::Mainpage.VideoListManager.UpdateVideosAsync(selected.Where(v => v.IsSelected.Value).Select(v => v.VideoInfo).ToList().AsReadOnly(), (s, e) => WS::Mainpage.MessageHandler.AppendMessage(s, LocalConstant.SystemMessageDispacher, e));
 
             if (result.IsSucceeded)
             {
@@ -419,6 +419,15 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public void OnCancelUpdateButtonClick()
         {
             WS::Mainpage.VideoListManager.CancelUpdate();
+        }
+
+        /// <summary>
+        /// 動画詳細情報のボタンがクリックされたとき
+        /// </summary>
+        /// <param name="niconicoID"></param>
+        public void OnVideoDetailButtonClick(string niconicoID)
+        {
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/video/{niconicoID}/", BlazorWindows.MainPage);
         }
 
         #endregion

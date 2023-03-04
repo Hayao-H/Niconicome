@@ -17,6 +17,8 @@ namespace Niconicome.Models.Utils.Reactive
 
         private Timer? _timer;
 
+        private object _lock = new object();
+
         #endregion
 
         #region Method
@@ -48,27 +50,31 @@ namespace Niconicome.Models.Utils.Reactive
 
         private void OnProprtyChange()
         {
-
-            if (this._timer is not null)
+            lock (this._lock)
             {
-                this._timer.Stop();
-            }
-
-            this._timer = new Timer(1000);
-            this._timer.AutoReset = false;
-            this._timer.Elapsed += (_, _) =>
-            {
-                try
+                if (this._timer is not null)
                 {
-                    foreach (var handler in this._handlers)
-                    {
-                        handler();
-                    }
+                    this._timer.Stop();
                 }
-                catch { }
-            };
 
-            this._timer.Enabled = true;
+                this._timer = new Timer(1000);
+                this._timer.AutoReset = false;
+                this._timer.Elapsed += (_, _) =>
+                {
+                    try
+                    {
+                        foreach (var handler in this._handlers)
+                        {
+                            handler();
+                        }
+
+                        this._timer = null;
+                    }
+                    catch { }
+                };
+
+                this._timer.Enabled = true;
+            }
         }
 
         #endregion

@@ -272,11 +272,31 @@
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn {
   display: flex;
+  position: relative;
   justify-content: center;
   flex-direction: column;
   width: 700px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn:hover .VideoInfoLinkWrapper {
+  display: flex;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn .VideoInfoLinkWrapper {
+  display: none;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  top: 3px;
+  left: 3px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn .VideoInfoLinkWrapper:hover {
+  background-color: rgba(0, 0, 0, 0.8);
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .UploadedDateTimeColumn {
   display: flex;

@@ -1,0 +1,42 @@
+﻿@page "/video/{NiconicoID}/";
+@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.VideoDetailViewModel DataContext;
+@inject IJSRuntime JS;
+
+@if (DataContext.VideoInfo is not null)
+{
+    <h3>@(DataContext.VideoInfo.Title)</h3>
+
+    @if (DataContext.VideoInfo.IsDownloaded.Value)
+    {
+        <div class="VideoElement">
+            <video-js id="video-player" controls>
+                <source src="@(DataContext.VideoUrl)" type="video/mp4" />
+            </video-js>
+        </div>
+    }
+}
+
+<div>
+    <button class="btn btn-primary" @onclick="DataContext.OnReturnButtonClick">戻る</button>
+</div>
+
+@code {
+
+    [Parameter]
+    public string NiconicoID { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        DataContext.Initialize(this.NiconicoID);
+        this.StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (DataContext.VideoInfo?.IsDownloaded.Value ?? false)
+        {
+            await JS.InvokeVoidAsync("initializeVideo");
+        }
+    }
+}

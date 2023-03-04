@@ -1,3 +1,9 @@
+document.addEventListener('keydown', e => {
+    if (e.key === "F5") {
+        location.href = "/";
+    }
+});
+
 
 function showTooltip() {
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(elm => {
@@ -20,4 +26,12 @@ function showModal() {
     const elm = document.querySelector("#Modal");
     const modal = new bootstrap.Modal(elm);
     modal.show();
+}
+
+function initializeVideo(){
+    videojs('video-player', {
+        controls: true,
+        autoplay: false,
+        preload: 'auto'
+      });
 }

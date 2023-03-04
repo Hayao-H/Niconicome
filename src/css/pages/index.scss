@@ -56,8 +56,8 @@ $VideoListRowHeight: 100;
         .ButtonsWrapper {
             display: flex;
             margin-left: 8px;
-            
-            >*{
+
+            >* {
                 margin-left: 5px;
             }
         }
@@ -240,7 +240,7 @@ $VideoListRowHeight: 100;
                 .MenuItem {
                     width: 200px;
                     color: #f7f1ff;
-                    padding:2px 5px;
+                    padding: 2px 5px;
                     border-bottom: 1px solid #535353e7;
                     cursor: pointer;
                 }
@@ -307,7 +307,7 @@ $VideoListRowHeight: 100;
                         height: 100%;
                     }
 
-                    .Duration{
+                    .Duration {
                         z-index: 100;
                         position: absolute;
                         font-size: 13px;
@@ -326,11 +326,36 @@ $VideoListRowHeight: 100;
 
                     .TitleColumn {
                         display: flex;
+                        position: relative;
                         justify-content: center;
                         flex-direction: column;
                         width: 700px;
                         padding-left: 8px;
                         border-right: 1px solid #e5e8ea;
+
+                        &:hover {
+                            .VideoInfoLinkWrapper {
+                                display: flex;
+                            }
+                        }
+
+                        .VideoInfoLinkWrapper {
+                            display: none;
+                            position: absolute;
+                            justify-content: center;
+                            align-items: center;
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 5px;
+                            top: 3px;
+                            left: 3px;
+                            background-color: rgba(0, 0, 0, .6);
+                            color: #fff;
+
+                            &:hover {
+                                background-color: rgba(0, 0, 0, .8);
+                            }
+                        }
                     }
 
                     .UploadedDateTimeColumn {

@@ -303,6 +303,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<TabsVM::VideoList.Pages.IndexViewModel>();
             services.AddTransient<TabsVM::VideoList.Pages.MigrationViewModel>();
             services.AddTransient<TabsVM::VideoList.Pages.PlaylistViewModel>();
+            services.AddTransient<TabsVM::VideoList.Pages.VideoDetailViewModel>();
             services.AddTransient<RemoteV2::Mylist.IMylistHandler, RemoteV2::Mylist.MylistHandler>();
             services.AddTransient<RemoteV2::Mylist.IWatchLaterHandler, RemoteV2::Mylist.WatchLaterHandler>();
             services.AddTransient<RemoteV2::Channel.IChannelVideoHandler, RemoteV2::Channel.ChannelVideoHandler>();
