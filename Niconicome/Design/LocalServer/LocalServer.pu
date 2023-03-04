@@ -21,6 +21,14 @@ interface IVideoRequestHandler {
     + IAttemptResult Handle(Uri request,HttpListenerResponse res);
 }
 
+interface ITsRequestHandler {
+    + IAttemptResult Handle(Uri request,HttpListenerResponse res);
+}
+
+interface IM3U8RequestHandler {
+    + IAttemptResult Handle(Uri request,HttpListenerResponse res);
+}
+
 interface INotFoundRequestHandler {
     + IAttemptResult Handle(HttpListenerResponse res);
 }
@@ -28,6 +36,8 @@ interface INotFoundRequestHandler {
 IServer *-- IUrlHandler
 IServer *-- IVideoRequestHandler
 IServer *-- INotFoundRequestHandler
+IServer *-- IM3U8RequestHandler
+IServer *-- ITsRequestHandler
 IServer ..> RequestType
 IUrlHandler ..> RequestType
 

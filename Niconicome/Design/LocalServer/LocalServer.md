@@ -11,7 +11,16 @@
 ## 使用技術
 **Model**  
 C# (```HttpListener```) 
+
+## フォルダー構成
+- ```\tmp\hls\playlist.m3u8```
+- ```\tmp\hls\001.ts```
+- ```\tmp\hls\002.ts```
+- ・・・
+
 ## URL設計
 URL | コンテンツ
 -- | --
 /niconicome/video/```playlist ID```/```video ID```/video.mp4 | 動画ファイル
+/niconicome/hls/playlist.m3u8 | インデックスファイル
+/niconicome/hls/```num```.ts | セグメントファイル
