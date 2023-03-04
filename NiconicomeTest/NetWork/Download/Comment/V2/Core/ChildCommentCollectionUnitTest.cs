@@ -18,7 +18,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Core
 
         private readonly string _thread = "1";
 
-        private readonly int _fork = 0;
+        private readonly string _fork = "";
 
         [OneTimeSetUp]
         public void SetUpOnce()

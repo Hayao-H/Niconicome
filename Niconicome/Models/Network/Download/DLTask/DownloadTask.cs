@@ -82,12 +82,11 @@ public interface IDownloadTask : IParallelTask<IDownloadTask>
 
 public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownloadTask>
 {
-    public DownloadTask(IPlaylistManager playlistManager, IMessageHandler messageHandler, IContentDownloadHelper contentDownloadHelper, IVideoListContainer container,IStringHandler stringHandler)
+    public DownloadTask(IPlaylistManager playlistManager, IMessageHandler messageHandler, IContentDownloadHelper contentDownloadHelper,IStringHandler stringHandler)
     {
         this._cts = new CancellationTokenSource();
         this._messageHandler = messageHandler;
         this._contentDownloadHelper = contentDownloadHelper;
-        this._container = container;
         this._playlistManager = playlistManager;
         this._stringHandler = stringHandler;
 
@@ -123,8 +122,6 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
     private readonly IContentDownloadHelper _contentDownloadHelper;
 
     private readonly IPlaylistManager _playlistManager;
-
-    private readonly IVideoListContainer _container;
 
     private readonly IStringHandler _stringHandler;
 
