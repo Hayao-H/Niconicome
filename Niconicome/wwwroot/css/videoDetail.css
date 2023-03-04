@@ -71,6 +71,15 @@
   line-height: 24px;
   float: left;
 }
+.TagContainer .Tag .TagName {
+  color: #32475e;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+}
+.TagContainer .Tag .TagName:hover {
+  text-decoration: underline;
+}
 .TagContainer .Tag .TagIcon {
   margin-left: 4px;
 }

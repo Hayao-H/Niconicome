@@ -63,7 +63,7 @@ $VideoInfoWidth: 400;
                 color: #7bd889;
             }
 
-            .NotDownloaded{
+            .NotDownloaded {
                 color: #ff3300;
             }
         }
@@ -85,6 +85,17 @@ $VideoInfoWidth: 400;
         height: 24px;
         line-height: 24px;
         float: left;
+
+        .TagName {
+            color: #32475e;
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .TagName:hover {
+            text-decoration: underline;
+        }
 
         .TagIcon {
             margin-left: 4px;

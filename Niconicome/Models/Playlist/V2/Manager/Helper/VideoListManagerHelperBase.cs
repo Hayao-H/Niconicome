@@ -16,7 +16,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 {
     public class VideoListManagerHelperBase
     {
-        public VideoListManagerHelperBase(IVideoStore videoStore,ITagStore tagStore)
+        public VideoListManagerHelperBase(IVideoStore videoStore, ITagStore tagStore)
         {
             this._videoStore = videoStore;
             this._tagStore = tagStore;
@@ -67,6 +67,11 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             video.ChannelID = source.ChannelID;
             video.Duration = source.Duration;
 
+            if (video.Tags.Count > source.Tags.Count)
+            {
+                video.ClearTags();
+            }
+
             foreach (var tag in source.Tags)
             {
                 if (!this._tagStore.Exist(tag.Name))
@@ -86,7 +91,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
                 tagResult.Data.IsNicodicExist = tag.IsNicodicExist;
 
-                if (!video.Tags.Any(t => t.Name == tag.Name))
+                if (!video.Tags.Any(t=>t.Name== tag.Name))
                 {
                     video.AddTag(tagResult.Data);
                 }

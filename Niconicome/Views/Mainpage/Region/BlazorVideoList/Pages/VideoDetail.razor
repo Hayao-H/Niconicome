@@ -68,11 +68,11 @@
         {
             @if (tag.IsNicodicExistthis)
             {
-                <li class="Tag">@(tag.Name)<a href="https://dic.nicovideo.jp/a/@(tag.Name)"><i class="TagIcon NicoDic fa-solid fa-book"></i></a></li>
+                <li class="Tag"><a class="TagName" href="https://nicovideo.jp/tag/@(tag.Name)">@(tag.Name)</a><a href="https://dic.nicovideo.jp/a/@(tag.Name)"><i class="TagIcon NicoDic fa-solid fa-book"></i></a></li>
             }
             else
             {
-                <li class="Tag">@(tag.Name)<a href="https://dic.nicovideo.jp/a/@(tag.Name)"><i class="TagIcon Question fa-solid fa-circle-question"></i></a></li>
+                <li class="Tag"><a class="TagName" href="https://nicovideo.jp/tag/@(tag.Name)">@(tag.Name)</a><a href="https://dic.nicovideo.jp/a/@(tag.Name)"><i class="TagIcon Question fa-solid fa-circle-question"></i></a></li>
             }
         }
     </ul>
