@@ -13,6 +13,10 @@ interface IServer {
     + void ShutDown();
 }
 
+interface IHLSManager {
+    Task<IAttemptResult> CreateFilesAsync(string niconicoID, int playlistID);
+}
+
 interface IUrlHandler {
     + RequestType GetReqyestType(Uri request);
 }
