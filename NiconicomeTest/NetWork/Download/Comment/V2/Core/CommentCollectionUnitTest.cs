@@ -26,7 +26,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Core
             this._comments1 = new List<CCore::IComment>(Enumerable.Range(1, 10).Select(i => new CCore::Comment()
             {
                 No = i,
-                Fork = 0,
+                Fork = "0",
                 Thread = "1",
                 Content = "Hello World",
             }));
@@ -34,7 +34,7 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Core
             this._comments2 = new List<CCore::IComment>(Enumerable.Range(1, 10).Select(i => new CCore::Comment()
             {
                 No = i,
-                Fork = 0,
+                Fork = "0",
                 Thread = "2",
                 Content = "Hello World",
             }));
@@ -81,14 +81,14 @@ namespace NiconicomeTest.NetWork.Download.Comment.V2.Core
             CCore::UnFilledRange range1 = unFilled[0];
 
             Assert.That(range1.Thread, Is.EqualTo("1"));
-            Assert.That(range1.Fork, Is.EqualTo(0));
+            Assert.That(range1.Fork, Is.EqualTo("0"));
             Assert.That(range1.Start.No, Is.EqualTo(7));
             Assert.That(range1.Count, Is.EqualTo(4));
 
             CCore::UnFilledRange range2 = unFilled[1];
 
             Assert.That(range2.Thread, Is.EqualTo("2"));
-            Assert.That(range2.Fork, Is.EqualTo(0));
+            Assert.That(range2.Fork, Is.EqualTo("0"));
             Assert.That(range2.Start.No, Is.EqualTo(5));
             Assert.That(range2.Count, Is.EqualTo(2));
 

@@ -19,16 +19,15 @@ namespace Niconicome.Models.Domain.Local.Playlist.AIMP
         /// <returns></returns>
         public string CreatePlaylist(IPlaylist playlistData)
         {
-            var paths = playlistData.GetAllFile();
             var listdata = new List<string>
             {
                 "#-----SUMMARY-----#",
                 $"Name={playlistData.PlaylistName}",
                 string.Empty,
                 "#-----CONTENT-----#",
-                $"-{Path.GetDirectoryName(paths.First())}",
+                $"-{Path.GetDirectoryName(playlistData.Videos.First().Path)}",
             };
-            listdata.AddRange(paths);
+            listdata.AddRange(playlistData.Videos.Select(v => $"{v.Path}|{v.Title}|{v.OwnerName}|"));
             listdata.Add(string.Empty);
             return string.Join(Environment.NewLine, listdata);
         }

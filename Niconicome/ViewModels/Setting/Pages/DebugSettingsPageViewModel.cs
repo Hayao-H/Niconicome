@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Windows;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Local.Settings;
+using Niconicome.ViewModels.Setting.Utils;
 using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
-    class DebugSettingsPageViewModel : SettingaBase
+    class DebugSettingsPageViewModel 
     {
 
         public DebugSettingsPageViewModel()
         {
-            this.IsDebugMode = new ReactiveProperty<bool>();
-            this.IsDebugMode.Subscribe(value =>
+            this.IsDebugMode = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.IsDebugMode, false), false);
+            this.IsDebugMode.RegisterPropChangeHandler(value =>
             {
                 WS::SettingPage.State.IsDebugMode = value;
                 string message = value ? "有効" : "無効";
                 WS::SettingPage.SnackbarMessageQueue.Enqueue($"デバッグモード: {message}");
             });
 
-            this.IsDevMode = WS::SettingPage.SettingsContainer.GetReactiveBoolSetting(SettingsEnum.IsDevMode);
+            this.IsDevMode = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.IsDeveloppersMode, false), false);
 
             this.LogFilePath = WS::SettingPage.LocalInfo.LogFileName;
             this.CopyLogFIlePathCommand = new ReactiveCommand()
@@ -42,12 +44,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// デバッグフラグ
         /// </summary>
-        public ReactiveProperty<bool> IsDebugMode { get; init; }
+        public SettingInfoViewModel<bool> IsDebugMode { get; init; }
 
         /// <summary>
         /// 開発者モード
         /// </summary>
-        public ReactiveProperty<bool> IsDevMode { get; init; }
+        public SettingInfoViewModel<bool> IsDevMode { get; init; }
 
         /// <summary>
         /// ログファイルパス
@@ -59,10 +61,10 @@ namespace Niconicome.ViewModels.Setting.Pages
 
     public class DebugSettingsPageViewModelD
     {
-        public ReactiveProperty<bool> IsDebugMode { get; init; } = new(true);
+        public SettingInfoViewModelD<bool> IsDebugMode { get; init; } = new(true);
 
         public string LogFilePath { get; init; } = @"path\to\log";
 
-        public ReactiveProperty<bool> IsDevMode { get; init; } = new(true);
+        public SettingInfoViewModelD<bool> IsDevMode { get; init; } = new(true);
     }
 }

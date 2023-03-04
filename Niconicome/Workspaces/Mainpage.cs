@@ -1,29 +1,33 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Auth;
-using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Local;
+using Niconicome.Models.Local.Addon.API.Local.Tab;
+using Niconicome.Models.Local.Addon.V2;
 using Niconicome.Models.Local.Application;
+using Niconicome.Models.Local.OS;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Local.Timer;
 using Niconicome.Models.Network;
 using Niconicome.Models.Network.Download;
-using Niconicome.Models.Network.Watch;
-using Niconicome.Models.Playlist;
-using Ext = Niconicome.Models.Local.External;
-using VideoList = Niconicome.Models.Playlist.VideoList;
-using Niconicome.Models.Utils;
-using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Network.Download.Actions;
-using Niconicome.Models.Local.Timer;
-using Niconicome.Models.Local.Addon.API.Local.Tab;
+using Niconicome.Models.Network.Download.DLTask;
 using Niconicome.Models.Network.Fetch;
 using Niconicome.Models.Network.Register;
+using Niconicome.Models.Network.Watch;
+using Niconicome.Models.Playlist;
+using Niconicome.Models.Playlist.Playlist;
+using Niconicome.Models.Utils;
 using Niconicome.Models.Utils.InitializeAwaiter;
-using Niconicome.Models.Network.Download.DLTask;
-using System.Windows.Controls;
-using Niconicome.Models.Local.OS;
-using Niconicome.Models.Local.Addon.V2;
+using Ext = Niconicome.Models.Local.External;
+using VideoList = Niconicome.Models.Playlist.VideoList;
+using Playlist = Niconicome.Models.Playlist.V2;
+using Niconicome.Models.Local.State.Toast;
+using Niconicome.Models.Domain.Utils.StringHandler;
+using MessageV2 = Niconicome.Models.Local.State.MessageV2;
+using Niconicome.Models.Local.External.Playlist;
+using Server = Niconicome.Models.Domain.Local.Server;
 
 namespace Niconicome.Workspaces
 {
@@ -40,14 +44,13 @@ namespace Niconicome.Workspaces
         public static IVideoFilter VideoFilter { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoFilter>();
         public static ILocalSettingHandler SettingHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingHandler>();
         public static IPlaylistCreator PlaylistCreator { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistCreator>();
-        public static ISnackbarHandler SnackbarHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ISnackbarHandler>();
+        public static IToastHandler SnackbarHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IToastHandler>();
         public static IShutdown Shutdown { get; private set; } = DIFactory.Provider.GetRequiredService<IShutdown>();
         public static IStartUp StartUp { get; private set; } = DIFactory.Provider.GetRequiredService<IStartUp>();
         public static IVideoIDHandler VideoIDHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoIDHandler>();
         public static VideoList::ICurrent CurrentPlaylist { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::ICurrent>();
         public static VideoList::IVideoListContainer VideoListContainer { get; private set; } = DIFactory.Provider.GetRequiredService<VideoList::IVideoListContainer>();
         public static Ext::IExternalAppUtils ExternalAppUtils { get; private set; } = DIFactory.Provider.GetRequiredService<Ext::IExternalAppUtils>();
-        public static IEnumSettingsHandler EnumSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IEnumSettingsHandler>();
         public static IDownloadSettingsHandler DownloadSettingsHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IDownloadSettingsHandler>();
         public static ISortInfoHandler SortInfoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ISortInfoHandler>();
         public static IPlaylistTreeHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistTreeHandler>();
@@ -56,7 +59,6 @@ namespace Niconicome.Workspaces
         public static IApplicationPowerManager ApplicationPower { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
         public static IStyleHandler StyleHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IStyleHandler>();
         public static ILocalSettingsContainer SettingsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingsContainer>();
-
         public static IPostDownloadActionssManager PostDownloadTasksManager { get; private set; } = DIFactory.Provider.GetRequiredService<IPostDownloadActionssManager>();
         public static IDlTimer DlTimer { get; private set; } = DIFactory.Provider.GetRequiredService<IDlTimer>();
         public static ITabsContainerHandler TabHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ITabsContainerHandler>();
@@ -99,12 +101,72 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// ページ遷移管理クラス
         /// </summary>
-        public static IBlazorPageManager BlazorPageManager { get; private set; }=DIFactory.Provider.GetRequiredService<IBlazorPageManager>();
+        public static IBlazorPageManager BlazorPageManager { get; private set; } = DIFactory.Provider.GetRequiredService<IBlazorPageManager>();
 
         /// <summary>
         /// アドンマネージャー
         /// </summary>
         public static IAddonManager AddonManager { get; private set; } = DIFactory.Provider.GetRequiredService<IAddonManager>();
+
+        /// <summary>
+        /// 設定コンテナ
+        /// </summary>
+        public static ISettingsContainer SettingsConainer { get; private set; } = DIFactory.Resolve<ISettingsContainer>();
+
+        /// <summary>
+        /// 動画・プレイリストコンテナ
+        /// </summary>
+        public static Playlist::IPlaylistVideoContainer PlaylistVideoContainer { get; private set; } = DIFactory.Resolve<Playlist::IPlaylistVideoContainer>();
+
+        /// <summary>
+        /// 動画リスト
+        /// </summary>
+        public static Playlist::Manager.IVideoListManager VideoListManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.IVideoListManager>();
+
+        /// <summary>
+        /// プレリストの管理
+        /// </summary>
+        public static Playlist::Manager.IPlaylistManager PlaylistManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.IPlaylistManager>();
+
+        /// <summary>
+        /// プレイリストと動画の移行
+        /// </summary>
+        public static Playlist::Migration.IVideoAndPlayListMigration VideoAndPlayListMigration { get; private set; } = DIFactory.Resolve<Playlist::Migration.IVideoAndPlayListMigration>();
+
+        /// <summary>
+        /// プロセス
+        /// </summary>
+        public static Ext::IExternalProcessUtils ExternalProcessUtils { get; private set; } = DIFactory.Resolve<Ext::IExternalProcessUtils>();
+
+        /// <summary>
+        /// 文字列生成
+        /// </summary>
+        public static IStringHandler StringHandler { get; private set; } = DIFactory.Resolve<IStringHandler>();
+
+        /// <summary>
+        /// メッセージハンドラ
+        /// </summary>
+        public static MessageV2::IMessageHandler MessageHandler { get; private set; } = DIFactory.Resolve<MessageV2::IMessageHandler>();
+
+        /// <summary>
+        /// 外部アプリハンドラ
+        /// </summary>
+        public static Ext::IExternalAppUtilsV2 ExternalAppUtilsV2 { get; private set; } = DIFactory.Resolve<Ext::IExternalAppUtilsV2>();
+
+        /// <summary>
+        /// 動画情報のコピー
+        /// </summary>
+        public static Playlist::Utils.IVideoInfoCopyManager VideoInfoCopyManager { get; private set; } = DIFactory.Resolve<Playlist::Utils.IVideoInfoCopyManager>();
+
+        /// <summary>
+        /// 動画フィルター
+        /// </summary>
+        public static Playlist::Utils.IVideoInfoFilterManager VideoInfoFilterManager { get; private set; } = DIFactory.Resolve<Playlist::Utils.IVideoInfoFilterManager>();
+
+        /// <summary>
+        /// HLS
+        /// </summary>
+        public static Server::HLS.IHLSManager HLSManager { get; private set; } = DIFactory.Resolve<Server::HLS.IHLSManager>();
 
     }
 }

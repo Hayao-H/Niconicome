@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Local.State;
+using Niconicome.Models.Domain.Utils.Error;
+using Niconicome.Models.Local.State.MessageV2;
 
 namespace Niconicome.Models.Local.Addon.API.Local.IO
 {
@@ -39,7 +40,7 @@ namespace Niconicome.Models.Local.Addon.API.Local.IO
 
         public void write(string content)
         {
-            this.messageHandler.AppendMessage($"[{this._addonInfomation!.Name}]{content}");
+            this.messageHandler.AppendMessage($"{content}", "Addon", ErrorLevel.Log);
         }
 
         public void write(object content)

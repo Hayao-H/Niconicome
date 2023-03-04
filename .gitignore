@@ -356,3 +356,7 @@ Umls
 
 #Sample
 Sample/*
+
+# WebFiles
+*.yarn
+.env

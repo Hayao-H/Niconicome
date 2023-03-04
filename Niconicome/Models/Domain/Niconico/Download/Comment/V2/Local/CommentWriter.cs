@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Niconico.Net.Xml;
@@ -18,10 +19,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
         /// コメントを書き込む
         /// </summary>
         /// <param name="comments"></param>
-        /// <param name="threadInfo"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        IAttemptResult WriteComment(IEnumerable<Core::IComment> comments, Core::IThreadInfo threadInfo, CommentWriterOption option);
+        IAttemptResult WriteComment(IEnumerable<Core::IComment> comments, CommentWriterOption option);
     }
 
     public class CommentWriter : ICommentWriter
@@ -45,17 +45,24 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
 
         #region Method
 
-        public IAttemptResult WriteComment(IEnumerable<Core::IComment> comments, Core::IThreadInfo threadInfo, CommentWriterOption option)
+        public IAttemptResult WriteComment(IEnumerable<Core::IComment> comments, CommentWriterOption option)
         {
+            var builder = new StringBuilder();
             string content;
 
-            var data = new V2::PacketElement() { VideoID = option.VideoID };
-            data.Chat.AddRange(comments.Select(c => this._converter.ConvertCoreCommentToChat(c)));
-            data.Thread = this._converter.ConvertCoreThreadInfoToThread(threadInfo);
+            if (!option.OmitXmlDeclaration)
+            {
+                builder.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            }
+
+            builder.AppendLine($"<!--BoonSutazioData={option.VideoID}-->");
+
+            var data = new V2::PacketElement();
+            data.Chat.AddRange(comments.Select(c => this._converter.ConvertCoreCommentToChat(c)).OrderBy(c => c.Vpos));
 
             try
             {
-                content = Xmlparser.Serialize(data, new XmlWriterSettings() { OmitXmlDeclaration = option.OmitXmlDeclaration, Indent = true });
+                content = Xmlparser.Serialize(data, new XmlWriterSettings() { OmitXmlDeclaration = true, Indent = true });
             }
             catch (Exception ex)
             {
@@ -63,9 +70,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
                 return AttemptResult.Fail($"コメントのシリアライズに失敗しました。（詳細:{ex}）");
             }
 
+            builder.AppendLine(content);
+
             try
             {
-                this._fileIO.Write(option.Path, content);
+                this._fileIO.Write(option.Path, builder.ToString());
             }
             catch (Exception ex)
             {

@@ -1,0 +1,599 @@
+@use "sass:math";
+
+$VideoListRowHeight: 100;
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 5px;
+    box-shadow: inset 0 0 6px #e7e7e7e7;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #737575;
+    border-radius: 5px;
+}
+
+.PageContent {
+    position: relative;
+
+    .ControlsContainer {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        width: 100%;
+        height: 40px;
+        margin: 10px 0;
+
+        .InputBoxWrapper {
+            display: flex;
+            justify-content: space-between;
+            width: 40%;
+            height: 100%;
+
+            #InputBox {
+                width: 85%;
+                height: 100%;
+                border-top: none;
+                border-left: none;
+                border-right: none;
+                border-bottom: solid 2px #e7e7e7e7;
+                padding: 5px 0;
+                outline: none;
+                display: inline-block;
+            }
+
+            #RegisterButton {
+                width: 15;
+                margin-left: 5px;
+                padding: 5px 20px;
+            }
+        }
+
+        .ButtonsWrapper {
+            display: flex;
+            margin-left: 8px;
+
+            >* {
+                margin-left: 5px;
+            }
+        }
+    }
+
+    .VideoList {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        $HeaderHeight: 35px;
+        $CheckBoxWidth: 50;
+        $ThumbWidth : math.div($VideoListRowHeight - 16, 9)* 16+16;
+        $TitleWidth: 700;
+        $UploadedDateTimeWidth: 250;
+        $IsDownloadedColumnWidth: 70;
+        $CountColumnWidth: 125;
+        $MessageColumnWidth: 150;
+
+        #VideoListHeader {
+            background-color: #f2f3f5;
+            display: flex;
+            justify-content: start;
+            position: relative;
+            height: $HeaderHeight;
+            color: #001835;
+
+            .HeaderItem {
+                display: inline-block;
+                padding-left: 8px;
+                font-size: 14px;
+                height: $HeaderHeight;
+                line-height: $HeaderHeight;
+                user-select: none;
+
+                .SortIcon {
+                    display: none;
+                    width: 0;
+                    height: 0;
+                    margin-left: 2px;
+                    border-left: 6px solid transparent;
+                    border-right: 6px solid transparent;
+
+                    &.Show {
+                        display: inline-block;
+                    }
+
+                    &.Ascendant {
+                        border-bottom: 6px solid black;
+                    }
+
+                    &.Descendant {
+                        border-top: 6px solid black;
+                    }
+                }
+            }
+
+            >.Separator {
+                position: absolute;
+                opacity: 0;
+                width: 20px;
+                height: 100%;
+                margin: 0;
+                cursor: col-resize;
+            }
+
+            #CheckBoxColumn {
+                display: flex;
+                justify-content: center;
+                width: #{$CheckBoxWidth}px;
+                border-right: 1px solid #e5e8ea;
+                padding: 0;
+            }
+
+            #ThumbnailColumn {
+                width: #{$ThumbWidth}px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #TitleColumn {
+                width: #{$TitleWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #UploadedDateTimeColumn {
+                width: #{$UploadedDateTimeWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #IsDownloadedColumn {
+                width: #{$IsDownloadedColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #ViewCountColumn {
+                width: #{$CountColumnWidth}px;
+                height: 100%;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #CommentCountColumn {
+                width: #{$CountColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #MylistCountColumn {
+                width: #{$CountColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #LikeCountColumn {
+                width: #{$CountColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+
+            #MessageColumn {
+                width: #{$MessageColumnWidth}px;
+                padding-left: 8px;
+                border-right: 1px solid #e5e8ea;
+            }
+        }
+
+        .SortContextMenuWrapper {
+            position: relative;
+
+            .SortContextMenu {
+                display: none;
+                position: absolute;
+                top: 0;
+                background-color: #2d2c2d;
+                z-index: 9999;
+
+                &.Show {
+                    display: block;
+                }
+
+                .MenuItem {
+                    width: 200px;
+                    color: #f7f1ff;
+                    padding: 2px 5px;
+                    border-bottom: 1px solid #535353e7;
+                    cursor: pointer;
+                }
+
+                .Separator {
+                    height: 0;
+                    width: 200px;
+                    border: 1px solid #e7e7e7e7;
+                }
+
+                .OptionMenu {
+                    display: flex;
+                    justify-content: space-between;
+
+                    .Circle {
+                        display: none;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        background-color: #202020;
+                        border: 1px solid #7e7e7ee7;
+
+                        &.Show {
+                            display: inline;
+                        }
+                    }
+                }
+            }
+        }
+
+        .VideoListBody {
+            border: solid 1px #e5e8ea;
+            height: #{$VideoListRowHeight * 4}px;
+            overflow-y: scroll;
+            position: relative;
+
+            .VideoListRow {
+                height: #{$VideoListRowHeight}px;
+                display: flex;
+                border-bottom: 1px solid #e5e8ea;
+                user-select: none;
+
+                &.DropTarget {
+                    border-top: 1px solid #222222;
+                }
+
+                .CheckBoxColumn {
+                    display: flex;
+                    justify-content: center;
+                    flex-direction: column;
+                    width: #{$CheckBoxWidth}px;
+                    border-right: 1px solid #e5e8ea;
+                }
+
+                .ThumbnailColumn {
+                    position: relative;
+                    height: 100%;
+                    width: #{$ThumbWidth}px;
+                    border-right: 1px solid #e5e8ea;
+                    padding: 8px;
+
+                    .Thumbnail {
+                        width: 100%;
+                        height: 100%;
+                    }
+
+                    .Duration {
+                        z-index: 100;
+                        position: absolute;
+                        font-size: 13px;
+                        right: 10px;
+                        bottom: 10px;
+                        padding: 1px 8px;
+                        color: #fff;
+                        background-color: #222222b0;
+                    }
+                }
+
+                .VideoInfoContainer {
+                    display: flex;
+                    justify-content: flex-start;
+                    height: 100%;
+
+                    .TitleColumn {
+                        display: flex;
+                        position: relative;
+                        justify-content: center;
+                        flex-direction: column;
+                        width: 700px;
+                        padding-left: 8px;
+                        border-right: 1px solid #e5e8ea;
+
+                        &:hover {
+                            .VideoInfoLinkWrapper {
+                                display: flex;
+                            }
+                        }
+
+                        .VideoInfoLinkWrapper {
+                            display: none;
+                            position: absolute;
+                            justify-content: center;
+                            align-items: center;
+                            width: 30px;
+                            height: 30px;
+                            border-radius: 5px;
+                            top: 3px;
+                            left: 3px;
+                            background-color: rgba(0, 0, 0, .6);
+                            color: #fff;
+
+                            &:hover {
+                                background-color: rgba(0, 0, 0, .8);
+                            }
+                        }
+                    }
+
+                    .UploadedDateTimeColumn {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        flex-direction: column;
+                        width: 250px;
+                        padding-left: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .IsDownloadedColumn {
+                        display: flex;
+                        color: #7bd889;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: center;
+                        width: #{$IsDownloadedColumnWidth}px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+
+                        .NotDownloaded {
+                            color: #ff3300;
+                        }
+                    }
+
+                    .ViewCountColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        width: #{$CountColumnWidth}px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .CommentCountColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        width: #{$CountColumnWidth}px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .MylistCountColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        width: #{$CountColumnWidth}px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .LikeCountColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        width: #{$CountColumnWidth}px;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                    }
+
+                    .MessageColumn {
+                        display: flex;
+                        justify-content: center;
+                        flex-direction: column;
+                        padding-right: 8px;
+                        border-right: 1px solid #e5e8ea;
+                        width: #{$MessageColumnWidth}px;
+                    }
+
+                }
+            }
+
+            .VideoListRow:hover {
+                background: #f4f4f4f4;
+            }
+
+        }
+    }
+
+    .ToastContent {
+        position: fixed;
+        margin: auto;
+        right: 0;
+        left: 0;
+        bottom: 10px;
+
+        .ToastHeader {
+            display: flex;
+            align-items: center;
+
+            .ToastImage {
+                height: 20px;
+                width: 20px;
+                margin-right: 5px;
+                background: #007aff;
+                border-radius: 5px;
+            }
+        }
+
+    }
+
+    .OutputContainer {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 400px;
+        background-color: #fff;
+        overflow-y: auto;
+        border-left: 1px solid #e7e7e7e7;
+
+        .ToolBar {
+            display: flex;
+            justify-content: flex-end;
+            background-color: #f9f9fa;
+
+            .CloseButton {
+                margin-right: 8px;
+            }
+
+            .CloseButton:hover {
+                color: #d70022;
+            }
+        }
+
+        .Controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            padding: 5px;
+        }
+
+        .MessageBox {
+            padding: 5px;
+
+            .MessageRow {
+                display: flex;
+                padding: 3px;
+                border-bottom: 1px solid #e7e7e7e7;
+                word-wrap: break-word;
+
+                .MessageIcon {
+                    color: #1e90ff;
+                }
+
+                .MessageContent {
+                    margin-left: 5px;
+                    flex-grow: 1;
+                }
+
+                .MessageInfomation {
+                    color: #3161b8;
+                    width: 20%;
+                }
+            }
+
+            .MessageRow.Yellow {
+                background-color: #fffbd6;
+                color: #be9b00;
+
+                .MessageIcon {
+                    color: #be9b00;
+                }
+            }
+
+            .MessageRow.Red {
+                background-color: #fdf2f5;
+                color: #d70022;
+
+                .MessageIcon {
+                    color: #d70022;
+                }
+            }
+        }
+    }
+
+    .OutputContainer.Show {
+        display: block;
+    }
+
+}
+
+
+
+.ContextMenuWrapper {
+    position: relative;
+
+    .ContextMenu {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        background: #fff;
+        padding: 5px;
+        border: 1px solid #e7e7e7e7;
+
+        .ContextMenuItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px;
+            width: 250px;
+            height: 37px;
+            font-size: 13px;
+            background: #fff;
+            z-index: 9999;
+            border-bottom: 1px solid #e7e7e7e7;
+
+            .ContextMenuIcon {
+                margin-right: 8px;
+            }
+
+            &.Clickable {
+                cursor: pointer;
+            }
+
+            .ContextMenuItemTriangle {
+                width: 0;
+                height: 0;
+                border-left: 6px solid black;
+                border-top: 6px solid transparent;
+                border-bottom: 6px solid transparent;
+            }
+        }
+
+        .ContextMenuItem:hover {
+            background: #e7e7e7e7;
+        }
+
+        .RootMenu {
+            position: relative;
+
+            >.SubMenu {
+                display: none;
+                position: absolute;
+                left: 100%;
+                border: 1px solid #e7e7e7e7;
+
+                &.One {
+                    top: 0;
+                }
+
+                &.Two {
+                    top: -100%
+                }
+
+                &.Three {
+                    top: -200%
+                }
+
+                &.Many {
+                    top: -300%
+                }
+            }
+        }
+
+        .RootMenu:hover {
+            .SubMenu {
+                display: block;
+            }
+        }
+    }
+
+    .ContextMenu.Show {
+        display: block;
+    }
+}

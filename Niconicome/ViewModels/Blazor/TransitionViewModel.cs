@@ -9,6 +9,6 @@ namespace Niconicome.ViewModels.Blazor
 {
     public class TransitionViewModel
     {
-        public string PageToNavigate => WS::AddonPage.BlazorPageManager.PageToNavigate;
+        public string PageToNavigate => WS::AddonPage.BlazorPageManager.CurrentRequestedPage;
     }
 }

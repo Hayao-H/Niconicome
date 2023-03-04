@@ -4,98 +4,96 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Local.Settings;
+using Niconicome.ViewModels.Setting.Utils;
 using Reactive.Bindings;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
-    class ExternalSoftwareSettingsViewModel : SettingaBase
+    class ExternalSoftwareSettingsViewModel 
     {
 
         public ExternalSoftwareSettingsViewModel()
         {
-            this.PlayerAPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.PlayerAPath);
-            this.PlayerBPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.PlayerBPath);
-            this.AppAPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AppAPath);
-            this.AppBPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AppBPath);
-            this.AppAParam = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AppAParam);
-            this.AppBParam = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.AppBParam);
-            this.FfmpegPath = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FfmpegPath);
-            this.useShellWhenLaunchingFFmpegFIeld = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.FFmpegShell);
-            this.reAllocateCommandsField = WS::SettingPage.SettingHandler.GetBoolSetting(SettingsEnum.ReAllocateCommands);
-            this.FFmpegFormat = WS::SettingPage.SettingsContainer.GetReactiveStringSetting(SettingsEnum.FFmpegFormat, Format.DefaultFFmpegFormat, true);
+            this.PlayerAPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.PlayerAPath, ""), "");
+            this.PlayerBPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.PlayerBPath, ""), "");
+            this.AppAPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppIdPath, ""), "");
+            this.AppBPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppUrlPath, ""), "");
+            this.AppAParam = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppIdParam, ""), "");
+            this.AppBParam = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppUrlParam, ""), "");
+            this.FfmpegPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FFmpegPath, Format.FFmpegPath), Format.FFmpegPath);
+            this.UseShellWhenLaunchingFFmpeg = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.UseShellWhenLaunchingFFmpeg, false), false);
+            this.ReAllocateCommands = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.ReAllocateIfVideoisNotSaved, false), false);
+            this.FFmpegFormat = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FFmpegFormat, Format.DefaultFFmpegFormat), Format.DefaultFFmpegFormat);
         }
-
-        private bool useShellWhenLaunchingFFmpegFIeld;
-
-        private bool reAllocateCommandsField;
 
         /// <summary>
         /// プレイヤーAのパス
         /// </summary>
-        public ReactiveProperty<string> PlayerAPath { get; init; }
+        public SettingInfoViewModel<string> PlayerAPath { get; init; }
 
         /// <summary>
         /// プレイヤーBのパス
         /// </summary>
-        public ReactiveProperty<string> PlayerBPath { get; init; }
+        public SettingInfoViewModel<string> PlayerBPath { get; init; }
 
         /// <summary>
         /// A
         /// </summary>
-        public ReactiveProperty<string> AppAPath { get; init; }
+        public SettingInfoViewModel<string> AppAPath { get; init; }
 
         /// <summary>
         /// B
         /// </summary>
-        public ReactiveProperty<string> AppBPath { get; init; }
+        public SettingInfoViewModel<string> AppBPath { get; init; }
 
         /// <summary>
         /// A
         /// </summary>
-        public ReactiveProperty<string> AppAParam { get; init; }
+        public SettingInfoViewModel<string> AppAParam { get; init; }
 
         /// <summary>
         /// B
         /// </summary>
-        public ReactiveProperty<string> AppBParam { get; init; }
+        public SettingInfoViewModel<string> AppBParam { get; init; }
 
         /// <summary>
         /// ffmpegのパス
         /// </summary>
-        public ReactiveProperty<string> FfmpegPath { get; init; }
+        public SettingInfoViewModel<string> FfmpegPath { get; init; }
 
         /// <summary>
         /// ffmpegのフォーマット
         /// </summary>
-        public ReactiveProperty<string> FFmpegFormat { get; init; }
+        public SettingInfoViewModel<string> FFmpegFormat { get; init; }
 
         /// <summary>
         /// シェルを利用する
         /// </summary>
-        public bool UseShellWhenLaunchingFFmpeg { get => this.useShellWhenLaunchingFFmpegFIeld; set => this.Savesetting(ref this.useShellWhenLaunchingFFmpegFIeld, value, SettingsEnum.FFmpegShell); }
+        public SettingInfoViewModel<bool> UseShellWhenLaunchingFFmpeg { get; init; }
 
         /// <summary>
         /// 保存されていない動画の場合再割り当てを行う
         /// </summary>
-        public bool ReAllocateCommands { get => this.reAllocateCommandsField; set => this.Savesetting(ref this.reAllocateCommandsField, value, SettingsEnum.ReAllocateCommands); }
+        public SettingInfoViewModel<bool> ReAllocateCommands { get; init; }
 
     }
 
     class ExternalSoftwareSettingsViewModelD
     {
-        public ReactiveProperty<string> PlayerAPath { get; init; } = new("設定値");
-        public ReactiveProperty<string> PlayerBPath { get; init; } = new("設定値");
-        public ReactiveProperty<string> AppAPath { get; init; } = new("設定値");
-        public ReactiveProperty<string> AppBPath { get; init; } = new("設定値");
-        public ReactiveProperty<string> AppAParam { get; init; } = new("設定値");
-        public ReactiveProperty<string> AppBParam { get; init; } = new("設定値");
-        public ReactiveProperty<string> FfmpegPath { get; init; } = new("設定値");
-        public ReactiveProperty<string> FFmpegFormat { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> PlayerAPath { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> PlayerBPath { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> AppAPath { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> AppBPath { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> AppAParam { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> AppBParam { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> FfmpegPath { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> FFmpegFormat { get; init; } = new("設定値");
 
-        public bool UseShellWhenLaunchingFFmpeg { get; set; } = true;
+        public SettingInfoViewModelD<bool> UseShellWhenLaunchingFFmpeg { get; set; } = new(true);
 
-        public bool ReAllocateCommands { get; set; } = true;
+        public SettingInfoViewModelD<bool> ReAllocateCommands { get; set; } = new(true);
     }
 }

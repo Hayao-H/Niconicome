@@ -99,7 +99,7 @@ namespace Niconicome.Models.Playlist.VideoList
                 else
                 {
                     IAttemptResult<IListVideoInfo> vResult = this._videoHandler.GetVideo(originalVideo.Id.Value);
-                    if (!vResult.IsSucceeded||vResult.Data is null)
+                    if (!vResult.IsSucceeded || vResult.Data is null)
                     {
                         continue;
                     }

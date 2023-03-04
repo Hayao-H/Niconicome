@@ -14,7 +14,20 @@ namespace Niconicome.Models.Local
 {
     public interface ILocalVideoUtils
     {
+        /// <summary>
+        /// 指定した条件でファイルパスを取得
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="folderPath"></param>
+        /// <param name="format"></param>
+        /// <param name="replaceStricted"></param>
+        /// <param name="searchExact"></param>
+        /// <returns></returns>
         string GetFilePath(IListVideoInfo video, string folderPath, string format, bool replaceStricted, bool searchExact);
+
+        /// <summary>
+        /// キャッシュをクリア
+        /// </summary>
         void ClearCache();
     }
 

@@ -1,0 +1,18 @@
+﻿@inject Niconicome.ViewModels.Blazor.BlazorBaseViewModel DataContext;
+@inject NavigationManager navigation;
+
+@code {
+
+	protected ElementReference container;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+		await container.FocusAsync();
+	}
+
+	public void OnKeyDown(KeyboardEventArgs e)
+	{
+		DataContext.OnKeyDown(e, navigation);
+	}
+}

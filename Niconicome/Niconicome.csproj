@@ -9,49 +9,46 @@
 		<FileVersion>0.0.0.0</FileVersion>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-		<PublishSingleFile>true</PublishSingleFile>
-		<PublishTrimmed>false</PublishTrimmed>
 		<Deterministic>false</Deterministic>
 		<Version>0.11.1</Version>
 		<PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
-		<Copyright>c2022 Hayao-H</Copyright>
+		<Copyright>c2023 Hayao-H</Copyright>
 		<Authors>Hayao-H</Authors>
 		<PackageIcon>icon.png</PackageIcon>
 		<ApplicationIcon>app.ico</ApplicationIcon>
 		<MinimumPlatformVersion>7.0</MinimumPlatformVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<Optimize>false</Optimize>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DebugType>none</DebugType>
-		<DebugSymbols>false</DebugSymbols>
-	</PropertyGroup>
-
 	<ItemGroup>
-	  <None Include="wwwroot\addon.html" />
+	  <COMReference Include="Shell32">
+	    <WrapperTool>tlbimp</WrapperTool>
+	    <VersionMinor>0</VersionMinor>
+	    <VersionMajor>1</VersionMajor>
+	    <Guid>50a7e9b0-70ef-11d1-b75a-00a0c90564fe</Guid>
+	    <Lcid>0</Lcid>
+	    <Isolated>false</Isolated>
+	    <EmbedInteropTypes>true</EmbedInteropTypes>
+	  </COMReference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AngleSharp" Version="0.17.1" />
+		<PackageReference Include="AngleSharp" Version="1.0.1" />
 		<PackageReference Include="CredentialManagement" Version="1.0.2" />
-		<PackageReference Include="LiteDB" Version="5.0.11" />
-		<PackageReference Include="MaterialDesignColors" Version="2.0.4" />
-		<PackageReference Include="MaterialDesignThemes" Version="4.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.540" />
-		<PackageReference Include="Microsoft.ClearScript" Version="7.3.0" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.5" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1210.39" />
+		<PackageReference Include="LiteDB" Version="5.0.15" />
+		<PackageReference Include="MaterialDesignColors" Version="2.1.1" />
+		<PackageReference Include="MaterialDesignThemes" Version="4.7.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.552" />
+		<PackageReference Include="Microsoft.ClearScript" Version="7.3.7" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
 		<PackageReference Include="Prism.Unity" Version="8.1.97" />
-		<PackageReference Include="ReactiveProperty" Version="8.1.2" />
-		<PackageReference Include="ReactiveProperty.WPF" Version="8.1.2" />
-		<PackageReference Include="System.Security.Permissions" Version="6.0.0" />
+		<PackageReference Include="ReactiveProperty" Version="8.2.0" />
+		<PackageReference Include="ReactiveProperty.WPF" Version="8.2.0" />
+		<PackageReference Include="System.Security.Permissions" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 		<PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
 	</ItemGroup>

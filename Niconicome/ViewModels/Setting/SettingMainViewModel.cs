@@ -6,8 +6,8 @@ using System.Windows.Media;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System.Windows;
-using Niconicome.Models.Domain.Utils;
 using MaterialDesign = MaterialDesignThemes.Wpf;
+using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting
@@ -73,7 +73,7 @@ namespace Niconicome.ViewModels.Setting
 
             //クリックした要素を取得
             Point pos = e.GetPosition(panel);
-            var target = Utils.HitTest<TextBlock>(panel, pos);
+            var target = Utils::Utils.HitTest<TextBlock>(panel, pos);
             if (target is null) return;
             var targetBorder = target.GetParent<Border>();
             if (targetBorder is null) return;
@@ -85,7 +85,7 @@ namespace Niconicome.ViewModels.Setting
             }
 
             this.ResetSelectedItem();
-            targetBorder.BorderBrush = Utils.ConvertToBrush("#757575");
+            targetBorder.BorderBrush = Utils::Utils.ConvertToBrush("#757575");
             this.currentSelected = targetBorder;
 
             vm.Navigate(this.GetPages(target.Text));

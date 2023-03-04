@@ -35,166 +35,47 @@
     </Window.Resources>
     <materialDesign:DialogHost Identifier="default">
         <DockPanel>
-            <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}" d:DataContext="{d:DesignInstance {x:Type vm:MainWindowViewModel}}">
-                <materialDesign:DrawerHost.LeftDrawerContent>
-                    <Grid Width="250">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{Binding TreeWidth.Value}"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <ContentControl 
+                        Grid.Column= "0" 
+                        prism:RegionManager.RegionName="PlaylistTree"
+                        >
+                </ContentControl>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="37*"/>
+                    </Grid.RowDefinitions>
+                    <ToolBarTray>
+                        <ToolBar ClipToBounds="False"
+                                     Style="{StaticResource MaterialDesignToolBar}">
+                            <Image Source="{Binding UserImage.Value}" Height="40" Width="40"/>
+                            <TextBlock Text="{Binding Username.Value}" VerticalAlignment="Center" Margin="2 0"/>
+                            <Button Content="{Binding LoginBtnVal.Value}" Command="{Binding LoginCommand}"/>
+                            <Separator />
+                            <Button Content="{materialDesign:PackIcon Kind=Restart}" Command="{Binding Restart}" ToolTip="再起動"/>
+                            <Button Content="{materialDesign:PackIcon Kind=ExitToApp}" Command="{Binding ShutDown}" ToolTip="終了"/>
+                            <Separator />
+                            <Button Content="{materialDesign:PackIcon Kind=Cog}" ToolTip="設定" Command="{Binding OpenSettingCommand}"/>
+                            <Button Content="{materialDesign:PackIcon Kind=Puzzle}" ToolTip="アドオン管理" Command="{Binding OpenAddonManagerCommand}"/>
+                            <Button Content="{materialDesign:PackIcon Kind=Download}" ToolTip="ダウンロード一覧" Command="{Binding OpenDownloadTaskWindowsCommand}"/>
+                        </ToolBar>
+                    </ToolBarTray>
+                    <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="3*"/>
-                            <RowDefinition Height="17*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="{Binding TabsHeight.Value}"/>
                         </Grid.RowDefinitions>
-                        <materialDesign:ColorZone materialDesign:ShadowAssist.ShadowDepth="Depth1" Padding="8" >
-                            <StackPanel Orientation="Vertical">
-                                <DockPanel>
-                                    <Image Source="{Binding UserImage.Value}" Height="40"  Margin="5 0">
-                                        <i:Interaction.Behaviors>
-                                            <vm:UserImageBehavior/>
-                                        </i:Interaction.Behaviors>
-                                    </Image>
-                                    <TextBlock Text="{Binding Username.Value}" Style="{DynamicResource MaterialDesignBody1TextBlock}" VerticalAlignment="Center" />
-                                </DockPanel>
-                                <Button Content="{Binding LoginBtnVal.Value}"  Command="{Binding LoginCommand}" Margin="8 10" ToolTip="{Binding LoginBtnTooltip.Value}"/>
-                            </StackPanel>
-                        </materialDesign:ColorZone>
-                        <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">
-                            <MenuItem Header="設定" Height="40" Command="{Binding OpenSettingCommand}" >
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="CogOutline"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="ダウンロード" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenDownloadTaskWindowsCommand}">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="Download"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="アドオン" HorizontalContentAlignment="Left"  Height="40" Command="{Binding OpenAddonManagerCommand}">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="Puzzle"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="再起動" Command="{Binding Restart}" Height="40">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="Restart"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
-                            <MenuItem Header="終了" Command="{Binding ShutDown}"  Height="40">
-                                <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="Power"/>
-                                </MenuItem.Icon>
+                        <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion" BorderBrush="#4A4A4A" ItemTemplate="{StaticResource TabItemTemplate}"/>
+                        <TabControl Background="{DynamicResource MaterialDesignPaper}" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A" Grid.Row="1" ItemTemplate="{StaticResource TabItemTemplate}" />
 
-                            </MenuItem>
-                        </StackPanel>
-                    </Grid>
-                </materialDesign:DrawerHost.LeftDrawerContent>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{Binding TreeWidth.Value}"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column= "0" 
-                          Background="#323232">
-                        <Grid.DataContext>
-                            <vm:PlaylistTreeViewModel/>
-                        </Grid.DataContext>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="16*"/>
-                        </Grid.RowDefinitions>
-                        <DockPanel Grid.Row="0">
-                            <Button Width="auto" Margin="6" HorizontalAlignment="Left" Command="{Binding PlaylistRefreshcommand}" ToolTip="プレイリストを更新する">
-                                <materialDesign:PackIcon Kind="Refresh" />
-                            </Button>
-                        </DockPanel>
-                        <TreeView ItemsSource="{Binding PlaylistTree}" Grid.Row="1" >
-                            <i:Interaction.Behaviors>
-                                <vm:PlaylistTreeBehavior/>
-                            </i:Interaction.Behaviors>
-                            <TreeView.ItemTemplate>
-                                <HierarchicalDataTemplate DataType="tree:ITreePlaylistInfo" ItemsSource="{Binding Children}">
-                                    <StackPanel>
-                                        <Grid>
-                                            <Grid.ToolTip>
-                                                <TextBlock Text="{Binding Videos.Count,StringFormat={}{0}件の動画}"/>
-                                            </Grid.ToolTip>
-                                            <Separator BorderThickness="1" Visibility="{Binding BeforeSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                            <TextBlock Foreground="#FAFAFA" Text="{Binding Name.Value}"/>
-                                            <Separator BorderThickness="1" Visibility="{Binding AfterSeparatorVisibility,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" BorderBrush="#000"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </HierarchicalDataTemplate>
-                            </TreeView.ItemTemplate>
-                            <TreeView.ItemContainerStyle>
-                                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                                    <Setter Property="Tag" Value="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType=TreeView, Mode=FindAncestor}}"/>
-                                    <Setter Property="ContextMenu">
-                                        <Setter.Value>
-                                            <ContextMenu StaysOpen="False" DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}" >
-                                                <MenuItem Header="プレイリストを追加する"
-                                                  Command="{Binding AddPlaylist}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Plus"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem Header="このプレイリストを削除する"
-                                                  Command="{Binding RemovePlaylist}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext.Id, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Delete"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                                <MenuItem Header="このプレイリストを編集する"
-                                                  Command="{Binding EditPlaylistCommand}"
-                                                  CommandParameter="{Binding  Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-                                                    <MenuItem.Icon>
-                                                        <materialDesign:PackIcon Kind="Edit"/>
-                                                    </MenuItem.Icon>
-                                                </MenuItem>
-                                            </ContextMenu>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                                </Style>
-                            </TreeView.ItemContainerStyle>
-                        </TreeView>
-                    </Grid>
-                    <Grid Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="19*"/>
-                        </Grid.RowDefinitions>
-                        <DockPanel >
-                            <ToggleButton Margin="10 0" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignHamburgerToggleButton}" x:Name="MenuToggleButton" Foreground="{DynamicResource MaterialDesignBody}"/>
-                            <DockPanel HorizontalAlignment="Right">
-                                <Button Margin="10,0" Grid.Column="0" Width="60" VerticalAlignment="Center" ToolTip="アプリケーション設定" Command="{Binding OpenSettingCommand}">
-                                    <materialDesign:PackIcon Kind="cog">
-                                        <materialDesign:PackIcon.RenderTransform>
-                                            <ScaleTransform CenterY="8" CenterX="7" ScaleX="1.7" ScaleY="1.7"/>
-                                        </materialDesign:PackIcon.RenderTransform>
-                                    </materialDesign:PackIcon>
-                                </Button>
-                            </DockPanel>
-                        </DockPanel>
-                        <Grid Grid.Row="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="{Binding TabsHeight.Value}"/>
-                            </Grid.RowDefinitions>
-                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion" BorderBrush="#4A4A4A">
-                                <TabControl.Resources>
-                                    <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
-                                    </Style>
-                                </TabControl.Resources>
-                            </TabControl>
-                            <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="1" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A">
-                                <TabControl.Resources>
-                                    <Style TargetType="TabItem" BasedOn="{StaticResource TabStyle}">
-                                    </Style>
-                                </TabControl.Resources>
-                            </TabControl >
-                        </Grid>
                     </Grid>
                 </Grid>
-            </materialDesign:DrawerHost>
+            </Grid>
         </DockPanel>
     </materialDesign:DialogHost>
 </Window>

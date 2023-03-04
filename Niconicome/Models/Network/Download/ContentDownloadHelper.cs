@@ -16,6 +16,7 @@ using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
 using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
+using Niconicome.Models.Domain.Playlist;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -29,42 +30,30 @@ namespace Niconicome.Models.Network.Download
         /// <param name="OnMessage"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IListVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token);
+        Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token);
     }
 
     public class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, ILocalSettingHandler localSettingHandler, IDomainModelConverter converter, IEnumSettingsHandler enumSettingsHander, IPathOrganizer pathOrganizer, IVideoInfoContainer container)
+        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, IDomainModelConverter converter)
         {
             this.localContentHandler = localContentHandler;
-            this.settingHandler = localSettingHandler;
             this.converter = converter;
             this.logger = logger;
-            this.enumSettingsHandler = enumSettingsHander;
-            this.pathOrganizer = pathOrganizer;
-            this.container = container;
         }
 
         #region DI
         private readonly ILogger logger;
 
-        private readonly ILocalSettingHandler settingHandler;
-
         private readonly ILocalContentHandler localContentHandler;
 
         private readonly IDomainModelConverter converter;
-
-        private readonly IEnumSettingsHandler enumSettingsHandler;
-
-        private readonly IPathOrganizer pathOrganizer;
-
-        private readonly IVideoInfoContainer container;
 
         #endregion
 
         #region Methods
 
-        public async Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IListVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
+        public async Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
         {
             var context = new DownloadContext(setting.NiconicoId);
             var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
@@ -75,7 +64,7 @@ namespace Niconicome.Models.Network.Download
 
             if (session.Video is not null)
             {
-                this.converter.ConvertDomainVideoInfoToListVideoInfo(videoInfo, session.Video);
+                this.converter.ConvertDomainVideoInfoToVideoInfo(videoInfo, session.Video);
             }
 
 
@@ -101,7 +90,7 @@ namespace Niconicome.Models.Network.Download
             if (setting.Skip)
             {
                 string fileNameFormat = setting.FileNameFormat;
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix);
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo,setting.VerticalResolution, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix);
             }
 
             if (!Directory.Exists(setting.FolderPath))

@@ -4,18 +4,19 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Niconicome.Views.Setting.Pages"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
-        xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        mc:Ignorable="d"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="13"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        FontFamily="Yu Gothic"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:vm="clr-namespace:Niconicome.ViewModels.Setting.Pages"
+      xmlns:mainvm ="clr-namespace:Niconicome.ViewModels.Setting"
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      mc:Ignorable="d"
+      TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+      TextElement.FontWeight="Regular"
+      TextElement.FontSize="13"
+      TextOptions.TextFormattingMode="Ideal"
+      TextOptions.TextRenderingMode="Auto"
+      FontFamily="Yu Gothic"
       d:DesignHeight="450" d:DesignWidth="800"
+      d:DataContext="{d:DesignInstance vm:RestorePageViewModelD,IsDesignTimeCreatable=True}"
       Title="回復">
     <Page.DataContext>
         <vm:RestorePageViewModel/>
@@ -43,8 +44,8 @@
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="名前" DisplayMemberBinding="{Binding Name}"/>
-                                <GridViewColumn Header="作成日" DisplayMemberBinding="{Binding CreatedOn,StringFormat=yyyy/MM/dd HH:mm}"/>
-                                <GridViewColumn Header="ファイルサイズ" DisplayMemberBinding="{Binding FileSize,StringFormat={}{0}kB}"/>
+                                <GridViewColumn Header="作成日" DisplayMemberBinding="{Binding CatedOn}"/>
+                                <GridViewColumn Header="ファイルサイズ" DisplayMemberBinding="{Binding FileSize}"/>
                             </GridView>
                         </ListView.View>
                         <ListView.ItemContainerStyle>
@@ -63,7 +64,7 @@
                     </ListView>
                     <DockPanel Margin="5 0 20 0">
                         <Label Content="名前" VerticalAlignment="Bottom"/>
-                        <TextBox Width="300" VerticalContentAlignment="Bottom" Text="{Binding BackupName,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"/>
+                        <TextBox Width="300" VerticalContentAlignment="Bottom" Text="{Binding BackupNameInput.Value,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"/>
                         <Button Content="バックアップを作成する"  Margin="0 8 0 0" HorizontalAlignment="Right" Command="{Binding CreatebackupCommand}"/>
                     </DockPanel>
                 </StackPanel>
@@ -100,7 +101,7 @@
                         </ListBox.ItemContainerStyle>
                     </ListBox>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox VerticalContentAlignment="Bottom" Width="400" Text="{Binding VIdeoDir}"/>
+                        <TextBox VerticalContentAlignment="Bottom" Width="400" Text="{Binding VIdeoDirInput.Value}"/>
                         <Button Content="追加" Margin="10 0" Command="{Binding AddVideoDirCommand}"/>
                     </StackPanel>
                     <TextBlock TextWrapping="Wrap" Style="{StaticResource MaterialDesignTextBlock}" Opacity=".8">

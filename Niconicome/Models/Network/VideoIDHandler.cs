@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -196,9 +197,9 @@ namespace Niconicome.Models.Network
         /// </summary>
         private async Task<IEnumerable<IListVideoInfo>> GetVideoListInfosFromLocalPath(string localPath)
         {
-            IEnumerable<string> ids = this._localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
+            IAttemptResult<IImmutableList<string>> ids = this._localDirectoryHandler.GetVideoIdsFromDirectory(localPath);
 
-            IAttemptResult<IEnumerable<IListVideoInfo>> result = await this._networkVideoHandler.GetVideoListInfosAsync(ids);
+            IAttemptResult<IEnumerable<IListVideoInfo>> result = await this._networkVideoHandler.GetVideoListInfosAsync(ids.Data!);
 
             return result.Data!;
         }

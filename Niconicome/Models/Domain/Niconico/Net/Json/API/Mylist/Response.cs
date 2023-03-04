@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Extensions.System;
+using Windows.Devices.Input;
 
 namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist
 {
@@ -29,6 +31,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist
     {
         public string WatchId { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
+        public DateTime AddedAt { get; set; } = new();
         public Video Video { get; set; } = new();
     }
 
@@ -36,8 +39,11 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist
     {
         public string Id { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
+        public int Duration { get; set; }
         public DateTime RegisteredAt { get; set; }
         public Thumbnail Thumbnail { get; set; } = new();
+        public Owner Owner { get; set; } = new();
+        public Count Count { get; set; } = new();
     }
 
     public class Thumbnail
@@ -45,6 +51,36 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Mylist
         public string Url { get; set; } = string.Empty;
         public string MiddleUrl { get; set; } = string.Empty;
         public string LargeUrl { get; set; } = string.Empty;
+
+        public string GetURL()
+        {
+            if (!this.LargeUrl.IsNullOrEmpty())
+            {
+                return this.LargeUrl;
+            }
+            else if (!this.MiddleUrl.IsNullOrEmpty())
+            {
+                return this.MiddleUrl;
+            }
+            else
+            {
+                return this.Url;
+            }
+        }
+    }
+
+    public class Count
+    {
+        public int View { get; set; }
+        public int Comment { get; set; }
+        public int Mylist { get; set; }
+        public int Like { get; set; }
+    }
+
+    public class Owner
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
     }
 
 }

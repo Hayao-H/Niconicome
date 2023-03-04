@@ -1,0 +1,53 @@
+@startuml LocalServer
+
+title LocalServer
+
+enum RequestType {
+    + None
+    + Video
+    + Thumbnail
+}
+
+interface IServer {
+    + void Start();
+    + void ShutDown();
+}
+
+interface IHLSManager {
+    Task<IAttemptResult> CreateFilesAsync(string niconicoID, int playlistID);
+}
+
+interface IUrlHandler {
+    + RequestType GetReqyestType(Uri request);
+}
+
+interface IVideoRequestHandler {
+    + IAttemptResult Handle(Uri request,HttpListenerResponse res);
+}
+
+interface ITsRequestHandler {
+    + IAttemptResult Handle(Uri request,HttpListenerResponse res);
+}
+
+interface IM3U8RequestHandler {
+    + IAttemptResult Handle(Uri request,HttpListenerResponse res);
+}
+
+interface INotFoundRequestHandler {
+    + IAttemptResult Handle(HttpListenerResponse res);
+}
+
+interface IUserChromeRequestHandler {
+    + IAttemptResult Handle(HttpListenerResponse res);
+}
+
+IServer *-- IUrlHandler
+IServer *-- IVideoRequestHandler
+IServer *-- INotFoundRequestHandler
+IServer *-- IM3U8RequestHandler
+IServer *-- ITsRequestHandler
+IServer *-- IUserChromeRequestHandler
+IServer ..> RequestType
+IUrlHandler ..> RequestType
+
+@enduml

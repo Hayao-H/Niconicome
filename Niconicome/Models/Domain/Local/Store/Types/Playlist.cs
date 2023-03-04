@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico;
 using LiteDB;
+using Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Store.Types
 {
@@ -97,6 +98,11 @@ namespace Niconicome.Models.Domain.Local.Store.Types
                 }
                 return layer;
             }
+        }
+
+        public override string ToString()
+        {
+            return this.PlaylistName ?? LocalConstant.DefaultPlaylistName;
         }
     }
 

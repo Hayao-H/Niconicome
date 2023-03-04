@@ -38,18 +38,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter
             var comment = new Comment()
             {
                 Thread = chat.Thread,
-                Fork = chat.Fork,
                 No = chat.No,
-                Vpos = chat.Vpos,
-                Date = chat.Date,
-                DateUsec = chat.DateUsec,
-                Anonimity = chat.Anonymity,
+                Vpos = chat.Vpos * 10,
+                Date = DateTimeOffset.FromUnixTimeSeconds(chat.Date).ToLocalTime().DateTime,
                 UserID = chat.UserId,
-                Mail = chat.Mail,
+                Command = chat.Mail?.Split(' ').ToList() ?? new List<string>(),
                 Content = chat.Text,
-                Premium = chat.Premium,
                 Score = chat.Score,
-                Nicoru = chat.Nicoru,
             };
 
             return comment;
@@ -59,19 +54,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter
         {
             var chat = new V2::ChatElement()
             {
-                Text = comment.Content,
-                Mail = comment.Mail,
-                UserId = comment.UserID,
+                Text = comment.Content ?? string.Empty,
+                Mail = string.Join(' ', comment.Command),
+                UserId = comment.UserID ?? string.Empty,
                 Thread = comment.Thread,
                 No = comment.No,
-                Vpos = comment.Vpos,
-                Premium = comment.Premium ?? 0,
-                Anonymity = comment.Anonimity,
-                Nicoru = comment.Nicoru,
-                Deleted = comment.Deleted ?? 0,
+                Vpos = comment.Vpos / 10,
                 Score = comment.Score,
-                Date = comment.Date,
-                DateUsec = comment.DateUsec,
+                Date = new DateTimeOffset(comment.Date, TimeSpan.FromHours(9)).ToUnixTimeSeconds(),
             };
 
             return chat;

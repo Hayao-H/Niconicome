@@ -61,7 +61,7 @@ namespace Niconicome.Extensions.System.List
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        public static IEnumerable<T> Copy<T>(this IEnumerable<T> source)
+        public static List<T> Copy<T>(this IEnumerable<T> source)
         {
             return new List<T>(source);
         }

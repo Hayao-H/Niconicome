@@ -1,0 +1,39 @@
+.PlaylistInfoContainer {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #e7e7e7e7;
+    border-radius: 10px;
+
+    >.PlaylistInfoRow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 80px;
+
+        &:not(.Last) {
+            border-bottom: 1px solid #e7e7e7e7;
+        }
+
+        .InputBox {
+            width: 40%;
+            outline: none;
+            border: none;
+            border-bottom: 1px solid #c7c7cb;
+            text-align: right;
+        }
+
+        .PlaylistTypeBox {
+            width: 30%;
+        }
+    }
+}
+
+.ControlsWrapper {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+
+    >.ControlItem{
+        margin-left: 5px;
+    }
+}

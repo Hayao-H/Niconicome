@@ -4,8 +4,12 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Threading.Tasks;
 using Microsoft.VisualBasic;
 using Microsoft.Web.WebView2.Core;
+using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
+using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Auth
@@ -39,14 +43,14 @@ namespace Niconicome.Models.Auth
 
     class AutoLogin : IAutoLogin
     {
-        public AutoLogin(ISession session, IAccountManager accountManager, ILocalSettingHandler settingHandler, IWebview2SharedLogin webview2SharedLogin, IFirefoxSharedLogin firefoxSharedLogin, IStoreFirefoxSharedLogin storeFirefoxSharedLogin)
+        public AutoLogin(ISession session, IAccountManager accountManager, IWebview2SharedLogin webview2SharedLogin, IFirefoxSharedLogin firefoxSharedLogin, IStoreFirefoxSharedLogin storeFirefoxSharedLogin, ISettingsContainer settingsConainer)
         {
             this._session = session;
             this._accountManager = accountManager;
-            this._settingHandler = settingHandler;
             this._webview2SharedLogin = webview2SharedLogin;
             this._firefoxSharedLogin = firefoxSharedLogin;
             this._storeFirefoxSharedLogin = storeFirefoxSharedLogin;
+            this._settingsConainer = settingsConainer;
         }
 
         #region field
@@ -55,7 +59,7 @@ namespace Niconicome.Models.Auth
 
         private readonly IAccountManager _accountManager;
 
-        private readonly ILocalSettingHandler _settingHandler;
+        private readonly ISettingsContainer _settingsConainer;
 
         private readonly IWebview2SharedLogin _webview2SharedLogin;
 
@@ -69,7 +73,7 @@ namespace Niconicome.Models.Auth
 
         public bool IsAUtologinEnable
         {
-            get => this._settingHandler.GetBoolSetting(SettingsEnum.AutologinEnable);
+            get => this._settingsConainer.GetSetting(SettingNames.IsAutologinEnable,false).Data?.Value ?? false;
         }
 
         #endregion
@@ -101,13 +105,15 @@ namespace Niconicome.Models.Auth
             }
             else if (type == AutoLoginType.Firefox)
             {
-                var ffProfile = this._settingHandler.GetStringSetting(SettingsEnum.FFProfileName);
-                result = await this._firefoxSharedLogin.TryLogin(ffProfile!);
+                var ffProfile = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName,"");
+                if (!ffProfile.IsSucceeded || ffProfile.Data is null) return false;
+                result = await this._firefoxSharedLogin.TryLogin(ffProfile.Data.Value);
             }
             else if (type == AutoLoginType.StoreFirefox)
             {
-                var ffProfile = this._settingHandler.GetStringSetting(SettingsEnum.FFProfileName);
-                result = await this._storeFirefoxSharedLogin.TryLogin(ffProfile!);
+                var ffProfile = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName,"");
+                if (!ffProfile.IsSucceeded || ffProfile.Data is null) return false;
+                result = await this._storeFirefoxSharedLogin.TryLogin(ffProfile.Data.Value);
             }
 
             return result;
@@ -116,8 +122,21 @@ namespace Niconicome.Models.Auth
 
         private AutoLoginType GetAutoLoginType()
         {
-            var mode = this._settingHandler.GetStringSetting(SettingsEnum.AutologinMode) ?? AutoLoginTypeString.Normal;
-            var ffProfile = this._settingHandler.GetStringSetting(SettingsEnum.FFProfileName);
+            IAttemptResult<ISettingInfo<string>> mResult = this._settingsConainer.GetSetting(SettingNames.AutoLoginMode,AutoLoginTypeString.Normal);
+            IAttemptResult<ISettingInfo<string>> pResult = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName,"");
+
+            if (!mResult.IsSucceeded || mResult.Data is null)
+            {
+                return AutoLoginType.None;
+
+            }
+            else if (!pResult.IsSucceeded || pResult.Data is null)
+            {
+                return AutoLoginType.None;
+            }
+
+            var mode = mResult.Data.Value.IsNullOrEmpty() ? AutoLoginTypeString.Normal : mResult.Data.Value;
+            var ffProfile = pResult.Data.Value;
 
             if (mode == AutoLoginTypeString.Normal)
             {

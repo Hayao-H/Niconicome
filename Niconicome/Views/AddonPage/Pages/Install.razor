@@ -1,39 +1,42 @@
 ﻿@page "/addons/install/{ID}"
 @inject Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages.InstallViewModel DataContext
+@inherits BlazorBase;
 
-<nav aria-label="breadcrumb">
-	<ol class="breadcrumb">
-		<li class="breadcrumb-item"><a href="/addons">アドオンマネージャー</a></li>
-		<li class="breadcrumb-item active">@(DataContext.InstallOrUpdate)</li>
-	</ol>
-</nav>
+<div tabindex="0" @ref="container" @onkeydown="OnKeyDown" class="PageContainer">
+	<nav aria-label="breadcrumb">
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/addons">アドオンマネージャー</a></li>
+			<li class="breadcrumb-item active">@(DataContext.InstallOrUpdate)</li>
+		</ol>
+	</nav>
 
-<h5 class="text-muted">アドオンの@(DataContext.InstallOrUpdate)</h5>
+	<h5 class="text-muted">アドオンの@(DataContext.InstallOrUpdate)</h5>
 
-<div class="@(DataContext.SelectViewDisplay) container">
-	<h5 class="text-muted">Step1. @(DataContext.InstallOrUpdate)するファイルのフルパスを入力してください。</h5>
-	<div class="input-group row mt-4">
-		<input class="form-control col-8" @bind="DataContext.SelectedFilePath" />
-		<button class="btn btn-outline-secondary col-auto" type="button" @onclick="DataContext.OnFileSelected">決定</button>
-		<span class="col-4"></span>
+	<div class="@(DataContext.SelectViewDisplay) container">
+		<h5 class="text-muted">Step1. @(DataContext.InstallOrUpdate)するファイルのフルパスを入力してください。</h5>
+		<div class="input-group row mt-4">
+			<input class="form-control col-8" @bind="DataContext.SelectedFilePath" />
+			<button class="btn btn-outline-secondary col-auto" type="button" @onclick="DataContext.OnFileSelected">決定</button>
+			<span class="col-4"></span>
+		</div>
 	</div>
-</div>
 
-<div class="@(DataContext.InfomationViewDisplay) container">
-	<h5 class="row text-muted">Step2. アドオンの情報です。</h5>
-	<p class="row border border-secondary rounded p-2 mt-4">@((MarkupString)DataContext.AddonInfomationText)</p>
-	<div class="row align-content-between">
-		<span class="col-9"></span>
-		<button class="btn btn-light col-3" disabled="@(DataContext.IsInstallDisabled)" @onclick="DataContext.Install">インストール</button>
+	<div class="@(DataContext.InfomationViewDisplay) container">
+		<h5 class="row text-muted">Step2. アドオンの情報です。</h5>
+		<p class="row border border-secondary rounded p-2 mt-4">@((MarkupString)DataContext.AddonInfomationText)</p>
+		<div class="row align-content-between">
+			<span class="col-9"></span>
+			<button class="btn btn-light col-3" disabled="@(DataContext.IsInstallDisabled)" @onclick="DataContext.Install">インストール</button>
+		</div>
 	</div>
-</div>
 
-<div class="@(DataContext.InstallViewDisplay) container">
-	<h5 class="row text-muted">Step3. @(DataContext.InstallOrUpdate)を開始します。</h5>
-	<p class="row border border-secondary rounded p-2 mt-4">@((MarkupString)DataContext.InstallInfomationText)</p>
-	<div class="row align-content-between">
-		<span class="col-9"></span>
-		<a class="btn btn-light col-3 @(DataContext.IsCompleteDisabled)" href="/addons">完了</a>
+	<div class="@(DataContext.InstallViewDisplay) container">
+		<h5 class="row text-muted">Step3. @(DataContext.InstallOrUpdate)を開始します。</h5>
+		<p class="row border border-secondary rounded p-2 mt-4">@((MarkupString)DataContext.InstallInfomationText)</p>
+		<div class="row align-content-between">
+			<span class="col-9"></span>
+			<a class="btn btn-light col-3 @(DataContext.IsCompleteDisabled)" href="/addons">完了</a>
+		</div>
 	</div>
 </div>
 

@@ -1,0 +1,227 @@
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+  box-shadow: inset 0 0 6px rgba(231, 231, 231, 0.9058823529);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #737575;
+  border-radius: 5px;
+}
+
+.PageContent .ControlsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 100%;
+  height: 40px;
+  margin: 10px 0;
+}
+.PageContent .ControlsContainer .InputBoxWrapper {
+  width: 40%;
+  height: 100%;
+}
+.PageContent .ControlsContainer .InputBoxWrapper #InputBox {
+  width: 80%;
+  height: 100%;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: solid 2px rgba(231, 231, 231, 0.9058823529);
+  padding: 5px 0;
+  outline: none;
+  display: inline-block;
+}
+.PageContent .ControlsContainer .InputBoxWrapper #RegisterButton {
+  margin-left: 5px;
+  padding: 5px 20px;
+}
+.PageContent .VideoList {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.PageContent .VideoList #VideoListHeader {
+  background-color: #f2f3f5;
+  display: flex;
+  justify-content: start;
+  position: relative;
+  height: 35px;
+  color: #001835;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem {
+  display: inline-block;
+  padding-left: 8px;
+  height: 35px;
+  line-height: 35px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+.PageContent .VideoList #VideoListHeader .Separator {
+  position: absolute;
+  opacity: 0;
+  width: 20px;
+  height: 100%;
+  margin: 0;
+  cursor: col-resize;
+}
+.PageContent .VideoList #VideoListHeader #CheckBoxColumn {
+  width: 50px;
+  border-right: 1px solid #e5e8ea;
+  padding: 0;
+}
+.PageContent .VideoList #VideoListHeader #CheckBoxColumnSeparator {
+  left: 40px;
+}
+.PageContent .VideoList #VideoListHeader #ThumbnailColumn {
+  width: 165.3333333333px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #ThumbnailColumnSeparator {
+  left: 205.3333333333px;
+}
+.PageContent .VideoList #VideoListHeader #TitleColumn {
+  width: 700px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #TitleColumnSeparator {
+  left: 905.3333333333px;
+}
+.PageContent .VideoList #VideoListHeader #UploadedDateTimeColumn {
+  width: 250px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #UploadedDateTimeColumnSeparator {
+  left: 1155.3333333333px;
+}
+.PageContent .VideoList #VideoListHeader #ViewCountColumn {
+  width: 110px;
+  height: 100%;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #ViewCountColumnSeparator {
+  left: 1265.3333333333px;
+}
+.PageContent .VideoList #VideoListHeader #CommentCountColumn {
+  width: 110px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #CommentCountColumnSeparator {
+  left: 1375.3333333333px;
+}
+.PageContent .VideoList #VideoListHeader #MylistCountColumn {
+  width: 110px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #MylistCountColumnSeparator {
+  left: 1485.3333333333px;
+}
+.PageContent .VideoList #VideoListHeader #LikeCountColumn {
+  width: 110px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody {
+  border: solid 1px #e5e8ea;
+  height: 400px;
+  overflow-y: scroll;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow {
+  height: 100px;
+  display: flex;
+  border-bottom: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .CheckBoxColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 50px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailWrapper {
+  height: 100%;
+  width: 165.3333333333px;
+  border-right: 1px solid #e5e8ea;
+  padding: 8px;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailWrapper .Thumbnail {
+  width: 100%;
+  height: 100%;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer {
+  display: flex;
+  justify-content: flex-start;
+  height: 100%;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 700px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .UploadedDateTimeColumn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 250px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .ViewCountColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 110px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .CommentCountColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 110px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .MylistCountColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 110px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .LikeCountColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 110px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow:hover {
+  background: rgba(244, 244, 244, 0.9568627451);
+}
+
+.PlaylistInfoContainer.PlaylistInfoRow {
+  display: flex;
+  justify-content: space-between;
+}

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
@@ -6,132 +8,131 @@ using System.Windows;
 using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.List;
-using Niconicome.Models.Local;
+using Niconicome.Models.Domain.Local.DataBackup;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Utils.Reactive;
+using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Controls;
+using Niconicome.ViewModels.Setting.Pages.String;
 using MD = MaterialDesignThemes.Wpf;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
-    class RestorePageViewModel : BindableBase
+    public class RestorePageViewModel : BindableBase
     {
         public RestorePageViewModel(Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessage)
         {
+            WS::SettingPage.Restore.Initialize();
+
             this.showMessage = showMessage;
-            this.Backups = new ObservableCollection<IBackupData>();
-            this.Backups.Addrange(WS::SettingPage.Restore.GetAllBackups());
+
+            this.Backups = new BindableCollection<BackupDataViewModel, IBackupData>(WS::SettingPage.Restore.Backups, b => new BackupDataViewModel(b));
+
             this.SnackbarMessageQueue = WS::SettingPage.SnackbarMessageQueue;
+            this.VideoDirectories = new BindableCollection<string, string>(WS::SettingPage.Restore.VideoFileDirectories, x => x);
 
-            this.VideoDirectories = new ObservableCollection<string>(WS::SettingPage.Restore.GetAllVideoDirectories());
-
-            this.CreatebackupCommand = new CommandBase<object>(_ => true, _ =>
+            this.CreatebackupCommand = new BindableCommand(() =>
             {
-                if (this.BackupName.IsNullOrEmpty()) return;
-                var result = WS::SettingPage.Restore.TryCreateBackup(this.BackupName);
-                if (result)
+                if (this.BackupNameInput.Value.IsNullOrEmpty()) return;
+
+                var result = WS::SettingPage.Restore.CreateBackup(this.BackupNameInput.Value);
+                if (result.IsSucceeded)
                 {
-                    this.Backups.Clear();
-                    this.Backups.Addrange(WS::SettingPage.Restore.GetAllBackups());
-                    this.SnackbarMessageQueue.Enqueue($"バックアップ「{this.BackupName}」を作成しました。");
-                    this.BackupName = string.Empty;
+                    this.SnackbarMessageQueue.Enqueue(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.BackupCreated, this.BackupNameInput.Value));
+                    this.BackupNameInput.Value = string.Empty;
                 }
                 else
                 {
-                    this.SnackbarMessageQueue.Enqueue("バックアップの作成に失敗しました。");
+                    this.SnackbarMessageQueue.Enqueue(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.FailedToCreateBackup));
                 }
-            });
+            }, new BindableProperty<bool>(true));
 
-            this.ResetSettingsCommand = new CommandBase<object>(_ => true, async _ =>
+            this.ResetSettingsCommand = new BindableCommand(async () =>
             {
-                var confirm = await this.showMessage("本当に設定を削除しますか？この操作は元に戻すことができません。", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
+                var confirm = await this.showMessage(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.ConfirmMessageOfResetSetting), MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
                 if (confirm != MaterialMessageBoxResult.Yes) return;
-                WS::SettingPage.Restore.ResetSettings();
-                this.SnackbarMessageQueue.Enqueue("設定をリセットしました。");
-            });
 
-            this.RemovebackupCommand = new CommandBase<IBackupData>(_ => true, arg =>
-            {
-                if (arg is null) return;
-                if (arg.AsNullable<IBackupData>() is not IBackupData backup || backup is null) return;
-
-                bool result = WS::SettingPage.Restore.TryRemoveBackup(backup.GUID);
-
-                if (result)
+                IAttemptResult result = WS::SettingPage.Restore.ResetSettings();
+                if (result.IsSucceeded)
                 {
-                    this.SnackbarMessageQueue.Enqueue($"バックアップを削除しました。");
-                    this.Backups.Clear();
-                    this.Backups.Addrange(WS::SettingPage.Restore.GetAllBackups());
+                    this.SnackbarMessageQueue.Enqueue(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.ResetOfSettingHasCompleted));
+                }
+            }, new BindableProperty<bool>(true));
+
+            this.RemovebackupCommand = new BindableCommand<BackupDataViewModel>(vm =>
+            {
+                if (vm.Backup.GUID.IsNullOrEmpty()) return;
+
+                IAttemptResult result = WS::SettingPage.Restore.RemoveBackup(vm.Backup.GUID);
+
+                if (result.IsSucceeded)
+                {
+                    this.SnackbarMessageQueue.Enqueue(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.BackupDeleted));
                 }
                 else
                 {
-                    this.SnackbarMessageQueue.Enqueue($"バックアップ「{backup.Name}」の削除に失敗しました。");
+                    this.SnackbarMessageQueue.Enqueue(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.FailedToDeleteBackup));
                 }
 
-            });
+            }, new BindableProperty<bool>(true));
 
-            this.ApplyBackupCommand = new CommandBase<IBackupData>(_ => true, async arg =>
+            this.ApplyBackupCommand = new BindableCommand<BackupDataViewModel>(async vm =>
              {
 
-                 if (arg is null) return;
-                 if (arg.AsNullable<IBackupData>() is not IBackupData backup || backup is null) return;
+                 if (vm.Backup.GUID.IsNullOrEmpty()) return;
 
-                 var confirm = await this.showMessage("本当にこのバックアップを適用しますか？現在の設定は全て削除され、操作は元に戻すことができません。", MessageBoxButtons.Yes | MessageBoxButtons.No | MessageBoxButtons.Cancel, MessageBoxIcons.Question);
+                 var confirm = await this.showMessage(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.ConfirmMessageOfApplyingBackup), MessageBoxButtons.Yes | MessageBoxButtons.No | MessageBoxButtons.Cancel, MessageBoxIcons.Question);
                  if (confirm != MaterialMessageBoxResult.Yes) return;
 
-                 bool result = WS::SettingPage.Restore.TryApplyBackup(backup.GUID);
+                 IAttemptResult result = WS::SettingPage.Restore.ApplyBackup(vm.Backup.GUID);
 
-                 if (result)
+                 if (result.IsSucceeded)
                  {
-                     this.SnackbarMessageQueue.Enqueue($"バックアップを適用しました。");
+                     this.SnackbarMessageQueue.Enqueue(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.BackupApplyed), WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.Restart), () => WS::SettingPage.PowerManager.Restart());
                  }
                  else
                  {
-                     this.SnackbarMessageQueue.Enqueue($"バックアップの適用に失敗しました。");
+                     this.SnackbarMessageQueue.Enqueue(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.FailedToApplyBackup));
                  }
-             });
+             }, this._isBackupProcessing);
 
-            this.ResetDataCommand = new CommandBase<object>(_ => true, async _ =>
+            this.ResetDataCommand = new BindableCommand(async () =>
               {
 
-                  var confirm = await this.showMessage("本当に全ての動画・プレイリストを削除しますか？この操作は元に戻すことができません。", MessageBoxButtons.Yes | MessageBoxButtons.No | MessageBoxButtons.Cancel, MessageBoxIcons.Question);
-                  if (confirm != MaterialMessageBoxResult.OK) return;
-                  WS::SettingPage.Restore.DeleteAllVideosAndPlaylists();
-                  this.SnackbarMessageQueue.Enqueue("データをリセットしました。");
-                  WS::SettingPage.PlaylistTreeHandler.Refresh();
-                  WS::SettingPage.PlaylistTreeHandler.Refresh();
-              });
+                  var confirm = await this.showMessage(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.ConfirmMessageOfDeletingAllData), MessageBoxButtons.Yes | MessageBoxButtons.No | MessageBoxButtons.Cancel, MessageBoxIcons.Question);
+                  if (confirm != MaterialMessageBoxResult.Yes) return;
 
-            this.LoadSavedFiles = new CommandBase<object>(_ => true, _ =>
-            {
-                WS::SettingPage.Restore.JustifySavedFilePaths();
-            });
+                  IAttemptResult result = WS::SettingPage.Restore.DeleteAllVideosAndPlaylists();
+                  if (result.IsSucceeded)
+                  {
+                      this.SnackbarMessageQueue.Enqueue(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.DeletingAllDataHasCompleted));
+                      WS::SettingPage.PlaylistTreeHandler.Refresh();
+                  }
+              }, new BindableProperty<bool>(true));
 
-            this.AddVideoDirCommand = new CommandBase<object>(_ => true, _ =>
+            this.LoadSavedFiles = new BindableCommand(async () =>
             {
-                if (this.VIdeoDir.IsNullOrEmpty())
+                await WS::SettingPage.Restore.GetVideosFromVideoDirectoryAsync();
+            }, this._isLoadVideosProcessing);
+
+            this.AddVideoDirCommand = new BindableCommand(async () =>
+            {
+                if (this.VIdeoDirInput.Value.IsNullOrEmpty())
                 {
-                    this.SnackbarMessageQueue.Enqueue("パスを指定してください。");
                     return;
                 }
 
-                if (!Directory.Exists(this.VIdeoDir))
-                {
-                    this.SnackbarMessageQueue.Enqueue("そのようなディレクトリーは存在しません。");
-                    return;
-                }
+                await WS::SettingPage.Restore.AddVideoDirectoryAsync(this.VIdeoDirInput.Value);
+                this.VIdeoDirInput.Value = string.Empty;
+            }, new BindableProperty<bool>(true));
 
-                WS::SettingPage.Restore.AddVideoDirectory(this.VIdeoDir);
-                this.VideoDirectories.Add(this.VIdeoDir);
-                this.VIdeoDir = string.Empty;
-            });
-
-            this.DeleteVideoDirectoryCommand = new CommandBase<string>(_ => true, arg =>
+            this.DeleteVideoDirectoryCommand = new BindableCommand<string>(arg =>
             {
-                if (arg is null or not string) return;
+                if (arg.IsNullOrEmpty()) return;
+
                 WS::SettingPage.Restore.DeleteVideoDirectory(arg);
-                this.VideoDirectories.Clear();
-                this.VideoDirectories.Addrange(WS::SettingPage.Restore.GetAllVideoDirectories());
-            });
+            }, new BindableProperty<bool>(true));
         }
 
 
@@ -139,69 +140,23 @@ namespace Niconicome.ViewModels.Setting.Pages
         {
         }
 
-        private string backupNameField = string.Empty;
+        private readonly Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessage;
 
-        private string videodirField = string.Empty;
+        private readonly IBindableProperty<bool> _isBackupProcessing = WS::SettingPage.Restore.IsApplyingBackupProcessing;
+
+        private readonly IBindableProperty<bool> _isLoadVideosProcessing = WS::SettingPage.Restore.IsGettingVideosProcessing;
+
+        #region Props
 
         /// <summary>
         /// 保存ディレクトリー名
         /// </summary>
-        public string VIdeoDir { get => this.videodirField; set => this.SetProperty(ref this.videodirField, value); }
+        public IBindableProperty<string> VIdeoDirInput { get; init; } = new BindableProperty<string>(string.Empty);
 
         /// <summary>
         /// バックアップ名
         /// </summary>
-        public string BackupName { get => this.backupNameField; set => this.SetProperty(ref this.backupNameField, value); }
-
-        /// <summary>
-        /// バックアップを作成する
-        /// </summary>
-        public CommandBase<object> CreatebackupCommand { get; init; }
-
-        /// <summary>
-        /// 設定をリセット
-        /// </summary>
-        public CommandBase<object> ResetSettingsCommand { get; init; }
-
-        /// <summary>
-        /// バックアップ一覧
-        /// </summary>
-        public ObservableCollection<IBackupData> Backups { get; init; }
-
-        /// <summary>
-        /// バックアップを削除
-        /// </summary>
-        public CommandBase<IBackupData> RemovebackupCommand { get; init; }
-
-        /// <summary>
-        /// バックアップを適用
-        /// </summary>
-        public CommandBase<IBackupData> ApplyBackupCommand { get; init; }
-
-        /// <summary>
-        /// データをリセット
-        /// </summary>
-        public CommandBase<object> ResetDataCommand { get; init; }
-
-        /// <summary>
-        /// 保存したファイルを再読み込み
-        /// </summary>
-        public CommandBase<object> LoadSavedFiles { get; init; }
-
-        /// <summary>
-        /// 保存ディレクトリを追加
-        /// </summary>
-        public CommandBase<object> AddVideoDirCommand { get; init; }
-
-        /// <summary>
-        /// 保存ディレクトリを削除
-        /// </summary>
-        public CommandBase<string> DeleteVideoDirectoryCommand { get; init; }
-
-        /// <summary>
-        /// 保存フォルダー
-        /// </summary>
-        public ObservableCollection<string> VideoDirectories { get; init; }
+        public IBindableProperty<string> BackupNameInput { get; init; } = new BindableProperty<string>(string.Empty);
 
         /// <summary>
         /// メッセージキュー
@@ -209,8 +164,124 @@ namespace Niconicome.ViewModels.Setting.Pages
         public MD::ISnackbarMessageQueue SnackbarMessageQueue { get; init; }
 
         /// <summary>
-        /// メッセージボックス
+        /// 保存フォルダー
         /// </summary>
-        private readonly Func<string, MessageBoxButtons, MessageBoxIcons, Task<MaterialMessageBoxResult>> showMessage;
+        public BindableCollection<string, string> VideoDirectories { get; init; }
+
+        /// <summary>
+        /// バックアップ一覧
+        /// </summary>
+        public BindableCollection<BackupDataViewModel, IBackupData> Backups { get; init; }
+
+        #endregion
+
+        #region Command
+
+        /// <summary>
+        /// バックアップを作成する
+        /// </summary>
+        public IBindableCommand CreatebackupCommand { get; init; }
+
+        /// <summary>
+        /// 設定をリセット
+        /// </summary>
+        public IBindableCommand ResetSettingsCommand { get; init; }
+
+        /// <summary>
+        /// バックアップを削除
+        /// </summary>
+        public IBindableCommand<BackupDataViewModel> RemovebackupCommand { get; init; }
+
+        /// <summary>
+        /// バックアップを適用
+        /// </summary>
+        public IBindableCommand<BackupDataViewModel> ApplyBackupCommand { get; init; }
+
+        /// <summary>
+        /// データをリセット
+        /// </summary>
+        public IBindableCommand ResetDataCommand { get; init; }
+
+        /// <summary>
+        /// 保存したファイルを再読み込み
+        /// </summary>
+        public IBindableCommand LoadSavedFiles { get; init; }
+
+        /// <summary>
+        /// 保存ディレクトリを追加
+        /// </summary>
+        public IBindableCommand AddVideoDirCommand { get; init; }
+
+        /// <summary>
+        /// 保存ディレクトリを削除
+        /// </summary>
+        public IBindableCommand<string> DeleteVideoDirectoryCommand { get; init; }
+
+        #endregion
+    }
+
+    [Obsolete("For Design Only")]
+    public class RestorePageViewModelD : BindableBase
+    {
+        public RestorePageViewModelD()
+        {
+            this.VIdeoDirInput = new BindableProperty<string>(string.Empty);
+            this.BackupNameInput = new BindableProperty<string>(string.Empty);
+            this.SnackbarMessageQueue = new MD::SnackbarMessageQueue();
+            this.VideoDirectories = new BindableCollection<string, string>(new ObservableCollection<string>(), x => x);
+            this.Backups = new BindableCollection<BackupDataViewModel, IBackupData>(new ObservableCollection<IBackupData>(), x => new BackupDataViewModel(x));
+        }
+
+        #region Props
+
+        public IBindableProperty<string> VIdeoDirInput { get; init; }
+
+        public IBindableProperty<string> BackupNameInput { get; init; }
+
+        public MD::ISnackbarMessageQueue SnackbarMessageQueue { get; init; }
+
+        public BindableCollection<string, string> VideoDirectories { get; init; }
+
+        public BindableCollection<BackupDataViewModel, IBackupData> Backups { get; init; }
+
+        #endregion
+
+        #region Command
+
+        public IBindableCommand? CreatebackupCommand { get; init; }
+
+        public IBindableCommand? ResetSettingsCommand { get; init; }
+
+        public IBindableCommand<string>? RemovebackupCommand { get; init; }
+
+        public IBindableCommand<string>? ApplyBackupCommand { get; init; }
+
+        public IBindableCommand? ResetDataCommand { get; init; }
+
+        public IBindableCommand? LoadSavedFiles { get; init; }
+
+        public IBindableCommand? AddVideoDirCommand { get; init; }
+
+        public IBindableCommand<string>? DeleteVideoDirectoryCommand { get; init; }
+
+        #endregion
+    }
+
+    public class BackupDataViewModel
+    {
+        public BackupDataViewModel(IBackupData backup)
+        {
+            this._backup = backup;
+        }
+
+        private readonly IBackupData _backup;
+
+        public IBackupData Backup => this._backup;
+
+        public string Name => this._backup.Name;
+
+        public string FileSize => $"{this._backup.FileSize}kB";
+
+        public string CatedOn => this._backup.CreatedOn.ToString("yyyy/MM/dd HH:mm");
     }
 }

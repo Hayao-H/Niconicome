@@ -8,6 +8,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Dmc;
 using Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Niconicome.Models.Domain.Niconico.Watch;
@@ -37,13 +38,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     /// </summary>
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(ILogger logger, IVideoDownloadHelper videoDownloadHelper, IVideoEncoader encorder, INiconicoUtils utils, IVideoFileStorehandler fileStorehandler, IStreamResumer streamResumer, INicoFileIO fileIO, IPathOrganizer pathOrganizer)
+        public VideoDownloader(ILogger logger, IVideoDownloadHelper videoDownloadHelper, IVideoEncoader encorder, IStreamResumer streamResumer, INicoFileIO fileIO, IPathOrganizer pathOrganizer,IVideoFileStore videoFileStore)
         {
             this._logger = logger;
             this._videoDownloadHelper = videoDownloadHelper;
+            this._videoFileStore = videoFileStore;
             this._encorder = encorder;
-            this._utils = utils;
-            this._fileStorehandler = fileStorehandler;
             this._streamResumer = streamResumer;
             this._fileIO = fileIO;
             this._pathOrganizer = pathOrganizer;
@@ -57,9 +57,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         private readonly IVideoEncoader _encorder;
 
-        private readonly INiconicoUtils _utils;
-
-        private readonly IVideoFileStorehandler _fileStorehandler;
+        private readonly IVideoFileStore _videoFileStore;
 
         private readonly IStreamResumer _streamResumer;
 
@@ -183,7 +181,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 this.RemoveEconomyFile(settings.FilePath);
             }
 
-            this._fileStorehandler.Add(settings.NiconicoId, Path.Combine(settings.FolderPath, fileName));
+            this._videoFileStore.AddFile(settings.NiconicoId, Path.Combine(settings.FolderPath, fileName));
 
             this._logger.Log($"動画のダウンロードが完了しました。({context.GetLogContent()})");
 

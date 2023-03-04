@@ -9,8 +9,10 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
+using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Niconicome.ViewModels.Setting.Utils;
 using Niconicome.Views;
 using Prism.Events;
 using Prism.Regions;
@@ -24,27 +26,27 @@ namespace Niconicome.ViewModels.Mainpage
 {
     class DownloadSettingsViewModel : TabViewModelBase, IDisposable
     {
-        public DownloadSettingsViewModel(IEventAggregator ea, IDialogService dialogService,IRegionManager regionManager) : base("設定", "")
+        public DownloadSettingsViewModel(IEventAggregator ea, IDialogService dialogService, IRegionManager regionManager) : base("ダウンロード", "")
         {
 
             this._dialogService = dialogService;
             this._regionManager = regionManager;
 
-            this.IsDownloadingVideoInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsLimittingCommentCountEnable = WS::Mainpage.DownloadSettingsHandler.IsLimittingCommentCountEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsDownloadingVideoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsDownloadingCommentEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingCommentEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsDownloadingCommentLogEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingCommentLogEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsDownloadingEasyComment = WS::Mainpage.DownloadSettingsHandler.IsDownloadingEasyComment.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsDownloadingThumbEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingThumbEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsDownloadingOwnerComment = WS::Mainpage.DownloadSettingsHandler.IsDownloadingOwnerComment.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsOverwriteEnable = WS::Mainpage.DownloadSettingsHandler.IsOverwriteEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsSkippingEnable = WS::Mainpage.DownloadSettingsHandler.IsSkippingEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsCopyFromAnotherFolderEnable = WS::Mainpage.DownloadSettingsHandler.IsCopyFromAnotherFolderEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.MaxCommentsCount = WS::Mainpage.DownloadSettingsHandler.MaxCommentsCount.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsNotEncodeEnable = WS::Mainpage.DownloadSettingsHandler.IsNoEncodeEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsDownloadingIchibaInfoEnable = WS::Mainpage.DownloadSettingsHandler.IsDownloadingIchibaInfoEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
-            this.IsCommentAppendingEnable = WS::Mainpage.DownloadSettingsHandler.IsAppendingCommentEnable.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(this.disposables);
+            this.IsDownloadingVideoInfoEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoInfoEnable);
+            this.IsLimittingCommentCountEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsLimittingCommentCountEnable);
+            this.IsDownloadingVideoEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsDownloadingVideoEnable);
+            this.IsDownloadingCommentEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsDownloadingCommentEnable);
+            this.IsDownloadingCommentLogEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsDownloadingCommentLogEnable);
+            this.IsDownloadingEasyComment = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsDownloadingEasyComment);
+            this.IsDownloadingThumbEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsDownloadingThumbEnable);
+            this.IsDownloadingOwnerComment = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsDownloadingOwnerComment);
+            this.IsOverwriteEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsOverwriteEnable);
+            this.IsSkippingEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsSkippingEnable);
+            this.IsCopyFromAnotherFolderEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsCopyFromAnotherFolderEnable);
+            this.MaxCommentsCount = new SettingInfoViewModel<int>(WS::Mainpage.DownloadSettingsHandler.MaxCommentsCount);
+            this.IsNotEncodeEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsNoEncodeEnable);
+            this.IsDownloadingIchibaInfoEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsDownloadingIchibaInfoEnable);
+            this.IsCommentAppendingEnable = new SettingInfoViewModel<bool>(WS::Mainpage.DownloadSettingsHandler.IsAppendingCommentEnable);
 
             var s1 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"), "1080px");
             var s2 = new ComboboxItem<VideoInfo::IResolution>(new VideoInfo::Resolution("1280x720"), "720px");
@@ -56,10 +58,12 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.disposables = new CompositeDisposable();
 
-            this.SelectedResolution = WS::Mainpage.DownloadSettingsHandler.Resolution
-                .ToReactivePropertyAsSynchronized(
-                x => x.Value,
-                x => x.Vertical switch
+            this.SelectedResolution = new BindableProperty<ComboboxItem<VideoInfo::IResolution>>(s1);
+
+            this._handler = x =>
+            {
+                if (this.SelectedResolution.Value.Value.Vertical == x.Vertical) return;
+                this.SelectedResolution.Value = x.Vertical switch
                 {
                     1080 => s1,
                     720 => s2,
@@ -67,8 +71,15 @@ namespace Niconicome.ViewModels.Mainpage
                     360 => s4,
                     240 => s5,
                     _ => s1
-                }, x => x.Value)
-                .AddTo(this.disposables);
+                };
+            };
+            WS::Mainpage.DownloadSettingsHandler.Resolution.RegisterPropertyChangeHandler(this._handler);
+
+            this.SelectedResolution.RegisterPropertyChangeHandler(x =>
+            {
+                if (WS::Mainpage.DownloadSettingsHandler.Resolution.Value.Vertical == this.SelectedResolution.Value.Value.Vertical) return;
+                WS::Mainpage.DownloadSettingsHandler.Resolution.Value = x.Value;
+            });
 
             #region サムネ
 
@@ -78,49 +89,37 @@ namespace Niconicome.ViewModels.Mainpage
             var t4 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Player, "プレイヤー");
 
             this.ThumbSizes = new List<ComboboxItem<VideoInfo.ThumbSize>>() { t1, t2, t3, t4 };
-            this.SelectedThumbSize = WS::Mainpage.DownloadSettingsHandler.ThumbnailSize
-                .ToReactivePropertyAsSynchronized(
-                x => x.Value,
-                x => x switch
-                {
-                    VideoInfo::ThumbSize.Large => t1,
-                    VideoInfo::ThumbSize.Middle => t2,
-                    VideoInfo::ThumbSize.Normal => t3,
-                    _ => t4
-                }, x => x.Value)
-                .AddTo(this.disposables);
+            this.SelectedThumbSize = new ConvertableSettingInfoViewModel<VideoInfo.ThumbSize, ComboboxItem<VideoInfo.ThumbSize>>(WS::Mainpage.DownloadSettingsHandler.ThumbnailSize, x => x switch
+            {
+                VideoInfo::ThumbSize.Large => t1,
+                VideoInfo::ThumbSize.Middle => t2,
+                VideoInfo::ThumbSize.Normal => t3,
+                _ => t4
+            }, x => x.Value);
 
             #endregion
 
-            this.SnackbarMessageQueue = WS::Mainpage.SnackbarHandler.Queue;
+            this.IsDownloading = new BindableProperty<bool>(false);
+            WS::Mainpage.DownloadManager.IsProcessing.Subscribe(x => this.IsDownloading.Value = x);
 
-            this.IsDownloading = WS::Mainpage.DownloadManager.IsProcessing.ToReactiveProperty().AddTo(this.disposables);
-
-            this.DownloadCommand = new[] {
-                WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(p=>p is not null),
+            this.DownloadCommand =
                 WS::Mainpage.DownloadManager.IsProcessing
-                .Select(x=>!x)
-            }
-            .CombineLatestValuesAreAllTrue()
+                .Select(x => !x)
             .ToReactiveCommand()
             .WithSubscribe(async () => await this.DownloadVideo(null))
             .AddTo(this.disposables);
 
-            this.StageVideosCommand = WS::Mainpage.CurrentPlaylist.SelectedPlaylist
-                .Select(p => p is not null)
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
+            this.StageVideosCommand = new ReactiveCommand().WithSubscribe(() =>
             {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
+                if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ステージできません");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、ステージできません");
                     return;
                 }
 
                 if (!this.IsDownloadingCommentEnable.Value && (this.IsDownloadingCommentLogEnable.Value || this.IsDownloadingEasyComment.Value || this.IsDownloadingOwnerComment.Value))
                 {
-                    this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
                     return;
                 }
 
@@ -128,7 +127,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 WS::Mainpage.DownloadManager.StageVIdeo();
 
-                this.SnackbarMessageQueue.Enqueue($"選択された動画をステージしました。", "管理画面を開く", () =>
+                WS::Mainpage.SnackbarHandler.Enqueue($"選択された動画をステージしました。", "管理画面を開く", () =>
                 {
                     WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager, this._dialogService);
                 });
@@ -149,6 +148,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         ~DownloadSettingsViewModel()
         {
+            WS::Mainpage.DownloadSettingsHandler.Resolution.UnRegisterPropertyChangeHandler(this._handler);
             this.Dispose();
         }
 
@@ -158,13 +158,15 @@ namespace Niconicome.ViewModels.Mainpage
 
         private readonly IRegionManager _regionManager;
 
+        private Action<VideoInfo::IResolution> _handler;
+
         #endregion
 
 
         /// <summary>
         /// ダウンロードフラグ
         /// </summary>
-        public ReactiveProperty<bool> IsDownloading { get; init; }
+        public BindableProperty<bool> IsDownloading { get; init; }
 
         /// <summary>
         /// 動画をダウンロードする
@@ -184,88 +186,88 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画ダウンロードフラグ
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingVideoEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadingVideoEnable { get; init; }
 
         /// <summary>
         /// コメントダウンロードフラグ
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingCommentEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadingCommentEnable { get; init; }
 
         /// <summary>
         /// 過去ログダウンロードフラグ
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingCommentLogEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadingCommentLogEnable { get; init; }
 
         /// <summary>
         /// 投稿者コメント
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingOwnerComment { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadingOwnerComment { get; init; }
 
         /// <summary>
         /// かんたんコメント
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingEasyComment { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadingEasyComment { get; init; }
 
         /// <summary>
         /// サムネイルダウンロードフラグ
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingThumbEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadingThumbEnable { get; init; }
 
         /// <summary>
         /// 動画情報
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadingVideoInfoEnable { get; init; }
 
         /// <summary>
         /// 市場情報
         /// </summary>
-        public ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; init; }
+        public SettingInfoViewModel<bool> IsDownloadingIchibaInfoEnable { get; init; }
 
 
         /// <summary>
         /// 上書き保存フラグ
         /// </summary>
-        public ReactiveProperty<bool> IsOverwriteEnable { get; init; }
+        public SettingInfoViewModel<bool> IsOverwriteEnable { get; init; }
 
         /// <summary>
         /// ダウンロード済をスキップ
         /// </summary>
-        public ReactiveProperty<bool> IsSkippingEnable { get; init; }
+        public SettingInfoViewModel<bool> IsSkippingEnable { get; init; }
 
         /// <summary>
         /// 別フォルダーからコピー
         /// </summary>
-        public ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; init; }
+        public SettingInfoViewModel<bool> IsCopyFromAnotherFolderEnable { get; init; }
 
         /// <summary>
         /// コメント取得数を制限する
         /// </summary>
-        public ReactiveProperty<bool> IsLimittingCommentCountEnable { get; init; }
+        public SettingInfoViewModel<bool> IsLimittingCommentCountEnable { get; init; }
 
         /// <summary>
         /// エンコードしない
         /// </summary>
-        public ReactiveProperty<bool> IsNotEncodeEnable { get; init; }
+        public SettingInfoViewModel<bool> IsNotEncodeEnable { get; init; }
 
         /// <summary>
         /// コメント追記設定
         /// </summary>
-        public ReactiveProperty<bool> IsCommentAppendingEnable { get; init; }
+        public SettingInfoViewModel<bool> IsCommentAppendingEnable { get; init; }
 
         /// <summary>
         /// コメントの最大取得数
         /// </summary>
-        public ReactiveProperty<int> MaxCommentsCount { get; init; }
+        public SettingInfoViewModel<int> MaxCommentsCount { get; init; }
 
         /// <summary>
         /// 選択中の解像度
         /// </summary>
-        public ReactiveProperty<ComboboxItem<VideoInfo::IResolution>> SelectedResolution { get; init; }
+        public IBindableProperty<ComboboxItem<VideoInfo::IResolution>> SelectedResolution { get; init; }
 
         /// <summary>
         /// サムネイルサイズ
         /// </summary>
-        public ReactiveProperty<ComboboxItem<VideoInfo::ThumbSize>> SelectedThumbSize { get; init; }
+        public ConvertableSettingInfoViewModel<VideoInfo::ThumbSize, ComboboxItem<VideoInfo::ThumbSize>> SelectedThumbSize { get; init; }
 
         /// <summary>
         /// 解像度一覧
@@ -277,11 +279,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public List<ComboboxItem<VideoInfo::ThumbSize>> ThumbSizes { get; init; }
 
-        /// <summary>
-        /// スナックバー
-        /// </summary>
-        public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; }
-
         #region private
 
         /// <summary>
@@ -291,21 +288,21 @@ namespace Niconicome.ViewModels.Mainpage
         /// <returns></returns>
         private async Task DownloadVideo(VideoInfoViewModel? vm)
         {
-            if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
+            if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
             {
-                this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
+                WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、ダウンロードできません");
                 return;
             }
 
             if (!WS::Mainpage.Session.IsLogin.Value)
             {
-                this.SnackbarMessageQueue.Enqueue("動画をダウンロードするにはログインが必要です。");
+                WS::Mainpage.SnackbarHandler.Enqueue("動画をダウンロードするにはログインが必要です。");
                 return;
             }
 
             if (!this.IsDownloadingCommentEnable.Value && (this.IsDownloadingCommentLogEnable.Value || this.IsDownloadingEasyComment.Value || this.IsDownloadingOwnerComment.Value))
             {
-                this.SnackbarMessageQueue.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
+                WS::Mainpage.SnackbarHandler.Enqueue("過去ログ・投コメ・かんたんコメントをDLするにはコメントにチェックを入れてください。");
                 return;
             }
 
@@ -313,7 +310,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.DownloadManager.StageVIdeo();
 
-            await WS::Mainpage.DownloadManager.StartDownloadAsync( m => this.SnackbarMessageQueue.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
+            await WS::Mainpage.DownloadManager.StartDownloadAsync(m => WS::Mainpage.SnackbarHandler.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
             WS::Mainpage.PostDownloadTasksManager.HandleAction();
         }
 
@@ -342,7 +339,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.Resolutions = new List<ComboboxItem<VideoInfo::IResolution>>() { s1, s2, s3, s4, s5 };
 
-            this.SelectedResolution = new ReactiveProperty<ComboboxItem<VideoInfo::IResolution>>(s1);
+            this.SelectedResolution = new BindableProperty<ComboboxItem<VideoInfo::IResolution>>(s1);
 
             var t1 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Large, "大");
             var t2 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Middle, "中");
@@ -350,10 +347,10 @@ namespace Niconicome.ViewModels.Mainpage
             var t4 = new ComboboxItem<VideoInfo::ThumbSize>(VideoInfo::ThumbSize.Player, "プレイヤー");
 
             this.ThumbSizes = new List<ComboboxItem<VideoInfo.ThumbSize>>() { t1, t2, t3, t4 };
-            this.SelectedThumbSize = new ReactiveProperty<ComboboxItem<VideoInfo::ThumbSize>>(t1);
+            this.SelectedThumbSize = new ConvertableSettingInfoViewModelD<ComboboxItem<VideoInfo.ThumbSize>>(t1);
         }
 
-        public ReactiveProperty<bool> IsDownloading { get; init; } = new();
+        public BindableProperty<bool> IsDownloading { get; init; } = new(false);
 
         public ReactiveCommand DownloadCommand { get; init; } = new();
 
@@ -361,41 +358,41 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveCommand StageVideosCommand { get; init; } = new();
 
-        public ReactiveProperty<bool> IsDownloadingVideoEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadingVideoEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsDownloadingCommentEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadingCommentEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsDownloadingCommentLogEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadingCommentLogEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsDownloadingOwnerComment { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadingOwnerComment { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsDownloadingEasyComment { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadingEasyComment { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsDownloadingThumbEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadingThumbEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsOverwriteEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsOverwriteEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsSkippingEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsSkippingEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsCopyFromAnotherFolderEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsLimittingCommentCountEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsLimittingCommentCountEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadingVideoInfoEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; set; } = new(true);
+        public SettingInfoViewModelD<bool> IsDownloadingIchibaInfoEnable { get; set; } = new(true);
 
-        public ReactiveProperty<bool> IsNotEncodeEnable { get; init; } = new(false);
+        public SettingInfoViewModelD<bool> IsNotEncodeEnable { get; init; } = new(false);
 
-        public ReactiveProperty<bool> IsCommentAppendingEnable { get; init; } = new();
+        public SettingInfoViewModelD<bool> IsCommentAppendingEnable { get; init; } = new(true);
 
-        public ReactiveProperty<int> MaxCommentsCount { get; set; } = new(2000);
+        public SettingInfoViewModelD<int> MaxCommentsCount { get; set; } = new(2000);
 
-        public ReactiveProperty<ComboboxItem<VideoInfo::IResolution>> SelectedResolution { get; set; }
+        public IBindableProperty<ComboboxItem<VideoInfo::IResolution>> SelectedResolution { get; set; }
 
         public List<ComboboxItem<VideoInfo::IResolution>> Resolutions { get; init; }
 
-        public ReactiveProperty<ComboboxItem<VideoInfo::ThumbSize>> SelectedThumbSize { get; init; }
+        public ConvertableSettingInfoViewModelD<ComboboxItem<VideoInfo::ThumbSize>> SelectedThumbSize { get; init; }
 
         public List<ComboboxItem<VideoInfo::ThumbSize>> ThumbSizes { get; init; }
 

@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Automation;
 using System.Windows.Input;
+using Niconicome.Models.Domain.Utils;
 using Windows.Foundation;
 
 namespace Niconicome.Models.Domain.Local.IO
@@ -50,7 +51,7 @@ namespace Niconicome.Models.Domain.Local.IO
         /// <returns></returns>
         public bool Exists(string path)
         {
-            return File.Exists(path);
+            return File.Exists(IOUtils.GetPrefixedPath(path));
         }
 
         /// <summary>
@@ -91,8 +92,7 @@ namespace Niconicome.Models.Domain.Local.IO
                 }
             }
 
-            using var fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-            using var writer = new StreamWriter(fs, encoding ?? Encoding.UTF8);
+            using var writer = new StreamWriter(path, append, encoding ?? Encoding.UTF8);
             writer.Write(content);
         }
 

@@ -2,152 +2,155 @@
 @namespace Niconicome.Views.AddonPage.V2.Pages
 @inject Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages.IndexViewModel DataContext;
 @inject IJSRuntime JS;
+@inherits BlazorBase;
 
-<div class="alert @(DataContext.AlertTypeClass) @(DataContext.DisplayAlertMessage? "d-block":"d-none")" role="alert">
-	@(DataContext.AlertMessage)
-</div>
+<div tabindex="0" @ref="container" @onkeydown="OnKeyDown" class="PageContainer">
+	<div class="alert @(DataContext.AlertTypeClass) @(DataContext.DisplayAlertMessage? "d-block":"d-none")" role="alert">
+		@(DataContext.AlertMessage)
+	</div>
 
-@if (DataContext.UpdateInfomation is not null)
-{
-	<div class="modal fade" id="addonUpdateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">更新の確認</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<p><span class="fw-bold">@(DataContext.UpdateInfomation.Name)</span>をインストールしますか？このアドオンは以下の新しい権限を要求します。</p>
-					<ul class="d-flex align-items-start flex-column">
-						@foreach (var permission in DataContext.UpdateInfomation.NewPermissions)
-						{
-							<li><p class="m-0" title="@(permission.Description)" data-bs-toggle="tooltip" data-bs-placement="right">@(permission.Name)</p></li>
-						}
-					</ul>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="()=>DataContext.OnInstallUpdateClick(DataContext.UpdateInfomation.ID,DataContext.UpdateInfomation.ArchivePath)">更新</button>
+	@if (DataContext.UpdateInfomation is not null)
+	{
+		<div class="modal fade" id="addonUpdateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">更新の確認</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p><span class="fw-bold">@(DataContext.UpdateInfomation.Name)</span>をインストールしますか？このアドオンは以下の新しい権限を要求します。</p>
+						<ul class="d-flex align-items-start flex-column">
+							@foreach (var permission in DataContext.UpdateInfomation.NewPermissions)
+							{
+								<li><p class="m-0" title="@(permission.Description)" data-bs-toggle="tooltip" data-bs-placement="right">@(permission.Name)</p></li>
+							}
+						</ul>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="()=>DataContext.OnInstallUpdateClick(DataContext.UpdateInfomation.ID,DataContext.UpdateInfomation.ArchivePath)">更新</button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-}
+	}
 
 
-@if (DataContext.ToBeUninstalledAddon is not null)
-{
-	<div class="modal fade" id="addonUninstallModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">アンインストールの確認</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<p><span class="fw-bold">@(DataContext.ToBeUninstalledAddon.Name)</span>をアンインストールしますか？</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-					<button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="DataContext.OnUninstallConfirmed">アンインストール</button>
+	@if (DataContext.ToBeUninstalledAddon is not null)
+	{
+		<div class="modal fade" id="addonUninstallModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">アンインストールの確認</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p><span class="fw-bold">@(DataContext.ToBeUninstalledAddon.Name)</span>をアンインストールしますか？</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+						<button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="DataContext.OnUninstallConfirmed">アンインストール</button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-}
+	}
 
-<div class="my-4">
-	<div class="px-1 text-muted d-flex justify-content-between align-items-stretch">
-		<h5 class="align-self-center">アドオンマネージャー</h5>
-		<div class="dropdown">
-			<button class="btn btn-light dropdown-toggle" type="button" id="configButton" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-				<i class="fa-solid fa-gear" />
-			</button>
-			<ul class="dropdown-menu p-1" aria-labelledby="configButton">
-				<li><a class="dropdown-item" href="/addons/install/0">インストール</a></li>
-				<li><a class="dropdown-item" @onclick="DataContext.OnCheckForUpdateClick">更新確認</a></li>
-				<li class="form-check">
-					<input class="form-check-input" type="checkbox" @bind="@(DataContext.IsDevModeEnable)" id="flexCheckIndeterminate">
-					<label class="form-check-label" for="flexCheckIndeterminate">
-						開発者モード
-					</label>
-				</li>
-			</ul>
-		</div>
-	</div>
-
-	<div class="mb-3">
-		<h5 class="fw-bold">有効なアドオン</h5>
-		<div>
-			@foreach (var item in DataContext.LoadedAddons)
-			{
-				<div class="card mt-2">
-					<div class="row">
-						<div class="col-md-1 d-flex align-items-center">
-							<img class="d-block mx-auto" height="32" width="32" src="@item.IconData" />
-						</div>
-						<div class="col-md-10 card-body p-2">
-							<a class="text-reset text-decoration-none" href="/addons/about/@(item.ID)">
-								<h5 class="card-title">@item.Name <span class="text-muted fs-6">by @(item.Author), Ver.@(item.Version)</span></h5>
-								<p class="fw-normal fs-6">@item.Description</p>
-							</a>
-						</div>
-						<div class="dropdown col-md-1 d-flex justify-content-centor align-items-center">
-							<button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-								<i class="fa-solid fa-ellipsis fa-xl"></i>
-							</button>
-							<ul class="dropdown-menu" aria-labelledby="updateButton">
-								<li><a class="dropdown-item" href="/addons/install/@(item.ID)"><i class="fa-solid fa-arrow-rotate-right me-1"></i>更新する</a></li>
-								<li><a class="dropdown-item" href="" @onclick="()=>DataContext.OnUninstallClicled(item)"><i class="fa-solid fa-trash me-1"></i>アンインストール</a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			}
-		</div>
-	</div>
-
-	<div class="mt-5">
-		<h5 class="fw-bold">アップデート可能なアドオン</h5>
-		<div>
-			@foreach (var item in DataContext.ToBeUpdatedAddons)
-			{
-				<div class="card mt-2">
-					<div class="row">
-						<div class="col-md-1 d-flex align-items-center">
-							<img class="d-block mx-auto" height="32" width="32" src="@item.IconData" />
-						</div>
-						<div class="col-md-10 card-body p-2">
-							<h5 class="card-title">@item.Name <span class="text-muted fs-6">by @item.Author</span></h5>
-							<p class="fw-normal fs-6 m-0">@item.Description</p>
-							<p class="fw-normal fs-6 mt-1">現在のバージョン：v@(item.Version)、新しいバージョン：v@(item.NewVersion)</p>
-						</div>
-						<div class="dropdown col-md-1 d-flex justify-content-centor align-items-center">
-							<button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-								<i class="fa-solid fa-ellipsis fa-xl"></i>
-							</button>
-							<ul class="dropdown-menu" aria-labelledby="updateButton">
-								<li><a class="dropdown-item" href="" @onclick="()=>DataContext.OnUpdateClick(item.ID)"><i class="fa-solid fa-cloud-arrow-down me-1"></i>更新する</a></li>
-								<li><a class="dropdown-item" href="@(item.ChangeLogURL)" title="@(item.ChangeLogURL)を開く" data-bs-toggle="tooltip"><i class="fa-solid fa-globe me-1"></i>更新情報</a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			}
+	<div class="my-4">
+		<div class="px-1 text-muted d-flex justify-content-between align-items-stretch">
+			<h5 class="align-self-center">アドオンマネージャー</h5>
+			<div class="dropdown">
+				<button class="btn btn-light dropdown-toggle" type="button" id="configButton" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+					<i class="fa-solid fa-gear" />
+				</button>
+				<ul class="dropdown-menu p-1" aria-labelledby="configButton">
+					<li><a class="dropdown-item" href="/addons/install/0">インストール</a></li>
+					<li><a class="dropdown-item" @onclick="DataContext.OnCheckForUpdateClick">更新確認</a></li>
+					<li class="form-check">
+						<input class="form-check-input" type="checkbox" @bind="@(DataContext.IsDevModeEnable)" id="flexCheckIndeterminate">
+						<label class="form-check-label" for="flexCheckIndeterminate">
+							開発者モード
+						</label>
+					</li>
+				</ul>
+			</div>
 		</div>
 
-		<div class="mt-5">
-			<h5 class="fw-bold">読み込みに失敗したアドオン</h5>
+		<div class="mb-3">
+			<h5 class="fw-bold">有効なアドオン</h5>
 			<div>
-				@foreach (var item in DataContext.LoadFailedAddons)
+				@foreach (var item in DataContext.LoadedAddons)
 				{
 					<div class="card mt-2">
-						<div class="card-body p-2">
-							<h5 class="card-title">@item.DirectoryName</h5>
-							<p class="fw-normal fs-6 m-0">@item.Message</p>
+						<div class="row">
+							<div class="col-md-1 d-flex align-items-center">
+								<img class="d-block mx-auto" height="32" width="32" src="@item.IconData" />
+							</div>
+							<div class="col-md-10 card-body p-2">
+								<a class="text-reset text-decoration-none" href="/addons/about/@(item.ID)">
+									<h5 class="card-title">@item.Name <span class="text-muted fs-6">by @(item.Author), Ver.@(item.Version)</span></h5>
+									<p class="fw-normal fs-6">@item.Description</p>
+								</a>
+							</div>
+							<div class="dropdown col-md-1 d-flex justify-content-centor align-items-center">
+								<button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+									<i class="fa-solid fa-ellipsis fa-xl"></i>
+								</button>
+								<ul class="dropdown-menu" aria-labelledby="updateButton">
+									<li><a class="dropdown-item" href="/addons/install/@(item.ID)"><i class="fa-solid fa-arrow-rotate-right me-1"></i>更新する</a></li>
+									<li><a class="dropdown-item" href="" @onclick="()=>DataContext.OnUninstallClicled(item)"><i class="fa-solid fa-trash me-1"></i>アンインストール</a></li>
+								</ul>
+							</div>
 						</div>
 					</div>
 				}
+			</div>
+		</div>
+
+		<div class="mt-5">
+			<h5 class="fw-bold">アップデート可能なアドオン</h5>
+			<div>
+				@foreach (var item in DataContext.ToBeUpdatedAddons)
+				{
+					<div class="card mt-2">
+						<div class="row">
+							<div class="col-md-1 d-flex align-items-center">
+								<img class="d-block mx-auto" height="32" width="32" src="@item.IconData" />
+							</div>
+							<div class="col-md-10 card-body p-2">
+								<h5 class="card-title">@item.Name <span class="text-muted fs-6">by @item.Author</span></h5>
+								<p class="fw-normal fs-6 m-0">@item.Description</p>
+								<p class="fw-normal fs-6 mt-1">現在のバージョン：v@(item.Version)、新しいバージョン：v@(item.NewVersion)</p>
+							</div>
+							<div class="dropdown col-md-1 d-flex justify-content-centor align-items-center">
+								<button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+									<i class="fa-solid fa-ellipsis fa-xl"></i>
+								</button>
+								<ul class="dropdown-menu" aria-labelledby="updateButton">
+									<li><a class="dropdown-item" href="" @onclick="()=>DataContext.OnUpdateClick(item.ID)"><i class="fa-solid fa-cloud-arrow-down me-1"></i>更新する</a></li>
+									<li><a class="dropdown-item" href="@(item.ChangeLogURL)" title="@(item.ChangeLogURL)を開く" data-bs-toggle="tooltip"><i class="fa-solid fa-globe me-1"></i>更新情報</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+
+			<div class="mt-5">
+				<h5 class="fw-bold">読み込みに失敗したアドオン</h5>
+				<div>
+					@foreach (var item in DataContext.LoadFailedAddons)
+					{
+						<div class="card mt-2">
+							<div class="card-body p-2">
+								<h5 class="card-title">@item.DirectoryName</h5>
+								<p class="fw-normal fs-6 m-0">@item.Message</p>
+							</div>
+						</div>
+					}
+				</div>
 			</div>
 		</div>
 	</div>

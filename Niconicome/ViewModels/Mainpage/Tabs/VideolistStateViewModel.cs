@@ -10,6 +10,9 @@ using Videolist = Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Playlist;
 using Niconicome.ViewModels.Mainpage.Tabs;
+using Niconicome.Models.Utils.Reactive;
+using Niconicome.Models.Utils.Reactive.Command;
+using Niconicome.Models.Domain.Playlist;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -17,38 +20,61 @@ namespace Niconicome.ViewModels.Mainpage
     {
         public VideolistStateViewModel() : base("状態", "")
         {
-            WS::Mainpage.VideoListContainer.ListChanged += this.OnListChanged;
-            WS::Mainpage.CurrentPlaylist.SelectedVideos.Subscribe(value => this.SelectedVideosCount.Value = value.ToString());
-            this.RefreshCommand.Subscribe(() =>
+            WS::Mainpage.PlaylistVideoContainer.AddPlaylistChangeEventHandler(p =>
             {
-                this.SelectedVideosCount.Value = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value).Count().ToString();
+                this.SetCount(p);
+
+                if (this._alreadySubscribed.Contains(p.ID))
+                {
+                    return;
+                }
+
+                p.SelectedVideosCount.Subscribe(count => this.SelectedVideosCount.Value = count.ToString());
+                p.VideosCount.Subscribe(count => this.AllVideosCount.Value = count.ToString());
+
+                this._alreadySubscribed.Add(p.ID);
             });
+
+            this.RefreshCommand = new BindableCommand(() =>
+            {
+                if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
+                {
+                    return;
+                }
+
+                IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
+                this.SetCount(playlist);
+
+            }, new BindableProperty<bool>(true));
+
         }
 
-        ~VideolistStateViewModel()
-        {
-            WS::Mainpage.VideoListContainer.ListChanged -= this.OnListChanged;
-        }
-
-        private void OnListChanged(object? sender, ListChangedEventArgs<Playlist::IListVideoInfo> e)
-        {
-            this.AllVideosCount.Value = WS::Mainpage.VideoListContainer.Videos.Count.ToString();
-        }
+        private List<int> _alreadySubscribed = new();
 
         /// <summary>
         /// 選択された動画数
         /// </summary>
-        public ReactiveProperty<string> SelectedVideosCount { get; init; } = new();
+        public IBindableProperty<string> SelectedVideosCount { get; init; } = new BindableProperty<string>(string.Empty);
 
         /// <summary>
         /// すべての動画数
         /// </summary>
-        public ReactiveProperty<string> AllVideosCount { get; init; } = new();
+        public IBindableProperty<string> AllVideosCount { get; init; } = new BindableProperty<string>(string.Empty);
 
         /// <summary>
         /// 更新コマンド
         /// </summary>
-        public ReactiveCommand RefreshCommand { get; init; } = new();
+        public BindableCommand RefreshCommand { get; init; }
+
+        /// <summary>
+        /// 値を設定
+        /// </summary>
+        /// <param name="playlist"></param>
+        private void SetCount(IPlaylistInfo playlist)
+        {
+            this.SelectedVideosCount.Value = playlist.SelectedVideosCount.Value.ToString();
+            this.AllVideosCount.Value = playlist.VideosCount.Value.ToString();
+        }
 
     }
 

@@ -22,6 +22,7 @@ using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.Views;
 using Niconicome.Views.AddonPage;
 using Niconicome.Views.Mainpage.Region;
+using Niconicome.Views.Mainpage.Region.PlaylistTree;
 using Niconicome.Views.Setting;
 using Prism.Ioc;
 using Prism.Regions;
@@ -30,6 +31,8 @@ using Prism.Unity;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
+using Tree = Niconicome.Views.Mainpage.Region.PlaylistTree;
+using Niconicome.Models.Local.State;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -46,6 +49,8 @@ namespace Niconicome.ViewModels.Mainpage
             this.RegionManager = regionManager;
             this.dialogService = dialogService;
 
+            this.RegionManager.RegisterViewWithRegion<Tree::PlaylistTree>("PlaylistTree");
+
             this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");
             this.LoginBtnTooltip = new ReactiveProperty<string>("ログイン画面を表示する");
@@ -53,6 +58,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.Themehandler.Initialize();
             WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
 
             this.LoginCommand = new ReactiveCommand()
                 .WithSubscribe(async () =>
@@ -127,7 +133,7 @@ namespace Niconicome.ViewModels.Mainpage
                     ///}
                     ///dialogService.Show(nameof(AddonManagerWindow));
 
-                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons");
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons", BlazorWindows.Addon);
                     WS::Mainpage.WindowTabHelper.OpenAddonManager(this.RegionManager);
                 });
 
@@ -368,12 +374,12 @@ namespace Niconicome.ViewModels.Mainpage
             IRegion bottomTabRegion = regionManager.Regions[LocalConstant.BottomTabRegionName];
             bottomTabRegion.Add(containerProvider.Resolve<DownloadSettings>());
             bottomTabRegion.Add(containerProvider.Resolve<Output>());
-            bottomTabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
+            //bottomTabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
             bottomTabRegion.Add(containerProvider.Resolve<VideoListState>());
             bottomTabRegion.Add(containerProvider.Resolve<TimerSettings>());
 
             IRegion topTabRegion = regionManager.Regions[LocalConstant.TopTabRegionName];
-            var videoListView = containerProvider.Resolve<VideoList>();
+            var videoListView = containerProvider.Resolve<MainVideoList>();
             topTabRegion.Add(videoListView);
             topTabRegion.Activate(videoListView);
         }

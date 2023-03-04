@@ -12,7 +12,7 @@ using MaterialDesign = MaterialDesignThemes.Wpf;
 
 namespace Niconicome.ViewModels.Controls
 {
-    static class MaterialMessageBox
+    public static class MaterialMessageBox
     {
         /// <summary>
         /// メッセージボックスを表示する
@@ -35,7 +35,7 @@ namespace Niconicome.ViewModels.Controls
         }
     }
 
-    class MessageBoxViewModel : BindableBase
+    public class MessageBoxViewModel : BindableBase
     {
         public MessageBoxViewModel()
         {
@@ -139,7 +139,7 @@ namespace Niconicome.ViewModels.Controls
     }
 
     [Flags]
-    enum MessageBoxButtons
+    public enum MessageBoxButtons
     {
         Yes = 1,
         No = 2,
@@ -147,14 +147,14 @@ namespace Niconicome.ViewModels.Controls
         Cancel = 8,
     }
 
-    enum MessageBoxIcons
+    public enum MessageBoxIcons
     {
         Question,
         Caution,
         Error
     }
 
-    enum MaterialMessageBoxResult
+    public enum MaterialMessageBoxResult
     {
         Yes,
         No,
