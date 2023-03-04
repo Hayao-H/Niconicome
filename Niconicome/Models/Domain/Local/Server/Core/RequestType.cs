@@ -12,5 +12,6 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         Video,
         M3U8,
         TS,
+        UserChrome,
     }
 }

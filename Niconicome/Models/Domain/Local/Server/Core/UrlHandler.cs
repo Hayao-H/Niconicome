@@ -28,7 +28,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                 return RequestType.Video;
             }
 
-            if (path== @"/niconicome/hls/playlist.m3u8")
+            if (path == @"/niconicome/hls/playlist.m3u8")
             {
                 return RequestType.M3U8;
             }
@@ -36,6 +36,11 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             if (Regex.IsMatch(path, @"/niconicome/hls/video\d+\.ts"))
             {
                 return RequestType.TS;
+            }
+
+            if (path == @"/niconicome/css/userChrome.css")
+            {
+                return RequestType.UserChrome;
             }
 
             return RequestType.None;

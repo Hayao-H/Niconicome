@@ -7,9 +7,11 @@ using Niconicome.Models.Local.Application;
 using Niconicome.Models.Local.Restore;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Local.State.Style;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Playlist.VideoList;
 using MaterialDesign = MaterialDesignThemes.Wpf;
+using MessageV2 = Niconicome.Models.Local.State.MessageV2;
 
 namespace Niconicome.Workspaces
 {
@@ -36,5 +38,15 @@ namespace Niconicome.Workspaces
         /// 文字列生成
         /// </summary>
         public static IStringHandler StringHandler { get; private set; } = DIFactory.Resolve<IStringHandler>();
+
+        /// <summary>
+        /// userChrome.cssの出力
+        /// </summary>
+        public static IUserChromeHandler UserChromeHandler { get; private set; } = DIFactory.Resolve<IUserChromeHandler>();
+
+        /// <summary>
+        /// メッセージハンドラ
+        /// </summary>
+        public static MessageV2::IMessageHandler NewMessageHandler { get; private set; } = DIFactory.Resolve<MessageV2::IMessageHandler>();
     }
 }

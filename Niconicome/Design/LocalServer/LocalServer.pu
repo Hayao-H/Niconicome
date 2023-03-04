@@ -37,11 +37,16 @@ interface INotFoundRequestHandler {
     + IAttemptResult Handle(HttpListenerResponse res);
 }
 
+interface IUserChromeRequestHandler {
+    + IAttemptResult Handle(HttpListenerResponse res);
+}
+
 IServer *-- IUrlHandler
 IServer *-- IVideoRequestHandler
 IServer *-- INotFoundRequestHandler
 IServer *-- IM3U8RequestHandler
 IServer *-- ITsRequestHandler
+IServer *-- IUserChromeRequestHandler
 IServer ..> RequestType
 IUrlHandler ..> RequestType
 

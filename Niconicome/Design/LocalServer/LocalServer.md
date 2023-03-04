@@ -24,3 +24,4 @@ URL | コンテンツ
 /niconicome/video/```playlist ID```/```video ID```/video.mp4 | 動画ファイル
 /niconicome/hls/playlist.m3u8 | インデックスファイル
 /niconicome/hls/```num```.ts | セグメントファイル
+/niconicome/css/userChrome.css | ユーザー定義CSS

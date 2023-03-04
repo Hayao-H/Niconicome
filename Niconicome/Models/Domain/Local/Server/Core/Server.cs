@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
@@ -25,7 +26,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class Server : IServer
     {
-        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts)
+        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts,IUserChromeRequestHandler userChrome)
         {
             this._urlHandler = urlHandler;
             this._video = video;
@@ -33,6 +34,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             this._errorHandler = errorHandler;
             this._m3U8 = m3U8;
             this._ts = ts;
+            this._userChrome = userChrome;
         }
 
         ~Server()
@@ -51,6 +53,8 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         private readonly IM3U8RequestHandler _m3U8;
 
         private readonly ITSRequestHandler _ts;
+
+        private readonly IUserChromeRequestHandler _userChrome;
 
         private readonly IErrorHandler _errorHandler;
 
@@ -138,6 +142,15 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                             try
                             {
                                 result = this._ts.Handle(request.Url, response);
+                            }
+                            catch { }
+                        }
+
+                        if (type == RequestType.UserChrome)
+                        {
+                            try
+                            {
+                                result = this._userChrome.Handle(response);
                             }
                             catch { }
                         }

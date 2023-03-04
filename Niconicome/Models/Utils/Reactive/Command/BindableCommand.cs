@@ -30,6 +30,8 @@ namespace Niconicome.Models.Utils.Reactive.Command
             this.Initialize();
         }
 
+        public static IBindableCommand Empty => new BindableCommand(() => { }, new BindableProperty<bool>(true));
+
         #region ICommand
 
         public event EventHandler? CanExecuteChanged;

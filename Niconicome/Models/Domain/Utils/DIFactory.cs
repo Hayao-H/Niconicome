@@ -331,7 +331,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Server::RequestHandler.M3U8.IM3U8RequestHandler, Server::RequestHandler.M3U8.M3U8RequestHandler>();
             services.AddSingleton<Server::RequestHandler.TS.ITSRequestHandler, Server::RequestHandler.TS.TSRequestHandler>();
             services.AddSingleton<Server::RequestHandler.NotFound.INotFoundRequestHandler, Server::RequestHandler.NotFound.NotFoundRequestHandler>();
+            services.AddSingleton<Server::RequestHandler.UserChrome.IUserChromeRequestHandler, Server::RequestHandler.UserChrome.UserChromeRequestHandler>();
             services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
+            services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
 
             return services.BuildServiceProvider();
         }

@@ -48,7 +48,7 @@
                             <TranslateTransform Y="7"/>
                         </materialDesign:PackIcon.RenderTransform>
                     </materialDesign:PackIcon>
-                    <Label Content="スタイルファイルの書き出し"/>
+                    <Label Content="スタイルファイルの書き出し・上書き"/>
                     <Button Content="実行"
                             Command="{Binding SaveStyleCommand}"
                             Width="auto"

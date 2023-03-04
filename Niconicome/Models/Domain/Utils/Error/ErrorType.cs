@@ -9,6 +9,7 @@ using Niconicome.Models.Domain.Local.Server.HLS;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
 using Niconicome.Models.Domain.Niconico.Remote.V2.Error;
 using Niconicome.Models.Domain.Niconico.Watch.V2.Error;
@@ -63,6 +64,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 29, typeof(HLSManagerError) },
             { 30, typeof(M3U8RequestHandlerError) },
             { 31, typeof(TSRequestHandlerError) },
+            { 32, typeof(UserChromeRequestHandlerError) },
         };
     }
 }

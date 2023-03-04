@@ -23,9 +23,9 @@ namespace Niconicome.Models.Const
 
         public static string DefaultAddonExtension = ".zip";
 
-        public static string UserChromePath = @"chrome\userChrome.json";
+        public static string UserChromePath = @"chrome\userChrome.css";
 
-        public static string UserChromeFileName = @"userChrome.json";
+        public static string UserChromeFileName = @"userChrome.css";
 
         public static string AddonsFolder = @"addons";
 
