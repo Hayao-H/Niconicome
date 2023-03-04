@@ -41,7 +41,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8
 
         public IAttemptResult Handle(HttpListenerResponse res)
         {
-            if (!this._fileIO.Exists(@"tmp\hls\playlisyt.m3u8"))
+            if (!this._fileIO.Exists(Path.Join(AppContext.BaseDirectory, "tmp", "hls", "playlist.m3u8")))
             {
                 this._errorHandler.HandleError(M3U8RequestHandlerError.PlaylistDoesNotExist);
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(M3U8RequestHandlerError.PlaylistDoesNotExist));
@@ -76,7 +76,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8
         {
             try
             {
-                using var video = new FileStream(@"tmp\hls\playlist.m3u8", FileMode.Open, FileAccess.Read);
+                using var video = new FileStream(Path.Join(AppContext.BaseDirectory, "tmp", "hls", "playlist.m3u8"), FileMode.Open, FileAccess.Read);
                 video.CopyTo(stream);
             }
             catch (Exception ex)

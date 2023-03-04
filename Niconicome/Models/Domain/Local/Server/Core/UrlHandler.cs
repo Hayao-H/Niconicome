@@ -33,7 +33,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                 return RequestType.M3U8;
             }
 
-            if (Regex.IsMatch(path, @"/niconicome/hls/\d+\.ts "))
+            if (Regex.IsMatch(path, @"/niconicome/hls/video\d+\.ts"))
             {
                 return RequestType.TS;
             }
