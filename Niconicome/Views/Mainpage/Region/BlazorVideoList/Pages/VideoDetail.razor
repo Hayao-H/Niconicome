@@ -1,24 +1,84 @@
 ﻿@page "/video/{NiconicoID}/";
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.VideoDetailViewModel DataContext;
 @inject IJSRuntime JS;
+@inject NavigationManager nm;
 
 @using System.Threading;
 
 @if (DataContext.VideoInfo is not null)
 {
-    <h3>@(DataContext.VideoInfo.Title)</h3>
+    <div class="VideotitleContainer">
+        <h3>@(DataContext.VideoInfo.Title)</h3>
+    </div>
 
-    @if (DataContext.CanPlay.Value)
-    {
-        <div class="VideoElement">
-            <video-js id="video-player" controls>
-                <source src="http://localhost:2580/niconicome/hls/playlist.m3u8" type="application/x-mpegURL" />
-            </video-js>
+    <div class="VideoContentContainer">
+        @if (DataContext.CanPlay.Value)
+        {
+            <div class="VideoElement">
+                <video-js id="video-player" controls>
+                    <source src="http://localhost:2580/niconicome/hls/playlist.m3u8" type="application/x-mpegURL" />
+                </video-js>
+            </div>
+        }
+        else
+        {
+            <img class="VideoElement" src="data:image/jpeg;base64,@(DataContext.VideoInfo.Base64ThumbData.Value)" />
+        }
+        <div class="VideoInfoContainer">
+            <div class="VideoInfoRow">
+                <p><i class="VideoInfoIcon fa-solid fa-user"></i>投稿者</p>
+                <p>
+                    <a href="https://www.nicovideo.jp/user/@(DataContext.VideoInfo.OwnerID)">@(DataContext.VideoInfo.OwnerName)さん</a>
+                    <a class="UserVideos" href="https://www.nicovideo.jp/user/@(DataContext.VideoInfo.OwnerID)/video">投稿動画</a>
+                </p>
+            </div>
+            <div class="VideoInfoRow">
+                <p><i class="VideoInfoIcon fa-solid fa-calendar"></i>投稿日時</p>
+                <p>@(DataContext.VideoInfo.UploadedOn)</p>
+            </div>
+            <div class="VideoInfoRow">
+                <p><i class="VideoInfoIcon fa-solid fa-play"></i>再生回数</p>
+                <p>@(DataContext.VideoInfo.ViewCount)</p>
+            </div>
+            <div class="VideoInfoRow">
+                <p><i class="VideoInfoIcon fa-solid fa-message"></i>コメント数</p>
+                <p>@(DataContext.VideoInfo.CommentCount)</p>
+            </div>
+            <div class="VideoInfoRow">
+                <p><i class="VideoInfoIcon fa-solid fa-folder"></i>マイリスト数</p>
+                <p>@(DataContext.VideoInfo.MylistCount)</p>
+            </div>
+            <div class="VideoInfoRow">
+                <p><i class="VideoInfoIcon Like fa-solid fa-heart"></i>いいね数</p>
+                <p>@(DataContext.VideoInfo.LikeCount)</p>
+            </div>
+            <div class="VideoInfoRow">
+                <p><i class="VideoInfoIcon fa-solid fa-globe"></i>動画ID</p>
+                <p><a href="https://nico.ms/@(DataContext.VideoInfo.NiconicoId)">@(DataContext.VideoInfo.NiconicoId)</a></p>
+            </div>
+            <div class="VideoInfoRow">
+                <p><i class="VideoInfoIcon fa-solid fa-download"></i>ダウンロード済み</p>
+                <p class="@(DataContext.VideoInfo.IsDownloaded.Value? "Downloaded": "NotDownloaded")">@(DataContext.VideoInfo.IsDownloaded.Value ? "Yes" : "No")</p>
+            </div>
         </div>
-    }
+    </div>
+
+    <ul class="TagContainer">
+        @foreach (var tag in DataContext.VideoInfo.Tags)
+        {
+            @if (tag.IsNicodicExistthis)
+            {
+                <li class="Tag">@(tag.Name)<a href="https://dic.nicovideo.jp/a/@(tag.Name)"><i class="TagIcon NicoDic fa-solid fa-book"></i></a></li>
+            }
+            else
+            {
+                <li class="Tag">@(tag.Name)<a href="https://dic.nicovideo.jp/a/@(tag.Name)"><i class="TagIcon Question fa-solid fa-circle-question"></i></a></li>
+            }
+        }
+    </ul>
 }
 
-<div>
+<div class="ControlsContainer">
     <button class="btn btn-primary" @onclick="DataContext.OnReturnButtonClick">戻る</button>
 </div>
 

@@ -28,10 +28,10 @@ function showModal() {
     modal.show();
 }
 
-function initializeVideo(){
+function initializeVideo() {
     videojs('video-player', {
         controls: true,
         autoplay: false,
-        preload: 'auto'
-      });
+        preload: 'auto',
+    });
 }

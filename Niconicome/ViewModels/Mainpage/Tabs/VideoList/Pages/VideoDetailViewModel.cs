@@ -69,6 +69,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.VideoInfo = new VideoInfoViewModel(result.Data);
             this.VideoUrl = $"http://localhost:2580/niconicome/video/{playlist.ID}/{niconicoID}/video.mp4";
 
+
             if (result.Data.IsDownloaded.Value)
             {
                 _ = Task.Run(async () =>
