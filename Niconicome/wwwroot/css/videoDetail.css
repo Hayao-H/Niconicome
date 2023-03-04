@@ -51,7 +51,13 @@
 .VideoContentContainer .VideoInfoContainer .VideoInfoRow .Downloaded {
   color: #7bd889;
 }
+.VideoContentContainer .VideoInfoContainer .VideoInfoRow .Downloaded .VideoInfoIcon {
+  color: #7bd889;
+}
 .VideoContentContainer .VideoInfoContainer .VideoInfoRow .NotDownloaded {
+  color: #ff3300;
+}
+.VideoContentContainer .VideoInfoContainer .VideoInfoRow .NotDownloaded .VideoInfoIcon {
   color: #ff3300;
 }
 

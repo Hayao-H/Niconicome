@@ -61,10 +61,18 @@ $VideoInfoWidth: 400;
 
             .Downloaded {
                 color: #7bd889;
+
+                .VideoInfoIcon {
+                    color: #7bd889;
+                }
             }
 
             .NotDownloaded {
                 color: #ff3300;
+
+                .VideoInfoIcon {
+                    color: #ff3300;
+                }
             }
         }
     }

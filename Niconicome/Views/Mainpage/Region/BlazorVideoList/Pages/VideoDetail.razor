@@ -57,8 +57,14 @@
                 <p><a href="https://nico.ms/@(DataContext.VideoInfo.NiconicoId)">@(DataContext.VideoInfo.NiconicoId)</a></p>
             </div>
             <div class="VideoInfoRow">
-                <p><i class="VideoInfoIcon fa-solid fa-download"></i>ダウンロード済み</p>
-                <p class="@(DataContext.VideoInfo.IsDownloaded.Value? "Downloaded": "NotDownloaded")">@(DataContext.VideoInfo.IsDownloaded.Value ? "Yes" : "No")</p>
+                <p></p>
+                @if (DataContext.VideoInfo.IsDownloaded.Value)
+                {
+                    <p class="Downloaded"><i class="VideoInfoIcon fa-solid fa-download"></i>ダウンロード済み</p>
+                } else
+                {
+                    <p class="NotDownloaded"><i class="VideoInfoIcon fa-solid fa-download"></i>未ダウンロード</p>
+                }
             </div>
         </div>
     </div>
