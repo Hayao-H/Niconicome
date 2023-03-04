@@ -12,7 +12,7 @@
 		<Deterministic>false</Deterministic>
 		<Version>0.11.1</Version>
 		<PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
-		<Copyright>c2022 Hayao-H</Copyright>
+		<Copyright>c2023 Hayao-H</Copyright>
 		<Authors>Hayao-H</Authors>
 		<PackageIcon>icon.png</PackageIcon>
 		<ApplicationIcon>app.ico</ApplicationIcon>
