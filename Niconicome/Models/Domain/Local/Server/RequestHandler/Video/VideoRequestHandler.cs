@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
@@ -14,6 +17,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.Video
         /// <summary>
         /// リクエストを処理する
         /// </summary>
+        /// <param name="request"></param>
         /// <param name="res"></param>
         /// <returns></returns>
         IAttemptResult Handle(Uri request, HttpListenerResponse res);
@@ -21,7 +25,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.Video
 
     public class VideoRequestHandler : IVideoRequestHandler
     {
-        public VideoRequestHandler(INiconicomeFileIO fileIO,IVideoStore videoStore,IErrorHandler errorHandler)
+        public VideoRequestHandler(INiconicomeFileIO fileIO, IVideoStore videoStore, IErrorHandler errorHandler)
         {
             this._fileIO = fileIO;
             this._store = videoStore;
@@ -67,15 +71,17 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.Video
             }
 
             IAttemptResult wResult = this.WriteToStream(res.OutputStream, video.FilePath);
+
             if (!wResult.IsSucceeded)
             {
                 res.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return AttemptResult.Fail(wResult.Message);
             }
 
-            res.ContentType = "video/mp4";
             res.StatusCode = (int)HttpStatusCode.OK;
+            res.ContentType = "video/mp4";
             return AttemptResult.Succeeded();
+
         }
 
 
@@ -133,7 +139,6 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.Video
 
             return AttemptResult.Succeeded();
         }
-
 
         private record VideoIDInfo(int PlaylistID, string NiconicoID);
 

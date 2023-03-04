@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
@@ -96,18 +93,25 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                             continue;
                         }
 
-
                         RequestType type = this._urlHandler.GetReqyestType(request.Url);
                         IAttemptResult? result = null;
 
                         if (type == RequestType.Video)
                         {
-                            result = this._video.Handle(request.Url, response);
+                            try
+                            {
+                                result = this._video.Handle(request.Url, response);
+                            }
+                            catch { }
                         }
 
                         if (result is null || !result.IsSucceeded)
                         {
-                            this._notFound.Handle(request.Url, response, result?.Message);
+                            try
+                            {
+                                this._notFound.Handle(request.Url, response, result?.Message);
+                            }
+                            catch { }
                         }
 
                         response.Close();
@@ -120,6 +124,8 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                 {
                     this._errorHandler.HandleError(ServerError.ServerStoppedWithException, ex);
                     this._isRunning = false;
+
+                    this.Start();
                 }
             });
         }
