@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions;
 using Reactive.Bindings.Extensions;
@@ -15,6 +16,7 @@ namespace Niconicome.Models.Utils.Reactive
     {
         public BindableCollection(ObservableCollection<TOrigin> baseCollection, Func<TOrigin, TItem> converter)
         {
+            this._ctx = SynchronizationContext.Current;
             this._baseCollection = baseCollection;
             this._converter = converter;
             this.AddRange(baseCollection.Select(x => converter(x)));
@@ -24,6 +26,7 @@ namespace Niconicome.Models.Utils.Reactive
 
         public BindableCollection(ReadOnlyObservableCollection<TOrigin> baseCollection, Func<TOrigin, TItem> converter)
         {
+            this._ctx = SynchronizationContext.Current;
             this._converter = converter;
             this._baseCollection = baseCollection;
             this.AddRange(baseCollection.Select(x => converter(x)));
@@ -51,6 +54,8 @@ namespace Niconicome.Models.Utils.Reactive
 
         private readonly object _lockObj = new object();
 
+        private readonly SynchronizationContext? _ctx;
+
         #endregion
 
         #region Method
@@ -70,51 +75,53 @@ namespace Niconicome.Models.Utils.Reactive
 
         private void OnBaseCollecitonChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            lock(this._lockObj)
+            this._ctx?.Post(_ =>
             {
-                if (e.Action == NotifyCollectionChangedAction.Add)
+                lock (this._lockObj)
                 {
-                    if (e.NewItems?[0] is TOrigin item)
+                    if (e.Action == NotifyCollectionChangedAction.Add)
                     {
-                        TItem converted = this._converter(item);
-                        if (converted is null)
+                        if (e.NewItems?[0] is TOrigin item)
                         {
-                            return;
-                        }
-                        else
-                        {
-                            this.Add(converted);
+                            TItem converted = this._converter(item);
+                            if (converted is null)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                this.Add(converted);
+                            }
                         }
                     }
-                }
-                else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldStartingIndex >= 0)
-                {
-                    this.RemoveAt(e.OldStartingIndex);
-                }
-                else if (e.Action == NotifyCollectionChangedAction.Replace)
-                {
-                    if (e.NewItems?[0] is TOrigin item) this[e.OldStartingIndex] = this._converter(item);
-                }
-                else if (e.Action == NotifyCollectionChangedAction.Move)
-                {
-                    this.Move(e.OldStartingIndex, e.NewStartingIndex);
-                }
-                else if (e.Action == NotifyCollectionChangedAction.Reset)
-                {
-                    this.Clear();
-                    foreach (var item in this._baseCollection.As<IEnumerable<TOrigin>>()) this.Add(this._converter(item));
-                }
-                else
-                {
-                    return;
-                }
+                    else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldStartingIndex >= 0)
+                    {
+                        this.RemoveAt(e.OldStartingIndex);
+                    }
+                    else if (e.Action == NotifyCollectionChangedAction.Replace)
+                    {
+                        if (e.NewItems?[0] is TOrigin item) this[e.OldStartingIndex] = this._converter(item);
+                    }
+                    else if (e.Action == NotifyCollectionChangedAction.Move)
+                    {
+                        this.Move(e.OldStartingIndex, e.NewStartingIndex);
+                    }
+                    else if (e.Action == NotifyCollectionChangedAction.Reset)
+                    {
+                        this.Clear();
+                    }
+                    else
+                    {
+                        return;
+                    }
 
-                try
-                {
-                    this._handler?.Invoke();
+                    try
+                    {
+                        this._handler?.Invoke();
+                    }
+                    catch { }
                 }
-                catch { }
-            }
+            }, null);
         }
 
         #endregion

@@ -60,6 +60,11 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
                 WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{id}", BlazorWindows.MainPage);
             });
 
+            this.Refresh = new BindableCommand(() =>
+            {
+                WS::Mainpage.PlaylistManager.Initialize();
+            });
+
             WS::Mainpage.PlaylistManager.Initialize();
         }
 
@@ -72,6 +77,8 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
         public IBindableCommand<int> RemovePlaylist { get; init; }
 
         public IBindableCommand<int> EditPlaylist { get; init; }
+
+        public IBindableCommand Refresh { get; init; }
 
         #endregion
 

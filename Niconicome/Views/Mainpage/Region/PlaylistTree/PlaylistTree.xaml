@@ -23,7 +23,7 @@
             <RowDefinition Height="16*"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
-            <Button Width="auto" Margin="6" HorizontalAlignment="Left"  ToolTip="プレイリストを更新する">
+            <Button Command="{Binding Refresh}" Width="auto" Margin="6" HorizontalAlignment="Left"  ToolTip="プレイリストを更新する">
                 <materialDesign:PackIcon Kind="Refresh" />
             </Button>
         </DockPanel>

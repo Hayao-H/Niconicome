@@ -66,6 +66,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                  {
                      this.MigrationResult = result.Data;
                      this.IsMigrated.Value = true;
+
+                     WS::Mainpage.PlaylistManager.Initialize();
                  }
              });
 
