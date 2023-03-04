@@ -132,17 +132,9 @@ $VideoListRowHeight: 100;
                 padding: 0;
             }
 
-            #CheckBoxColumnSeparator {
-                left: #{$CheckBoxWidth - 10}px;
-            }
-
             #ThumbnailColumn {
                 width: #{$ThumbWidth}px;
                 border-right: 1px solid #e5e8ea;
-            }
-
-            #ThumbnailColumnSeparator {
-                left: #{$CheckBoxWidth + $ThumbWidth - 10}px;
             }
 
             #TitleColumn {
@@ -151,28 +143,16 @@ $VideoListRowHeight: 100;
                 border-right: 1px solid #e5e8ea;
             }
 
-            #TitleColumnSeparator {
-                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth - 10}px;
-            }
-
             #UploadedDateTimeColumn {
                 width: #{$UploadedDateTimeWidth}px;
                 padding-left: 8px;
                 border-right: 1px solid #e5e8ea;
             }
 
-            #UploadedDateTimeColumnSeparator {
-                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth - 10}px;
-            }
-
             #IsDownloadedColumn {
                 width: #{$IsDownloadedColumnWidth}px;
                 padding-left: 8px;
                 border-right: 1px solid #e5e8ea;
-            }
-
-            #IsDownloadedColumnSeparator {
-                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $IsDownloadedColumnWidth - 10}px;
             }
 
             #ViewCountColumn {
@@ -182,18 +162,10 @@ $VideoListRowHeight: 100;
                 border-right: 1px solid #e5e8ea;
             }
 
-            #ViewCountColumnSeparator {
-                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $IsDownloadedColumnWidth + $CountColumnWidth - 10}px;
-            }
-
             #CommentCountColumn {
                 width: #{$CountColumnWidth}px;
                 padding-left: 8px;
                 border-right: 1px solid #e5e8ea;
-            }
-
-            #CommentCountColumnSeparator {
-                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $IsDownloadedColumnWidth + $CountColumnWidth * 2 - 10}px;
             }
 
             #MylistCountColumn {
@@ -202,18 +174,10 @@ $VideoListRowHeight: 100;
                 border-right: 1px solid #e5e8ea;
             }
 
-            #MylistCountColumnSeparator {
-                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $IsDownloadedColumnWidth + $CountColumnWidth * 3 - 10}px;
-            }
-
             #LikeCountColumn {
                 width: #{$CountColumnWidth}px;
                 padding-left: 8px;
                 border-right: 1px solid #e5e8ea;
-            }
-
-            #LikeCountColumnSeparator {
-                left: #{$CheckBoxWidth + $ThumbWidth + $TitleWidth + $UploadedDateTimeWidth + $IsDownloadedColumnWidth + $CountColumnWidth * 4 - 10}px;
             }
 
             #MessageColumn {

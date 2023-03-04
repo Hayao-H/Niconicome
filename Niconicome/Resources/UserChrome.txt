@@ -1,0 +1,89 @@
+/*全体のスタイル*/
+* {
+    /* フォントサイズを変更
+    font-size: 16px;
+    */
+}
+
+/*動画リスト列のスタイル*/
+.PageContent .VideoList .VideoListBody .VideoListRow {
+    /* 高さ
+    height: 100px;
+    */
+}
+
+/*チェックボックス行のスタイル*/
+.PageContent .VideoList #VideoListHeader #CheckBoxColumn {
+    /* 非表示にする
+    display: none;
+    */
+}
+
+/*サムネイル行のスタイル*/
+.PageContent .VideoList #VideoListHeader #ThumbnailColumn {
+    /* 非表示にする
+    display: none;
+    */
+
+    /* 幅と高さ。高さはリストの高さと合わせる前提のレイアウト。サムネは16:9になるように計算。 16pxは左右のpadding。
+    width: calc((100px - 16px) / 9px * 16px + 16px);
+    height: 100px;
+    padding: 8px;
+    */
+}
+
+/*タイトル行のスタイル*/
+.PageContent .VideoList #VideoListHeader #TitleColumn {
+    /* 非表示にする
+    display: none;
+    */
+}
+
+/*投稿日時行のスタイル*/
+.PageContent .VideoList #VideoListHeader #UploadedDateTimeColumn {
+    /* 非表示にする
+    display: none;
+    */
+}
+
+/*ダウンロードフラグ行のスタイル*/
+.PageContent .VideoList #VideoListHeader #IsDownloadedColumn {
+    /* 非表示にする
+    display: none;
+    */
+}
+
+/*再生回数行のスタイル*/
+.PageContent .VideoList #VideoListHeader #ViewCountColumn {
+    /* 非表示にする
+    display: none;
+    */
+}
+
+/*コメント数行のスタイル*/
+.PageContent .VideoList #VideoListHeader #CommentCountColumn {
+    /* 非表示にする
+    display: none;
+    */
+}
+
+/*マイリスト数行のスタイル*/
+.PageContent .VideoList #VideoListHeader #MylistCountColumn {
+    /* 非表示にする
+    display: none;
+    */
+}
+
+/*いいね数行のスタイル*/
+.PageContent .VideoList #VideoListHeader #LikeCountColumn {
+    /* 非表示にする
+    display: none;
+    */
+}
+
+/*メッセージ行のスタイル*/
+.PageContent .VideoList #VideoListHeader #MessageColumn {
+    /* 非表示にする
+    display: none;
+    */
+}

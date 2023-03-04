@@ -108,39 +108,24 @@
   border-right: 1px solid #e5e8ea;
   padding: 0;
 }
-.PageContent .VideoList #VideoListHeader #CheckBoxColumnSeparator {
-  left: 40px;
-}
 .PageContent .VideoList #VideoListHeader #ThumbnailColumn {
   width: 165.3333333333px;
   border-right: 1px solid #e5e8ea;
-}
-.PageContent .VideoList #VideoListHeader #ThumbnailColumnSeparator {
-  left: 205.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #TitleColumn {
   width: 700px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
-.PageContent .VideoList #VideoListHeader #TitleColumnSeparator {
-  left: 905.3333333333px;
-}
 .PageContent .VideoList #VideoListHeader #UploadedDateTimeColumn {
   width: 250px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
-.PageContent .VideoList #VideoListHeader #UploadedDateTimeColumnSeparator {
-  left: 1155.3333333333px;
-}
 .PageContent .VideoList #VideoListHeader #IsDownloadedColumn {
   width: 70px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
-}
-.PageContent .VideoList #VideoListHeader #IsDownloadedColumnSeparator {
-  left: 1225.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #ViewCountColumn {
   width: 125px;
@@ -148,32 +133,20 @@
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
-.PageContent .VideoList #VideoListHeader #ViewCountColumnSeparator {
-  left: 1350.3333333333px;
-}
 .PageContent .VideoList #VideoListHeader #CommentCountColumn {
   width: 125px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
-}
-.PageContent .VideoList #VideoListHeader #CommentCountColumnSeparator {
-  left: 1475.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #MylistCountColumn {
   width: 125px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
-.PageContent .VideoList #VideoListHeader #MylistCountColumnSeparator {
-  left: 1600.3333333333px;
-}
 .PageContent .VideoList #VideoListHeader #LikeCountColumn {
   width: 125px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
-}
-.PageContent .VideoList #VideoListHeader #LikeCountColumnSeparator {
-  left: 1725.3333333333px;
 }
 .PageContent .VideoList #VideoListHeader #MessageColumn {
   width: 150px;

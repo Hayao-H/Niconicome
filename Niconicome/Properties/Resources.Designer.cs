@@ -61,7 +61,35 @@ namespace Niconicome.Properties {
         }
         
         /// <summary>
-        ///    に類似しているローカライズされた文字列を検索します。
+        ///   /*全体のスタイル*/
+        ///* {
+        ///    /* フォントサイズを変更
+        ///    font-size: 16px;
+        ///    */
+        ///}
+        ///
+        ////*動画リスト列のスタイル*/
+        ///.PageContent .VideoList .VideoListBody .VideoListRow {
+        ///    /* 高さ
+        ///    height: 100px;
+        ///    */
+        ///}
+        ///
+        ////*チェックボックス行のスタイル*/
+        ///.PageContent .VideoList #VideoListHeader #CheckBoxColumn {
+        ///    /* 非表示にする
+        ///    display: none;
+        ///    */
+        ///}
+        ///
+        ////*サムネイル行のスタイル*/
+        ///.PageContent .VideoList #VideoListHeader #ThumbnailColumn {
+        ///    /* 非表示にする
+        ///    display: none;
+        ///    */
+        ///
+        ///    /* 幅と高さ。高さはリストの高さと合わせる前提のレイアウト。サムネは16:9になるように計算。 16pxは左右のpadding。
+        ///  [残りの文字列は切り詰められました]&quot;; に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string UserChrome {
             get {

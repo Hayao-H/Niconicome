@@ -9,7 +9,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome
 {
     public enum UserChromeRequestHandlerStringContent
     {
-        [StringEnum("//This file was automatically generated.")]
+        [StringEnum("/* This file was automatically generated. */")]
         DefaultContent,
     }
 }

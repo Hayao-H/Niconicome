@@ -2,6 +2,7 @@ import { AttemptResultWidthData } from '../../shared/AttemptResult';
 import { ElementHandler } from '../../shared/ElementHandler';
 import { ElementIDs } from './ElementIds';
 import { Dictionary } from '../../shared/Collection/dictionary';
+import { StyleHandler } from '../../shared/StyleHandler';
 
 export interface WidthHandler {
     Initialize(): void;
@@ -9,8 +10,9 @@ export interface WidthHandler {
 
 export class WidthHandlerImpl implements WidthHandler {
 
-    constructor(elementHandler: ElementHandler) {
+    constructor(elementHandler: ElementHandler, styleHandler: StyleHandler) {
         this._elmHandler = elementHandler;
+        this._styleHandler = styleHandler;
         this._columnIDs = {
             '0': 'CheckBoxColumn',
             '1': 'ThumbnailColumn',
@@ -40,6 +42,8 @@ export class WidthHandlerImpl implements WidthHandler {
 
     private readonly _elmHandler: ElementHandler;
 
+    private readonly _styleHandler: StyleHandler;
+
     private readonly _columnIDs: Dictionary<string>;
 
     private readonly _separatorIDs: Dictionary<string>;
@@ -52,18 +56,55 @@ export class WidthHandlerImpl implements WidthHandler {
 
     public Initialize(): void {
 
-        const sepResult: AttemptResultWidthData<NodeListOf<Element>> = this._elmHandler.GetAll(ElementIDs.Separator);
-        if (!sepResult.IsSucceeded || sepResult.Data === null) return;
+        let left = 0;
+        for (const key in this._separatorIDs) {
 
-        sepResult.Data.forEach(elm => {
-            if (!(elm instanceof HTMLElement)) return;
+            const sepResult: AttemptResultWidthData<Element> = this._elmHandler.Get(this._separatorIDs[key]);
+            if (!sepResult.IsSucceeded || sepResult.Data === null) continue;
+
+            const elm = sepResult.Data;
+            if (!(elm instanceof HTMLElement)) continue;
+
+            const styleResult = this._styleHandler.GetComputedStyle(`#${this._columnIDs[key]}`);
+            if (styleResult.IsSucceeded && styleResult.Data !== null) {
+                const style: CSSStyleDeclaration = styleResult.Data;
+
+                const rawResult = this._elmHandler.GetAll(`.${this._columnIDs[key]}`);
+                if (!rawResult.IsSucceeded || rawResult.Data === null) {
+                    continue;
+                }
+
+                if (style.display === "none") {
+                    //ヘッダーが非表示ならセパレーターも非表示
+                    elm.style.display = "none";
+
+                    //リスト側も非表示にする
+                    rawResult.Data.forEach(raw => {
+                        if (raw instanceof HTMLElement) {
+                            raw.style.display = "none";
+                        }
+                    });
+
+                    continue;
+                } else {
+                    left += Number(style.width.match(/\d+/));
+                    elm.style.left = `${left}px`;
+
+                    //リスト側の幅をヘッダーに合わせる
+                    rawResult.Data.forEach(raw => {
+                        if (raw instanceof HTMLElement) {
+                            raw.style.width = style.width;
+                        }
+                    });
+                }
+            }
 
             const indexS = elm.dataset.index;
 
-            if (indexS == undefined) return;
+            if (indexS == undefined) continue;
 
             elm.addEventListener('mousedown', _ => this.OnMouseDown(indexS));
-        });
+        }
 
         const pageResult = this._elmHandler.Get(ElementIDs.PageContent);
         if (!pageResult.IsSucceeded || pageResult.Data === null || !(pageResult.Data instanceof HTMLElement)) return;
