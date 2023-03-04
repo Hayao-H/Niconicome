@@ -5,7 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.DataBackup;
 using Niconicome.Models.Domain.Local.Server.Core;
+using Niconicome.Models.Domain.Local.Server.HLS;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
 using Niconicome.Models.Domain.Niconico.Remote.V2.Error;
 using Niconicome.Models.Domain.Niconico.Watch.V2.Error;
@@ -57,6 +60,9 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 26, typeof(VideoRequestHandlerError) },
             { 27, typeof(NotFoundRequestHandlerError) },
             { 28, typeof(ServerError) },
+            { 29, typeof(HLSManagerError) },
+            { 30, typeof(M3U8RequestHandlerError) },
+            { 31, typeof(TSRequestHandlerError) },
         };
     }
 }

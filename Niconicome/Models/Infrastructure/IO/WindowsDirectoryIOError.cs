@@ -11,5 +11,7 @@ namespace Niconicome.Models.Infrastructure.IO
     {
         [ErrorEnum(ErrorLevel.Error, "デイレクトリの作成に失敗しました。(path:{0})")]
         FailedToCreateDirectory,
+        [ErrorEnum(ErrorLevel.Error,"ディレクトリの削除に失敗しました。(path:{0})")]
+        FailedToDeleteDirectory,
     }
 }

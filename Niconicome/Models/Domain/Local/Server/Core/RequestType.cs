@@ -10,5 +10,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
     {
         None,
         Video,
+        M3U8,
+        TS,
     }
 }

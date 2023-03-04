@@ -23,7 +23,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.AppBPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppUrlPath, ""), "");
             this.AppAParam = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppIdParam, ""), "");
             this.AppBParam = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppUrlParam, ""), "");
-            this.FfmpegPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FFmpegPath, ""), "");
+            this.FfmpegPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FFmpegPath, Format.FFmpegPath), Format.FFmpegPath);
             this.UseShellWhenLaunchingFFmpeg = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.UseShellWhenLaunchingFFmpeg, false), false);
             this.ReAllocateCommands = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.ReAllocateIfVideoisNotSaved, false), false);
             this.FFmpegFormat = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FFmpegFormat, Format.DefaultFFmpegFormat), Format.DefaultFFmpegFormat);

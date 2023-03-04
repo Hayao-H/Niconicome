@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
@@ -23,12 +25,14 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class Server : IServer
     {
-        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler)
+        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts)
         {
             this._urlHandler = urlHandler;
             this._video = video;
             this._notFound = notFound;
             this._errorHandler = errorHandler;
+            this._m3U8 = m3U8;
+            this._ts = ts;
         }
 
         ~Server()
@@ -43,6 +47,10 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         private readonly IVideoRequestHandler _video;
 
         private readonly INotFoundRequestHandler _notFound;
+
+        private readonly IM3U8RequestHandler _m3U8;
+
+        private readonly ITSRequestHandler _ts;
 
         private readonly IErrorHandler _errorHandler;
 
@@ -101,6 +109,24 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                             try
                             {
                                 result = this._video.Handle(request.Url, response);
+                            }
+                            catch { }
+                        }
+
+                        if (type == RequestType.M3U8)
+                        {
+                            try
+                            {
+                                result = this._m3U8.Handle(response);
+                            }
+                            catch { }
+                        }
+
+                        if (type == RequestType.TS)
+                        {
+                            try
+                            {
+                                result = this._ts.Handle(request.Url, response);
                             }
                             catch { }
                         }

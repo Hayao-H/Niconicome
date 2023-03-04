@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Niconicome.Models.Domain.Utils.Error;
+
+namespace Niconicome.Models.Domain.Local.Server.HLS
+{
+    public enum HLSManagerError
+    {
+        [ErrorEnum(ErrorLevel.Error,"動画がダウンロードされていません。(id:{0}, playlist:{1})")]
+        VideoIsNotDownloaded,
+        [ErrorEnum(ErrorLevel.Error,"動画ファイルが存在しません。(path:{0})")]
+        FileDoesNotExist,
+        [ErrorEnum(ErrorLevel.Error, "ファイルのHLS化に失敗しました。")]
+        FailedToEncodeFileToHLS,
+    }
+}

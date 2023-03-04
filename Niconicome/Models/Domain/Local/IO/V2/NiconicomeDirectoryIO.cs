@@ -17,6 +17,14 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         IAttemptResult CreateDirectory(string path);
 
         /// <summary>
+        /// ディレクトリを削除
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="recursive"></param>
+        /// <returns></returns>
+        IAttemptResult Delete(string path, bool recursive = true);
+
+        /// <summary>
         /// ディレクトリの存在を確認
         /// </summary>
         /// <param name="path"></param>

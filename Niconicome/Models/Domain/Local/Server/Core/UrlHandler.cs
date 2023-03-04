@@ -23,9 +23,19 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         {
             string path = request.AbsolutePath;
 
-            if (Regex.IsMatch(path, @"/niconicome/video/\d+/(sm|nm|so)?\d+/video.mp4"))
+            if (Regex.IsMatch(path, @"/niconicome/video/\d+/(sm|nm|so)?\d+/video\.mp4"))
             {
                 return RequestType.Video;
+            }
+
+            if (path== @"/niconicome/hls/playlist.m3u8")
+            {
+                return RequestType.M3U8;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/hls/\d+\.ts "))
+            {
+                return RequestType.TS;
             }
 
             return RequestType.None;

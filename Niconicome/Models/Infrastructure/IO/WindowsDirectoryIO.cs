@@ -40,6 +40,22 @@ namespace Niconicome.Models.Infrastructure.IO
             return AttemptResult.Succeeded();
         }
 
+        public IAttemptResult Delete(string path, bool recursive = true)
+        {
+            try
+            {
+                Directory.Delete(path, recursive);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToDeleteDirectory, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToDeleteDirectory, ex, path));
+            }
+
+            return AttemptResult.Succeeded();
+        }
+
+
         public bool Exists(string path)
         {
             return Directory.Exists(path);
