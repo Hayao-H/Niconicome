@@ -2,7 +2,8 @@
   "name": "niconicome-web",
   "packageManager": "yarn@3.2.4",
   "scripts": {
-    "build:dev": "yarn run cross-env MODE=\"development\" node scripts/videoList.js"
+    "build:dev": "yarn run cross-env MODE=\"development\" node scripts/videoList.js",
+    "build:prod": "yarn run cross-env node scripts/videoList.js"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
