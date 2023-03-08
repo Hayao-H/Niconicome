@@ -360,3 +360,6 @@ Sample/*
 # WebFiles
 *.yarn
 .env
+
+# Publish
+Publish/
