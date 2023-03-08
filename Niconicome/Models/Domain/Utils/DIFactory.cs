@@ -70,6 +70,7 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
+using Software = Niconicome.Models.Domain.Local.External.Software;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -334,6 +335,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Server::RequestHandler.UserChrome.IUserChromeRequestHandler, Server::RequestHandler.UserChrome.UserChromeRequestHandler>();
             services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
+            services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
 
             return services.BuildServiceProvider();
         }

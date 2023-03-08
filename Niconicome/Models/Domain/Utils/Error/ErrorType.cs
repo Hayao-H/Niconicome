@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.DataBackup;
+using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
 using Niconicome.Models.Domain.Local.Server.Core;
 using Niconicome.Models.Domain.Local.Server.HLS;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
@@ -65,6 +66,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 30, typeof(M3U8RequestHandlerError) },
             { 31, typeof(TSRequestHandlerError) },
             { 32, typeof(UserChromeRequestHandlerError) },
+            { 33, typeof(ProcessManagerError) },
         };
     }
 }
