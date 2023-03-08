@@ -34,7 +34,7 @@ jobs:
         TZ: 'Asia/Tokyo'
       run: echo "date=$(date '+%Y-%m-%d-%-H-%-M')" >> $GITHUB_ENV
   publish:
-    needs: [test]
+    needs: [test, date]
     runs-on: windows-latest
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
