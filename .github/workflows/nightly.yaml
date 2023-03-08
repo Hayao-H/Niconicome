@@ -54,7 +54,7 @@ jobs:
         $item2 = Get-Childitem -Recurse -Filter ffprobe.exe
         cd ..
         move $item[0].Fullname ffmpeg/bin
-        move $item2[1].Fullname ffmpeg/bin
+        move $item2[0].Fullname ffmpeg/bin
         del tmp -r
         
     - name: Build
