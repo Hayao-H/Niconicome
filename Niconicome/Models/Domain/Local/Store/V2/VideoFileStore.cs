@@ -23,14 +23,14 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <param name="filePath"></param>
         /// <param name="verticalResolution"></param>
         /// <returns></returns>
-        IAttemptResult AddFile(string niconicoID, string filePath);
+        Task<IAttemptResult> AddFileAsync(string niconicoID, string filePath);
 
         /// <summary>
         /// 指定したディレクトリ内に存在するファイルを追加
         /// </summary>
         /// <param name="directories"></param>
         /// <returns></returns>
-        IAttemptResult<int> AddFilesFromDirectoryList(IEnumerable<string> directories);
+        Task<IAttemptResult<int>> AddFilesFromDirectoryListAsync(IEnumerable<string> directories);
 
         /// <summary>
         /// ファイルの存在を確認

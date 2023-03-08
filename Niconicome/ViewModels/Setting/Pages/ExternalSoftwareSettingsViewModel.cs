@@ -24,6 +24,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.AppAParam = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppIdParam, ""), "");
             this.AppBParam = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.AppUrlParam, ""), "");
             this.FfmpegPath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FFmpegPath, Format.FFmpegPath), Format.FFmpegPath);
+            this.FFprovePath = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FFprobePath, Format.FFprobePath), "");
             this.UseShellWhenLaunchingFFmpeg = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.UseShellWhenLaunchingFFmpeg, false), false);
             this.ReAllocateCommands = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.ReAllocateIfVideoisNotSaved, false), false);
             this.FFmpegFormat = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.FFmpegFormat, Format.DefaultFFmpegFormat), Format.DefaultFFmpegFormat);
@@ -70,6 +71,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         public SettingInfoViewModel<string> FFmpegFormat { get; init; }
 
         /// <summary>
+        /// ffprobeのパス
+        /// </summary>
+        public SettingInfoViewModel<string> FFprovePath { get; init; }
+
+        /// <summary>
         /// シェルを利用する
         /// </summary>
         public SettingInfoViewModel<bool> UseShellWhenLaunchingFFmpeg { get; init; }
@@ -91,6 +97,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public SettingInfoViewModelD<string> AppBParam { get; init; } = new("設定値");
         public SettingInfoViewModelD<string> FfmpegPath { get; init; } = new("設定値");
         public SettingInfoViewModelD<string> FFmpegFormat { get; init; } = new("設定値");
+        public SettingInfoViewModelD<string> FFprovePath { get; init; } = new("設定値");
 
         public SettingInfoViewModelD<bool> UseShellWhenLaunchingFFmpeg { get; set; } = new(true);
 

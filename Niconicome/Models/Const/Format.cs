@@ -29,6 +29,9 @@ namespace Niconicome.Models.Const
 
         public const string FolderAutoMapSymbol = "<autoMap>";
 
-        public const string FFmpegPath = @"ffmpeg\bin\ffmpeg.exe";
+        public const string FFmpegPath = @"bin\ffmpeg.exe";
+
+        public const string FFprobePath = @"bin\ffprobe.exe";
+
     }
 }

@@ -105,6 +105,15 @@
                         <Label Content="ffmpegのパス"/>
                     </StackPanel>
                     <TextBox  Margin="10 0 0 0" Text="{Binding FfmpegPath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ApplicationCog" Foreground="SkyBlue">
+                            <materialDesign:PackIcon.RenderTransform>
+                                <TranslateTransform Y="7"/>
+                            </materialDesign:PackIcon.RenderTransform>
+                        </materialDesign:PackIcon>
+                        <Label Content="ffprobeのパス"/>
+                    </StackPanel>
+                    <TextBox  Margin="10 0 0 0" Text="{Binding FFprovePath.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                     <StackPanel Margin="6">
                         <DockPanel>
                             <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
@@ -112,8 +121,8 @@
                                     <TranslateTransform Y="7"/>
                                 </materialDesign:PackIcon.RenderTransform>
                             </materialDesign:PackIcon>
-                            <Label Content="FFmpegの起動にシェルを利用する"/>
-                            <ToggleButton IsChecked="{Binding   UseShellWhenLaunchingFFmpeg,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Right"/>
+                            <Label Content="ffmpeg/ffprobeの起動にシェルを利用する"/>
+                            <ToggleButton IsChecked="{Binding   UseShellWhenLaunchingFFmpeg.Value,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" HorizontalAlignment="Right"/>
                         </DockPanel>
                         <DockPanel>
                             <materialDesign:PackIcon Kind="Bash" Foreground="SkyBlue">
@@ -121,7 +130,7 @@
                                     <TranslateTransform Y="7"/>
                                 </materialDesign:PackIcon.RenderTransform>
                             </materialDesign:PackIcon>
-                            <Label Content="FFmpegのフォーマット"/>
+                            <Label Content="ffmpegのフォーマット"/>
                             <TextBox  Margin="10 0 0 0" Text="{Binding FFmpegFormat.Value,Mode=TwoWay,UpdateSourceTrigger=LostFocus}"/>
                         </DockPanel>
                     </StackPanel>

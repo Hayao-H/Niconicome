@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Settings;
