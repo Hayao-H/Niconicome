@@ -266,7 +266,7 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             {
                 try
                 {
-                    var reader = new StreamReader(Path.Combine(AppContext.BaseDirectory, FileFolder.SettingJSONPath));
+                    using var reader = new StreamReader(Path.Combine(AppContext.BaseDirectory, FileFolder.SettingJSONPath));
                     content = reader.ReadToEnd();
                 }
                 catch (Exception ex)
@@ -313,7 +313,8 @@ namespace Niconicome.Models.Infrastructure.Database.Json
 
 
                         data.Add(x.Key, stringList);
-                    } else
+                    }
+                    else
                     {
                         data.Add(x.Key, element.ValueKind switch
                         {
