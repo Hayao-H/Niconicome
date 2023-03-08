@@ -14,6 +14,8 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string FFmpegPath { get; private set; } = "Download.File.FFmpegPath";
 
+        public static string FFprobePath { get; private set; } = "Download.File.FFprobePath";
+
         public static string DefaultFolder { get; private set; } = "Download.File.Defaultfolder";
 
         public static string UseShellWhenLaunchingFFmpeg { get; set; } = "Download.File.UseShellWhenLaunchingffmpeg";
