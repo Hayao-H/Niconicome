@@ -34,7 +34,7 @@ jobs:
       env:
         TZ: 'Asia/Tokyo'
       run: |
-        $result = date '+%Y-%m-%d-%-H-%-M'
+        result=`date '+%Y-%m-%d-%-H-%-M'`
         echo "date=$result" >> $GITHUB_OUTPUT 
   publish:
     needs: [test, date]
