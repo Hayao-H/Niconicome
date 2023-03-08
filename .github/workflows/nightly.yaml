@@ -30,9 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Current Date
+      id: date
       env:
         TZ: 'Asia/Tokyo'
-      run: echo "date=$(date '+%Y-%m-%d-%-H-%-M')" >> $GITHUB_ENV
+      run: echo "date=$(date '+%Y-%m-%d-%-H-%-M')" >> $GITHUB_OUTPUT 
   publish:
     needs: [test, date]
     runs-on: windows-latest
@@ -82,20 +83,20 @@ jobs:
     - name: Upload Release Artifact(x64)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x64-${{ env.date }}
+        name: niconicome-nightly-win-x64-${{ needs.date.outputs.outputs1 }}
         path: ./win-x64.zip
     - name: Upload Release Artifact(x64 self-containes)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x64-sc-${{ env.date }}
+        name: niconicome-nightly-win-x64-sc-${{ needs.date.outputs.outputs1 }}
         path: ./win-x64-sc.zip
     - name: Upload Release Artifact(x86)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x86-${{ env.date }}
+        name: niconicome-nightly-win-x86-${{ needs.date.outputs.outputs1 }}
         path: ./win-x86.zip
     - name: Upload Release Artifact(x86 self-contained)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x86-sc-${{ env.date }}
+        name: niconicome-nightly-win-x86-sc-${{ needs.date.outputs.outputs1 }}
         path: ./win-x86-sc.zip
