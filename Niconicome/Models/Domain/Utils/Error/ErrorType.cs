@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.DataBackup;
+using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
 using Niconicome.Models.Domain.Local.Server.Core;
 using Niconicome.Models.Domain.Local.Server.HLS;
@@ -67,6 +68,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 31, typeof(TSRequestHandlerError) },
             { 32, typeof(UserChromeRequestHandlerError) },
             { 33, typeof(ProcessManagerError) },
+            { 34, typeof(FFprobeHandlerError) },
         };
     }
 }

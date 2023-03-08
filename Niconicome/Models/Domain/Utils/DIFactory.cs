@@ -336,6 +336,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
+            services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
 
             return services.BuildServiceProvider();
         }
