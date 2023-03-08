@@ -38,7 +38,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     /// </summary>
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(ILogger logger, IVideoDownloadHelper videoDownloadHelper, IVideoEncoader encorder, IStreamResumer streamResumer, INicoFileIO fileIO, IPathOrganizer pathOrganizer,IVideoFileStore videoFileStore)
+        public VideoDownloader(ILogger logger, IVideoDownloadHelper videoDownloadHelper, IVideoEncoader encorder, IStreamResumer streamResumer, INicoFileIO fileIO, IPathOrganizer pathOrganizer, IVideoFileStore videoFileStore)
         {
             this._logger = logger;
             this._videoDownloadHelper = videoDownloadHelper;
@@ -181,7 +181,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
                 this.RemoveEconomyFile(settings.FilePath);
             }
 
-            this._videoFileStore.AddFile(settings.NiconicoId, Path.Combine(settings.FolderPath, fileName));
+            await this._videoFileStore.AddFileAsync(settings.NiconicoId, Path.Combine(settings.FolderPath, fileName));
 
             this._logger.Log($"動画のダウンロードが完了しました。({context.GetLogContent()})");
 

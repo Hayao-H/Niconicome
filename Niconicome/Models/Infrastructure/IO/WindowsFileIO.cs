@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -11,20 +13,23 @@ namespace Niconicome.Models.Infrastructure.IO
 {
     public class WindowsFileIO : INiconicomeFileIO
     {
-        public WindowsFileIO(Error::IErrorHandler errorHandler)
+        public WindowsFileIO(Error::IErrorHandler errorHandler, IFFprobeHandler fFprobeHandler)
         {
             this._errorHandler = errorHandler;
+            this._fFprobeHandler = fFprobeHandler;
         }
 
         #region field
 
         private readonly Error::IErrorHandler _errorHandler;
 
+        private readonly IFFprobeHandler _fFprobeHandler;
+
         #endregion
 
         #region Method
 
-        public IAttemptResult<int> GetVerticalResolution(string path)
+        public async Task<IAttemptResult<int>> GetVerticalResolutionAsync(string path)
         {
             if (!this.Exists(path))
             {
@@ -32,63 +37,14 @@ namespace Niconicome.Models.Infrastructure.IO
                 return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FileDoesNotExist, path));
             }
 
-            Type? type = Type.GetTypeFromProgID("Shell.Application");
-
-            if (type is null)
+            IAttemptResult<IFFprobeResult> result = await this._fFprobeHandler.GetVideoInfomationAsync(path);
+            if (!result.IsSucceeded || result.Data is null)
             {
-                this._errorHandler.HandleError(WindowsFileIOError.FailedToGetShellType);
-                return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToGetShellType));
+                return AttemptResult<int>.Fail(result.Message);
             }
 
-            var s = Activator.CreateInstance(type);
+            return AttemptResult<int>.Succeeded(result.Data.Height);
 
-            dynamic? shell = Activator.CreateInstance(type);
-            if (shell is null)
-            {
-                this._errorHandler.HandleError(WindowsFileIOError.FailedToCreateShellInstance);
-                return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToCreateShellInstance));
-            }
-
-            try
-            {
-                string name = Path.GetFileName(path);
-                string? dirName = Path.GetDirectoryName(path);
-
-                Shell32.Folder folder = shell.NameSpace(dirName);
-                Shell32.FolderItem file = folder.ParseName(name);
-
-                List<string> arrHeaders = new List<string>();
-                for (int i = 0; i < 1000; i++)
-                {
-                    string header = folder.GetDetailsOf(null, i);
-                    arrHeaders.Add(header);
-                }
-
-                int index = arrHeaders.IndexOf("フレーム高");
-
-                string result = folder.GetDetailsOf(file, index);
-
-                if (string.IsNullOrEmpty(result))
-                {
-                    this._errorHandler.HandleError(WindowsFileIOError.FailedToGetVerticalResolution);
-                    return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToGetVerticalResolution));
-                }
-
-                if (int.TryParse(result, out int resultInt))
-                {
-                    return AttemptResult<int>.Succeeded(resultInt);
-                }
-                else
-                {
-                    this._errorHandler.HandleError(WindowsFileIOError.FailedToParseVerticalResoltion, resultInt);
-                    return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToParseVerticalResoltion, resultInt));
-                }
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(WindowsFileIOError.FailedToGetVerticalResolution, ex);
-                return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToGetVerticalResolution, ex));
-            }
         }
 
         public IAttemptResult Write(string path, string content, Encoding? encoding = null)
@@ -123,6 +79,25 @@ namespace Niconicome.Models.Infrastructure.IO
                 this._errorHandler.HandleError(WindowsFileIOError.ErrorWhenEnumerateVideoFiles, ex, path);
             }
         }
+
+        public async Task EnumerateFilesAsync(string path, string searchPattern, Func<string, Task> enumAction, bool searchSubDirectory)
+        {
+            SearchOption option = searchSubDirectory ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+            try
+            {
+                foreach (var file in Directory.EnumerateFiles(path, searchPattern, option))
+                {
+                    await enumAction(file);
+                }
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.ErrorWhenEnumerateVideoFiles, ex, path);
+            }
+
+        }
+
 
         public bool Exists(string path)
         {

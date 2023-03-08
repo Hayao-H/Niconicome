@@ -119,7 +119,7 @@ namespace Niconicome.Models.Network.Download
                 return new DownloadResult() { Message = $"ファイルのコピーに失敗しました。" };
             }
 
-            this._videoFileStore.AddFile(niconicoId, Path.Combine(destinationPath, filename));
+            this._videoFileStore.AddFileAsync(niconicoId, Path.Combine(destinationPath, filename));
 
             return new DownloadResult() { IsSucceeded = true };
 

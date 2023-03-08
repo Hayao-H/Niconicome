@@ -31,7 +31,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class LocalVideoLoader : ILocalVideoLoader
     {
-        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler, INiconicomeFileIO fileIO, IFFprobeHandler test)
+        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler, INiconicomeFileIO fileIO)
         {
             this._directoryIO = directoryIO;
             this._fileIO = fileIO;
@@ -39,7 +39,6 @@ namespace Niconicome.Models.Playlist.V2.Manager
             this._settingsContainer = settingsConainer;
             this._playlistVideoContainer = playlistVideoContainer;
             this._errorHandler = errorHandler;
-            this._test = test;
         }
 
         #region field
@@ -55,8 +54,6 @@ namespace Niconicome.Models.Playlist.V2.Manager
         private readonly IPlaylistVideoContainer _playlistVideoContainer;
 
         private readonly IErrorHandler _errorHandler;
-
-        private readonly IFFprobeHandler _test;
 
         private List<string>? _cachedFiles;
 
@@ -86,8 +83,6 @@ namespace Niconicome.Models.Playlist.V2.Manager
             ///削除動画のサムネを保存
             await this._thumbnailUtility.DownloadDeletedVideoThumbAsync();
 
-            var first = true;
-
             foreach (var video in videos)
             {
                 if (playlistID != (this._playlistVideoContainer.CurrentSelectedPlaylist?.ID ?? -1))
@@ -99,13 +94,6 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 if (this.IsDownloaded(video))
                 {
                     video.IsDownloaded.Value = true;
-
-                    if (first)
-                    {
-                        var reuslt = await this._test.GetVideoInfomationAsync(video.FilePath);
-                        first = false;
-                    }
-
                 }
                 else if (CheckWhetherSetDownloadPathOrNot(quick, video))
                 {
@@ -114,12 +102,6 @@ namespace Niconicome.Models.Playlist.V2.Manager
                     {
                         video.FilePath = pathResult.Data;
                         video.IsDownloaded.Value = true;
-
-                        if (first)
-                        {
-                            var reuslt = await this._test.GetVideoInfomationAsync(video.FilePath);
-                            first = false;
-                        }
 
                         if (!economy.IsNullOrEmpty())
                         {

@@ -47,14 +47,14 @@ namespace Niconicome.Models.Infrastructure.Database
             return AttemptResult<string>.Succeeded(result.Data.FilePath);
         }
 
-        public IAttemptResult AddFile(string niconicoID, string filePath)
+        public async Task<IAttemptResult> AddFileAsync(string niconicoID, string filePath)
         {
             if (this._liteDB.Exists<VideoFile>(TableNames.Video, v => v.FilePath == filePath))
             {
                 return AttemptResult.Succeeded();
             }
 
-            IAttemptResult<int> resolutionResult = this._fileIO.GetVerticalResolution(filePath);
+            IAttemptResult<int> resolutionResult = await this._fileIO.GetVerticalResolutionAsync(filePath);
             if (!resolutionResult.IsSucceeded)
             {
                 return AttemptResult.Fail(resolutionResult.Message);
@@ -75,27 +75,27 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._liteDB.Exists<VideoFile>(TableNames.Video, v => v.NiconicoID == niconicoID && v.VerticalResolution == verticalResolution);
         }
 
-        public IAttemptResult<int> AddFilesFromDirectoryList(IEnumerable<string> directories)
+        public async Task<IAttemptResult<int>> AddFilesFromDirectoryListAsync(IEnumerable<string> directories)
         {
             var succeeded = 0;
 
             foreach (var directory in directories)
             {
-                this._fileIO.EnumerateFiles(directory, "*" + FileFolder.Mp4FileExt, path =>
-                {
-                    string id = this._utils.GetIdFromFIleName(path);
-                    if (id.IsNullOrEmpty())
-                    {
-                        return;
-                    }
+                await this._fileIO.EnumerateFilesAsync(directory, "*" + FileFolder.Mp4FileExt, async path =>
+                 {
+                     string id = this._utils.GetIdFromFIleName(path);
+                     if (id.IsNullOrEmpty())
+                     {
+                         return;
+                     }
 
-                    IAttemptResult result = this.AddFile(id, path);
-                    if (result.IsSucceeded)
-                    {
-                        succeeded++;
-                    }
+                     IAttemptResult result = await this.AddFileAsync(id, path);
+                     if (result.IsSucceeded)
+                     {
+                         succeeded++;
+                     }
 
-                }, true);
+                 }, true);
             }
 
             return AttemptResult<int>.Succeeded(succeeded);

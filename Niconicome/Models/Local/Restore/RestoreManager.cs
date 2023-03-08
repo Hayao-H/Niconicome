@@ -96,7 +96,7 @@ namespace Niconicome.Models.Local.Restore
     public class RestoreManager : IRestoreManager
     {
 
-        public RestoreManager(IBackupManager backuphandler, IVideoFileStore fileStore, ISettingsContainer settingsContainer, IPlaylistStore playlistStore, IVideoStore videoStore, Error::IErrorHandler errorHandler,IPlaylistManager playlistManager)
+        public RestoreManager(IBackupManager backuphandler, IVideoFileStore fileStore, ISettingsContainer settingsContainer, IPlaylistStore playlistStore, IVideoStore videoStore, Error::IErrorHandler errorHandler, IPlaylistManager playlistManager)
         {
             this._backuphandler = backuphandler;
             this._fileStore = fileStore;
@@ -165,9 +165,9 @@ namespace Niconicome.Models.Local.Restore
 
             IAttemptResult<int>? result = null;
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                result = this._fileStore.AddFilesFromDirectoryList(new List<string>() { path });
+                result = await this._fileStore.AddFilesFromDirectoryListAsync(new List<string>() { path });
             });
 
             if (result?.IsSucceeded ?? false)
@@ -190,9 +190,9 @@ namespace Niconicome.Models.Local.Restore
 
             IAttemptResult<int>? result = null;
 
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                result = this._fileStore.AddFilesFromDirectoryList(sResult.Data.Value);
+                result = await this._fileStore.AddFilesFromDirectoryListAsync(sResult.Data.Value);
             });
 
             return result ?? AttemptResult<int>.Fail();

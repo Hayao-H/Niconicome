@@ -27,17 +27,14 @@ namespace Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe
 
     public class FFprobeHandler : IFFprobeHandler
     {
-        public FFprobeHandler(INiconicomeFileIO fileIO, IProcessManager processManager, ISettingsContainer settingsContainer, IErrorHandler errorHandler)
+        public FFprobeHandler(IProcessManager processManager, ISettingsContainer settingsContainer, IErrorHandler errorHandler)
         {
-            this._fileIO = fileIO;
             this._processManager = processManager;
             this._settingsContainer = settingsContainer;
             this._errorHandler = errorHandler;
         }
 
         #region field
-
-        private readonly INiconicomeFileIO _fileIO;
 
         private readonly IProcessManager _processManager;
 

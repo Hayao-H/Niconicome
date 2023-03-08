@@ -14,7 +14,7 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        IAttemptResult<int> GetVerticalResolution(string path);
+        Task<IAttemptResult<int>> GetVerticalResolutionAsync(string path);
 
         /// <summary>
         /// ファイルに書き込む
@@ -48,6 +48,15 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// <param name="enumAction"></param>
         /// <param name="searchSubDirectory"></param>
         void EnumerateFiles(string path, string searchPattern, Action<string> enumAction, bool searchSubDirectory);
+
+        /// <summary>
+        /// ファイルを列挙してアクションを実行
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="searchPattern"></param>
+        /// <param name="enumAction"></param>
+        /// <param name="searchSubDirectory"></param>
+        Task EnumerateFilesAsync(string path, string searchPattern, Func<string, Task> enumAction, bool searchSubDirectory);
 
         /// <summary>
         /// ファイルが存在するかどうかを確認する

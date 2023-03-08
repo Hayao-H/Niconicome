@@ -20,18 +20,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <COMReference Include="Shell32">
-	    <WrapperTool>tlbimp</WrapperTool>
-	    <VersionMinor>0</VersionMinor>
-	    <VersionMajor>1</VersionMajor>
-	    <Guid>50a7e9b0-70ef-11d1-b75a-00a0c90564fe</Guid>
-	    <Lcid>0</Lcid>
-	    <Isolated>false</Isolated>
-	    <EmbedInteropTypes>true</EmbedInteropTypes>
-	  </COMReference>
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="1.0.1" />
 		<PackageReference Include="CredentialManagement" Version="1.0.2" />
 		<PackageReference Include="LiteDB" Version="5.0.15" />
