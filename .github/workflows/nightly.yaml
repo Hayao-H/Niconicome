@@ -26,6 +26,13 @@ jobs:
       run: dotnet build -c Debug
     - name: Test
       run: dotnet test
+  date:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Current Date
+      env:
+        TZ: 'Asia/Tokyo'
+      run: echo "date=$(date '+%Y-%m-%d-%-H-%-M')" >> $GITHUB_ENV
   publish:
     needs: [test]
     runs-on: windows-latest
@@ -68,28 +75,27 @@ jobs:
         Copy-Item -Recurse ffmpeg/bin win-x64
         Copy-Item -Recurse ffmpeg/bin win-x86-sc
         Copy-Item -Recurse ffmpeg/bin win-x86
-    - name: Set Date
-      id: date
-      env:
-        TZ: 'Asia/Tokyo'
-      run: echo "::set-output name=date::$(date '+%Y-%m-%d-%-H-%-M')"
+        Compress-Archive -Path win-x64-sc -DestinationPath win-x64-sc.zip -CompressionLevel fastest
+        Compress-Archive -Path win-x64 -DestinationPath win-x64.zip -CompressionLevel fastest
+        Compress-Archive -Path win-x86-sc -DestinationPath win-x86-sc.zip -CompressionLevel fastest
+        Compress-Archive -Path win-x86 -DestinationPath win-x86.zip -CompressionLevel fastest
     - name: Upload Release Artifact(x64)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x64-${{ steps.date.outputs.date }}
-        path: ./win-x64/
+        name: niconicome-nightly-win-x64-${{ env.date }}
+        path: ./win-x64.zip
     - name: Upload Release Artifact(x64 self-containes)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x64-sc-${{ steps.date.outputs.date }}
-        path: ./win-x64-sc/
+        name: niconicome-nightly-win-x64-sc-${{ env.date }}
+        path: ./win-x64-sc.zip
     - name: Upload Release Artifact(x86)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x86-${{ steps.date.outputs.date }}
-        path: ./win-x86/
+        name: niconicome-nightly-win-x86-${{ env.date }}
+        path: ./win-x86.zip
     - name: Upload Release Artifact(x86 self-contained)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x86-sc-${{ steps.date.outputs.date }}
-        path: ./win-x86-sc/
+        name: niconicome-nightly-win-x86-sc-${{ env.date }}
+        path: ./win-x86-sc.zip
