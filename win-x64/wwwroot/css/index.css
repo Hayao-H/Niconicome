@@ -1,0 +1,495 @@
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+  box-shadow: inset 0 0 6px rgba(231, 231, 231, 0.9058823529);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #737575;
+  border-radius: 5px;
+}
+
+.PageContent {
+  position: relative;
+}
+.PageContent .ControlsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 100%;
+  height: 40px;
+  margin: 10px 0;
+}
+.PageContent .ControlsContainer .InputBoxWrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 40%;
+  height: 100%;
+}
+.PageContent .ControlsContainer .InputBoxWrapper #InputBox {
+  width: 85%;
+  height: 100%;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: solid 2px rgba(231, 231, 231, 0.9058823529);
+  padding: 5px 0;
+  outline: none;
+  display: inline-block;
+}
+.PageContent .ControlsContainer .InputBoxWrapper #RegisterButton {
+  width: 15;
+  margin-left: 5px;
+  padding: 5px 20px;
+}
+.PageContent .ControlsContainer .ButtonsWrapper {
+  display: flex;
+  margin-left: 8px;
+}
+.PageContent .ControlsContainer .ButtonsWrapper > * {
+  margin-left: 5px;
+}
+.PageContent .VideoList {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.PageContent .VideoList #VideoListHeader {
+  background-color: #f2f3f5;
+  display: flex;
+  justify-content: start;
+  position: relative;
+  height: 35px;
+  color: #001835;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem {
+  display: inline-block;
+  padding-left: 8px;
+  font-size: 14px;
+  height: 35px;
+  line-height: 35px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon {
+  display: none;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon.Show {
+  display: inline-block;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon.Ascendant {
+  border-bottom: 6px solid black;
+}
+.PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon.Descendant {
+  border-top: 6px solid black;
+}
+.PageContent .VideoList #VideoListHeader > .Separator {
+  position: absolute;
+  opacity: 0;
+  width: 20px;
+  height: 100%;
+  margin: 0;
+  cursor: col-resize;
+}
+.PageContent .VideoList #VideoListHeader #CheckBoxColumn {
+  display: flex;
+  justify-content: center;
+  width: 50px;
+  border-right: 1px solid #e5e8ea;
+  padding: 0;
+}
+.PageContent .VideoList #VideoListHeader #ThumbnailColumn {
+  width: 165.3333333333px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #TitleColumn {
+  width: 700px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #UploadedDateTimeColumn {
+  width: 250px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #IsDownloadedColumn {
+  width: 70px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #ViewCountColumn {
+  width: 125px;
+  height: 100%;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #CommentCountColumn {
+  width: 125px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #MylistCountColumn {
+  width: 125px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #LikeCountColumn {
+  width: 125px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList #VideoListHeader #MessageColumn {
+  width: 150px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .SortContextMenuWrapper {
+  position: relative;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu {
+  display: none;
+  position: absolute;
+  top: 0;
+  background-color: #2d2c2d;
+  z-index: 9999;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu.Show {
+  display: block;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .MenuItem {
+  width: 200px;
+  color: #f7f1ff;
+  padding: 2px 5px;
+  border-bottom: 1px solid rgba(83, 83, 83, 0.9058823529);
+  cursor: pointer;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .Separator {
+  height: 0;
+  width: 200px;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .OptionMenu {
+  display: flex;
+  justify-content: space-between;
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .OptionMenu .Circle {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #202020;
+  border: 1px solid rgba(126, 126, 126, 0.9058823529);
+}
+.PageContent .VideoList .SortContextMenuWrapper .SortContextMenu .OptionMenu .Circle.Show {
+  display: inline;
+}
+.PageContent .VideoList .VideoListBody {
+  border: solid 1px #e5e8ea;
+  height: 400px;
+  overflow-y: scroll;
+  position: relative;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow {
+  height: 100px;
+  display: flex;
+  border-bottom: 1px solid #e5e8ea;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow.DropTarget {
+  border-top: 1px solid #222222;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .CheckBoxColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  width: 50px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn {
+  position: relative;
+  height: 100%;
+  width: 165.3333333333px;
+  border-right: 1px solid #e5e8ea;
+  padding: 8px;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn .Thumbnail {
+  width: 100%;
+  height: 100%;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn .Duration {
+  z-index: 100;
+  position: absolute;
+  font-size: 13px;
+  right: 10px;
+  bottom: 10px;
+  padding: 1px 8px;
+  color: #fff;
+  background-color: rgba(34, 34, 34, 0.6901960784);
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer {
+  display: flex;
+  justify-content: flex-start;
+  height: 100%;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn {
+  display: flex;
+  position: relative;
+  justify-content: center;
+  flex-direction: column;
+  width: 700px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn:hover .VideoInfoLinkWrapper {
+  display: flex;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn .VideoInfoLinkWrapper {
+  display: none;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  top: 3px;
+  left: 3px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn .VideoInfoLinkWrapper:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .UploadedDateTimeColumn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 250px;
+  padding-left: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .IsDownloadedColumn {
+  display: flex;
+  color: #7bd889;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 70px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .IsDownloadedColumn .NotDownloaded {
+  color: #ff3300;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .ViewCountColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 125px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .CommentCountColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 125px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .MylistCountColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 125px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .LikeCountColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 125px;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .MessageColumn {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding-right: 8px;
+  border-right: 1px solid #e5e8ea;
+  width: 150px;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow:hover {
+  background: rgba(244, 244, 244, 0.9568627451);
+}
+.PageContent .ToastContent {
+  position: fixed;
+  margin: auto;
+  right: 0;
+  left: 0;
+  bottom: 10px;
+}
+.PageContent .ToastContent .ToastHeader {
+  display: flex;
+  align-items: center;
+}
+.PageContent .ToastContent .ToastHeader .ToastImage {
+  height: 20px;
+  width: 20px;
+  margin-right: 5px;
+  background: #007aff;
+  border-radius: 5px;
+}
+.PageContent .OutputContainer {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  background-color: #fff;
+  overflow-y: auto;
+  border-left: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.PageContent .OutputContainer .ToolBar {
+  display: flex;
+  justify-content: flex-end;
+  background-color: #f9f9fa;
+}
+.PageContent .OutputContainer .ToolBar .CloseButton {
+  margin-right: 8px;
+}
+.PageContent .OutputContainer .ToolBar .CloseButton:hover {
+  color: #d70022;
+}
+.PageContent .OutputContainer .Controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+.PageContent .OutputContainer .MessageBox {
+  padding: 5px;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow {
+  display: flex;
+  padding: 3px;
+  border-bottom: 1px solid rgba(231, 231, 231, 0.9058823529);
+  word-wrap: break-word;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow .MessageIcon {
+  color: #1e90ff;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow .MessageContent {
+  margin-left: 5px;
+  flex-grow: 1;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow .MessageInfomation {
+  color: #3161b8;
+  width: 20%;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow.Yellow {
+  background-color: #fffbd6;
+  color: #be9b00;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow.Yellow .MessageIcon {
+  color: #be9b00;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow.Red {
+  background-color: #fdf2f5;
+  color: #d70022;
+}
+.PageContent .OutputContainer .MessageBox .MessageRow.Red .MessageIcon {
+  color: #d70022;
+}
+.PageContent .OutputContainer.Show {
+  display: block;
+}
+
+.ContextMenuWrapper {
+  position: relative;
+}
+.ContextMenuWrapper .ContextMenu {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  background: #fff;
+  padding: 5px;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.ContextMenuWrapper .ContextMenu .ContextMenuItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+  width: 250px;
+  height: 37px;
+  font-size: 13px;
+  background: #fff;
+  z-index: 9999;
+  border-bottom: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.ContextMenuWrapper .ContextMenu .ContextMenuItem .ContextMenuIcon {
+  margin-right: 8px;
+}
+.ContextMenuWrapper .ContextMenu .ContextMenuItem.Clickable {
+  cursor: pointer;
+}
+.ContextMenuWrapper .ContextMenu .ContextMenuItem .ContextMenuItemTriangle {
+  width: 0;
+  height: 0;
+  border-left: 6px solid black;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+.ContextMenuWrapper .ContextMenu .ContextMenuItem:hover {
+  background: rgba(231, 231, 231, 0.9058823529);
+}
+.ContextMenuWrapper .ContextMenu .RootMenu {
+  position: relative;
+}
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu {
+  display: none;
+  position: absolute;
+  left: 100%;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.One {
+  top: 0;
+}
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Two {
+  top: -100%;
+}
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Three {
+  top: -200%;
+}
+.ContextMenuWrapper .ContextMenu .RootMenu > .SubMenu.Many {
+  top: -300%;
+}
+.ContextMenuWrapper .ContextMenu .RootMenu:hover .SubMenu {
+  display: block;
+}
+.ContextMenuWrapper .ContextMenu.Show {
+  display: block;
+}

@@ -43,6 +43,8 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         DeletingAllRecordFailed,
         [ErrorEnum(ErrorLevel.Log, "[{0}]テーブルのレコードを全て削除しました。")]
         AllRecordDeleted,
+        [ErrorEnum(ErrorLevel.Error, "コレクション一覧の取得に失敗しました。")]
+        FailedToGetCollectionNames,
     }
 
 

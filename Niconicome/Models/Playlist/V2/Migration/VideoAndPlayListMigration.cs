@@ -55,10 +55,24 @@ namespace Niconicome.Models.Playlist.V2.Migration
         {
             get
             {
-                //return true;
                 IAttemptResult<Version> result = this._applicationStore.GetDBVersion();
-                if (!result.IsSucceeded || result.Data is null) return false;
-                return result.Data < DBVersionConstant.VideosAndPlaylistMigrated;
+                if (!result.IsSucceeded || result.Data is null)
+                {
+                    return false;
+                }
+
+                if (result.Data > DBVersionConstant.VideosAndPlaylistMigrated)
+                {
+                    return false;
+                }
+
+                IAttemptResult<bool> oldResult = this._applicationStore.CheckWhetherOldDataExists();
+                if (!oldResult.IsSucceeded)
+                {
+                    return false;
+                }
+
+                return oldResult.Data;
             }
         }
 
