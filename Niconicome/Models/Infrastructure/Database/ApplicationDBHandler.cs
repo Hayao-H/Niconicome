@@ -44,7 +44,8 @@ namespace Niconicome.Models.Infrastructure.Database
             {
                 this._errorHandler.HandleError(ApplicationDBHandlerError.FailedToParseDBVersion, app.DBVersion);
                 return AttemptResult<Version>.Fail(this._errorHandler.GetMessageForResult(ApplicationDBHandlerError.FailedToParseDBVersion, app.DBVersion));
-            } else
+            }
+            else
             {
                 return AttemptResult<Version>.Succeeded(version);
             }
@@ -62,6 +63,24 @@ namespace Niconicome.Models.Infrastructure.Database
             app.DBVersion = version.ToString();
 
             return this._dataBase.Update(app);
+        }
+
+        public IAttemptResult<bool> CheckWhetherOldDataExists()
+        {
+            IAttemptResult init = this.Initialize();
+            if (!init.IsSucceeded)
+            {
+                return AttemptResult<bool>.Fail(init.Message);
+            }
+
+            IAttemptResult<IEnumerable<string>> result = this._dataBase.GetCollectionNames();
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return AttemptResult<bool>.Fail(result.Message);
+            }
+
+            List<string> cols = result.Data.ToList();
+            return AttemptResult<bool>.Succeeded(cols.Contains("playlists") || cols.Contains("videos"));
         }
 
         #endregion

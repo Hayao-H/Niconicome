@@ -104,6 +104,12 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         /// </summary>
         /// <returns></returns>
         IAttemptResult ReOpen();
+
+        /// <summary>
+        /// コレクションの一覧を取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IEnumerable<string>> GetCollectionNames();
     }
 
     public class LiteDBHandler : ILiteDBHandler
@@ -416,6 +422,21 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
             this._liteDB = this._dataBase.DB!;
             return AttemptResult.Succeeded();
         }
+
+        public IAttemptResult<IEnumerable<string>> GetCollectionNames()
+        {
+            try
+            {
+                IEnumerable<string> cols = this._liteDB.GetCollectionNames();
+                return AttemptResult<IEnumerable<string>>.Succeeded(cols);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(LiteDBError.FailedToGetCollectionNames,ex);
+                return AttemptResult<IEnumerable<string>>.Fail(this._errorHandler.GetMessageForResult(LiteDBError.FailedToGetCollectionNames, ex));
+            }
+        }
+
 
         #endregion
 

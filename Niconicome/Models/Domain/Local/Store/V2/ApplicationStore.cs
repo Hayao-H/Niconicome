@@ -21,5 +21,11 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <param name="version"></param>
         /// <returns></returns>
         IAttemptResult SetDBVersion(Version version);
+
+        /// <summary>
+        /// 古い動画/プレイリストのデータが存在するかどうかを確認
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<bool> CheckWhetherOldDataExists();
     }
 }
