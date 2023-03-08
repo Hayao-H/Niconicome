@@ -33,7 +33,9 @@ jobs:
       id: date
       env:
         TZ: 'Asia/Tokyo'
-      run: echo "date=$(date '+%Y-%m-%d-%-H-%-M')" >> $GITHUB_OUTPUT 
+      run: |
+        $result = date '+%Y-%m-%d-%-H-%-M'
+        echo "date=$result" >> $GITHUB_OUTPUT 
   publish:
     needs: [test, date]
     runs-on: windows-latest
