@@ -34,8 +34,6 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
 
         private readonly IErrorHandler _errorHandler;
 
-        private Dictionary<string, Process> _processes = new();
-
         #endregion
 
         #region Method
@@ -45,12 +43,9 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
             var tcs = new TaskCompletionSource<IAttemptResult<IProcessResult>>();
 
             string id = Guid.NewGuid().ToString("D");
-            var process = new Process();
+            using var process = new Process();
             var stdout = new StringBuilder();
             var stderr = new StringBuilder();
-
-            //GC防止
-            this._processes.Add(id, process);
 
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -84,7 +79,6 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
                 process.WaitForExit(timeoutSecond * 1000);
 
                 var result = new ProcessResult(process.ExitCode, stdout.ToString(), stderr.ToString());
-                this._processes.Remove(id);
                 tcs.SetResult(AttemptResult<IProcessResult>.Succeeded(result));
             }
             catch (Exception ex)
@@ -92,8 +86,6 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
                 this._errorHandler.HandleError(ProcessManagerError.FailedToStartProcess, ex);
                 tcs.SetResult(AttemptResult<IProcessResult>.Fail(this._errorHandler.GetMessageForResult(ProcessManagerError.FailedToStartProcess, ex)));
             }
-
-
 
             return tcs.Task;
         }
