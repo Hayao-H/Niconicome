@@ -17,13 +17,13 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
         /// <summary>
         /// 標準出力
         /// </summary>
-        StreamReader StandardOutput { get; }
+        string StandardOutput { get; }
 
         /// <summary>
         /// 例外
         /// </summary>
-        StreamReader ErrorOutput { get; }
+        string ErrorOutput { get; }
     }
 
-    public record ProcessResult(int ExitCode, StreamReader StandardOutput, StreamReader ErrorOutput) : IProcessResult;
+    public record ProcessResult(int ExitCode, string StandardOutput, string ErrorOutput) : IProcessResult;
 }

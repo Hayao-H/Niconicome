@@ -18,8 +18,9 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
         /// <param name="filePath"></param>
         /// <param name="arg"></param>
         /// <param name="useShell"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
-        Task<IAttemptResult<IProcessResult>> StartProcessAsync(string filePath, string arg, bool useShell);
+        Task<IAttemptResult<IProcessResult>> StartProcessAsync(string filePath, string arg, bool useShell, int timeoutSecond);
     }
 
     public class ProcessManager : IProcessManager
@@ -39,18 +40,25 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
 
         #region Method
 
-        public Task<IAttemptResult<IProcessResult>> StartProcessAsync(string filePath, string arg, bool useShell)
+        public Task<IAttemptResult<IProcessResult>> StartProcessAsync(string filePath, string arg, bool useShell, int timeoutSecond)
         {
             var tcs = new TaskCompletionSource<IAttemptResult<IProcessResult>>();
 
             string id = Guid.NewGuid().ToString("D");
             var process = new Process();
+            var stdout = new StringBuilder();
+            var stderr = new StringBuilder();
 
             //GC防止
             this._processes.Add(id, process);
 
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+
+            process.OutputDataReceived += (_, e) => { if (e.Data is not null) stdout.AppendLine(e.Data); };
+            process.ErrorDataReceived += (_, e) => { if (e.Data is not null) stderr.AppendLine(e.Data); };
 
             var commands = new List<string>();
             if (useShell)
@@ -66,22 +74,25 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
             commands.Add(arg);
 
             process.StartInfo.Arguments = string.Join(" ", commands);
-            process.Exited += (_, _) =>
-            {
-                var result = new ProcessResult(process.ExitCode, process.StandardOutput, process.StandardError);
-                this._processes.Remove(id);
-                tcs.SetResult(AttemptResult<IProcessResult>.Succeeded(result));
-            };
 
             try
             {
                 process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                process.WaitForExit(timeoutSecond * 1000);
+
+                var result = new ProcessResult(process.ExitCode, stdout.ToString(), stderr.ToString());
+                this._processes.Remove(id);
+                tcs.SetResult(AttemptResult<IProcessResult>.Succeeded(result));
             }
             catch (Exception ex)
             {
                 this._errorHandler.HandleError(ProcessManagerError.FailedToStartProcess, ex);
                 tcs.SetResult(AttemptResult<IProcessResult>.Fail(this._errorHandler.GetMessageForResult(ProcessManagerError.FailedToStartProcess, ex)));
             }
+
 
 
             return tcs.Task;

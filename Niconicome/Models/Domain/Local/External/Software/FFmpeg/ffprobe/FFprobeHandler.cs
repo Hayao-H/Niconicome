@@ -65,9 +65,9 @@ namespace Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe
             }
 
             string ffprobePath = this.GetffprobePath(ffprobePathResult.Data!.Value);
-            string command = $"ffprobe -i \"{path}\" -v error -show_streams -of json";
+            string command = $"-i \"{path}\" -v error -show_streams -of json";
 
-            IAttemptResult<IProcessResult> result = await this._processManager.StartProcessAsync(ffprobePath, command, useShellResult.Data!.Value);
+            IAttemptResult<IProcessResult> result = await this._processManager.StartProcessAsync(ffprobePath, command, useShellResult.Data!.Value, 15);
             if (!result.IsSucceeded || result.Data is null)
             {
                 return AttemptResult<IFFprobeResult>.Fail(result.Message);
@@ -75,9 +75,8 @@ namespace Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe
 
             if (result.Data.ExitCode != 0)
             {
-                string error = this.GetErrorMessage(result.Data.ErrorOutput);
-                this._errorHandler.HandleError(FFprobeHandlerError.FailedToRunFFprobe, error);
-                return AttemptResult<IFFprobeResult>.Fail(this._errorHandler.GetMessageForResult(FFprobeHandlerError.FailedToRunFFprobe, error));
+                this._errorHandler.HandleError(FFprobeHandlerError.FailedToRunFFprobe, result.Data.ErrorOutput);
+                return AttemptResult<IFFprobeResult>.Fail(this._errorHandler.GetMessageForResult(FFprobeHandlerError.FailedToRunFFprobe, result.Data.ErrorOutput));
             }
 
             IAttemptResult<Response> parseResult = this.ParseOutput(result.Data.StandardOutput);
@@ -139,22 +138,10 @@ namespace Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe
         /// <summary>
         /// 出力を解析
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="content"></param>
         /// <returns></returns>
-        private IAttemptResult<Response> ParseOutput(StreamReader stream)
+        private IAttemptResult<Response> ParseOutput(string content)
         {
-            string content;
-
-            try
-            {
-                content = stream.ReadToEnd();
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(FFprobeHandlerError.FailedToReadResponse, ex);
-                return AttemptResult<Response>.Fail(this._errorHandler.GetMessageForResult(FFprobeHandlerError.FailedToReadResponse, ex));
-            }
-
             try
             {
                 var data = JsonParser.DeSerialize<Response>(content);
@@ -165,28 +152,6 @@ namespace Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe
                 this._errorHandler.HandleError(FFprobeHandlerError.FailedToDeserializeData, ex);
                 return AttemptResult<Response>.Fail(this._errorHandler.GetMessageForResult(FFprobeHandlerError.FailedToDeserializeData, ex));
             }
-        }
-
-        /// <summary>
-        /// エラーメッセージを取得
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-        private string GetErrorMessage(StreamReader stream)
-        {
-            string content;
-
-            try
-            {
-                content = stream.ReadToEnd();
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(FFprobeHandlerError.FailedToReadError, ex);
-                return string.Empty;
-            }
-
-            return content;
         }
 
         //動画の高さを取得
