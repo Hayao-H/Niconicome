@@ -28,6 +28,8 @@ jobs:
       run: dotnet test
   date:
     runs-on: ubuntu-latest
+    outputs:
+        output1: ${{ steps.date.outputs.date }}
     steps:
     - name: Current Date
       id: date
@@ -82,23 +84,24 @@ jobs:
         Compress-Archive -Path win-x64 -DestinationPath win-x64.zip -CompressionLevel fastest
         Compress-Archive -Path win-x86-sc -DestinationPath win-x86-sc.zip -CompressionLevel fastest
         Compress-Archive -Path win-x86 -DestinationPath win-x86.zip -CompressionLevel fastest
+        echo ${{ needs.date.outputs.output1 }}
     - name: Upload Release Artifact(x64)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x64-${{ needs.date.outputs.outputs1 }}
+        name: niconicome-nightly-win-x64-${{ needs.date.outputs.output1 }}
         path: ./win-x64.zip
     - name: Upload Release Artifact(x64 self-containes)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x64-sc-${{ needs.date.outputs.outputs1 }}
+        name: niconicome-nightly-win-x64-sc-${{ needs.date.outputs.output1 }}
         path: ./win-x64-sc.zip
     - name: Upload Release Artifact(x86)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x86-${{ needs.date.outputs.outputs1 }}
+        name: niconicome-nightly-win-x86-${{ needs.date.outputs.output1 }}
         path: ./win-x86.zip
     - name: Upload Release Artifact(x86 self-contained)
       uses: actions/upload-artifact@v3
       with:
-        name: niconicome-nightly-win-x86-sc-${{ needs.date.outputs.outputs1 }}
+        name: niconicome-nightly-win-x86-sc-${{ needs.date.outputs.output1 }}
         path: ./win-x86-sc.zip
