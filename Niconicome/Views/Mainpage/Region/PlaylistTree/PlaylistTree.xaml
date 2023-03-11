@@ -73,7 +73,7 @@
                             </ContextMenu>
                         </Setter.Value>
                     </Setter>
-                    <Setter Property="IsExpanded" Value="{Binding IsExpanded,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>

@@ -65,6 +65,11 @@ namespace Niconicome.Models.Domain.Playlist
         bool IsAscendant { get; set; }
 
         /// <summary>
+        /// 展開フラグ
+        /// </summary>
+        IBindableProperty<bool> IsExpanded { get; }
+
+        /// <summary>
         /// 選択されている動画数
         /// </summary>
         IReadonlyBindablePperty<int> SelectedVideosCount { get; }
@@ -159,6 +164,15 @@ namespace Niconicome.Models.Domain.Playlist
                 video.IsSelected.Subscribe(this.OnSelectedChange);
             }
 
+            this.IsExpanded = new BindableProperty<bool>(false);
+            this.IsExpanded.Subscribe(v =>
+            {
+                if (this.IsAutoUpdateEnabled)
+                {
+                    this.Update(this);
+                }
+            });
+
         }
 
         #region field
@@ -237,6 +251,9 @@ namespace Niconicome.Models.Domain.Playlist
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
+
+        public IBindableProperty<bool> IsExpanded { get; init; }
+
 
         public IReadonlyBindablePperty<int> SelectedVideosCount { get; init; }
 

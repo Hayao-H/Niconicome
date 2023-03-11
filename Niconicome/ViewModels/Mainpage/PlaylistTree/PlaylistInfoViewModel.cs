@@ -46,6 +46,11 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
         public bool IsRoot => this.PlaylistInfo.PlaylistType == PlaylistType.Root;
 
         /// <summary>
+        /// 展開状況
+        /// </summary>
+        public IBindableProperty<bool> IsExpanded => this.PlaylistInfo.IsExpanded;
+
+        /// <summary>
         /// 子プレイリスト(デフォルトでは空)
         /// </summary>
         public ReadOnlyObservableCollection<PlaylistInfoViewModel> Children { get; init; }
