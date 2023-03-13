@@ -1,3 +1,3 @@
 export interface DotNetObjectReference {
-    invokeMethodAsync(methodName: string, ...params: string[]): Promise<void>;
+    invokeMethodAsync<T>(methodName: string, ...params: string[]): Promise<T>;
 }

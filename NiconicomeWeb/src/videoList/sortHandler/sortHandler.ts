@@ -3,7 +3,7 @@ import { ElementHandler, ElementHandlerImpl } from "../../shared/ElementHandler"
 import { ElementIDs } from "./elementIDs";
 
 export interface SortHandler {
-    Initialize(): void;
+    initialize(): void;
 }
 
 export class SortHandlerImpl implements SortHandler {
@@ -24,7 +24,7 @@ export class SortHandlerImpl implements SortHandler {
     private _lastOverElement: HTMLElement | null = null;
 
 
-    public Initialize(): void {
+    public initialize(): void {
         const rowResult = this._elmHandler.GetAll(ElementIDs.VideoListRow);
         if (!rowResult.IsSucceeded || rowResult.Data === null) {
             return;

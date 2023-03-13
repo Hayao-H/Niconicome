@@ -163,25 +163,6 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string StoreOnlyNiconicoIDOnRegister { get; private set; } = "Videolist.TextBoxAndButtons.StoreOnlyNiconicoIDOnRegister";
 
         //Videolist.ListView
-        public static string MainWindowSelectColumnWidth { get; private set; } = "Videolist.ListView.MainWindowSelectColumnWidth";
-
-        public static string MainWindowIDColumnWidth { get; private set; } = "Videolist.ListView.MainWindowIDColumnWidth";
-
-        public static string MainWindowTitleColumnWidth { get; private set; } = "Videolist.ListView.MainWindowTitleColumnWidth";
-
-        public static string MainWindowUploadColumnWidth { get; private set; } = "Videolist.ListView.MainWindowUploadColumnWidth";
-
-        public static string MainWindowViewCountColumnWidth { get; private set; } = "Videolist.ListView.MainWindowViewCountColumnWidth";
-
-        public static string MainWindowDownloadedFlagColumnWidth { get; private set; } = "Videolist.ListView.MainWindowDownloadedFlagColumnWidth";
-
-        public static string MainWindowStateColumnWidth { get; private set; } = "Videolist.ListView.MainWindowStateColumnWidth";
-
-        public static string MainWindowThumbnailColumnWidth { get; private set; } = "Videolist.ListView.MainWindowThumbnailColumnWidth";
-
-        public static string MainWindowBookMarkColumnWidth { get; private set; } = "Videolist.ListView.MainWindowBookMarkColumnWidth";
-
-        public static string MainWindowEconomyColumnWidth { get; private set; } = "Videolist.ListView.MainWindowEconomyColumnWidth";
 
         public static string ReAllocateIfVideoisNotSaved { get; private set; } = "Videolist.ListView.SwitchOpenInAppCommandToSendToAppCommandWhenNotDownloaded";
 
@@ -190,6 +171,26 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string IsRestoringColumnWidthDisabled { get; private set; } = "Videolist.ListView.IsRestoringColumnWidthDisabled";
 
         public static string DisableScrollRestore { get; private set; } = "Videolist.ListView.DisableScrollRestore";
+
+        //Videolist.ListView.Width
+        public static string VideoListCheckBoxColumnWidth { get; private set; } = "Videolist.ListView.Width.CheckBoxColumnWidth";
+
+        public static string VideoListThumbnailColumnWidth { get; private set; } = "Videolist.ListView.Width.ThumbnailColumnWidth";
+
+        public static string VideoListTitleColumnWidth { get; private set; } = "Videolist.ListView.Width.TitleColumnWidth";
+
+        public static string VideoListUploadedDateTimeColumnWidth { get; private set; } = "Videolist.ListView.Width.UploadedDateTimeColumnWidth";
+
+        public static string VideoListIsDownloadedColumnWidth { get; private set; } = "Videolist.ListView.Width.IsDownloadedColumnWidth";
+
+        public static string VideoListViewCountColumnWidth { get; private set; } = "Videolist.ListView.Width.ViewCountColumnWidth";
+
+        public static string VideoListCommentCountColumnWidth { get; private set; } = "Videolist.ListView.Width.CommentCountColumnWidth";
+        public static string VideoListMylistCountColumnWidth { get; private set; } = "Videolist.ListView.Width.MylistCountColumnWidth";
+
+        public static string VideoListLikeCountColumnWidth { get; private set; } = "Videolist.ListView.Width.LikeCountColumnWidth";
+
+        public static string VideoListMessageColumnWidth { get; private set; } = "Videolist.ListView.MessageColumnWidth";
 
         //Videolist.File
         public static string SearchVideosExact { get; private set; } = "Videolist.File.SearchVideosExact";

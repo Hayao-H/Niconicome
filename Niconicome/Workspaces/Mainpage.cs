@@ -28,6 +28,7 @@ using Niconicome.Models.Domain.Utils.StringHandler;
 using MessageV2 = Niconicome.Models.Local.State.MessageV2;
 using Niconicome.Models.Local.External.Playlist;
 using Server = Niconicome.Models.Domain.Local.Server;
+using Style = Niconicome.Models.Local.State.Style;
 
 namespace Niconicome.Workspaces
 {
@@ -168,5 +169,9 @@ namespace Niconicome.Workspaces
         /// </summary>
         public static Server::HLS.IHLSManager HLSManager { get; private set; } = DIFactory.Resolve<Server::HLS.IHLSManager>();
 
+        /// <summary>
+        /// カラム幅
+        /// </summary>
+        public static Style::IVideoListWidthManager VideoListWidthManager { get; private set; } = DIFactory.Resolve<Style::IVideoListWidthManager>();
     }
 }
