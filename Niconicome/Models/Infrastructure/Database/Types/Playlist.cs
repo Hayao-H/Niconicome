@@ -27,6 +27,8 @@ namespace Niconicome.Models.Infrastructure.Database.Types
 
         public bool IsAscendant { get; set; }
 
+        public bool IsExpanded { get; set; }
+
         public List<string> Videos { get; set; } = new();
 
         public List<int> Children { get; set; } = new();

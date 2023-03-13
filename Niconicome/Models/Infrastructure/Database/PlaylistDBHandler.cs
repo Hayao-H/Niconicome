@@ -162,6 +162,7 @@ namespace Niconicome.Models.Infrastructure.Database
                     _ => DBSortType.NiconicoID,
                 },
                 IsAscendant = data.IsAscendant,
+                IsExpanded = data.IsExpanded.Value,
                 Videos = data.Videos.Select(v => v.NiconicoId).ToList(),
                 Children = this.CanUpdateChildren(data) ? data.Children.Where(p => p.PlaylistType != PlaylistType.Temporary && p.PlaylistType != PlaylistType.DownloadSucceededHistory && p.PlaylistType != PlaylistType.DownloadFailedHistory).Select(v => v.ID).ToList() : data.ChildrenID.ToList(),
             };
@@ -243,6 +244,7 @@ namespace Niconicome.Models.Infrastructure.Database
             };
             info.IsAscendant = playlist.IsAscendant;
             info.RemoteParameter = playlist.RemoteParameter;
+            info.IsExpanded.Value = playlist.IsExpanded;
 
             info.IsAutoUpdateEnabled = true;
             return info;

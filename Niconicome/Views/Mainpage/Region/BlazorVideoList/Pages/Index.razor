@@ -323,10 +323,24 @@
 @code {
     private DotNetObjectReference<Index>? refToThis;
 
+    private IJSObjectReference? module;
+
     [JSInvokable]
     public void MoveVideo(string sourceID, string targetID)
     {
         DataContext.SortViewModel.MoveVideo(sourceID, targetID);
+    }
+
+    [JSInvokable]
+    public int GetWidth(string name)
+    {
+        return DataContext.VideoListWidthViewModel.GetWidth(name);
+    }
+
+    [JSInvokable]
+    public void SetWidth(string width, string name)
+    {
+        DataContext.VideoListWidthViewModel.SetWidth(width, name);
     }
 
     protected override async Task OnInitializedAsync()
@@ -336,7 +350,14 @@
 
         this._ctx = SynchronizationContext.Current;
 
-        DataContext.RegisterListChangedEventHandler(() => this.ExecuteInCurrentThread(this.StateHasChanged));
+        DataContext.RegisterListChangedEventHandler(() => this.ExecuteInCurrentThread(async () =>
+        {
+            this.StateHasChanged();
+            if (this.module is not null && this.refToThis is not null)
+            {
+                await module.InvokeVoidAsync("setWidth", this.refToThis);
+            }
+        }));
 
         DataContext.RegisterToastMessageChangeEventHandler(() =>
         {
@@ -365,8 +386,8 @@
         if (firstRender)
         {
             await JS.InvokeVoidAsync("showTooltip");
-            var module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
-            await module.InvokeVoidAsync("main", this.refToThis);
+            this.module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
+            await this.module.InvokeVoidAsync("initialize", this.refToThis);
         }
     }
 
@@ -384,12 +405,12 @@
         return await JS.InvokeAsync<int>("getBodyHeight");
     }
 
-
     private SynchronizationContext? _ctx;
 
     public void Dispose()
     {
         this.refToThis?.Dispose();
+        this.refToThis = null;
         this.DataContext.Dispose();
     }
 }

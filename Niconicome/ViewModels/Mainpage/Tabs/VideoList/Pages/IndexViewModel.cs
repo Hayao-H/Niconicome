@@ -17,6 +17,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Local.State.Style;
 using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.V2.Manager;
@@ -147,6 +148,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// フィルター
         /// </summary>
         public FilterViewModel FilterViewModel { get; init; }
+
+        /// <summary>
+        /// 幅
+        /// </summary>
+        public VideoListWidthViewModel VideoListWidthViewModel { get; init; } = new();
 
         #endregion
 
@@ -1116,6 +1122,56 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
 
         #endregion
+    }
+
+    public class VideoListWidthViewModel
+    {
+        /// <summary>
+        /// 幅を設定する
+        /// </summary>
+        public void SetWidth(string value, string name)
+        {
+            if (int.TryParse(value, out int width))
+            {
+                WS::Mainpage.VideoListWidthManager.SetWidth(width, this.Convert(name));
+            }
+        }
+
+        /// <summary>
+        /// 幅を取得する
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public int GetWidth(string name)
+        {
+            IAttemptResult<int> result = WS::Mainpage.VideoListWidthManager.GetWidth(this.Convert(name));
+            if (result.IsSucceeded)
+            {
+                return result.Data;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        private ColumnType Convert(string name)
+        {
+            return name switch
+            {
+                "CheckBoxColumn" => ColumnType.CheckBoxColumn,
+                "ThumbnailColumn" => ColumnType.ThumbnailColumn,
+                "TitleColumn" => ColumnType.TitleColumn,
+                "UploadedDateTimeColumn" => ColumnType.UploadedDateTimeColumn,
+                "IsDownloadedColumn" => ColumnType.IsDownloadedColumn,
+                "ViewCountColumn" => ColumnType.ViewCountColumn,
+                "CommentCountColumn" => ColumnType.CommentCountColumn,
+                "MylistCountColumn" => ColumnType.MylistCountColumn,
+                "LikeCountColumn" => ColumnType.LikeCountColumn,
+                "MessageColumn" => ColumnType.MessageColumn,
+                _ => ColumnType.MessageColumn,
+            };
+        }
     }
 
 }

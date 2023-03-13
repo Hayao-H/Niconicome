@@ -32,6 +32,8 @@ namespace NiconicomeTest.Stabs.Models.Domain.Playlist
 
         public bool IsAscendant { get; set; }
 
+        public IBindableProperty<bool> IsExpanded { get; init; } = new BindableProperty<bool>(false);
+
         public IReadonlyBindablePperty<int> SelectedVideosCount { get; init; } = new ReadonlyBindablePperty<int>(new BindableProperty<int>(0));
 
         public IReadonlyBindablePperty<int> VideosCount { get; init; } = new ReadonlyBindablePperty<int>(new BindableProperty<int>(0));

@@ -6,6 +6,7 @@ esbuild.build({
     entryPoints: ['./src/videoList/main.ts'],
     bundle: true,
     minify: !isDevelopment,
+    bundle: true,
     sourcemap: isDevelopment ? 'inline' : false,
     outdir: process.env.VIDEOLIST_DIR,
     target: "es2021",

@@ -61,7 +61,7 @@ namespace Niconicome.Models.Playlist.V2.Migration
                     return false;
                 }
 
-                if (result.Data > DBVersionConstant.VideosAndPlaylistMigrated)
+                if (result.Data >= DBVersionConstant.VideosAndPlaylistMigrated)
                 {
                     return false;
                 }

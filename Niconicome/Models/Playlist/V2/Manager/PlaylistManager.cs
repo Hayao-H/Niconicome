@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Automation;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 using Niconicome.Models.Playlist.V2.Migration;
+using Windows.Devices.Printers;
 
 namespace Niconicome.Models.Playlist.V2.Manager
 {
@@ -50,12 +52,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class PlaylistManager : IPlaylistManager
     {
-        public PlaylistManager(IPlaylistStore playlistStore, IErrorHandler errorHandler, IPlaylistVideoContainer container, IVideoAndPlayListMigration migration)
+        public PlaylistManager(IPlaylistStore playlistStore, IErrorHandler errorHandler, IPlaylistVideoContainer container, IVideoAndPlayListMigration migration, ISettingsContainer settingsContainer)
         {
             this._playlistStore = playlistStore;
             this._errorHandler = errorHandler;
             this._container = container;
             this._migration = migration;
+            this._settingsContainer = settingsContainer;
         }
 
         #region field
@@ -65,6 +68,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
         private readonly IErrorHandler _errorHandler;
 
         private readonly IPlaylistVideoContainer _container;
+
+        private readonly ISettingsContainer _settingsContainer;
 
         private readonly IVideoAndPlayListMigration _migration;
 
@@ -86,6 +91,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             IAttemptResult<IReadOnlyList<IPlaylistInfo>> result = this._playlistStore.GetAllPlaylist();
             if (!result.IsSucceeded || result.Data is null) return;
+
+            //展開状況を管理
+            IAttemptResult expandResult = this.HandleExpandState(result.Data);
+            if (!expandResult.IsSucceeded)
+            {
+                return;
+            }
 
             //データを準備
             this._playlists = result.Data.ToDictionary(p => p.ID);
@@ -200,9 +212,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
             return this._playlistStore.GetPlaylistByType(type);
         }
 
-        public　IAttemptResult<IPlaylistInfo> GetPlaylist(int ID)
+        public IAttemptResult<IPlaylistInfo> GetPlaylist(int ID)
         {
-            if (this._playlists.TryGetValue(ID,out IPlaylistInfo? playlist))
+            if (this._playlists.TryGetValue(ID, out IPlaylistInfo? playlist))
             {
                 return AttemptResult<IPlaylistInfo>.Succeeded(playlist);
             }
@@ -239,6 +251,51 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 //再帰的にツリーを構築
                 this.SetChild(child, list.AsReadOnly());
             }
+        }
+
+        //展開状況を管理
+        private IAttemptResult HandleExpandState(IEnumerable<IPlaylistInfo> playlists)
+        {
+            IAttemptResult<ISettingInfo<bool>> saveStateResult = this._settingsContainer.GetSetting(SettingNames.SaveTreePrevExpandedState, false);
+            if (!saveStateResult.IsSucceeded || saveStateResult.Data is null)
+            {
+                return AttemptResult.Fail(saveStateResult.Message);
+            }
+
+            IAttemptResult<ISettingInfo<bool>> expandAllResult = this._settingsContainer.GetSetting(SettingNames.ExpandTreeOnStartUp, false);
+            if (!expandAllResult.IsSucceeded || expandAllResult.Data is null)
+            {
+                return AttemptResult.Fail(expandAllResult.Message);
+            }
+
+            //全て展開
+            if (expandAllResult.Data.Value)
+            {
+                foreach (var playlist in playlists)
+                {
+                    playlist.IsAutoUpdateEnabled = false;
+                    playlist.IsExpanded.Value = true;
+                    playlist.IsAutoUpdateEnabled = true;
+                }
+
+                return AttemptResult.Succeeded();
+            }
+
+            //展開状況を引き継ぐ
+            if (saveStateResult.Data.Value)
+            {
+                return AttemptResult.Succeeded();
+            }
+
+            //展開状況を引き継がない
+            foreach (var playlist in playlists)
+            {
+                playlist.IsAutoUpdateEnabled = false;
+                playlist.IsExpanded.Value = false;
+                playlist.IsAutoUpdateEnabled = true;
+            }
+
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
