@@ -53,10 +53,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             onMessage($"動画情報の保存を開始します。");
             this._logger.Log($"{session.Video.Id}の動画情報保存を開始");
 
-            string fileName = this._pathOrganizer.GetFilePath(setting.FileNameFormat, session.Video.DmcInfo, setting.VideoInfoExt, setting.FolderPath, setting.IsReplaceStrictedEnable, setting.Overwrite, setting.VideoInfoSuffix);
+            string filePath = this._pathOrganizer.GetFilePath(setting.FileNameFormat, session.Video.DmcInfo, setting.VideoInfoExt, setting.FolderPath, setting.IsReplaceStrictedEnable, setting.Overwrite, setting.VideoInfoSuffix);
 
-
-            var filePath = Path.Combine(setting.FolderPath, fileName);
 
             string content = setting.VideoInfoType switch
             {
@@ -67,7 +65,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
 
             try
             {
-                IOUtils.CreateDirectoryIfNotExist(fileName);
+                IOUtils.CreateDirectoryIfNotExist(filePath);
                 this._fileIO.Write(filePath, content);
             }
             catch (Exception e)
