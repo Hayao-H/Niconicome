@@ -10,6 +10,7 @@ using Niconicome.Models.Playlist.V2.Manager.Error;
 using Niconicome.Models.Playlist.V2.Manager.Helper;
 using Niconicome.Models.Playlist.V2.Migration;
 using Niconicome.Models.Utils.Reactive;
+using Remote = Niconicome.Models.Domain.Niconico.Remote.V2;
 
 namespace Niconicome.Models.Playlist.V2.Manager
 {
@@ -30,7 +31,14 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <param name="inputText"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoAsync(string inputText, Action<string, ErrorLevel> onMessage);
+        Task<IAttemptResult<VideoRegistrationResult>> RegisterVideosAsync(string inputText, Action<string, ErrorLevel> onMessage);
+
+        /// <summary>
+        /// 動画を登録する
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <returns></returns>
+        Task<IAttemptResult> RegisterVideosAsync(IEnumerable<Remote::VideoInfo> videos);
 
         /// <summary>
         /// クリップボードから動画を登録
@@ -86,7 +94,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class VideoListManager : IVideoListManager
     {
-        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoListUpdateHandler updateHandler, IVideoListCRDHandler cRDHandler,IClipbordManager clipbordManager)
+        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoListUpdateHandler updateHandler, IVideoListCRDHandler cRDHandler, IClipbordManager clipbordManager)
         {
             this._container = container;
             this._loader = loader;
@@ -156,7 +164,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         }
 
-        public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoAsync(string inputText, Action<string, ErrorLevel> onMessage)
+        public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideosAsync(string inputText, Action<string, ErrorLevel> onMessage)
         {
             if (this._container.CurrentSelectedPlaylist is null)
             {
@@ -173,6 +181,24 @@ namespace Niconicome.Models.Playlist.V2.Manager
             return result;
         }
 
+        public async Task<IAttemptResult> RegisterVideosAsync(IEnumerable<Remote::VideoInfo> videos)
+        {
+            if (this._container.CurrentSelectedPlaylist is null)
+            {
+                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
+                return AttemptResult<VideoRegistrationResult>.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
+            }
+
+            IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
+
+            IAttemptResult result =  this._CRDHandler.RegisterVideos(videos, playlist);
+
+            await this.LoadVideosAsync(true,playlist.PlaylistType != PlaylistType.Temporary);
+
+            return result;
+        }
+
+
         public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideosFromClipbordAsync(Action<string, ErrorLevel> onMessage)
         {
             if (this._container.CurrentSelectedPlaylist is null)
@@ -184,7 +210,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
 
             IAttemptResult<string> text = this._clipbordManager.GetClipboardContent();
-            if (!text.IsSucceeded||text.Data is null)
+            if (!text.IsSucceeded || text.Data is null)
             {
                 return AttemptResult<VideoRegistrationResult>.Fail(text.Message);
             }

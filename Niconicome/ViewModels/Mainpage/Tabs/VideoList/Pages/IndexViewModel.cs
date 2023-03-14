@@ -217,7 +217,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.IsProcessing.Value = true;
 
-            IAttemptResult<VideoRegistrationResult> result = await WS::Mainpage.VideoListManager.RegisterVideoAsync(this.InputText.Value, (m, e) => WS::Mainpage.MessageHandler.AppendMessage(m, LocalConstant.SystemMessageDispacher, e));
+            IAttemptResult<VideoRegistrationResult> result = await WS::Mainpage.VideoListManager.RegisterVideosAsync(this.InputText.Value, (m, e) => WS::Mainpage.MessageHandler.AppendMessage(m, LocalConstant.SystemMessageDispacher, e));
 
             if (!result.IsSucceeded || result.Data is null)
             {
@@ -297,6 +297,14 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             var playlistID = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist.ID;
 
             WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{playlistID}", BlazorWindows.MainPage);
+        }
+
+        /// <summary>
+        /// プレイリスト編集ボタンがクリックされたとき
+        /// </summary>
+        public void OnSearchButtonClick()
+        {
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/search", BlazorWindows.MainPage);
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Video;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 
-namespace Niconicome.Models.Playlist.V2.Manager
+namespace Niconicome.Models.Playlist.V2.Manager.Helper
 {
 
     public interface ILocalVideoLoader

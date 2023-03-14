@@ -69,6 +69,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 32, typeof(UserChromeRequestHandlerError) },
             { 33, typeof(ProcessManagerError) },
             { 34, typeof(FFprobeHandlerError) },
+            { 35, typeof(SearchManagerError) },
         };
     }
 }

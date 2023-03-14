@@ -1,70 +1,68 @@
-.VideotitleContainer {
+.VideoDetailPage .VideotitleContainer {
   margin: 0 auto;
   width: calc(700px + 400px);
 }
-.VideotitleContainer .DownloadStatus {
+.VideoDetailPage .VideotitleContainer .DownloadStatus {
   font-size: 16px;
   margin-left: 8px;
 }
-.VideotitleContainer .DownloadStatus.Downloaded {
+.VideoDetailPage .VideotitleContainer .DownloadStatus.Downloaded {
   color: #7bd889;
 }
-.VideotitleContainer .DownloadStatus.NotDownloaded {
+.VideoDetailPage .VideotitleContainer .DownloadStatus.NotDownloaded {
   color: #ff3300;
 }
-
-.VideoContentContainer {
+.VideoDetailPage .VideoContentContainer {
   display: flex;
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
   width: calc(700px + 400px);
   margin: 16px auto;
 }
-.VideoContentContainer .VideoElement {
+.VideoDetailPage .VideoContentContainer .VideoElement {
   width: 700px;
   height: calc(700px / 16 * 9);
 }
-.VideoContentContainer .VideoElement #video-player {
+.VideoDetailPage .VideoContentContainer .VideoElement #video-player {
   width: 100%;
   height: 100%;
 }
-.VideoContentContainer .VideoInfoContainer {
+.VideoDetailPage .VideoContentContainer .VideoInfoContainer {
   display: flex;
   flex-direction: column;
   width: 400px;
   padding: 8px;
   background-color: #fff;
 }
-.VideoContentContainer .VideoInfoContainer .VideoInfoRow {
+.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
 }
-.VideoContentContainer .VideoInfoContainer .VideoInfoRow a {
+.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow a {
   color: #069;
   text-decoration: none;
 }
-.VideoContentContainer .VideoInfoContainer .VideoInfoRow a:hover {
+.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow a:hover {
   text-decoration: underline;
 }
-.VideoContentContainer .VideoInfoContainer .VideoInfoRow .UserVideos {
+.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow .UserVideos {
   border: 1px solid;
   padding: 3px;
   border-radius: 5px;
 }
-.VideoContentContainer .VideoInfoContainer .VideoInfoRow .VideoInfoIcon {
+.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow .VideoInfoIcon {
   margin-right: 6px;
   color: #8b888f;
 }
-.VideoContentContainer .VideoInfoContainer .VideoInfoRow .VideoInfoIcon.Like {
+.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow .VideoInfoIcon.Like {
   color: #e26775;
 }
-
-.TagContainer {
+.VideoDetailPage .TagContainer {
   width: calc(700px + 400px);
   margin: 16px auto;
   overflow: hidden;
 }
-.TagContainer .Tag {
+.VideoDetailPage .TagContainer .Tag {
   margin-right: 16px;
   margin-bottom: 8px;
   border: 1px solid #e5e8ea;
@@ -75,26 +73,25 @@
   line-height: 24px;
   float: left;
 }
-.TagContainer .Tag .TagName {
+.VideoDetailPage .TagContainer .Tag .TagName {
   color: #32475e;
   font-weight: 600;
   font-size: 13px;
   text-decoration: none;
 }
-.TagContainer .Tag .TagName:hover {
+.VideoDetailPage .TagContainer .Tag .TagName:hover {
   text-decoration: underline;
 }
-.TagContainer .Tag .TagIcon {
+.VideoDetailPage .TagContainer .Tag .TagIcon {
   margin-left: 4px;
 }
-.TagContainer .Tag .TagIcon.NicoDic {
+.VideoDetailPage .TagContainer .Tag .TagIcon.NicoDic {
   color: #b20000;
 }
-.TagContainer .Tag .TagIcon.Question {
+.VideoDetailPage .TagContainer .Tag .TagIcon.Question {
   color: #b2bac2;
 }
-
-.ControlsContainer {
+.VideoDetailPage .ControlsContainer {
   display: flex;
   justify-content: center;
   margin: 0 auto;
