@@ -58,7 +58,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Search
             list.Add($"_sort={sort}");
 
             //フィールド
-            list.Add("fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter,likeCounter");
+            list.Add("fields=contentId,title,viewCounter,mylistCounter,thumbnailUrl,startTime,commentCounter,likeCounter,lengthSeconds");
 
             //jsonフィルター
             if (query.Genre != Genre.All || query.UploadedDateTimeStart is not null)
