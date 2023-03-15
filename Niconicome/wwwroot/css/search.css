@@ -44,7 +44,7 @@
 .SearchPage .ResultHeader h4 {
   margin: 0;
 }
-.SearchPage .ResultHeader .RegisterButton {
+.SearchPage .ResultHeader .Button {
   margin-left: 8px;
 }
 .SearchPage .VideoList .VideoListRow {
@@ -88,6 +88,14 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+.SearchPage .VideoList .VideoListRow .VideoInfoWrapper .VideoUploadedOn {
+  font-size: 13px;
+  color: #666;
+  margin-left: 6px;
+}
+.SearchPage .VideoList .VideoListRow .VideoInfoWrapper .VideoUploadedOn .VideoUploadedOnLabel {
+  margin-right: 6px;
 }
 .SearchPage .VideoList .VideoListRow .VideoInfoWrapper .VideoTitle {
   color: #069;

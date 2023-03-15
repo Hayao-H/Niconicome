@@ -43,11 +43,12 @@
         <h4>検索結果（@(DataContext.Videos.Count)件）</h4>
         @if (DataContext.IsRegisterIsProcessing.Value)
         {
-            <button class="RegisterButton btn btn-primary" disabled>登録して戻る</button>
+            <button class="Button btn btn-primary" disabled>登録して戻る</button>
         } else
         {
-            <button class="RegisterButton btn btn-primary" @onclick="DataContext.OnRegisterButtonClick">登録して戻る</button>
+            <button class="Button btn btn-primary" @onclick="DataContext.OnRegisterButtonClick">登録して戻る</button>
         }
+        <button class="Button btn btn-primary" @onclick="DataContext.OnBackButtonClick">戻る</button>
     </div>
 
     <div class="VideoList">
@@ -62,6 +63,7 @@
                     <span class="Duration">@(video.Duration)</span>
                 </div>
                 <div class="VideoInfoWrapper">
+                    <p class="VideoUploadedOn"><span class="VideoUploadedOnLabel">投稿日時</span>@(video.UploadedDT)</p>
                     <a href="https://nico.ms/@(video.NiconicoID)" class="VideoTitle">@(video.Title)</a>
                     <div class="CountWrapper">
                         <p class="CountContent"><span class="CountLabel">再生</span>@(video.ViewCount)</p>
