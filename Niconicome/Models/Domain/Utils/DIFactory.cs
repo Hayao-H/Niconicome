@@ -295,7 +295,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Error.IErrorHandler, Error.ErrorHandler>();
             services.AddSingleton<NetworkVideo::IThumbnailUtility, NetworkVideo::ThumbnailUtility>();
             services.AddSingleton<PlaylistV2::IPlaylistVideoContainer, PlaylistV2::PlaylistVideoContainer>();
-            services.AddSingleton<PlaylistV2::Manager.ILocalVideoLoader, PlaylistV2::Manager.LocalVideoLoader>();
+            services.AddSingleton<PlaylistV2::Manager.Helper.ILocalVideoLoader, PlaylistV2::Manager.Helper.LocalVideoLoader>();
             services.AddTransient<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
             services.AddTransient<PlaylistV2::Manager.IVideoListManager, PlaylistV2::Manager.VideoListManager>();
             services.AddTransient<PlaylistV2::Manager.Helper.IVideoListCRDHandler, PlaylistV2::Manager.Helper.VideoListCRDHandler>();
@@ -305,6 +305,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<TabsVM::VideoList.Pages.MigrationViewModel>();
             services.AddTransient<TabsVM::VideoList.Pages.PlaylistViewModel>();
             services.AddTransient<TabsVM::VideoList.Pages.VideoDetailViewModel>();
+            services.AddTransient<TabsVM::VideoList.Pages.SearchViewModel>();
             services.AddTransient<RemoteV2::Mylist.IMylistHandler, RemoteV2::Mylist.MylistHandler>();
             services.AddTransient<RemoteV2::Mylist.IWatchLaterHandler, RemoteV2::Mylist.WatchLaterHandler>();
             services.AddTransient<RemoteV2::Channel.IChannelVideoHandler, RemoteV2::Channel.ChannelVideoHandler>();
@@ -338,6 +339,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
             services.AddSingleton<State::Style.IVideoListWidthManager, State::Style.VideoListWidthManager>();
+            services.AddTransient<PlaylistV2::Manager.ISearchManager, PlaylistV2::Manager.SearchManager>();
 
             return services.BuildServiceProvider();
         }

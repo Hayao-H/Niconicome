@@ -27,7 +27,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Search
     /// </summary>
     class Search : ISearch
     {
-        public Search(ISearchUrlConstructor urlConstructor, INicoHttp http,IErrorHandler errorHandler,IStringHandler stringHandler)
+        public Search(ISearchUrlConstructor urlConstructor, INicoHttp http, IErrorHandler errorHandler, IStringHandler stringHandler)
         {
             this._urlConstructor = urlConstructor;
             this._http = http;
@@ -67,6 +67,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Search
                 MylistCount = v.MylistCounter,
                 LikeCount = v.LikeCounter,
                 ThumbUrl = v.ThumbnailUrl,
+                Duration = v.LikeCounter,
             }).ToList();
 
             return AttemptResult<RemotePlaylistInfo>.Succeeded(new RemotePlaylistInfo()
@@ -75,7 +76,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Search
                 {
                     SearchType.Tag => SearchStringContent.ResultTitleTag,
                     _ => SearchStringContent.ResultTitleKw
-                },query.Query),
+                }, query.Query),
                 Videos = videos
             });
         }

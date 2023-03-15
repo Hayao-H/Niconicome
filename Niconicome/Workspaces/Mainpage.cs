@@ -173,5 +173,10 @@ namespace Niconicome.Workspaces
         /// カラム幅
         /// </summary>
         public static Style::IVideoListWidthManager VideoListWidthManager { get; private set; } = DIFactory.Resolve<Style::IVideoListWidthManager>();
+
+        /// <summary>
+        /// 検索
+        /// </summary>
+        public static Playlist::Manager.ISearchManager SearchManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.ISearchManager>();
     }
 }

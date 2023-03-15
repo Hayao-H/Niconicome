@@ -35,7 +35,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Search
         [JsonPropertyName("mylistCounter")]
         public int MylistCounter { get; set; }
 
-        [JsonPropertyName("commentkCounter")]
+        [JsonPropertyName("commentCounter")]
         public int CommentCounter { get; set; }
 
         [JsonPropertyName("likeCounter")]
@@ -43,6 +43,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Search
 
         [JsonPropertyName("thumbnailUrl")]
         public string ThumbnailUrl { get; set; } = string.Empty;
+
+        [JsonPropertyName("lengthSeconds")]
+        public int LengthSeconds { get; set; }
     }
 
     public class Response

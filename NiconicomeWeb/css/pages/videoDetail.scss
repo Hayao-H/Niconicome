@@ -1,127 +1,129 @@
 $videoWidth: 700;
 $VideoInfoWidth: 400;
 
-.VideotitleContainer {
-    margin: 0 auto;
-    width:calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
-
-    .DownloadStatus {
-        font-size: 16px;
-        margin-left: 8px;
-
-        &.Downloaded {
-            color: #7bd889;
-
+.VideoDetailPage {
+    .VideotitleContainer {
+        margin: 0 auto;
+        width:calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
+    
+        .DownloadStatus {
+            font-size: 16px;
+            margin-left: 8px;
+    
+            &.Downloaded {
+                color: #7bd889;
+    
+            }
+    
+            &.NotDownloaded {
+                color: #ff3300;
+    
+            }
         }
-
-        &.NotDownloaded {
-            color: #ff3300;
-
-        }
+    
     }
-
-}
-
-.VideoContentContainer {
-    display: flex;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, .1);
-    width: calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
-    margin: 16px auto;
-
-
-    .VideoElement {
-        width: #{$videoWidth}px;
-        height: calc(#{$videoWidth}px / 16 * 9);
-
-        #video-player {
-            width: 100%;
-            height: 100%;
-        }
-    }
-
-    .VideoInfoContainer {
+    
+    .VideoContentContainer {
         display: flex;
-        flex-direction: column;
-        width: #{$VideoInfoWidth}px;
-        padding: 8px;
-        background-color: #fff;
-
-        .VideoInfoRow {
+        box-shadow: 0 1px 8px rgba(0, 0, 0, .1);
+        width: calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
+        margin: 16px auto;
+    
+    
+        .VideoElement {
+            width: #{$videoWidth}px;
+            height: calc(#{$videoWidth}px / 16 * 9);
+    
+            #video-player {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    
+        .VideoInfoContainer {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-
-            a {
-                color: #069;
-                text-decoration: none;
-            }
-
-            a:hover {
-                text-decoration: underline;
-            }
-
-            .UserVideos {
-                border: 1px solid;
-                padding: 3px;
-                border-radius: 5px;
-            }
-
-            .VideoInfoIcon {
-                margin-right: 6px;
-                color: #8b888f;
-
-                &.Like {
-                    color: #e26775;
+            flex-direction: column;
+            width: #{$VideoInfoWidth}px;
+            padding: 8px;
+            background-color: #fff;
+    
+            .VideoInfoRow {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+    
+                a {
+                    color: #069;
+                    text-decoration: none;
+                }
+    
+                a:hover {
+                    text-decoration: underline;
+                }
+    
+                .UserVideos {
+                    border: 1px solid;
+                    padding: 3px;
+                    border-radius: 5px;
+                }
+    
+                .VideoInfoIcon {
+                    margin-right: 6px;
+                    color: #8b888f;
+    
+                    &.Like {
+                        color: #e26775;
+                    }
                 }
             }
         }
     }
-}
-
-.TagContainer {
-    width: calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
-    margin: 16px auto;
-    overflow: hidden;
-
-    .Tag {
-        margin-right: 16px;
-        margin-bottom: 8px;
-        border: 1px solid #e5e8ea;
-        border-radius: 12px;
-        padding: 0 10px;
-        list-style: none;
-        height: 24px;
-        line-height: 24px;
-        float: left;
-
-        .TagName {
-            color: #32475e;
-            font-weight: 600;
-            font-size: 13px;
-            text-decoration: none;
-        }
-
-        .TagName:hover {
-            text-decoration: underline;
-        }
-
-        .TagIcon {
-            margin-left: 4px;
-
-            &.NicoDic {
-                color: #b20000;
+    
+    .TagContainer {
+        width: calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
+        margin: 16px auto;
+        overflow: hidden;
+    
+        .Tag {
+            margin-right: 16px;
+            margin-bottom: 8px;
+            border: 1px solid #e5e8ea;
+            border-radius: 12px;
+            padding: 0 10px;
+            list-style: none;
+            height: 24px;
+            line-height: 24px;
+            float: left;
+    
+            .TagName {
+                color: #32475e;
+                font-weight: 600;
+                font-size: 13px;
+                text-decoration: none;
             }
-
-            &.Question {
-                color: #b2bac2;
+    
+            .TagName:hover {
+                text-decoration: underline;
+            }
+    
+            .TagIcon {
+                margin-left: 4px;
+    
+                &.NicoDic {
+                    color: #b20000;
+                }
+    
+                &.Question {
+                    color: #b2bac2;
+                }
             }
         }
     }
-}
-
-.ControlsContainer {
-    display: flex;
-    justify-content: center;
-    margin: 0 auto;
-    width:calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
+    
+    .ControlsContainer {
+        display: flex;
+        justify-content: center;
+        margin: 0 auto;
+        width:calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
+    }
 }

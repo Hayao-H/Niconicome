@@ -1,0 +1,91 @@
+﻿@page "/search";
+@using System.Threading;
+
+@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.SearchViewModel DataContext;
+
+<div class="SearchPage">
+
+    <h3>検索結果を登録する</h3>
+
+    <div class="ControlsContainer">
+        <div class="InputContainer">
+            <input @bind="DataContext.InputText.Value" />
+            <button @onclick="DataContext.OnSearchButtonClick" class="SearchIcon"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+        <select class="SearchSelectBox form-select" @bind="DataContext.SelectedSearchType">
+            <option value="" selected>検索タイプ</option>
+            @foreach (var value in DataContext.SelectableSearchType)
+            {
+                <option>@(value)</option>
+            }
+        </select>
+        <select class="SearchSelectBox form-select" @bind="DataContext.SelectedSortType">
+            <option value="" selected>並び替え</option>
+            @foreach (var value in DataContext.SelectableSortType)
+            {
+                <option>@(value)</option>
+            }
+        </select>
+        <select class="SearchSelectBox form-select" @bind="DataContext.SelectedGenre">
+            <option value="" selected>ジャンル</option>
+            @foreach (var value in DataContext.SelectableGenre)
+            {
+                <option>@(value)</option>
+            }
+        </select>
+    </div>
+
+    <div class="AlertMessageBox alert alert-danger @(DataContext.IsAlertShwon.Value? "": "Hide")" role="alert">
+        @(DataContext.AlertMessage.Value)
+    </div>
+
+    <div class="ResultHeader">
+        <h4>検索結果（@(DataContext.Videos.Count)件）</h4>
+        @if (DataContext.IsRegisterIsProcessing.Value)
+        {
+            <button class="RegisterButton btn btn-primary" disabled>登録して戻る</button>
+        } else
+        {
+            <button class="RegisterButton btn btn-primary" @onclick="DataContext.OnRegisterButtonClick">登録して戻る</button>
+        }
+    </div>
+
+    <div class="VideoList">
+        @foreach (var video in DataContext.Videos)
+        {
+            <div class="VideoListRow">
+                <div class="CheckBoxWrapper">
+                    <input type="checkbox" @bind="video.IsSelected"/>
+                </div>
+                <div class="ThumbnailWrapper">
+                    <img src="@(video.ThumbUrl)" />
+                    <span class="Duration">@(video.Duration)</span>
+                </div>
+                <div class="VideoInfoWrapper">
+                    <a href="https://nico.ms/@(video.NiconicoID)" class="VideoTitle">@(video.Title)</a>
+                    <div class="CountWrapper">
+                        <p class="CountContent"><span class="CountLabel">再生</span>@(video.ViewCount)</p>
+                        <p class="CountContent"><span class="CountLabel">コメント</span>@(video.CommentCount)</p>
+                        <p class="CountContent"><span class="CountLabel">マイリスト</span>@(video.MylistCount)</p>
+                        <p class="CountContent"><span class="CountLabel">いいね！</span>@(video.LikeCount)</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private SynchronizationContext? ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ctx = SynchronizationContext.Current;
+
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this.ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+}

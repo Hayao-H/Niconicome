@@ -18,6 +18,7 @@ using Niconicome.Models.Network.Video;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 using Niconicome.Models.Playlist.V2.Manager.StringContent;
 using Niconicome.Models.Playlist.V2.Migration;
+using Windows.Media.Ocr;
 using Remote = Niconicome.Models.Domain.Niconico.Remote.V2;
 using Utils = Niconicome.Models.Domain.Utils;
 
@@ -42,6 +43,13 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
         /// <param name="onMessage"></param>
         /// <returns></returns>
         Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoFromTextAsync(string content, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage);
+
+        /// <summary>
+        /// 動画を登録する
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <returns></returns>
+        IAttemptResult RegisterVideos(IEnumerable<Remote::VideoInfo> videos, IPlaylistInfo playlist);
 
         /// <summary>
         /// 現在のプレイリストから動画を取得
@@ -197,6 +205,29 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
 
         }
+
+        public IAttemptResult RegisterVideos(IEnumerable<Remote::VideoInfo> videos, IPlaylistInfo playlist)
+        {
+
+            foreach (var video in videos)
+            {
+                IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
+                if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
+
+                if (playlist.PlaylistType != PlaylistType.Temporary)
+                {
+                    playlist.AddVideo(vResult.Data);
+                }
+                else
+                {
+                    this._container.Videos.Add(vResult.Data);
+                }
+            }
+
+            return AttemptResult.Succeeded();
+
+        }
+
 
         public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoFromTextAsync(string content, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage)
         {
