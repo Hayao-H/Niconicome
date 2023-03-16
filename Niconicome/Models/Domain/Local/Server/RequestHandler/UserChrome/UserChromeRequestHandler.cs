@@ -44,6 +44,8 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome
         public IAttemptResult Handle(HttpListenerResponse res)
         {
 
+            res.ContentType = "text/css";
+
             IAttemptResult wResult = this.WriteToStream(res.OutputStream);
 
             if (!wResult.IsSucceeded)
@@ -53,7 +55,6 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome
             }
 
             res.StatusCode = (int)HttpStatusCode.OK;
-            res.ContentType = "text/css";
             return AttemptResult.Succeeded();
 
         }

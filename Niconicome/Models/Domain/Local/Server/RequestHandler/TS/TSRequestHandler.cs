@@ -60,7 +60,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.TS
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(TSRequestHandlerError.VideoDoesNotExist, videoFilePath));
             }
 
-
+            res.ContentType = "video/MP2T";
             IAttemptResult wResult = this.WriteToStream(res.OutputStream, videoFilePath);
 
             if (!wResult.IsSucceeded)
@@ -70,7 +70,6 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.TS
             }
 
             res.StatusCode = (int)HttpStatusCode.OK;
-            res.ContentType = "video/MP2T";
             return AttemptResult.Succeeded();
 
         }
