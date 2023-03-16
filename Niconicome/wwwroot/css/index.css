@@ -27,7 +27,7 @@
 .PageContent .ControlsContainer .InputBoxWrapper {
   display: flex;
   justify-content: space-between;
-  width: 40%;
+  width: 50%;
   height: 100%;
 }
 .PageContent .ControlsContainer .InputBoxWrapper #InputBox {
@@ -42,24 +42,18 @@
   display: inline-block;
 }
 .PageContent .ControlsContainer .InputBoxWrapper #RegisterButton {
-  width: 15;
   margin-left: 5px;
   padding: 5px 20px;
 }
 .PageContent .ControlsContainer .ButtonsWrapper {
   display: flex;
   margin-left: 8px;
+  flex: 1;
 }
 .PageContent .ControlsContainer .ButtonsWrapper > * {
   margin-left: 5px;
 }
-.PageContent .VideoList {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
 .PageContent .VideoList #VideoListHeader {
-  background-color: #f2f3f5;
   display: flex;
   justify-content: start;
   position: relative;
@@ -75,6 +69,8 @@
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+  flex-shrink: 0;
+  background-color: #f2f3f5;
 }
 .PageContent .VideoList #VideoListHeader .HeaderItem .SortIcon {
   display: none;
@@ -128,23 +124,23 @@
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #ViewCountColumn {
-  width: 125px;
+  width: 150px;
   height: 100%;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #CommentCountColumn {
-  width: 125px;
+  width: 150px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #MylistCountColumn {
-  width: 125px;
+  width: 150px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList #VideoListHeader #LikeCountColumn {
-  width: 125px;
+  width: 150px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
@@ -194,18 +190,20 @@
   display: inline;
 }
 .PageContent .VideoList .VideoListBody {
+  display: inline-block;
   border: solid 1px #e5e8ea;
   height: 400px;
-  overflow-y: scroll;
   position: relative;
+  overflow-y: auto;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow {
-  height: 100px;
   display: flex;
+  height: 100px;
   border-bottom: 1px solid #e5e8ea;
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+  width: auto;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow.DropTarget {
   border-top: 1px solid #222222;
@@ -213,16 +211,20 @@
 .PageContent .VideoList .VideoListBody .VideoListRow .CheckBoxColumn {
   display: flex;
   justify-content: center;
-  flex-direction: column;
+  align-items: center;
+  height: 100%;
   width: 50px;
   border-right: 1px solid #e5e8ea;
+  flex-shrink: 0;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn {
+  display: flex;
   position: relative;
   height: 100%;
   width: 165.3333333333px;
   border-right: 1px solid #e5e8ea;
   padding: 8px;
+  flex-shrink: 0;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .ThumbnailColumn .Thumbnail {
   width: 100%;
@@ -239,26 +241,33 @@
   background-color: rgba(34, 34, 34, 0.6901960784);
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer {
-  display: flex;
-  justify-content: flex-start;
   height: 100%;
+  display: flex;
+  flex-shrink: 0;
+}
+.PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .VideoInfoColumn {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex-shrink: 0;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn {
-  display: flex;
   position: relative;
-  justify-content: center;
-  flex-direction: column;
+  align-items: start;
   width: 700px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn:hover .VideoInfoLinkWrapper {
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .TitleColumn .VideoInfoLinkWrapper {
   display: none;
   position: absolute;
-  justify-content: center;
   align-items: center;
   width: 30px;
   height: 30px;
@@ -272,20 +281,12 @@
   background-color: rgba(0, 0, 0, 0.8);
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .UploadedDateTimeColumn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
   width: 250px;
   padding-left: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .IsDownloadedColumn {
-  display: flex;
   color: #7bd889;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
   width: 70px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
@@ -294,46 +295,26 @@
   color: #ff3300;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .ViewCountColumn {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: flex-end;
-  width: 125px;
+  width: 150px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .CommentCountColumn {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: flex-end;
-  width: 125px;
+  width: 150px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .MylistCountColumn {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: flex-end;
-  width: 125px;
+  width: 150px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .LikeCountColumn {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: flex-end;
-  width: 125px;
+  width: 150px;
   padding-right: 8px;
   border-right: 1px solid #e5e8ea;
 }
 .PageContent .VideoList .VideoListBody .VideoListRow .VideoInfoContainer .MessageColumn {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  padding-right: 8px;
   border-right: 1px solid #e5e8ea;
   width: 150px;
 }

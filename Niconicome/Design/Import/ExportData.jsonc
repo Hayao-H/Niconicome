@@ -1,0 +1,113 @@
+{
+    //動画
+    "videos": [
+        {
+            "id": 1,
+            "playlistID": 1,
+            "niconicoId": "sm9",
+            "title": "レッツゴー!陰陽師",
+            "uploadedOn": "20070309T003300.000+0900",
+            "addedAt": "20230316T070000.000+0900",
+            "viewCount": 21416860,
+            "commentCount": 5385729,
+            "mylistCount": 180060,
+            "likeCount": 20000,
+            "ownerID ": "4",
+            "ownerName": "中の",
+            "thumbUrl": "https://nicovideo.com/hoge.jpg",
+            "largeThumbUrl": "https://nicovideo.com/fuga.jpg",
+            "channelName": "",
+            "channelID": "",
+            "duration": 320,
+            "tags": [
+                1
+            ],
+            "isDeleted": false,
+            "isSelected": false,
+            "isDownloaded": true,
+            "isEconomy": false,
+            "videoFilePath": "C:\\Users\\Niconicome\\Videos\\Niconicome\\downloads\\レッツゴー!陰陽師.mp4"
+        }
+    ],
+    //タグ
+    "tags": [
+        {
+            "id": 1,
+            "name": "sm9",
+            "isNicodicExist": true
+        }
+    ],
+    //プレイリスト
+    "playlists": [
+        {
+            "id": 1,
+            "name": "プレイリスト一覧",
+            "folderPath": "",
+            "remoteParameter": "",
+            /*
+            プレイリストの種類
+                0: Local,
+                1: Mylist,
+                2: Series,
+                3: WatchLater,
+                4: UserVideos,
+                5: Channel,
+                6: Root,
+                7: Temporary,
+                8: DownloadSucceededHistory,
+                9: DownloadFailedHistory,
+                10: PlaybackHistory,
+            */
+            "playlistType": 6,
+            /*
+            ソート方法
+                0: NiconicoID,
+                1: Title,
+                2: UploadedOn,
+                3: AddedAt,
+                4: ViewCount,
+                5: CommentCount,
+                6: MylistCount,
+                7: LikeCount,
+                8: IsDownlaoded,
+                9: Custom,
+            */
+            "sortType": 0,
+            "isAscendant": false,
+            "isExpanded": false,
+            "videos": [],
+            "children": [
+                2,
+                3
+            ]
+        },
+        {
+            "id": 2,
+            "name": "VOCALOID",
+            "folderPath": "C:\\Users\\Niconicome\\Videos\\Niconicome\\VOCALOID",
+            "remoteParameter": "62690584",
+            "playlistType": 1,
+            "sortType": 0,
+            "isAscendant": false,
+            "isExpanded": false,
+            "videos": [
+                "sm15630734"
+            ],
+            "children": []
+        },
+        {
+            "id": 3,
+            "name": "その他",
+            "folderPath": "C:\\Users\\Niconicome\\Videos\\Niconicome\\downloads",
+            "remoteParameter": "",
+            "playlistType": 0,
+            "sortType": 0,
+            "isAscendant": false,
+            "isExpanded": false,
+            "videos": [
+                "9"
+            ],
+            "children": []
+        }
+    ]
+}

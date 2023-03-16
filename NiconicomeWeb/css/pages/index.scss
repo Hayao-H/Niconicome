@@ -31,7 +31,7 @@ $VideoListRowHeight: 100;
         .InputBoxWrapper {
             display: flex;
             justify-content: space-between;
-            width: 40%;
+            width: 50%;
             height: 100%;
 
             #InputBox {
@@ -47,7 +47,6 @@ $VideoListRowHeight: 100;
             }
 
             #RegisterButton {
-                width: 15;
                 margin-left: 5px;
                 padding: 5px 20px;
             }
@@ -56,6 +55,7 @@ $VideoListRowHeight: 100;
         .ButtonsWrapper {
             display: flex;
             margin-left: 8px;
+            flex: 1;
 
             >* {
                 margin-left: 5px;
@@ -64,21 +64,16 @@ $VideoListRowHeight: 100;
     }
 
     .VideoList {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-
         $HeaderHeight: 35px;
         $CheckBoxWidth: 50;
         $ThumbWidth : math.div($VideoListRowHeight - 16, 9)* 16+16;
         $TitleWidth: 700;
         $UploadedDateTimeWidth: 250;
         $IsDownloadedColumnWidth: 70;
-        $CountColumnWidth: 125;
+        $CountColumnWidth: 150;
         $MessageColumnWidth: 150;
 
         #VideoListHeader {
-            background-color: #f2f3f5;
             display: flex;
             justify-content: start;
             position: relative;
@@ -92,6 +87,8 @@ $VideoListRowHeight: 100;
                 height: $HeaderHeight;
                 line-height: $HeaderHeight;
                 user-select: none;
+                flex-shrink: 0;
+                background-color: #f2f3f5;
 
                 .SortIcon {
                     display: none;
@@ -236,16 +233,19 @@ $VideoListRowHeight: 100;
         }
 
         .VideoListBody {
+            display: inline-block;
             border: solid 1px #e5e8ea;
             height: #{$VideoListRowHeight * 4}px;
-            overflow-y: scroll;
             position: relative;
 
+            overflow-y: auto;
+
             .VideoListRow {
-                height: #{$VideoListRowHeight}px;
                 display: flex;
+                height: #{$VideoListRowHeight}px;
                 border-bottom: 1px solid #e5e8ea;
                 user-select: none;
+                width: auto;
 
                 &.DropTarget {
                     border-top: 1px solid #222222;
@@ -254,17 +254,21 @@ $VideoListRowHeight: 100;
                 .CheckBoxColumn {
                     display: flex;
                     justify-content: center;
-                    flex-direction: column;
+                    align-items: center;
+                    height: 100%;
                     width: #{$CheckBoxWidth}px;
                     border-right: 1px solid #e5e8ea;
+                    flex-shrink: 0;
                 }
 
                 .ThumbnailColumn {
+                    display: flex;
                     position: relative;
                     height: 100%;
                     width: #{$ThumbWidth}px;
                     border-right: 1px solid #e5e8ea;
                     padding: 8px;
+                    flex-shrink: 0;
 
                     .Thumbnail {
                         width: 100%;
@@ -284,15 +288,22 @@ $VideoListRowHeight: 100;
                 }
 
                 .VideoInfoContainer {
-                    display: flex;
-                    justify-content: flex-start;
                     height: 100%;
+                    display: flex;
+                    flex-shrink: 0;
+
+                    .VideoInfoColumn {
+                        display: flex;
+                        height: 100%;
+                        justify-content: center;
+                        align-items: center;
+                        flex-direction: column;
+                        flex-shrink: 0;
+                    }
 
                     .TitleColumn {
-                        display: flex;
                         position: relative;
-                        justify-content: center;
-                        flex-direction: column;
+                        align-items: start;
                         width: 700px;
                         padding-left: 8px;
                         border-right: 1px solid #e5e8ea;
@@ -300,13 +311,14 @@ $VideoListRowHeight: 100;
                         &:hover {
                             .VideoInfoLinkWrapper {
                                 display: flex;
+                                justify-content: center;
+                                align-items: center;
                             }
                         }
 
                         .VideoInfoLinkWrapper {
                             display: none;
                             position: absolute;
-                            justify-content: center;
                             align-items: center;
                             width: 30px;
                             height: 30px;
@@ -323,21 +335,13 @@ $VideoListRowHeight: 100;
                     }
 
                     .UploadedDateTimeColumn {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        flex-direction: column;
                         width: 250px;
                         padding-left: 8px;
                         border-right: 1px solid #e5e8ea;
                     }
 
                     .IsDownloadedColumn {
-                        display: flex;
                         color: #7bd889;
-                        justify-content: center;
-                        flex-direction: column;
-                        align-items: center;
                         width: #{$IsDownloadedColumnWidth}px;
                         padding-right: 8px;
                         border-right: 1px solid #e5e8ea;
@@ -348,50 +352,30 @@ $VideoListRowHeight: 100;
                     }
 
                     .ViewCountColumn {
-                        display: flex;
-                        justify-content: center;
-                        flex-direction: column;
-                        align-items: flex-end;
                         width: #{$CountColumnWidth}px;
                         padding-right: 8px;
                         border-right: 1px solid #e5e8ea;
                     }
 
                     .CommentCountColumn {
-                        display: flex;
-                        justify-content: center;
-                        flex-direction: column;
-                        align-items: flex-end;
                         width: #{$CountColumnWidth}px;
                         padding-right: 8px;
                         border-right: 1px solid #e5e8ea;
                     }
 
                     .MylistCountColumn {
-                        display: flex;
-                        justify-content: center;
-                        flex-direction: column;
-                        align-items: flex-end;
                         width: #{$CountColumnWidth}px;
                         padding-right: 8px;
                         border-right: 1px solid #e5e8ea;
                     }
 
                     .LikeCountColumn {
-                        display: flex;
-                        justify-content: center;
-                        flex-direction: column;
-                        align-items: flex-end;
                         width: #{$CountColumnWidth}px;
                         padding-right: 8px;
                         border-right: 1px solid #e5e8ea;
                     }
 
                     .MessageColumn {
-                        display: flex;
-                        justify-content: center;
-                        flex-direction: column;
-                        padding-right: 8px;
                         border-right: 1px solid #e5e8ea;
                         width: #{$MessageColumnWidth}px;
                     }

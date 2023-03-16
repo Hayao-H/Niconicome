@@ -131,17 +131,17 @@
                         <span class="Duration">@(video.Duration)</span>
                     </div>
                     <div class="VideoInfoContainer">
-                        <div class="TitleColumn">
+                        <div class="VideoInfoColumn TitleColumn">
                             <div class="VideoInfoLinkWrapper" @onclick="()=>DataContext.OnVideoDetailButtonClick(video.NiconicoId)">
                                 <i class="fa-solid fa-info"></i>
                             </div>
                             <p class="fw-bold">@(video.Title)</p>
                             <p class="text-muted ms-3">投稿者：@(video.OwnerName)</p>
                         </div>
-                        <div class="UploadedDateTimeColumn">
+                        <div class="VideoInfoColumn UploadedDateTimeColumn">
                             <p>投稿日時：@(video.UploadedOn)</p>
                         </div>
-                        <div class="IsDownloadedColumn">
+                        <div class="VideoInfoColumn IsDownloadedColumn">
                             <p class="@(video.IsDownloaded.Value ? "":"NotDownloaded")">
                                 @if (video.IsDownloaded.Value)
                                 {
@@ -153,19 +153,19 @@
                                 }
                             </p>
                         </div>
-                        <div class="ViewCountColumn">
+                        <div class="VideoInfoColumn ViewCountColumn">
                             <p>@(video.ViewCount)</p>
                         </div>
-                        <div class="CommentCountColumn">
+                        <div class="VideoInfoColumn CommentCountColumn">
                             <p>@(video.CommentCount)</p>
                         </div>
-                        <div class="MylistCountColumn">
+                        <div class="VideoInfoColumn MylistCountColumn">
                             <p>@(video.MylistCount)</p>
                         </div>
-                        <div class="LikeCountColumn">
+                        <div class="VideoInfoColumn LikeCountColumn">
                             <p>@(video.LikeCount)</p>
                         </div>
-                        <div class="MessageColumn">
+                        <div class="VideoInfoColumn MessageColumn">
                             <p>@(video.Message.Value)</p>
                         </div>
                     </div>

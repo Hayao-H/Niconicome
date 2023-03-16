@@ -5,3 +5,7 @@
 .PageContainer {
     outline: none;
 }
+
+.Content {
+    margin: 24px;
+}
