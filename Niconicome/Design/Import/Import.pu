@@ -1,0 +1,28 @@
+@startuml Import
+title Import/Export
+
+interface IAttemptResult
+interface IVideoStore
+interface IPlaylistStore
+
+interface IImportExportManager {
+    + IAttemptResult ExportData();
+    + IAttemptResult ImportData(string pathOfJson);
+}
+
+interface IExportHandler {
+    + IAttemptResult ExportData();
+}
+
+interface IImportHandler {
+    + IAttemptResult ImportData(string pathOfJson);
+}
+
+IImportExportManager *-- IExportHandler
+IImportExportManager *-- IImportHandler
+IExportHandler *-- IVideoStore
+IExportHandler *-- IPlaylistStore
+IImportHandler *-- IVideoStore
+IImportHandler *-- IPlaylistStore
+
+@enduml
