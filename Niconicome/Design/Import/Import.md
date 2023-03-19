@@ -22,6 +22,3 @@
 URL | コンテンツ
 -- | :--:
 ``/settings/import/`` | インデックス
-``/settings/import/niconicome/import`` | インポート
-``/settings/import/niconicome/export`` | エクスポート
-``/settings/import/xeno/import`` | インポート(NicomentXenoglossia)
