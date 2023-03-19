@@ -27,6 +27,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult<IVideoInfo> GetOnlySharedVideoVideo(int ID);
 
         /// <summary>
+        /// 全ての動画を取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IEnumerable<IVideoInfo>> GetAllVideos();
+
+        /// <summary>
         /// 動画を作成
         /// </summary>
         /// <param name="video"></param>

@@ -71,6 +71,34 @@ namespace Niconicome.Models.Infrastructure.Database
             return AttemptResult<ITagInfo>.Succeeded(data);
         }
 
+        public IAttemptResult<IEnumerable<ITagInfo>> GetAllTag()
+        {
+            IAttemptResult<IReadOnlyList<Tag>> result = this._database.GetAllRecords<Tag>(TableNames.Tag);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return AttemptResult<IEnumerable<ITagInfo>>.Fail(result.Message);
+            }
+
+            var tags = new List<ITagInfo>();
+            foreach (var tag in result.Data)
+            {
+                var data = new TagInfo(this)
+                {
+                    ID = tag.Id,
+                    Name = tag.Name,
+                };
+
+                data.IsAutoUpdateEnabled = false;
+                data.IsNicodicExist = tag.IsNicodicExist;
+                data.IsAutoUpdateEnabled = true;
+
+                tags.Add(data);
+            }
+
+
+            return AttemptResult<IEnumerable<ITagInfo>>.Succeeded(tags.AsReadOnly());
+        }
+
         public IAttemptResult Create(string tag)
         {
             Tag data = new Tag() { Name = tag };

@@ -89,7 +89,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             IAttemptResult specialResult = this.CreateSpecialPlaylist();
             if (!specialResult.IsSucceeded) return;
 
-            IAttemptResult<IReadOnlyList<IPlaylistInfo>> result = this._playlistStore.GetAllPlaylist();
+            IAttemptResult<IEnumerable<IPlaylistInfo>> result = this._playlistStore.GetAllPlaylist();
             if (!result.IsSucceeded || result.Data is null) return;
 
             //展開状況を管理

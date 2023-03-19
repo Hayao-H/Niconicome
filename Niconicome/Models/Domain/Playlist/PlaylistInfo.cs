@@ -303,6 +303,8 @@ namespace Niconicome.Models.Domain.Playlist
             video.IsSelected.Subscribe(this.OnSelectedChange);
             this.SetSelectedVideos();
 
+            video.PlaylistID = this.ID;
+
             this._videos.Add(video);
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }

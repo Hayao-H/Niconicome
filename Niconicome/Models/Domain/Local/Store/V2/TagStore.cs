@@ -24,6 +24,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult<ITagInfo> GetTag(int id);
 
         /// <summary>
+        /// 全てのタグを取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IEnumerable<ITagInfo>> GetAllTag();
+
+        /// <summary>
         /// タグを作成
         /// </summary>
         /// <param name="tag"></param>

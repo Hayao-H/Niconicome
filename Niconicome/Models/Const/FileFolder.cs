@@ -36,5 +36,7 @@ namespace Niconicome.Models.Const
         public static string LogFolderName = "log";
 
         public static string SettingJSONPath = @"data\settings.json";
+
+        public static string ExportFolderPath = @"data\export";
     }
 }
