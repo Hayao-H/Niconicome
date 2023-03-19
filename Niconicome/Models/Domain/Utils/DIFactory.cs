@@ -71,6 +71,7 @@ using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
 using Software = Niconicome.Models.Domain.Local.External.Software;
+using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -340,6 +341,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
             services.AddSingleton<State::Style.IVideoListWidthManager, State::Style.VideoListWidthManager>();
             services.AddTransient<PlaylistV2::Manager.ISearchManager, PlaylistV2::Manager.SearchManager>();
+            services.AddTransient<NicoImport::IExportHandler, NicoImport::ExportHandler>();
+            services.AddTransient<NicoImport::IImportHandler, NicoImport::ImportHandler>();
+            services.AddTransient<NicoImport::Converter.IExportConverter, NicoImport::Converter.ExportConverter>();
+            services.AddTransient<NicoImport::Converter.IImportConverter, NicoImport::Converter.ImportConverter>();
 
             return services.BuildServiceProvider();
         }

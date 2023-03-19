@@ -4,7 +4,7 @@
 @inject IJSRuntime JS;
 @inherits BlazorBase;
 
-<div tabindex="0" @ref="container" @onkeydown="OnKeyDown" class="PageContainer">
+<div class="PageContainer">
 	<div class="alert @(DataContext.AlertTypeClass) @(DataContext.DisplayAlertMessage? "d-block":"d-none")" role="alert">
 		@(DataContext.AlertMessage)
 	</div>

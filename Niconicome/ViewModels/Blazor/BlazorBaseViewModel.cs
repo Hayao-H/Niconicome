@@ -13,13 +13,9 @@ namespace Niconicome.ViewModels.Blazor
     {
         #region Method
 
-        public void OnKeyDown(KeyboardEventArgs e, NavigationManager navigation)
+        public void OnKeyDown(NavigationManager navigation)
         {
-            if (e.Key == "F5")
-            {
-                WS::Mainpage.BlazorPageManager.ReloadRequested(navigation.Uri);
-                navigation.NavigateTo("/");
-            }
+            WS::Mainpage.BlazorPageManager.ReloadRequested(navigation.Uri);
         }
 
         #endregion

@@ -1,8 +1,11 @@
-document.addEventListener('keydown', e => {
-    if (e.key === "F5") {
-        location.href = "/";
-    }
-});
+function initializeReloadHandler(helper) {
+    document.addEventListener('keydown', async e => {
+        if (e.key === "F5") {
+            await helper.invokeMethodAsync('OnReload');
+            location.href = "/";
+        }
+    });
+}
 
 
 function showTooltip() {

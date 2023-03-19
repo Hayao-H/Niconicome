@@ -2,6 +2,7 @@
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.IndexViewModel DataContext;
 @inject IJSRuntime JS;
 @implements IDisposable;
+@inherits BlazorBase;
 
 @using System.Threading;
 @using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages;
@@ -408,8 +409,9 @@
 
     private SynchronizationContext? _ctx;
 
-    public void Dispose()
+    public override void Dispose()
     {
+        base.Dispose();
         this.refToThis?.Dispose();
         this.refToThis = null;
         this.DataContext.Dispose();
