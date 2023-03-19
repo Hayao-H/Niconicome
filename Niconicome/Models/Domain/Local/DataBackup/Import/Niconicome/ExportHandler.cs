@@ -24,7 +24,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
 {
     public interface IExportHandler
     {
-        IAttemptResult ExportData();
+        /// <summary>
+        /// データをエクスポート
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<string> ExportData();
     }
 
     public class ExportHandler : IExportHandler
@@ -60,12 +64,12 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
 
         #region Method
 
-        public IAttemptResult ExportData()
+        public IAttemptResult<string> ExportData()
         {
             IAttemptResult<Type::Data> dResult = this.GetData();
             if (!dResult.IsSucceeded || dResult.Data is null)
             {
-                return AttemptResult.Fail(dResult.Message);
+                return AttemptResult<string>.Fail(dResult.Message);
             }
 
             string content;
@@ -77,13 +81,19 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
             catch (Exception ex)
             {
                 this._errorHandler.HandleError(ExportError.FailedToSerialize, ex);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ExportError.FailedToSerialize, ex));
+                return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(ExportError.FailedToSerialize, ex));
             }
 
             var fileName = this._stringHandler.GetContent(ExportSC.FileName, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss"));
             var path = Path.Join(AppContext.BaseDirectory, FileFolder.ExportFolderPath, fileName);
 
-            return this._fileIO.Write(path, content);
+            IAttemptResult wResult = this._fileIO.Write(path, content);
+            if (!wResult.IsSucceeded)
+            {
+                return AttemptResult<string>.Fail(wResult.Message);
+            }
+
+            return AttemptResult<string>.Succeeded(path);
         }
 
         #endregion
