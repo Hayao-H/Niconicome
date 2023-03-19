@@ -71,7 +71,6 @@ namespace Niconicome.Models.Infrastructure.Database
             return AttemptResult<ITagInfo>.Succeeded(data);
         }
 
-
         public IAttemptResult Create(string tag)
         {
             Tag data = new Tag() { Name = tag };
@@ -84,10 +83,13 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._database.Update(data);
         }
 
-
         public IAttemptResult Delete(int ID)
         {
             return this._database.Delete(TableNames.Tag, ID);
+        }
+        public IAttemptResult Clear()
+        {
+            return this._database.Clear(TableNames.Tag);
         }
 
         public bool Exist(string name)

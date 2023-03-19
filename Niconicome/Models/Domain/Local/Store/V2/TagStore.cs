@@ -38,6 +38,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult Delete(int ID);
 
         /// <summary>
+        /// 全てのデータを削除
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult Clear();
+
+        /// <summary>
         /// タグの存在有無を確認
         /// </summary>
         /// <param name="Name"></param>

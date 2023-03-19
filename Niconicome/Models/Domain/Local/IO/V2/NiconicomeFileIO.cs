@@ -26,6 +26,13 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         IAttemptResult Write(string path, string content, Encoding? encoding = null);
 
         /// <summary>
+        /// ファイルを読み込む
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        IAttemptResult<string> Read(string path);
+
+        /// <summary>
         /// ファイルを削除
         /// </summary>
         /// <param name="path"></param>

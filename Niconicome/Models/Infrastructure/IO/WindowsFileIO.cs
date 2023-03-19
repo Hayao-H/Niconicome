@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Utils;
@@ -56,11 +57,29 @@ namespace Niconicome.Models.Infrastructure.IO
             }
             catch (Exception ex)
             {
-                this._errorHandler.HandleError(WindowsFileIOError.FailedToWrite, ex);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToWrite, ex));
+                this._errorHandler.HandleError(WindowsFileIOError.FailedToWrite, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToWrite, ex, path));
             }
 
             return AttemptResult.Succeeded();
+        }
+
+        public IAttemptResult<string> Read(string path)
+        {
+            var content = string.Empty;
+
+            try
+            {
+                using var fs = new StreamReader(path);
+                content = fs.ReadToEnd();
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.FailedToRead, ex, path);
+                return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToRead, ex, path));
+            }
+
+            return AttemptResult<string>.Succeeded(content);
         }
 
         public void EnumerateFiles(string path, string searchPattern, Action<string> enumAction, bool searchSubDirectory)
@@ -97,7 +116,6 @@ namespace Niconicome.Models.Infrastructure.IO
             }
 
         }
-
 
         public bool Exists(string path)
         {
