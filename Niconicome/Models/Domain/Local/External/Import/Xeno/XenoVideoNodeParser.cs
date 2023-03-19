@@ -59,7 +59,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
         public IXenoVideoParseResult Parse(string rawContent)
         {
             var result = new XenoVideoParseResult();
-            foreach (var line in rawContent.Split(Environment.NewLine).Select((content, index) => new { content, index }).Where(l=>!l.content.IsNullOrEmpty()))
+            foreach (var line in rawContent.Split(Environment.NewLine).Select((content, index) => new { content, index }).Where(l => !l.content.IsNullOrEmpty()))
             {
                 IXenoVideoNode node;
                 try

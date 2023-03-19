@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using Niconicome.Models.Domain.Local.External.Import.Niconicome.Error;
+using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Error;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
-using Type = Niconicome.Models.Domain.Local.External.Import.Niconicome.Type;
+using Type = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Type;
 
-namespace Niconicome.Models.Domain.Local.External.Import.Niconicome.Converter
+namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter
 {
     public interface IImportConverter
     {
@@ -175,7 +175,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Niconicome.Converter
             foreach (var tag in source.Tags)
             {
                 IAttemptResult<ITagInfo> tagResult = this.ConvertToTagInfo(importSource.Tags[tag]);
-                if (tagResult.IsSucceeded && tagResult.Data is not  null)
+                if (tagResult.IsSucceeded && tagResult.Data is not null)
                 {
                     video.AddTag(tagResult.Data);
                 }

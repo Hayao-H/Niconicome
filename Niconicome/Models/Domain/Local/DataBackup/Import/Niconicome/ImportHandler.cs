@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using Niconicome.Models.Const;
-using Niconicome.Models.Domain.Local.External.Import.Niconicome.Converter;
-using Niconicome.Models.Domain.Local.External.Import.Niconicome.Error;
+using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter;
+using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Error;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
-using Type = Niconicome.Models.Domain.Local.External.Import.Niconicome.Type;
+using Type = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Type;
 
-namespace Niconicome.Models.Domain.Local.External.Import.Niconicome
+namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
 {
     public interface IImportHandler
     {
@@ -192,7 +192,8 @@ namespace Niconicome.Models.Domain.Local.External.Import.Niconicome
                     convertedP.Add(kv.Key, cResult.Data.PlaylistInfo);
                     succeededP++;
                     succeededV += cResult.Data.ImportedVideos;
-                } else
+                }
+                else
                 {
                     this._errorHandler.HandleError(ImportError.FailedToImportPlaylist, kv.Value.Name);
                 }

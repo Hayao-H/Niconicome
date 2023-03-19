@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.DataBackup;
-using Niconicome.Models.Domain.Local.External.Import.Niconicome.Error;
+using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Error;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
 using Niconicome.Models.Domain.Local.Server.Core;

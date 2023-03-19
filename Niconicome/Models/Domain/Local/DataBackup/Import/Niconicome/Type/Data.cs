@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Local.External.Import.Niconicome.Type;
 
-namespace Niconicome.Models.Domain.Local.External.Import.Niconicome.Type
+namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Type
 {
     public class Data
     {

@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework;
-using Niconicome.Models.Domain.Local.External.Import.Xeno;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using System.Linq;
 using NiconicomeTest.Stabs.Models.Domain.Local.Extarnal.Inport.Xeno;
+using Niconicome.Models.Domain.Local.External.Import.Xeno;
 
 namespace NiconicomeTest.Local.External.Inport.Xeno
 {

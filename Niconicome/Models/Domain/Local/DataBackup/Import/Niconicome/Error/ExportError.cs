@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Utils.Error;
 
-namespace Niconicome.Models.Domain.Local.External.Import.Niconicome.Error
+namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Error
 {
     public enum ExportError
     {

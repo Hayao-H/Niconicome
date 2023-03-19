@@ -1,6 +1,5 @@
 ﻿using Niconicome.Models.Domain.Local.External.Import.Xeno;
 
-
 namespace NiconicomeTest.Stabs.Models.Domain.Local.Extarnal.Inport.Xeno
 {
     class XenoVideoNodeParserStab : IXenoVideoNodeParser

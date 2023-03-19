@@ -86,7 +86,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
             }
             catch (Exception e)
             {
-                this.logger.Error("Xenoからのインポートに失敗しました。",e);
+                this.logger.Error("Xenoからのインポートに失敗しました。", e);
                 result = null;
                 return false;
             }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Playlist;
-using Type = Niconicome.Models.Domain.Local.External.Import.Niconicome.Type;
+using Type = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Type;
 
-namespace Niconicome.Models.Domain.Local.External.Import.Niconicome.Converter
+namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter
 {
     public interface IExportConverter
     {

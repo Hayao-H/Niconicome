@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Utils.StringHandler;
 
-namespace Niconicome.Models.Domain.Local.External.Import.Niconicome.StringContent
+namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.StringContent
 {
     public enum ExportSC
     {

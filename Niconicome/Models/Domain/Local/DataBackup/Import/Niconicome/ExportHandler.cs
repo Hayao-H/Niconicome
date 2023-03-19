@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
-using Niconicome.Models.Domain.Local.External.Import.Niconicome.Converter;
-using Niconicome.Models.Domain.Local.External.Import.Niconicome.Error;
-using Niconicome.Models.Domain.Local.External.Import.Niconicome.StringContent;
+using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter;
+using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Error;
+using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.StringContent;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Net.Json;
@@ -18,9 +18,9 @@ using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
 using Windows.Devices.Printers;
-using Type = Niconicome.Models.Domain.Local.External.Import.Niconicome.Type;
+using Type = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Type;
 
-namespace Niconicome.Models.Domain.Local.External.Import.Niconicome
+namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
 {
     public interface IExportHandler
     {
@@ -29,7 +29,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Niconicome
 
     public class ExportHandler : IExportHandler
     {
-        public ExportHandler(IPlaylistStore playlistStore,IVideoStore videoStore,ITagStore tagStore,INiconicomeFileIO fileIO,IExportConverter converter,IErrorHandler errorHandler,IStringHandler stringHandler)
+        public ExportHandler(IPlaylistStore playlistStore, IVideoStore videoStore, ITagStore tagStore, INiconicomeFileIO fileIO, IExportConverter converter, IErrorHandler errorHandler, IStringHandler stringHandler)
         {
             this._playlistStore = playlistStore;
             this._videoStore = videoStore;
