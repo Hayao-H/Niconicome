@@ -60,6 +60,8 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
 
         private readonly IStringHandler _stringHandler;
 
+        private readonly INiconicomeDirectoryIO _directoryIO;
+
         #endregion
 
         #region Method
@@ -85,7 +87,17 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
             }
 
             var fileName = this._stringHandler.GetContent(ExportSC.FileName, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss"));
-            var path = Path.Join(AppContext.BaseDirectory, FileFolder.ExportFolderPath, fileName);
+            var folderPath = Path.Join(AppContext.BaseDirectory, FileFolder.ExportFolderPath);
+            var path = Path.Join(folderPath, fileName);
+
+            if (!this._directoryIO.Exists(folderPath))
+            {
+                IAttemptResult dirResult = this._directoryIO.CreateDirectory(folderPath);
+                if (!dirResult.IsSucceeded)
+                {
+                    return AttemptResult<string>.Fail(dirResult.Message);
+                }
+            }
 
             IAttemptResult wResult = this._fileIO.Write(path, content);
             if (!wResult.IsSucceeded)
