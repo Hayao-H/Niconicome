@@ -33,7 +33,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
 
     public class ExportHandler : IExportHandler
     {
-        public ExportHandler(IPlaylistStore playlistStore, IVideoStore videoStore, ITagStore tagStore, INiconicomeFileIO fileIO, IExportConverter converter, IErrorHandler errorHandler, IStringHandler stringHandler)
+        public ExportHandler(IPlaylistStore playlistStore, IVideoStore videoStore, ITagStore tagStore, INiconicomeFileIO fileIO, IExportConverter converter, IErrorHandler errorHandler, IStringHandler stringHandler, INiconicomeDirectoryIO directoryIO)
         {
             this._playlistStore = playlistStore;
             this._videoStore = videoStore;
@@ -42,6 +42,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
             this._converter = converter;
             this._errorHandler = errorHandler;
             this._stringHandler = stringHandler;
+            this._directoryIO = directoryIO;
         }
 
         #region field
