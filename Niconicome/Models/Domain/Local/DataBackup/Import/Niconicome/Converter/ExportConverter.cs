@@ -69,7 +69,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter
                 },
                 IsExpanded = playlist.IsExpanded.Value,
                 Videos = playlist.Videos.Select(v => v.ID).ToList(),
-                Children = playlist.Children.Select(p => p.ID).ToList(),
+                Children = playlist.ChildrenID.ToList(),
             };
         }
 

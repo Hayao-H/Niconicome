@@ -16,7 +16,7 @@ function showTooltip() {
 
 function showToast() {
     document.querySelectorAll(".toast").forEach(elm => {
-        const toast = new bootstrap.Toast(elm, { delay: 4000 });
+        const toast = new bootstrap.Toast(elm, { delay: 4000, autohide: false });
         toast.show();
     })
 }

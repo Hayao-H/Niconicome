@@ -234,7 +234,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             {
                 //子プレイリストを取得
                 IPlaylistInfo child = this._playlists[childID];
-                current.AddChild(child);
+                current.AddChild(child, false);
 
                 //削除処理用に親のIDを追加
                 child.ParentID = current.ID;

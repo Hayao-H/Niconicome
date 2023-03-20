@@ -1,0 +1,62 @@
+.SettingPage {
+  display: flex;
+}
+.SettingPage .SideMenu {
+  width: 200px;
+}
+.SettingPage .SideMenu .MenuItem {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  border-radius: 6px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  cursor: pointer;
+}
+.SettingPage .SideMenu .MenuItem.NotImpl {
+  cursor: not-allowed;
+}
+.SettingPage .SideMenu .MenuItem .Icon {
+  margin-right: 10px;
+}
+.SettingPage .SideMenu .MenuItem:hover {
+  background-color: #dfdfe5;
+}
+.SettingPage .Body {
+  flex: 1;
+  margin-left: 8px;
+  min-height: 100%;
+}
+.SettingPage .Body .SettingContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.SettingPage .Body .SettingContent .Title {
+  font-size: 18px;
+}
+.SettingPage .Body .SettingContent .Icon {
+  margin-right: 8px;
+  color: #87ceeb;
+}
+
+.ImportPage .NiconicomeImport .InputContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 8px;
+}
+.ImportPage .NiconicomeImport .InputContainer .Label {
+  margin-left: 20px;
+  width: 240px;
+}
+.ImportPage .NiconicomeImport .InputContainer .Input {
+  margin-left: 10px;
+  outline: none;
+  border: none;
+  border-bottom: solid 2px rgba(231, 231, 231, 0.9058823529);
+  flex: 1;
+}

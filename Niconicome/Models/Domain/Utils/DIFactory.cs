@@ -72,6 +72,7 @@ using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
 using Software = Niconicome.Models.Domain.Local.External.Software;
 using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
+using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -345,6 +346,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<NicoImport::IImportHandler, NicoImport::ImportHandler>();
             services.AddTransient<NicoImport::Converter.IExportConverter, NicoImport::Converter.ExportConverter>();
             services.AddTransient<NicoImport::Converter.IImportConverter, NicoImport::Converter.ImportConverter>();
+            services.AddTransient<Restore::Import.Niconicome.IImportExportManager, Restore::Import.Niconicome.ImportExportManager>();
+            services.AddTransient<SettingsVM::ImportViewModel>();
 
             return services.BuildServiceProvider();
         }

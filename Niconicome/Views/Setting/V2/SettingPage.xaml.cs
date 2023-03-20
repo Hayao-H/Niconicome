@@ -12,17 +12,27 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Niconicome.Models.Domain.Utils;
+using Niconicome.ViewModels;
+using Niconicome.ViewModels.Setting.V2;
 
-namespace Niconicome.Views.SettingPage
+namespace Niconicome.Views.Setting.V2
 {
     /// <summary>
     /// SettingPage.xaml の相互作用ロジック
     /// </summary>
-    public partial class SettingPage : UserControl
+    [ViewModel(typeof(SettingPageViewModel))]
+    public partial class SettingPage : UserControl, IDisposable
     {
         public SettingPage()
         {
             InitializeComponent();
+            Resources.Add("services", DIFactory.Provider);
+        }
+
+        public void Dispose()
+        {
+            this.webview.DisposeAsync();
         }
     }
 }

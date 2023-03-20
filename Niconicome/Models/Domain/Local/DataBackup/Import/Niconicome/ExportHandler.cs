@@ -147,6 +147,10 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
             var videos = new List<Type::Video>();
             foreach (var v in vResult.Data)
             {
+                if (v.PlaylistID == 0)
+                {
+                    continue;
+                }
                 videos.Add(this._converter.ConvertVideo(v));
             }
 

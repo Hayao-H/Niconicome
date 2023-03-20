@@ -1,0 +1,71 @@
+﻿@page "/settings/import/";
+
+@using Niconicome.Views.Setting.V2.Shared;
+@inherits BlazorBase;
+
+@inject IJSRuntime JS;
+@inject VM::Setting.V2.Page.ImportViewModel DataContext;
+
+<div class="SettingPage ImportPage">
+    <div class="SideMenu">
+        <SideMenu />
+    </div>
+    <div class="Body">
+
+        <div class="Alert alert @(DataContext.AlertTypeClass.Value) @(DataContext.AlertVisibilityClass.Value)" role="alert">
+            @(DataContext.AlertContent.Value)
+        </div>
+
+        <h3>インポート・エクスポート</h3>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-file-export"></i>データのエクスポート</p>
+            @if (DataContext.IsProcessing.Value)
+            {
+                <button class="btn btn-primary" disabled>実行</button>
+            }
+            else
+            {
+                <button class="btn btn-primary" @onclick="DataContext.OnExportButtonClickASync">実行</button>
+            }
+        </div>
+
+        <div class="NiconicomeImport">
+            <div class="SettingContent">
+                <p class="Title"><i class="Icon fa-solid fa-file-import"></i>データのインポート</p>
+                @if (DataContext.IsProcessing.Value)
+                {
+                    <button class="btn btn-primary" disabled>実行</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary" @onclick="DataContext.OnImportButtonClickAsync">実行</button>
+                }
+            </div>
+            <div class="InputContainer">
+                <p class="Label">インポートするファイルのパス</p>
+                <input class="Input" @bind="DataContext.ImpottPathInput.Value" />
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private SynchronizationContext? ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ctx = SynchronizationContext.Current;
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this.ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

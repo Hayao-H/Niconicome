@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -143,9 +144,12 @@ namespace Niconicome.Models.Domain.Playlist
 
     public class PlaylistInfo : UpdatableInfoBase<IPlaylistStore, IPlaylistInfo>, IPlaylistInfo
     {
-        public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore) : base(playlistStore)
+        public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore, IEnumerable<int> childrenID) : base(playlistStore)
         {
             this.Children = new ReadOnlyObservableCollection<IPlaylistInfo>(this._children);
+
+            this._childrenID = new List<int>(childrenID);
+            this.ChildrenID = this._childrenID.AsReadOnly();
 
             this.Name = new BindableProperty<string>(name);
             this.Name.RegisterPropertyChangeHandler(_ =>
@@ -180,6 +184,8 @@ namespace Niconicome.Models.Domain.Playlist
         private readonly ObservableCollection<IPlaylistInfo> _children = new();
 
         private readonly List<IVideoInfo> _videos = new();
+
+        private readonly List<int> _childrenID;
 
         private List<string> _parentNames = new();
 
@@ -286,6 +292,10 @@ namespace Niconicome.Models.Domain.Playlist
         public IAttemptResult AddChild(IPlaylistInfo playlistInfo, bool commit = true)
         {
             this._children.Add(playlistInfo);
+            if (commit && !this._childrenID.Contains(playlistInfo.ID))
+            {
+                this._childrenID.Add(playlistInfo.ID);
+            }
 
             return commit && this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
@@ -293,6 +303,10 @@ namespace Niconicome.Models.Domain.Playlist
         public IAttemptResult RemoveChild(IPlaylistInfo playlistInfo)
         {
             this._children.Remove(playlistInfo);
+            if (this._childrenID.Contains(playlistInfo.ID))
+            {
+                this._childrenID.Remove(playlistInfo.ID);
+            }
 
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
@@ -400,8 +414,6 @@ namespace Niconicome.Models.Domain.Playlist
 
             this._videos.Clear();
             this._videos.AddRange(sortedList);
-
-            this.Update(this);
         }
 
         private void OnSelectedChange(bool value)

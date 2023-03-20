@@ -364,7 +364,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._channnelName = value;
-                this.Update(this);
+                if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
 
@@ -374,7 +374,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._channnelID = value;
-                this.Update(this);
+                if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
 

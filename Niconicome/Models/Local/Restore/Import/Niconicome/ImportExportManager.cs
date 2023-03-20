@@ -14,14 +14,14 @@ namespace Niconicome.Models.Local.Restore.Import.Niconicome
         /// データをエクスポート
         /// </summary>
         /// <returns></returns>
-        IAttemptResult ExportData();
+        Task<IAttemptResult<string>> ExportDataAsync();
 
         /// <summary>
         /// データをインポート
         /// </summary>
         /// <param name="pathOfJson"></param>
         /// <returns></returns>
-        IAttemptResult<ImportResult> ImportData(string path);
+        Task<IAttemptResult<ImportResult>> ImportDataAsync(string path);
     }
 
     public class ImportExportManager : IImportExportManager
@@ -42,14 +42,14 @@ namespace Niconicome.Models.Local.Restore.Import.Niconicome
 
         #region Method
 
-        public IAttemptResult ExportData()
+        public async Task<IAttemptResult<string>> ExportDataAsync()
         {
-            return this._exportHandler.ExportData();
+            return await Task.Run(() => this._exportHandler.ExportData());
         }
 
-        public IAttemptResult<ImportResult> ImportData(string path)
+        public async Task<IAttemptResult<ImportResult>> ImportDataAsync(string path)
         {
-            return this._importHandler.ImportData(path);
+            return await Task.Run(() => this._importHandler.ImportData(path));
         }
 
         #endregion

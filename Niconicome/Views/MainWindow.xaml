@@ -63,6 +63,7 @@
                             <Button Content="{materialDesign:PackIcon Kind=Cog}" ToolTip="設定" Command="{Binding OpenSettingCommand}"/>
                             <Button Content="{materialDesign:PackIcon Kind=Puzzle}" ToolTip="アドオン管理" Command="{Binding OpenAddonManagerCommand}"/>
                             <Button Content="{materialDesign:PackIcon Kind=Download}" ToolTip="ダウンロード一覧" Command="{Binding OpenDownloadTaskWindowsCommand}"/>
+                            <Button Content="{materialDesign:PackIcon Kind=Import}" ToolTip="インポート" Command="{Binding OpenSettingV2Command}"/>
                         </ToolBar>
                     </ToolBarTray>
                     <Grid Grid.Row="1">

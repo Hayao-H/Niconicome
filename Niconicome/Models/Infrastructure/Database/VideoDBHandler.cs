@@ -69,7 +69,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsDownloaded.Value = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
             video.AddedAt = data.AddedAt;
-            video.PlaylistID = data.PlaylistID;
+            video.PlaylistID = playlistID;
 
             video.IsAutoUpdateEnabled = true;
 
@@ -261,7 +261,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
         private Video ConvertToVideo(IVideoInfo video)
         {
-            return new Video()
+            var converted = new Video()
             {
                 Id = video.ID,
                 SharedVideoID = video.SharedID,
@@ -272,6 +272,8 @@ namespace Niconicome.Models.Infrastructure.Database
                 VideoFilePath = video.FilePath,
                 AddedAt = video.AddedAt,
             };
+
+            return converted;
         }
 
         private IVideoInfo ConvertToVideoInfo(SharedVideo sharedData, int videoID = DefaultVideoID)

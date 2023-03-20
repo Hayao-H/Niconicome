@@ -110,6 +110,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter
             //登録されている動画
             foreach (var video in data.Videos)
             {
+                if (!source.Videos.ContainsKey(video))
+                {
+                    continue;
+                }
+
                 IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(source.Videos[video], playlist.ID, source);
                 if (vResult.IsSucceeded && vResult.Data is not null)
                 {

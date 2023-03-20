@@ -206,10 +206,9 @@ namespace Niconicome.Models.Infrastructure.Database
                 videos.Add(vResult.Data);
             }
 
-            var info = new PlaylistInfo(playlist.Name, videos, this)
+            var info = new PlaylistInfo(playlist.Name, videos, this, playlist.Children)
             {
                 ID = playlist.Id,
-                ChildrenID = playlist.Children.AsReadOnly(),
             };
 
             info.IsAutoUpdateEnabled = false;
