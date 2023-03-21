@@ -141,6 +141,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
             var playlists = new List<Type::Playlist>();
             foreach (var p in pResult.Data)
             {
+                if (!this.CheckWhetherExportablePlaylist(p))
+                {
+                    continue;
+                }
+
                 playlists.Add(this._converter.ConvertPlaylist(p));
             }
 
@@ -168,6 +173,36 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
             };
 
             return AttemptResult<Type::Data>.Succeeded(data);
+        }
+
+        /// <summary>
+        /// 特殊プレイリストはroot以外エクスポートしない
+        /// </summary>
+        /// <param name="playlist"></param>
+        /// <returns></returns>
+        private bool CheckWhetherExportablePlaylist(IPlaylistInfo playlist)
+        {
+            if (playlist.PlaylistType == PlaylistType.Temporary)
+            {
+                return false;
+            }
+
+            if (playlist.PlaylistType == PlaylistType.DownloadFailedHistory)
+            {
+                return false;
+            }
+
+            if (playlist.PlaylistType == PlaylistType.DownloadSucceededHistory)
+            {
+                return false;
+            }
+
+            if (playlist.PlaylistType == PlaylistType.PlaybackHistory)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         #endregion
