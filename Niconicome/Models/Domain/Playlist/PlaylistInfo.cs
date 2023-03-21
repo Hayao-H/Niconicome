@@ -144,12 +144,9 @@ namespace Niconicome.Models.Domain.Playlist
 
     public class PlaylistInfo : UpdatableInfoBase<IPlaylistStore, IPlaylistInfo>, IPlaylistInfo
     {
-        public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore, IEnumerable<int> childrenID) : base(playlistStore)
+        public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore) : base(playlistStore)
         {
             this.Children = new ReadOnlyObservableCollection<IPlaylistInfo>(this._children);
-
-            this._childrenID = new List<int>(childrenID);
-            this.ChildrenID = this._childrenID.AsReadOnly();
 
             this.Name = new BindableProperty<string>(name);
             this.Name.RegisterPropertyChangeHandler(_ =>
@@ -184,8 +181,6 @@ namespace Niconicome.Models.Domain.Playlist
         private readonly ObservableCollection<IPlaylistInfo> _children = new();
 
         private readonly List<IVideoInfo> _videos = new();
-
-        private readonly List<int> _childrenID;
 
         private List<string> _parentNames = new();
 
@@ -292,10 +287,6 @@ namespace Niconicome.Models.Domain.Playlist
         public IAttemptResult AddChild(IPlaylistInfo playlistInfo, bool commit = true)
         {
             this._children.Add(playlistInfo);
-            if (commit && !this._childrenID.Contains(playlistInfo.ID))
-            {
-                this._childrenID.Add(playlistInfo.ID);
-            }
 
             return commit && this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
@@ -303,10 +294,6 @@ namespace Niconicome.Models.Domain.Playlist
         public IAttemptResult RemoveChild(IPlaylistInfo playlistInfo)
         {
             this._children.Remove(playlistInfo);
-            if (this._childrenID.Contains(playlistInfo.ID))
-            {
-                this._childrenID.Remove(playlistInfo.ID);
-            }
 
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
