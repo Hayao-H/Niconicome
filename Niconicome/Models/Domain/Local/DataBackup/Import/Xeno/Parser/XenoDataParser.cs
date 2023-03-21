@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using Niconicome.Extensions.System.Collections.Generic;
 using Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Error;
-using Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.StringContent;
 using Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Type;
 using Niconicome.Models.Domain.Local.IO.V2;
-using Niconicome.Models.Domain.Niconico.Net.Xml;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
@@ -29,11 +24,10 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
 
     public class XenoDataParser : IXenoDataParser
     {
-        public XenoDataParser(INiconicomeFileIO fileIO,IErrorHandler errorHandler,IStringHandler stringHandler)
+        public XenoDataParser(INiconicomeFileIO fileIO, IErrorHandler errorHandler)
         {
             this._fileIO = fileIO;
             this._errorHandler = errorHandler;
-            this._stringHandler = stringHandler;
         }
 
         #region field
@@ -41,8 +35,6 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
         private readonly INiconicomeFileIO _fileIO;
 
         private readonly IErrorHandler _errorHandler;
-
-        private readonly IStringHandler _stringHandler;
 
         #endregion
         public IAttemptResult<IEnumerable<IXenoPlaylist>> ParseData(string rootPath)
@@ -54,13 +46,13 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
             }
 
             IAttemptResult<string> readResult = this._fileIO.Read(rootPath);
-            if (!readResult.IsSucceeded||readResult.Data is null)
+            if (!readResult.IsSucceeded || readResult.Data is null)
             {
                 return AttemptResult<IEnumerable<IXenoPlaylist>>.Fail(readResult.Message);
             }
 
             IAttemptResult<IEnumerable<XenoRootNode>> rootResult = this.ParseRoot(readResult.Data);
-            if (!rootResult.IsSucceeded||rootResult.Data is null)
+            if (!rootResult.IsSucceeded || rootResult.Data is null)
             {
                 return AttemptResult<IEnumerable<IXenoPlaylist>>.Fail(rootResult.Message);
             }
@@ -92,7 +84,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
 
                 IXenoPlaylist playlist;
 
-                if (Regex.IsMatch(node.PlaylistInfo, @"https?://ch.nicovideo.jp/.+"))
+                if (Regex.IsMatch(node.PlaylistInfo, @"https?://ch\.nicovideo\.jp/.+"))
                 {
                     playlist = new XenoPlaylist(node.Title, node.FolderPath, this.GetChannelID(node.PlaylistInfo));
                 }
@@ -108,20 +100,18 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
                     parents.Clear();
                     parents.Add(1, playlist);
                 }
-
-                if (node.Layer == prevLayer)
+                else if (node.Layer == prevLayer)
                 {
                     parents[node.Layer - 1].Children.Add(playlist.ID);
+                    parents.AddOrSet(node.Layer,playlist);
                 }
-
-                if (node.Layer == prevLayer + 1)
+                else if (node.Layer == prevLayer + 1)
                 {
                     parents[prevLayer].Children.Add(playlist.ID);
                     parents.AddOrSet(node.Layer, playlist);
                     prevLayer = node.Layer;
                 }
-
-                if (node.Layer < prevLayer)
+                else if (node.Layer < prevLayer)
                 {
                     parents[node.Layer - 1].Children.Add(playlist.ID);
                 }
@@ -134,6 +124,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
                 }
 
                 if (string.IsNullOrEmpty(node.PlaylistInfo))
+                {
+                    continue;
+                }
+
+                if (!node.PlaylistInfo.EndsWith(".txt"))
                 {
                     continue;
                 }
@@ -218,6 +213,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
 
             foreach (var line in readResult.Data.Split(Environment.NewLine))
             {
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
                 string[] splitted = line.Split('\t');
 
                 if (splitted.Length < 5)
@@ -255,6 +255,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
 
             foreach (var line in content.Split(Environment.NewLine))
             {
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
                 string[] splitted = line.Split("\t");
 
                 if (splitted.Length < 4)
