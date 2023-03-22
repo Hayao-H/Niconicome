@@ -14,7 +14,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.StringContent
         XenoPlaylistName,
         [StringEnum("データを解析中")]
         ParsingData,
-        [StringEnum("処理中：「({0})」")]
+        [StringEnum("処理中：「{0}」")]
         ProcessingPlaylist,
         [StringEnum("プレイリストの親子関係を構築中...")]
         ResolveChildren,
