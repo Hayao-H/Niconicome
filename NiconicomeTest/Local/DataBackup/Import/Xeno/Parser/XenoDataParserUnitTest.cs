@@ -67,7 +67,8 @@ namespace NiconicomeTest.Local.DataBackup.Import.Xeno.Parser
             Assert.That(aba, Is.Not.Null);
             Assert.That(b, Is.Not.Null);
 
-            Assert.That(root!.Children.Count, Is.EqualTo(2));
+            Assert.That(root!.IsRoot, Is.True);
+            Assert.That(root.Children.Count, Is.EqualTo(2));
             Assert.That(root.Children.Contains(a!.ID), Is.True);
             Assert.That(root.Children.Contains(b!.ID), Is.True);
 
