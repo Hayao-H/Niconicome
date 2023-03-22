@@ -6,6 +6,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.DataBackup;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Niconico.Net.Xml;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Utils.Reactive;
@@ -73,6 +74,12 @@ namespace Niconicome.Models.Local.Restore
         IAttemptResult Initialize();
 
         /// <summary>
+        /// 使用されていない動画等を削除
+        /// </summary>
+        /// <returns></returns>
+        Task<IAttemptResult> CleanDataAsync();
+
+        /// <summary>
         /// バックアップデータ
         /// </summary>
         ReadOnlyObservableCollection<IBackupData> Backups { get; }
@@ -96,7 +103,7 @@ namespace Niconicome.Models.Local.Restore
     public class RestoreManager : IRestoreManager
     {
 
-        public RestoreManager(IBackupManager backuphandler, IVideoFileStore fileStore, ISettingsContainer settingsContainer, IPlaylistStore playlistStore, IVideoStore videoStore, Error::IErrorHandler errorHandler, IPlaylistManager playlistManager)
+        public RestoreManager(IBackupManager backuphandler, IVideoFileStore fileStore, ISettingsContainer settingsContainer, IPlaylistStore playlistStore, IVideoStore videoStore, Error::IErrorHandler errorHandler, IPlaylistManager playlistManager, IStoreCleaner storeCleaner)
         {
             this._backuphandler = backuphandler;
             this._fileStore = fileStore;
@@ -105,6 +112,7 @@ namespace Niconicome.Models.Local.Restore
             this._videoStore = videoStore;
             this._errorHandler = errorHandler;
             this._playlistManager = playlistManager;
+            this._storeCleaner = storeCleaner;
             this.Backups = new ReadOnlyObservableCollection<IBackupData>(this._backups);
             this.VideoFileDirectories = new ReadOnlyObservableCollection<string>(this._videoFileDirectories);
         }
@@ -121,6 +129,8 @@ namespace Niconicome.Models.Local.Restore
         private readonly IVideoStore _videoStore;
 
         private readonly IPlaylistManager _playlistManager;
+
+        private readonly IStoreCleaner _storeCleaner;
 
         private readonly Error::IErrorHandler _errorHandler;
 
@@ -326,6 +336,18 @@ namespace Niconicome.Models.Local.Restore
 
             return AttemptResult.Succeeded();
         }
+
+        public async Task<IAttemptResult> CleanDataAsync()
+        {
+            IAttemptResult pResult = await Task.Run(() => this._storeCleaner.CleanPlaylists());
+            if (pResult.IsSucceeded)
+            {
+                return pResult;
+            }
+
+            return await Task.Run(() => this._storeCleaner.CleanVideos());
+        }
+
 
         #endregion
 

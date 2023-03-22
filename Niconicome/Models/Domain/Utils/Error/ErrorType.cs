@@ -75,6 +75,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 36, typeof(ImportError) },
             { 37, typeof(XenoDataParserError) },
             { 38, typeof(XenoImportHandlerError) },
+            { 39, typeof(DBCleanerError) },
         };
     }
 }

@@ -352,6 +352,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<XenoImport::Parser.IXenoDataParser, XenoImport::Parser.XenoDataParser>();
             services.AddTransient<XenoImport::IXenoImportHandler, XenoImport::XenoImportHandler>();
             services.AddTransient<Restore::Import.Xeno.IXenoImportManager, Restore::Import.Xeno.XenoImportManager>();
+            services.AddTransient<Store::V2.IStoreCleaner, DB::DBCleaner>();
 
             return services.BuildServiceProvider();
         }
