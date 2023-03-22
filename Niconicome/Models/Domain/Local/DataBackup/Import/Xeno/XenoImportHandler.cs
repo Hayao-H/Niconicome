@@ -27,7 +27,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno
 
     public class XenoImportHandler : IXenoImportHandler
     {
-        public XenoImportHandler(IXenoDataParser parser,IVideoStore videoStore,IPlaylistStore playlistStore,IStringHandler stringHandler,IErrorHandler errorHandler)
+        public XenoImportHandler(IXenoDataParser parser, IVideoStore videoStore, IPlaylistStore playlistStore, IStringHandler stringHandler, IErrorHandler errorHandler)
         {
             this._parser = parser;
             this._videoStore = videoStore;
@@ -143,24 +143,32 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno
                 IPlaylistInfo data = pResult.Data;
 
                 //動画
-                foreach (var video in playlist.Videos)
+                if (playlist.IsChannel)
                 {
-                    IAttemptResult vcResult = this._videoStore.Create(video.NiconicoID, data.ID);
-                    if (!vcResult.IsSucceeded)
+                    data.PlaylistType = PlaylistType.Channel;
+                    data.RemoteParameter = playlist.ChannelID;
+                }
+                else
+                {
+                    foreach (var video in playlist.Videos)
                     {
-                        this._errorHandler.HandleError(Err.FailedToImportVideo, playlist.Name, video.NiconicoID);
-                        continue;
-                    }
+                        IAttemptResult vcResult = this._videoStore.Create(video.NiconicoID, data.ID);
+                        if (!vcResult.IsSucceeded)
+                        {
+                            this._errorHandler.HandleError(Err.FailedToImportVideo, playlist.Name, video.NiconicoID);
+                            continue;
+                        }
 
-                    IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(video.NiconicoID, data.ID);
-                    if (!vResult.IsSucceeded || vResult.Data is null)
-                    {
-                        this._errorHandler.HandleError(Err.FailedToImportVideo, playlist.Name, video.NiconicoID);
-                        continue;
-                    }
+                        IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(video.NiconicoID, data.ID);
+                        if (!vResult.IsSucceeded || vResult.Data is null)
+                        {
+                            this._errorHandler.HandleError(Err.FailedToImportVideo, playlist.Name, video.NiconicoID);
+                            continue;
+                        }
 
-                    data.AddVideo(vResult.Data);
-                    importedVideos++;
+                        data.AddVideo(vResult.Data);
+                        importedVideos++;
+                    }
                 }
 
                 if (playlist.IsRoot)
