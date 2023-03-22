@@ -48,6 +48,27 @@
             </div>
         </div>
 
+        <div class="XenoImport">
+            <div class="SettingContent">
+                <p class="Title"><i class="Icon fa-solid fa-file-import"></i>NicomentXenoglossiaからのインポート</p>
+                @if (DataContext.IsProcessing.Value)
+                {
+                    <button class="btn btn-primary" disabled>実行</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary" @onclick="DataContext.OnXenoImportButtonClickAsync">実行</button>
+                }
+            </div>
+            <div class="InputContainer">
+                <p class="Label">「固定URL.txt」のパス</p>
+                <input class="Input" @bind="DataContext.XenoRootFilePathInput.Value" />
+            </div>
+            <div class="MessageContainer">
+                <p class="Message">@(DataContext.XenoMessage.Value)</p>
+            </div>
+        </div>
+
     </div>
 </div>
 

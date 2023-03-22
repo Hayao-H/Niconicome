@@ -43,20 +43,31 @@
   color: #87ceeb;
 }
 
-.ImportPage .NiconicomeImport .InputContainer {
+.ImportPage .NiconicomeImport .InputContainer,
+.ImportPage .XenoImport .InputContainer {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   margin-top: 8px;
 }
-.ImportPage .NiconicomeImport .InputContainer .Label {
+.ImportPage .NiconicomeImport .InputContainer .Label,
+.ImportPage .XenoImport .InputContainer .Label {
   margin-left: 20px;
   width: 240px;
 }
-.ImportPage .NiconicomeImport .InputContainer .Input {
+.ImportPage .NiconicomeImport .InputContainer .Input,
+.ImportPage .XenoImport .InputContainer .Input {
   margin-left: 10px;
   outline: none;
   border: none;
   border-bottom: solid 2px rgba(231, 231, 231, 0.9058823529);
   flex: 1;
+}
+.ImportPage .XenoImport .MessageContainer {
+  margin-top: 20px;
+  margin-left: 20px;
+  border: 1px rgba(231, 231, 231, 0.9058823529) solid;
+}
+.ImportPage .XenoImport .MessageContainer .Message {
+  padding: 8px;
 }

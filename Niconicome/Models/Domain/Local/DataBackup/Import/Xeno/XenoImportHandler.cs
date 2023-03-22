@@ -12,6 +12,8 @@ using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
 using SC = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.StringContent.XenoImportHandlerStringContent;
 using Err = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Error.XenoImportHandlerError;
+using System.IO;
+
 namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno
 {
     public interface IXenoImportHandler
@@ -70,7 +72,9 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno
                 return AttemptResult<IXenoImportResult>.Fail(rootResult.Message);
             }
 
-            return this.SaveDataToStore(rootResult.Data, parseResult.Data, onMessage);
+            string folderPath = Path.GetDirectoryName(path) ?? string.Empty;
+
+            return this.SaveDataToStore(rootResult.Data, parseResult.Data, onMessage, folderPath);
         }
 
 
@@ -114,7 +118,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno
         /// <param name="playlists"></param>
         /// <param name="onMessage"></param>
         /// <returns></returns>
-        private IAttemptResult<IXenoImportResult> SaveDataToStore(IPlaylistInfo root, IEnumerable<IXenoPlaylist> playlists, Action<string> onMessage)
+        private IAttemptResult<IXenoImportResult> SaveDataToStore(IPlaylistInfo root, IEnumerable<IXenoPlaylist> playlists, Action<string> onMessage, string rootFolderPath)
         {
             var converted = new Dictionary<string, IPlaylistInfo>();
             var source = playlists.ToDictionary(p => p.ID);
@@ -142,6 +146,8 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno
 
                 IPlaylistInfo data = pResult.Data;
 
+                data.IsAutoUpdateEnabled = false;
+
                 //動画
                 if (playlist.IsChannel)
                 {
@@ -166,10 +172,16 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno
                             continue;
                         }
 
+                        vResult.Data.Title = video.Title;
                         data.AddVideo(vResult.Data);
                         importedVideos++;
                     }
                 }
+
+                data.IsAutoUpdateEnabled = true;
+
+                //フォルダーパス
+                data.FolderPath = this.GetFolderPath(playlist.FolderPath, rootFolderPath);
 
                 if (playlist.IsRoot)
                 {
@@ -197,6 +209,16 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno
             onMessage(this._stringHandler.GetContent(SC.ImportCompleted));
 
             return AttemptResult<IXenoImportResult>.Succeeded(new XenoImportResult(importedVideos, converted.Count));
+        }
+
+        private string GetFolderPath(string path, string rootFolderPath)
+        {
+            if (Path.IsPathRooted(path))
+            {
+                return path;
+            }
+
+            return Path.Join(rootFolderPath, path);
         }
 
         #endregion

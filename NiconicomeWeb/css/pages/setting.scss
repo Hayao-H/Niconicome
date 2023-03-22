@@ -53,7 +53,8 @@
 
 .ImportPage {
 
-    .NiconicomeImport {
+    .NiconicomeImport,
+    .XenoImport {
         .InputContainer {
 
             display: flex;
@@ -69,9 +70,21 @@
             .Input {
                 margin-left: 10px;
                 outline: none;
-                border: none;                
+                border: none;
                 border-bottom: solid 2px #e7e7e7e7;
                 flex: 1;
+            }
+        }
+    }
+
+    .XenoImport {
+        .MessageContainer {
+            margin-top: 20px;
+            margin-left: 20px;
+            border: 1px #e7e7e7e7 solid;
+
+            .Message {
+                padding: 8px;
             }
         }
     }

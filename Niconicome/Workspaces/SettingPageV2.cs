@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Local.Restore.Import.Niconicome;
+using Niconicome.Models.Local.Restore.Import.Xeno;
 using Niconicome.Models.Local.State.MessageV2;
 
 namespace Niconicome.Workspaces
@@ -26,5 +27,10 @@ namespace Niconicome.Workspaces
         /// インポート・エクスポート
         /// </summary>
         public static IImportExportManager ImportExportManager { get; private set; } = DIFactory.Resolve<IImportExportManager>();
+
+        /// <summary>
+        /// Xenoからのインポート
+        /// </summary>
+        public static IXenoImportManager XenoImportManager { get; private set; } = DIFactory.Resolve<IXenoImportManager>();
     }
 }
