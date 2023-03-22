@@ -86,11 +86,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
 
                 if (Regex.IsMatch(node.PlaylistInfo, @"https?://ch\.nicovideo\.jp/.+"))
                 {
-                    playlist = new XenoPlaylist(node.Title, node.FolderPath, this.GetChannelID(node.PlaylistInfo));
+                    playlist = new XenoPlaylist(node.Title, node.FolderPath, node.Layer, this.GetChannelID(node.PlaylistInfo));
                 }
                 else
                 {
-                    playlist = new XenoPlaylist(node.Title, node.FolderPath);
+                    playlist = new XenoPlaylist(node.Title, node.FolderPath, node.Layer);
                 }
                 data.Add(playlist);
 
@@ -103,7 +103,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Parser
                 else if (node.Layer == prevLayer)
                 {
                     parents[node.Layer - 1].Children.Add(playlist.ID);
-                    parents.AddOrSet(node.Layer,playlist);
+                    parents.AddOrSet(node.Layer, playlist);
                 }
                 else if (node.Layer == prevLayer + 1)
                 {

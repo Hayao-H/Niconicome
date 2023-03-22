@@ -24,6 +24,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Type
         bool IsChannel { get; }
 
         /// <summary>
+        /// ルートフラグ
+        /// </summary>
+        bool IsRoot { get; }
+
+        /// <summary>
         /// チャンネルID
         /// </summary>
         string ChannelID { get; }
@@ -47,10 +52,11 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Type
 
     public class XenoPlaylist : IXenoPlaylist
     {
-        public XenoPlaylist(string name, string folderPath, string? channelID = null)
+        public XenoPlaylist(string name, string folderPath, int layer, string? channelID = null)
         {
             this.Name = name;
             this.FolderPath = folderPath;
+            this.IsRoot = layer == 1;
 
             if (channelID is not null)
             {
@@ -68,6 +74,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Type
 
         public string FolderPath { get; init; }
 
+        public bool IsRoot { get; init; }
 
         public bool IsChannel { get; init; }
 
