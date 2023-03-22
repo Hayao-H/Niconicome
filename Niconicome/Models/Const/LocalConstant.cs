@@ -18,6 +18,8 @@ namespace Niconicome.Models.Const
 
         public static string DefaultPlaylistName = "新しいプレイリスト";
 
+        public static string RootPlaylistName = "プレイリスト一覧";
+
         public static string BottomTabRegionName = "BottomTabResion";
 
         public static string TopTabRegionName = "TopTabRegion";
@@ -34,6 +36,7 @@ namespace Niconicome.Models.Const
 
         public const string VideoListV2TabID = "8E112E95-9B7A-4F0A-98FA-A63E42BC8850";
 
+        public const string SettingTabID = "C3C14FDE-B307-4805-BA69-8095E992B75E";
 
     }
 }

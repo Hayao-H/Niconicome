@@ -1,0 +1,13 @@
+p {
+    margin-bottom: 0 !important;
+}
+
+.Content {
+    margin: 24px;
+}
+
+.Alert {
+    &.Hide {
+        display: none;
+    }
+}

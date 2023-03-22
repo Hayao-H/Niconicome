@@ -61,7 +61,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
             Video data = result.Data;
 
-            var video = this.ConvertToVideoInfo(sharedData, data.Id, playlistID);
+            var video = this.ConvertToVideoInfo(sharedData, data.Id);
 
             video.IsAutoUpdateEnabled = false;
 
@@ -69,6 +69,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsDownloaded.Value = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
             video.AddedAt = data.AddedAt;
+            video.PlaylistID = playlistID;
 
             video.IsAutoUpdateEnabled = true;
 
@@ -91,6 +92,49 @@ namespace Niconicome.Models.Infrastructure.Database
             var video = this.ConvertToVideoInfo(sharedData);
 
             return AttemptResult<IVideoInfo>.Succeeded(video);
+        }
+
+        public IAttemptResult<IEnumerable<IVideoInfo>> GetAllVideos()
+        {
+            IAttemptResult<IReadOnlyList<Video>> vResult = this._database.GetAllRecords<Video>(TableNames.Video);
+            if (!vResult.IsSucceeded || vResult.Data is null)
+            {
+                return AttemptResult<IEnumerable<IVideoInfo>>.Fail(vResult.Message);
+            }
+
+            IAttemptResult<IReadOnlyList<SharedVideo>> svResult = this._database.GetAllRecords<SharedVideo>(TableNames.SharedVideo);
+            if (!svResult.IsSucceeded || svResult.Data is null)
+            {
+                return AttemptResult<IEnumerable<IVideoInfo>>.Fail(svResult.Message);
+            }
+
+            Dictionary<int, SharedVideo> shared = svResult.Data.ToDictionary(v => v.Id);
+
+            var videos = new List<IVideoInfo>();
+
+            foreach (var data in vResult.Data)
+            {
+                if (!shared.ContainsKey(data.SharedVideoID))
+                {
+                    continue;
+                }
+
+                var video = this.ConvertToVideoInfo(shared[data.SharedVideoID], data.Id);
+
+                video.IsAutoUpdateEnabled = false;
+
+                video.IsSelected.Value = data.IsSelected;
+                video.IsDownloaded.Value = data.IsDownloaded;
+                video.IsEconomy = data.IsEconomy;
+                video.AddedAt = data.AddedAt;
+                video.PlaylistID = data.PlaylistID;
+
+                video.IsAutoUpdateEnabled = true;
+
+                videos.Add(video);
+            }
+
+            return AttemptResult<IEnumerable<IVideoInfo>>.Succeeded(videos.AsReadOnly());
         }
 
         public IAttemptResult<int> Create(string niconicoID)
@@ -138,7 +182,6 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._database.Update(data);
 
         }
-
 
         public IAttemptResult Delete(int ID, int playlistID)
         {
@@ -218,7 +261,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
         private Video ConvertToVideo(IVideoInfo video)
         {
-            return new Video()
+            var converted = new Video()
             {
                 Id = video.ID,
                 SharedVideoID = video.SharedID,
@@ -229,9 +272,11 @@ namespace Niconicome.Models.Infrastructure.Database
                 VideoFilePath = video.FilePath,
                 AddedAt = video.AddedAt,
             };
+
+            return converted;
         }
 
-        private IVideoInfo ConvertToVideoInfo(SharedVideo sharedData, int videoID = DefaultVideoID, int playlistID = DefaultPlaylistID)
+        private IVideoInfo ConvertToVideoInfo(SharedVideo sharedData, int videoID = DefaultVideoID)
         {
             var tags = new List<ITagInfo>();
 
@@ -247,7 +292,6 @@ namespace Niconicome.Models.Infrastructure.Database
             {
                 SharedID = sharedData.Id,
                 ID = videoID,
-                PlaylistID = playlistID,
             };
 
             video.IsAutoUpdateEnabled = false;

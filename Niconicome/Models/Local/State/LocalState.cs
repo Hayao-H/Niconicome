@@ -32,6 +32,11 @@ namespace Niconicome.Models.Local.State
         /// ダウンロードタスク一覧
         /// </summary>
         bool IsTaskWindowOpen { get; set; }
+
+        /// <summary>
+        /// 設定タブ
+        /// </summary>
+        bool IsSettingTabOpen { get; set; }
     }
 
     public class LocalState : ILocalState
@@ -70,6 +75,8 @@ namespace Niconicome.Models.Local.State
         public bool IsAddonManagerOpen { get; set; }
 
         public bool IsTaskWindowOpen { get; set; }
+
+        public bool IsSettingTabOpen { get; set; }
 
         #endregion
     }

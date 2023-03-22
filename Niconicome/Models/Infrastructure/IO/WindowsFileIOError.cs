@@ -21,6 +21,8 @@ namespace Niconicome.Models.Infrastructure.IO
         FailedToParseVerticalResoltion,
         [ErrorEnum(ErrorLevel.Error,"ファイルへの書き込みに失敗しました。(path:{0})")]
         FailedToWrite,
+        [ErrorEnum(ErrorLevel.Error, "ファイルへの読み込みに失敗しました。(path:{0})")]
+        FailedToRead,
         [ErrorEnum(ErrorLevel.Error, "ファイル検索中にエラーが発生しました。(path:{0})")]
         ErrorWhenEnumerateVideoFiles,
         [ErrorEnum(ErrorLevel.Error,"ファイルの削除に失敗しました。(path:{0})")]

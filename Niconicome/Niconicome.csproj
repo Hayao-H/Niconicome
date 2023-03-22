@@ -17,6 +17,7 @@
 		<PackageIcon>icon.png</PackageIcon>
 		<ApplicationIcon>app.ico</ApplicationIcon>
 		<MinimumPlatformVersion>7.0</MinimumPlatformVersion>
+		<DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

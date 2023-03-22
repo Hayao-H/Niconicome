@@ -1,8 +1,11 @@
-document.addEventListener('keydown', e => {
-    if (e.key === "F5") {
-        location.href = "/";
-    }
-});
+function initializeReloadHandler(helper) {
+    document.addEventListener('keydown', async e => {
+        if (e.key === "F5") {
+            await helper.invokeMethodAsync('OnReload');
+            location.href = "/";
+        }
+    });
+}
 
 
 function showTooltip() {
@@ -13,7 +16,7 @@ function showTooltip() {
 
 function showToast() {
     document.querySelectorAll(".toast").forEach(elm => {
-        const toast = new bootstrap.Toast(elm, { delay: 4000 });
+        const toast = new bootstrap.Toast(elm, { delay: 4000, autohide: false });
         toast.show();
     })
 }

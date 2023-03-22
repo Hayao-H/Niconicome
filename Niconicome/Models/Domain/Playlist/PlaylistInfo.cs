@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -143,9 +144,10 @@ namespace Niconicome.Models.Domain.Playlist
 
     public class PlaylistInfo : UpdatableInfoBase<IPlaylistStore, IPlaylistInfo>, IPlaylistInfo
     {
-        public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore) : base(playlistStore)
+        public PlaylistInfo(string name, List<IVideoInfo> videos, IPlaylistStore playlistStore, IEnumerable<int> childrenID) : base(playlistStore)
         {
             this.Children = new ReadOnlyObservableCollection<IPlaylistInfo>(this._children);
+            this._childrenID = new List<int>(childrenID);
 
             this.Name = new BindableProperty<string>(name);
             this.Name.RegisterPropertyChangeHandler(_ =>
@@ -182,6 +184,8 @@ namespace Niconicome.Models.Domain.Playlist
         private readonly List<IVideoInfo> _videos = new();
 
         private List<string> _parentNames = new();
+
+        private readonly List<int> _childrenID;
 
         private string _folderPath = string.Empty;
 
@@ -273,7 +277,10 @@ namespace Niconicome.Models.Domain.Playlist
 
         public ReadOnlyObservableCollection<IPlaylistInfo> Children { get; init; }
 
-        public IReadOnlyList<int> ChildrenID { get; init; } = (new List<int>()).AsReadOnly();
+        public IReadOnlyList<int> ChildrenID
+        {
+            get => this._childrenID.AsReadOnly();
+        }
 
         public IReadOnlyList<IVideoInfo> Videos { get; init; }
 
@@ -285,7 +292,14 @@ namespace Niconicome.Models.Domain.Playlist
 
         public IAttemptResult AddChild(IPlaylistInfo playlistInfo, bool commit = true)
         {
-            this._children.Add(playlistInfo);
+            if (!this.ChildrenID.Contains(playlistInfo.ID) && this.ChildrenID.Count > 0 && this._children.Count == 0)
+            {
+                this._childrenID.Add(playlistInfo.ID);
+            }
+            else
+            {
+                this._children.Add(playlistInfo);
+            }
 
             return commit && this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
@@ -302,6 +316,8 @@ namespace Niconicome.Models.Domain.Playlist
             this._videosCount.Value++;
             video.IsSelected.Subscribe(this.OnSelectedChange);
             this.SetSelectedVideos();
+
+            video.PlaylistID = this.ID;
 
             this._videos.Add(video);
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
@@ -398,8 +414,6 @@ namespace Niconicome.Models.Domain.Playlist
 
             this._videos.Clear();
             this._videos.AddRange(sortedList);
-
-            this.Update(this);
         }
 
         private void OnSelectedChange(bool value)

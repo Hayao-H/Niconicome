@@ -23,7 +23,7 @@ namespace Niconicome.Models.Domain.Playlist
         /// <summary>
         /// プレイリストのID
         /// </summary>
-        int PlaylistID { get; }
+        int PlaylistID { get; set; }
 
         /// <summary>
         /// 動画ID
@@ -177,6 +177,8 @@ namespace Niconicome.Models.Domain.Playlist
 
         private DateTime _registeredAt;
 
+        private int _playlistID;
+
         private int _viewCount;
 
         private int _commentCount;
@@ -215,7 +217,18 @@ namespace Niconicome.Models.Domain.Playlist
 
         public int ID { get; init; }
 
-        public int PlaylistID { get; init; }
+        public int PlaylistID
+        {
+            get => this._playlistID;
+            set
+            {
+                this._playlistID = value;
+                if (this.IsAutoUpdateEnabled)
+                {
+                    this.Update(this);
+                }
+            }
+        }
 
         public string NiconicoId { get; init; }
 
@@ -351,7 +364,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._channnelName = value;
-                this.Update(this);
+                if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
 
@@ -361,7 +374,7 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._channnelID = value;
-                this.Update(this);
+                if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
 

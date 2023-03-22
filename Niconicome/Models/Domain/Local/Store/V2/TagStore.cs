@@ -24,6 +24,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult<ITagInfo> GetTag(int id);
 
         /// <summary>
+        /// 全てのタグを取得
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult<IEnumerable<ITagInfo>> GetAllTag();
+
+        /// <summary>
         /// タグを作成
         /// </summary>
         /// <param name="tag"></param>
@@ -36,6 +42,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <param name="ID"></param>
         /// <returns></returns>
         IAttemptResult Delete(int ID);
+
+        /// <summary>
+        /// 全てのデータを削除
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult Clear();
 
         /// <summary>
         /// タグの存在有無を確認

@@ -70,6 +70,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.Video
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoRequestHandlerError.VideoIsNotDownloaded, id.PlaylistID, id.NiconicoID));
             }
 
+            res.ContentType = "video/mp4";
             IAttemptResult wResult = this.WriteToStream(res.OutputStream, video.FilePath);
 
             if (!wResult.IsSucceeded)
@@ -79,7 +80,6 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.Video
             }
 
             res.StatusCode = (int)HttpStatusCode.OK;
-            res.ContentType = "video/mp4";
             return AttemptResult.Succeeded();
 
         }

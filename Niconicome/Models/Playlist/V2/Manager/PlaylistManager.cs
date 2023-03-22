@@ -89,7 +89,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             IAttemptResult specialResult = this.CreateSpecialPlaylist();
             if (!specialResult.IsSucceeded) return;
 
-            IAttemptResult<IReadOnlyList<IPlaylistInfo>> result = this._playlistStore.GetAllPlaylist();
+            IAttemptResult<IEnumerable<IPlaylistInfo>> result = this._playlistStore.GetAllPlaylist();
             if (!result.IsSucceeded || result.Data is null) return;
 
             //展開状況を管理
@@ -234,7 +234,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             {
                 //子プレイリストを取得
                 IPlaylistInfo child = this._playlists[childID];
-                current.AddChild(child);
+                current.AddChild(child, false);
 
                 //削除処理用に親のIDを追加
                 child.ParentID = current.ID;

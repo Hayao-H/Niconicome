@@ -1,0 +1,91 @@
+.SettingPage {
+    display: flex;
+
+    .SideMenu {
+        width: 200px;
+
+        .MenuItem {
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            border-radius: 6px;
+            user-select: none;
+            cursor: pointer;
+
+            &.NotImpl {
+                cursor: not-allowed;
+            }
+
+            .Icon {
+                margin-right: 10px;
+            }
+        }
+
+        .MenuItem:hover {
+            background-color: #dfdfe5;
+        }
+    }
+
+    .Body {
+        flex: 1;
+        margin-left: 8px;
+        min-height: 100%;
+
+        .SettingContent {
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+
+            .Title {
+                font-size: 18px;
+            }
+
+            .Icon {
+                margin-right: 8px;
+                color: #87ceeb;
+            }
+        }
+    }
+}
+
+.ImportPage {
+
+    .NiconicomeImport,
+    .XenoImport {
+        .InputContainer {
+
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 8px;
+
+            .Label {
+                margin-left: 20px;
+                width: 240px;
+            }
+
+            .Input {
+                margin-left: 10px;
+                outline: none;
+                border: none;
+                border-bottom: solid 2px #e7e7e7e7;
+                flex: 1;
+            }
+        }
+    }
+
+    .XenoImport {
+        .MessageContainer {
+            margin-top: 20px;
+            margin-left: 20px;
+            border: 1px #e7e7e7e7 solid;
+
+            .Message {
+                padding: 8px;
+            }
+        }
+    }
+}

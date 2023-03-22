@@ -33,6 +33,8 @@ using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
 using Tree = Niconicome.Views.Mainpage.Region.PlaylistTree;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Utils.Reactive.Command;
+using Niconicome.Models.Utils.Reactive;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -137,6 +139,12 @@ namespace Niconicome.ViewModels.Mainpage
                     WS::Mainpage.WindowTabHelper.OpenAddonManager(this.RegionManager);
                 });
 
+            this.OpenSettingV2Command = new BindableCommand(() =>
+            {
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/import/", BlazorWindows.Settings);
+                WS::Mainpage.WindowTabHelper.OpenSettingsTab(this.RegionManager);
+            }, new BindableProperty<bool>(true));
+
 
             #region UI系の設定
 
@@ -209,6 +217,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// 再起動
         /// </summary>
         public ReactiveCommand Restart { get; init; }
+
+        /// <summary>
+        /// 設定を開く
+        /// </summary>
+        public BindableCommand OpenSettingV2Command { get; init; }
 
         #endregion
 

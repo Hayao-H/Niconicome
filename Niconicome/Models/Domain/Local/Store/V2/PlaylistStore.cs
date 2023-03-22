@@ -14,7 +14,7 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// 全てのプレイリストを取得
         /// </summary>
         /// <returns></returns>
-        IAttemptResult<IReadOnlyList<IPlaylistInfo>> GetAllPlaylist();
+        IAttemptResult<IEnumerable<IPlaylistInfo>> GetAllPlaylist();
 
         /// <summary>
         /// 指定したIDのプレイリストを取得する

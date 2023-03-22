@@ -47,6 +47,8 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(M3U8RequestHandlerError.PlaylistDoesNotExist));
             }
 
+            res.ContentType = "application/x-mpegURL";
+
             IAttemptResult wResult = this.WriteToStream(res.OutputStream);
 
             if (!wResult.IsSucceeded)
@@ -56,7 +58,6 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8
             }
 
             res.StatusCode = (int)HttpStatusCode.OK;
-            res.ContentType = "application/x-mpegURL";
             return AttemptResult.Succeeded();
 
         }

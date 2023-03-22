@@ -68,11 +68,11 @@ namespace Niconicome.Models.Infrastructure.Database
         }
 
 
-        public IAttemptResult<IReadOnlyList<IPlaylistInfo>> GetAllPlaylist()
+        public IAttemptResult<IEnumerable<IPlaylistInfo>> GetAllPlaylist()
         {
 
             IAttemptResult<IReadOnlyList<Types::Playlist>> dbResult = this._database.GetAllRecords<Types::Playlist>(TableNames.Playlist);
-            if (!dbResult.IsSucceeded || dbResult.Data is null) return AttemptResult<IReadOnlyList<IPlaylistInfo>>.Fail(dbResult.Message);
+            if (!dbResult.IsSucceeded || dbResult.Data is null) return AttemptResult<IEnumerable<IPlaylistInfo>>.Fail(dbResult.Message);
 
             var infos = new List<IPlaylistInfo>();
 
@@ -83,7 +83,7 @@ namespace Niconicome.Models.Infrastructure.Database
                 infos.Add(pResult.Data);
             }
 
-            return AttemptResult<IReadOnlyList<IPlaylistInfo>>.Succeeded(infos.AsReadOnly());
+            return AttemptResult<IEnumerable<IPlaylistInfo>>.Succeeded(infos.AsReadOnly());
         }
 
 
@@ -206,10 +206,9 @@ namespace Niconicome.Models.Infrastructure.Database
                 videos.Add(vResult.Data);
             }
 
-            var info = new PlaylistInfo(playlist.Name, videos, this)
+            var info = new PlaylistInfo(playlist.Name, videos, this,playlist.Children)
             {
                 ID = playlist.Id,
-                ChildrenID = playlist.Children.AsReadOnly(),
             };
 
             info.IsAutoUpdateEnabled = false;

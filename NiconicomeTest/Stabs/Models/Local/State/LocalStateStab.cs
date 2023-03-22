@@ -20,5 +20,8 @@ namespace NiconicomeTest.Stabs.Models.Local.State
         public bool IsAddonManagerOpen { get; set; }
 
         public bool IsTaskWindowOpen { get; set; }
+
+        public bool IsSettingTabOpen { get; set; }
+
     }
 }

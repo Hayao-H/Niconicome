@@ -1,7 +1,11 @@
-﻿p {
-    margin-bottom: 0 !important;
+p {
+  margin-bottom: 0 !important;
 }
 
-.PageContainer {
-    outline: none;
+.Content {
+  margin: 24px;
+}
+
+.Alert.Hide {
+  display: none;
 }

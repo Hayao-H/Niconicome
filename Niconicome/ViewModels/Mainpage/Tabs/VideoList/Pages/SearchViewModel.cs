@@ -156,6 +156,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             WS.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
         }
 
+        public void OnBackButtonClick()
+        {
+            WS.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+        }
+
         #endregion
 
         #region private
@@ -234,10 +239,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             var s = $"{video.Duration % 60}".PadLeft(2, '0');
 
             this.Duration = $"{m}:{s}";
-            this.ViewCount = video.ViewCount;
-            this.CommentCount = video.CommentCount;
-            this.MylistCount = video.MylistCount;
-            this.LikeCount = video.LikeCount;
+            this.ViewCount = video.ViewCount.ToString("#,0");
+            this.CommentCount = video.CommentCount.ToString("#,0");
+            this.MylistCount = video.MylistCount.ToString("#,0");
+            this.LikeCount = video.LikeCount.ToString("#,0");
 
             this.Video = video;
         }
@@ -252,13 +257,13 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public string Duration { get; init; }
 
-        public int ViewCount { get; init; }
+        public string ViewCount { get; init; }
 
-        public int CommentCount { get; init; }
+        public string CommentCount { get; init; }
 
-        public int MylistCount { get; init; }
+        public string MylistCount { get; init; }
 
-        public int LikeCount { get; init; }
+        public string LikeCount { get; init; }
 
         public bool IsSelected { get; set; } = true;
 
