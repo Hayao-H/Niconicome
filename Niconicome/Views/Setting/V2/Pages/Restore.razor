@@ -20,131 +20,159 @@
             <h3>回復</h3>
         </div>
 
-        <div class="SettingContent">
-            <p class="Title"><i class="Icon fa-solid fa-database"></i>バックアップ</p>
-        </div>
+        <div class="ContentWrapper">
+            <div class="SettingContent">
+                <p class="Title"><i class="Icon fa-solid fa-database"></i>バックアップ</p>
+            </div>
 
-        <div class="BackupSettingsContainer">
-            <div class="BackupList">
-                <div class="BackupListHeader">
-                    <span class="ItemColumn HeaderColumn Selected">&nbsp;</span>
-                    <span class="ItemColumn HeaderColumn Name">名前</span>
-                    <span class="ItemColumn HeaderColumn CreatedOn">作成日時</span>
-                    <span class="ItemColumn HeaderColumn Size">サイズ</span>
+            <div class="BackupSettingsContainer">
+                <div class="BackupList">
+                    <div class="BackupListHeader">
+                        <span class="ItemColumn HeaderColumn Selected">&nbsp;</span>
+                        <span class="ItemColumn HeaderColumn Name">名前</span>
+                        <span class="ItemColumn HeaderColumn CreatedOn">作成日時</span>
+                        <span class="ItemColumn HeaderColumn Size">サイズ</span>
+                    </div>
+                    <div class="BackupListBody">
+                        @foreach (var backup in DataContext.Backups)
+                        {
+                            <div class="BackupListRow">
+                                <span class="ItemColumn Selected"><input type="checkbox" @bind="backup.IsChecked.Value" /></span>
+                                <span class="ItemColumn Name">@(backup.Name)</span>
+                                <span class="ItemColumn CreatedOn">@(backup.CreatedOn)</span>
+                                <span class="ItemColumn Size">@(backup.FileSize)</span>
+                            </div>
+                        }
+                    </div>
                 </div>
-                <div class="BackupListBody">
-                    @foreach (var backup in DataContext.Backups)
+                <div class="BackupControlsContainer">
+                    <span class="Label">名前</span>
+                    <input class="Input" @bind="DataContext.BackupNameInput.Value" />
+                    @if (DataContext.IsProcessing.Value)
                     {
-                        <div class="BackupListRow">
-                            <span class="ItemColumn Selected"><input type="checkbox" @bind="backup.IsChecked.Value" /></span>
-                            <span class="ItemColumn Name">@(backup.Name)</span>
-                            <span class="ItemColumn CreatedOn">@(backup.CreatedOn)</span>
-                            <span class="ItemColumn Size">@(backup.FileSize)</span>
-                        </div>
+                        <button class="Button btn btn-primary" disabled>追加</button>
+                        <button class="Button btn btn-primary" disabled>適用</button>
+                        <button class="Button btn btn-primary" disabled>削除</button>
+                    }
+                    else
+                    {
+                        <button class="Button btn btn-primary" @onclick="DataContext.OnAddBackupButtonClick">追加</button>
+                        <button class="Button btn btn-primary" @onclick="DataContext.OnApplyBackupButtonClickAsync">適用</button>
+                        <button class="Button btn btn-primary" @onclick="DataContext.OnDeleteBackupButtonClick">削除</button>
                     }
                 </div>
             </div>
-            <div class="BackupControlsContainer">
-                <span class="Label">名前</span>
-                <input class="Input" @bind="DataContext.BackupNameInput.Value" />
-                @if (DataContext.IsProcessing.Value)
-                {
-                    <button class="Button btn btn-primary" disabled>追加</button>
-                    <button class="Button btn btn-primary" disabled>適用</button>
-                    <button class="Button btn btn-primary" disabled>削除</button>
-                }
-                else
-                {
-                    <button class="Button btn btn-primary" @onclick="DataContext.OnAddBackupButtonClick">追加</button>
-                    <button class="Button btn btn-primary" @onclick="DataContext.OnApplyBackupButtonClickAsync">適用</button>
-                    <button class="Button btn btn-primary" @onclick="DataContext.OnDeleteBackupButtonClick">削除</button>
-                }
+
+            <hr class="Separator" />
+
+            <div class="SettingContent">
+                <p class="Title"><i class="Icon fa-solid fa-file-video"></i>動画を探索するディレクトリ</p>
             </div>
-        </div>
 
-        <div class="SettingContent">
-            <p class="Title"><i class="Icon fa-solid fa-file-video"></i>動画を探索するディレクトリ</p>
-        </div>
-
-        <div class="DirectorySettingsContainer">
-            <div class="DirectoryList">
-                <div class="DirectoryListHeader">
-                    <span class="ItemColumn HeaderColumn Selected">&nbsp;</span>
-                    <span class="ItemColumn HeaderColumn Path">パス</span>
+            <div class="DirectorySettingsContainer">
+                <div class="DirectoryList">
+                    <div class="DirectoryListHeader">
+                        <span class="ItemColumn HeaderColumn Selected">&nbsp;</span>
+                        <span class="ItemColumn HeaderColumn Path">パス</span>
+                    </div>
+                    <div class="DirectoryListBody">
+                        @foreach (var backup in DataContext.VideoDirectories)
+                        {
+                            <div class="DirectoryListRow">
+                                <span class="ItemColumn Selected"><input type="checkbox" @bind="backup.IsChecked.Value" /></span>
+                                <span class="ItemColumn Path">@(backup.Path)</span>
+                            </div>
+                        }
+                    </div>
                 </div>
-                <div class="DirectoryListBody">
-                    @foreach (var backup in DataContext.VideoDirectories)
+                <div class="DirectoryControlsContainer">
+                    <span class="Label">パス</span>
+                    <input class="Input" @bind="DataContext.VideoDirectoryPathInput.Value" />
+                    @if (DataContext.IsVideoDirProcessing.Value)
                     {
-                        <div class="DirectoryListRow">
-                            <span class="ItemColumn Selected"><input type="checkbox" @bind="backup.IsChecked.Value" /></span>
-                            <span class="ItemColumn Path">@(backup.Path)</span>
-                        </div>
+                        <button class="Button btn btn-primary" disabled>追加</button>
+                        <button class="Button btn btn-primary" disabled>動画の読み込み</button>
+                    }
+                    else
+                    {
+                        <button class="Button btn btn-primary" @onclick="DataContext.OnAddVideoDirectoryButtonClickAsync">追加</button>
+                        <button class="Button btn btn-primary" @onclick="DataContext.OnLoadVideosButtonClickedASync">動画の読み込み</button>
                     }
                 </div>
+                <div class="LoadVideoDescription accordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#LoadVideoDetail">
+                                動画の読み込みについて
+                            </button>
+                        </h2>
+                        <div id="LoadVideoDetail" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                本機能は探索ディレクトリ以下に存在する保存済のファイルを探索します。<br />
+                                既にファイルを保存していて、かつフォルダー名を変更した際などに有用です。<br />
+                                ※ディスクへのアクセスを行うため、実行には時間がかかります。
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="DirectoryControlsContainer">
-                <span class="Label">パス</span>
-                <input class="Input" @bind="DataContext.VideoDirectoryPathInput.Value" />
-                @if (DataContext.IsVideoDirProcessing.Value)
+
+            <hr class="Separator" />
+
+            <div class="SettingContent">
+                <p class="Title"><i class="Icon fa-solid fa-broom"></i>データの整理を行う</p>
+                @if (DataContext.IsDataCleaningProcessing.Value)
                 {
-                    <button class="Button btn btn-primary" disabled>追加</button>
-                    <button class="Button btn btn-primary" disabled>動画の読み込み</button>
+                    <button class="btn btn-primary" disabled>実行</button>
                 }
                 else
                 {
-                    <button class="Button btn btn-primary" @onclick="DataContext.OnAddVideoDirectoryButtonClickAsync">追加</button>
-                    <button class="Button btn btn-primary" @onclick="DataContext.OnLoadVideosButtonClickedASync">動画の読み込み</button>
+                    <button class="btn btn-primary" @onclick="DataContext.OnCleanDataButtonClickedAsync">実行</button>
                 }
             </div>
-            <div class="LoadVideoDescription accordion">
+
+            <div class="DataCleaningDescription accordion">
                 <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOne">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#LoadVideoDetail">
-                            動画の読み込みについて
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#DataCleaningDetail">
+                            データの整理について
                         </button>
                     </h2>
-                    <div id="LoadVideoDetail" class="accordion-collapse collapse">
+                    <div id="DataCleaningDetail" class="accordion-collapse collapse">
                         <div class="accordion-body">
-                            本機能は探索ディレクトリ以下に存在する保存済のファイルを探索します。<br />
-                            既にファイルを保存していて、かつフォルダー名を変更した際などに有用です。<br />
-                            ※ディスクへのアクセスを行うため、実行には時間がかかります。
+                            本機能はデータベースに存在する以下のような不要データを削除します。データのエクスポート前に実行することをお勧めします。
+                            <ul>
+                                <li>どのプレイリストからも参照されていない動画</li>
+                                <li>ルートプレイリストから辿ることが出来ない孤立したプレイリスト</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="SettingContent">
-            <p class="Title"><i class="Icon fa-solid fa-broom"></i>データの整理を行う</p>
-            @if (DataContext.IsDataCleaningProcessing.Value)
-            {
-                <button class="btn btn-primary" disabled>実行</button>
-            }
-            else
-            {
-                <button class="btn btn-primary" @onclick="DataContext.OnCleanDataButtonClickedAsync">実行</button>
-            }
-        </div>
+            <hr class="Separator" />
 
-        <div class="DataCleaningDescription accordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#DataCleaningDetail">
-                        データの整理について
-                    </button>
-                </h2>
-                <div id="DataCleaningDetail" class="accordion-collapse collapse">
-                    <div class="accordion-body">
-                        本機能はデータベースに存在する以下のような不要データを削除します。データのエクスポート前に実行することをお勧めします。
-                        <ul>
-                            <li>どのプレイリストからも参照されていない動画</li>
-                            <li>ルートプレイリストから辿ることが出来ない孤立したプレイリスト</li>
-                        </ul>
-                    </div>
+            <div class="DangerZoneContainer">
+                <div class="SettingContent M0">
+                    <p class="Title"><i class="Icon Danger fa-solid fa-circle-exclamation"></i>危険地帯</p>
                 </div>
+
+                <div class="DangerZoneBody">
+
+                    <div class="SettingContent">
+                        <p class="Title"><i class="Icon Danger fa-solid fa-eraser"></i>データを全て削除する</p>
+                        <button class="btn btn-danger" @onclick="DataContext.OnResetDataButtonClick">実行</button>
+                    </div>
+
+                    <div class="SettingContent">
+                        <p class="Title"><i class="Icon Danger fa-solid fa-eraser"></i>設定を全て削除する</p>
+                        <button class="btn btn-danger" @onclick="DataContext.OnResetSettingButtonClick">実行</button>
+                    </div>
+
+                </div>
+
             </div>
         </div>
-
     </div>
 </div>
 

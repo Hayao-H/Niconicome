@@ -22,7 +22,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.Bindables.Add(this._alertBindables);
             this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
             this.ImpottPathInput = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
-            this.XenoMessage = new BindableProperty<string>("テスト").AddTo(this.Bindables);
+            this.XenoMessage = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
             this.XenoRootFilePathInput = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
         }
 
@@ -69,11 +69,12 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.IsProcessing.Value = true;
 
             IAttemptResult<ImportResult> result = await WS.ImportExportManager.ImportDataAsync(this.ImpottPathInput.Value);
-            if (!result.IsSucceeded||result.Data is null)
+            if (!result.IsSucceeded || result.Data is null)
             {
-                this.ShowAlert(WS.StringHandler.GetContent(ImportVMSC.ImportFailed),AlertType.Error);
+                this.ShowAlert(WS.StringHandler.GetContent(ImportVMSC.ImportFailed), AlertType.Error);
                 WS.MessageHandler.AppendMessage(WS.StringHandler.GetContent(ImportVMSC.ImportFailedDetail, result.Message), LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
-            } else
+            }
+            else
             {
                 string message = WS.StringHandler.GetContent(ImportVMSC.ImportSucceeded, result.Data.ImportSucceededPlaylistsCount, result.Data.ImpotySucceededVideosCount);
                 this.ShowAlert(message, AlertType.Info);
@@ -101,11 +102,12 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.IsProcessing.Value = true;
 
             IAttemptResult<IXenoImportResult> result = await WS.XenoImportManager.ImportDataAsync(this.XenoRootFilePathInput.Value, m => this.XenoMessage.Value = m);
-            if (!result.IsSucceeded||result.Data is null)
+            if (!result.IsSucceeded || result.Data is null)
             {
                 this.ShowAlert(WS.StringHandler.GetContent(ImportVMSC.ImportFailed), AlertType.Error);
                 WS.MessageHandler.AppendMessage(WS.StringHandler.GetContent(ImportVMSC.ImportFailedDetail, result.Message), LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
-            } else
+            }
+            else
             {
                 string message = WS.StringHandler.GetContent(ImportVMSC.ImportSucceeded, result.Data.SucceededPlaylistsCount, result.Data.SucceededVideosCount);
                 this.ShowAlert(message, AlertType.Info);

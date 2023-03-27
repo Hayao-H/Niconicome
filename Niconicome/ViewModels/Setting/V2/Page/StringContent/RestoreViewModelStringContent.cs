@@ -43,5 +43,13 @@ namespace Niconicome.ViewModels.Setting.V2.Page.StringContent
         DataCleaningFailed,
         [StringEnum("データの整理に成功しました。")]
         DataCleaningSucceeded,
+        [StringEnum("データの削除に成功しました。")]
+        DataResetSucceeded,
+        [StringEnum("データの削除に失敗しました。")]
+        DataResetFailed,
+        [StringEnum("設定の削除に成功しました。")]
+        SettingResetSucceeded,
+        [StringEnum("設定の削除に失敗しました。")]
+        SettingResetFailed,
     }
 }

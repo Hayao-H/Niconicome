@@ -6,6 +6,12 @@ p {
   margin: 24px;
 }
 
+.Alert {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  left: 8px;
+}
 .Alert.Hide {
   display: none;
 }

@@ -278,6 +278,44 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             }
         }
 
+        public void OnResetDataButtonClick()
+        {
+            IAttemptResult result = WS.RestoreManager.DeleteAllVideosAndPlaylists();
+            if (result.IsSucceeded)
+            {
+                string message = WS.StringHandler.GetContent(SC.DataResetSucceeded);
+                WS.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher);
+                this.ShowAlert(message, AlertType.Info);
+            }
+            else
+            {
+                string message = WS.StringHandler.GetContent(SC.DataResetFailed);
+                string detail = WS.StringHandler.GetContent(SC.DetailInfo, result.Message);
+                this.ShowAlert(message, AlertType.Error);
+                WS.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+                WS.MessageHandler.AppendMessage(detail, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+            }
+        }
+
+        public void OnResetSettingButtonClick()
+        {
+            IAttemptResult result = WS.RestoreManager.ResetSettings();
+            if (result.IsSucceeded)
+            {
+                string message = WS.StringHandler.GetContent(SC.SettingResetSucceeded);
+                WS.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher);
+                this.ShowAlert(message, AlertType.Info);
+            }
+            else
+            {
+                string message = WS.StringHandler.GetContent(SC.SettingResetFailed);
+                string detail = WS.StringHandler.GetContent(SC.DetailInfo, result.Message);
+                this.ShowAlert(message, AlertType.Error);
+                WS.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+                WS.MessageHandler.AppendMessage(detail, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+            }
+        }
+
         #endregion
 
         public void Dispose()

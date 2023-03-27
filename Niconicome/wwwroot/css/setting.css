@@ -35,12 +35,25 @@
   align-items: center;
   margin-top: 20px;
 }
+.SettingPage .Body .SettingContent.M0 {
+  margin-top: 0;
+}
 .SettingPage .Body .SettingContent .Title {
   font-size: 18px;
 }
 .SettingPage .Body .SettingContent .Icon {
   margin-right: 8px;
   color: #87ceeb;
+}
+.SettingPage .Body .SettingContent .Icon.Danger {
+  color: #ff69b4;
+}
+.SettingPage .Body .ContentWrapper {
+  margin-left: 16px;
+}
+.SettingPage .Body .Separator {
+  border: 1px solid rgba(87, 86, 86, 0.9058823529);
+  margin: 40px 5px;
 }
 
 .ImportPage .NiconicomeImport .InputContainer,
@@ -183,4 +196,12 @@
 }
 .RestorePage .DataCleaningDescription {
   margin: 20px 10px;
+}
+.RestorePage .DangerZoneContainer {
+  background-color: #f8d7da;
+  border-radius: 8px;
+  padding: 16px;
+}
+.RestorePage .DangerZoneContainer .DangerZoneBody {
+  margin-left: 16px;
 }

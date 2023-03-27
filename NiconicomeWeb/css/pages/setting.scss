@@ -39,6 +39,10 @@
             align-items: center;
             margin-top: 20px;
 
+            &.M0 {
+                margin-top: 0;
+            }
+
             .Title {
                 font-size: 18px;
             }
@@ -46,7 +50,20 @@
             .Icon {
                 margin-right: 8px;
                 color: #87ceeb;
+
+                &.Danger {
+                    color: #ff69b4;
+                }
             }
+        }
+
+        .ContentWrapper {
+            margin-left: 16px;
+        }
+
+        .Separator {
+            border: 1px solid #575656e7;
+            margin: 40px 5px;
         }
     }
 }
@@ -239,5 +256,15 @@
 
     .DataCleaningDescription {
         margin: 20px 10px;
+    }
+
+    .DangerZoneContainer {
+        background-color: #f8d7da;
+        border-radius: 8px;
+        padding: 16px;
+
+        .DangerZoneBody {
+            margin-left: 16px;
+        }
     }
 }
