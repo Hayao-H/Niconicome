@@ -37,7 +37,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
         public IAttemptResult<string> GetFilePath(string niconicoID, uint verticalResolution)
         {
-            IAttemptResult<VideoFile> result = this._liteDB.GetRecord<VideoFile>(TableNames.VideoFile, v => v.NiconicoID == niconicoID && v.VerticalResolution == verticalResolution);
+            IAttemptResult<VideoFile> result = this._liteDB.GetRecord<VideoFile>(TableNames.VideoFile, v => v.NiconicoID == niconicoID && v.VerticalResolution >= verticalResolution);
 
             if (!result.IsSucceeded || result.Data is null)
             {
@@ -72,7 +72,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
         public bool Exist(string niconicoID, uint verticalResolution)
         {
-            return this._liteDB.Exists<VideoFile>(TableNames.Video, v => v.NiconicoID == niconicoID && v.VerticalResolution == verticalResolution);
+            return this._liteDB.Exists<VideoFile>(TableNames.VideoFile, v => v.NiconicoID == niconicoID && v.VerticalResolution >= verticalResolution);
         }
 
         public async Task<IAttemptResult<int>> AddFilesFromDirectoryListAsync(IEnumerable<string> directories)

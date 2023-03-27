@@ -51,7 +51,7 @@ namespace Niconicome.Models.Local.Restore
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        IAttemptResult ApplyBackup(string guid);
+        Task<IAttemptResult> ApplyBackupAsync(string guid);
 
         /// <summary>
         /// バックアップを作成
@@ -98,6 +98,11 @@ namespace Niconicome.Models.Local.Restore
         /// バックアップ適用フラグ
         /// </summary>
         IBindableProperty<bool> IsApplyingBackupProcessing { get; }
+
+        /// <summary>
+        /// クリーニングフラグ
+        /// </summary>
+        IBindableProperty<bool> IsDataCleaningProcessing { get; }
     }
 
     public class RestoreManager : IRestoreManager
@@ -150,20 +155,27 @@ namespace Niconicome.Models.Local.Restore
 
         public IBindableProperty<bool> IsApplyingBackupProcessing { get; init; } = new BindableProperty<bool>(false);
 
+        public IBindableProperty<bool> IsDataCleaningProcessing { get; init; } = new BindableProperty<bool>(false);
+
+
         #endregion
 
         #region Method
 
         public async Task<IAttemptResult<int>> AddVideoDirectoryAsync(string path)
         {
+            this.IsGettingVideosProcessing.Value = true;
+
             IAttemptResult<ISettingInfo<List<string>>> sResult = this._settingsContainer.GetSetting(SettingNames.VideoSearchDirectories, new List<string>());
             if (!sResult.IsSucceeded || sResult.Data is null)
             {
+                this.IsGettingVideosProcessing.Value = false;
                 return AttemptResult<int>.Fail(sResult.Message);
             }
 
             if (sResult.Data.Value.Contains(path))
             {
+                this.IsGettingVideosProcessing.Value = false;
                 this._errorHandler.HandleError(RestoreManagerError.VideoDirectoryAllreadyRegistered, path);
                 return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(RestoreManagerError.VideoDirectoryAllreadyRegistered, path));
             }
@@ -185,15 +197,19 @@ namespace Niconicome.Models.Local.Restore
                 this._videoFileDirectories.Add(path);
             }
 
+            this.IsGettingVideosProcessing.Value = false;
             return result ?? AttemptResult<int>.Fail();
 
         }
 
         public async Task<IAttemptResult<int>> GetVideosFromVideoDirectoryAsync()
         {
+            this.IsGettingVideosProcessing.Value = true;
+
             IAttemptResult<ISettingInfo<List<string>>> sResult = this._settingsContainer.GetSetting(SettingNames.VideoSearchDirectories, new List<string>());
             if (!sResult.IsSucceeded || sResult.Data is null)
             {
+                this.IsGettingVideosProcessing.Value = false;
                 return AttemptResult<int>.Fail(sResult.Message);
             }
 
@@ -205,6 +221,7 @@ namespace Niconicome.Models.Local.Restore
                 result = await this._fileStore.AddFilesFromDirectoryListAsync(sResult.Data.Value);
             });
 
+            this.IsGettingVideosProcessing.Value = false;
             return result ?? AttemptResult<int>.Fail();
         }
 
@@ -269,17 +286,21 @@ namespace Niconicome.Models.Local.Restore
             return this._settingsContainer.ClearSettings();
         }
 
-        public IAttemptResult ApplyBackup(string guid)
+        public async Task<IAttemptResult> ApplyBackupAsync(string guid)
         {
-            IAttemptResult result = this._backuphandler.ApplyBackup(guid);
+            this.IsApplyingBackupProcessing.Value = true;
+
+            IAttemptResult result = await Task.Run(() => this._backuphandler.ApplyBackup(guid));
             if (!result.IsSucceeded)
             {
+                this.IsApplyingBackupProcessing.Value = false;
                 return result;
             }
 
             this._videoStore.Flush();
             this._playlistManager.Initialize();
 
+            this.IsApplyingBackupProcessing.Value = false;
             return AttemptResult.Succeeded();
         }
 
@@ -339,13 +360,19 @@ namespace Niconicome.Models.Local.Restore
 
         public async Task<IAttemptResult> CleanDataAsync()
         {
+            this.IsDataCleaningProcessing.Value = true;
+
             IAttemptResult pResult = await Task.Run(() => this._storeCleaner.CleanPlaylists());
-            if (pResult.IsSucceeded)
+            if (!pResult.IsSucceeded)
             {
+                this.IsDataCleaningProcessing.Value = false;
                 return pResult;
             }
 
-            return await Task.Run(() => this._storeCleaner.CleanVideos());
+            IAttemptResult vResult = await Task.Run(() => this._storeCleaner.CleanVideos());
+
+            this.IsDataCleaningProcessing.Value = false;
+            return vResult;
         }
 
 

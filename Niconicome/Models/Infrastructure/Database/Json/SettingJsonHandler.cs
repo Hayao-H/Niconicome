@@ -304,9 +304,9 @@ namespace Niconicome.Models.Infrastructure.Database.Json
                         var stringList = new List<string>();
                         foreach (JsonElement elm in element.EnumerateArray())
                         {
-                            stringList.Add(element.ValueKind switch
+                            stringList.Add(elm.ValueKind switch
                             {
-                                JsonValueKind.String => element.GetString() ?? string.Empty,
+                                JsonValueKind.String => elm.GetString() ?? string.Empty,
                                 _ => throw new NotSupportedException()
                             });
                         }

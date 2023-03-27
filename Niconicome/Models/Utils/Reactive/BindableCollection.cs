@@ -7,12 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Niconicome.Extensions;
 using Reactive.Bindings.Extensions;
 
 namespace Niconicome.Models.Utils.Reactive
 {
-    public class BindableCollection<TItem, TOrigin> : ObservableCollection<TItem>, IBindable
+    public class BindableCollection<TItem, TOrigin> : ObservableCollection<TItem>, IBindable, IDisposable
     {
         public BindableCollection(ObservableCollection<TOrigin> baseCollection, Func<TOrigin, TItem> converter)
         {
@@ -129,6 +130,7 @@ namespace Niconicome.Models.Utils.Reactive
         public void Dispose()
         {
             this._handler = null;
+            this._baseCollection.As<INotifyCollectionChanged>().CollectionChanged -= this.OnBaseCollecitonChanged;
         }
     }
 }

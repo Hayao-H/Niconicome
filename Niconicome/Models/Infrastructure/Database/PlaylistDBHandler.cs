@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -206,7 +207,7 @@ namespace Niconicome.Models.Infrastructure.Database
                 videos.Add(vResult.Data);
             }
 
-            var info = new PlaylistInfo(playlist.Name, videos, this,playlist.Children)
+            var info = new PlaylistInfo(playlist.Name, videos, this, playlist.Children)
             {
                 ID = playlist.Id,
             };

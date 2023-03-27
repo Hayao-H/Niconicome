@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.StringHandler;
+using Niconicome.Models.Local.Restore;
 using Niconicome.Models.Local.Restore.Import.Niconicome;
 using Niconicome.Models.Local.Restore.Import.Xeno;
-using Niconicome.Models.Local.State.MessageV2;
+using Niconicome.Models.Local.State;
+using MessageV2 = Niconicome.Models.Local.State.MessageV2;
 
 namespace Niconicome.Workspaces
 {
@@ -16,7 +18,7 @@ namespace Niconicome.Workspaces
         /// <summary>
         /// メッセージハンドラ
         /// </summary>
-        public static IMessageHandler MessageHandler { get; private set; } = DIFactory.Resolve<IMessageHandler>();
+        public static MessageV2::IMessageHandler MessageHandler { get; private set; } = DIFactory.Resolve<MessageV2::IMessageHandler>();
 
         /// <summary>
         /// 文字列ハンドラ
@@ -32,5 +34,15 @@ namespace Niconicome.Workspaces
         /// Xenoからのインポート
         /// </summary>
         public static IXenoImportManager XenoImportManager { get; private set; } = DIFactory.Resolve<IXenoImportManager>();
+
+        /// <summary>
+        /// 回復
+        /// </summary>
+        public static IRestoreManager RestoreManager { get; private set; } = DIFactory.Resolve<IRestoreManager>();
+
+        /// <summary>
+        /// ページ
+        /// </summary>
+        public static IBlazorPageManager BlazorPageManager { get; private set; } = DIFactory.Resolve<IBlazorPageManager>();
     }
 }

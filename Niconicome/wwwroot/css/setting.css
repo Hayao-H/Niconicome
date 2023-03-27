@@ -71,3 +71,116 @@
 .ImportPage .XenoImport .MessageContainer .Message {
   padding: 8px;
 }
+
+.RestorePage .TitleContainer {
+  display: flex;
+  align-items: center;
+}
+.RestorePage .TitleContainer .Icon {
+  margin-right: 8px;
+  color: #ff69b4;
+}
+.RestorePage .BackupSettingsContainer {
+  margin-top: 18px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .BackupListHeader {
+  display: flex;
+}
+.RestorePage .BackupSettingsContainer .BackupList .BackupListBody .BackupListRow {
+  display: flex;
+}
+.RestorePage .BackupSettingsContainer .BackupList .ItemColumn {
+  padding: 8px;
+  height: 100%;
+  display: inline-block;
+}
+.RestorePage .BackupSettingsContainer .BackupList .HeaderColumn {
+  background-color: #f2f3f5;
+  padding: 2px 8px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .ItemColumn:not(:last-child) {
+  border-right: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.RestorePage .BackupSettingsContainer .BackupList .Selected {
+  width: 30px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .Name {
+  width: 300px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .CreatedOn {
+  width: 400px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .Size {
+  width: 200px;
+}
+.RestorePage .BackupSettingsContainer .BackupControlsContainer {
+  margin-top: 30px;
+  margin-left: 10px;
+}
+.RestorePage .BackupSettingsContainer .BackupControlsContainer .Label {
+  margin-right: 8px;
+  font-weight: bold;
+}
+.RestorePage .BackupSettingsContainer .BackupControlsContainer .Input {
+  outline: none;
+  border: none;
+  border-bottom: 2px solid rgba(231, 231, 231, 0.9058823529);
+  width: 50%;
+  margin-right: 8px;
+}
+.RestorePage .BackupSettingsContainer .BackupControlsContainer .Button {
+  margin-left: 4px;
+}
+.RestorePage .DirectorySettingsContainer {
+  margin-top: 18px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .DirectoryListHeader {
+  display: flex;
+  justify-content: stretch;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .DirectoryListBody .DirectoryListRow {
+  display: flex;
+  justify-content: stretch;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .ItemColumn {
+  padding: 8px;
+  height: 100%;
+  display: inline-block;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .HeaderColumn {
+  background-color: #f2f3f5;
+  padding: 2px 8px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .ItemColumn:not(:last-child) {
+  border-right: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .Selected {
+  width: 30px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .Path {
+  flex: 1;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryControlsContainer {
+  margin-top: 30px;
+  margin-left: 10px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Label {
+  margin-right: 8px;
+  font-weight: bold;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Input {
+  outline: none;
+  border: none;
+  border-bottom: 2px solid rgba(231, 231, 231, 0.9058823529);
+  width: 50%;
+  margin-right: 8px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Button {
+  margin-left: 4px;
+}
+.RestorePage .DirectorySettingsContainer .LoadVideoDescription {
+  margin: 20px 10px;
+}
+.RestorePage .DataCleaningDescription {
+  margin: 20px 10px;
+}

@@ -24,6 +24,8 @@ namespace Niconicome.Models.Infrastructure.Database
 
         private readonly ILiteDBHandler _database;
 
+        private readonly Dictionary<int, Tag> _cache = new();
+
         #endregion
 
 
@@ -52,7 +54,7 @@ namespace Niconicome.Models.Infrastructure.Database
 
         public IAttemptResult<ITagInfo> GetTag(int id)
         {
-            IAttemptResult<Tag> result = this._database.GetRecord<Tag>(TableNames.Tag, id);
+            IAttemptResult<Tag> result = this.GetTagFromCache(id);
             if (!result.IsSucceeded || result.Data is null)
             {
                 return AttemptResult<ITagInfo>.Fail(result.Message);
@@ -142,6 +144,37 @@ namespace Niconicome.Models.Infrastructure.Database
                 Name = info.Name,
                 IsNicodicExist = info.IsNicodicExist,
             };
+        }
+
+        /// <summary>
+        /// キャッシュから取得
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        private IAttemptResult<Tag> GetTagFromCache(int ID)
+        {
+            if (this._cache.Count == 0)
+            {
+                IAttemptResult<IReadOnlyList<Tag>> allResult = this._database.GetAllRecords<Tag>(TableNames.Tag);
+                if (!allResult.IsSucceeded||allResult.Data is null)
+                {
+                    return AttemptResult<Tag>.Fail(allResult.Message);
+                }
+            }
+
+            if (this._cache.ContainsKey(ID))
+            {
+                return AttemptResult<Tag>.Succeeded(this._cache[ID]);
+            }
+
+            IAttemptResult<Tag> result = this._database.GetRecord<Tag>(TableNames.Tag, ID);
+            if (!result.IsSucceeded||result.Data is null)
+            {
+                return result;
+            }
+
+            this._cache.Add(ID, result.Data);
+            return AttemptResult<Tag>.Succeeded(result.Data);
         }
 
         #endregion

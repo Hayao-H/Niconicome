@@ -56,9 +56,14 @@ namespace Niconicome.Models.Infrastructure.Database
             }
 
             CheckChildren(root.Children);
+            playlistsUsageData[root.Id] = true;
 
             foreach (var target in playlistsUsageData.Where(x => !x.Value).Select(x => x.Key))
             {
+                if (!CheckWhetherDeletionAllowed(playlists[target]))
+                {
+                    continue;
+                }
                 this._database.Delete(TableNames.Playlist, target);
             }
 
@@ -114,6 +119,36 @@ namespace Niconicome.Models.Infrastructure.Database
         #region private
 
         private record VideoKey(int PlaylistID, int SharedID);
+
+        private bool CheckWhetherDeletionAllowed(Types::Playlist playlist)
+        {
+            if (playlist.PlaylistType == Types::DBPlaylistType.Root)
+            {
+                return false;
+            }
+
+            if (playlist.PlaylistType == Types::DBPlaylistType.Temporary)
+            {
+                return false;
+            }
+
+            if (playlist.PlaylistType == Types::DBPlaylistType.DownloadFailedHistory)
+            {
+                return false;
+            }
+
+            if (playlist.PlaylistType == Types::DBPlaylistType.DownloadSucceededHistory)
+            {
+                return false;
+            }
+
+            if (playlist.PlaylistType == Types::DBPlaylistType.PlaybackHistory)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         #endregion
 

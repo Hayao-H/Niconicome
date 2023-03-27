@@ -349,6 +349,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<NicoImport::Converter.IImportConverter, NicoImport::Converter.ImportConverter>();
             services.AddTransient<Restore::Import.Niconicome.IImportExportManager, Restore::Import.Niconicome.ImportExportManager>();
             services.AddTransient<SettingsVM::ImportViewModel>();
+            services.AddTransient<SettingsVM::SideMenuViewModel>();
+            services.AddTransient<SettingsVM::RestoreViewModel>();
             services.AddTransient<XenoImport::Parser.IXenoDataParser, XenoImport::Parser.XenoDataParser>();
             services.AddTransient<XenoImport::IXenoImportHandler, XenoImport::XenoImportHandler>();
             services.AddTransient<Restore::Import.Xeno.IXenoImportManager, Restore::Import.Xeno.XenoImportManager>();
