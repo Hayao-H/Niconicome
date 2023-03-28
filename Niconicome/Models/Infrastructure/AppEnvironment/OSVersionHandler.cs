@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Niconicome.Models.Domain.Utils.AppEnvironment;
 
 namespace Niconicome.Models.Infrastructure.AppEnvironment
@@ -63,5 +64,9 @@ namespace Niconicome.Models.Infrastructure.AppEnvironment
             }
         }
         public bool Is64BitOperatingSYstem => Environment.Is64BitOperatingSystem;
+
+        public double WorkAreWidth => SystemParameters.WorkArea.Width;
+
+        public double WorkAreHeight => SystemParameters.WorkArea.Height;
     }
 }
