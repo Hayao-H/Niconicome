@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LiteDB;
+using Niconicome.Extensions.System.Collections.Generic;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted;
 using Niconicome.Models.Domain.Playlist;
@@ -51,14 +52,14 @@ namespace Niconicome.Models.Infrastructure.Database
                 return AttemptResult<IVideoInfo>.Succeeded(cachedVideo);
             }
 
-            IAttemptResult<SharedVideo> sharedResult = this.GetSharedVideo(niconicoID);
+            IAttemptResult<SharedVideo> sharedResult = this.GetSharedVideoFromCache(niconicoID);
             if (!sharedResult.IsSucceeded || sharedResult.Data is null)
             {
                 return AttemptResult<IVideoInfo>.Fail(sharedResult.Message);
             }
             SharedVideo sharedData = sharedResult.Data;
 
-            IAttemptResult<Video> result = this.GetDBVideo(sharedData.Id, playlistID);
+            IAttemptResult<Video> result = this.GetVideoFromCache(sharedData.Id, playlistID);
             if (!result.IsSucceeded || result.Data is null)
             {
                 return AttemptResult<IVideoInfo>.Fail(result.Message);
@@ -67,15 +68,15 @@ namespace Niconicome.Models.Infrastructure.Database
             Video data = result.Data;
 
             var video = this.ConvertToVideoInfo(sharedData, data.Id);
-            
+
             video.IsAutoUpdateEnabled = false;
-            
+
             video.IsSelected.Value = data.IsSelected;
             video.IsDownloaded.Value = data.IsDownloaded;
             video.IsEconomy = data.IsEconomy;
             video.AddedAt = data.AddedAt;
             video.PlaylistID = playlistID;
-            
+
             video.IsAutoUpdateEnabled = true;
 
             //var video = new VideoInfo(sharedData.NiconicoId, this, new List<ITagInfo>())
@@ -185,11 +186,13 @@ namespace Niconicome.Models.Infrastructure.Database
         public IAttemptResult Update(IVideoInfo video)
         {
             SharedVideo shareData = this.ConvertToSharedVideo(video);
+            this._sharedCache.AddOrSet(video.NiconicoId, shareData);
             IAttemptResult sharedResult = this._database.Update(shareData);
 
             if (!sharedResult.IsSucceeded || video.ID == DefaultVideoID) return sharedResult;
 
             Video data = this.ConvertToVideo(video);
+            this._videoCache.AddOrSet($"{video.SharedID}-{video.PlaylistID}", data);
             return this._database.Update(data);
 
         }
@@ -358,7 +361,7 @@ namespace Niconicome.Models.Infrastructure.Database
         /// </summary>
         /// <param name="niconicoID"></param>
         /// <returns></returns>
-        private IAttemptResult<SharedVideo> GetSharedVideo(string niconicoID)
+        private IAttemptResult<SharedVideo> GetSharedVideoFromCache(string niconicoID)
         {
             if (this._sharedCache.Count == 0)
             {
@@ -395,7 +398,7 @@ namespace Niconicome.Models.Infrastructure.Database
         /// <param name="sharedID"></param>
         /// <param name="playlistID"></param>
         /// <returns></returns>
-        private IAttemptResult<Video> GetDBVideo(int sharedID, int playlistID)
+        private IAttemptResult<Video> GetVideoFromCache(int sharedID, int playlistID)
         {
             var id = $"{sharedID}-{playlistID}";
             if (this._videoCache.Count == 0)
