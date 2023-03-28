@@ -35,7 +35,7 @@ namespace Niconicome.ViewModels.Shared
                 _ => "alert-info"
             };
 
-            var timer = new Timer(5 * 1000);
+            var timer = new Timer(3 * 1000);
             timer.AutoReset = false;
             timer.Elapsed += (_, _) =>
             {
