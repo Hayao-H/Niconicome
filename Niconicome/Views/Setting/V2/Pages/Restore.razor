@@ -91,11 +91,13 @@
                     @if (DataContext.IsVideoDirProcessing.Value)
                     {
                         <button class="Button btn btn-primary" disabled>追加</button>
+                        <button class="Button btn btn-primary" disabled>削除</button>
                         <button class="Button btn btn-primary" disabled>動画の読み込み</button>
                     }
                     else
                     {
                         <button class="Button btn btn-primary" @onclick="DataContext.OnAddVideoDirectoryButtonClickAsync">追加</button>
+                        <button class="Button btn btn-primary" @onclick="DataContext.OnDeleteVideoDirButtonClick">削除</button>
                         <button class="Button btn btn-primary" @onclick="DataContext.OnLoadVideosButtonClickedASync">動画の読み込み</button>
                     }
                 </div>

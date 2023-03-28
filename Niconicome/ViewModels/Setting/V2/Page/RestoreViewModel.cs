@@ -220,7 +220,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
                 IAttemptResult result = WS.RestoreManager.DeleteVideoDirectory(d.Path);
                 if (result.IsSucceeded)
                 {
-                    string message = WS.StringHandler.GetContent(SC.DeletingVideoDirectoryFailed);
+                    string message = WS.StringHandler.GetContent(SC.DeletingVideoDirectorySucceeded);
                     WS.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher);
                     this.ShowAlert(message, AlertType.Info);
                 }
