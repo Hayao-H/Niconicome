@@ -108,7 +108,7 @@ namespace Niconicome.Models.Utils
 
             IContainerProvider container = app.Container;
 
-            if (this._localState.IsAddonManagerOpen && this._settingHandler.GetBoolSetting(SettingsEnum.SingletonWindows))
+            if (this._localState.IsSettingTabOpen && this._settingHandler.GetBoolSetting(SettingsEnum.SingletonWindows))
             {
                 return;
             }
@@ -117,7 +117,7 @@ namespace Niconicome.Models.Utils
             var view = container.Resolve<SettingPage>();
             region.Add(view);
             region.Activate(view);
-            this._localState.IsAddonManagerOpen = true;
+            this._localState.IsSettingTabOpen = true;
         }
 
 
