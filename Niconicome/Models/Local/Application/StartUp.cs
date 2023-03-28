@@ -31,7 +31,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp( IBackupManager backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer,IServer server)
+        public StartUp(IBackupManager backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer, IServer server)
         {
             this._backuphandler = backuphandler;
             this._autoLogin = autoLogin;

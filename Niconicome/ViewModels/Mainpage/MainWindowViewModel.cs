@@ -141,15 +141,15 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.OpenSettingV2Command = new BindableCommand(() =>
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/import/", BlazorWindows.Settings);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/import", BlazorWindows.Settings);
                 WS::Mainpage.WindowTabHelper.OpenSettingsTab(this.RegionManager);
             }, new BindableProperty<bool>(true));
 
 
             #region UI系の設定
 
-            this.TreeWidth = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.Tree.Width ?? 250).ToReadOnlyReactiveProperty();
-            this.TabsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TabsHeight ?? 260).ToReadOnlyReactiveProperty();
+            this.TreeWidth = new ReadOnlyReactiveProperty<int>(new ReactiveProperty<int>(250));
+            this.TabsHeight = new ReadOnlyReactiveProperty<int>(new ReactiveProperty<int>(260));
 
             #endregion
 

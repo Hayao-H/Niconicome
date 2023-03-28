@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.DataBackup;
 using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Error;
 using Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Error;
+using Niconicome.Models.Domain.Local.External.Software.FFmpeg.FFmpeg;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
 using Niconicome.Models.Domain.Local.Server.Core;
@@ -75,6 +76,8 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 36, typeof(ImportError) },
             { 37, typeof(XenoDataParserError) },
             { 38, typeof(XenoImportHandlerError) },
+            { 39, typeof(DBCleanerError) },
+            { 40, typeof(FFmpegManagerError) },
         };
     }
 }

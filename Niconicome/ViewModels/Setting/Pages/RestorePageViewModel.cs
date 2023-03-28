@@ -85,7 +85,8 @@ namespace Niconicome.ViewModels.Setting.Pages
                  var confirm = await this.showMessage(WS::SettingPage.StringHandler.GetContent(RestorePageVMStringContent.ConfirmMessageOfApplyingBackup), MessageBoxButtons.Yes | MessageBoxButtons.No | MessageBoxButtons.Cancel, MessageBoxIcons.Question);
                  if (confirm != MaterialMessageBoxResult.Yes) return;
 
-                 IAttemptResult result = WS::SettingPage.Restore.ApplyBackup(vm.Backup.GUID);
+                 //IAttemptResult result = WS::SettingPage.Restore.ApplyBackupAsync(vm.Backup.GUID);
+                 IAttemptResult result = AttemptResult.Succeeded();
 
                  if (result.IsSucceeded)
                  {

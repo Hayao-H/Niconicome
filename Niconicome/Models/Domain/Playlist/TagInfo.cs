@@ -47,7 +47,10 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._isNicodicExist = value;
-                this.Update(this);
+                if (this.IsAutoUpdateEnabled)
+                {
+                    this.Update(this);
+                }
             }
         }
 

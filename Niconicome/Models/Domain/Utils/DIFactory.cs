@@ -341,6 +341,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
+            services.AddTransient<Software::FFmpeg.FFmpeg.IFFmpegManager, Software::FFmpeg.FFmpeg.FFmpegManager>();
             services.AddSingleton<State::Style.IVideoListWidthManager, State::Style.VideoListWidthManager>();
             services.AddTransient<PlaylistV2::Manager.ISearchManager, PlaylistV2::Manager.SearchManager>();
             services.AddTransient<NicoImport::IExportHandler, NicoImport::ExportHandler>();
@@ -349,9 +350,12 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<NicoImport::Converter.IImportConverter, NicoImport::Converter.ImportConverter>();
             services.AddTransient<Restore::Import.Niconicome.IImportExportManager, Restore::Import.Niconicome.ImportExportManager>();
             services.AddTransient<SettingsVM::ImportViewModel>();
+            services.AddTransient<SettingsVM::SideMenuViewModel>();
+            services.AddTransient<SettingsVM::RestoreViewModel>();
             services.AddTransient<XenoImport::Parser.IXenoDataParser, XenoImport::Parser.XenoDataParser>();
             services.AddTransient<XenoImport::IXenoImportHandler, XenoImport::XenoImportHandler>();
             services.AddTransient<Restore::Import.Xeno.IXenoImportManager, Restore::Import.Xeno.XenoImportManager>();
+            services.AddTransient<Store::V2.IStoreCleaner, DB::DBCleaner>();
 
             return services.BuildServiceProvider();
         }

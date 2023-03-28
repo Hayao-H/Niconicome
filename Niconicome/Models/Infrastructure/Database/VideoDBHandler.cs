@@ -6,7 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LiteDB;
+using Niconicome.Extensions.System.Collections.Generic;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Niconico.Net.Xml.API.Obsoleted;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
@@ -35,6 +37,10 @@ namespace Niconicome.Models.Infrastructure.Database
 
         private readonly Dictionary<int, Dictionary<string, IVideoInfo>> _cache = new();
 
+        private readonly Dictionary<string, SharedVideo> _sharedCache = new();
+
+        private readonly Dictionary<string, Video> _videoCache = new();
+
         #endregion
 
         #region Method
@@ -46,14 +52,14 @@ namespace Niconicome.Models.Infrastructure.Database
                 return AttemptResult<IVideoInfo>.Succeeded(cachedVideo);
             }
 
-            IAttemptResult<SharedVideo> sharedResult = this._database.GetRecord<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID);
+            IAttemptResult<SharedVideo> sharedResult = this.GetSharedVideoFromCache(niconicoID);
             if (!sharedResult.IsSucceeded || sharedResult.Data is null)
             {
                 return AttemptResult<IVideoInfo>.Fail(sharedResult.Message);
             }
             SharedVideo sharedData = sharedResult.Data;
 
-            IAttemptResult<Video> result = this._database.GetRecord<Video>(TableNames.Video, v => v.SharedVideoID == sharedData.Id && v.PlaylistID == playlistID);
+            IAttemptResult<Video> result = this.GetVideoFromCache(sharedData.Id, playlistID);
             if (!result.IsSucceeded || result.Data is null)
             {
                 return AttemptResult<IVideoInfo>.Fail(result.Message);
@@ -72,6 +78,12 @@ namespace Niconicome.Models.Infrastructure.Database
             video.PlaylistID = playlistID;
 
             video.IsAutoUpdateEnabled = true;
+
+            //var video = new VideoInfo(sharedData.NiconicoId, this, new List<ITagInfo>())
+            //{
+            //    SharedID = sharedData.Id,
+            //    ID = data.Id,
+            //};
 
             if (!this._cache.ContainsKey(playlistID)) this._cache.Add(playlistID, new Dictionary<string, IVideoInfo>());
             if (!this._cache[playlistID].ContainsKey(niconicoID)) this._cache[playlistID].Add(sharedData.NiconicoId, video);
@@ -174,11 +186,13 @@ namespace Niconicome.Models.Infrastructure.Database
         public IAttemptResult Update(IVideoInfo video)
         {
             SharedVideo shareData = this.ConvertToSharedVideo(video);
+            this._sharedCache.AddOrSet(video.NiconicoId, shareData);
             IAttemptResult sharedResult = this._database.Update(shareData);
 
             if (!sharedResult.IsSucceeded || video.ID == DefaultVideoID) return sharedResult;
 
             Video data = this.ConvertToVideo(video);
+            this._videoCache.AddOrSet($"{video.SharedID}-{video.PlaylistID}", data);
             return this._database.Update(data);
 
         }
@@ -224,7 +238,6 @@ namespace Niconicome.Models.Infrastructure.Database
 
             return this._database.Exists<Video>(TableNames.Video, v => v.SharedVideoID == sharedResult.Data.Id && v.PlaylistID == playlistID);
         }
-
 
         #endregion
 
@@ -341,6 +354,80 @@ namespace Niconicome.Models.Infrastructure.Database
                 return true;
             }
 
+        }
+
+        /// <summary>
+        /// キャッシュを取得
+        /// </summary>
+        /// <param name="niconicoID"></param>
+        /// <returns></returns>
+        private IAttemptResult<SharedVideo> GetSharedVideoFromCache(string niconicoID)
+        {
+            if (this._sharedCache.Count == 0)
+            {
+                IAttemptResult<IReadOnlyList<SharedVideo>> allResult = this._database.GetAllRecords<SharedVideo>(TableNames.SharedVideo);
+                if (!allResult.IsSucceeded || allResult.Data is null)
+                {
+                    return AttemptResult<SharedVideo>.Fail(allResult.Message);
+                }
+
+                foreach (var v in allResult.Data)
+                {
+                    this._sharedCache.Add(v.NiconicoId, v);
+                }
+            }
+
+            if (this._sharedCache.ContainsKey(niconicoID))
+            {
+                return AttemptResult<SharedVideo>.Succeeded(this._sharedCache[niconicoID]);
+            }
+
+            IAttemptResult<SharedVideo> result = this._database.GetRecord<SharedVideo>(TableNames.SharedVideo, v => v.NiconicoId == niconicoID);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return result;
+            }
+
+            this._sharedCache.Add(niconicoID, result.Data);
+            return AttemptResult<SharedVideo>.Succeeded(result.Data);
+        }
+
+        /// <summary>
+        /// キャッシュを取得
+        /// </summary>
+        /// <param name="sharedID"></param>
+        /// <param name="playlistID"></param>
+        /// <returns></returns>
+        private IAttemptResult<Video> GetVideoFromCache(int sharedID, int playlistID)
+        {
+            var id = $"{sharedID}-{playlistID}";
+            if (this._videoCache.Count == 0)
+            {
+                IAttemptResult<IReadOnlyList<Video>> allResult = this._database.GetAllRecords<Video>(TableNames.Video);
+                if (!allResult.IsSucceeded || allResult.Data is null)
+                {
+                    return AttemptResult<Video>.Fail(allResult.Message);
+                }
+
+                foreach (var v in allResult.Data)
+                {
+                    this._videoCache.Add($"{v.SharedVideoID}-{v.PlaylistID}", v);
+                }
+            }
+
+            if (this._videoCache.ContainsKey(id))
+            {
+                return AttemptResult<Video>.Succeeded(this._videoCache[id]);
+            }
+
+            IAttemptResult<Video> result = this._database.GetRecord<Video>(TableNames.Video, v => v.SharedVideoID == sharedID && v.PlaylistID == playlistID);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return result;
+            }
+
+            this._videoCache.Add(id, result.Data);
+            return AttemptResult<Video>.Succeeded(result.Data);
         }
 
         #endregion

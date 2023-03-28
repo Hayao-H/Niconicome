@@ -35,7 +35,7 @@ namespace Niconicome.ViewModels.Setting.V2
                     }
                 }
 
-                WS::Mainpage.LocalState.IsAddonManagerOpen = false;
+                WS::Mainpage.LocalState.IsSettingTabOpen = false;
             });
         }
 

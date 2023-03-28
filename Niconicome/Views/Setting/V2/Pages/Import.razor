@@ -1,4 +1,4 @@
-﻿@page "/settings/import/";
+﻿@page "/settings/import";
 
 @using Niconicome.Views.Setting.V2.Shared;
 @inherits BlazorBase;
@@ -30,6 +30,8 @@
             }
         </div>
 
+        <hr class="Separator" />
+
         <div class="NiconicomeImport">
             <div class="SettingContent">
                 <p class="Title"><i class="Icon fa-solid fa-file-import"></i>データのインポート</p>
@@ -47,6 +49,8 @@
                 <input class="Input" @bind="DataContext.ImpottPathInput.Value" />
             </div>
         </div>
+
+        <hr class="Separator" />
 
         <div class="XenoImport">
             <div class="SettingContent">

@@ -6,6 +6,7 @@ using Niconicome.Extensions.System.List;
 using Niconicome.Models.Domain.Local.DataBackup;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Niconico.Net.Xml;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Utils.Reactive;
@@ -50,7 +51,7 @@ namespace Niconicome.Models.Local.Restore
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        IAttemptResult ApplyBackup(string guid);
+        Task<IAttemptResult> ApplyBackupAsync(string guid);
 
         /// <summary>
         /// バックアップを作成
@@ -73,6 +74,12 @@ namespace Niconicome.Models.Local.Restore
         IAttemptResult Initialize();
 
         /// <summary>
+        /// 使用されていない動画等を削除
+        /// </summary>
+        /// <returns></returns>
+        Task<IAttemptResult> CleanDataAsync();
+
+        /// <summary>
         /// バックアップデータ
         /// </summary>
         ReadOnlyObservableCollection<IBackupData> Backups { get; }
@@ -91,12 +98,17 @@ namespace Niconicome.Models.Local.Restore
         /// バックアップ適用フラグ
         /// </summary>
         IBindableProperty<bool> IsApplyingBackupProcessing { get; }
+
+        /// <summary>
+        /// クリーニングフラグ
+        /// </summary>
+        IBindableProperty<bool> IsDataCleaningProcessing { get; }
     }
 
     public class RestoreManager : IRestoreManager
     {
 
-        public RestoreManager(IBackupManager backuphandler, IVideoFileStore fileStore, ISettingsContainer settingsContainer, IPlaylistStore playlistStore, IVideoStore videoStore, Error::IErrorHandler errorHandler, IPlaylistManager playlistManager)
+        public RestoreManager(IBackupManager backuphandler, IVideoFileStore fileStore, ISettingsContainer settingsContainer, IPlaylistStore playlistStore, IVideoStore videoStore, Error::IErrorHandler errorHandler, IPlaylistManager playlistManager, IStoreCleaner storeCleaner)
         {
             this._backuphandler = backuphandler;
             this._fileStore = fileStore;
@@ -105,6 +117,7 @@ namespace Niconicome.Models.Local.Restore
             this._videoStore = videoStore;
             this._errorHandler = errorHandler;
             this._playlistManager = playlistManager;
+            this._storeCleaner = storeCleaner;
             this.Backups = new ReadOnlyObservableCollection<IBackupData>(this._backups);
             this.VideoFileDirectories = new ReadOnlyObservableCollection<string>(this._videoFileDirectories);
         }
@@ -121,6 +134,8 @@ namespace Niconicome.Models.Local.Restore
         private readonly IVideoStore _videoStore;
 
         private readonly IPlaylistManager _playlistManager;
+
+        private readonly IStoreCleaner _storeCleaner;
 
         private readonly Error::IErrorHandler _errorHandler;
 
@@ -140,20 +155,27 @@ namespace Niconicome.Models.Local.Restore
 
         public IBindableProperty<bool> IsApplyingBackupProcessing { get; init; } = new BindableProperty<bool>(false);
 
+        public IBindableProperty<bool> IsDataCleaningProcessing { get; init; } = new BindableProperty<bool>(false);
+
+
         #endregion
 
         #region Method
 
         public async Task<IAttemptResult<int>> AddVideoDirectoryAsync(string path)
         {
+            this.IsGettingVideosProcessing.Value = true;
+
             IAttemptResult<ISettingInfo<List<string>>> sResult = this._settingsContainer.GetSetting(SettingNames.VideoSearchDirectories, new List<string>());
             if (!sResult.IsSucceeded || sResult.Data is null)
             {
+                this.IsGettingVideosProcessing.Value = false;
                 return AttemptResult<int>.Fail(sResult.Message);
             }
 
             if (sResult.Data.Value.Contains(path))
             {
+                this.IsGettingVideosProcessing.Value = false;
                 this._errorHandler.HandleError(RestoreManagerError.VideoDirectoryAllreadyRegistered, path);
                 return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(RestoreManagerError.VideoDirectoryAllreadyRegistered, path));
             }
@@ -175,15 +197,19 @@ namespace Niconicome.Models.Local.Restore
                 this._videoFileDirectories.Add(path);
             }
 
+            this.IsGettingVideosProcessing.Value = false;
             return result ?? AttemptResult<int>.Fail();
 
         }
 
         public async Task<IAttemptResult<int>> GetVideosFromVideoDirectoryAsync()
         {
+            this.IsGettingVideosProcessing.Value = true;
+
             IAttemptResult<ISettingInfo<List<string>>> sResult = this._settingsContainer.GetSetting(SettingNames.VideoSearchDirectories, new List<string>());
             if (!sResult.IsSucceeded || sResult.Data is null)
             {
+                this.IsGettingVideosProcessing.Value = false;
                 return AttemptResult<int>.Fail(sResult.Message);
             }
 
@@ -195,6 +221,7 @@ namespace Niconicome.Models.Local.Restore
                 result = await this._fileStore.AddFilesFromDirectoryListAsync(sResult.Data.Value);
             });
 
+            this.IsGettingVideosProcessing.Value = false;
             return result ?? AttemptResult<int>.Fail();
         }
 
@@ -259,17 +286,21 @@ namespace Niconicome.Models.Local.Restore
             return this._settingsContainer.ClearSettings();
         }
 
-        public IAttemptResult ApplyBackup(string guid)
+        public async Task<IAttemptResult> ApplyBackupAsync(string guid)
         {
-            IAttemptResult result = this._backuphandler.ApplyBackup(guid);
+            this.IsApplyingBackupProcessing.Value = true;
+
+            IAttemptResult result = await Task.Run(() => this._backuphandler.ApplyBackup(guid));
             if (!result.IsSucceeded)
             {
+                this.IsApplyingBackupProcessing.Value = false;
                 return result;
             }
 
             this._videoStore.Flush();
             this._playlistManager.Initialize();
 
+            this.IsApplyingBackupProcessing.Value = false;
             return AttemptResult.Succeeded();
         }
 
@@ -326,6 +357,24 @@ namespace Niconicome.Models.Local.Restore
 
             return AttemptResult.Succeeded();
         }
+
+        public async Task<IAttemptResult> CleanDataAsync()
+        {
+            this.IsDataCleaningProcessing.Value = true;
+
+            IAttemptResult pResult = await Task.Run(() => this._storeCleaner.CleanPlaylists());
+            if (!pResult.IsSucceeded)
+            {
+                this.IsDataCleaningProcessing.Value = false;
+                return pResult;
+            }
+
+            IAttemptResult vResult = await Task.Run(() => this._storeCleaner.CleanVideos());
+
+            this.IsDataCleaningProcessing.Value = false;
+            return vResult;
+        }
+
 
         #endregion
 

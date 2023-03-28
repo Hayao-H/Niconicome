@@ -24,6 +24,13 @@ namespace Niconicome.Models.Local.State
         void RegisterNavigationManager(BlazorWindows window, NavigationManager navigationManager);
 
         /// <summary>
+        /// NavigationManagerを登録解除
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="navigationManager"></param>
+        void UnRegisterNavigationManager(BlazorWindows window);
+
+        /// <summary>
         /// 遷移すべきページを取得
         /// </summary>
         /// <param name="window"></param>
@@ -96,6 +103,17 @@ namespace Niconicome.Models.Local.State
 
             this._navigations.Add(window, navigation);
         }
+
+        public void UnRegisterNavigationManager(BlazorWindows window)
+        {
+            if (!this._navigations.ContainsKey(window))
+            {
+                return;
+            }
+
+            this._navigations.Remove(window);
+        }
+
 
         public void ReloadRequested(string currentURL)
         {
