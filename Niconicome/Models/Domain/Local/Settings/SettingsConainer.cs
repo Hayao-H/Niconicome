@@ -20,6 +20,15 @@ namespace Niconicome.Models.Domain.Local.Settings
         IAttemptResult<ISettingInfo<T>> GetSetting<T>(string settingName, T defaultValue) where T : notnull;
 
         /// <summary>
+        /// 設定の値だけを取得する
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="settingName"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        IAttemptResult<T> GetOnlyValue<T>(string settingName, T defaultValue) where T : notnull;
+
+        /// <summary>
         /// 全ての設定を削除する
         /// </summary>
         /// <returns></returns>
@@ -31,7 +40,7 @@ namespace Niconicome.Models.Domain.Local.Settings
         public SettingsConainer(ISettingsStore store, ISettingMigratioin settingMigratioin)
         {
             this._store = store;
-            this._settingMigratioin= settingMigratioin;
+            this._settingMigratioin = settingMigratioin;
         }
 
         #region field
@@ -60,7 +69,30 @@ namespace Niconicome.Models.Domain.Local.Settings
             return this._store.GetSetting<T>(settingName);
         }
 
-        public　IAttemptResult ClearSettings()
+        public IAttemptResult<T> GetOnlyValue<T>(string settingName, T defaultValue) where T : notnull
+        {
+            if (this._settingMigratioin.IsMigrationNeeded)
+            {
+                IAttemptResult migResult = this._settingMigratioin.Migrate();
+                if (!migResult.IsSucceeded) return AttemptResult<T>.Fail(migResult.Message);
+            }
+
+            if (!this._store.Exists(settingName))
+            {
+                this._store.SetSetting(settingName, defaultValue);
+            }
+
+            IAttemptResult<ISettingInfo<T>> result = this._store.GetSetting<T>(settingName);
+            if (!result.IsSucceeded||result.Data is null)
+            {
+                return AttemptResult<T>.Fail(result.Message);
+            }
+
+            return AttemptResult<T>.Succeeded(result.Data.Value);
+        }
+
+
+        public IAttemptResult ClearSettings()
         {
             return this._store.Clear();
         }

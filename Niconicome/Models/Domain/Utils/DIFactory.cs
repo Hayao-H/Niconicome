@@ -341,6 +341,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
+            services.AddTransient<Software::FFmpeg.FFmpeg.IFFmpegManager, Software::FFmpeg.FFmpeg.FFmpegManager>();
             services.AddSingleton<State::Style.IVideoListWidthManager, State::Style.VideoListWidthManager>();
             services.AddTransient<PlaylistV2::Manager.ISearchManager, PlaylistV2::Manager.SearchManager>();
             services.AddTransient<NicoImport::IExportHandler, NicoImport::ExportHandler>();
