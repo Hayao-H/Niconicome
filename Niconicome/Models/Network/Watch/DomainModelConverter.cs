@@ -118,7 +118,10 @@ namespace Niconicome.Models.Network.Watch
                 }
 
                 result.Data.IsNicodicExist = tag.IsNicodicExist;
-                info.AddTag(result.Data);
+                if (!info.Tags.Any(t => t.Name == tag.Name))
+                {
+                    info.AddTag(result.Data);
+                }
             }
 
             //再生回数
