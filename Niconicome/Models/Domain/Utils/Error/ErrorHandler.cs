@@ -149,7 +149,7 @@ namespace Niconicome.Models.Domain.Utils.Error
 
             if (converted is int index)
             {
-                return $"{errorLevel}{errorType}{index}";
+                return $"{errorLevel}{errorType}-{index}";
             }
             else
             {
