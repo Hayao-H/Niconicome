@@ -343,6 +343,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
             services.AddTransient<Software::FFmpeg.FFmpeg.IFFmpegManager, Software::FFmpeg.FFmpeg.FFmpegManager>();
             services.AddSingleton<State::Style.IVideoListWidthManager, State::Style.VideoListWidthManager>();
+            services.AddSingleton<State::Style.IWindowStyleManager, State::Style.WindowStyleManager>();
             services.AddTransient<PlaylistV2::Manager.ISearchManager, PlaylistV2::Manager.SearchManager>();
             services.AddTransient<NicoImport::IExportHandler, NicoImport::ExportHandler>();
             services.AddTransient<NicoImport::IImportHandler, NicoImport::ImportHandler>();

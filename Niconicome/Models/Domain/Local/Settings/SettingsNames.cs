@@ -208,6 +208,15 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string IsDebugMode { get; private set; } = "Application.IsDebugMode";
 
+        //Application.Window
+        public static string WindowTop { get; private set; } = "Application.Window.WindowTop";
+
+        public static string WindowLeft { get; private set; } = "Application.Window.WindowLeft";
+
+        public static string WindowWidth { get; private set; } = "Application.Window.WindowWidth";
+
+        public static string WindowHeight { get; private set; } = "Application.Window.WindowHeight";
+
         //Addons
         public static string IsDeveloppersMode { get; private set; } = "Addons.IsDeveloppersModeEnabled";
 

@@ -35,6 +35,7 @@ using Tree = Niconicome.Views.Mainpage.Region.PlaylistTree;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.Models.Utils.Reactive;
+using Style = Niconicome.Models.Local.State.Style;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -347,7 +348,11 @@ namespace Niconicome.ViewModels.Mainpage
         {
             base.OnAttached();
             this.AssociatedObject.Closing += this.OnClosing;
-            this.AssociatedObject.Loaded += (_, _) => this.CreateTabs();
+            this.AssociatedObject.Loaded += (_, _) =>
+            {
+                this.SetWindowPosition();
+                this.CreateTabs();
+            };
         }
 
         protected override void OnDetaching()
@@ -358,6 +363,10 @@ namespace Niconicome.ViewModels.Mainpage
 
         private void OnClosing(object? sender, CancelEventArgs e)
         {
+
+            Window window = this.AssociatedObject;
+            WS.Mainpage.WindowStyleManager.SaveTyle(new Style::WindowStyle((int)window.Top, (int)window.Left, (int)window.Height, (int)window.Width));
+
             if (!WS::Mainpage.Shutdown.IsShutdowned)
             {
                 IDialogService service = Application.Current.As<PrismApplication>().Container.Resolve<IDialogService>();
@@ -373,6 +382,37 @@ namespace Niconicome.ViewModels.Mainpage
                 }
 
                 WS::Mainpage.Shutdown.ShutdownApp();
+            }
+        }
+
+        private void SetWindowPosition()
+        {
+            IAttemptResult<Style::WindowStyle> result = WS.Mainpage.WindowStyleManager.GetStyle();
+            if (!result.IsSucceeded||result.Data is null)
+            {
+                return;
+            }
+
+            Style::WindowStyle style = result.Data;
+
+            if (style.Top >= 0)
+            {
+                this.AssociatedObject.Top = style.Top;
+            }
+
+            if (style.Left >= 0)
+            {
+                this.AssociatedObject.Left = style.Left;
+            }
+
+            if (style.Width >= 0)
+            {
+                this.AssociatedObject.Width = style.Width;
+            }
+
+            if (style.Height >= 0)
+            {
+                this.AssociatedObject.Height = style.Height;
             }
         }
 
