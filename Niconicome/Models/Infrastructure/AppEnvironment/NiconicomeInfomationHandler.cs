@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Forms;
 using Niconicome.Models.Domain.Utils.AppEnvironment;
 
 namespace Niconicome.Models.Infrastructure.AppEnvironment

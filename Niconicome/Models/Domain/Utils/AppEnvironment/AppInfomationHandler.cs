@@ -17,5 +17,6 @@ namespace Niconicome.Models.Domain.Utils.AppEnvironment
         /// 64bitプロセスであるかどうかを確認
         /// </summary>
         bool Is64BitProcess { get; }
+
     }
 }

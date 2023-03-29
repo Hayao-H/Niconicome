@@ -88,12 +88,12 @@ namespace Niconicome.Models.Domain.Local.Style
                     return new AttemptResult<UserChrome>() { Message = "userChrome.jsonの解析に失敗しました。", Exception = e };
                 }
 
-                this.logger.Log("userChrome.jsonの読み込みに成功しました。");
+                //this.logger.Log("userChrome.jsonの読み込みに成功しました。");
                 return new AttemptResult<UserChrome>() { Data = chrome, IsSucceeded = true };
             }
             else
             {
-                this.logger.Log("userChrome.jsonが存在しなかったのでインスタンスを作成しました。");
+                //this.logger.Log("userChrome.jsonが存在しなかったのでインスタンスを作成しました。");
                 return new AttemptResult<UserChrome>() { IsSucceeded = true, Data = new UserChrome() };
             }
         }

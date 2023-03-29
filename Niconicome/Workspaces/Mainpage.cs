@@ -178,5 +178,10 @@ namespace Niconicome.Workspaces
         /// 検索
         /// </summary>
         public static Playlist::Manager.ISearchManager SearchManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.ISearchManager>();
+
+        /// <summary>
+        /// ウィンドウの位置など
+        /// </summary>
+        public static Style::IWindowStyleManager WindowStyleManager { get; private set; } = DIFactory.Resolve<Style::IWindowStyleManager>();
     }
 }

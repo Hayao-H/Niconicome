@@ -24,5 +24,15 @@ namespace Niconicome.Models.Domain.Utils.AppEnvironment
         /// 64bitアーキテクチャーであるかどうかを確認
         /// </summary>
         bool Is64BitOperatingSYstem { get; }
+
+        /// <summary>
+        /// 作業領域の幅
+        /// </summary>
+        double WorkAreWidth { get; }
+
+        /// <summary>
+        /// 作業領域の高さ
+        /// </summary>
+        double WorkAreHeight { get; }
     }
 }
