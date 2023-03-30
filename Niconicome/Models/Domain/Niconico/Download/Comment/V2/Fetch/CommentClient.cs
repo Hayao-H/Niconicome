@@ -102,9 +102,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
             //変数定義
             var loopIndex = 0;
-            var fetchedCommentCountOfDefaultThread = new List<int>();
             Core::IComment? firstComment = null;
-            ITarget? defaultThread = dmcInfo.CommentTargets.FirstOrDefault(t => t.Fork == "main");
+            ITarget? defaultThread = dmcInfo.CommentTargets.LastOrDefault(t => t.Fork == "main");
 
             //デフォルトスレッドが存在しない場合はエラー
             if (defaultThread is null)
@@ -169,9 +168,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
                 var converted = fResult.Data!;
 
-                //取得したコメントのうち、デフォルトスレッドに投稿されたものの数を記録
-                fetchedCommentCountOfDefaultThread.Add(this.GetDefaultThreadCommentCount(defaultThreadID, defaultThreadFork, converted));
-
                 //コメントをコレクションに追加
                 foreach (var c in converted) collection.Add(c);
 
@@ -198,6 +194,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                     break;
                 }
 
+                if (this.CanQuitDownload(0, collection.Count, clientOption))
+                {
+                    break;
+                }
+
                 //変数を更新
                 loopIndex++;
             }
@@ -209,7 +210,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
             }
 
             //取得できなかったコメントを再取得
-            var averageFetchCount = (int)Math.Floor(fetchedCommentCountOfDefaultThread.Average());
             var unfetchedRange = collection.GetUnFilledRange().OrderByDescending(r => r.Start.No).ToList();
 
             //取得情報を初期化
