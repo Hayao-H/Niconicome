@@ -357,6 +357,17 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 dlSucceededGetResult.Data.PlaylistType = PlaylistType.DownloadSucceededHistory;
             }
 
+            if (!this._playlistStore.Exist(PlaylistType.PlaybackHistory))
+            {
+                IAttemptResult<int> playbackCreationResult = this._playlistStore.Create("最近再生した動画");
+                if (!playbackCreationResult.IsSucceeded) return AttemptResult.Fail(playbackCreationResult.Message);
+
+                IAttemptResult<IPlaylistInfo> playbackGetResult = this._playlistStore.GetPlaylist(playbackCreationResult.Data);
+                if (!playbackGetResult.IsSucceeded || playbackGetResult.Data is null) return AttemptResult.Fail(playbackGetResult.Message);
+
+                playbackGetResult.Data.PlaylistType = PlaylistType.PlaybackHistory;
+            }
+
             return AttemptResult.Succeeded();
         }
 
