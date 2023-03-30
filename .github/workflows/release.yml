@@ -13,7 +13,9 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+      with:
+        ref: main
     - name: Setup .NET 6.0.*
       uses: actions/setup-dotnet@v1
       with:
@@ -48,8 +50,7 @@ jobs:
       id: get-version
       run: |
         VERSION=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
-        echo ::set-output name=version::$VERSION
-
+        echo "version=$VERSION" >> $GITHUB_OUTPUT 
   publish:
     if: contains(github.ref, 'tags/v')
     needs: [test, release]
@@ -59,7 +60,9 @@ jobs:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       NUGET_XMLDOC_MODE: skip
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+      with:
+        ref: main
     - name: Setup .NET6.0
       uses: actions/setup-dotnet@v1
       with:
@@ -71,20 +74,22 @@ jobs:
         mkdir ffmpeg/bin
         cd tmp
         $ProgressPreference = 'SilentlyContinue'
-        Invoke-WebRequest https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip -o ffbin.zip
+        Invoke-WebRequest https://github.com/GyanD/codexffmpeg/releases/download/6.0/ffmpeg-6.0-full_build.zip -o ffbin.zip
         Expand-Archive ffbin.zip -Force
         $item = Get-Childitem -Recurse -Filter ffmpeg.exe
+        $item2 = Get-Childitem -Recurse -Filter ffprobe.exe
         cd ..
         move $item[0].Fullname ffmpeg/bin
+        move $item2[0].Fullname ffmpeg/bin
         del tmp -r
         
     - name: Build
       shell: powershell
       run: |
-        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x64 -p:PublishSingleFile=true --self-contained true  -o win-x64-sc
-        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x64 -p:PublishSingleFile=true --self-contained false  -o win-x64
-        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86 -p:PublishSingleFile=true --self-contained true  -o win-x86-sc
-        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86 -p:PublishSingleFile=true --self-contained false  -o win-x86
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true  -o win-x64-sc
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained false  -o win-x64
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true  -o win-x86-sc
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained false  -o win-x86
         Copy-Item -Recurse ffmpeg/bin win-x64-sc
         Copy-Item -Recurse ffmpeg/bin win-x64
         Copy-Item -Recurse ffmpeg/bin win-x86-sc

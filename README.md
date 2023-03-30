@@ -2,7 +2,7 @@
 [![.Net6 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net6%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net6+CI%2FCD%22) 
 [![niconicome-nightly-build](https://github.com/Hayao-H/Niconicome/actions/workflows/nightly.yaml/badge.svg)](https://github.com/Hayao-H/Niconicome/actions/workflows/nightly.yaml)
 [![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
-[![Github Release](https://img.shields.io/badge/release-v0.11.1-blue)](https://github.com/Hayao-H/Niconicome/releases)
+[![Github Release](https://img.shields.io/badge/release-v0.12.0-blue)](https://github.com/Hayao-H/Niconicome/releases/latest)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
@@ -15,21 +15,22 @@
 ---
 
 ## 機能
-- 動画・サムネイル・コメントのダウンロード。(:new: コメントサーバー移行に対応@[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0))
+- :new: BlazorベースのWeb技術を用いたUI
+- :new: データのエクスポート・インポート（JSON形式）。 
+- 動画・サムネイル・コメントのダウンロード。(:new: コメントサーバー移行に対応@[v0.12.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.12.0))
 - 投稿者コメント、かんたんコメント、過去ログをオプションで取捨可能。
 - 暗号化動画（公式アニメ）のコメント・サムネイルダウンロード。
-- ローカルDBによるデータ管理。
+- ローカルDBとJSONによるデータ管理。
 - [AIMP](https://www.aimp.ru/)で再生可能な形式のプレイリストを出力。
 - マイリスト、あとで見る(旧:とりあえずマイリスト)、ユーザー・チャンネル投稿動画からの一括登録。
 - アプリ内ブラウザを利用したログインで連携ログイン・二段階認証などに対応。([WebView2 Runtime](#WebView2について)のインストールが必要です。)
 - クリップボード・ニコニコでの検索結果からの動画登録に対応。
 - 外部ソフトの起動。
-- データベースファイルのバックアップ・復元。 
+- データベースファイルのバックアップ・復元。
 - NicomentXenoglossiaからのプレイリストデータ移行。
 - Mozilla Firefoxとのログイン連携。
 - タイマー処理。指定時間にDLを開始できます。
-### 今後追加予定の機能
--  :new: Webview2・JavaScriptベースのプラグイン機能([ClearScript](https://github.com/microsoft/ClearScript)を利用・[v0.8.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.8.0)で一部実装)。
+- Webview2・JavaScriptベースのプラグイン機能([ClearScript](https://github.com/microsoft/ClearScript)を利用)。
 
 ---
 
@@ -63,9 +64,10 @@ WPFと.NET6を用いて開発しています。したがって、対応OSはそ�
 - Windows 7 SP1 ESU
 - Windows 8.1
 - Windows10
+- Windows11
 
 に対応しています。詳しくは[こちら](https://docs.microsoft.com/ja-jp/dotnet/core/install/windows?tabs=net50)をご覧ください。  
-※動作確認はWindows10 homeでのみ行っております。
+※動作確認はWindows101 homeでのみ行っております。
 
 ---
 
