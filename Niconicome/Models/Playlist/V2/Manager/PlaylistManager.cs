@@ -85,6 +85,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             this._playlists.Clear();
 
+            this._playlistStore.Flush();
+
             //特殊なプレイリストを作成
             IAttemptResult specialResult = this.CreateSpecialPlaylist();
             if (!specialResult.IsSucceeded) return;

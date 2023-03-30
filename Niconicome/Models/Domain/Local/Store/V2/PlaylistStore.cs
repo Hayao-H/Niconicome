@@ -50,6 +50,11 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         IAttemptResult Delete(int ID);
 
         /// <summary>
+        /// キャッシュをクリア
+        /// </summary>
+        void Flush();
+
+        /// <summary>
         /// プレイリストの存在を確認する
         /// </summary>
         /// <param name="playlistType"></param>

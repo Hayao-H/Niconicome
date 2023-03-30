@@ -56,7 +56,7 @@ namespace Niconicome.Models.Local.External
 
     public class ExternalAppUtilsV2 : IExternalAppUtilsV2
     {
-        public ExternalAppUtilsV2(IErrorHandler errorHandler, ICommandExecuter commandExecuter, ISettingsContainer settingsContainer,IVideoStore videoStore,IPlaylistManager playlistManager)
+        public ExternalAppUtilsV2(IErrorHandler errorHandler, ICommandExecuter commandExecuter, ISettingsContainer settingsContainer, IVideoStore videoStore, IPlaylistManager playlistManager)
         {
             this._errorHandler = errorHandler;
             this._commandExecuter = commandExecuter;
@@ -184,10 +184,10 @@ namespace Niconicome.Models.Local.External
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ExternalAppUtilsV2Error.VideoIsNotDownloaded, videoInfo.NiconicoId));
             }
 
-            this.AddVideoToHistory(videoInfo.NiconicoId);
+            var path = videoInfo.FilePath.Replace(@"\\?\", string.Empty);
 
-            var path = videoInfo.FilePath.Replace(@"\\?\", string.Empty)
-                ;
+            this.AddVideoToHistory(videoInfo.NiconicoId, path);
+
             return this._commandExecuter.Execute(appPath, $"\"{path}\"");
         }
 
@@ -231,7 +231,8 @@ namespace Niconicome.Models.Local.External
         /// 履歴に残す
         /// </summary>
         /// <param name="niconicoID"></param>
-        private void AddVideoToHistory(string niconicoID)
+        /// <param name="filePath"></param>
+        private void AddVideoToHistory(string niconicoID, string filePath)
         {
             if (this._settingsContainer.GetOnlyValue(SettingNames.DisablePlaybackHistory, false).Data)
             {
@@ -239,7 +240,7 @@ namespace Niconicome.Models.Local.External
             }
 
             IAttemptResult<IPlaylistInfo> pResult = this._playlistManager.GetSpecialPlaylistByType(SpecialPlaylists.PlaybackHistory);
-            if (!pResult.IsSucceeded||pResult.Data is null)
+            if (!pResult.IsSucceeded || pResult.Data is null)
             {
                 return;
             }
@@ -258,10 +259,12 @@ namespace Niconicome.Models.Local.External
             }
 
             IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(niconicoID, playlist.ID);
-            if (!vResult.IsSucceeded||vResult.Data is null)
+            if (!vResult.IsSucceeded || vResult.Data is null)
             {
                 return;
             }
+
+            vResult.Data.FilePath = filePath;
 
             playlist.AddVideo(vResult.Data);
         }

@@ -114,6 +114,12 @@ namespace Niconicome.Models.Infrastructure.Database
             return this._database.Clear(TableNames.Playlist);
         }
 
+        public void Flush()
+        {
+            this._cache.Clear();
+        }
+
+
         public bool Exist(PlaylistType playlistType)
         {
             DBPlaylistType dBPlaylistType = this.Convert(playlistType);
@@ -206,7 +212,8 @@ namespace Niconicome.Models.Infrastructure.Database
             if (this._cache.ContainsKey(playlist.Id))
             {
                 info = this._cache[playlist.Id];
-            }else
+            }
+            else
             {
                 var videos = new List<IVideoInfo>();
                 foreach (var videoID in playlist.Videos)
