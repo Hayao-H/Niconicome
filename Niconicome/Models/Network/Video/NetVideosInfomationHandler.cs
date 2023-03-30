@@ -146,8 +146,8 @@ namespace Niconicome.Models.Network.Video
             IAttemptResult<Info::IDomainVideoInfo> result = await this._watch.GetVideoInfoAsync(niconicoID);
             if (!result.IsSucceeded || result.Data is null)
             {
-                onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingOfVideoHasFailed, niconicoID),ErrorLevel.Error);
-                onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingOfVideoHasFailedDetail, result.Message ?? ""),ErrorLevel.Error);
+                onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingOfVideoHasFailed, niconicoID), ErrorLevel.Error);
+                onMessage(this._stringHandler.GetContent(NetVideosInfomationHandlerStringContent.RetrievingOfVideoHasFailedDetail, result.Message ?? ""), ErrorLevel.Error);
                 return AttemptResult<Remote::VideoInfo>.Fail(result.Message);
             }
 
@@ -167,6 +167,7 @@ namespace Niconicome.Models.Network.Video
                 ChannelID = result.Data.ChannelID,
                 ChannelName = result.Data.ChannelName,
                 AddedAt = DateTime.Now,
+                Duration = result.Data.Duration,
                 Tags = result.Data.Tags.Select(t => new Remote::Tag() { IsNicodicExist = t.IsNicodicExist, Name = t.Name }).ToList().AsReadOnly(),
             });
         }

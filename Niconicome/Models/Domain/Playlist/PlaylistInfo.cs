@@ -292,7 +292,7 @@ namespace Niconicome.Models.Domain.Playlist
 
         public IAttemptResult AddChild(IPlaylistInfo playlistInfo, bool commit = true)
         {
-            if (!this.ChildrenID.Contains(playlistInfo.ID) && this.ChildrenID.Count > 0 && this._children.Count == 0)
+            if (commit && !this.ChildrenID.Contains(playlistInfo.ID) && this.ChildrenID.Count > 0 && this._children.Count == 0)
             {
                 this._childrenID.Add(playlistInfo.ID);
             }

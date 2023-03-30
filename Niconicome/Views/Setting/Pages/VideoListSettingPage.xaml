@@ -80,6 +80,19 @@
             </DockPanel>
             <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             <DockPanel>
+                <materialDesign:PackIcon Kind="History" Foreground="SkyBlue">
+                    <materialDesign:PackIcon.RenderTransform>
+                        <TranslateTransform Y="7"/>
+                    </materialDesign:PackIcon.RenderTransform>
+                </materialDesign:PackIcon>
+                <Label Content="再生履歴を表示・保持しない"/>
+                <ToggleButton 
+                    IsChecked="{Binding IsPlaybackHistoryDisabled.Value}"
+                    HorizontalAlignment="Right"
+                    />
+            </DockPanel>
+            <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+            <DockPanel>
                 <materialDesign:PackIcon Kind="ArrowVerticalLock" Foreground="SkyBlue">
                     <materialDesign:PackIcon.RenderTransform>
                         <TranslateTransform Y="7"/>

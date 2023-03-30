@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Utils.Error;
@@ -11,7 +12,7 @@ namespace Niconicome.Models.Infrastructure.Database
 {
     public class DBCleaner : IStoreCleaner
     {
-        public DBCleaner(ILiteDBHandler database,IErrorHandler errorHandler)
+        public DBCleaner(ILiteDBHandler database, IErrorHandler errorHandler)
         {
             this._database = database;
             this._errorHandler = errorHandler;

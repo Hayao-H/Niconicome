@@ -7,10 +7,12 @@ using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.External;
 using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.External.Error;
+using Niconicome.Models.Playlist.V2.Manager;
 
 namespace Niconicome.Models.Local.External
 {
@@ -54,11 +56,13 @@ namespace Niconicome.Models.Local.External
 
     public class ExternalAppUtilsV2 : IExternalAppUtilsV2
     {
-        public ExternalAppUtilsV2(IErrorHandler errorHandler, ICommandExecuter commandExecuter, ISettingsContainer settingsContainer)
+        public ExternalAppUtilsV2(IErrorHandler errorHandler, ICommandExecuter commandExecuter, ISettingsContainer settingsContainer, IVideoStore videoStore, IPlaylistManager playlistManager)
         {
             this._errorHandler = errorHandler;
             this._commandExecuter = commandExecuter;
             this._settingsContainer = settingsContainer;
+            this._videoStore = videoStore;
+            this._playlistManager = playlistManager;
         }
 
 
@@ -69,6 +73,10 @@ namespace Niconicome.Models.Local.External
         private readonly ICommandExecuter _commandExecuter;
 
         private readonly ISettingsContainer _settingsContainer;
+
+        private readonly IVideoStore _videoStore;
+
+        private readonly IPlaylistManager _playlistManager;
 
         #endregion
 
@@ -176,8 +184,10 @@ namespace Niconicome.Models.Local.External
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ExternalAppUtilsV2Error.VideoIsNotDownloaded, videoInfo.NiconicoId));
             }
 
-            var path = videoInfo.FilePath.Replace(@"\\?\", string.Empty)
-                ;
+            var path = videoInfo.FilePath.Replace(@"\\?\", string.Empty);
+
+            this.AddVideoToHistory(videoInfo.NiconicoId, path);
+
             return this._commandExecuter.Execute(appPath, $"\"{path}\"");
         }
 
@@ -215,6 +225,48 @@ namespace Niconicome.Models.Local.External
             }
 
             return result.Data.Value;
+        }
+
+        /// <summary>
+        /// 履歴に残す
+        /// </summary>
+        /// <param name="niconicoID"></param>
+        /// <param name="filePath"></param>
+        private void AddVideoToHistory(string niconicoID, string filePath)
+        {
+            if (this._settingsContainer.GetOnlyValue(SettingNames.DisablePlaybackHistory, false).Data)
+            {
+                return;
+            }
+
+            IAttemptResult<IPlaylistInfo> pResult = this._playlistManager.GetSpecialPlaylistByType(SpecialPlaylists.PlaybackHistory);
+            if (!pResult.IsSucceeded || pResult.Data is null)
+            {
+                return;
+            }
+
+            IPlaylistInfo playlist = pResult.Data;
+
+            if (this._videoStore.Exist(niconicoID, playlist.ID))
+            {
+                return;
+            }
+
+            IAttemptResult cResult = this._videoStore.Create(niconicoID, playlist.ID);
+            if (!cResult.IsSucceeded)
+            {
+                return;
+            }
+
+            IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(niconicoID, playlist.ID);
+            if (!vResult.IsSucceeded || vResult.Data is null)
+            {
+                return;
+            }
+
+            vResult.Data.FilePath = filePath;
+
+            playlist.AddVideo(vResult.Data);
         }
 
         #endregion

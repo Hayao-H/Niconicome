@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Download;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
@@ -82,13 +83,14 @@ public interface IDownloadTask : IParallelTask<IDownloadTask>
 
 public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownloadTask>
 {
-    public DownloadTask(IPlaylistManager playlistManager, IMessageHandler messageHandler, IContentDownloadHelper contentDownloadHelper,IStringHandler stringHandler)
+    public DownloadTask(IPlaylistManager playlistManager, IMessageHandler messageHandler, IContentDownloadHelper contentDownloadHelper, IStringHandler stringHandler, IVideoStore videoStore)
     {
         this._cts = new CancellationTokenSource();
         this._messageHandler = messageHandler;
         this._contentDownloadHelper = contentDownloadHelper;
         this._playlistManager = playlistManager;
         this._stringHandler = stringHandler;
+        this._videoStore = videoStore;
 
         this.OnWait = _ => { };
         this.TaskFunction = async (_, _) => await this.DownloadAsync();
@@ -122,6 +124,8 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
     private readonly IContentDownloadHelper _contentDownloadHelper;
 
     private readonly IPlaylistManager _playlistManager;
+
+    private readonly IVideoStore _videoStore;
 
     private readonly IStringHandler _stringHandler;
 
@@ -205,11 +209,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
 
             if (this._settings!.SaveFailedHistory)
             {
-                IAttemptResult<IPlaylistInfo> pResult = this._playlistManager.GetSpecialPlaylistByType(SpecialPlaylists.DownloadFailedHistory);
-                if (pResult.IsSucceeded && pResult.Data is not null)
-                {
-                    pResult.Data.AddVideo(this._video);
-                }
+                this.AddVideoToSpecialPlaylist(SpecialPlaylists.DownloadFailedHistory);
             }
 
             this.IsCompleted.Value = true;
@@ -242,11 +242,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
 
             if (this._settings.SaveSucceededHistory)
             {
-                IAttemptResult<IPlaylistInfo> pResult = this._playlistManager.GetSpecialPlaylistByType(SpecialPlaylists.DownloadSucceededHistory);
-                if (pResult.IsSucceeded && pResult.Data is not null)
-                {
-                    pResult.Data.AddVideo(this._video);
-                }
+                this.AddVideoToSpecialPlaylist(SpecialPlaylists.DownloadSucceededHistory);
             }
 
         }
@@ -281,6 +277,45 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
     private bool CheckIfInitialized()
     {
         return this._video is not null && this._settings is not null;
+    }
+
+    private IAttemptResult AddVideoToSpecialPlaylist(SpecialPlaylists type)
+    {
+
+        if (this._video is null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        IAttemptResult<IPlaylistInfo> pResult = this._playlistManager.GetSpecialPlaylistByType(type);
+        if (!pResult.IsSucceeded || pResult.Data is null)
+        {
+            return AttemptResult.Fail(pResult.Message);
+        }
+
+        IPlaylistInfo playlist = pResult.Data;
+
+        if (this._videoStore.Exist(this._video.NiconicoId, playlist.ID))
+        {
+            return AttemptResult.Succeeded();
+        }
+
+        IAttemptResult cResult = this._videoStore.Create(this._video.NiconicoId, playlist.ID);
+        if (!cResult.IsSucceeded)
+        {
+            return cResult;
+        }
+
+        IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(this._video.NiconicoId, playlist.ID);
+        if (!vResult.IsSucceeded || vResult.Data is null)
+        {
+            return AttemptResult.Fail(vResult.Message);
+        }
+
+        return playlist.AddVideo(vResult.Data);
+
+
+
     }
 
     #endregion

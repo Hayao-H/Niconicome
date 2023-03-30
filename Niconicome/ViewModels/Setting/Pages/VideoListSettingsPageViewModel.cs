@@ -43,6 +43,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.IsDownloadSucceededHistoryDisabled = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.DisableDownloadSucceededHistory,false), false);
             this.IsDownloadFailedHistoryDisabled = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.DisableDownloadFailedHistory,false), false);
             this.IsRestoringScrollPosDisabled = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.DisableScrollRestore, false), false);
+            this.IsPlaybackHistoryDisabled = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.DisablePlaybackHistory, false), false);
 
             #endregion
         }
@@ -74,6 +75,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// DL失敗履歴を無効にする
         /// </summary>
         public SettingInfoViewModel<bool> IsDownloadFailedHistoryDisabled { get; init; }
+
+        /// <summary>
+        /// 再生履歴を無効にする
+        /// </summary>
+        public SettingInfoViewModel<bool> IsPlaybackHistoryDisabled { get; init; }
 
         /// <summary>
         /// スクロール一復元を無効にする
@@ -110,6 +116,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public SettingInfoViewModelD<bool> IsDownloadFailedHistoryDisabled { get; init; } = new(true);
 
         public SettingInfoViewModelD<bool> IsRestoringScrollPosDisabled { get; init; } = new(true);
+
+        public SettingInfoViewModelD<bool> IsPlaybackHistoryDisabled { get; init; } = new(true);
 
     }
 }
