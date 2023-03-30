@@ -122,6 +122,8 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string DisableDownloadFailedHistory { get; private set; } = "Download.History.DisableDownloadFailedHistory";
 
+        public static string DisablePlaybackHistory { get; private set; } = "Download.History.DisablePlaybackHistory";
+
         //Network.Session
         public static string IsAutologinEnable { get; private set; } = "Network.Session.IsAutoLoginEnabled";
 

@@ -106,11 +106,16 @@ namespace Niconicome.Models.Playlist.V2.Manager
             //ルートプレイリストが見つからない
             if (root is null) return;
 
-            IPlaylistInfo? temp = result.Data.FirstOrDefault(p => p.PlaylistType == PlaylistType.Temporary);
+            //特殊プレイリスト
+            IEnumerable<IPlaylistInfo> special = this.GetSpecialPlaylists(result.Data);
+            IPlaylistInfo? temp = special.FirstOrDefault(p => p.PlaylistType == PlaylistType.Temporary);
             if (temp is null) return;
             this._container.CurrentSelectedPlaylist = temp;
 
-            root.AddChild(temp, false);
+            foreach (var p in special)
+            {
+                root.AddChild(p, false);
+            }
 
             this.SetChild(root, new List<string>().AsReadOnly());
 
@@ -234,6 +239,10 @@ namespace Niconicome.Models.Playlist.V2.Manager
             {
                 //子プレイリストを取得
                 IPlaylistInfo child = this._playlists[childID];
+                if (this.CheckWhetherSpecialPlaylist(child))
+                {
+                    continue;
+                }
                 current.AddChild(child, false);
 
                 //削除処理用に親のIDを追加
@@ -349,6 +358,64 @@ namespace Niconicome.Models.Playlist.V2.Manager
             }
 
             return AttemptResult.Succeeded();
+        }
+
+        private IEnumerable<IPlaylistInfo> GetSpecialPlaylists(IEnumerable<IPlaylistInfo> playlists)
+        {
+            bool disableFailed = this._settingsContainer.GetOnlyValue(SettingNames.DisableDownloadFailedHistory, false).Data;
+            bool disableSucceeded = this._settingsContainer.GetOnlyValue(SettingNames.DisableDownloadSucceededHistory, false).Data;
+            bool disablePlayback = this._settingsContainer.GetOnlyValue(SettingNames.DisablePlaybackHistory, false).Data;
+
+
+            return playlists.Where(p =>
+            {
+                if (p.PlaylistType == PlaylistType.Temporary)
+                {
+                    return true; ;
+                }
+
+                if (!disableFailed && p.PlaylistType == PlaylistType.DownloadFailedHistory)
+                {
+                    return true; ;
+                }
+
+                if (!disableSucceeded && p.PlaylistType == PlaylistType.DownloadSucceededHistory)
+                {
+                    return true; ;
+                }
+
+                if (!disablePlayback && p.PlaylistType == PlaylistType.PlaybackHistory)
+                {
+                    return true; ;
+                }
+
+                return false;
+            });
+        }
+
+        private bool CheckWhetherSpecialPlaylist(IPlaylistInfo playlist)
+        {
+            if(playlist.PlaylistType == PlaylistType.Temporary)
+            {
+                return true;
+            }
+
+            if (playlist.PlaylistType == PlaylistType.DownloadSucceededHistory)
+            {
+                return true;
+            }
+
+            if (playlist.PlaylistType == PlaylistType.DownloadFailedHistory)
+            {
+                return true;
+            }
+
+            if (playlist.PlaylistType == PlaylistType.PlaybackHistory)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         #endregion

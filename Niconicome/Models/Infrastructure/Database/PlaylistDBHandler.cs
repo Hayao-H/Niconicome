@@ -34,6 +34,8 @@ namespace Niconicome.Models.Infrastructure.Database
 
         private readonly IErrorHandler _errorHandler;
 
+        private readonly Dictionary<int, IPlaylistInfo> _cache = new();
+
         #endregion
 
         #region Method
@@ -199,18 +201,28 @@ namespace Niconicome.Models.Infrastructure.Database
         /// <returns></returns>
         private IPlaylistInfo Convert(Types::Playlist playlist)
         {
-            var videos = new List<IVideoInfo>();
-            foreach (var videoID in playlist.Videos)
-            {
-                IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(videoID, playlist.Id);
-                if (!vResult.IsSucceeded || vResult.Data is null) continue;
-                videos.Add(vResult.Data);
-            }
+            IPlaylistInfo info;
 
-            var info = new PlaylistInfo(playlist.Name, videos, this, playlist.Children)
+            if (this._cache.ContainsKey(playlist.Id))
             {
-                ID = playlist.Id,
-            };
+                info = this._cache[playlist.Id];
+            }else
+            {
+                var videos = new List<IVideoInfo>();
+                foreach (var videoID in playlist.Videos)
+                {
+                    IAttemptResult<IVideoInfo> vResult = this._videoStore.GetVideo(videoID, playlist.Id);
+                    if (!vResult.IsSucceeded || vResult.Data is null) continue;
+                    videos.Add(vResult.Data);
+                }
+
+                info = new PlaylistInfo(playlist.Name, videos, this, playlist.Children)
+                {
+                    ID = playlist.Id,
+                };
+
+                this._cache.Add(playlist.Id, info);
+            }
 
             info.IsAutoUpdateEnabled = false;
 
