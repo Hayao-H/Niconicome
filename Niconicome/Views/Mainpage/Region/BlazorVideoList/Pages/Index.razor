@@ -14,8 +14,8 @@
     <h3>@(DataContext.PlaylistName)</h3>
 
     <div class="ControlsContainer">
-        <div class="InputBoxWrapper">
-            <input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDown" />
+        <div class="InputBoxWrapper InputContextMenuWrapper">
+            <input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @onmousedown="DataContext.InputContextMenuViewModel.OnClick" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDown" />
             @if (DataContext.IsProcessing.Value)
             {
                 <button type="button" id="RegisterButton" class="btn btn-primary" disabled>登録</button>
@@ -24,6 +24,16 @@
             {
                 <button type="button" id="RegisterButton" class="btn btn-primary" @onclick="async ()=>await DataContext.AddVideoAsync()">登録</button>
             }
+
+
+            <div class="ContextMenu @(DataContext.InputContextMenuViewModel.IsMenuVisible.Value?"Show":"")" style="top:@(DataContext.InputContextMenuViewModel.MouseTop.Value)px; left:@(DataContext.InputContextMenuViewModel.MouseLeft.Value)px;">
+                <div class="ContextMenuItem Clickable">
+                    <p @onclick="DataContext.InputContextMenuViewModel.OnPasteButtonClick"><i class="fa-solid fa-paste fa-sm ContextMenuIcon"></i>貼り付け</p>
+                </div>
+                <div class="ContextMenuItem Clickable">
+                    <p @onclick="DataContext.InputContextMenuViewModel.OnCopyClick"><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>コピー</p>
+                </div>
+            </div>
         </div>
         <div class="ButtonsWrapper">
             <button type="button" class="btn btn-primary ControlButton" title="プレイリスト情報を編集" @onclick="DataContext.OnPlaylistEditButtonClick"><i class="fa-solid fa-pen"></i></button>
@@ -376,6 +386,16 @@
             {
                 JS.InvokeVoidAsync("showModal");
             });
+        });
+
+        DataContext.InputContextMenuViewModel.RegisterGetSelectionFunc(async () =>
+        {
+            if (this.module is not null)
+            {
+                return await this.module.InvokeAsync<string>("getSelectedIOfInput");
+            }
+
+            return string.Empty;
         });
 
         DataContext.Bindables.RegisterPropertyChangeHandler(() => this.ExecuteInCurrentThread(this.StateHasChanged));
