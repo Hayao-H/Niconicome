@@ -1,0 +1,20 @@
+﻿@inject VM::Setting.V2.Page.SideMenuViewModel DataContext;
+@implements IDisposable;
+
+<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-gear"></i>一般設定</p>
+<p class="MenuItem NotImpl"><i class="Icon fa-regular fa-file"></i>ファイル設定</p>
+<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-download"></i>ダウンロード設定</p>
+<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-up-right-from-square"></i>外部ソフト設定</p>
+<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-list"></i>動画リスト設定</p>
+<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-palette"></i>スタイル設定</p>
+<p class="MenuItem" @onclick="()=>DataContext.OnLinkCkick(VM::Setting.V2.Page.SettingPages.Restore)"><i class="Icon fa-solid fa-triangle-exclamation"></i>回復</p>
+<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-bug"></i>デバッグ設定</p>
+<p class="MenuItem" @onclick="()=>DataContext.OnLinkCkick(VM::Setting.V2.Page.SettingPages.Import)"><i class="Icon fa-solid fa-file-import"></i>インポート</p>
+<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-circle-info"></i>アプリ情報</p>
+
+@code {
+    public void Dispose()
+    {
+        DataContext.Dispose();
+    }
+}

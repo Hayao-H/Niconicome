@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.API.Resource;
-using Niconicome.Models.Domain.Local.Addons.Core.Engine;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Helper.Result;
 using NiconicomeTest.Stabs.Models.Domain.Local.IO;
 using NiconicomeTest.Stabs.Models.Domain.Utils;

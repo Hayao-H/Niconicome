@@ -24,16 +24,13 @@ namespace Niconicome.Models.Domain.Local.LocalFile
     class Encodeutility : IEncodeutility
     {
 
-        public Encodeutility(ILocalSettingHandler settingHandler, ILocalState localState, ILogger logger)
+        public Encodeutility(ILocalSettingHandler settingHandler, ILogger logger)
         {
             this.settingHandler = settingHandler;
-            this.localState = localState;
             this.logger = logger;
         }
 
         private readonly ILocalSettingHandler settingHandler;
-
-        private readonly ILocalState localState;
 
         private readonly ILogger logger;
 

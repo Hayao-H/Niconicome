@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.Storage;
+using Niconicome.Models.Infrastructure.Database.LiteDB;
 
 namespace Niconicome.Models.Domain.Local.Store.Types
 {
@@ -43,9 +44,14 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     /// <summary>
     /// アプリケーションの設定(真偽値)
     /// </summary>
-    public record AppSettingBool : IStorable
+    public record AppSettingBool : IStorable, IBaseStoreClass
     {
-        public static string TableName { get; } = "appsettingsbool";
+        [BsonIgnore]
+        public string TableName { get; } = "appsettingsbool";
+
+        [BsonIgnore]
+        public static string TableNameS { get; } = "appsettingsbool";
+
 
         [BsonId]
         public int Id { get; set; }
@@ -65,9 +71,13 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     /// <summary>
     /// アプリケーションの設定(文字列)
     /// </summary>
-    public record AppSettingString : IStorable
+    public record AppSettingString : IStorable, IBaseStoreClass
     {
-        public static string TableName { get; } = "appsettingsstr";
+        [BsonIgnore]
+        public static string TableNameS { get; } = "appsettingsstr";
+
+        [BsonIgnore]
+        public string TableName { get; } = "appsettingsstr";
 
         [BsonId]
         public int Id { get; set; }
@@ -86,9 +96,13 @@ namespace Niconicome.Models.Domain.Local.Store.Types
     /// <summary>
     /// アプリケーションの設定(整数値)
     /// </summary>
-    public record AppSettingInt : IStorable
+    public record AppSettingInt : IStorable, IBaseStoreClass
     {
-        public static string TableName { get; } = "appsettingsint";
+        [BsonIgnore]
+        public static string TableNameS { get; } = "appsettingsint";
+
+        public string TableName { get; } = "appsettingsint";
+
 
         [BsonId]
         public int Id { get; set; }
@@ -181,7 +195,6 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string ThumbnailSuffix { get; private set; } = "thumbnailsuffix";
         public static string OwnerCommentSuffix { get; private set; } = "ownercommentsuffix";
         public static string IsDeveloppersMode { get; private set; } = "isdeveloppersmode";
-        public static string IsAddonDebuggingEnable { get; private set; } = "isaddondebuggingenable";
         public static string IsDlTImerEveryDayEnable { get; private set; } = "isdltimereverydayenable";
         public static string PostDownloadAction { get; private set; } = "postdownloadaction";
         public static string EnonomyQualitySuffix { get; private set; } = "enonomyqualitysuffix";
@@ -195,6 +208,5 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public static string CommentCountPerBlock { get; private set; } = "commentcountperblock";
         public static string IsAppendingToLocalCommentEnable { get; private set; } = "isappendingtolocalcommentenable";
         public static string IsOmittingXmlDeclarationIsEnable { get; private set; } = "isomittingxmldeclarationisenable";
-
     }
 }

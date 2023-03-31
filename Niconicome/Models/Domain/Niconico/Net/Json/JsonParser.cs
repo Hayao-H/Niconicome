@@ -20,6 +20,7 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json
                 new JsonSerializerOptions()
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    AllowTrailingCommas = true,
                     PropertyNameCaseInsensitive = false,
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                     Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)

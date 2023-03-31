@@ -37,10 +37,11 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
                 Name = new ReactiveProperty<string>(playlist.Name),
                 IsRemotePlaylist = playlist.IsChannel,
                 RemoteType = playlist.IsChannel ? RemoteType.Channel : RemoteType.None,
-                RemoteId = playlist.ChannelId??string.Empty,
+                RemoteId = playlist.ChannelId ?? string.Empty,
             };
 
-            converted.Videos.AddRange(playlist.Videos.Select(v => {
+            converted.Videos.AddRange(playlist.Videos.Select(v =>
+            {
                 var video = this.videoInfoContainer.GetVideo(v);
                 return video;
             }));

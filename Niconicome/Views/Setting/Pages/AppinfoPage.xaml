@@ -232,6 +232,57 @@
                         </Hyperlink>
                         </TextBlock>
 
+                        <TextBlock Style="{StaticResource LicenseTitle}">
+                        <Hyperlink NavigateUri="https://getbootstrap.jp/">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Bootstrap
+                        </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
+                        <Hyperlink NavigateUri="https://getbootstrap.jp/docs/5.0/about/license/">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Read license on Bootstrap Doc
+                        </Hyperlink>
+                        </TextBlock>
+
+                        <TextBlock Style="{StaticResource LicenseTitle}">
+                        <Hyperlink NavigateUri="https://fontawesome.com/">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Font Awesome
+                        </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
+                        <Hyperlink NavigateUri="https://fontawesome.com/license/free">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Read license on fontawesome.com
+                        </Hyperlink>
+                        </TextBlock>
+
+                        <TextBlock Style="{StaticResource LicenseTitle}">
+                        <Hyperlink NavigateUri="https://videojs.com/">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            video.js
+                        </Hyperlink>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource LicenseBlock}">
+                        <Hyperlink NavigateUri="https://github.com/videojs/video.js/blob/main/LICENSE">
+                            <i:Interaction.Behaviors>
+                                <mainvm:HyperlinkBehavior/>
+                            </i:Interaction.Behaviors>
+                            Read license github.com
+                        </Hyperlink>
+                        </TextBlock>
+
                     </StackPanel>
                 </Expander>
             </StackPanel>

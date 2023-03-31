@@ -9,22 +9,34 @@ namespace Niconicome.Models.Const
 {
     public static class FileFolder
     {
-       public const string DefaultDownloadDir = "downloaded";
+        public static string DefaultDownloadDir = "downloaded";
 
-        public const string FirefoxCookieFileName= "cookies.sqlite";
+        public static string FirefoxCookieFileName = "cookies.sqlite";
 
-        public const string Mp4FileExt = ".mp4";
+        public static string Mp4FileExt = ".mp4";
 
-        public const string TsFileExt = ".ts";
+        public static string TsFileExt = ".ts";
 
-        public const string DefaultHtmlFileExt = ".html";
+        public static string DefaultHtmlFileExt = ".html";
 
-        public const string DefaultJpegFileExt = ".jpg";
+        public static string DefaultJpegFileExt = ".jpg";
 
-        public const string UserChromePath = @"chrome\userChrome.json";
+        public static string DefaultAddonExtension = ".zip";
 
-        public const string UserChromeFileName = @"userChrome.json";
+        public static string UserChromePath = @"chrome\userChrome.css";
 
-        public const string AddonsFolder = @"addons";
+        public static string UserChromeFileName = @"userChrome.css";
+
+        public static string AddonsFolder = @"addons";
+
+        public static string ManifestFileName = "manifest.json";
+
+        public static string AddonsTmpDirectory = @"tmp\addons";
+
+        public static string LogFolderName = "log";
+
+        public static string SettingJSONPath = @"data\settings.json";
+
+        public static string ExportFolderPath = @"data\export";
     }
 }

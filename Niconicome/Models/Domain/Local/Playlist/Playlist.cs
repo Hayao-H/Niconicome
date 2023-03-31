@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,13 +11,50 @@ namespace Niconicome.Models.Domain.Local.Playlist
 
     public interface IPlaylist
     {
-        void Add(string filpath);
-        void AddRange(IEnumerable<string> filepaths);
-        void Remove(string filepath);
-        void Clear();
-        IEnumerable<string> GetAllFile();
+        /// <summary>
+        /// 動画を追加
+        /// </summary>
+        /// <param name="video"></param>
+        void Add(IVideo video);
+
+        /// <summary>
+        /// 複数の動画を追加
+        /// </summary>
+        /// <param name="videos"></param>
+        void AddRange(IEnumerable<IVideo> videos);
+
+        /// <summary>
+        /// 動画数
+        /// </summary>
         int Count { get; }
+
+        /// <summary>
+        /// プレイリスト名
+        /// </summary>
         string PlaylistName { get; }
+
+        /// <summary>
+        /// 動画
+        /// </summary>
+        ReadOnlyCollection<IVideo> Videos { get; }
+    }
+
+    public interface IVideo
+    {
+        /// <summary>
+        /// ファイルパス
+        /// </summary>
+        string Path { get; }
+
+        /// <summary>
+        /// タイトル
+        /// </summary>
+        string Title { get; }
+
+        /// <summary>
+        /// 投稿者名
+        /// </summary>
+        string OwnerName { get; }
     }
 
     public interface IPlaylistHandler
@@ -24,70 +62,32 @@ namespace Niconicome.Models.Domain.Local.Playlist
         string CreatePlaylist(IPlaylist playlistData);
     }
 
-    /// <summary>
-    /// 全てのハンドラが共通して扱うことが出来るプレイリスト
-    /// </summary>
     public class Playlist : IPlaylist
     {
-        private readonly List<string> filePaths = new();
+        private readonly List<IVideo> _videos = new();
 
-        /// <summary>
-        /// ファイルを追加
-        /// </summary>
-        /// <param name="filpath"></param>
-        public void Add(string filpath)
+        public void Add(IVideo video)
         {
-            this.filePaths.AddUnique(filpath);
+            this._videos.AddUnique(video);
         }
 
-        /// <summary>
-        /// 複数のファイルを追加
-        /// </summary>
-        /// <param name="filepaths"></param>
-        public void AddRange(IEnumerable<string> filepaths)
+        public void AddRange(IEnumerable<IVideo> videos)
         {
-            foreach (var path in filepaths)
+            foreach (var path in videos)
             {
                 this.Add(path);
             }
         }
 
+        public int Count => this._videos.Count;
 
-        /// <summary>
-        /// ファイルを削除
-        /// </summary>
-        /// <param name="filepath"></param>
-        public void Remove(string filepath)
-        {
-            this.filePaths.Remove(filepath);
-        }
+        public string PlaylistName { get; init; } = string.Empty;
 
-        /// <summary>
-        /// ファイルを全て削除
-        /// </summary>
-        public void Clear()
-        {
-            this.filePaths.Clear();
-        }
+        public ReadOnlyCollection<IVideo> Videos => this._videos.AsReadOnly();
 
-        /// <summary>
-        /// ファイルパスを取得
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<string> GetAllFile()
-        {
-            return this.filePaths;
-        }
-
-        /// <summary>
-        /// ファイル数
-        /// </summary>
-        public int Count { get => this.filePaths.Count; }
-
-        /// <summary>
-        /// プレイリスト名
-        /// </summary>
-        public string PlaylistName { get; set; } = string.Empty;
 
     }
+
+    public record Video(string Path, string Title, string OwnerName) : IVideo;
+
 }

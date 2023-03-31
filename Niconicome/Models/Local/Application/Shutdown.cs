@@ -1,6 +1,9 @@
 ﻿using System;
 using Niconicome.Models.Domain.Local;
-using Niconicome.Models.Domain.Local.Addons.Core.Engine.Context;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
+using Niconicome.Models.Domain.Local.Server.Core;
+using Niconicome.Models.Infrastructure.Database.LiteDB;
+using Niconicome.Models.Local.State.Style;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 
@@ -14,20 +17,26 @@ namespace Niconicome.Models.Local.Application
 
     public class Shutdown : IShutdown
     {
-        public Shutdown(IDataBase dataBase, IPlaylistHandler playlistHandler,IAddonContexts contexts)
+        public Shutdown(ILiteDBHandler dataBase, IPlaylistHandler playlistHandler, IAddonContextsContainer contexts, IServer server, IVideoListWidthManager widthManager)
         {
-            this.dataBase = dataBase;
+            this._database = dataBase;
             this.playlistHandler = playlistHandler;
             this._contexts = contexts;
+            this._server = server;
+            this._widthManager = widthManager;
         }
 
         #region field
 
-        private readonly IDataBase dataBase;
+        private readonly ILiteDBHandler _database;
 
         private readonly IPlaylistHandler playlistHandler;
 
-        private readonly IAddonContexts _contexts;
+        private readonly IAddonContextsContainer _contexts;
+
+        private readonly IServer _server;
+
+        private readonly IVideoListWidthManager _widthManager;
 
         #endregion
 
@@ -40,8 +49,10 @@ namespace Niconicome.Models.Local.Application
         {
             if (this.IsShutdowned) throw new InvalidOperationException("終了処理は一度のみ可能です。");
             this.playlistHandler.SaveAllPlaylists();
-            this._contexts.KillAll();
-            this.dataBase.Dispose();
+            this._contexts.ShutDownAll();
+            this._server.ShutDown();
+            this._widthManager.SaveWidth();
+            this._database.Dispose();
             this.IsShutdowned = true;
         }
     }

@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using Const =Niconicome.Models.Const;
-using Niconicome.Models.Domain.Local.Addons.Core;
-using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 using Niconicome.Models.Domain.Niconico;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
 {
     public interface IAddonHttp
     {
         INicoHttp? NicoHttp { get; }
-        void Initialize(AddonInfomation addon);
+        void Initialize(IAddonInfomation addon);
         Task<HttpResponseMessage> GetAsync(Uri uri);
         Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content);
     }
@@ -42,7 +40,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
 
         #region Method
 
-        public void Initialize(AddonInfomation addon)
+        public void Initialize(IAddonInfomation addon)
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
 
@@ -51,7 +49,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
             this.client.DefaultRequestHeaders.Add("X-Frontend-Id", "6");
             this.client.DefaultRequestHeaders.Add("X-Frontend-Version", "0");
 
-            if (!addon.Permissions.Contains(PermissionNames.Session))
+            if (!addon.Permissions.Contains(Permissions.Session))
             {
                 this.NicoHttp = null;
             }

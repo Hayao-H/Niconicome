@@ -6,13 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
+using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Local.Addons.Core;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.JavaScript;
 
 namespace Niconicome.Models.Domain.Utils
 {
     public static class JsUtils
     {
-        private static readonly IJavaScriptExecuter executer = new JavaScriptExecuter();
+        private static readonly IJavaScriptEngine executer = DIFactory.Provider.GetRequiredService<IJavaScriptEngine>();
 
         private static bool isInitialized;
 

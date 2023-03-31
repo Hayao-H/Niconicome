@@ -93,7 +93,6 @@ namespace Niconicome.Models.Domain.Niconico.Remote.Search
                 videoInfo.ViewCount.Value = v.ViewCounter;
                 videoInfo.CommentCount.Value = v.CommentCounter;
                 videoInfo.MylistCount.Value = v.MylistCounter;
-                videoInfo.Tags = v.Tags.Split(" ");
                 videoInfo.ThumbUrl.Value = v.ThumbnailUrl;
                 return videoInfo;
             });

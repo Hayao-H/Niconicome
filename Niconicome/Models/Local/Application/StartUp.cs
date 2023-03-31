@@ -4,14 +4,20 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Models.Auth;
-using Niconicome.Models.Local.State;
 using Niconicome.Models.Domain.Utils;
-using Store = Niconicome.Models.Domain.Local.Store;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using NicoIO = Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Addon;
 using Niconicome.Models.Utils.InitializeAwaiter;
+using Niconicome.Models.Local.Addon.V2;
+using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Utils.NicoLogger;
+using Niconicome.Models.Local.State.Toast;
+using Niconicome.Models.Domain.Local.DataBackup;
+using Niconicome.Models.Domain.Local.Server.Core;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -25,46 +31,42 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(Store::IVideoStoreHandler videoStoreHandler, Store::IPlaylistStoreHandler playlistStoreHandler, Store::IVideoFileStorehandler fileStorehandler, IBackuphandler backuphandler, IAutoLogin autoLogin, ISnackbarHandler snackbarHandler, ILogger logger, ILocalSettingHandler settingHandler, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonHandler addonHandler)
+        public StartUp(IBackupManager backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer, IServer server)
         {
-
-            this._videoStoreHandler = videoStoreHandler;
-            this._playlistStoreHandler = playlistStoreHandler;
-            this._fileStorehandler = fileStorehandler;
             this._backuphandler = backuphandler;
             this._autoLogin = autoLogin;
             this._snackbarHandler = snackbarHandler;
             this._logger = logger;
-            this._settingHandler = settingHandler;
             this._streamResumer = streamResumer;
             this._nicoDirectoryIO = nicoDirectoryIO;
-            this._addonHandler = addonHandler;
+            this._addonManager = addonManager;
+            this._installManager = installManager;
+            this._settingsConainer = settingsConainer;
+            this._server = server;
             this.DeleteInvalidbackup();
         }
 
         #region field
 
-        private readonly Store::IVideoStoreHandler _videoStoreHandler;
-
-        private readonly Store::IPlaylistStoreHandler _playlistStoreHandler;
-
-        private readonly Store::IVideoFileStorehandler _fileStorehandler;
-
-        private readonly IBackuphandler _backuphandler;
+        private readonly IBackupManager _backuphandler;
 
         private readonly IAutoLogin _autoLogin;
 
-        private readonly ISnackbarHandler _snackbarHandler;
+        private readonly IToastHandler _snackbarHandler;
 
         private readonly ILogger _logger;
-
-        private readonly ILocalSettingHandler _settingHandler;
 
         private readonly Resume::IStreamResumer _streamResumer;
 
         private readonly NicoIO::INicoDirectoryIO _nicoDirectoryIO;
 
-        private readonly IAddonHandler _addonHandler;
+        private readonly IAddonManager _addonManager;
+
+        private readonly IAddonInstallManager _installManager;
+
+        private readonly ISettingsContainer _settingsConainer;
+
+        private readonly IServer _server;
 
         #endregion
 
@@ -80,10 +82,9 @@ namespace Niconicome.Models.Local.Application
         {
             Task.Run(async () =>
             {
+                this.StartServer();
                 this.RemoveTmpFolder();
-                this.JustifyData();
-                this.DeleteInvalidFilePath();
-                await this.LoadAddonAsync();
+                await this.LoadAddon();
                 await this.Autologin();
             });
         }
@@ -95,7 +96,11 @@ namespace Niconicome.Models.Local.Application
         {
             if (this._nicoDirectoryIO.Exists("tmp"))
             {
-                var maxTmp = this._settingHandler.GetIntSetting(SettingsEnum.MaxTmpDirCount);
+                IAttemptResult<ISettingInfo<int>> result = this._settingsConainer.GetSetting<int>(SettingNames.MaxTmpSegmentsDirCount, 20);
+                if (!result.IsSucceeded || result.Data is null) return;
+
+                int maxTmp = result.Data.Value;
+
                 if (maxTmp < 0) maxTmp = 20;
                 var infos = this._streamResumer.GetAllSegmentsDirectoryInfo().ToList();
                 if (infos.Count <= maxTmp) return;
@@ -109,27 +114,19 @@ namespace Niconicome.Models.Local.Application
         }
 
         /// <summary>
-        /// データを修復する
-        /// </summary>
-        private void JustifyData()
-        {
-            this._playlistStoreHandler.Initialize();
-        }
-
-        /// <summary>
-        /// 存在しない動画ファイルのパスを削除する
-        /// </summary>
-        private void DeleteInvalidFilePath()
-        {
-            this._fileStorehandler.Clean();
-        }
-
-        /// <summary>
         /// 存在しないバックアップを削除する
         /// </summary>
         private void DeleteInvalidbackup()
         {
             this._backuphandler.Clean();
+        }
+
+        /// <summary>
+        /// ローカルサーバーを起動する
+        /// </summary>
+        private void StartServer()
+        {
+            this._server.Start();
         }
 
         /// <summary>
@@ -181,9 +178,11 @@ namespace Niconicome.Models.Local.Application
         /// <summary>
         /// アドオンを読み込む
         /// </summary>
-        private async Task LoadAddonAsync()
+        private async Task LoadAddon()
         {
-            await this._addonHandler.InitializeAsync();
+            this._addonManager.InitializeAddons();
+            await this._installManager.InstallEssensialAddons();
+            await this._addonManager.CheckForUpdates();
         }
     }
 }

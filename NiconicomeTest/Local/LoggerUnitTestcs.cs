@@ -2,8 +2,7 @@ using System;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NUnit.Framework;
 using Utils = Niconicome.Models.Domain.Utils;
-using Local = Niconicome.Models.Local;
-using State = Niconicome.Models.Local.State;
+using NiconicomeTest.Stabs.Models.Local.State;
 
 namespace NiconicomeTest.Local.LoggerTest
 {
@@ -19,7 +18,7 @@ namespace NiconicomeTest.Local.LoggerTest
         public void SetUp()
         {
             this.logstream = new LogstreamStab();
-            this.logger = new Utils::Logger(this.logstream, new Utils::ErrorHandler(), new State::LocalState() { IsDebugMode = true });
+            this.logger = new Utils::Logger(this.logstream, new Utils::ErrorHandler(), new LocalStateStub { IsDebugMode = true });
         }
 
         [Test]

@@ -26,11 +26,8 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Search
         [JsonPropertyName("title")]
         public string Title { get; set; } = string.Empty;
 
-        [JsonPropertyName("description")]
-        public string Description { get; set; } = string.Empty;
-
         [JsonPropertyName("startTime")]
-        public DateTimeOffset StartTime { get; set; }
+        public DateTime StartTime { get; set; }
 
         [JsonPropertyName("viewCounter")]
         public int ViewCounter { get; set; }
@@ -38,14 +35,17 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Search
         [JsonPropertyName("mylistCounter")]
         public int MylistCounter { get; set; }
 
-        [JsonPropertyName("commentkCounter")]
+        [JsonPropertyName("commentCounter")]
         public int CommentCounter { get; set; }
 
-        [JsonPropertyName("tags")]
-        public string Tags { get; set; } = string.Empty;
+        [JsonPropertyName("likeCounter")]
+        public int LikeCounter { get; set; }
 
         [JsonPropertyName("thumbnailUrl")]
         public string ThumbnailUrl { get; set; } = string.Empty;
+
+        [JsonPropertyName("lengthSeconds")]
+        public int LengthSeconds { get; set; }
     }
 
     public class Response

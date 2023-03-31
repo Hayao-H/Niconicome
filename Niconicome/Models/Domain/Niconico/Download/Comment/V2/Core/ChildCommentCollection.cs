@@ -12,7 +12,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         /// <summary>
         /// Fork
         /// </summary>
-        int Fork { get; init; }
+        string Fork { get; init; }
 
         /// <summary>
         /// Thread
@@ -59,7 +59,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
     public class ChildCommentCollection : IChildCommentCollection
     {
-        public ChildCommentCollection(int commentCount, int commentCountPerBlock, string thread, int fork)
+        public ChildCommentCollection(int commentCount, int commentCountPerBlock, string thread, string fork)
         {
             this.Fork = fork;
             this.Thread = thread;
@@ -80,7 +80,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
         #region Props
 
-        public int Fork { get; init; }
+        public string Fork { get; init; }
 
         public string Thread { get; init; }
 

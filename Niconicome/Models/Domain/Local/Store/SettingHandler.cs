@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LiteDB;
 using Niconicome.Extensions;
+using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Network;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
@@ -26,6 +30,10 @@ namespace Niconicome.Models.Domain.Local.Store
 
     public interface ISettingHandler
     {
+        IAttemptResult<IEnumerable<ISettingData<bool>>> GetAllBoolSetting();
+        IAttemptResult<IEnumerable<ISettingData<string>>> GetAllStringSetting();
+        IAttemptResult<IEnumerable<ISettingData<int>>> GetAllIntSetting();
+
         ISettingData<bool> GetBoolSetting(string settingName);
         ISettingData<string> GetStringSetting(string settingName);
         ISettingData<int> GetIntSetting(string settingName);
@@ -37,12 +45,49 @@ namespace Niconicome.Models.Domain.Local.Store
 
     public class SettingHandler : ISettingHandler
     {
-        public SettingHandler(IDataBase database)
+        public SettingHandler(IDataBase database,ILiteDBHandler db)
         {
             this.database = database;
+            this._database = db;
         }
 
         private readonly IDataBase database;
+
+        private readonly ILiteDBHandler _database;
+
+        public IAttemptResult<IEnumerable<ISettingData<bool>>> GetAllBoolSetting()
+        {
+            IAttemptResult<IReadOnlyList<STypes::AppSettingBool>> result = this._database.GetAllRecords<STypes::AppSettingBool>(STypes::AppSettingBool.TableNameS);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return AttemptResult<IEnumerable<ISettingData<bool>>>.Fail(result.Message);
+            }
+
+            return AttemptResult<IEnumerable<ISettingData<bool>>>.Succeeded(result.Data.Where(r => r.SettingName is not null).Select(r => new SettingData<bool>(r.Value, r.SettingName!)));
+        }
+
+        public IAttemptResult<IEnumerable<ISettingData<string>>> GetAllStringSetting()
+        {
+            IAttemptResult<IReadOnlyList<STypes::AppSettingString>> result = this._database.GetAllRecords<STypes::AppSettingString>(STypes::AppSettingString.TableNameS);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return AttemptResult<IEnumerable<ISettingData<string>>>.Fail(result.Message);
+            }
+
+            return AttemptResult<IEnumerable<ISettingData<string>>>.Succeeded(result.Data.Where(r => r.SettingName is not null && r.Value is not null).Select(r => new SettingData<string>(r.Value ?? string.Empty, r.SettingName!)));
+        }
+
+        public IAttemptResult<IEnumerable<ISettingData<int>>> GetAllIntSetting()
+        {
+            IAttemptResult<IReadOnlyList<STypes::AppSettingInt>> result = this._database.GetAllRecords<STypes::AppSettingInt>(STypes::AppSettingInt.TableNameS);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return AttemptResult<IEnumerable<ISettingData<int>>>.Fail(result.Message);
+            }
+
+            return AttemptResult<IEnumerable<ISettingData<int>>>.Succeeded(result.Data.Where(r => r.SettingName is not null).Select(r => new SettingData<int>(r.Value, r.SettingName!)));
+        }
+
 
         /// <summary>
         /// 真偽値の設定を取得する
@@ -118,7 +163,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="value"></param>
         public void SaveBoolSetting(string settingName, bool value)
         {
-            string tableName = STypes::AppSettingBool.TableName;
+            string tableName = STypes::AppSettingBool.TableNameS;
             var data = new STypes::AppSettingBool() { Value = value, SettingName = settingName };
 
             if (this.Exists(settingName, SettingType.boolSetting))
@@ -140,7 +185,7 @@ namespace Niconicome.Models.Domain.Local.Store
         /// <param name="value"></param>
         public void SaveStringSetting(string settingName, string value)
         {
-            string tableName = STypes::AppSettingString.TableName;
+            string tableName = STypes::AppSettingString.TableNameS;
             var data = new STypes::AppSettingString() { Value = value, SettingName = settingName };
 
             if (this.Exists(settingName, SettingType.stringSetting))
@@ -187,10 +232,10 @@ namespace Niconicome.Models.Domain.Local.Store
         {
             return settingType switch
             {
-                SettingType.boolSetting => STypes::AppSettingBool.TableName,
-                SettingType.stringSetting => STypes::AppSettingString.TableName,
-                SettingType.intSetting => STypes::AppSettingInt.TableName,
-                _ => STypes::AppSettingString.TableName,
+                SettingType.boolSetting => STypes::AppSettingBool.TableNameS,
+                SettingType.stringSetting => STypes::AppSettingString.TableNameS,
+                SettingType.intSetting => STypes::AppSettingInt.TableNameS,
+                _ => STypes::AppSettingString.TableNameS,
             };
         }
     }

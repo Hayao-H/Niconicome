@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Utils.Error;
 
 namespace Niconicome.Models.Helper.Result
 {
@@ -12,6 +13,7 @@ namespace Niconicome.Models.Helper.Result
         string? Message { get; }
         Exception? Exception { get; }
         string ExceptionMessage { get; }
+        ErrorLevel ErrorLevel { get; }
     }
 
     public class AttemptResult : IAttemptResult
@@ -22,15 +24,17 @@ namespace Niconicome.Models.Helper.Result
 
         public Exception? Exception { get; set; }
 
+        public ErrorLevel ErrorLevel { get; set; }
+
         public string ExceptionMessage => this.Exception?.Message ?? "None";
 
         /// <summary>
         /// インスタンスを作成
         /// </summary>
         /// <returns></returns>
-        public static IAttemptResult Fail(string? message = null, Exception? ex = null)
+        public static IAttemptResult Fail(string? message = null, Exception? ex = null, ErrorLevel errorLevel = ErrorLevel.Error)
         {
-            return new AttemptResult() { Message = message, Exception = ex };
+            return new AttemptResult() { Message = message, Exception = ex,ErrorLevel = errorLevel };
         }
 
         /// <summary>

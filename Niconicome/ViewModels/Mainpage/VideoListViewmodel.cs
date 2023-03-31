@@ -1,30 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Media;
 using System.Reactive.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions.System;
 using Niconicome.Extensions.System.Diagnostics;
 using Niconicome.Extensions.System.Windows;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.Types;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
-using Niconicome.Models.Utils;
 using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Converter.KeyDown;
 using Niconicome.ViewModels.Mainpage.Tabs;
@@ -37,9 +34,9 @@ using EnumSettings = Niconicome.Models.Local.Settings.EnumSettingsValue;
 using MaterialDesign = MaterialDesignThemes.Wpf;
 using Net = Niconicome.Models.Domain.Network;
 using Playlist = Niconicome.Models.Domain.Local.Playlist;
-using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using Utils = Niconicome.Models.Domain.Utils;
 using WS = Niconicome.Workspaces;
+using Settings = Niconicome.Models.Domain.Local.Settings;
 
 namespace Niconicome.ViewModels.Mainpage
 {
@@ -66,9 +63,6 @@ namespace Niconicome.ViewModels.Mainpage
             this.IsTemporaryPlaylist = WS::Mainpage.CurrentPlaylist.IsTemporaryPlaylist.ToReadOnlyReactiveProperty();
 
             this.showMessageBox = showMessageBox;
-
-            this.SnackbarMessageQueue = WS::Mainpage.SnackbarHandler.Queue;
-
             this.ea = ea;
 
 
@@ -308,7 +302,7 @@ namespace Niconicome.ViewModels.Mainpage
               {
                   if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                   {
-                      this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
+                      WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、動画を追加できません");
                       return;
                   }
 
@@ -345,7 +339,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を削除できません");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、動画を削除できません");
                     return;
                 }
 
@@ -372,12 +366,12 @@ namespace Niconicome.ViewModels.Mainpage
                 if (targetVideos.Count > 1)
                 {
                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
-                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue($"{targetVideos.First().NiconicoId.Value}ほか{targetVideos.Count - 1}件の動画を削除しました。");
                 }
                 else
                 {
                     WS::Mainpage.Messagehandler.AppendMessage($"{targetVideos.First().NiconicoId.Value}を削除しました。");
-                    this.SnackbarMessageQueue.Enqueue($"{targetVideos.First().NiconicoId.Value}を削除しました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue($"{targetVideos.First().NiconicoId.Value}を削除しました。");
                 }
 
             });
@@ -386,7 +380,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を視聴できません");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、動画を視聴できません");
                     return;
                 }
                 if (arg is null || arg is not VideoInfoViewModel videoInfo) return;
@@ -397,7 +391,7 @@ namespace Niconicome.ViewModels.Mainpage
                 catch (Exception ex)
                 {
                     WS::Mainpage.Messagehandler.AppendMessage($"ブラウザー起動中に問題が発生しました。(詳細: {ex.Message})");
-                    this.SnackbarMessageQueue.Enqueue($"ブラウザー起動中に問題が発生しました。(詳細: {ex.Message})");
+                    WS::Mainpage.SnackbarHandler.Enqueue($"ブラウザー起動中に問題が発生しました。(詳細: {ex.Message})");
                     return;
                 }
             });
@@ -410,7 +404,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、プレイリスト情報を編集できません");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、プレイリスト情報を編集できません");
                     return;
                 }
 
@@ -430,7 +424,7 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                     {
-                        this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を追加できません");
+                        WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、動画を追加できません");
                         return;
                     }
 
@@ -438,12 +432,12 @@ namespace Niconicome.ViewModels.Mainpage
 
                     if (!result.IsSucceeded || result.Data is null)
                     {
-                        this.SnackbarMessageQueue.Enqueue("クリップボードの読み込みに失敗しました。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("クリップボードの読み込みに失敗しました。");
                         return;
                     }
                     else if (result.Data.IsNullOrEmpty())
                     {
-                        this.SnackbarMessageQueue.Enqueue("クリップボードが空です。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("クリップボードが空です。");
                         return;
                     }
 
@@ -461,7 +455,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!WS::Mainpage.Session.IsLogin.Value)
                 {
-                    this.SnackbarMessageQueue.Enqueue("リモートプレイリストを登録する為にはログインが必要です。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("リモートプレイリストを登録する為にはログインが必要です。");
                     return;
                 }
 
@@ -486,7 +480,7 @@ namespace Niconicome.ViewModels.Mainpage
                     if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
                     {
 
-                        this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、動画を更新できません");
+                        WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、動画を更新できません");
                         return;
                     }
 
@@ -494,12 +488,12 @@ namespace Niconicome.ViewModels.Mainpage
 
                     if (videos.Count < 1) return;
 
-                    this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を更新します。");
+                    WS::Mainpage.SnackbarHandler.Enqueue($"{videos.Count}件の動画を更新します。");
                     WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を更新します。");
 
                     IAttemptResult<int> result = await WS::Mainpage.VideoRefreshManager.RefreshAndSaveAsync(videos);
 
-                    this.SnackbarMessageQueue.Enqueue($"動画を更新しました。（{result.Data}件失敗）");
+                    WS::Mainpage.SnackbarHandler.Enqueue($"動画を更新しました。（{result.Data}件失敗）");
                     WS::Mainpage.Messagehandler.AppendMessage($"動画を更新しました。（{result.Data}件失敗）");
 
                 })
@@ -521,12 +515,12 @@ namespace Niconicome.ViewModels.Mainpage
 
                     if (!WS::Mainpage.Session.IsLogin.Value)
                     {
-                        this.SnackbarMessageQueue.Enqueue("リモートプレイリストと同期する為にはログインが必要です。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("リモートプレイリストと同期する為にはログインが必要です。");
                         return;
                     }
                     else if (playlistInfo is null)
                     {
-                        this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、同期できません");
+                        WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、同期できません");
                         return;
                     }
                     else if (!WS::Mainpage.VideoRefreshManager.CheckIfRemotePlaylistCanBeFetched(playlistInfo))
@@ -539,12 +533,12 @@ namespace Niconicome.ViewModels.Mainpage
                     if (result.IsSucceeded)
                     {
                         WS::Mainpage.Messagehandler.AppendMessage($"同期が完了しました。({result.Message})");
-                        this.SnackbarMessageQueue.Enqueue($"同期が完了しました。({result.Message})");
+                        WS::Mainpage.SnackbarHandler.Enqueue($"同期が完了しました。({result.Message})");
                     }
                     else
                     {
                         WS::Mainpage.Messagehandler.AppendMessage("情報の取得に失敗しました。");
-                        this.SnackbarMessageQueue.Enqueue($"情報の取得に失敗しました。(詳細: {result.Message})");
+                        WS::Mainpage.SnackbarHandler.Enqueue($"情報の取得に失敗しました。(詳細: {result.Message})");
                     }
 
                 })
@@ -559,7 +553,7 @@ namespace Niconicome.ViewModels.Mainpage
               {
                   if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                   {
-                      this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                      WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                       return;
                   }
 
@@ -578,7 +572,7 @@ namespace Niconicome.ViewModels.Mainpage
                           IAttemptResult<IEnumerable<IListVideoInfo>> result = WS::Mainpage.VideoHandler.GetAllVideos();
                           if (!result.IsSucceeded || result.Data is null)
                           {
-                              this.SnackbarMessageQueue.Enqueue("データベースからの動画情報の取得に失敗しました。");
+                              WS::Mainpage.SnackbarHandler.Enqueue("データベースからの動画情報の取得に失敗しました。");
                               return;
                           }
                           videos = result.Data;
@@ -606,7 +600,7 @@ namespace Niconicome.ViewModels.Mainpage
                 {
                     if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                     {
-                        this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、検索画面を表示できません。");
+                        WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、検索画面を表示できません。");
                         return;
                     }
 
@@ -622,7 +616,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
                 foreach (var video in this.Videos)
@@ -636,7 +630,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
                 foreach (var video in this.Videos)
@@ -649,7 +643,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
                 foreach (var video in this.Videos.Where(v => !v.VideoInfo.IsDownloaded.Value))
@@ -662,7 +656,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
                 foreach (var video in this.Videos.Where(v => v.VideoInfo.IsDownloaded.Value))
@@ -675,7 +669,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
                 foreach (var video in this.Videos.Where(v => !v.VideoInfo.IsDownloaded.Value))
@@ -688,7 +682,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
                 foreach (var video in this.Videos.Where(v => v.VideoInfo.IsDownloaded.Value))
@@ -702,7 +696,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
                 string folderPath = video.VideoInfo.FolderPath.Value;
@@ -718,7 +712,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
                 if (arg is null || arg is not VideoInfoViewModel videoInfo || videoInfo is null) return;
@@ -727,7 +721,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!result.IsSucceeded)
                 {
-                    this.SnackbarMessageQueue.Enqueue("コマンドの実行に失敗しました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("コマンドの実行に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "コマンドの実行に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
                 }
@@ -737,7 +731,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
 
@@ -747,7 +741,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!result.IsSucceeded)
                 {
-                    this.SnackbarMessageQueue.Enqueue("コマンドの実行に失敗しました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("コマンドの実行に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "コマンドの実行に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
                 }
@@ -757,7 +751,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
 
@@ -774,7 +768,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!result.IsSucceeded)
                 {
-                    this.SnackbarMessageQueue.Enqueue("動画の再生に失敗しました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("動画の再生に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "動画の再生に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
                 }
@@ -784,7 +778,7 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist is null)
                 {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("プレイリストが選択されていないため、処理できません。");
                     return;
                 }
 
@@ -801,7 +795,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!result.IsSucceeded)
                 {
-                    this.SnackbarMessageQueue.Enqueue("動画の再生に失敗しました。");
+                    WS::Mainpage.SnackbarHandler.Enqueue("動画の再生に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "動画の再生に失敗しました。");
                     WS::Mainpage.Messagehandler.AppendMessage($"詳細:{result?.Exception?.Message ?? "None"}");
                 }
@@ -809,35 +803,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.CreatePlaylistCommand = new CommandBase<string>(_ => true, arg =>
             {
-                if (WS::Mainpage.CurrentPlaylist.SelectedPlaylist.Value is null)
-                {
-                    this.SnackbarMessageQueue.Enqueue("プレイリストが選択されていないため、処理できません。");
-                    return;
-                }
-
-                if (arg is null || arg is not string || arg.IsNullOrEmpty()) return;
-                Playlist::PlaylistType type = arg switch
-                {
-                    "aimp" => Playlist::PlaylistType.Aimp,
-                    _ => Playlist::PlaylistType.Aimp,
-                };
-
-                IEnumerable<IListVideoInfo> videos = WS::Mainpage.VideoListContainer.Videos.Where(v => v.IsSelected.Value && v.IsDownloaded.Value);
-
-                if (!videos.Any()) return;
-
-                IAttemptResult<int> result = WS::Mainpage.PlaylistCreator.TryCreatePlaylist(videos, type);
-
-                if (result.IsSucceeded)
-                {
-                    WS::Mainpage.Messagehandler.AppendMessage($"プレイリストを保存フォルダーに作成しました。({result.Data}件失敗)");
-                    this.SnackbarMessageQueue.Enqueue($"プレイリストを保存フォルダーに作成しました。({result.Data}件失敗)");
-                }
-                else
-                {
-                    WS::Mainpage.Messagehandler.AppendMessage($"プレイリストの作成に失敗しました。");
-                    this.SnackbarMessageQueue.Enqueue($"プレイリストの作成に失敗しました。（{result.Message}）");
-                }
             });
 
             this.VideoDoubleClickCommand = new ReactiveCommand<MouseEventArgs>()
@@ -846,7 +811,11 @@ namespace Niconicome.ViewModels.Mainpage
                     if (e.Source is not FrameworkElement source) return;
                     if (source.DataContext is not VideoInfoViewModel videoInfo) return;
 
-                    var setting = WS::Mainpage.EnumSettingsHandler.GetSetting<EnumSettings::VideodbClickSettings>();
+                    IAttemptResult<ISettingInfo<EnumSettings::VideodbClickSettings>> result = WS::Mainpage.SettingsConainer.GetSetting(Settings::SettingNames.VideoListItemdbClickAction, EnumSettings::VideodbClickSettings.NotConfigured);
+
+                    if (!result.IsSucceeded || result.Data is null) return;
+
+                    var setting = result.Data.Value;
 
                     if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
                     {
@@ -885,7 +854,7 @@ namespace Niconicome.ViewModels.Mainpage
                         IAttemptResult result = WS::Mainpage.ClipbordManager.StartMonitoring();
                         if (!result.IsSucceeded)
                         {
-                            this.SnackbarMessageQueue.Enqueue("クリップボードの監視に失敗しました。");
+                            WS::Mainpage.SnackbarHandler.Enqueue("クリップボードの監視に失敗しました。");
                             WS::Mainpage.Messagehandler.AppendMessage(result.Message ?? "クリップボードの監視に失敗しました。");
                         }
                     }
@@ -1169,11 +1138,6 @@ namespace Niconicome.ViewModels.Mainpage
         public ReadOnlyReactiveCollection<VideoInfoViewModel> Videos { get; init; }
 
         /// <summary>
-        /// スナックバー
-        /// </summary>
-        public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; }
-
-        /// <summary>
         /// ユーザーの入力値
         /// </summary>
         public ReactivePropertySlim<string> InputString { get; init; } = new();
@@ -1352,7 +1316,7 @@ namespace Niconicome.ViewModels.Mainpage
             var orderStr = WS::Mainpage.SortInfoHandler.IsDescendingStr.Value;
 
             WS::Mainpage.Messagehandler.AppendMessage($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
-            this.SnackbarMessageQueue.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
+            WS::Mainpage.SnackbarHandler.Enqueue($"動画を{sortTypeStr}の順に{orderStr}で並び替えました。");
         }
 
         #region field
@@ -1379,13 +1343,13 @@ namespace Niconicome.ViewModels.Mainpage
         /// <returns></returns>
         private async Task RegisterVideoAsync(string data, bool isTextIsFromClipBoard)
         {
-            this.SnackbarMessageQueue.Enqueue("動画を追加します");
+            WS::Mainpage.SnackbarHandler.Enqueue("動画を追加します");
 
             IAttemptResult<IEnumerable<IListVideoInfo>> result = await WS::Mainpage.VideoRegistrationHandler.ResgisterVideoAsync(data, isTextIsFromClipBoard);
 
             if (!result.IsSucceeded || result.Data is null)
             {
-                this.SnackbarMessageQueue.Enqueue("動画情報の取得に失敗しました");
+                WS::Mainpage.SnackbarHandler.Enqueue(result.Message?? "動画情報の取得に失敗しました");
                 return;
             }
 
@@ -1393,11 +1357,11 @@ namespace Niconicome.ViewModels.Mainpage
 
             if (videos.Count == 0)
             {
-                this.SnackbarMessageQueue.Enqueue("動画情報を1件も取得できませんでした");
+                WS::Mainpage.SnackbarHandler.Enqueue("動画情報を1件も取得できませんでした");
                 return;
             }
 
-            this.SnackbarMessageQueue.Enqueue($"{videos.Count}件の動画を追加しました");
+            WS::Mainpage.SnackbarHandler.Enqueue($"{videos.Count}件の動画を追加しました");
             WS::Mainpage.Messagehandler.AppendMessage($"{videos.Count}件の動画を追加しました");
 
             if (!videos[0].ChannelID.Value.IsNullOrEmpty())

@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.ClearScript;
-using Niconicome.Models.Domain.Local.Addons.Core;
-using Niconicome.Models.Domain.Local.Addons.Core.Permisson;
-using Niconicome.Models.Domain.Local.Addons.Core.Utils;
-using Niconicome.Models.Domain.Niconico;
-using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Utils;
 
 namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
 {
@@ -27,7 +21,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         /// 初期化する
         /// </summary>
         /// <param name="hostPermissions"></param>
-        void Initialize(AddonInfomation info);
+        void Initialize(IAddonInfomation info);
     }
 
 
@@ -92,7 +86,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
             return res;
         }
 
-        public void Initialize(AddonInfomation info)
+        public void Initialize(IAddonInfomation info)
         {
             this.http.Initialize(info);
             this.permissionsHandler.Initialize(info.HostPermissions);

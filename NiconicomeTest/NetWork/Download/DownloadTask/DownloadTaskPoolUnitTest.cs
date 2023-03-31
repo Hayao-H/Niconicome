@@ -1,7 +1,10 @@
 ﻿using System;
-using NiconicomeTest.Stabs.Models.Local.State;
+using Niconicome.Models.Domain.Utils.StringHandler;
+using NiconicomeTest.Stabs.Models.Domain.Local.Store.V2;
+using NiconicomeTest.Stabs.Models.Local.State.MessageV2;
 using NiconicomeTest.Stabs.Models.Network.Download;
 using NiconicomeTest.Stabs.Models.Playlist.Playlist;
+using NiconicomeTest.Stabs.Models.Playlist.V2.Manager;
 using NiconicomeTest.Stabs.Models.Playlist.VideoList;
 using NUnit.Framework;
 using Reactive.Bindings.Extensions;
@@ -22,7 +25,7 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void タスクを追加する()
         {
-            var task = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
             this.downloadTaskPool!.AddTask(task);
 
             Assert.That(this.downloadTaskPool!.Tasks.Count, Is.EqualTo(1));
@@ -33,7 +36,7 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         {
             bool isFired = true;
             this.downloadTaskPool!.Tasks.CollectionChangedAsObservable().Subscribe(e => isFired = true);
-            var task = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
             this.downloadTaskPool!.AddTask(task);
 
             Assert.That(isFired, Is.True);
@@ -42,7 +45,7 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void タスクを削除する()
         {
-            var task = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
             this.downloadTaskPool!.AddTask(task);
             this.downloadTaskPool!.RemoveTask(task);
 
@@ -52,9 +55,9 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void 複数のタスクを削除する()
         {
-            var task1 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
-            var task2 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
-            var task3 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task1 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
+            var task2 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
+            var task3 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
 
             foreach (var task in new[] { task1, task2, task3 })
             {
@@ -72,9 +75,9 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void タスクをクリア()
         {
-            var task1 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
-            var task2 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
-            var task3 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task1 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
+            var task2 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
+            var task3 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
 
             foreach (var task in new[] { task1, task2, task3 })
             {
@@ -91,9 +94,9 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         {
             this.downloadTaskPool!.DisplayCompleted.Value = false;
 
-            var task1 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
-            var task2 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
-            var task3 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task1 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
+            var task2 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
+            var task3 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
 
             task1.IsCompleted.Value = true;
             task2.IsCompleted.Value = true;
@@ -112,9 +115,9 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         {
             this.downloadTaskPool!.DisplayCanceled.Value = false;
 
-            var task1 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
-            var task2 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
-            var task3 = new Download::DownloadTask(new PlaylistHandlerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new VideoListContainerStub(), new VideosUncheckerStub());
+            var task1 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
+            var task2 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
+            var task3 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
 
             task1.IsCanceled.Value = true;
             task3.IsCanceled.Value = true;

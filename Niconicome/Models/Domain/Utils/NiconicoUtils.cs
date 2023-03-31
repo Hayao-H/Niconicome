@@ -142,7 +142,7 @@ namespace Niconicome.Models.Domain.Utils
         public string GetIdFromFIleName(string filenameWithExt)
         {
             string filename = Path.GetFileNameWithoutExtension(filenameWithExt) ?? string.Empty;
-            if (filename == string.Empty) throw new InvalidOperationException("ファイル名が空です。");
+            if (filename == string.Empty) return "";
 
             var match = Regex.Match(filenameWithExt, "(sm|nm|so)?[0-9]+");
             return match.Value;

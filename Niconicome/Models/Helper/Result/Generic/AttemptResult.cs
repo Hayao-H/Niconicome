@@ -1,4 +1,5 @@
 ﻿using System;
+using Niconicome.Models.Domain.Utils.Error;
 
 namespace Niconicome.Models.Helper.Result
 {
@@ -19,9 +20,9 @@ namespace Niconicome.Models.Helper.Result
         /// インスタンスを作成
         /// </summary>
         /// <returns></returns>
-        public new static IAttemptResult<T> Fail(string? message = null, Exception? ex = null)
+        public new static IAttemptResult<T> Fail(string? message = null, Exception? ex = null, ErrorLevel errorLevel = ErrorLevel.Error)
         {
-            return new AttemptResult<T>() { Message = message, Exception = ex };
+            return new AttemptResult<T>() { Message = message, Exception = ex, ErrorLevel = ErrorLevel.Error };
         }
 
         /// <summary>

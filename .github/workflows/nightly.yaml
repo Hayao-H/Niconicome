@@ -1,0 +1,107 @@
+name: niconicome-nightly-build
+on: 
+  pull_request:
+    types: [closed]
+    branches:
+      - develop
+jobs:
+  test:
+    name: Debug Build & Test
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: develop
+    - name: Setup .NET 6.0.*
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.*
+    - name: Clean
+      run: dotnet clean && dotnet nuget locals all --clear
+    - name: Build
+      run: dotnet build -c Debug
+    - name: Test
+      run: dotnet test
+  date:
+    runs-on: ubuntu-latest
+    outputs:
+        output1: ${{ steps.date.outputs.date }}
+    steps:
+    - name: Current Date
+      id: date
+      env:
+        TZ: 'Asia/Tokyo'
+      run: |
+        result=`date '+%Y-%m-%d-%-H-%-M'`
+        echo "date=$result" >> $GITHUB_OUTPUT 
+  publish:
+    needs: [test, date]
+    runs-on: windows-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: develop
+    - name: Setup .NET6.0
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.*
+    - name:  Download ffmpeg
+      shell: powershell
+      run: |
+        mkdir tmp -force
+        mkdir ffmpeg/bin
+        cd tmp
+        $ProgressPreference = 'SilentlyContinue'
+        Invoke-WebRequest https://github.com/GyanD/codexffmpeg/releases/download/6.0/ffmpeg-6.0-full_build.zip -o ffbin.zip
+        Expand-Archive ffbin.zip -Force
+        $item = Get-Childitem -Recurse -Filter ffmpeg.exe
+        $item2 = Get-Childitem -Recurse -Filter ffprobe.exe
+        cd ..
+        move $item[0].Fullname ffmpeg/bin
+        move $item2[0].Fullname ffmpeg/bin
+        del tmp -r
+        
+    - name: Build
+      shell: powershell
+      run: |
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true  -o win-x64-sc
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained false  -o win-x64
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained true  -o win-x86-sc
+        dotnet publish ./Niconicome/Niconicome.csproj  -c Release -r win-x86 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --self-contained false  -o win-x86
+        Copy-Item -Recurse ffmpeg/bin win-x64-sc
+        Copy-Item -Recurse ffmpeg/bin win-x64
+        Copy-Item -Recurse ffmpeg/bin win-x86-sc
+        Copy-Item -Recurse ffmpeg/bin win-x86
+        Compress-Archive -Path win-x64-sc -DestinationPath win-x64-sc.zip -CompressionLevel fastest
+        Compress-Archive -Path win-x64 -DestinationPath win-x64.zip -CompressionLevel fastest
+        Compress-Archive -Path win-x86-sc -DestinationPath win-x86-sc.zip -CompressionLevel fastest
+        Compress-Archive -Path win-x86 -DestinationPath win-x86.zip -CompressionLevel fastest
+        echo ${{ needs.date.outputs.output1 }}
+    - name: Upload Release Artifact(x64)
+      uses: actions/upload-artifact@v3
+      with:
+        name: niconicome-nightly-win-x64-${{ needs.date.outputs.output1 }}
+        path: ./win-x64.zip
+    - name: Upload Release Artifact(x64 self-containes)
+      uses: actions/upload-artifact@v3
+      with:
+        name: niconicome-nightly-win-x64-sc-${{ needs.date.outputs.output1 }}
+        path: ./win-x64-sc.zip
+    - name: Upload Release Artifact(x86)
+      uses: actions/upload-artifact@v3
+      with:
+        name: niconicome-nightly-win-x86-${{ needs.date.outputs.output1 }}
+        path: ./win-x86.zip
+    - name: Upload Release Artifact(x86 self-contained)
+      uses: actions/upload-artifact@v3
+      with:
+        name: niconicome-nightly-win-x86-sc-${{ needs.date.outputs.output1 }}
+        path: ./win-x86-sc.zip

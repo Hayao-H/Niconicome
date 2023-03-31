@@ -31,7 +31,7 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
     /// </summary>
     public class XenoPlaylist : IXenoPlaylist
     {
-        public XenoPlaylist(string name,string channelId,IXenoPlaylist parent)
+        public XenoPlaylist(string name, string channelId, IXenoPlaylist parent)
         {
             this.Name = name;
             this.ChannelId = channelId;
@@ -39,13 +39,13 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
             parent.ChildPlaylists.Add(this);
         }
 
-        public XenoPlaylist(string name,string channelId)
+        public XenoPlaylist(string name, string channelId)
         {
             this.Name = name;
             this.ChannelId = channelId;
         }
 
-        public XenoPlaylist(string name,IXenoPlaylist parent)
+        public XenoPlaylist(string name, IXenoPlaylist parent)
         {
             this.Name = name;
             this.ParentPlaylist = parent;

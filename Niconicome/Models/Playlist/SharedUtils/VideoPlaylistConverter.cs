@@ -137,10 +137,13 @@ namespace Niconicome.Models.Playlist.SharedUtils
             converted.Videos.Clear();
             converted.Videos.AddRange(source.Videos.Select(v => this.ConvertLocalVideoToStoreVideo(v)));
 
-            IAttemptResult<STypes::Playlist> pResult = this._playlistStoreHandler.GetPlaylist(source.ParentId);
-            if (pResult.IsSucceeded && pResult.Data is not null)
+            if (this._playlistStoreHandler.Exists(source.ParentId))
             {
-                converted.ParentPlaylist = pResult.Data;
+                IAttemptResult<STypes::Playlist> pResult = this._playlistStoreHandler.GetPlaylist(source.ParentId);
+                if (pResult.IsSucceeded && pResult.Data is not null)
+                {
+                    converted.ParentPlaylist = pResult.Data;
+                }
             }
 
             return converted;
@@ -167,10 +170,6 @@ namespace Niconicome.Models.Playlist.SharedUtils
             converted.BookMarkedVideoID = source.BookMarkedVideoID;
             converted.Videos.Clear();
             converted.Videos.AddRange(source.Videos.Select(v => this.ConvertStoreVideoToLocalVideo(v)));
-            if (source.ParentPlaylist is not null)
-            {
-                converted.ParentId = source.ParentPlaylist.Id;
-            }
 
             return converted;
         }

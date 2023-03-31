@@ -1,0 +1,33 @@
+﻿@inject Niconicome.ViewModels.Blazor.BlazorBaseViewModel DataContext;
+@inject NavigationManager navigation;
+@inject IJSRuntime JS;
+
+@implements IDisposable;
+
+@code {
+
+    private DotNetObjectReference<BlazorBase>? reference;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.reference = DotNetObjectReference.Create(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        await JS.InvokeVoidAsync("initializeReloadHandler", reference);
+    }
+
+    [JSInvokable]
+    public void OnReload()
+    {
+        DataContext.OnKeyDown(navigation);
+    }
+
+    public virtual void Dispose()
+    {
+        this.reference?.Dispose();
+    }
+}

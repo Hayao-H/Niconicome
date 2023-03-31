@@ -10,8 +10,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
     {
         bool IsOriginationSpecified { get; }
 
+        bool IsMaxFetchCountSpecified { get; }
+
         DateTime Origination { get; }
+
+        int MaxFetchCount { get; }
     }
 
-    public record CommentClientOption(bool IsOriginationSpecified, DateTime Origination) : ICommentClientOption;
+    public record CommentClientOption(bool IsOriginationSpecified, bool IsMaxFetchCountSpecified, DateTime Origination, int MaxFetchCount) : ICommentClientOption;
 }

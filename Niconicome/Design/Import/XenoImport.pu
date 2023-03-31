@@ -1,0 +1,51 @@
+@startuml XenoImport
+title XenoImport
+
+interface IAttemptResult<T>
+interface IVideoStore
+interface IPlaylistStore
+
+class V
+class VM
+
+interface IXenoImportResult {
+   + int ImportedPlaylistsCount
+   + int ImportedVideosCount
+   + int FailedPlaylistsCount
+   + int FailedVideosCount
+}
+
+class XenoImportManager {
+    + Task<IAttemptResult<XenoImportResult>> ImportVideosAsync(string path)
+}
+
+class XenoImportHandler {
+    + IAttemptResult<XenoImportResult> ImportVideos(string path)
+}
+
+class XenoPlaylist {
+    + string ID
+    + string Name
+    + List<IXenoVideo> Videos
+    + List<string> Children
+}
+
+class XenoVideo {
+    + string NiconicoID;
+    + string Title;
+}
+
+class XenoDataParser {
+    IAttemptResult<List<IXenoPlaylist>> ParseData(string path)
+}
+
+V ..> VM
+VM ..> XenoImportManager
+XenoImportManager ..> XenoImportHandler
+XenoImportHandler ..> XenoDataParser
+XenoImportHandler ..> IVideoStore
+XenoImportHandler ..> IPlaylistStore
+XenoDataParser -- XenoPlaylist
+XenoPlaylist o-- XenoVideo
+
+@enduml

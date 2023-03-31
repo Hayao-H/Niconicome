@@ -29,10 +29,12 @@ namespace Niconicome.Models.Domain.Local.External.Import.Xeno
                 else if (item.index == 3)
                 {
                     this.Title = item.content;
-                } else if (item.index == 4)
+                }
+                else if (item.index == 4)
                 {
                     this.ListPath = item.content;
-                } else if (item.index == 5)
+                }
+                else if (item.index == 5)
                 {
                     this.FolderPath = item.content;
                 }

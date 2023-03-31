@@ -1,5 +1,6 @@
-﻿using Niconicome.Models.Domain.Local.Store;
-using STypes = Niconicome.Models.Domain.Local.Store.Types;
+﻿using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Local.Settings
 {
@@ -10,17 +11,17 @@ namespace Niconicome.Models.Local.Settings
         bool GetBoolSetting(SettingsEnum setting);
         string? GetStringSetting(SettingsEnum setting);
         int GetIntSetting(SettingsEnum setting);
-        void SaveSetting<T>(T data, SettingsEnum setting);
+        void SaveSetting<T>(T data, SettingsEnum setting) where T : notnull;
     }
 
     public class LocalSettingHandler : ILocalSettingHandler
     {
-        public LocalSettingHandler(ISettingHandler settingHandler)
+        public LocalSettingHandler(ISettingsContainer settingsConainer)
         {
-            this.settingHandler = settingHandler;
+            this._settingsConainer = settingsConainer;
         }
 
-        private readonly ISettingHandler settingHandler;
+        private readonly ISettingsContainer _settingsConainer;
 
         /// <summary>
         /// 文字列の設定を取得する
@@ -32,9 +33,11 @@ namespace Niconicome.Models.Local.Settings
             var settingname = this.GetSettingName(setting);
             if (settingname is null) return null;
 
-            if (this.settingHandler.Exists(settingname, SettingType.stringSetting))
+            IAttemptResult<ISettingInfo<string>> result = this._settingsConainer.GetSetting(settingname, "");
+
+            if (result.IsSucceeded && result.Data is not null)
             {
-                return this.settingHandler.GetStringSetting(settingname).Data;
+                return result.Data.Value;
             }
             else
             {
@@ -52,9 +55,11 @@ namespace Niconicome.Models.Local.Settings
             var settingname = this.GetSettingName(setting);
             if (settingname is null) return false;
 
-            if (this.settingHandler.Exists(settingname, SettingType.boolSetting))
+            IAttemptResult<ISettingInfo<bool>> result = this._settingsConainer.GetSetting(settingname, false);
+
+            if (result.IsSucceeded && result.Data is not null)
             {
-                return this.settingHandler.GetBoolSetting(settingname).Data;
+                return result.Data.Value;
             }
             else
             {
@@ -72,9 +77,11 @@ namespace Niconicome.Models.Local.Settings
             var settingname = this.GetSettingName(setting);
             if (settingname is null) return -1;
 
-            if (this.settingHandler.Exists(settingname, SettingType.intSetting))
+            IAttemptResult<ISettingInfo<int>> result = this._settingsConainer.GetSetting(settingname, -1);
+
+            if (result.IsSucceeded && result.Data is not null)
             {
-                return this.settingHandler.GetIntSetting(settingname).Data;
+                return result.Data.Value;
             }
             else
             {
@@ -89,22 +96,16 @@ namespace Niconicome.Models.Local.Settings
         /// <typeparam name="T"></typeparam>
         /// <param name="data"></param>
         /// <param name="setting"></param>
-        public void SaveSetting<T>(T data, SettingsEnum setting)
+        public void SaveSetting<T>(T data, SettingsEnum setting) where T : notnull
         {
             var settingname = this.GetSettingName(setting);
             if (settingname is null) return;
 
-            if (data is bool boolData)
+            IAttemptResult<ISettingInfo<T>> result = this._settingsConainer.GetSetting(settingname, data);
+
+            if (result.IsSucceeded && result.Data is not null)
             {
-                this.settingHandler.SaveBoolSetting(settingname, boolData);
-            }
-            else if (data is string stringData)
-            {
-                this.settingHandler.SaveStringSetting(settingname, stringData);
-            }
-            else if (data is int intData)
-            {
-                this.settingHandler.SaveIntSetting(settingname, intData);
+                result.Data.Value = data;
             }
         }
 
@@ -117,95 +118,84 @@ namespace Niconicome.Models.Local.Settings
         {
             return settings switch
             {
-                SettingsEnum.FileNameFormat => STypes::SettingNames.FileNameFormat,
-                SettingsEnum.PlayerAPath => STypes::SettingNames.PlayerAPath,
-                SettingsEnum.PlayerBPath => STypes::SettingNames.PlayerBPath,
-                SettingsEnum.AppAPath => STypes::SettingNames.AppUrlPath,
-                SettingsEnum.AppAParam => STypes::SettingNames.AppUrlParam,
-                SettingsEnum.AppBPath => STypes::SettingNames.AppIdPath,
-                SettingsEnum.AppBParam => STypes::SettingNames.AppIdParam,
-                SettingsEnum.FfmpegPath => STypes::SettingNames.FFmpegPath,
-                SettingsEnum.DefaultFolder => STypes::SettingNames.DefaultFolder,
-                SettingsEnum.CommentOffset => STypes::SettingNames.CommentOffset,
-                SettingsEnum.DLVideo => STypes::SettingNames.IsDownloadingVideoEnable,
-                SettingsEnum.DLComment => STypes::SettingNames.IsDownloadingCommentEnable,
-                SettingsEnum.DLKako => STypes::SettingNames.IsDownloadingKakoroguEnable,
-                SettingsEnum.DLEasy => STypes::SettingNames.IsDownloadingEasyEnable,
-                SettingsEnum.DLThumb => STypes::SettingNames.IsDownloadingThumbEnable,
-                SettingsEnum.DLOwner => STypes::SettingNames.IsDownloadingOwnerEnable,
-                SettingsEnum.DLSkip => STypes::SettingNames.IsSkipEnable,
-                SettingsEnum.DLCopy => STypes::SettingNames.IsCopyEnable,
-                SettingsEnum.DLOverwrite => STypes::SettingNames.IsOverwriteEnable,
-                SettingsEnum.SwitchOffset => STypes::SettingNames.IsAutoSwitchOffsetEnable,
-                SettingsEnum.FFmpegShell => STypes::SettingNames.UseShellWhenLaunchingFFmpeg,
-                SettingsEnum.AutologinEnable => STypes::SettingNames.IsAutologinEnable,
-                SettingsEnum.AutologinMode => STypes::SettingNames.AutoLoginMode,
-                SettingsEnum.MaxParallelDL => STypes::SettingNames.MaxParallelDownloadCount,
-                SettingsEnum.MaxParallelSegDl => STypes::SettingNames.MaxParallelSegmentDownloadCount,
-                SettingsEnum.DLAllFromQueue => STypes::SettingNames.DownloadAllWhenPushDLButton,
-                SettingsEnum.AllowDupeOnStage => STypes::SettingNames.AllowDupeOnStage,
-                SettingsEnum.ReplaceSBToMB => STypes::SettingNames.ReplaceSingleByteToMultiByte,
-                SettingsEnum.OverrideVideoFileDTToUploadedDT => STypes::SettingNames.OverideVideoFileDTToUploadedDT,
-                SettingsEnum.MaxCommentsCount => STypes::SettingNames.MaxCommentCount,
-                SettingsEnum.LimitCommentsCount => STypes::SettingNames.LimitCommentCount,
-                SettingsEnum.DLVideoInfo => STypes::SettingNames.IsDownloadingVideoInfoEnable,
-                SettingsEnum.VideoInfoInJson => STypes::SettingNames.IsDownloadingVideoInfoInJsonEnable,
-                SettingsEnum.MaxFetchCount => STypes::SettingNames.MaxParallelFetchCount,
-                SettingsEnum.FetchSleepInterval => STypes::SettingNames.FetchSleepInterval,
-                SettingsEnum.SkipSSLVerification => STypes::SettingNames.SkipSSLVerification,
-                SettingsEnum.ExpandAll => STypes::SettingNames.ExpandTreeOnStartUp,
-                SettingsEnum.InheritExpandedState => STypes::SettingNames.SaveTreePrevExpandedState,
-                SettingsEnum.EnableResume => STypes::SettingNames.IsResumeEnable,
-                SettingsEnum.MaxTmpDirCount => STypes::SettingNames.MaxTmpSegmentsDirCount,
-                SettingsEnum.StoreOnlyNiconicoID => STypes::SettingNames.StoreOnlyNiconicoIDOnRegister,
-                SettingsEnum.UnsafeCommentHandle => STypes::SettingNames.EnableUnsafeCommentHandle,
-                SettingsEnum.MWSelectColumnWid => STypes::SettingNames.MainWindowSelectColumnWidth,
-                SettingsEnum.MWIDColumnWid => STypes::SettingNames.MainWindowIDColumnWidth,
-                SettingsEnum.MWTitleColumnWid => STypes::SettingNames.MainWindowTitleColumnWidth,
-                SettingsEnum.MWUploadColumnWid => STypes::SettingNames.MainWindowUploadColumnWidth,
-                SettingsEnum.MWViewCountColumnWid => STypes::SettingNames.MainWindowViewCountColumnWidth,
-                SettingsEnum.MWDownloadedFlagColumnWid => STypes::SettingNames.MainWindowDownloadedFlagColumnWidth,
-                SettingsEnum.MWStateColumnWid => STypes::SettingNames.MainWindowStateColumnWidth,
-                SettingsEnum.MWThumbColumnWid => STypes::SettingNames.MainWindowThumbnailColumnWidth,
-                SettingsEnum.ReAllocateCommands => STypes::SettingNames.ReAllocateIfVideoisNotSaved,
-                SettingsEnum.VListItemdbClick => STypes::SettingNames.VideoListItemdbClickAction,
-                SettingsEnum.AutoRenameNetPlaylist => STypes::SettingNames.AutoRenamingAfterSetNetworkPlaylist,
-                SettingsEnum.VideoInfoType => STypes::SettingNames.VideoInfoType,
-                SettingsEnum.DlWithoutEncode => STypes::SettingNames.DownloadVideoWithoutEncodeEnable,
-                SettingsEnum.IchibaInfoType => STypes::SettingNames.IchibaInfoType,
-                SettingsEnum.DlIchiba => STypes::SettingNames.IsDownloadingIchibaInfoEnable,
-                SettingsEnum.NoRestoreClumnWIdth => STypes::SettingNames.IsRestoringColumnWidthDisabled,
-                SettingsEnum.FFProfileName => STypes::SettingNames.FirefoxProfileName,
-                SettingsEnum.HtmlExt => STypes::SettingNames.HtmlFileExtension,
-                SettingsEnum.JpegExt => STypes::SettingNames.JpegFileExtension,
-                SettingsEnum.VideoinfoSuffix => STypes::SettingNames.VideoInfoSuffix,
-                SettingsEnum.IchibaInfoSuffix => STypes::SettingNames.IchibaSuffix,
-                SettingsEnum.DisableDLFailedHistory => STypes::SettingNames.DisableDownloadFailedHistory,
-                SettingsEnum.DisableDLSucceededHistory => STypes::SettingNames.DisableDownloadSucceededHistory,
-                SettingsEnum.SingletonWindows => STypes::SettingNames.LimitWindowsToSingleton,
-                SettingsEnum.AppTheme => STypes::SettingNames.ApplicationTheme,
-                SettingsEnum.ConfirmIfDownloading => STypes::SettingNames.ConfirmIfDownloading,
-                SettingsEnum.MWBookMarkColumnWid => STypes::SettingNames.MainWindowBookMarkColumnWidth,
-                SettingsEnum.FFmpegFormat => STypes::SettingNames.FFmpegFormat,
-                SettingsEnum.ThumbSize => STypes::SettingNames.ThumbnailSize,
-                SettingsEnum.DisableScrollRestore => STypes::SettingNames.DisableScrollRestore,
-                SettingsEnum.OwnerComSuffix => STypes::SettingNames.OwnerCommentSuffix,
-                SettingsEnum.ThumbSuffix => STypes::SettingNames.ThumbnailSuffix,
-                SettingsEnum.IsDevMode => STypes::SettingNames.IsDeveloppersMode,
-                SettingsEnum.IsAddonDebugEnable => STypes::SettingNames.IsAddonDebuggingEnable,
-                SettingsEnum.DlTimerEveryDay => STypes::SettingNames.IsDlTImerEveryDayEnable,
-                SettingsEnum.PostDlAction => STypes::SettingNames.PostDownloadAction,
-                SettingsEnum.EconomySuffix => STypes::SettingNames.EnonomyQualitySuffix,
-                SettingsEnum.ExperimentalSafety => STypes::SettingNames.IsExperimentalCommentSafetySystemEnable,
-                SettingsEnum.SnackbarDuration => STypes::SettingNames.SnackbarDuration,
-                SettingsEnum.CommentWaitSpan => STypes::SettingNames.CommentFetchWaitSpan,
-                SettingsEnum.MWEconomyColumnWid => STypes::SettingNames.MainWindowEconomyColumnWidth,
-                SettingsEnum.DeleteEcoFile => STypes::SettingNames.DeleteExistingEconomyFile,
-                SettingsEnum.SearchExact => STypes::SettingNames.SearchVideosExact,
-                SettingsEnum.ShowTasksAsTab => STypes::SettingNames.ShowDownloadTasksAsTab,
-                SettingsEnum.CommentCountPerBlock => STypes::SettingNames.CommentCountPerBlock,
-                SettingsEnum.AppendComment => STypes::SettingNames.IsAppendingToLocalCommentEnable,
-                SettingsEnum.OmitXmlDeclaration => STypes::SettingNames.IsOmittingXmlDeclarationIsEnable,
+                SettingsEnum.FileNameFormat => SettingNames.FileNameFormat,
+                SettingsEnum.PlayerAPath => SettingNames.PlayerAPath,
+                SettingsEnum.PlayerBPath => SettingNames.PlayerBPath,
+                SettingsEnum.AppAPath => SettingNames.AppUrlPath,
+                SettingsEnum.AppAParam => SettingNames.AppUrlParam,
+                SettingsEnum.AppBPath => SettingNames.AppIdPath,
+                SettingsEnum.AppBParam => SettingNames.AppIdParam,
+                SettingsEnum.FfmpegPath => SettingNames.FFmpegPath,
+                SettingsEnum.DefaultFolder => SettingNames.DefaultFolder,
+                SettingsEnum.CommentOffset => SettingNames.CommentOffset,
+                SettingsEnum.DLVideo => SettingNames.IsDownloadingVideoEnable,
+                SettingsEnum.DLComment => SettingNames.IsDownloadingCommentEnable,
+                SettingsEnum.DLKako => SettingNames.IsDownloadingKakoroguEnable,
+                SettingsEnum.DLEasy => SettingNames.IsDownloadingEasyEnable,
+                SettingsEnum.DLThumb => SettingNames.IsDownloadingThumbEnable,
+                SettingsEnum.DLOwner => SettingNames.IsDownloadingOwnerEnable,
+                SettingsEnum.DLSkip => SettingNames.IsSkipEnable,
+                SettingsEnum.DLCopy => SettingNames.IsCopyEnable,
+                SettingsEnum.DLOverwrite => SettingNames.IsOverwriteEnable,
+                SettingsEnum.SwitchOffset => SettingNames.IsAutoSwitchOffsetEnable,
+                SettingsEnum.FFmpegShell => SettingNames.UseShellWhenLaunchingFFmpeg,
+                SettingsEnum.AutologinEnable => SettingNames.IsAutologinEnable,
+                SettingsEnum.AutologinMode => SettingNames.AutoLoginMode,
+                SettingsEnum.MaxParallelDL => SettingNames.MaxParallelDownloadCount,
+                SettingsEnum.MaxParallelSegDl => SettingNames.MaxParallelSegmentDownloadCount,
+                SettingsEnum.DLAllFromQueue => SettingNames.DownloadAllWhenPushDLButton,
+                SettingsEnum.AllowDupeOnStage => SettingNames.AllowDupeOnStage,
+                SettingsEnum.ReplaceSBToMB => SettingNames.ReplaceSingleByteToMultiByte,
+                SettingsEnum.OverrideVideoFileDTToUploadedDT => SettingNames.OverideVideoFileDTToUploadedDT,
+                SettingsEnum.MaxCommentsCount => SettingNames.MaxCommentCount,
+                SettingsEnum.LimitCommentsCount => SettingNames.LimitCommentCount,
+                SettingsEnum.DLVideoInfo => SettingNames.IsDownloadingVideoInfoEnable,
+                SettingsEnum.VideoInfoInJson => SettingNames.IsDownloadingVideoInfoInJsonEnable,
+                SettingsEnum.MaxFetchCount => SettingNames.MaxParallelFetchCount,
+                SettingsEnum.FetchSleepInterval => SettingNames.FetchSleepInterval,
+                SettingsEnum.SkipSSLVerification => SettingNames.SkipSSLVerification,
+                SettingsEnum.ExpandAll => SettingNames.ExpandTreeOnStartUp,
+                SettingsEnum.InheritExpandedState => SettingNames.SaveTreePrevExpandedState,
+                SettingsEnum.EnableResume => SettingNames.IsResumeEnable,
+                SettingsEnum.MaxTmpDirCount => SettingNames.MaxTmpSegmentsDirCount,
+                SettingsEnum.StoreOnlyNiconicoID => SettingNames.StoreOnlyNiconicoIDOnRegister,
+                SettingsEnum.UnsafeCommentHandle => SettingNames.EnableUnsafeCommentHandle,
+                SettingsEnum.ReAllocateCommands => SettingNames.ReAllocateIfVideoisNotSaved,
+                SettingsEnum.VListItemdbClick => SettingNames.VideoListItemdbClickAction,
+                SettingsEnum.AutoRenameNetPlaylist => SettingNames.AutoRenamingAfterSetNetworkPlaylist,
+                SettingsEnum.VideoInfoType => SettingNames.VideoInfoType,
+                SettingsEnum.DlWithoutEncode => SettingNames.DownloadVideoWithoutEncodeEnable,
+                SettingsEnum.IchibaInfoType => SettingNames.IchibaInfoType,
+                SettingsEnum.DlIchiba => SettingNames.IsDownloadingIchibaInfoEnable,
+                SettingsEnum.NoRestoreClumnWIdth => SettingNames.IsRestoringColumnWidthDisabled,
+                SettingsEnum.FFProfileName => SettingNames.FirefoxProfileName,
+                SettingsEnum.HtmlExt => SettingNames.HtmlFileExtension,
+                SettingsEnum.JpegExt => SettingNames.JpegFileExtension,
+                SettingsEnum.VideoinfoSuffix => SettingNames.VideoInfoSuffix,
+                SettingsEnum.IchibaInfoSuffix => SettingNames.IchibaSuffix,
+                SettingsEnum.DisableDLFailedHistory => SettingNames.DisableDownloadFailedHistory,
+                SettingsEnum.DisableDLSucceededHistory => SettingNames.DisableDownloadSucceededHistory,
+                SettingsEnum.SingletonWindows => SettingNames.LimitWindowsToSingleton,
+                SettingsEnum.AppTheme => SettingNames.ApplicationTheme,
+                SettingsEnum.ConfirmIfDownloading => SettingNames.ConfirmIfDownloading,
+                SettingsEnum.FFmpegFormat => SettingNames.FFmpegFormat,
+                SettingsEnum.ThumbSize => SettingNames.ThumbnailSize,
+                SettingsEnum.DisableScrollRestore => SettingNames.DisableScrollRestore,
+                SettingsEnum.OwnerComSuffix => SettingNames.OwnerCommentSuffix,
+                SettingsEnum.ThumbSuffix => SettingNames.ThumbnailSuffix,
+                SettingsEnum.IsDevMode => SettingNames.IsDeveloppersMode,
+                SettingsEnum.DlTimerEveryDay => SettingNames.IsDlTImerEveryDayEnable,
+                SettingsEnum.PostDlAction => SettingNames.PostDownloadAction,
+                SettingsEnum.EconomySuffix => SettingNames.EnonomyQualitySuffix,
+                SettingsEnum.ExperimentalSafety => SettingNames.IsExperimentalCommentSafetySystemEnable,
+                SettingsEnum.SnackbarDuration => SettingNames.SnackbarDuration,
+                SettingsEnum.CommentWaitSpan => SettingNames.CommentFetchWaitSpan,
+                SettingsEnum.DeleteEcoFile => SettingNames.DeleteExistingEconomyFile,
+                SettingsEnum.SearchExact => SettingNames.SearchVideosExact,
+                SettingsEnum.ShowTasksAsTab => SettingNames.ShowDownloadTasksAsTab,
+                SettingsEnum.CommentCountPerBlock => SettingNames.CommentCountPerBlock,
+                SettingsEnum.AppendComment => SettingNames.IsAppendingToLocalCommentEnable,
+                SettingsEnum.OmitXmlDeclaration => SettingNames.IsOmittingXmlDeclarationIsEnable,
                 _ => null
             };
         }
@@ -288,7 +278,6 @@ namespace Niconicome.Models.Local.Settings
         OwnerComSuffix,
         ThumbSuffix,
         IsDevMode,
-        IsAddonDebugEnable,
         DlTimerEveryDay,
         PostDlAction,
         EconomySuffix,

@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Reactive.Linq;
+using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
+using Niconicome.Models.Utils.Reactive;
+using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Mainpage.Utils;
+using Niconicome.ViewModels.Setting.Pages.String;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using WS = Niconicome.Workspaces;
+using SC = Niconicome.ViewModels.Setting.Pages.String.StylePageVMStringContent;
 
 namespace Niconicome.ViewModels.Setting.Pages
 {
@@ -17,41 +23,44 @@ namespace Niconicome.ViewModels.Setting.Pages
         {
             #region テーマ
 
-            var light = new ComboboxItem<ApplicationThemeSettings>(ApplicationThemeSettings.Light, "ライト");
-            var dark = new ComboboxItem<ApplicationThemeSettings>(ApplicationThemeSettings.Dark, "ダーク");
-            var inherit = new ComboboxItem<ApplicationThemeSettings>(ApplicationThemeSettings.Inherit, "システム設定に従う");
+            var light = new ComboboxItem<ApplicationThemeSettings>(ApplicationThemeSettings.Light, WS::SettingPage.StringHandler.GetContent(SC.Light));
+            var dark = new ComboboxItem<ApplicationThemeSettings>(ApplicationThemeSettings.Dark, WS::SettingPage.StringHandler.GetContent(SC.Dark));
+            var inherit = new ComboboxItem<ApplicationThemeSettings>(ApplicationThemeSettings.Inherit, WS::SettingPage.StringHandler.GetContent(SC.Inherit));
             this.SelectableThemes = new List<ComboboxItem<ApplicationThemeSettings>>() { inherit, light, dark };
-            this.SelectedTheme = WS::SettingPage.Themehandler.GetTheme() switch
-            {
-                ApplicationThemeSettings.Light => new ReactiveProperty<ComboboxItem<ApplicationThemeSettings>>(light),
-                ApplicationThemeSettings.Dark => new ReactiveProperty<ComboboxItem<ApplicationThemeSettings>>(dark),
-                _ => new ReactiveProperty<ComboboxItem<ApplicationThemeSettings>>(inherit)
-            };
 
-            this.SelectedTheme.Skip(1).Subscribe(value =>
+            this.SelectedTheme = new BindableProperty<ComboboxItem<ApplicationThemeSettings>>(WS::SettingPage.Themehandler.GetTheme() switch {
+                ApplicationThemeSettings.Light=>light,
+                ApplicationThemeSettings.Dark =>dark,
+                _=>inherit
+            }).Subscribe(value =>
             {
                 WS::SettingPage.Themehandler.SetTheme(value.Value);
                 if (value.Value == ApplicationThemeSettings.Inherit)
                 {
-                    WS::SettingPage.SnackbarMessageQueue.Enqueue("システムテーマを適用するには、再起動する必要があります。", "再起動", () => WS::SettingPage.PowerManager.Restart());
+                    string message = WS::SettingPage.StringHandler.GetContent(SC.NeedRestart);
+                    string restart = WS::SettingPage.StringHandler.GetContent(SC.Restart);
+                    WS::SettingPage.SnackbarMessageQueue.Enqueue(message, restart, () => WS::SettingPage.PowerManager.Restart());
                 }
-            }).AddTo(this.disposables);
+            });
 
-            this.SaveStyleCommand = new ReactiveCommand()
-                .WithSubscribe(() =>
+
+            this.SaveStyleCommand = new BindableCommand(() =>
                 {
-                    IAttemptResult result = WS::SettingPage.StyleHandler.SaveUserChrome();
+                    IAttemptResult result = WS::SettingPage.UserChromeHandler.SaveStyle();
                     if (!result.IsSucceeded)
                     {
-                        WS::SettingPage.MessageHandler.AppendMessage($"スタイルファイルの書き出しに失敗しました。(詳細:{result.Exception?.Message ?? "None"})");
-                        WS::SettingPage.SnackbarMessageQueue.Enqueue("スタイルファイルの書き出しに失敗しました。");
+                        string message = WS::SettingPage.StringHandler.GetContent(SC.FailedToWriteUserChrome);
+                        string messageD = WS::SettingPage.StringHandler.GetContent(SC.FailedToWriteUserChromeDetail, result.Message ?? string.Empty);
+                        WS::SettingPage.NewMessageHandler.AppendMessage(messageD, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                        WS::SettingPage.SnackbarMessageQueue.Enqueue(message);
                     }
                     else
                     {
-                        WS::SettingPage.MessageHandler.AppendMessage("スタイルファイルを書き出しにました");
-                        WS::SettingPage.SnackbarMessageQueue.Enqueue("スタイルファイルを書き出しました。");
+                        string message = WS::SettingPage.StringHandler.GetContent(SC.WritingUserChromeHasCompleted);
+                        WS::SettingPage.NewMessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
+                        WS::SettingPage.SnackbarMessageQueue.Enqueue(message);
                     }
-                });
+                }, new BindableProperty<bool>(true));
 
             #endregion
         }
@@ -64,12 +73,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// 選択されたテーマ
         /// </summary>
-        public ReactiveProperty<ComboboxItem<ApplicationThemeSettings>> SelectedTheme { get; init; }
+        public IBindableProperty<ComboboxItem<ApplicationThemeSettings>> SelectedTheme { get; init; }
 
         /// <summary>
         /// スタイルを書き出す
         /// </summary>
-        public ReactiveCommand SaveStyleCommand { get; init; }
+        public IBindableCommand SaveStyleCommand { get; init; }
 
     }
 
@@ -83,15 +92,15 @@ namespace Niconicome.ViewModels.Setting.Pages
             var dark = new ComboboxItem<ApplicationThemeSettings>(ApplicationThemeSettings.Dark, "ダーク");
             var inherit = new ComboboxItem<ApplicationThemeSettings>(ApplicationThemeSettings.Inherit, "システム設定に従う");
             this.SelectableThemes = new List<ComboboxItem<ApplicationThemeSettings>>() { inherit, light, dark };
-            this.SelectedTheme = new ReactiveProperty<ComboboxItem<ApplicationThemeSettings>>(light);
+            this.SelectedTheme = new BindableProperty<ComboboxItem<ApplicationThemeSettings>>(light);
 
             #endregion
         }
 
         public List<ComboboxItem<ApplicationThemeSettings>> SelectableThemes { get; init; }
 
-        public ReactiveProperty<ComboboxItem<ApplicationThemeSettings>> SelectedTheme { get; init; }
+        public IBindableProperty<ComboboxItem<ApplicationThemeSettings>> SelectedTheme { get; init; }
 
-        public ReactiveCommand SaveStyleCommand { get; init; } = new();
+        public IBindableCommand SaveStyleCommand { get; init; } = BindableCommand.Empty;
     }
 }

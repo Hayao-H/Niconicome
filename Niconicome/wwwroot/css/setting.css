@@ -1,0 +1,208 @@
+.SettingPage {
+  display: flex;
+}
+.SettingPage .SideMenu {
+  width: 200px;
+}
+.SettingPage .SideMenu .MenuItem {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  border-radius: 6px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  cursor: pointer;
+}
+.SettingPage .SideMenu .MenuItem.NotImpl {
+  cursor: not-allowed;
+}
+.SettingPage .SideMenu .MenuItem .Icon {
+  margin-right: 10px;
+}
+.SettingPage .SideMenu .MenuItem:hover {
+  background-color: #dfdfe5;
+}
+.SettingPage .Body {
+  flex: 1;
+  margin-left: 8px;
+  min-height: 100%;
+}
+.SettingPage .Body .SettingContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.SettingPage .Body .SettingContent.M0 {
+  margin-top: 0;
+}
+.SettingPage .Body .SettingContent .Title {
+  font-size: 18px;
+}
+.SettingPage .Body .SettingContent .Icon {
+  margin-right: 8px;
+  color: #87ceeb;
+}
+.SettingPage .Body .SettingContent .Icon.Danger {
+  color: #ff69b4;
+}
+.SettingPage .Body .ContentWrapper {
+  margin-left: 16px;
+}
+.SettingPage .Body .Separator {
+  border: 1px solid rgba(87, 86, 86, 0.9058823529);
+  margin: 40px 5px;
+}
+
+.ImportPage .NiconicomeImport .InputContainer,
+.ImportPage .XenoImport .InputContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 8px;
+}
+.ImportPage .NiconicomeImport .InputContainer .Label,
+.ImportPage .XenoImport .InputContainer .Label {
+  margin-left: 20px;
+  width: 240px;
+}
+.ImportPage .NiconicomeImport .InputContainer .Input,
+.ImportPage .XenoImport .InputContainer .Input {
+  margin-left: 10px;
+  outline: none;
+  border: none;
+  border-bottom: solid 2px rgba(231, 231, 231, 0.9058823529);
+  flex: 1;
+}
+.ImportPage .XenoImport .MessageContainer {
+  margin-top: 20px;
+  margin-left: 20px;
+  border: 1px rgba(231, 231, 231, 0.9058823529) solid;
+}
+.ImportPage .XenoImport .MessageContainer .Message {
+  padding: 8px;
+}
+
+.RestorePage .TitleContainer {
+  display: flex;
+  align-items: center;
+}
+.RestorePage .TitleContainer .Icon {
+  margin-right: 8px;
+  color: #ff69b4;
+}
+.RestorePage .BackupSettingsContainer {
+  margin-top: 18px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .BackupListHeader {
+  display: flex;
+}
+.RestorePage .BackupSettingsContainer .BackupList .BackupListBody .BackupListRow {
+  display: flex;
+}
+.RestorePage .BackupSettingsContainer .BackupList .ItemColumn {
+  padding: 8px;
+  height: 100%;
+  display: inline-block;
+}
+.RestorePage .BackupSettingsContainer .BackupList .HeaderColumn {
+  background-color: #f2f3f5;
+  padding: 2px 8px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .ItemColumn:not(:last-child) {
+  border-right: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.RestorePage .BackupSettingsContainer .BackupList .Selected {
+  width: 30px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .Name {
+  width: 300px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .CreatedOn {
+  width: 400px;
+}
+.RestorePage .BackupSettingsContainer .BackupList .Size {
+  width: 200px;
+}
+.RestorePage .BackupSettingsContainer .BackupControlsContainer {
+  margin-top: 30px;
+  margin-left: 10px;
+}
+.RestorePage .BackupSettingsContainer .BackupControlsContainer .Label {
+  margin-right: 8px;
+  font-weight: bold;
+}
+.RestorePage .BackupSettingsContainer .BackupControlsContainer .Input {
+  outline: none;
+  border: none;
+  border-bottom: 2px solid rgba(231, 231, 231, 0.9058823529);
+  width: 50%;
+  margin-right: 8px;
+}
+.RestorePage .BackupSettingsContainer .BackupControlsContainer .Button {
+  margin-left: 4px;
+}
+.RestorePage .DirectorySettingsContainer {
+  margin-top: 18px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .DirectoryListHeader {
+  display: flex;
+  justify-content: stretch;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .DirectoryListBody .DirectoryListRow {
+  display: flex;
+  justify-content: stretch;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .ItemColumn {
+  padding: 8px;
+  height: 100%;
+  display: inline-block;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .HeaderColumn {
+  background-color: #f2f3f5;
+  padding: 2px 8px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .ItemColumn:not(:last-child) {
+  border-right: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .Selected {
+  width: 30px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryList .Path {
+  flex: 1;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryControlsContainer {
+  margin-top: 30px;
+  margin-left: 10px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Label {
+  margin-right: 8px;
+  font-weight: bold;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Input {
+  outline: none;
+  border: none;
+  border-bottom: 2px solid rgba(231, 231, 231, 0.9058823529);
+  width: 50%;
+  margin-right: 8px;
+}
+.RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Button {
+  margin-left: 4px;
+}
+.RestorePage .DirectorySettingsContainer .LoadVideoDescription {
+  margin: 20px 10px;
+}
+.RestorePage .DataCleaningDescription {
+  margin: 20px 10px;
+}
+.RestorePage .DangerZoneContainer {
+  background-color: #f8d7da;
+  color: #842029;
+  border-radius: 8px;
+  padding: 16px;
+}
+.RestorePage .DangerZoneContainer .DangerZoneBody {
+  margin-left: 16px;
+}

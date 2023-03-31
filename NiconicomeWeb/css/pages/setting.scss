@@ -1,0 +1,271 @@
+.SettingPage {
+    display: flex;
+
+    .SideMenu {
+        width: 200px;
+
+        .MenuItem {
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            border-radius: 6px;
+            user-select: none;
+            cursor: pointer;
+
+            &.NotImpl {
+                cursor: not-allowed;
+            }
+
+            .Icon {
+                margin-right: 10px;
+            }
+        }
+
+        .MenuItem:hover {
+            background-color: #dfdfe5;
+        }
+    }
+
+    .Body {
+        flex: 1;
+        margin-left: 8px;
+        min-height: 100%;
+
+        .SettingContent {
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+
+            &.M0 {
+                margin-top: 0;
+            }
+
+            .Title {
+                font-size: 18px;
+            }
+
+            .Icon {
+                margin-right: 8px;
+                color: #87ceeb;
+
+                &.Danger {
+                    color: #ff69b4;
+                }
+            }
+        }
+
+        .ContentWrapper {
+            margin-left: 16px;
+        }
+
+        .Separator {
+            border: 1px solid #575656e7;
+            margin: 40px 5px;
+        }
+    }
+}
+
+.ImportPage {
+
+    .NiconicomeImport,
+    .XenoImport {
+        .InputContainer {
+
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 8px;
+
+            .Label {
+                margin-left: 20px;
+                width: 240px;
+            }
+
+            .Input {
+                margin-left: 10px;
+                outline: none;
+                border: none;
+                border-bottom: solid 2px #e7e7e7e7;
+                flex: 1;
+            }
+        }
+    }
+
+    .XenoImport {
+        .MessageContainer {
+            margin-top: 20px;
+            margin-left: 20px;
+            border: 1px #e7e7e7e7 solid;
+
+            .Message {
+                padding: 8px;
+            }
+        }
+    }
+}
+
+.RestorePage {
+    .TitleContainer {
+        display: flex;
+        align-items: center;
+
+        .Icon {
+            margin-right: 8px;
+            color: #ff69b4;
+        }
+    }
+
+    .BackupSettingsContainer {
+        margin-top: 18px;
+
+        .BackupList {
+            .BackupListHeader {
+                display: flex;
+            }
+
+            .BackupListBody {
+                .BackupListRow {
+                    display: flex;
+                }
+            }
+
+            .ItemColumn {
+                padding: 8px;
+                height: 100%;
+                display: inline-block;
+            }
+
+            .HeaderColumn {
+                background-color: #f2f3f5;
+                padding: 2px 8px;
+            }
+
+            .ItemColumn:not(:last-child) {
+                border-right: 1px solid #e7e7e7e7;
+            }
+
+            .Selected {
+                width: 30px;
+            }
+
+            .Name {
+                width: 300px;
+            }
+
+            .CreatedOn {
+                width: 400px;
+            }
+
+            .Size {
+                width: 200px;
+            }
+        }
+
+        .BackupControlsContainer {
+            margin-top: 30px;
+            margin-left: 10px;
+
+            .Label {
+                margin-right: 8px;
+                font-weight: bold;
+            }
+
+            .Input {
+                outline: none;
+                border: none;
+                border-bottom: 2px solid #e7e7e7e7;
+                width: 50%;
+                margin-right: 8px;
+            }
+
+            .Button {
+                margin-left: 4px;
+            }
+        }
+    }
+
+    .DirectorySettingsContainer {
+        margin-top: 18px;
+
+        .DirectoryList {
+            .DirectoryListHeader {
+                display: flex;
+                justify-content: stretch;
+            }
+
+            .DirectoryListBody {
+                .DirectoryListRow {
+                    display: flex;
+                    justify-content: stretch;
+                }
+            }
+
+            .ItemColumn {
+                padding: 8px;
+                height: 100%;
+                display: inline-block;
+            }
+
+            .HeaderColumn {
+                background-color: #f2f3f5;
+                padding: 2px 8px;
+            }
+
+            .ItemColumn:not(:last-child) {
+                border-right: 1px solid #e7e7e7e7;
+            }
+
+            .Selected {
+                width: 30px;
+            }
+
+            .Path {
+                flex: 1;
+            }
+        }
+
+        .DirectoryControlsContainer {
+            margin-top: 30px;
+            margin-left: 10px;
+
+            .Label {
+                margin-right: 8px;
+                font-weight: bold;
+            }
+
+            .Input {
+                outline: none;
+                border: none;
+                border-bottom: 2px solid #e7e7e7e7;
+                width: 50%;
+                margin-right: 8px;
+            }
+
+            .Button {
+                margin-left: 4px;
+            }
+        }
+
+        .LoadVideoDescription {
+            margin: 20px 10px;
+        }
+    }
+
+    .DataCleaningDescription {
+        margin: 20px 10px;
+    }
+
+    .DangerZoneContainer {
+        background-color: #f8d7da;
+        color: #842029;
+        border-radius: 8px;
+        padding: 16px;
+
+        .DangerZoneBody {
+            margin-left: 16px;
+        }
+    }
+}

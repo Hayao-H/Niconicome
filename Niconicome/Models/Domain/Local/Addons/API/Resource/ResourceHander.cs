@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
-using Niconicome.Models.Domain.Local.Addons.Core.Engine;
+using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Helper.Result;
 using Const = Niconicome.Models.Const;
@@ -41,7 +41,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Resource
 
         private INicoFileIO _fileIO;
 
-        private string? _packageID;
+        private string? _directoryName;
 
         private string? _addonName;
 
@@ -55,7 +55,7 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Resource
         {
             this.CheckIfInitialized();
 
-            string path = Path.Combine(FileFolder.AddonsFolder, this._packageID!, Const::AddonConstant.ResourceDirectoryName, relativePath);
+            string path = Path.Combine(FileFolder.AddonsFolder, this._directoryName!, Const::AddonConstant.ResourceDirectoryName, relativePath);
 
             string data;
             try
@@ -71,12 +71,12 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Resource
             return new AttemptResult<string>() { IsSucceeded = true, Data = data };
         }
 
-        public void Initialize(string packageID, string addonName)
+        public void Initialize(string directorName, string addonName)
         {
             if (this._isInitialized) return;
 
             this._addonName = addonName;
-            this._packageID = packageID;
+            this._directoryName = directorName;
             this._isInitialized = true;
         }
 

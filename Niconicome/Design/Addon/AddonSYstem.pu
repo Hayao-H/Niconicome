@@ -1,0 +1,137 @@
+@startuml AddonSystem
+title アドオン機能
+
+interface IattemptResult<T>
+interface ITabInfomation
+
+class ReactiveProperty
+
+class View
+class ViewModel
+
+class Permission
+
+class AddonInfomation {
+    + string ID
+    + string Name
+    + string IconPath
+    + description
+    + List<Permission> Permissions
+    + string Author
+    + string HomePage
+    + string ScriptPath
+    + string DllPath
+    + ReactiveProperty<bool> HaveUpdate
+}
+
+class JavaScriptEngine {
+    + void Execute(string scpt)
+}
+
+class AddonContext {
+    + List<ITabInfomation> HandlingTabs
+    + AddonInfomation AddonInfomation
+    - JavaScriptEngine Enginee
+    + IattemptResult Initialize(AddonInfomation infomation)
+    + ShutDown()
+    + RegisterExceptionHandler(AddonContext sender,Exception ex)
+}
+
+class AddonLoader {
+    + AddonInfomation LoadAddon(string manifestPath)
+}
+
+class AddonSettingsHandler {
+    + bool IsAutoUpdateEnable
+    + bool IsSafemodeEnable
+    + bool IsDevelopperModeEnable
+    + void ResetSafemodeStatus() 
+}
+
+class AddonInstaller {
+    + IattemptResult<InstallInfomation> ExtractAddon(string zipFilePath)
+    + IattemptResult Install(string folderPath)
+}
+
+class AddonUpdatChecker {
+    + Task<IAttemptResult<bool>> CheckForUpdate(AddonInfomation Infomation)
+}
+
+class AddonUpdator {
+    + IattemptResult<UpdateInfomation> DownloadAndLoad(IAddonInfomation Infomation)
+}
+
+class UpdateInfomation {
+    + List<Permission> NewPermissions
+    + bool HasNewPermission
+    + IAddonInfomation AddonInfomation
+}
+
+class InstallInfomation {
+    + AddonInfomation Addon
+    + string FolderPath
+}
+
+class AddonUninstaller {
+    + IattemptResult Uninstall(string id)
+}
+
+class AddonManager {
+    + IattemptResult InitializeAddons()
+    + IattemptResult CheckForUpdate()
+    + IattemptResult Reload(string id)
+    + Task<IAttemptResult> UpdateAsync(string ID)
+    - IattemptResult Kill(string id)
+}
+
+class AddonStatusContainer {
+    + List<AddonInfomation> LoadedAddons
+    + List<AddonInfomation> LoadFailedAddons
+    + List<AddonInfomation> ToBeUpdatedAddons
+}
+
+class InstallManager {
+    + IAttemptResult<IAddonInfomation> LoadInfomation(string archivePath)
+    + IAttemptResult InstallAndLoad(string archivePath)
+    + IAttemptResult UpdateAndLoad(string ID, string archivePath)
+    + Task<IattemptResult<UpdateInfomation>> DownloadAndLoadUpdate(IAddonInfomation Infomation
+    + IAttemptResult Unintlall(string id)
+}
+
+class AddonContextsContainer {
+    + List<AddonContext> Contexts
+}
+
+View *-- ViewModel
+ViewModel --> AddonManager
+ViewModel --> InstallManager
+ViewModel --> AddonStatusContainer
+InstallManager--> AddonInstaller
+InstallManager --> AddonUninstaller
+AddonManager --> AddonLoader
+AddonManager --> AddonSettingsHandler
+AddonManager --> AddonUpdatChecker
+AddonManager --> AddonContextsContainer
+AddonManager --> AddonStatusContainer
+InstallManager --> AddonContextsContainer
+InstallManager --> AddonUpdator
+
+
+AddonInstaller *-- InstallInfomation
+AddonInstaller --> AddonLoader
+
+AddonUninstaller --> AddonContextsContainer
+
+AddonContext --* JavaScriptEngine
+AddonContext --* AddonInfomation
+AddonContext o-- ITabInfomation
+
+AddonContextsContainer o-- AddonContext
+
+UpdateInfomation *-- Permission
+UpdateInfomation --o AddonUpdator
+AddonUpdator --> AddonLoader
+
+AddonInfomation --o AddonStatusContainer
+
+@enduml 

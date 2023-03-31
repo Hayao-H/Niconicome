@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -16,11 +15,13 @@ using Niconicome.Models.Domain.Local.Addons.API.Tab;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Utils.InitializeAwaiter;
+using Niconicome.Models.Utils.Reactive;
+using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Controls;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.Views;
-using Niconicome.Views.AddonPage;
 using Niconicome.Views.Mainpage.Region;
 using Niconicome.Views.Setting;
 using Prism.Ioc;
@@ -28,7 +29,8 @@ using Prism.Regions;
 using Prism.Services.Dialogs;
 using Prism.Unity;
 using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
+using Style = Niconicome.Models.Local.State.Style;
+using Tree = Niconicome.Views.Mainpage.Region.PlaylistTree;
 using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage
@@ -46,6 +48,8 @@ namespace Niconicome.ViewModels.Mainpage
             this.RegionManager = regionManager;
             this.dialogService = dialogService;
 
+            this.RegionManager.RegisterViewWithRegion<Tree::PlaylistTree>("PlaylistTree");
+
             this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
             this.Username = new ReactiveProperty<string>("未ログイン");
             this.LoginBtnTooltip = new ReactiveProperty<string>("ログイン画面を表示する");
@@ -53,6 +57,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.Themehandler.Initialize();
             WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
 
             this.LoginCommand = new ReactiveCommand()
                 .WithSubscribe(async () =>
@@ -121,18 +126,27 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenAddonManagerCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    if (WS::Mainpage.LocalState.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
-                    {
-                        return;
-                    }
-                    dialogService.Show(nameof(AddonManagerWindow));
+                    ///if (WS::Mainpage.LocalState.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
+                    ///{
+                    ///    return;
+                    ///}
+                    ///dialogService.Show(nameof(AddonManagerWindow));
+
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons", BlazorWindows.Addon);
+                    WS::Mainpage.WindowTabHelper.OpenAddonManager(this.RegionManager);
                 });
+
+            this.OpenSettingV2Command = new BindableCommand(() =>
+            {
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/import", BlazorWindows.Settings);
+                WS::Mainpage.WindowTabHelper.OpenSettingsTab(this.RegionManager);
+            }, new BindableProperty<bool>(true));
 
 
             #region UI系の設定
 
-            this.TreeWidth = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.Tree.Width ?? 250).ToReadOnlyReactiveProperty();
-            this.TabsHeight = WS::Mainpage.StyleHandler.UserChrome.Select(value => value?.MainPage.VideoList.TabsHeight ?? 260).ToReadOnlyReactiveProperty();
+            this.TreeWidth = new ReadOnlyReactiveProperty<int>(new ReactiveProperty<int>(250));
+            this.TabsHeight = new ReadOnlyReactiveProperty<int>(new ReactiveProperty<int>(260));
 
             #endregion
 
@@ -200,6 +214,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// 再起動
         /// </summary>
         public ReactiveCommand Restart { get; init; }
+
+        /// <summary>
+        /// 設定を開く
+        /// </summary>
+        public BindableCommand OpenSettingV2Command { get; init; }
 
         #endregion
 
@@ -325,7 +344,11 @@ namespace Niconicome.ViewModels.Mainpage
         {
             base.OnAttached();
             this.AssociatedObject.Closing += this.OnClosing;
-            this.AssociatedObject.Loaded += (_, _) => this.CreateTabs();
+            this.AssociatedObject.Loaded += (_, _) =>
+            {
+                this.SetWindowPosition();
+                this.CreateTabs();
+            };
         }
 
         protected override void OnDetaching()
@@ -336,6 +359,10 @@ namespace Niconicome.ViewModels.Mainpage
 
         private void OnClosing(object? sender, CancelEventArgs e)
         {
+
+            Window window = this.AssociatedObject;
+            WS.Mainpage.WindowStyleManager.SaveTyle(new Style::WindowStyle((int)window.Top, (int)window.Left, (int)window.Height, (int)window.Width));
+
             if (!WS::Mainpage.Shutdown.IsShutdowned)
             {
                 IDialogService service = Application.Current.As<PrismApplication>().Container.Resolve<IDialogService>();
@@ -354,6 +381,37 @@ namespace Niconicome.ViewModels.Mainpage
             }
         }
 
+        private void SetWindowPosition()
+        {
+            IAttemptResult<Style::WindowStyle> result = WS.Mainpage.WindowStyleManager.GetStyle();
+            if (!result.IsSucceeded||result.Data is null)
+            {
+                return;
+            }
+
+            Style::WindowStyle style = result.Data;
+
+            if (style.Top >= 0)
+            {
+                this.AssociatedObject.Top = style.Top;
+            }
+
+            if (style.Left >= 0)
+            {
+                this.AssociatedObject.Left = style.Left;
+            }
+
+            if (style.Width >= 0)
+            {
+                this.AssociatedObject.Width = style.Width;
+            }
+
+            if (style.Height >= 0)
+            {
+                this.AssociatedObject.Height = style.Height;
+            }
+        }
+
         private void CreateTabs()
         {
             if (this.AssociatedObject.DataContext is not MainWindowViewModel vm) return;
@@ -365,12 +423,12 @@ namespace Niconicome.ViewModels.Mainpage
             IRegion bottomTabRegion = regionManager.Regions[LocalConstant.BottomTabRegionName];
             bottomTabRegion.Add(containerProvider.Resolve<DownloadSettings>());
             bottomTabRegion.Add(containerProvider.Resolve<Output>());
-            bottomTabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
+            //bottomTabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
             bottomTabRegion.Add(containerProvider.Resolve<VideoListState>());
             bottomTabRegion.Add(containerProvider.Resolve<TimerSettings>());
 
             IRegion topTabRegion = regionManager.Regions[LocalConstant.TopTabRegionName];
-            var videoListView = containerProvider.Resolve<VideoList>();
+            var videoListView = containerProvider.Resolve<MainVideoList>();
             topTabRegion.Add(videoListView);
             topTabRegion.Activate(videoListView);
         }

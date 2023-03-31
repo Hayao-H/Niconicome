@@ -1,12 +1,13 @@
 ﻿using System.Net.Http;
 using System.Net.Security;
 using Microsoft.Extensions.DependencyInjection;
-using Reactive.Bindings.Extensions;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
-using Addons = Niconicome.Models.Local.Addon;
-using AddonsCore = Niconicome.Models.Domain.Local.Addons.Core;
+using AddonsCoreV2 = Niconicome.Models.Domain.Local.Addons.Core.V2;
 using AddonsDomainAPI = Niconicome.Models.Domain.Local.Addons.API;
+using AddonsV2 = Niconicome.Models.Local.Addon.V2;
+using AddonVM = Niconicome.ViewModels.Mainpage.Subwindows.AddonManager;
 using Auth = Niconicome.Models.Auth;
+using Backup = Niconicome.Models.Domain.Local.DataBackup;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
 using CommentConverter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
 using CommentFetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
@@ -14,6 +15,7 @@ using CommentIntegrate = Niconicome.Models.Domain.Niconico.Download.Comment.V2.I
 using CommentLocal = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local;
 using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
+using DB = Niconicome.Models.Infrastructure.Database;
 using DLActions = Niconicome.Models.Network.Download.Actions;
 using DlComment = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DlDescription = Niconicome.Models.Domain.Niconico.Download.Description;
@@ -24,7 +26,9 @@ using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
 using DomainExt = Niconicome.Models.Domain.Local.External;
 using DomainNet = Niconicome.Models.Domain.Network;
 using DomainPlaylist = Niconicome.Models.Domain.Local.Playlist;
+using DomainSettings = Niconicome.Models.Domain.Local.Settings;
 using DomainWatch = Niconicome.Models.Domain.Niconico.Watch;
+using DomainWatchV2 = Niconicome.Models.Domain.Niconico.Watch.V2;
 using DomainXeno = Niconicome.Models.Domain.Local.External.Import.Xeno;
 using Download = Niconicome.Models.Network.Download;
 using DownloadTask = Niconicome.Models.Network.Download.DLTask;
@@ -33,6 +37,7 @@ using Fetch = Niconicome.Models.Network.Fetch;
 using FF = Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Ichiba = Niconicome.Models.Domain.Niconico.Video.Ichiba;
+using Infla = Niconicome.Models.Infrastructure;
 using IO = Niconicome.Models.Domain.Local.IO;
 using Local = Niconicome.Models.Local;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
@@ -40,25 +45,35 @@ using Machine = Niconicome.Models.Domain.Local.Machine;
 using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
+using NetworkVideo = Niconicome.Models.Network.Video;
 using Niconico = Niconicome.Models.Domain.Niconico;
-using Permissions = Niconicome.Models.Domain.Local.Addons.Core.Permisson;
+using OS = Niconicome.Models.Local.OS;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
+using PlaylistV2 = Niconicome.Models.Playlist.V2;
 using Register = Niconicome.Models.Network.Register;
+using RemoteV2 = Niconicome.Models.Domain.Niconico.Remote.V2;
+using Restore = Niconicome.Models.Local.Restore;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
+using Server = Niconicome.Models.Domain.Local.Server;
 using Settings = Niconicome.Models.Local.Settings;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Style = Niconicome.Models.Domain.Local.Style;
+using TabsVM = Niconicome.ViewModels.Mainpage.Tabs;
 using Timer = Niconicome.Models.Local.Timer;
 using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
+using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
-using OS = Niconicome.Models.Local.OS;
+using Software = Niconicome.Models.Domain.Local.External.Software;
+using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
+using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
+using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -66,8 +81,9 @@ namespace Niconicome.Models.Domain.Utils
     {
         private static ServiceProvider GetProvider()
         {
-
             var services = new ServiceCollection();
+            services.AddWpfBlazorWebView();
+            services.AddBlazorWebViewDeveloperTools();
             services.AddHttpClient<Niconico::INicoHttp, Niconico::NicoHttp>()
                 .ConfigureHttpMessageHandlerBuilder(builder =>
                 {
@@ -88,8 +104,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Auth::ISession, Auth::Session>();
             services.AddSingleton<Niconico::INiconicoContext, Niconico::NiconicoContext>();
             services.AddTransient<IErrorHandler, ErrorHandler>();
-            services.AddSingleton<ILogStream, LogStream>();
             services.AddTransient<ILogger, Logger>();
+            services.AddSingleton<NicoLogger.ILogWriter, Infla::Log.LogStream>();
+            services.AddTransient<NicoLogger.INiconicomeLogger, NicoLogger.NiconicomeLogger>();
             services.AddSingleton<DataBase::IDataBase, DataBase::DataBase>();
             services.AddTransient<Store::IPlaylistStoreHandler, Store::PlaylistStoreHandler>();
             services.AddTransient<Store::IVideoStoreHandler, Store::VideoStoreHandler>();
@@ -130,15 +147,14 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<MyApplication::IStartUp, MyApplication::StartUp>();
             services.AddTransient<Store::ISettingHandler, Store::SettingHandler>();
             services.AddTransient<Settings::ILocalSettingHandler, Settings::LocalSettingHandler>();
-            services.AddTransient<Settings.IEnumSettingsHandler, Settings::EnumSettingsHandler>();
             services.AddTransient<INiconicoUtils, NiconicoUtils>();
             services.AddSingleton<State::ILocalState, State::LocalState>();
             services.AddTransient<LocalFile::IEncodeutility, LocalFile::Encodeutility>();
             services.AddTransient<Store::IVideoFileStorehandler, Store::VideoFileStorehandler>();
-            services.AddTransient<Local::IRestore, Local::Restore>();
-            services.AddTransient<Local::IBackuphandler, Local::BackupHandler>();
+            services.AddTransient<Restore::IRestoreManager, Restore::RestoreManager>();
+            services.AddTransient<Backup::IBackupManager, Backup::BackupManager>();
             services.AddTransient<DomainPlaylist::IPlaylistFileFactory, DomainPlaylist::PlaylistFileFactory>();
-            services.AddTransient<Local::IPlaylistCreator, Local::PlaylistCreator>();
+            services.AddTransient<Ext.Playlist.IPlaylistCreator, Ext::Playlist.PlaylistCreator>();
             services.AddSingleton<MyApplication::IShutdown, MyApplication::Shutdown>();
             services.AddTransient<DlComment::ICommentDownloader, DlComment::CommentDownloader>();
             services.AddTransient<DlComment::ICommentConverter, DlComment::CommentConverter>();
@@ -161,7 +177,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Download::IDownloadSettingsHandler, Download::DownloadSettingsHandler>();
             services.AddTransient<Handlers::ICoreWebview2Handler, Handlers::CoreWebview2Handler>();
             services.AddTransient<Auth::IAutoLogin, Auth::AutoLogin>();
-            services.AddSingleton<State::ISnackbarHandler, State::SnackbarHandler>();
+            services.AddSingleton<State::Toast.IToastHandler, State::Toast.ToastHandler>();
             services.AddTransient<SQlite::ISQliteLoader, SQlite::SQliteLoader>();
             services.AddTransient<SQlite::ISqliteCookieLoader, SQlite::SqliteCookieLoader>();
             services.AddTransient<Cookies::IChromeCookieDecryptor, Cookies::ChromeCookieDecryptor>();
@@ -202,24 +218,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Series::ISeriesPageHtmlParser, Series::SeriesPageHtmlParser>();
             services.AddSingleton<Playlist::IVideoInfoContainer, Playlist::VideoInfoContainer>();
             services.AddSingleton<Playlist::ILightVideoListinfoHandler, Playlist::LightVideoListinfoHandler>();
-            services.AddTransient<Permissions::IPermissionsHandler, Permissions::PermissionsHandler>();
-            services.AddTransient<AddonsCore::IJavaScriptExecuter, AddonsCore::JavaScriptExecuter>();
-            services.AddTransient<AddonsCore::AutoUpdate.Github.IReleaseChecker, AddonsCore::AutoUpdate.Github.ReleaseChecker>();
-            services.AddSingleton<AddonsCore::IAddonInfomationsContainer, AddonsCore::AddonInfomationsContainer>();
-            services.AddSingleton<AddonsCore::Engine.Context.IAddonContexts, AddonsCore::Engine.Context.AddonContexts>();
-            services.AddSingleton<AddonsCore::Engine.Context.IAddonContext, AddonsCore::Engine.Context.AddonContext>();
-            services.AddSingleton<AddonsCore::Engine.IAddonEngine, AddonsCore::Engine.AddonEngine>();
-            services.AddTransient<AddonsCore::Engine.IAddonLogger, AddonsCore::Engine.AddonLogger>();
-            services.AddTransient<AddonsCore::Installer.IAddonStoreHandler, AddonsCore::Installer.AddonStoreHandler>();
-            services.AddTransient<AddonsCore::Installer.IAddonInstaller, AddonsCore::Installer.AddonInstaller>();
-            services.AddTransient<AddonsCore::Installer.IManifestLoader, AddonsCore::Installer.ManifestLoader>();
-            services.AddSingleton<Addons::IAddonHandler, Addons::AddonHandler>();
-            services.AddSingleton<Addons::IAddonInstallManager, Addons::AddonInstallManager>();
             services.AddTransient<AddonAPI.Local.IO.IOutput, AddonAPI.Local.IO.Output>();
             services.AddTransient<AddonAPI.Net.Http.Fetch.IFetch, AddonAPI.Net.Http.Fetch.Fetch>();
             services.AddTransient<AddonAPI.Net.Http.Fetch.IAddonHttp, AddonAPI.Net.Http.Fetch.AddonHttp>();
             services.AddTransient<AddonAPI::IAPIEntryPoint, AddonAPI::APIEntryPoint>();
-            services.AddTransient<AddonsCore::Installer.IAddonUninstaller, AddonsCore::Installer.AddonUninstaller>();
             services.AddSingleton<AddonsDomainAPI::Hooks.IHooksManager, AddonsDomainAPI::Hooks.HooksManager>();
             services.AddTransient<AddonAPI::Net.Hooks.IHooks, AddonAPI::Net.Hooks.Hooks>();
             services.AddTransient<AddonAPI::Local.IO.ILog, AddonAPI::Local.IO.Log>();
@@ -233,7 +235,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<AddonAPI::Local.Storage.ILocalStorage, AddonAPI::Local.Storage.LocalStorage>();
             services.AddTransient<AddonsDomainAPI::Resource.IResourceHander, AddonsDomainAPI::Resource.ResourceHander>();
             services.AddTransient<AddonAPI::Local.Resource.IPublicResourceHandler, AddonAPI::Local.Resource.PublicResourceHandler>();
-            services.AddTransient<AddonsCore::Utils.IHostPermissionsHandler, AddonsCore::Utils.HostPermissionsHandler>();
             services.AddTransient<AddonsDomainAPI::Tab.ITabInfomation, AddonsDomainAPI::Tab.TabInfomation>();
             services.AddSingleton<AddonAPI::Local.Tab.ITabsContainer, AddonAPI::Local.Tab.TabsContainer>();
             services.AddTransient<AddonAPI::Local.Tab.ITabItem, AddonAPI::Local.Tab.TabItem>();
@@ -260,6 +261,103 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
             services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
             services.AddSingleton<OS::IClipbordManager, OS::ClipbordManager>();
+            services.AddTransient<VM::Blazor.TransitionViewModel>();
+            services.AddSingleton<State::IBlazorPageManager, State::BlazorPageManager>();
+            services.AddTransient<AddonsV2::IAddonInstallManager, AddonsV2::AddonInstallManager>();
+            services.AddTransient<AddonsV2::IAddonManager, AddonsV2::AddonManager>();
+            services.AddSingleton<AddonsV2::IAddonStatusContainer, AddonsV2::AddonStatusContainer>();
+            services.AddTransient<AddonsCoreV2::Engine.IAddonLogger, AddonsCoreV2::Engine.AddonLogger>();
+            services.AddTransient<AddonsCoreV2::Engine.Context.IAddonContext, AddonsCoreV2::Engine.Context.AddonContext>();
+            services.AddSingleton<AddonsCoreV2::Engine.Context.IAddonContextsContainer, AddonsCoreV2::Engine.Context.AddonContextsContainer>();
+            services.AddTransient<AddonsCoreV2::Engine.Infomation.IManifestLoader, AddonsCoreV2::Engine.Infomation.ManifestLoader>();
+            services.AddTransient<AddonsCoreV2::Engine.JavaScript.IJavaScriptEngine, AddonsCoreV2::Engine.JavaScript.JavaScriptEngine>();
+            services.AddTransient<AddonsCoreV2::Install.IAddonExtractor, AddonsCoreV2::Install.AddonExtractor>();
+            services.AddTransient<AddonsCoreV2::Install.IAddonInstaller, AddonsCoreV2::Install.AddonInstaller>();
+            services.AddTransient<AddonsCoreV2::Loader.IAddonLoader, AddonsCoreV2::Loader.AddonLoader>();
+            services.AddTransient<AddonsCoreV2::Permisson.IPermissionsHandler, AddonsCoreV2::Permisson.PermissionsHandler>();
+            services.AddTransient<AddonsCoreV2::Uninstall.IAddonUninstaller, AddonsCoreV2::Uninstall.AddonUninstaller>();
+            services.AddTransient<AddonsCoreV2::Update.IAddonUpdateChecker, AddonsCoreV2::Update.AddonUpdateChecker>();
+            services.AddTransient<AddonsCoreV2::Update.IAddonUpdator, AddonsCoreV2::Update.AddonUpdator>();
+            services.AddTransient<AddonsCoreV2::Utils.IHostPermissionsHandler, AddonsCoreV2::Utils.HostPermissionsHandler>();
+            services.AddTransient<AddonsCoreV2::Utils.IAddonSettingsHandler, AddonsCoreV2::Utils.AddonSettingsHandler>();
+            services.AddTransient<AddonVM::Pages.IndexViewModel>();
+            services.AddTransient<AddonVM::Pages.InstallViewModel>();
+            services.AddTransient<AddonVM::Pages.AboutViewModel>();
+            services.AddTransient<Utils::IBlazorHelper, Utils::BlazorHelper>();
+            services.AddTransient<Store::V2.IApplicationStore, DB::ApplicationDBHandler>();
+            services.AddSingleton<NicoLogger.ILogWriter, Infla::Log.LogStream>();
+            services.AddTransient<AppEnvironment.IAppInfomationHandler, Infla::AppEnvironment.NiconicomeInfomationHandler>();
+            services.AddTransient<AppEnvironment.IOSInfomationHandler, Infla::AppEnvironment.WindowsInfomationHandler>();
+            services.AddSingleton<Store::V2.ISettingsStore, DB::Json.SettingJsonHandler>();
+            services.AddSingleton<Store::V2.IPlaylistStore, DB::PlaylistDBHandler>();
+            services.AddSingleton<Store::V2.IVideoStore, DB::VideoDBHandler>();
+            services.AddSingleton<Store::V2.ITagStore, DB::TagDBHandler>();
+            services.AddSingleton<DomainSettings::ISettingsContainer, DomainSettings::SettingsConainer>();
+            services.AddTransient<DomainSettings::ISettingMigratioin, DomainSettings::SettingMigratioin>();
+            services.AddSingleton<DB::LiteDB.ILiteDBHandler, DB::LiteDB.LiteDBHandler>();
+            services.AddTransient<Error.IErrorHandler, Error.ErrorHandler>();
+            services.AddSingleton<NetworkVideo::IThumbnailUtility, NetworkVideo::ThumbnailUtility>();
+            services.AddSingleton<PlaylistV2::IPlaylistVideoContainer, PlaylistV2::PlaylistVideoContainer>();
+            services.AddSingleton<PlaylistV2::Manager.Helper.ILocalVideoLoader, PlaylistV2::Manager.Helper.LocalVideoLoader>();
+            services.AddTransient<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
+            services.AddTransient<PlaylistV2::Manager.IVideoListManager, PlaylistV2::Manager.VideoListManager>();
+            services.AddTransient<PlaylistV2::Manager.Helper.IVideoListCRDHandler, PlaylistV2::Manager.Helper.VideoListCRDHandler>();
+            services.AddTransient<PlaylistV2::Manager.Helper.IVideoListUpdateHandler, PlaylistV2::Manager.Helper.VideoListUpdateHandler>();
+            services.AddTransient<PlaylistV2::Migration.IVideoAndPlayListMigration, PlaylistV2::Migration.VideoAndPlayListMigration>();
+            services.AddTransient<TabsVM::VideoList.Pages.IndexViewModel>();
+            services.AddTransient<TabsVM::VideoList.Pages.MigrationViewModel>();
+            services.AddTransient<TabsVM::VideoList.Pages.PlaylistViewModel>();
+            services.AddTransient<TabsVM::VideoList.Pages.VideoDetailViewModel>();
+            services.AddTransient<TabsVM::VideoList.Pages.SearchViewModel>();
+            services.AddTransient<RemoteV2::Mylist.IMylistHandler, RemoteV2::Mylist.MylistHandler>();
+            services.AddTransient<RemoteV2::Mylist.IWatchLaterHandler, RemoteV2::Mylist.WatchLaterHandler>();
+            services.AddTransient<RemoteV2::Channel.IChannelVideoHandler, RemoteV2::Channel.ChannelVideoHandler>();
+            services.AddTransient<RemoteV2::Channel.IChannelPageHtmlParser, RemoteV2::Channel.ChannelPageHtmlParser>();
+            services.AddTransient<RemoteV2::Series.ISeriesHandler, RemoteV2::Series.SeriesHandler>();
+            services.AddTransient<RemoteV2::UserVideo.IUserVideoHandler, RemoteV2::UserVideo.UserVideoHandler>();
+            services.AddTransient<RemoteV2::Search.ISearch, RemoteV2::Search.Search>();
+            services.AddTransient<RemoteV2::Search.ISearchUrlConstructor, RemoteV2::Search.SearchUrlConstructor>();
+            services.AddTransient<NetworkVideo::IInputTextParser, NetworkVideo::InputTextParser>();
+            services.AddSingleton<NetworkVideo::INetVideosInfomationHandler, NetworkVideo::NetVideosInfomationHandler>();
+            services.AddTransient<StringHandler.IStringHandler, StringHandler.StringHandler>();
+            services.AddTransient<DomainWatchV2::IWatchPageInfomationHandler, DomainWatchV2::WatchPageInfomationHandler>();
+            services.AddTransient<VM::Blazor.BlazorBaseViewModel>();
+            services.AddTransient<Ext::IExternalProcessUtils, Ext::ExternalProcessUtils>();
+            services.AddSingleton<State::MessageV2.IMessageHandler, State::MessageV2.MessageHandler>();
+            services.AddTransient<Ext::IExternalAppUtilsV2, Ext::ExternalAppUtilsV2>();
+            services.AddTransient<IO::V2.INiconicomeFileIO, Infla::IO.WindowsFileIO>();
+            services.AddTransient<IO::V2.INiconicomeDirectoryIO, Infla::IO.WindowsDirectoryIO>();
+            services.AddTransient<Store::V2.IVideoFileStore, DB::VideoFileDBHandler>();
+            services.AddTransient<PlaylistV2::Utils.IVideoInfoCopyManager, PlaylistV2::Utils.VideoInfoCopyManager>();
+            services.AddTransient<PlaylistV2::Utils.IVideoInfoFilterManager, PlaylistV2::Utils.VideoInfoFilterManager>();
+            services.AddSingleton<Server::Core.IServer, Server::Core.Server>();
+            services.AddSingleton<Server::Core.IUrlHandler, Server::Core.UrlHandler>();
+            services.AddSingleton<Server::RequestHandler.Video.IVideoRequestHandler, Server::RequestHandler.Video.VideoRequestHandler>();
+            services.AddSingleton<Server::RequestHandler.M3U8.IM3U8RequestHandler, Server::RequestHandler.M3U8.M3U8RequestHandler>();
+            services.AddSingleton<Server::RequestHandler.TS.ITSRequestHandler, Server::RequestHandler.TS.TSRequestHandler>();
+            services.AddSingleton<Server::RequestHandler.NotFound.INotFoundRequestHandler, Server::RequestHandler.NotFound.NotFoundRequestHandler>();
+            services.AddSingleton<Server::RequestHandler.UserChrome.IUserChromeRequestHandler, Server::RequestHandler.UserChrome.UserChromeRequestHandler>();
+            services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
+            services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
+            services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
+            services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
+            services.AddTransient<Software::FFmpeg.FFmpeg.IFFmpegManager, Software::FFmpeg.FFmpeg.FFmpegManager>();
+            services.AddSingleton<State::Style.IVideoListWidthManager, State::Style.VideoListWidthManager>();
+            services.AddSingleton<State::Style.IWindowStyleManager, State::Style.WindowStyleManager>();
+            services.AddTransient<PlaylistV2::Manager.ISearchManager, PlaylistV2::Manager.SearchManager>();
+            services.AddTransient<NicoImport::IExportHandler, NicoImport::ExportHandler>();
+            services.AddTransient<NicoImport::IImportHandler, NicoImport::ImportHandler>();
+            services.AddTransient<NicoImport::Converter.IExportConverter, NicoImport::Converter.ExportConverter>();
+            services.AddTransient<NicoImport::Converter.IImportConverter, NicoImport::Converter.ImportConverter>();
+            services.AddTransient<Restore::Import.Niconicome.IImportExportManager, Restore::Import.Niconicome.ImportExportManager>();
+            services.AddTransient<SettingsVM::ImportViewModel>();
+            services.AddTransient<SettingsVM::SideMenuViewModel>();
+            services.AddTransient<SettingsVM::RestoreViewModel>();
+            services.AddTransient<XenoImport::Parser.IXenoDataParser, XenoImport::Parser.XenoDataParser>();
+            services.AddTransient<XenoImport::IXenoImportHandler, XenoImport::XenoImportHandler>();
+            services.AddTransient<Restore::Import.Xeno.IXenoImportManager, Restore::Import.Xeno.XenoImportManager>();
+            services.AddTransient<Store::V2.IStoreCleaner, DB::DBCleaner>();
+
             return services.BuildServiceProvider();
         }
 
@@ -277,6 +375,11 @@ namespace Niconicome.Models.Domain.Utils
 
                 return DIFactory.provider;
             }
+        }
+
+        public static T Resolve<T>() where T : notnull
+        {
+            return Provider.GetRequiredService<T>();
         }
     }
 }

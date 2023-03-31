@@ -285,7 +285,7 @@ namespace Niconicome.Models.Playlist.VideoList
             {
                 if (this.Videos.Any(v => v.NiconicoId.Value == video.NiconicoId.Value))
                 {
-                    return AttemptResult.Fail("{video.NiconicoId.Value}は既に現在のプレイリストに存在します。");
+                    return AttemptResult.Fail($"{video.NiconicoId.Value}は既に現在のプレイリストに存在します。");
                 }
 
                 try

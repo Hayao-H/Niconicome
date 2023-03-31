@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,15 @@ namespace Niconicome.Models.Const
 
         public const string DefaultOwnerCommentSuffix = "[owner]";
 
+        public const string DefaultEconomyVideoSuffix = "[economy]";
+
         public const string DefaultThumbnailSuffix = "";
+
+        public const string FolderAutoMapSymbol = "<autoMap>";
+
+        public const string FFmpegPath = @"bin\ffmpeg.exe";
+
+        public const string FFprobePath = @"bin\ffprobe.exe";
+
     }
 }

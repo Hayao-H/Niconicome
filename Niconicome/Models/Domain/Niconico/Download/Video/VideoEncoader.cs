@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.External.Software.FFmpeg.FFmpeg;
 using Niconicome.Models.Domain.Utils;
 using LocalFile = Niconicome.Models.Domain.Local.LocalFile;
 
@@ -38,10 +39,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
     class VideoEncoader : IVideoEncoader
     {
 
-        public VideoEncoader(ITsMerge tsMerge, LocalFile::IEncodeutility encodeutility)
+        public VideoEncoader(ITsMerge tsMerge, IFFmpegManager ffmpegManager)
         {
             this.tsMerge = tsMerge;
-            this.encodeutility = encodeutility;
+            this._ffmpegManager = ffmpegManager;
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
         /// <summary>
         /// エンコーダー
         /// </summary>
-        private readonly LocalFile::IEncodeutility encodeutility;
+        private readonly IFFmpegManager _ffmpegManager;
 
         /// <summary>
         /// ファイル名
@@ -105,7 +106,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             else
             {
                 onMessage("ffmpegで変換を開始(.ts=>.mp4)");
-                await this.encodeutility.EncodeAsync(targetFilePath, mp4Filename, settings.CommandFormat, token, LocalFile::EncodeOptions.Copy);
+                await this._ffmpegManager.EncodeAsync(targetFilePath, mp4Filename, settings.CommandFormat, token);
                 onMessage("ffmpegの変換が完了");
             }
 

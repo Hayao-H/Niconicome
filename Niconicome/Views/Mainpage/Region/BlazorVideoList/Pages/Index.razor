@@ -1,0 +1,419 @@
+﻿@page "/videos"
+@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.IndexViewModel DataContext;
+@inject IJSRuntime JS;
+@implements IDisposable;
+@inherits BlazorBase;
+
+@using System.Threading;
+@using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages;
+@using Niconicome.Models.Domain.Playlist;
+@using Niconicome.Models.Playlist.V2.Utils;
+
+<div class="PageContent PageContainer ContextMenuWrapper">
+
+    <h3>@(DataContext.PlaylistName)</h3>
+
+    <div class="ControlsContainer">
+        <div class="InputBoxWrapper">
+            <input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDown" />
+            @if (DataContext.IsProcessing.Value)
+            {
+                <button type="button" id="RegisterButton" class="btn btn-primary" disabled>登録</button>
+            }
+            else
+            {
+                <button type="button" id="RegisterButton" class="btn btn-primary" @onclick="async ()=>await DataContext.AddVideoAsync()">登録</button>
+            }
+        </div>
+        <div class="ButtonsWrapper">
+            <button type="button" class="btn btn-primary ControlButton" title="プレイリスト情報を編集" @onclick="DataContext.OnPlaylistEditButtonClick"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="btn btn-primary ControlButton" title="リモートプレイリストと同期" @onclick="DataContext.OnSyncWithRemotePlaylistButtonClick"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+            <button type="button" class="btn btn-primary ControlButton" title="出力を開く" @onclick="DataContext.OutputViewModel.OnOutputButtonClicked"><i class="fa-solid fa-message"></i></button>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle ControlButton" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" title="動画をフィルターする">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><button class="dropdown-item" type="button" @onclick="DataContext.FilterViewModel.FilterByKeyword">キーワードでフィルター</button></li>
+                    <li><button class="dropdown-item" type="button" @onclick="DataContext.FilterViewModel.FilterByTag">タグでフィルター</button></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><button class="dropdown-item" type="button" @onclick="DataContext.FilterViewModel.ResetFilterState">フィルター解除</button></li>
+                </ul>
+            </div>
+            @if (DataContext.IsUpdating.Value)
+            {
+                <button type="button" class="btn btn-primary ControlButton" title="更新をキャンセル" @onclick="DataContext.OnCancelUpdateButtonClick"><i class="fa-sharp fa-solid fa-xmark"></i></button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-primary ControlButton" title="動画情報を更新" @onclick="DataContext.OnUpdateButtonClick"><i class="fa-solid fa-arrows-rotate"></i></button>
+            }
+            @if (DataContext.IsProcessing.Value)
+            {
+                <button type="button" class="btn btn-primary ControlButton" title="クリップボードから登録" disabled><i class="fa-solid fa-clipboard"></i></button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-primary ControlButton" 　title="クリップボードから登録" @onclick="DataContext.AddVideoFromClipbordAsync"><i class="fa-solid fa-clipboard"></i></button>
+            }
+            <button type="button" class="btn btn-primary ControlButton" 　title="検索結果から登録" @onclick="DataContext.OnSearchButtonClick"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </div>
+    </div>
+
+    <div class="VideoList">
+        <div class="SortContextMenuWrapper">
+            <div id="VideoListHeader" @onmousedown="DataContext.SortViewModel.OnMenuClick">
+                <span id="CheckBoxColumn" class="HeaderItem"><input type="checkbox" @bind="DataContext.IsIntegratedCheckboxChecked.Value" /></span>
+                <hr id="CheckBoxColumnSeparator" data-index="0" class="Separator" />
+                <span id="ThumbnailColumn" class="HeaderItem"></span>
+                <hr id="ThumbnailColumnSeparator" data-index="1" class="Separator" />
+                <span id="TitleColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.Title)">
+                    タイトル
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.Title].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="TitleColumnSeparator" data-index="2" class="Separator" />
+                <span id="UploadedDateTimeColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.UploadedOn)">
+                    投稿日時
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.UploadedOn].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="UploadedDateTimeColumnSeparator" data-index="3" class="Separator" />
+                <span id="IsDownloadedColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.IsDownlaoded)">
+                    DL済
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.IsDownlaoded].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="IsDownloadedColumnSeparator" data-index="4" class="Separator" />
+                <span id="ViewCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.ViewCount)">
+                    再生回数
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.ViewCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="ViewCountColumnSeparator" data-index="5" class="Separator" />
+                <span id="CommentCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.CommentCount)">
+                    コメント数
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.CommentCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="CommentCountColumnSeparator" data-index="6" class="Separator" />
+                <span id="MylistCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.MylistCount)">
+                    マイリスト数
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.MylistCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="MylistCountColumnSeparator" data-index="7" class="Separator" />
+                <span id="LikeCountColumn" class="HeaderItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.LikeCount)">
+                    いいね数
+                    <span class="SortIcon @(DataContext.SortViewModel.Visibility[SortType.LikeCount].Value?"Show":"") @(DataContext.SortViewModel.SortOption.Value)"></span>
+                </span>
+                <hr id="LikeCountColumnSeparator" data-index="8" class="Separator" />
+                <span id="MessageColumn" class="HeaderItem">メッセージ</span>
+            </div>
+
+            <div class="SortContextMenu @(DataContext.SortViewModel.IsMenuVisible.Value?"Show":"")" style="left:@(DataContext.SortViewModel.MenuLeft.Value)px;">
+                <div class="MenuItem OptionMenu" @onclick="()=>DataContext.SortViewModel.SetSortDirection(true)">昇順<span class="Circle @(DataContext.SortViewModel.IsAscending.Value?"Show":"")"></span></div>
+                <div class="MenuItem OptionMenu" @onclick="()=>DataContext.SortViewModel.SetSortDirection(false)">降順<span class="Circle @(DataContext.SortViewModel.IsAscending.Value?"":"Show")"></span></div>
+                <div class="Separator"></div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.Title)">タイトルで並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.UploadedOn)">投稿日時で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.AddedAt)">追加日時で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.NiconicoID)">IDで並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.IsDownlaoded)">DL状態で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.ViewCount)">再生回数で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.CommentCount)">コメント数で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.MylistCount)">マイリスト数で並び替え</div>
+                <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.LikeCount)">いいね数で並び替え</div>
+            </div>
+        </div>
+        <div class="VideoListBody">
+            @foreach (var video in DataContext.Videos)
+            {
+                <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" draggable="true">
+                    <div class="CheckBoxColumn">
+                        <input type="checkbox" @bind="@(video.IsSelected.Value)" />
+                    </div>
+                    <div class="ThumbnailColumn">
+                        <img class="Thumbnail" src="data:image/jpeg;base64,@(video.Base64ThumbData.Value)" />
+                        <span class="Duration">@(video.Duration)</span>
+                    </div>
+                    <div class="VideoInfoContainer">
+                        <div class="VideoInfoColumn TitleColumn">
+                            <div class="VideoInfoLinkWrapper" @onclick="()=>DataContext.OnVideoDetailButtonClick(video.NiconicoId)">
+                                <i class="fa-solid fa-info"></i>
+                            </div>
+                            <p class="fw-bold">@(video.Title)</p>
+                            <p class="text-muted ms-3">投稿者：@(video.OwnerName)</p>
+                        </div>
+                        <div class="VideoInfoColumn UploadedDateTimeColumn">
+                            <p>投稿日時：@(video.UploadedOn)</p>
+                        </div>
+                        <div class="VideoInfoColumn IsDownloadedColumn">
+                            <p class="@(video.IsDownloaded.Value ? "":"NotDownloaded")">
+                                @if (video.IsDownloaded.Value)
+                                {
+                                    <i class="fa-solid fa-check"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-xmark"></i>
+                                }
+                            </p>
+                        </div>
+                        <div class="VideoInfoColumn ViewCountColumn">
+                            <p>@(video.ViewCount)</p>
+                        </div>
+                        <div class="VideoInfoColumn CommentCountColumn">
+                            <p>@(video.CommentCount)</p>
+                        </div>
+                        <div class="VideoInfoColumn MylistCountColumn">
+                            <p>@(video.MylistCount)</p>
+                        </div>
+                        <div class="VideoInfoColumn LikeCountColumn">
+                            <p>@(video.LikeCount)</p>
+                        </div>
+                        <div class="VideoInfoColumn MessageColumn">
+                            <p>@(video.Message.Value)</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="ContextMenu @(DataContext.ContextMenu.IsMenuVisible.Value?"Show":"")" style="top:@(DataContext.ContextMenu.MouseTop.Value)px; left:@(DataContext.ContextMenu.MouseLeft.Value)px;">
+            <div class="ContextMenuItem Clickable" @onclick="DataContext.ConfirmBeforeDeletion">
+                <p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>動画を削除する</p>
+            </div>
+            <div class="ContextMenuItem Clickable">
+                <p @onclick="DataContext.ContextMenu.OpenInNiconico"><i class="fa-solid fa-play fa-sm ContextMenuIcon"></i>ニコニコで視聴する</p>
+            </div>
+            <div class="ContextMenuItem Clickable">
+                <p @onclick="DataContext.ContextMenu.OpenDownloadDirectory"><i class="fa-solid fa-folder fa-sm ContextMenuIcon"></i>保存フォルダーを開く</p>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-file-video fa-sm ContextMenuIcon"></i>開く</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Two">
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.OpenInPlayerA">アプリで開く(A)</p>
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.OpenInPlayerB">アプリで開く(B)</p>
+                </div>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-paper-plane fa-sm ContextMenuIcon"></i>送る</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Two">
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.SendToAppA">アプリに送る(A)</p>
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.SendToAppB">アプリに送る(B)</p>
+                </div>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-check fa-sm ContextMenuIcon"></i>選択</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Many">
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.Select(ContextMenuViewModel.SelectTarget.All)">全て選択する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.UnSelect(ContextMenuViewModel.SelectTarget.All)">全て選択解除する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.Select(ContextMenuViewModel.SelectTarget.Downloaded)">ダウンロード済みの動画を選択する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.UnSelect(ContextMenuViewModel.SelectTarget.Downloaded)">ダウンロード済みの動画を選択解除する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.Select(ContextMenuViewModel.SelectTarget.NotDownloaded)">未ダウンロードの動画を選択する</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.UnSelect(ContextMenuViewModel.SelectTarget.NotDownloaded)">未ダウンロードの動画を選択解除する</p>
+                </div>
+            </div>
+            <div class="RootMenu Three">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>コピー</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Three">
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardSingle(CopyTarget.NiconicoID)">ID</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardSingle(CopyTarget.Title)">タイトル</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardSingle(CopyTarget.URL)">URL</p>
+                </div>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-copy fa-sm ContextMenuIcon"></i>全てコピー</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Three">
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardMulti(CopyTarget.NiconicoID)">ID</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardMulti(CopyTarget.Title)">タイトル</p>
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CopyDataToClipboardMulti(CopyTarget.URL)">URL</p>
+                </div>
+            </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-music fa-sm ContextMenuIcon"></i>プレイリストを作成</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu One">
+                    <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CreatePlaylist(ContextMenuViewModel.PlaylistType.AIMP)">.aimppl4形式のプレイリストを作成する</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="OutputContainer @(DataContext.OutputViewModel.IsEnabled.Value ?"Show":"")">
+        <div class="ToolBar">
+            <div class="CloseButton" @onclick="DataContext.OutputViewModel.OnOutputButtonClicked"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        <div class="Controls">
+            <h4>出力</h4>
+            <div>
+                <button type="button" class="btn btn-primary" title="コピー" @onclick="DataContext.OutputViewModel.OnCopyButtonClicked"><i class="fa-solid fa-copy"></i></button>
+                <button type="button" class="btn btn-primary" title="出力をクリア" @onclick="DataContext.OutputViewModel.OnClearButtonClicked"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+        <div class="MessageBox">
+            @foreach (var message in DataContext.OutputViewModel.Messages)
+            {
+                <div class="MessageRow @(message.ColorClass)">
+                    <div class="MessageIcon"><i class="fa-solid @(message.ErrorIcon)"></i></div>
+                    <div class="MessageContent">
+                        <p>@(message.Content)</p>
+                    </div>
+                    <div class="MessageInfomation">
+                        @(message.AddedAt),<br />@(message.Dispacher)
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="modal fade" id="Modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">本当に以下の動画を削除しますか？</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @(DataContext.ConfirmMessage.Value)
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick="DataContext.DeleteVideos">はい</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @if (DataContext.ToastMessage is not null)
+    {
+        <div class="ToastContent toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="ToastHeader toast-header">
+                <div class="ToastImage"></div>
+                <strong class="me-auto">@(DataContext.ToastMessage.Dispatcher)</strong>
+                <small>@(DataContext.ToastMessage.AddedAt)</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @(DataContext.ToastMessage.Message)
+            </div>
+            @if (DataContext.ToastMessage.HasAction)
+            {
+                <div class="d-flex m-2 justify-content-end">
+                    <button type="button" class="btn btn-primary btnsm" @onclick="DataContext.ToastMessage.ActionObject">@(DataContext.ToastMessage.ActionString)</button>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+@code {
+    private DotNetObjectReference<Index>? refToThis;
+
+    private IJSObjectReference? module;
+
+    [JSInvokable]
+    public void MoveVideo(string sourceID, string targetID)
+    {
+        DataContext.SortViewModel.MoveVideo(sourceID, targetID);
+    }
+
+    [JSInvokable]
+    public int GetWidth(string name)
+    {
+        return DataContext.VideoListWidthViewModel.GetWidth(name);
+    }
+
+    [JSInvokable]
+    public void SetWidth(string width, string name)
+    {
+        DataContext.VideoListWidthViewModel.SetWidth(width, name);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        this.refToThis = DotNetObjectReference.Create<Index>(this);
+
+        this._ctx = SynchronizationContext.Current;
+
+        DataContext.RegisterListChangedEventHandler(() => this.ExecuteInCurrentThread(async () =>
+        {
+            this.StateHasChanged();
+            if (this.module is not null && this.refToThis is not null)
+            {
+                await module.InvokeVoidAsync("setWidth", this.refToThis);
+            }
+        }));
+
+        DataContext.RegisterToastMessageChangeEventHandler(() =>
+        {
+            this.ExecuteInCurrentThread(() =>
+            {
+                this.StateHasChanged();
+                JS.InvokeVoidAsync("showToast");
+            });
+        });
+
+        DataContext.RegisterConfirmOfDeletionHandler(() =>
+        {
+            this.ExecuteInCurrentThread(() =>
+            {
+                JS.InvokeVoidAsync("showModal");
+            });
+        });
+
+        DataContext.Bindables.RegisterPropertyChangeHandler(() => this.ExecuteInCurrentThread(this.StateHasChanged));
+        await DataContext.Initialize();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("showTooltip");
+            this.module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
+            await this.module.InvokeVoidAsync("initialize", this.refToThis);
+        }
+    }
+
+    private void ExecuteInCurrentThread(Action action)
+    {
+        this._ctx?.Post(_ =>
+        {
+            action();
+        }
+        , null);
+    }
+
+    private async Task<int> GetBodyHeight()
+    {
+        return await JS.InvokeAsync<int>("getBodyHeight");
+    }
+
+    private SynchronizationContext? _ctx;
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        this.refToThis?.Dispose();
+        this.refToThis = null;
+        this.DataContext.Dispose();
+    }
+}

@@ -1,10 +1,14 @@
 ﻿using System;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Niconico.Download.Comment;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
+using Niconicome.Models.Playlist.V2;
 using Niconicome.Models.Playlist.VideoList;
+using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
@@ -15,90 +19,90 @@ namespace Niconicome.Models.Network.Download
 {
     public interface IDownloadSettingsHandler
     {
-        /// <summary>
+        /// <summary>? 
         /// 別フォルダーからコピー
-        /// </summary>
-        ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsCopyFromAnotherFolderEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// コメントDL
-        /// </summary>
-        ReactiveProperty<bool> IsDownloadingCommentEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsDownloadingCommentEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// 過去ログDL
-        /// </summary>
-        ReactiveProperty<bool> IsDownloadingCommentLogEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsDownloadingCommentLogEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// かんたんコメントDL
-        /// </summary>
-        ReactiveProperty<bool> IsDownloadingEasyComment { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsDownloadingEasyComment { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// 投コメDL
-        /// </summary>
-        ReactiveProperty<bool> IsDownloadingOwnerComment { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsDownloadingOwnerComment { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// サムネDL
-        /// </summary>
-        ReactiveProperty<bool> IsDownloadingThumbEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsDownloadingThumbEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// 動画DL
-        /// </summary>
-        ReactiveProperty<bool> IsDownloadingVideoEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsDownloadingVideoEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// 動画情報DL
-        /// </summary>
-        ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsDownloadingVideoInfoEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// 市場情報DL
-        /// </summary>
-        ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsDownloadingIchibaInfoEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// コメ数制限有効フラグ
-        /// </summary>
-        ReactiveProperty<bool> IsLimittingCommentCountEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsLimittingCommentCountEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// 上書きフラグ
-        /// </summary>
-        ReactiveProperty<bool> IsOverwriteEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsOverwriteEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// スキップフラグ
-        /// </summary>
-        ReactiveProperty<bool> IsSkippingEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsSkippingEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// エンコードスキップフラグ
-        /// </summary>
-        ReactiveProperty<bool> IsNoEncodeEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsNoEncodeEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// コメント追記フラグ
-        /// </summary>
-        ReactiveProperty<bool> IsAppendingCommentEnable { get; }
+        /// </summary>? 
+        ISettingInfo<bool> IsAppendingCommentEnable { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// コメ数制限
-        /// </summary>
-        ReactiveProperty<int> MaxCommentsCount { get; }
+        /// </summary>? 
+        ISettingInfo<int> MaxCommentsCount { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// 解像度設定
-        /// </summary>
-        ReactiveProperty<VideoInfo::IResolution> Resolution { get; }
+        /// </summary>? 
+        IBindableProperty<VideoInfo::IResolution> Resolution { get; }
 
-        /// <summary>
+        /// <summary>? 
         /// サムネサイズ設定
-        /// </summary>
-        ReactiveProperty<VideoInfo::ThumbSize> ThumbnailSize { get; }
+        /// </summary>? 
+        ISettingInfo<VideoInfo::ThumbSize> ThumbnailSize { get; }
 
         /// <summary>
         /// DL設定を構築
@@ -109,48 +113,29 @@ namespace Niconicome.Models.Network.Download
 
     public class DownloadSettingsHandler : BindableBase, IDownloadSettingsHandler
     {
-        public DownloadSettingsHandler(ILocalSettingHandler settingHandler, ICurrent current, IEnumSettingsHandler enumSettingsHandler, ILocalSettingsContainer container)
+        public DownloadSettingsHandler(ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer)
         {
-            this.settingHandler = settingHandler;
-            this.current = current;
-            this.enumSettingsHandler = enumSettingsHandler;
-            this._container = container;
+            this._playlistVideoContainer = playlistVideoContainer;
+            this._container = settingsConainer;
 
-            this.IsDownloadingVideoInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLVideoInfo)).AddTo(this.disposables);
-            this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount)).AddTo(this.disposables);
-            this.IsDownloadingVideoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLVideo)).AddTo(this.disposables);
-            this.IsDownloadingCommentEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLComment)).AddTo(this.disposables);
-            this.IsDownloadingCommentLogEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLKako)).AddTo(this.disposables);
-            this.IsDownloadingEasyComment = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLEasy)).AddTo(this.disposables);
-            this.IsDownloadingThumbEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLThumb)).AddTo(this.disposables);
-            this.IsDownloadingOwnerComment = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLOwner)).AddTo(this.disposables);
-            this.IsOverwriteEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLOverwrite)).AddTo(this.disposables);
-            this.IsSkippingEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLSkip)).AddTo(this.disposables);
-            this.IsCopyFromAnotherFolderEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DLCopy)).AddTo(this.disposables);
-            this.IsLimittingCommentCountEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.LimitCommentsCount)).AddTo(this.disposables);
-            this.MaxCommentsCount = new ReactiveProperty<int>(this.settingHandler.GetIntSetting(SettingsEnum.MaxCommentsCount)).AddTo(this.disposables);
-            this.IsNoEncodeEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlWithoutEncode)).AddTo(this.disposables);
-            this.IsDownloadingIchibaInfoEnable = new ReactiveProperty<bool>(this.settingHandler.GetBoolSetting(SettingsEnum.DlIchiba)).AddTo(this.disposables);
-            this.ThumbnailSize = new ReactiveProperty<VideoInfo::ThumbSize>(this.enumSettingsHandler.GetSetting<VideoInfo::ThumbSize>());
-            this.IsAppendingCommentEnable = this._container.GetReactiveBoolSetting(SettingsEnum.AppendComment);
+            this.IsDownloadingVideoInfoEnable = settingsConainer.GetSetting(SettingNames.IsDownloadingVideoInfoEnable, false).Data!;
+            this.IsDownloadingVideoEnable = settingsConainer.GetSetting(SettingNames.IsDownloadingVideoEnable, false).Data!;
+            this.IsDownloadingCommentEnable = settingsConainer.GetSetting(SettingNames.IsDownloadingCommentEnable, false).Data!;
+            this.IsDownloadingCommentLogEnable = settingsConainer.GetSetting(SettingNames.IsDownloadingKakoroguEnable, false).Data!;
+            this.IsDownloadingEasyComment = settingsConainer.GetSetting(SettingNames.IsDownloadingEasyEnable, false).Data!;
+            this.IsDownloadingThumbEnable = settingsConainer.GetSetting(SettingNames.IsDownloadingThumbEnable, false).Data!;
+            this.IsDownloadingOwnerComment = settingsConainer.GetSetting(SettingNames.IsDownloadingOwnerEnable, false).Data!;
+            this.IsOverwriteEnable = settingsConainer.GetSetting(SettingNames.IsOverwriteEnable, false).Data!;
+            this.IsSkippingEnable = settingsConainer.GetSetting(SettingNames.IsSkipEnable, false).Data!;
+            this.IsCopyFromAnotherFolderEnable = settingsConainer.GetSetting(SettingNames.IsCopyEnable, false).Data!;
+            this.IsLimittingCommentCountEnable = settingsConainer.GetSetting(SettingNames.LimitCommentCount, false).Data!;
+            this.MaxCommentsCount = settingsConainer.GetSetting(SettingNames.MaxCommentCount, -1).Data!;
+            this.IsNoEncodeEnable = settingsConainer.GetSetting(SettingNames.DownloadVideoWithoutEncodeEnable, false).Data!;
+            this.IsDownloadingIchibaInfoEnable = settingsConainer.GetSetting(SettingNames.IsDownloadingIchibaInfoEnable, false).Data!;
+            this.ThumbnailSize = settingsConainer.GetSetting(SettingNames.ThumbnailSize, VideoInfo::ThumbSize.Large).Data!;
+            this.IsAppendingCommentEnable = settingsConainer.GetSetting(SettingNames.IsAppendingToLocalCommentEnable, false).Data!;
 
-            this.IsDownloadingVideoInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideoInfo));
-            this.IsDownloadingVideoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLVideo));
-            this.IsDownloadingCommentEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLComment));
-            this.IsDownloadingCommentLogEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLKako));
-            this.IsDownloadingEasyComment.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLEasy));
-            this.IsDownloadingThumbEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLThumb));
-            this.IsDownloadingOwnerComment.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLOwner));
-            this.IsOverwriteEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLOverwrite));
-            this.IsSkippingEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLSkip));
-            this.IsCopyFromAnotherFolderEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DLCopy));
-            this.IsLimittingCommentCountEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.LimitCommentsCount));
-            this.MaxCommentsCount.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.MaxCommentsCount));
-            this.IsNoEncodeEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DlWithoutEncode));
-            this.IsDownloadingIchibaInfoEnable.Subscribe(value => this.settingHandler.SaveSetting(value, SettingsEnum.DlIchiba));
-            this.ThumbnailSize.Subscribe(value => this.enumSettingsHandler.SaveSetting(value));
-
-            this.Resolution = new ReactiveProperty<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"));
+            this.Resolution = new BindableProperty<VideoInfo::IResolution>(new VideoInfo::Resolution("1920x1080"));
         }
 
         ~DownloadSettingsHandler()
@@ -159,80 +144,82 @@ namespace Niconicome.Models.Network.Download
         }
 
         #region field
-        private readonly ILocalSettingHandler settingHandler;
 
-        private readonly ICurrent current;
+        private readonly IPlaylistVideoContainer _playlistVideoContainer;
 
-        private readonly IEnumSettingsHandler enumSettingsHandler;
-
-        private readonly ILocalSettingsContainer _container;
+        private readonly ISettingsContainer _container;
         #endregion
 
         public DownloadSettings CreateDownloadSettings()
         {
 
-            if (this.current.SelectedPlaylist.Value is null) throw new InvalidOperationException("");
+            if (this._playlistVideoContainer.CurrentSelectedPlaylist is null) throw new InvalidOperationException("");
 
             //フラグ系
-            bool replaceStricted = this.settingHandler.GetBoolSetting(SettingsEnum.ReplaceSBToMB);
-            bool overrideVideoDT = this.settingHandler.GetBoolSetting(SettingsEnum.OverrideVideoFileDTToUploadedDT);
-            bool resumeEnable = this.settingHandler.GetBoolSetting(SettingsEnum.EnableResume);
-            bool unsafeHandle = this.settingHandler.GetBoolSetting(SettingsEnum.UnsafeCommentHandle);
-            bool experimentalSafety = this.settingHandler.GetBoolSetting(SettingsEnum.ExperimentalSafety);
-            bool deleteEconomyFile = this.settingHandler.GetBoolSetting(SettingsEnum.DeleteEcoFile);
-            bool omitXmlDec = this.settingHandler.GetBoolSetting(SettingsEnum.OmitXmlDeclaration);
+            bool replaceStricted = this._container.GetSetting(SettingNames.ReplaceSingleByteToMultiByte, false).Data!.Value;
+            bool overrideVideoDT = this._container.GetSetting(SettingNames.OverideVideoFileDTToUploadedDT, false).Data!.Value;
+            bool resumeEnable = this._container.GetSetting(SettingNames.IsResumeEnable, false).Data!.Value;
+            bool unsafeHandle = this._container.GetSetting(SettingNames.EnableUnsafeCommentHandle, false).Data!.Value;
+            bool experimentalSafety = this._container.GetSetting(SettingNames.IsExperimentalCommentSafetySystemEnable, false).Data!.Value;
+            bool deleteEconomyFile = this._container.GetSetting(SettingNames.DeleteExistingEconomyFile, false).Data!.Value;
+            bool omitXmlDec = this._container.GetSetting(SettingNames.IsOmittingXmlDeclarationIsEnable, false).Data!.Value;
 
             //ファイル系
-            string folderPath = this.current.PlaylistFolderPath;
-            string fileFormat = this.settingHandler.GetStringSetting(SettingsEnum.FileNameFormat) ?? Format.DefaultFileNameFormat;
-            string thumbExt = this.settingHandler.GetStringSetting(SettingsEnum.JpegExt) ?? FileFolder.DefaultJpegFileExt;
-            string videoInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.VideoinfoSuffix) ?? Format.DefaultVideoInfoSuffix;
-            string ichibaInfoSuffix = this.settingHandler.GetStringSetting(SettingsEnum.IchibaInfoSuffix) ?? Format.DefaultIchibaSuffix;
-            string thumbSuffix = this.settingHandler.GetStringSetting(SettingsEnum.ThumbSuffix) ?? Format.DefaultThumbnailSuffix;
-            string ownerComSuffix = this.settingHandler.GetStringSetting(SettingsEnum.OwnerComSuffix) ?? Format.DefaultOwnerCommentSuffix;
-            string economySuffix = this.settingHandler.GetStringSetting(SettingsEnum.EconomySuffix) ?? "";
+            string folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.FolderPath;
+            string fileFormat = this._container.GetSetting(SettingNames.FileNameFormat, Format.DefaultFileNameFormat).Data!.Value;
+            string thumbExt = this._container.GetSetting(SettingNames.JpegFileExtension, FileFolder.DefaultJpegFileExt).Data!.Value;
+            string videoInfoSuffix = this._container.GetSetting(SettingNames.VideoInfoSuffix, Format.DefaultVideoInfoSuffix).Data!.Value;
+            string ichibaInfoSuffix = this._container.GetSetting(SettingNames.IchibaSuffix, Format.DefaultIchibaSuffix).Data!.Value;
+            string thumbSuffix = this._container.GetSetting(SettingNames.ThumbnailSuffix, Format.DefaultThumbnailSuffix).Data!.Value;
+            string ownerComSuffix = this._container.GetSetting(SettingNames.OwnerCommentSuffix, Format.DefaultOwnerCommentSuffix).Data!.Value;
+            string economySuffix = this._container.GetSetting(SettingNames.EnonomyQualitySuffix, Format.DefaultEconomyVideoSuffix).Data!.Value;
+
+            if (string.IsNullOrEmpty(folderPath))
+            {
+                folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath;
+            }
 
             //動画情報
-            VideoInfoTypeSettings videoInfoT = this.enumSettingsHandler.GetSetting<VideoInfoTypeSettings>();
+            VideoInfoTypeSettings videoInfoT = this._container.GetSetting(SettingNames.VideoInfoType, VideoInfoTypeSettings.Text).Data!.Value;
             string videoInfoExt = videoInfoT == VideoInfoTypeSettings.Json ? ".json" : videoInfoT == VideoInfoTypeSettings.Xml ? ".xml" : ".txt";
 
             //市場情報
-            IchibaInfoTypeSettings ichibaInfoT = this.enumSettingsHandler.GetSetting<IchibaInfoTypeSettings>();
-            string? htmlExt = this.settingHandler.GetStringSetting(SettingsEnum.HtmlExt);
-            string ichibaInfoExt = ichibaInfoT == IchibaInfoTypeSettings.Json ? ".json" : ichibaInfoT == IchibaInfoTypeSettings.Xml ? ".xml" : htmlExt ?? ".html";
+            IchibaInfoTypeSettings ichibaInfoT = this._container.GetSetting(SettingNames.IchibaInfoType, IchibaInfoTypeSettings.Html).Data!.Value;
+            string htmlExt = this._container.GetSetting(SettingNames.HtmlFileExtension, FileFolder.DefaultHtmlFileExt).Data!.Value;
+            string ichibaInfoExt = ichibaInfoT == IchibaInfoTypeSettings.Json ? ".json" : ichibaInfoT == IchibaInfoTypeSettings.Xml ? ".xml" : htmlExt;
 
             //FFmpeg系
-            string commandFormat = this.settingHandler.GetStringSetting(SettingsEnum.FFmpegFormat) ?? Format.DefaultFFmpegFormat;
+            string commandFormat = this._container.GetSetting(SettingNames.FFmpegFormat, Format.DefaultFFmpegFormat).Data!.Value;
             if (commandFormat.IsNullOrEmpty())
             {
                 commandFormat = Format.DefaultFFmpegFormat;
             }
 
             //コメントDL系
-            int commentCountPerBlock = this.settingHandler.GetIntSetting(SettingsEnum.CommentCountPerBlock);
+            int commentCountPerBlock = this._container.GetSetting(SettingNames.CommentCountPerBlock, NetConstant.DefaultCommentCountPerBlock).Data!.Value;
 
             //時関・並列係
-            int commentFetchWaitSpan = this.settingHandler.GetIntSetting(SettingsEnum.CommentWaitSpan);
+            int commentFetchWaitSpan = this._container.GetSetting(SettingNames.CommentFetchWaitSpan, LocalConstant.DefaultCommetFetchWaitSpan).Data!.Value;
             if (commentFetchWaitSpan < 0)
             {
                 commentFetchWaitSpan = LocalConstant.DefaultCommetFetchWaitSpan;
             }
 
-            int maxParallelSegmentDownloadCount = this.settingHandler.GetIntSetting(SettingsEnum.MaxParallelSegDl);
+            int maxParallelSegmentDownloadCount = this._container.GetSetting(SettingNames.MaxParallelSegmentDownloadCount, NetConstant.DefaultMaxParallelSegmentDownloadCount).Data!.Value;
             if (maxParallelSegmentDownloadCount <= 0)
             {
                 maxParallelSegmentDownloadCount = NetConstant.DefaultMaxParallelDownloadCount;
             }
 
-            int commentOffset = this.settingHandler.GetIntSetting(SettingsEnum.CommentOffset);
+            int commentOffset = this._container.GetSetting(SettingNames.CommentOffset, CommentCollection.NumberToThrough).Data!.Value;
             if (commentOffset <= 0)
             {
                 commentOffset = CommentCollection.NumberToThrough;
             }
 
             //履歴系
-            bool saveSucceeded = !this.settingHandler.GetBoolSetting(SettingsEnum.DisableDLSucceededHistory);
-            bool saveFailed = !this.settingHandler.GetBoolSetting(SettingsEnum.DisableDLFailedHistory);
+            bool saveSucceeded = !this._container.GetSetting(SettingNames.DisableDownloadSucceededHistory, false).Data!.Value; ;
+            bool saveFailed = !this._container.GetSetting(SettingNames.DisableDownloadFailedHistory, false).Data!.Value; ;
 
 
             return new DownloadSettings
@@ -250,7 +237,7 @@ namespace Niconicome.Models.Network.Download
                 OmittingXmlDeclaration = omitXmlDec,
                 FolderPath = folderPath,
                 VerticalResolution = this.Resolution.Value.Vertical,
-                PlaylistID = this.current.SelectedPlaylist.Value.Id,
+                PlaylistID = this._playlistVideoContainer.CurrentSelectedPlaylist.ID,
                 IsReplaceStrictedEnable = replaceStricted,
                 OverrideVideoFileDateToUploadedDT = overrideVideoDT,
                 MaxCommentsCount = this.IsLimittingCommentCountEnable.Value ? this.MaxCommentsCount.Value : 0,
@@ -283,38 +270,38 @@ namespace Niconicome.Models.Network.Download
             };
         }
 
-        public ReactiveProperty<bool> IsDownloadingVideoEnable { get; init; }
+        public ISettingInfo<bool> IsDownloadingVideoEnable { get; init; }
 
-        public ReactiveProperty<bool> IsDownloadingCommentEnable { get; init; }
+        public ISettingInfo<bool> IsDownloadingCommentEnable { get; init; }
 
-        public ReactiveProperty<bool> IsDownloadingCommentLogEnable { get; init; }
+        public ISettingInfo<bool> IsDownloadingCommentLogEnable { get; init; }
 
-        public ReactiveProperty<bool> IsDownloadingOwnerComment { get; init; }
+        public ISettingInfo<bool> IsDownloadingOwnerComment { get; init; }
 
-        public ReactiveProperty<bool> IsDownloadingEasyComment { get; init; }
+        public ISettingInfo<bool> IsDownloadingEasyComment { get; init; }
 
-        public ReactiveProperty<bool> IsDownloadingThumbEnable { get; init; }
+        public ISettingInfo<bool> IsDownloadingThumbEnable { get; init; }
 
-        public ReactiveProperty<bool> IsOverwriteEnable { get; init; }
+        public ISettingInfo<bool> IsOverwriteEnable { get; init; }
 
-        public ReactiveProperty<bool> IsSkippingEnable { get; init; }
+        public ISettingInfo<bool> IsSkippingEnable { get; init; }
 
-        public ReactiveProperty<bool> IsAppendingCommentEnable { get; init; }
+        public ISettingInfo<bool> IsAppendingCommentEnable { get; init; }
 
-        public ReactiveProperty<bool> IsCopyFromAnotherFolderEnable { get; init; }
+        public ISettingInfo<bool> IsCopyFromAnotherFolderEnable { get; init; }
 
-        public ReactiveProperty<bool> IsNoEncodeEnable { get; init; }
+        public ISettingInfo<bool> IsNoEncodeEnable { get; init; }
 
-        public ReactiveProperty<bool> IsLimittingCommentCountEnable { get; init; }
+        public ISettingInfo<bool> IsLimittingCommentCountEnable { get; init; }
 
-        public ReactiveProperty<bool> IsDownloadingVideoInfoEnable { get; init; }
+        public ISettingInfo<bool> IsDownloadingVideoInfoEnable { get; init; }
 
-        public ReactiveProperty<bool> IsDownloadingIchibaInfoEnable { get; init; }
+        public ISettingInfo<bool> IsDownloadingIchibaInfoEnable { get; init; }
 
-        public ReactiveProperty<int> MaxCommentsCount { get; init; }
+        public ISettingInfo<int> MaxCommentsCount { get; init; }
 
-        public ReactiveProperty<VideoInfo::IResolution> Resolution { get; init; }
+        public IBindableProperty<VideoInfo::IResolution> Resolution { get; init; }
 
-        public ReactiveProperty<VideoInfo::ThumbSize> ThumbnailSize { get; init; }
+        public ISettingInfo<VideoInfo::ThumbSize> ThumbnailSize { get; init; }
     }
 }

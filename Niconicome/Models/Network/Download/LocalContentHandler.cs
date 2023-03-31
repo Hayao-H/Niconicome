@@ -1,14 +1,16 @@
 ﻿using System;
 using System.IO;
 using Niconicome.Models.Domain.Local.Store;
+using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Network.Download
 {
     public interface ILocalContentHandler
     {
-        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, string videoInfoExt, string ichibaInfoExt, string thumbnailExt, string ichibaSuffix, string videoInfosuffix);
+        ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, uint verticalResolution, bool replaceStricted, string videoInfoExt, string ichibaInfoExt, string thumbnailExt, string ichibaSuffix, string videoInfosuffix);
         IDownloadResult MoveDownloadedFile(string niconicoId, string downloadedFilePath, string destinationPath);
     }
 
@@ -28,16 +30,16 @@ namespace Niconicome.Models.Network.Download
     /// </summary>
     public class LocalContentHandler : ILocalContentHandler
     {
-        public LocalContentHandler(INiconicoUtils niconicoUtils, IVideoFileStorehandler videoFileStorehandler, ILogger logger)
+        public LocalContentHandler(INiconicoUtils niconicoUtils, IVideoFileStore fileStore, ILogger logger)
         {
-            this.niconicoUtils = niconicoUtils;
-            this.videoFileStorehandler = videoFileStorehandler;
+            this._niconicoUtils = niconicoUtils;
             this.logger = logger;
+            this._videoFileStore = fileStore;
         }
 
-        private readonly INiconicoUtils niconicoUtils;
+        private readonly INiconicoUtils _niconicoUtils;
 
-        private readonly IVideoFileStorehandler videoFileStorehandler;
+        private readonly IVideoFileStore _videoFileStore;
 
         private readonly ILogger logger;
 
@@ -48,19 +50,23 @@ namespace Niconicome.Models.Network.Download
         /// <param name="format"></param>
         /// <param name="dmcInfo"></param>
         /// <returns></returns>
-        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, bool replaceStricted, string videoInfoExt, string ichibaInfoExt, string thumbnailExt, string ichibaSuffix, string videoInfosuffix)
+        public ILocalContentInfo GetLocalContentInfo(string folderPath, string format, IDmcInfo dmcInfo, uint verticalResolution, bool replaceStricted, string videoInfoExt, string ichibaInfoExt, string thumbnailExt, string ichibaSuffix, string videoInfosuffix)
         {
-            string videoFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".mp4", replaceStricted);
-            string commentFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, ".xml", replaceStricted);
-            string thumbFIlename = this.niconicoUtils.GetFileName(format, dmcInfo, thumbnailExt, replaceStricted);
-            string videoInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, videoInfoExt, replaceStricted, videoInfosuffix);
-            string ichibaInfoFilename = this.niconicoUtils.GetFileName(format, dmcInfo, ichibaInfoExt, replaceStricted, ichibaSuffix);
-            bool videoExist = this.videoFileStorehandler.Exists(dmcInfo.Id);
+            string videoFIlename = this._niconicoUtils.GetFileName(format, dmcInfo, ".mp4", replaceStricted);
+            string commentFIlename = this._niconicoUtils.GetFileName(format, dmcInfo, ".xml", replaceStricted);
+            string thumbFIlename = this._niconicoUtils.GetFileName(format, dmcInfo, thumbnailExt, replaceStricted);
+            string videoInfoFilename = this._niconicoUtils.GetFileName(format, dmcInfo, videoInfoExt, replaceStricted, videoInfosuffix);
+            string ichibaInfoFilename = this._niconicoUtils.GetFileName(format, dmcInfo, ichibaInfoExt, replaceStricted, ichibaSuffix);
+            bool videoExist = this._videoFileStore.Exist(dmcInfo.Id, verticalResolution);
             string? localPath = null;
 
             if (videoExist)
             {
-                localPath = this.videoFileStorehandler.GetFilePath(dmcInfo.Id);
+                IAttemptResult<string> result = this._videoFileStore.GetFilePath(dmcInfo.Id, verticalResolution);
+                if (result.IsSucceeded&&result.Data is not null)
+                {
+                    localPath = result.Data;
+                }
             }
 
             return new LocalContentInfo()
@@ -113,7 +119,7 @@ namespace Niconicome.Models.Network.Download
                 return new DownloadResult() { Message = $"ファイルのコピーに失敗しました。" };
             }
 
-            this.videoFileStorehandler.Add(niconicoId, Path.Combine(destinationPath, filename));
+            this._videoFileStore.AddFileAsync(niconicoId, Path.Combine(destinationPath, filename));
 
             return new DownloadResult() { IsSucceeded = true };
 

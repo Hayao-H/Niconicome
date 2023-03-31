@@ -240,6 +240,11 @@ namespace Niconicome.Models.Playlist.Playlist
 
         public IAttemptResult<ITreePlaylistInfo> GetPlaylist(int id)
         {
+            if (!this._playlistStoreHandler.Exists(id))
+            {
+                return AttemptResult<ITreePlaylistInfo>.Fail($"指定されたプレイリストが存在しません。(ID:{id})");
+            }
+
             IAttemptResult<STypes::Playlist> result = this._playlistStoreHandler.GetPlaylist(id);
 
             if (!result.IsSucceeded || result.Data is null)
@@ -473,6 +478,7 @@ namespace Niconicome.Models.Playlist.Playlist
 
             foreach (var p in playlists)
             {
+                if (p.IsRoot) continue;
                 if (!this._playlistStoreHandler.Exists(p.Id)) continue;
                 IAttemptResult result = this.Update(p);
 

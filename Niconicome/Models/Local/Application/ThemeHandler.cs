@@ -1,6 +1,8 @@
 ﻿using System;
 using MaterialDesignThemes.Wpf;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 
@@ -15,15 +17,15 @@ namespace Niconicome.Models.Local.Application
 
     public class ThemeHandler : IThemehandler
     {
-        public ThemeHandler(IEnumSettingsHandler settingsHandler, ILogger logger)
+        public ThemeHandler(ISettingsContainer settingsConainer, ILogger logger)
         {
-            this.settingsHandler = settingsHandler;
             this.logger = logger;
+            this._settingsConainer = settingsConainer;
         }
 
         #region field
 
-        private readonly IEnumSettingsHandler settingsHandler;
+        private readonly ISettingsContainer _settingsConainer;
 
         private readonly ILogger logger;
 
@@ -35,7 +37,15 @@ namespace Niconicome.Models.Local.Application
         /// <returns></returns>
         public ApplicationThemeSettings GetTheme()
         {
-            return this.settingsHandler.GetSetting<ApplicationThemeSettings>();
+            IAttemptResult<ISettingInfo<ApplicationThemeSettings>> result = this._settingsConainer.GetSetting(SettingNames.ApplicationTheme, ApplicationThemeSettings.Inherit);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return ApplicationThemeSettings.Inherit;
+            }
+            else
+            {
+                return result.Data.Value;
+            }
         }
 
         /// <summary>
@@ -44,7 +54,15 @@ namespace Niconicome.Models.Local.Application
         /// <param name="setting"></param>
         public void SetTheme(ApplicationThemeSettings setting)
         {
-            this.settingsHandler.SaveSetting(setting);
+            IAttemptResult<ISettingInfo<ApplicationThemeSettings>> result = this._settingsConainer.GetSetting(SettingNames.ApplicationTheme, ApplicationThemeSettings.Inherit);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return;
+            }
+            else
+            {
+                result.Data.Value = setting;
+            }
 
             var paletteHelper = new PaletteHelper();
             ITheme theme;
