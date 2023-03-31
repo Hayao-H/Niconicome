@@ -68,6 +68,9 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.FilterViewModel = new FilterViewModel(this.InputText, this.Videos);
             this.FilterViewModel.RegisterFilterEventHandler(this.OnListChanged);
+
+            this.InputContextMenuViewModel = new InputContextMenuViewModel(this.InputText);
+            this.Bindables.Add(this.InputContextMenuViewModel.Bindables);
         }
 
 
@@ -153,6 +156,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// 幅
         /// </summary>
         public VideoListWidthViewModel VideoListWidthViewModel { get; init; } = new();
+
+        /// <summary>
+        /// 入力欄のコンテキストメニュー
+        /// </summary>
+        public InputContextMenuViewModel InputContextMenuViewModel { get; init; }
 
         #endregion
 
@@ -1182,4 +1190,109 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         }
     }
 
+    public class InputContextMenuViewModel
+    {
+        public InputContextMenuViewModel(IBindableProperty<string> input)
+        {
+            this._input = input;
+            this.MouseTop = new BindableProperty<double>(0);
+            this.MouseLeft = new BindableProperty<double>(0);
+            this.IsMenuVisible = new BindableProperty<bool>(false).AddTo(this.Bindables);
+        }
+
+        #region field
+
+        private readonly IBindableProperty<string> _input;
+
+        private Func<Task<string>>? _getSelectitonFunc;
+
+        #endregion
+
+        #region Prop
+
+        public Bindables Bindables { get; init; } = new();
+
+        public IBindableProperty<double> MouseTop { get; init; }
+
+        public IBindableProperty<double> MouseLeft { get; init; }
+
+        public IBindableProperty<bool> IsMenuVisible { get; init; }
+
+        #endregion
+
+        #region Method
+
+        public void OnClick(MouseEventArgs e)
+        {
+            if (e.Button == 2)
+            {
+                this.MouseTop.Value = e.ClientY - 50;
+                this.MouseLeft.Value = e.ClientX;
+                this.IsMenuVisible.Value = true;
+                return;
+            }
+
+            if (e.Button == 0)
+            {
+                this.IsMenuVisible.Value = false;
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 選択状況を取得する関数を登録
+        /// </summary>
+        /// <param name="func"></param>
+        public void RegisterGetSelectionFunc(Func<Task<string>> func)
+        {
+            this._getSelectitonFunc = func;
+        }
+
+        /// <summary>
+        /// 貼り付け
+        /// </summary>
+        public void OnPasteButtonClick()
+        {
+            this.IsMenuVisible.Value = false;
+
+            IAttemptResult<string> clipBoardResult = WS.Mainpage.ClipbordManager.GetClipboardContent();
+            if (!clipBoardResult.IsSucceeded || clipBoardResult.Data is null)
+            {
+                return;
+            }
+
+            string currentValue = this._input.Value;
+            this._input.Value = currentValue + clipBoardResult.Data;
+        }
+
+        /// <summary>
+        /// コピー
+        /// </summary>
+        /// <returns></returns>
+        public async Task OnCopyClick()
+        {
+            this.IsMenuVisible.Value = false;
+
+            if (this._getSelectitonFunc is null)
+            {
+                return;
+            }
+
+            string content;
+
+            try
+            {
+                content = await this._getSelectitonFunc();
+            }
+            catch
+            {
+                return;
+            }
+
+            WS.Mainpage.ClipbordManager.SetToClipBoard(content);
+        }
+
+        #endregion
+
+    }
 }
