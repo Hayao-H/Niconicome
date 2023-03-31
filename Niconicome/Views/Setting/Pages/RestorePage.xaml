@@ -21,7 +21,7 @@
         <Border BorderThickness="0 0 0 1" BorderBrush="#e7e7e7">
             <TextBlock Text="回復" FontSize="24" Margin="16 0" VerticalAlignment="Bottom"/>
         </Border>
-        <TextBlock Grid.Row="1">
+        <TextBlock Grid.Row="1" Padding="5" TextWrapping="WrapWithOverflow">
             この画面の項目は新しい設定画面に移行しました。ツールバーにある2つの歯車が表示されているボタンを押すと設定画面を開くことが出来ます。
         </TextBlock>
     </Grid>
