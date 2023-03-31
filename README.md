@@ -79,7 +79,9 @@ WPFと.NET6を用いて開発しています。したがって、対応OSはそ�
 ---
 
 ## スクリーンショット
-![img-001](Niconicome/src/doc/img/img-001.png)
-![img-002](Niconicome/src/doc/img/img-002.png)
-![img-003](Niconicome/src/doc/img/img-003.png)
+![img-001](Niconicome/src/doc/img/img-001.jpg)
+![img-002](Niconicome/src/doc/img/img-002.jpg)
+![img-003](Niconicome/src/doc/img/img-003.jpg)
+![img-004](Niconicome/src/doc/img/img-004.jpg)
+![img-005](Niconicome/src/doc/img/img-005.jpg)
 
