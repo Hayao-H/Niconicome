@@ -36,6 +36,12 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <returns></returns>
         IAttemptResult SetSetting<T>(string name, T value) where T : notnull;
 
+        /// <summary>
+        /// 設定の型を取得する
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        IAttemptResult<DataType> GetValueType(string name);
 
         /// <summary>
         /// 設定ファイルを再読み込みしてキャッシュを更新する
@@ -61,5 +67,13 @@ namespace Niconicome.Models.Domain.Local.Store.V2
         /// <returns></returns>
         bool Exists(string name);
 
+    }
+
+    public enum DataType
+    {
+        Unknown,
+        String,
+        Int,
+        Array,
     }
 }
