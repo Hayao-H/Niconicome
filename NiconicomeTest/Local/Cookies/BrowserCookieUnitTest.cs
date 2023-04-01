@@ -19,7 +19,7 @@ namespace NiconicomeTest.Local.Cookies
         {
             var wv2 = this.loader!.GetCookiePath(CookieType.Webview2);
 
-            Assert.That(wv2, Is.EqualTo(@"Niconicome.exe.WebView2\EBWebView\Default\Cookies"));
+            Assert.That(wv2, Is.EqualTo(@"Niconicome.exe.WebView2\EBWebView\Default\Network\Cookies"));
         }
     }
 }
