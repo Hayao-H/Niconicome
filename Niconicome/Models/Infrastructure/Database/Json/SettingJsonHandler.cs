@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -115,6 +116,47 @@ namespace Niconicome.Models.Infrastructure.Database.Json
             return this.Update(data);
         }
 
+        public IAttemptResult<DataType> GetValueType(string name)
+        {
+            IAttemptResult iResult = this.Initialize();
+            if (!iResult.IsSucceeded) return AttemptResult<DataType>.Fail(iResult.Message);
+
+            IAttemptResult<Dictionary<string, object>> dResult = this.Read();
+            if (!dResult.IsSucceeded || dResult.Data is null)
+            {
+                return AttemptResult<DataType>.Fail(dResult.Message);
+            }
+
+            Dictionary<string, object> data = dResult.Data;
+
+            if (!data.ContainsKey(name))
+            {
+                this._errorHandler.HandleError(SettingJSONError.SettingNotFound, name);
+                return AttemptResult<DataType>.Fail(this._errorHandler.GetMessageForResult(SettingJSONError.SettingNotFound, name));
+            }
+
+            dynamic value = data[name];
+            Type t = value.GetType();
+            if (t == typeof(string))
+            {
+                return AttemptResult<DataType>.Succeeded(DataType.String);
+            }
+
+            if (t == typeof(int))
+            {
+                return AttemptResult<DataType>.Succeeded(DataType.Int);
+            }
+
+            if (t.IsArray)
+            {
+                return AttemptResult<DataType>.Succeeded(DataType.Array);
+            }
+
+            return AttemptResult<DataType>.Succeeded(DataType.Unknown);
+
+        }
+
+
         public bool Exists(string settingName)
         {
             IAttemptResult iResult = this.Initialize();
@@ -130,7 +172,6 @@ namespace Niconicome.Models.Infrastructure.Database.Json
 
             return data.ContainsKey(settingName);
         }
-
 
         public IAttemptResult Flush()
         {
