@@ -17,7 +17,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.HtmlFileExt = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.HtmlFileExtension, FileFolder.DefaultHtmlFileExt), FileFolder.DefaultHtmlFileExt);
             this.JpegFileExt = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.JpegFileExtension, FileFolder.DefaultJpegFileExt), FileFolder.DefaultJpegFileExt);
             this.VideoInfoSuffix = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.VideoInfoSuffix, Format.DefaultVideoInfoSuffix), Format.DefaultVideoInfoSuffix);
-            this.IchibaSuffix = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.IchibaInfoType, Format.DefaultIchibaSuffix), Format.DefaultIchibaSuffix);
+            this.IchibaSuffix = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.IchibaSuffix, Format.DefaultIchibaSuffix), Format.DefaultIchibaSuffix);
 
             this.IsSearchingVideosExactEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.SearchVideosExact, false), false);
             this.ThumbnailSuffix = new SettingInfoViewModel<string>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.ThumbnailSuffix, Format.DefaultThumbnailSuffix), Format.DefaultThumbnailSuffix);

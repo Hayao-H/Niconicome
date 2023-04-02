@@ -33,10 +33,6 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         public void ShutDown()
         {
-            if (!this.shutdown.IsShutdowned)
-            {
-                this.shutdown.ShutdownApp();
-            }
             OsApplication.Current.Shutdown();
         }
 
@@ -48,10 +44,6 @@ namespace Niconicome.Models.Local.Application
             string? filename = Process.GetCurrentProcess().MainModule?.FileName;
             if (filename is not null)
             {
-                if (!this.shutdown.IsShutdowned)
-                {
-                    this.shutdown.ShutdownApp();
-                }
                 try
                 {
                     Process.Start(filename);

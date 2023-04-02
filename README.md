@@ -2,7 +2,7 @@
 [![.Net6 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net6%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net6+CI%2FCD%22) 
 [![niconicome-nightly-build](https://github.com/Hayao-H/Niconicome/actions/workflows/nightly.yaml/badge.svg)](https://github.com/Hayao-H/Niconicome/actions/workflows/nightly.yaml)
 [![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
-[![Github Release](https://img.shields.io/badge/release-v0.12.0-blue)](https://github.com/Hayao-H/Niconicome/releases/latest)
+[![Github Release](https://img.shields.io/badge/release-v0.12.1-blue)](https://github.com/Hayao-H/Niconicome/releases/latest)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![Twitter Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=Twitter%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
@@ -79,7 +79,9 @@ WPFと.NET6を用いて開発しています。したがって、対応OSはそ�
 ---
 
 ## スクリーンショット
-![img-001](Niconicome/src/doc/img/img-001.png)
-![img-002](Niconicome/src/doc/img/img-002.png)
-![img-003](Niconicome/src/doc/img/img-003.png)
+![img-001](Niconicome/src/doc/img/img-001.jpg)
+![img-002](Niconicome/src/doc/img/img-002.jpg)
+![img-003](Niconicome/src/doc/img/img-003.jpg)
+![img-004](Niconicome/src/doc/img/img-004.jpg)
+![img-005](Niconicome/src/doc/img/img-005.jpg)
 
