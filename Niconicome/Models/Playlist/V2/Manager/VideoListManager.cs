@@ -23,7 +23,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <param name="refresh"></param>
         /// <param name="setPath"></param>
         /// <returns></returns>
-        Task LoadVideosAsync(bool quick = false, bool refresh = true, bool setPath = true);
+        Task LoadVideosAsync(bool quick = false, bool setPath = true);
 
         /// <summary>
         /// 動画を登録する
@@ -131,7 +131,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         #region Method
 
-        public async Task LoadVideosAsync(bool quick = false, bool refresh = true, bool setPath = true)
+        public async Task LoadVideosAsync(bool quick = false, bool setPath = true)
         {
             //移行が必要な場合は処理を中止
             if (this._migration.IsMigrationNeeded) return;
@@ -147,7 +147,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             if (setPath)
             {
-                await this._loader.SetPathAsync(refresh ? this._container.CurrentSelectedPlaylist.Videos : this._container.Videos, quick);
+                await this._loader.SetPathAsync(this._container.CurrentSelectedPlaylist.Videos, quick);
             }
 
             if (playlistID != (this._container.CurrentSelectedPlaylist?.ID ?? -1))
@@ -156,11 +156,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 return;
             }
 
-            if (refresh)
-            {
-                this._container.Videos.Clear();
-                this._container.Videos.AddRange(this._container.CurrentSelectedPlaylist!.Videos);
-            }
+            this._container.Videos.Clear();
+            this._container.Videos.AddRange(this._container.CurrentSelectedPlaylist!.Videos);
 
         }
 
@@ -176,7 +173,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             IAttemptResult<VideoRegistrationResult> result = await this._CRDHandler.RegisterVideoAsync(inputText, playlist, onMessage);
 
-            await this.LoadVideosAsync(true, playlist.PlaylistType != PlaylistType.Temporary);
+            await this.LoadVideosAsync(true);
 
             return result;
         }
@@ -191,9 +188,9 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
             IPlaylistInfo playlist = this._container.CurrentSelectedPlaylist;
 
-            IAttemptResult result =  this._CRDHandler.RegisterVideos(videos, playlist);
+            IAttemptResult result = this._CRDHandler.RegisterVideos(videos, playlist);
 
-            await this.LoadVideosAsync(true,playlist.PlaylistType != PlaylistType.Temporary);
+            await this.LoadVideosAsync(true, playlist.PlaylistType != PlaylistType.Temporary);
 
             return result;
         }
