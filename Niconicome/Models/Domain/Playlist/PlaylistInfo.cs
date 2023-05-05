@@ -320,6 +320,12 @@ namespace Niconicome.Models.Domain.Playlist
             video.PlaylistID = this.ID;
 
             this._videos.Add(video);
+
+            if (this.PlaylistType == PlaylistType.Temporary)
+            {
+                return AttemptResult.Succeeded();
+            }
+
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 
@@ -330,6 +336,12 @@ namespace Niconicome.Models.Domain.Playlist
             this.SetSelectedVideos();
 
             this._videos.RemoveAll(v => v.NiconicoId == video.NiconicoId);
+
+            if (this.PlaylistType == PlaylistType.Temporary)
+            {
+                return AttemptResult.Succeeded();
+            }
+
             return this.IsAutoUpdateEnabled ? this.Update(this) : AttemptResult.Succeeded();
         }
 

@@ -75,7 +75,7 @@ namespace Niconicome.Models.Playlist.V2
             this._playlistChangeHandlers.Add(handler);
         }
 
-        public　void RemovePlaylistChangeEventHandler(Action<IPlaylistInfo> handler)
+        public void RemovePlaylistChangeEventHandler(Action<IPlaylistInfo> handler)
         {
             this._playlistChangeHandlers.RemoveAll(h => h == handler);
         }
