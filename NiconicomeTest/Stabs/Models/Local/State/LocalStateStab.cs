@@ -23,5 +23,7 @@ namespace NiconicomeTest.Stabs.Models.Local.State
 
         public bool IsSettingTabOpen { get; set; }
 
+        public int Port { get; set; }
+
     }
 }

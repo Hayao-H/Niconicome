@@ -1,5 +1,6 @@
 ﻿using Niconicome.Models.Domain.Local.Server.Core;
 using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
@@ -47,11 +48,11 @@ namespace Niconicome.Models.Local.State
 
     public class LocalState : ILocalState
     {
-        public LocalState(INiconicomeLogger logger, IServer server)
+        public LocalState(INiconicomeLogger logger, IServer server, ILogger legacyLogger)
         {
             this._logger = logger;
             this._server = server;
-
+            this._legacyLogger = legacyLogger;
         }
 
         #region field
@@ -59,6 +60,8 @@ namespace Niconicome.Models.Local.State
         private readonly INiconicomeLogger _logger;
 
         private readonly IServer _server;
+
+        private readonly ILogger _legacyLogger;
 
         private bool _isDebugMode;
 
@@ -74,6 +77,7 @@ namespace Niconicome.Models.Local.State
             {
                 this._isDebugMode = value;
                 this._logger.IsDebugMode = value;
+                this._legacyLogger.IsDebugMode = value;
             }
         }
 
