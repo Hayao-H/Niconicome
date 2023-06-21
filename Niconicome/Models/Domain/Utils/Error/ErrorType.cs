@@ -22,6 +22,7 @@ using Niconicome.Models.Infrastructure.Database.Error;
 using Niconicome.Models.Infrastructure.Database.Json;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Infrastructure.IO;
+using Niconicome.Models.Infrastructure.Network;
 using Niconicome.Models.Local.External.Error;
 using Niconicome.Models.Local.External.Playlist;
 using Niconicome.Models.Local.OS;
@@ -78,6 +79,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 38, typeof(XenoImportHandlerError) },
             { 39, typeof(DBCleanerError) },
             { 40, typeof(FFmpegManagerError) },
+            { 41, typeof(NetworkError) },
         };
     }
 }

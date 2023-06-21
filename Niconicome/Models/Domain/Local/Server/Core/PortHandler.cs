@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using Niconicome.Models.Domain.Local.Server.Connection;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
@@ -33,10 +34,11 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class PortHandler : IPortHandler
     {
-        public PortHandler(IErrorHandler errorHandler, ISettingsContainer settingsContainer)
+        public PortHandler(IErrorHandler errorHandler, ISettingsContainer settingsContainer, ITCPConnectionHandler connectionHandler)
         {
             this._errorHandler = errorHandler;
             this._settingsContainer = settingsContainer;
+            this._connectionHandler = connectionHandler;
         }
 
         #region field
@@ -44,6 +46,8 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         private readonly IErrorHandler _errorHandler;
 
         private readonly ISettingsContainer _settingsContainer;
+
+        private readonly ITCPConnectionHandler _connectionHandler;
 
         #endregion
 
@@ -65,14 +69,14 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         public IAttemptResult<IEnumerable<int>> GetAvailablePorts()
         {
-            IAttemptResult<List<int>> ports = this.GetUnAvailablePorts();
+            IAttemptResult<IEnumerable<int>> ports = this._connectionHandler.GetOccupiedTCPPorts();
             if (!ports.IsSucceeded || ports.Data is null)
             {
                 return AttemptResult<IEnumerable<int>>.Fail(ports.Message);
             }
 
             var available = new List<int>();
-            foreach (var p in Enumerable.Range(1024, 65536))
+            foreach (var p in Enumerable.Range(1024, 65536 - 1024 + 1))
             {
                 if (ports.Data.Any(x => x == p))
                 {
@@ -90,36 +94,13 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         public bool IsPortAvailable(int port)
         {
 
-            IAttemptResult<List<int>> ports = this.GetUnAvailablePorts();
+            IAttemptResult<IEnumerable<int>> ports = this._connectionHandler.GetOccupiedTCPPorts();
             if (!ports.IsSucceeded || ports.Data is null)
             {
                 return false;
             }
 
             return !ports.Data.Contains(port);
-        }
-
-        #endregion
-
-        #region private
-
-        private IAttemptResult<List<int>> GetUnAvailablePorts()
-        {
-            var connections = IPGlobalProperties.GetIPGlobalProperties();
-            var ports = new List<int>();
-
-            try
-            {
-                var x = connections.GetActiveTcpListeners().Select(c => c.Port);
-                ports.AddRange(connections.GetActiveTcpListeners().Select(c => c.Port));
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(ServerError.FailedToGetPortInfo, ex);
-                return AttemptResult<List<int>>.Fail(this._errorHandler.GetMessageForResult(ServerError.FailedToGetPortInfo, ex));
-            }
-
-            return AttemptResult<List<int>>.Succeeded(ports);
         }
 
         #endregion

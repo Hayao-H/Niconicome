@@ -15,7 +15,5 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         ServerStoppedWithException,
         [ErrorEnum(ErrorLevel.Log, "ローカルサーバーをシャットダウンしました。")]
         ServerStopped,
-        [ErrorEnum(ErrorLevel.Error, "使用中のポート一覧の取得に失敗しました。")]
-        FailedToGetPortInfo,
     }
 }
