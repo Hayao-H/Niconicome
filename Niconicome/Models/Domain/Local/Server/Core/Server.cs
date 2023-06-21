@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Server.Core
 {
@@ -73,7 +74,6 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         private bool _isRunning;
 
-
         #endregion
 
         #region Props
@@ -97,7 +97,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             {
                 try
                 {
-                    this.Port = 2580;
+                    this.Port = this._portHandler.GetSettingValue();
                     if (!this._portHandler.IsPortAvailable(this.Port))
                     {
                         if (this._ports.Count == 0)
@@ -123,7 +123,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                     listnner.Prefixes.Add($"http://localhost:{this.Port}/");
 
                     listnner.Start();
-                    this._errorHandler.HandleError(ServerError.ServerStarted,this.Port);
+                    this._errorHandler.HandleError(ServerError.ServerStarted, this.Port);
 
                     while (this._isRunning)
                     {

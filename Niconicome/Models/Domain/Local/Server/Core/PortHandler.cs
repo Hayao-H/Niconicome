@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Server.Core
 {
     public interface IPortHandler
     {
+        /// <summary>
+        /// 設定値を取得する
+        /// </summary>
+        /// <returns></returns>
+        int GetSettingValue();
+
         /// <summary>
         /// 空きポートであるかどうか調べる
         /// </summary>
@@ -27,18 +33,35 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class PortHandler : IPortHandler
     {
-        public PortHandler(IErrorHandler errorHandler)
+        public PortHandler(IErrorHandler errorHandler, ISettingsContainer settingsContainer)
         {
             this._errorHandler = errorHandler;
+            this._settingsContainer = settingsContainer;
         }
 
         #region field
 
-        public IErrorHandler _errorHandler;
+        private readonly IErrorHandler _errorHandler;
+
+        private readonly ISettingsContainer _settingsContainer;
 
         #endregion
 
         #region Method
+
+        public int GetSettingValue()
+        {
+            IAttemptResult<int> result = this._settingsContainer.GetOnlyValue(SettingNames.LocalServerPort, Const::NetConstant.DefaultServerPort);
+            if (!result.IsSucceeded)
+            {
+                return Const::NetConstant.DefaultServerPort;
+            }
+            else
+            {
+                return result.Data;
+            }
+        }
+
 
         public IAttemptResult<IEnumerable<int>> GetAvailablePorts()
         {
