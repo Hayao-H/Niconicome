@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.WindowsAPICodePack.Taskbar;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
@@ -74,6 +75,8 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         private bool _isRunning;
 
+        private bool _isShutdowned;
+
         #endregion
 
         #region Props
@@ -86,7 +89,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         public void Start()
         {
-            if (this._isRunning)
+            if (this._isRunning||this._isShutdowned)
             {
                 return;
             }
@@ -214,7 +217,10 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                     this._errorHandler.HandleError(ServerError.ServerStoppedWithException, ex);
                     this._isRunning = false;
 
-                    this.Start();
+                    if (!this._isShutdowned)
+                    {
+                        this.Start();
+                    }
                 }
             });
         }
@@ -222,6 +228,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         public void ShutDown()
         {
             this._isRunning = false;
+            this._isShutdowned = true;
         }
 
 
