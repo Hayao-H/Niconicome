@@ -338,6 +338,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Server::RequestHandler.NotFound.INotFoundRequestHandler, Server::RequestHandler.NotFound.NotFoundRequestHandler>();
             services.AddSingleton<Server::RequestHandler.UserChrome.IUserChromeRequestHandler, Server::RequestHandler.UserChrome.UserChromeRequestHandler>();
             services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
+            services.AddSingleton<Server::Core.IPortHandler, Server::Core.PortHandler>();
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();

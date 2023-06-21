@@ -9,11 +9,13 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 {
     public enum ServerError
     {
-        [ErrorEnum(ErrorLevel.Log,"ローカルサーバーを起動しました。")]
+        [ErrorEnum(ErrorLevel.Log, "ローカルサーバーを起動しました。(Port:{0})")]
         ServerStarted,
         [ErrorEnum(ErrorLevel.Error, "サーバーの実行中に例外が発生しました。")]
         ServerStoppedWithException,
-        [ErrorEnum(ErrorLevel.Log,"ローカルサーバーをシャットダウンしました。")]
+        [ErrorEnum(ErrorLevel.Log, "ローカルサーバーをシャットダウンしました。")]
         ServerStopped,
+        [ErrorEnum(ErrorLevel.Error, "使用中のポート一覧の取得に失敗しました。")]
+        FailedToGetPortInfo,
     }
 }

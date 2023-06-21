@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
@@ -13,6 +15,12 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 {
     public interface IServer
     {
+
+        /// <summary>
+        /// ポート番号
+        /// </summary>
+        int Port { get; }
+
         /// <summary>
         /// サーバーを起動
         /// </summary>
@@ -26,7 +34,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class Server : IServer
     {
-        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts,IUserChromeRequestHandler userChrome)
+        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IPortHandler portHandler)
         {
             this._urlHandler = urlHandler;
             this._video = video;
@@ -35,6 +43,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             this._m3U8 = m3U8;
             this._ts = ts;
             this._userChrome = userChrome;
+            this._portHandler = portHandler;
         }
 
         ~Server()
@@ -58,8 +67,18 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         private readonly IErrorHandler _errorHandler;
 
+        private readonly IPortHandler _portHandler;
+
+        private readonly Queue<int> _ports = new();
+
         private bool _isRunning;
 
+
+        #endregion
+
+        #region Props
+
+        public int Port { get; private set; }
 
         #endregion
 
@@ -78,13 +97,33 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             {
                 try
                 {
+                    this.Port = 2580;
+                    if (!this._portHandler.IsPortAvailable(this.Port))
+                    {
+                        if (this._ports.Count == 0)
+                        {
+
+                            IAttemptResult<IEnumerable<int>> portResult = this._portHandler.GetAvailablePorts();
+                            if (!portResult.IsSucceeded || portResult.Data is null)
+                            {
+                                return;
+                            }
+
+                            foreach (var p in portResult.Data)
+                            {
+                                this._ports.Enqueue(p);
+                            }
+                        }
+                        this.Port = this._ports.Dequeue();
+                    }
+
                     var listnner = new HttpListener();
 
                     listnner.Prefixes.Clear();
-                    listnner.Prefixes.Add(@"http://localhost:2580/");
+                    listnner.Prefixes.Add($"http://localhost:{this.Port}/");
 
                     listnner.Start();
-                    this._errorHandler.HandleError(ServerError.ServerStarted);
+                    this._errorHandler.HandleError(ServerError.ServerStarted,this.Port);
 
                     while (this._isRunning)
                     {

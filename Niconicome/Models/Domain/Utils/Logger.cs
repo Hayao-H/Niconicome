@@ -28,6 +28,8 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="message">メッセージ</param>
         /// <param name="result">結果</param>
         void Error(string message, IAttemptResult result);
+
+        bool IsDebugMode { get; set; }
     }
 
     public interface IErrorHandler
@@ -42,13 +44,10 @@ namespace Niconicome.Models.Domain.Utils
 
         private readonly IErrorHandler errorHandler;
 
-        private readonly ILocalState localState;
-
-        public Logger(ILogWriter logStream, IErrorHandler errorHandler, ILocalState localState)
+        public Logger(ILogWriter logStream, IErrorHandler errorHandler)
         {
             this.logStream = logStream;
             this.errorHandler = errorHandler;
-            this.localState = localState;
         }
 
         /// <summary>
@@ -130,6 +129,8 @@ namespace Niconicome.Models.Domain.Utils
             }
         }
 
+        public bool IsDebugMode { get; set; }
+
 
         /// <summary>
         /// ログファイル・出力に書き込む
@@ -137,7 +138,7 @@ namespace Niconicome.Models.Domain.Utils
         /// <param name="source"></param>
         private void Write(string source, bool force = false)
         {
-            if (!force && !this.localState.IsDebugMode) return;
+            if (!force && !this.IsDebugMode) return;
 
             string dt = DateTime.Now.ToString("HH:mm.ss");
 

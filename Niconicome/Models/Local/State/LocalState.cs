@@ -1,4 +1,5 @@
-﻿using Niconicome.Models.Domain.Local.Settings;
+﻿using Niconicome.Models.Domain.Local.Server.Core;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
@@ -37,21 +38,27 @@ namespace Niconicome.Models.Local.State
         /// 設定タブ
         /// </summary>
         bool IsSettingTabOpen { get; set; }
+
+        /// <summary>
+        /// ローカルサーバーのポート
+        /// </summary>
+        int Port { get; }
     }
 
     public class LocalState : ILocalState
     {
-        public LocalState(INiconicomeLogger logger)
+        public LocalState(INiconicomeLogger logger, IServer server)
         {
             this._logger = logger;
-#if DEBUG
-            this._isDebugMode = true;
-#endif
+            this._server = server;
+
         }
 
         #region field
 
         private readonly INiconicomeLogger _logger;
+
+        private readonly IServer _server;
 
         private bool _isDebugMode;
 
@@ -77,6 +84,8 @@ namespace Niconicome.Models.Local.State
         public bool IsTaskWindowOpen { get; set; }
 
         public bool IsSettingTabOpen { get; set; }
+
+        public int Port => this._server.Port;
 
         #endregion
     }
