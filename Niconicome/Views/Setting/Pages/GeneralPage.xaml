@@ -178,6 +178,21 @@
                     <ToggleButton HorizontalAlignment="Right" IsChecked="{Binding IsShowingTasksAsTabEnable.Value}" />
                 </DockPanel>
                 <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
+                <DockPanel>
+                    <materialDesign:PackIcon Kind="Server" Foreground="SkyBlue">
+                        <materialDesign:PackIcon.RenderTransform>
+                            <TranslateTransform Y="7"/>
+                        </materialDesign:PackIcon.RenderTransform>
+                    </materialDesign:PackIcon>
+                    <Label Content="ローカルサーバーのポート番号" />
+                    <TextBox 
+                        HorizontalAlignment="Right"
+                        HorizontalContentAlignment="Right"
+                        Width="100"
+                        ToolTip="整数値を入力してください。"
+                        Text="{Binding LocalServerPort.Value,UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+                <Separator BorderThickness="1" BorderBrush="#e7e7e7" Margin="0 8"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

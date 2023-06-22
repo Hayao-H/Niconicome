@@ -40,6 +40,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public Bindables Bindables { get; init; } = new();
 
+        /// <summary>
+        /// ローカルサーバーのポート
+        /// </summary>
+        public int ServerPort => WS::Mainpage.LocalState.Port;
+
         #endregion
 
         #region Method
@@ -66,8 +71,9 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
 
+            var port = WS::Mainpage.LocalState.Port;
             this.VideoInfo = new VideoInfoViewModel(result.Data);
-            this.VideoUrl = $"http://localhost:2580/niconicome/video/{playlist.ID}/{niconicoID}/video.mp4";
+            this.VideoUrl = $"http://localhost:{port}/niconicome/video/{playlist.ID}/{niconicoID}/video.mp4";
 
 
             if (result.Data.IsDownloaded.Value)
