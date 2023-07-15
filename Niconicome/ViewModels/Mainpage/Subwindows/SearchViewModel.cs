@@ -104,8 +104,8 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                     SearchType = this.IsTag ? Search::SearchType.Tag : Search::SearchType.Keyword,
                     Genre = this.Genre.Value,
                     SortOption = this.Sort.Value,
-                    UploadedDateTimeStart = this.ConfigureDateTimeManualy ? new DateTimeOffset(this.UploadDTStart, TimeSpan.FromHours(9)) : this.UploadedDT.Value == default ? null : this.UploadedDT.Value,
-                    UploadedDateTimeEnd = this.ConfigureDateTimeManualy ? new DateTimeOffset(this.UploadDTEnd, TimeSpan.FromHours(9)) : null,
+                    UploadedDateTimeStart = this.ConfigureDateTimeManualy ? new DateTimeOffset(DateTime.SpecifyKind(this.UploadDTStart, DateTimeKind.Unspecified), TimeSpan.FromHours(9)) : this.UploadedDT.Value == default ? null : this.UploadedDT.Value,
+                    UploadedDateTimeEnd = this.ConfigureDateTimeManualy ? new DateTimeOffset(DateTime.SpecifyKind(this.UploadDTEnd,DateTimeKind.Unspecified), TimeSpan.FromHours(9)) : null,
                     Page = this.Page,
                 };
 
