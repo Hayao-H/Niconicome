@@ -22,6 +22,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             {
                 SettingPages.Import => "/settings/import",
                 SettingPages.Restore => "/settings/restore",
+                SettingPages.General => "/settings/general",
                 _ => "/settings"
             };
 
@@ -38,6 +39,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
     {
         Import,
         Restore,
+        General,
     }
 
 }

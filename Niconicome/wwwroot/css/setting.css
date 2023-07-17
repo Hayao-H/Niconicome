@@ -48,6 +48,10 @@
 .SettingPage .Body .SettingContent .Icon.Danger {
   color: #ff69b4;
 }
+.SettingPage .Body .SettingContent .Select,
+.SettingPage .Body .SettingContent .Input {
+  width: 40%;
+}
 .SettingPage .Body .ContentWrapper {
   margin-left: 16px;
 }

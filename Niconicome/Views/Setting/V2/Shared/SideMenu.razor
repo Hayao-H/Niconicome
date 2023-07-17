@@ -1,7 +1,7 @@
 ﻿@inject VM::Setting.V2.Page.SideMenuViewModel DataContext;
 @implements IDisposable;
 
-<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-gear"></i>一般設定</p>
+<p class="MenuItem" @onclick="()=>DataContext.OnLinkCkick(VM::Setting.V2.Page.SettingPages.General)"><i class="Icon fa-solid fa-gear"></i>一般設定</p>
 <p class="MenuItem NotImpl"><i class="Icon fa-regular fa-file"></i>ファイル設定</p>
 <p class="MenuItem NotImpl"><i class="Icon fa-solid fa-download"></i>ダウンロード設定</p>
 <p class="MenuItem NotImpl"><i class="Icon fa-solid fa-up-right-from-square"></i>外部ソフト設定</p>

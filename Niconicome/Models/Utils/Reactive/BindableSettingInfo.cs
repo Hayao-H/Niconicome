@@ -11,7 +11,7 @@ namespace Niconicome.Models.Utils.Reactive
 {
     public interface IBindableSettingInfo<T> : IBindableProperty<T>
     {
-
+        new IBindableSettingInfo<T> AddTo(Bindables bindables);
     }
 
     public class BindableSettingInfo<T> : BindableProperty<T>, IBindableSettingInfo<T> where T : notnull
@@ -36,6 +36,17 @@ namespace Niconicome.Models.Utils.Reactive
                 this.Subscribe(v => this._settingInfo.Value = selecter(v));
             }
         }
+
+        #region Method
+
+        public new IBindableSettingInfo<T> AddTo(Bindables bindables)
+        {
+            bindables.Add(this);
+            return this;
+        }
+
+
+        #endregion
 
         #region field
 

@@ -38,6 +38,13 @@ namespace Niconicome.Models.Utils.Reactive
         /// <param name="selector"></param>
         /// <returns></returns>
         IBindableProperty<U> Select<U>(Func<T, U> selector);
+
+        /// <summary>
+        /// 購読解除
+        /// </summary>
+        /// <param name="handler"></param>
+        void UnSubscribe(Action<T> handler);
+
     }
 
 
@@ -85,10 +92,16 @@ namespace Niconicome.Models.Utils.Reactive
             Action<T> subscriber = x => p.Value = selector(x);
 
             this.Subscribe(subscriber);
-            p.PropertyDisposed += (_, _) => this.UnRegisterPropertyChangeHandler(subscriber);
+            p.PropertyDisposed += (_, _) => this.UnSubscribe(subscriber);
 
             return p;
         }
+
+        public void UnSubscribe(Action<T> handler)
+        {
+            this.UnRegisterPropertyChangeHandler(handler);
+        }
+
 
         #endregion
 

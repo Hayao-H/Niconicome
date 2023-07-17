@@ -16,13 +16,13 @@ using WS = Niconicome.Workspaces.SettingPageV2;
 
 namespace Niconicome.ViewModels.Setting.V2.Page
 {
-    public class GeneralViewModel
+    public class GeneralViewModel : IDisposable
     {
 
         public GeneralViewModel()
         {
 
-            this.IsAutologinEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsAutologinEnable, false), false);
+            this.IsAutologinEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsAutologinEnable, false), false).AddTo(this.Bindables);
 
             var normal = new SelectBoxItem<string>("パスワードログイン", AutoLoginTypeString.Normal);
             var wv2 = new SelectBoxItem<string>("Webview2とCookieを共有", AutoLoginTypeString.Webview2);
@@ -31,32 +31,38 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.SelectableAutoLoginType.AddRange(new[] { normal, wv2, firefox, storeFirefox });
 
-            this.SelectedAutoLoginType = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Normal), AutoLoginTypeString.Normal);
+            this.SelectedAutoLoginType = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Normal), AutoLoginTypeString.Normal).AddTo(this.Bindables);
 
-            this.DisplayFirefoxPrifile = this.SelectedAutoLoginType.Select(t => t == AutoLoginTypeString.Firefox || t == AutoLoginTypeString.StoreFirefox).AsReadOnly();
+            this.DisplayFirefoxPrifile = this.SelectedAutoLoginType.Select(t => t == AutoLoginTypeString.Firefox || t == AutoLoginTypeString.StoreFirefox).AsReadOnly().AddTo(this.Bindables);
 
-            this.DisplayFirefoxPrifile.Subscribe(v =>
+            this.SelectableFirefoxProfiles = new BindableCollection<string, string>(this._selectableFirefoxProfiles, p => p);
+            this.Bindables.Add(this.SelectableFirefoxProfiles);
+
+            Action<bool> action = v =>
             {
                 if (!v)
                 {
                     return;
                 }
 
-                this.SelectableFirefoxProfiles.Clear();
+                this._selectableFirefoxProfiles.Clear();
 
                 if (this.SelectedAutoLoginType.Value == AutoLoginTypeString.Firefox)
                 {
-                    this.SelectableFirefoxProfiles.AddRange(WS.AutoLogin.GetFirefoxProfiles(AutoLoginType.Firefox).Select(p => p.ProfileName));
+                    this._selectableFirefoxProfiles.AddRange(WS.AutoLogin.GetFirefoxProfiles(AutoLoginType.Firefox).Select(p => p.ProfileName));
                 }
                 else
                 {
-                    this.SelectableFirefoxProfiles.AddRange(WS.AutoLogin.GetFirefoxProfiles(AutoLoginType.StoreFirefox).Select(p => p.ProfileName));
+                    this._selectableFirefoxProfiles.AddRange(WS.AutoLogin.GetFirefoxProfiles(AutoLoginType.StoreFirefox).Select(p => p.ProfileName));
                 }
-            });
+            };
 
-            this.SelectedFirefoxProfileName = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.FirefoxProfileName, string.Empty), string.Empty);
+            action(true);
+            this.DisplayFirefoxPrifile.Subscribe(action);
 
-            this.IsShowingTasksAsTabEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.ShowDownloadTasksAsTab, true), true);
+            this.SelectedFirefoxProfileName = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.FirefoxProfileName, string.Empty), string.Empty).AddTo(this.Bindables);
+
+            this.IsShowingTasksAsTabEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.ShowDownloadTasksAsTab, true), true).AddTo(this.Bindables);
 
             var n1 = new SelectBoxItem<int>("1", 1);
             var n2 = new SelectBoxItem<int>("2", 2);
@@ -65,33 +71,43 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             var n5 = new SelectBoxItem<int>("5", 5);
 
             this.SelectableMaxParallelFetch = new() { n1, n2, n3, n4 };
-            this.MaxFetchParallelCount = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.MaxParallelFetchCount, 4), 4);
+            this.MaxFetchParallelCount = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.MaxParallelFetchCount, 4), 4).AddTo(this.Bindables);
 
             this.SelectablefetchSleepInterval = new() { n1, n2, n3, n4, n5 };
-            this.FetchSleepInterval = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.FetchSleepInterval, 5), 5);
+            this.FetchSleepInterval = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.FetchSleepInterval, 5), 5).AddTo(this.Bindables);
 
-            this.IsSkippingSSLVerificationEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.SkipSSLVerification, false), false);
+            this.IsSkippingSSLVerificationEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.SkipSSLVerification, false), false).AddTo(this.Bindables);
 
-            this.IsSavePrevPlaylistExpandedStateEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.SaveTreePrevExpandedState, false), false);
+            this.IsSavePrevPlaylistExpandedStateEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.SaveTreePrevExpandedState, false), false).AddTo(this.Bindables);
 
-            this.IsExpandallPlaylistsEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.ExpandTreeOnStartUp, false), false);
+            this.IsExpandallPlaylistsEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.ExpandTreeOnStartUp, false), false).AddTo(this.Bindables);
 
-            this.IsStoreOnlyNiconicoIDEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.StoreOnlyNiconicoIDOnRegister, false), false);
+            this.IsStoreOnlyNiconicoIDEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.StoreOnlyNiconicoIDOnRegister, false), false).AddTo(this.Bindables);
 
             this.IsAutoRenamingRemotePlaylistEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.AutoRenamingAfterSetNetworkPlaylist, true), true);
 
-            this.IsConfirmngIfDownloadingEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.ConfirmIfDownloading, true), true);
+            this.IsConfirmngIfDownloadingEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.ConfirmIfDownloading, true), true).AddTo(this.Bindables);
 
-            this.IsSingletonWindowsEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.LimitWindowsToSingleton, true), true);
+            this.IsSingletonWindowsEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.LimitWindowsToSingleton, true), true).AddTo(this.Bindables);
 
-            this.LocalServerPort = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.LocalServerPort, NetConstant.DefaultServerPort), NetConstant.DefaultServerPort, p => p > 65535 || p < 0 ? NetConstant.DefaultServerPort : p, x => x is int);
+            this.LocalServerPort = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.LocalServerPort, NetConstant.DefaultServerPort), NetConstant.DefaultServerPort, p => p > 65535 || p < 0 ? NetConstant.DefaultServerPort : p, x => x is int).AddTo(this.Bindables);
 
-            this.SnackbarDuration = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.SnackbarDuration, NetConstant.DefaultServerPort), NetConstant.DefaultServerPort, x =>  x < 0 ? 4000 : x, x => x is int);
+            this.SnackbarDuration = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.SnackbarDuration, NetConstant.DefaultServerPort), NetConstant.DefaultServerPort, x => x < 0 ? 4000 : x, x => x is int).AddTo(this.Bindables);
 
         }
 
+        #region field
+
+        private readonly ObservableCollection<string> _selectableFirefoxProfiles = new();
+
+        #endregion
 
         #region Props
+
+        /// <summary>
+        /// 変更監視オブジェクト
+        /// </summary>
+        public Bindables Bindables { get; init; } = new();
 
         /// <summary>
         /// 自動ログイン
@@ -116,7 +132,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// <summary>
         /// 選択可能なFirefoxのプロファイル
         /// </summary>
-        public List<string> SelectableFirefoxProfiles { get; init; } = new();
+        public BindableCollection<string, string> SelectableFirefoxProfiles { get; init; }
 
         /// <summary>
         /// Firefoxのプロファイル
@@ -195,5 +211,9 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
         #endregion
 
+        public void Dispose()
+        {
+            this.Bindables.Dispose();
+        }
     }
 }

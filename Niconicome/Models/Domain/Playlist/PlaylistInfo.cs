@@ -150,7 +150,7 @@ namespace Niconicome.Models.Domain.Playlist
             this._childrenID = new List<int>(childrenID);
 
             this.Name = new BindableProperty<string>(name);
-            this.Name.RegisterPropertyChangeHandler(_ =>
+            this.Name.Subscribe(_ =>
             {
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             });
@@ -332,7 +332,7 @@ namespace Niconicome.Models.Domain.Playlist
         public IAttemptResult RemoveVideo(IVideoInfo video)
         {
             this._videosCount.Value--;
-            video.IsSelected.UnRegisterPropertyChangeHandler(this.OnSelectedChange);
+            video.IsSelected.UnSubscribe(this.OnSelectedChange);
             this.SetSelectedVideos();
 
             this._videos.RemoveAll(v => v.NiconicoId == video.NiconicoId);

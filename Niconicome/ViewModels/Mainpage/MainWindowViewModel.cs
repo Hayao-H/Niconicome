@@ -138,7 +138,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.OpenSettingV2Command = new BindableCommand(() =>
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/import", BlazorWindows.Settings);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/general", BlazorWindows.Settings);
                 WS::Mainpage.WindowTabHelper.OpenSettingsTab(this.RegionManager);
             }, new BindableProperty<bool>(true));
 
