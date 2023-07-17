@@ -97,7 +97,7 @@ namespace Niconicome.Models.Utils.Reactive
         public event EventHandler? PropertyDisposed;
 
 
-        public T Value
+        public virtual T Value
         {
             get => this._value;
             set

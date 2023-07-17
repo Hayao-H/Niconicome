@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Auth;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Local.Restore;
@@ -44,5 +46,15 @@ namespace Niconicome.Workspaces
         /// ページ
         /// </summary>
         public static IBlazorPageManager BlazorPageManager { get; private set; } = DIFactory.Resolve<IBlazorPageManager>();
+
+        /// <summary>
+        /// 設定コンテナ
+        /// </summary>
+        public static ISettingsContainer SettingsContainer { get; private set; } = DIFactory.Resolve<ISettingsContainer>();
+
+        /// <summary>
+        /// 自動ログイン
+        /// </summary>
+        public static IAutoLogin AutoLogin { get; private set; }=DIFactory.Resolve<IAutoLogin>();
     }
 }
