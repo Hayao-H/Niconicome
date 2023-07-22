@@ -1,0 +1,138 @@
+﻿@page "/settings/file";
+
+@using Niconicome.Views.Setting.V2.Shared;
+@inherits BlazorBase;
+
+@inject IJSRuntime JS;
+@inject VM::Setting.V2.Page.FileViewModel DataContext;
+
+<div class="SettingPage FilePage">
+    <div class="SideMenu">
+        <SideMenu />
+    </div>
+    <div class="Body">
+
+        <h3>一般設定</h3>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-download"></i>ファイル名のフォーマット</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.FileFormat.Value">
+            </div>
+        </div>
+
+        <div class="Detail accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#FileFormatDetail">
+                        ファイル名のフォーマットについて
+                    </button>
+                </h2>
+                <div id="FileFormatDetail" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        &lt;title&gt; :動画タイトル,<br />
+                        &lt;id&gt; :動画ID,<br />
+                        &lt;uploadedon&gt; :投稿日時,<br />
+                        &lt;downloadon&gt; :DL日時<br />
+                        &lt;owner&gt; :投稿者のニックネーム<br />
+                        &lt;ownerId&gt; :投稿者のユーザーID<br />
+                        &lt;duration&gt; :再生時間（hh:mm:ss）<br />
+                        &lt;durationS&gt; :再生時間（秒数）<br />
+                        ※カスタム書式を利用できます。詳しくは<a href="https://github.com/Hayao-H/Niconicome/wiki/%E8%A8%AD%E5%AE%9A%E9%A0%85%E7%9B%AE#%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E8%A8%AD%E5%AE%9A">wiki</a>をご覧ください。<br />
+                        ※「\」でフォルダーを作成します。[&lt;id&gt;]&lt;title&gt;でxenoのデフォルトと同じフォーマットになります。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-download"></i>保存フォルダーが指定されていなかった場合に使用するフォルダー</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.DefaultFolder.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-file-code"></i>htmlファイルの拡張子（ピリオド付き）</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.HtmlFileExt.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-file-image"></i>jpegファイルの拡張子（ピリオド付き）</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.JpegFileExt.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-basket-shopping"></i>市場情報ファイルの接尾辞</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.IchibaSuffix.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-circle-info"></i>動画情報ファイルの接尾辞</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.VideoInfoSuffix.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-message"></i>投稿者コメントファイルの接尾辞</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.OwnerCommentSuffix.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-file-image"></i>サムネイルファイルの接尾辞</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.ThumbnailSuffix.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-moon"></i>エコノミーファイルの接尾辞</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.EconomySuffix.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="replaceSB"><i class="Icon fa-solid fa-font"></i>禁則文字をマルチバイト文字に置き換える</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="replaceSB" @bind="DataContext.IsReplaceSBToSBEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="searchExact"><i class="Icon fa-solid fa-magnifying-glass"></i>保存した動画ファイルををフォーマット通りに検索する（非推奨）</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="searchExact" @bind="DataContext.IsSearchingVideosExactEnable.Value">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private SynchronizationContext? ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ctx = SynchronizationContext.Current;
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this.ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

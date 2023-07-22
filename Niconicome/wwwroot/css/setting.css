@@ -1,8 +1,10 @@
 .SettingPage {
   display: flex;
+  flex-direction: column;
 }
 .SettingPage .SideMenu {
-  width: 200px;
+  position: fixed;
+  top: 10px;
 }
 .SettingPage .SideMenu .MenuItem {
   padding: 8px;
@@ -26,8 +28,9 @@
 }
 .SettingPage .Body {
   flex: 1;
-  margin-left: 8px;
+  margin-left: 208px;
   min-height: 100%;
+  overflow-y: auto;
 }
 .SettingPage .Body .SettingContent {
   display: flex;
@@ -58,6 +61,10 @@
 .SettingPage .Body .Separator {
   border: 1px solid rgba(87, 86, 86, 0.9058823529);
   margin: 40px 5px;
+}
+
+.FilePage .Detail {
+  margin: 0 20px;
 }
 
 .ImportPage .NiconicomeImport .InputContainer,

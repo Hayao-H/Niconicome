@@ -1,8 +1,10 @@
 .SettingPage {
     display: flex;
+    flex-direction: column;
 
     .SideMenu {
-        width: 200px;
+        position: fixed;
+        top: 10px;
 
         .MenuItem {
             padding: 8px;
@@ -29,8 +31,9 @@
 
     .Body {
         flex: 1;
-        margin-left: 8px;
+        margin-left: 208px;
         min-height: 100%;
+        overflow-y: auto;
 
         .SettingContent {
 
@@ -70,6 +73,12 @@
             border: 1px solid #575656e7;
             margin: 40px 5px;
         }
+    }
+}
+
+.FilePage {
+    .Detail {
+        margin: 0 20px;
     }
 }
 
