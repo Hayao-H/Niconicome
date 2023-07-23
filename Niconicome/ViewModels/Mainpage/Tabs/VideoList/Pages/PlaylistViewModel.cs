@@ -20,7 +20,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.Bindables = new Bindables();
 
             this.SelectablePlaylistType = new List<string>() { PlaylistTypeString.WatchLater, PlaylistTypeString.Mylist, PlaylistTypeString.Series, PlaylistTypeString.UserVideos, PlaylistTypeString.Channel, PlaylistTypeString.Local }.AsReadOnly();
-            this.CurrentPlaylistType = new BindableProperty<string>(string.Empty).Subscribe(v => this.IsRemotePlaylist.Value = v != PlaylistTypeString.Local).AddTo(this.Bindables);
+            this.CurrentPlaylistType = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
+            this.IsRemotePlaylist = this.CurrentPlaylistType.Select(t => t != PlaylistTypeString.Local && t != PlaylistTypeString.WatchLater).AsReadOnly().AddTo(this.Bindables);
             this.CanEditPlaylisType = this._canEditPlaylistType.AsReadOnly().AddTo(this.Bindables);
         }
 
@@ -69,7 +70,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <summary>
         /// リモートプレイリストであるかどうか
         /// </summary>
-        public IBindableProperty<bool> IsRemotePlaylist { get; init; } = new BindableProperty<bool>(false);
+        public IReadonlyBindablePperty<bool> IsRemotePlaylist { get; init; }
 
         /// <summary>
         /// プレイリストの種類を変更できるかどうか
@@ -118,7 +119,6 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.DirectoryPath = this._playlist.FolderPath;
             this.RemotePlaylistParam = this._playlist.RemoteParameter;
             this.CurrentPlaylistType.Value = this.Convert(this._playlist.PlaylistType);
-            this.IsRemotePlaylist.Value = this.CurrentPlaylistType.Value != PlaylistTypeString.Local;
             this._canEditPlaylistType.Value = this._playlist.PlaylistType != PlaylistType.Root && this._playlist.PlaylistType != PlaylistType.Temporary && this._playlist.PlaylistType != PlaylistType.PlaybackHistory && this._playlist.PlaylistType != PlaylistType.DownloadSucceededHistory && this._playlist.PlaylistType != PlaylistType.DownloadFailedHistory;
         }
 
