@@ -160,7 +160,7 @@ namespace Niconicome.Models.Network.Download
             bool overrideVideoDT = this._container.GetSetting(SettingNames.OverideVideoFileDTToUploadedDT, false).Data!.Value;
             bool resumeEnable = this._container.GetSetting(SettingNames.IsResumeEnable, false).Data!.Value;
             bool unsafeHandle = this._container.GetSetting(SettingNames.EnableUnsafeCommentHandle, false).Data!.Value;
-            bool experimentalSafety = this._container.GetSetting(SettingNames.IsExperimentalCommentSafetySystemEnable, false).Data!.Value;
+            bool experimentalSafety = true;//this._container.GetSetting(SettingNames.IsExperimentalCommentSafetySystemEnable, false).Data!.Value;
             bool deleteEconomyFile = this._container.GetSetting(SettingNames.DeleteExistingEconomyFile, false).Data!.Value;
             bool omitXmlDec = this._container.GetSetting(SettingNames.IsOmittingXmlDeclarationIsEnable, false).Data!.Value;
 

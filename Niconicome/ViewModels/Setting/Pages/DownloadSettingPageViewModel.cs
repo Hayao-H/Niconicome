@@ -96,9 +96,9 @@ namespace Niconicome.ViewModels.Setting.Pages
                 _ => t1
             }, x => x.Value);
 
-            var i1 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Html, "html");
-            var i2 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Json, "json");
-            var i3 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Xml, "xml");
+            var i1 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Html, "HTML");
+            var i2 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Json, "JSON");
+            var i3 = new ComboboxItem<IchibaInfoTypeSettings>(IchibaInfoTypeSettings.Xml, "XML");
             this.SelectableIchibaInfoType = new List<ComboboxItem<IchibaInfoTypeSettings>>() { i1, i2, i3 };
             this.IchibaInfoType = new ConvertableSettingInfoViewModel<IchibaInfoTypeSettings, ComboboxItem<IchibaInfoTypeSettings>>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.IchibaInfoType, IchibaInfoTypeSettings.Html), i1, x => x switch
             {

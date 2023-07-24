@@ -1,0 +1,140 @@
+﻿@page "/settings/download";
+
+@using Niconicome.Views.Setting.V2.Shared;
+@inherits BlazorBase;
+
+@inject IJSRuntime JS;
+@inject VM::Setting.V2.Page.DownloadViewModel DataContext;
+
+<div class="SettingPage FilePage">
+    <div class="SideMenu">
+        <SideMenu />
+    </div>
+    <div class="Body">
+
+        <h3>ダウンロード設定</h3>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-clock"></i>過去ログ取得時の待機時間（ミリ秒）</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.CommentFetchWaitSpan.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-folder"></i>一時フォルダーの最大保持数</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.MaxTmpDirCount.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-box"></i>【上級者向け】コレクション1ブロックあたりのコメント数（推奨値：100）</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.CommentCountPerBlock.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title" title="大きなすぎる場合、失敗する確率が高くなります"><i class="Icon fa-solid fa-download"></i>最大並列ダウンロード数</p>
+            <select class="form-select Select" @bind="DataContext.MaxParallelDownloadCount.Value">
+                @foreach (var x in DataContext.SelectableMaxParallelDownloadCount)
+                {
+                    <option value="@x.Value">@x.DidplayValue</option>
+                }
+            </select>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title" title="大きなすぎる場合、失敗する確率が高くなります"><i class="Icon fa-solid fa-file-download"></i>HLSセグメントファイルの最大並列ダウンロード数（推奨値：1）</p>
+            <select class="form-select Select" @bind="DataContext.MaxParallelSegmentDownloadCount.Value">
+                @foreach (var x in DataContext.SelectableMaxParallelSegmentDownloadCount)
+                {
+                    <option value="@x.Value">@x.DidplayValue</option>
+                }
+            </select>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-circle-info"></i>動画情報ファイルの保存形式</p>
+            <select class="form-select Select" @bind="DataContext.VideoInfoType.Value">
+                @foreach (var x in DataContext.SelectableVideoInfoType)
+                {
+                    <option value="@x.Value">@x.DidplayValue</option>
+                }
+            </select>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-basket-shopping"></i>市場情報ファイルの保存形式</p>
+            <select class="form-select Select" @bind="DataContext.IchibaInfoType.Value">
+                @foreach (var x in DataContext.SelectableIchibaInfoType)
+                {
+                    <option value="@x.Value">@x.DidplayValue</option>
+                }
+            </select>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="downloadAll" title="無効にすると現在のプレイリストの動画のみDLします"><i class="Icon fa-solid fa-list"></i>メインページのダウンロードボタンでキューのタスク全てをDLする</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="downloadAll" @bind="DataContext.IsDownloadFromQueueEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="allowDupe" title="無効にするとひとつのプレイリストから同じ動画を同時にDLすることが出来ません"><i class="Icon fa-solid fa-list-check"></i>ステージ時の重複（同一プレイリスト内での登録）を許可する（非推奨）</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="allowDupe" @bind="DataContext.IsDupeOnStageAllowed.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="overrideDT"><i class="Icon fa-solid fa-calendar-days"></i>動画ファイルの更新日時を投稿日時にする</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="overrideDT" @bind="DataContext.IsOverrideVideoFileDTToUploadedDT.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="resume"><i class="Icon    fa-solid fa-arrows-rotate"></i>可能な場合は動画ファイルのDLをレジュームする</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="resume" @bind="DataContext.IsDownloadResumingEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="deleteEco"><i class="Icon fa-solid fa-trash"></i>非エコノミーファイルをDL後、エコノミーファイルを削除</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="deleteEco" @bind="DataContext.IsDeletingExistingEconomyFileEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="omitXML"><i class="Icon fa-solid fa-code"></i>コメントファイルにXML宣言を追加しない</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="omitXML" @bind="DataContext.IsOmitXmlDeclarationEnable.Value">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private SynchronizationContext? ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ctx = SynchronizationContext.Current;
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this.ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

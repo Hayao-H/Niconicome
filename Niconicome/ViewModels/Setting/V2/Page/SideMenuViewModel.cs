@@ -24,6 +24,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
                 SettingPages.Restore => "/settings/restore",
                 SettingPages.General => "/settings/general",
                 SettingPages.File => "/settings/file",
+                SettingPages.Download => "/settings/download",
                 _ => "/settings"
             };
 
@@ -42,6 +43,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         Restore,
         General,
         File,
+        Download,
     }
 
 }
