@@ -1,0 +1,129 @@
+﻿@page "/settings/external";
+
+@using Niconicome.Views.Setting.V2.Shared;
+@inherits BlazorBase;
+
+@inject IJSRuntime JS;
+@inject VM::Setting.V2.Page.ExternalSoftwareViewModel DataContext;
+
+<div class="SettingPage FilePage">
+    <div class="SideMenu">
+        <SideMenu />
+    </div>
+    <div class="Body">
+
+        <h3>外部ソフト設定</h3>
+
+        <div class="Detail accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#FileFormatDetail">
+                        実行ファイルパスについて
+                    </button>
+                </h2>
+                <div id="FileFormatDetail" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        実行ファイルパスは実行ファイルの絶対パスを指定してください。(例: C:\video\player.exe)<br />
+                        ただし、実行ファイルのパスが通っている場合は、ファイル名を利用することが出来ます。<br />
+                        ※Windowsの環境変数についての更に詳しい情報は<a href="https://www.atmarkit.co.jp/ait/articles/1805/11/news035.html">＠IT様の記事</a>をご覧ください。<br />
+                        パラメーターは<br />
+                        &lt;id&gt;：ID<br />
+                        &lt;url&gt;：視聴ページのURL<br />
+                        &lt;url:short&gt;：視聴ページの短縮URL<br />
+                        が置き換え対象の文字列として使用できます。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-arrow-up-right-from-square"></i>「アプリで開く(A)」のパス</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.PlayerAPath.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-arrow-up-right-from-square"></i>「アプリで開く(B)」のパス</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.PlayerBPath.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-share-from-square"></i>「アプリに送る(A)」のパス</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.AppAPath.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent SubContent">
+            <p class="Title"><i class="Icon fa-solid fa-terminal"></i>「アプリに送る(A)」のパラメーター</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.AppAParam.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-share-from-square"></i>「アプリに送る(B)」のパス</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.AppBPath.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent SubContent">
+            <p class="Title"><i class="Icon fa-solid fa-terminal"></i>「アプリに送る(B)」のパラメーター</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.AppBParam.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-file-video"></i>ffmpegのパス</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.FfmpegPath.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent SubContent">
+            <p class="Title"><i class="Icon fa-solid fa-terminal"></i>ffmpegのフォーマット</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.FFmpegFormat.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent SubContent">
+            <label class="Title" for="useShell"><i class="Icon fa-solid fa-terminal"></i>ffmpeg/ffprobeの起動にシェルを利用する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="useShell" @bind="DataContext.UseShellWhenLaunchingFFmpeg.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-file-video"></i>ffprobeのパス</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.FFprovePath.Value">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private SynchronizationContext? ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ctx = SynchronizationContext.Current;
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this.ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

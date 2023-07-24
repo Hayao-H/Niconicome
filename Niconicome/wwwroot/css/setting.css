@@ -41,6 +41,13 @@
 .SettingPage .Body .SettingContent.M0 {
   margin-top: 0;
 }
+.SettingPage .Body .SettingContent.SubContent {
+  margin-top: 3px;
+  margin-left: 20px;
+}
+.SettingPage .Body .SettingContent.SubContent .Title {
+  font-size: 15px;
+}
 .SettingPage .Body .SettingContent .Title {
   font-size: 18px;
 }

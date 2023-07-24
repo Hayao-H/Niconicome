@@ -46,6 +46,15 @@
                 margin-top: 0;
             }
 
+            &.SubContent {
+                margin-top: 3px;
+                margin-left:20px;
+
+                .Title {
+                    font-size: 15px;
+                }
+            }
+
             .Title {
                 font-size: 18px;
             }
