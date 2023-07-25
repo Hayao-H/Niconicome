@@ -29,6 +29,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
                 SettingPages.VideoList => "/settings/videolist",
                 SettingPages.Style => "/settings/style",
                 SettingPages.Debug => "/settings/debug",
+                SettingPages.AppInfo => "/settings/appinfo",
                 _ => "/settings"
             };
 
@@ -52,6 +53,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         VideoList,
         Style,
         Debug,
+        AppInfo,
     }
 
 }

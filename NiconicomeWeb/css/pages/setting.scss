@@ -302,3 +302,15 @@
         padding: 8px;
     }
 }
+
+.AppInfoPage {
+    .LicenseList {
+
+        margin-top: 16px;
+
+        .LicenseContent {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}

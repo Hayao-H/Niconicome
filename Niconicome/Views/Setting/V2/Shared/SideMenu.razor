@@ -10,7 +10,7 @@
 <p class="MenuItem" @onclick="()=>DataContext.OnLinkCkick(VM::Setting.V2.Page.SettingPages.Restore)"><i class="Icon fa-solid fa-triangle-exclamation"></i>回復</p>
 <p class="MenuItem" @onclick="()=>DataContext.OnLinkCkick(VM::Setting.V2.Page.SettingPages.Debug)"><i class="Icon fa-solid fa-bug"></i>デバッグ設定</p>
 <p class="MenuItem" @onclick="()=>DataContext.OnLinkCkick(VM::Setting.V2.Page.SettingPages.Import)"><i class="Icon fa-solid fa-file-import"></i>インポート</p>
-<p class="MenuItem NotImpl"><i class="Icon fa-solid fa-circle-info"></i>アプリ情報</p>
+<p class="MenuItem" @onclick="()=>DataContext.OnLinkCkick(VM::Setting.V2.Page.SettingPages.AppInfo)"><i class="Icon fa-solid fa-circle-info"></i>アプリ情報</p>
 
 @code {
     public void Dispose()

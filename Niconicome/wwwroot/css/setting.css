@@ -232,3 +232,11 @@
   color: white;
   padding: 8px;
 }
+
+.AppInfoPage .LicenseList {
+  margin-top: 16px;
+}
+.AppInfoPage .LicenseList .LicenseContent {
+  display: flex;
+  justify-content: space-between;
+}
