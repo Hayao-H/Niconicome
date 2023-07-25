@@ -69,6 +69,8 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.TS
                 return AttemptResult.Fail(wResult.Message);
             }
 
+            this._errorHandler.HandleError(TSRequestHandlerError.FileSent,videoFilePath);
+
             res.StatusCode = (int)HttpStatusCode.OK;
             return AttemptResult.Succeeded();
 

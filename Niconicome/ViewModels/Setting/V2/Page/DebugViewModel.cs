@@ -11,6 +11,7 @@ using WS = Niconicome.Workspaces.SettingPageV2;
 using SC = Niconicome.ViewModels.Setting.V2.Page.StringContent.DebugVMSC;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Utils.Error;
 
 namespace Niconicome.ViewModels.Setting.V2.Page
 {
@@ -65,13 +66,14 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             {
                 string message = WS.StringHandler.GetContent(SC.LogFilePathCopied);
                 this.ShowAlert(message, AlertType.Info);
-            } else
+            }
+            else
             {
                 string message = WS.StringHandler.GetContent(SC.LogFilePathCopyFailed);
-                string messageD = WS.StringHandler.GetContent(SC.LogFilePathCopyFailedDetail,result.Message);
+                string messageD = WS.StringHandler.GetContent(SC.LogFilePathCopyFailedDetail, result.Message);
 
                 this.ShowAlert(message, AlertType.Error);
-                WS.MessageHandler.AppendMessage(messageD, LocalConstant.SystemMessageDispacher);
+                WS.MessageHandler.AppendMessage(messageD, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
             }
         }
     }
