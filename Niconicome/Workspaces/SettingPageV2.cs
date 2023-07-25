@@ -8,6 +8,7 @@ using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Local.Application;
+using Niconicome.Models.Local.OS;
 using Niconicome.Models.Local.Restore;
 using Niconicome.Models.Local.Restore.Import.Niconicome;
 using Niconicome.Models.Local.Restore.Import.Xeno;
@@ -73,6 +74,21 @@ namespace Niconicome.Workspaces
         /// 電源管理
         /// </summary>
         public static IApplicationPowerManager PowerManager { get; private set; } = DIFactory.Resolve<IApplicationPowerManager>();
+
+        /// <summary>
+        /// クリップボード
+        /// </summary>
+        public static IClipbordManager ClipbordManager { get; private set; } = DIFactory.Resolve<IClipbordManager>();
+
+        /// <summary>
+        /// ローカル情報
+        /// </summary>
+        public static ILocalInfo LocalInfo { get; private set; } = DIFactory.Resolve<ILocalInfo>();
+
+        /// <summary>
+        /// ローカルステート
+        /// </summary>
+        public static ILocalState State { get; private set; } = DIFactory.Resolve<ILocalState>();
 
     }
 }

@@ -48,7 +48,7 @@
 
             &.SubContent {
                 margin-top: 3px;
-                margin-left:20px;
+                margin-left: 20px;
 
                 .Title {
                     font-size: 15px;
@@ -290,5 +290,15 @@
         .DangerZoneBody {
             margin-left: 16px;
         }
+    }
+}
+
+.DebugPage {
+    .LogFilePath {
+        margin-left: 20px;
+        margin-top: 8px;
+        background-color: #383638;
+        color: white;
+        padding: 8px;
     }
 }

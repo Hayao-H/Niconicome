@@ -3,7 +3,6 @@ using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Local.State
 {
@@ -48,11 +47,17 @@ namespace Niconicome.Models.Local.State
 
     public class LocalState : ILocalState
     {
-        public LocalState(INiconicomeLogger logger, IServer server, ILogger legacyLogger)
+        public LocalState(INiconicomeLogger logger, IServer server, ILogger legacyLogger, ISettingsContainer settingsContainer)
         {
             this._logger = logger;
             this._server = server;
             this._legacyLogger = legacyLogger;
+
+            IAttemptResult<ISettingInfo<bool>> result = settingsContainer.GetSetting(SettingNames.IsDebugMode, false);
+            if (result.IsSucceeded&&result.Data is not null)
+            {
+                this.IsDebugMode = result.Data.Value;
+            }
         }
 
         #region field

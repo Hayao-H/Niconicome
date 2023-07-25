@@ -11,23 +11,19 @@ namespace Niconicome.Models.Local.State
 {
     public interface ILocalInfo
     {
+        /// <summary>
+        /// ログファイル名
+        /// </summary>
         string LogFileName { get; }
+
+        /// <summary>
+        /// アプリケーションのバージョン
+        /// </summary>
         string ApplicationVersion { get; }
-        bool IsMultiWindowsAllowed { get; }
     }
 
     public class LocalInfo : ILocalInfo
     {
-        public LocalInfo(ILocalSettingsContainer container)
-        {
-            this.settingsContainer = container;
-        }
-
-        #region field
-
-        private ILocalSettingsContainer settingsContainer;
-
-        #endregion
 
         /// <summary>
         /// ログファイル名
@@ -36,7 +32,7 @@ namespace Niconicome.Models.Local.State
         {
             get
             {
-                var logStraem = Utils::DIFactory.Provider.GetRequiredService<ILogWriter>();
+                var logStraem = Utils::DIFactory.Resolve<ILogWriter>();
 
                 return logStraem.LogFilePath;
             }
@@ -53,12 +49,6 @@ namespace Niconicome.Models.Local.State
                 return v?.ToString() ?? "Nan";
             }
         }
-
-        /// <summary>
-        /// マルチウィンドウ
-        /// </summary>
-        public bool IsMultiWindowsAllowed => !this.settingsContainer.GetReactiveBoolSetting(SettingsEnum.SingletonWindows).Value;
-
 
     }
 }
