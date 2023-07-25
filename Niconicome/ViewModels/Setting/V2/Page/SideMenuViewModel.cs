@@ -26,6 +26,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
                 SettingPages.File => "/settings/file",
                 SettingPages.Download => "/settings/download",
                 SettingPages.ExternalSoftware => "/settings/external",
+                SettingPages.VideoList => "/settings/videolist",
                 _ => "/settings"
             };
 
@@ -46,6 +47,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         File,
         Download,
         ExternalSoftware,
+        VideoList,
     }
 
 }

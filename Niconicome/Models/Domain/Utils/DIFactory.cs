@@ -359,6 +359,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<SettingsVM::FileViewModel>();
             services.AddTransient<SettingsVM::DownloadViewModel>();
             services.AddTransient<SettingsVM::ExternalSoftwareViewModel>();
+            services.AddTransient<SettingsVM::VideoListViewModel>();
             services.AddTransient<XenoImport::Parser.IXenoDataParser, XenoImport::Parser.XenoDataParser>();
             services.AddTransient<XenoImport::IXenoImportHandler, XenoImport::XenoImportHandler>();
             services.AddTransient<Restore::Import.Xeno.IXenoImportManager, Restore::Import.Xeno.XenoImportManager>();
