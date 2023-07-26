@@ -57,6 +57,8 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8
                 return AttemptResult.Fail(wResult.Message);
             }
 
+            this._errorHandler.HandleError(M3U8RequestHandlerError.FileSent, Path.Join(AppContext.BaseDirectory, "tmp", "hls", "playlist.m3u8"));
+
             res.StatusCode = (int)HttpStatusCode.OK;
             return AttemptResult.Succeeded();
 

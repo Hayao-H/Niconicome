@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Auth;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.StringHandler;
+using Niconicome.Models.Local.Application;
+using Niconicome.Models.Local.OS;
 using Niconicome.Models.Local.Restore;
 using Niconicome.Models.Local.Restore.Import.Niconicome;
 using Niconicome.Models.Local.Restore.Import.Xeno;
 using Niconicome.Models.Local.State;
+using Niconicome.Models.Local.State.Style;
 using MessageV2 = Niconicome.Models.Local.State.MessageV2;
 
 namespace Niconicome.Workspaces
@@ -44,5 +49,46 @@ namespace Niconicome.Workspaces
         /// ページ
         /// </summary>
         public static IBlazorPageManager BlazorPageManager { get; private set; } = DIFactory.Resolve<IBlazorPageManager>();
+
+        /// <summary>
+        /// 設定コンテナ
+        /// </summary>
+        public static ISettingsContainer SettingsContainer { get; private set; } = DIFactory.Resolve<ISettingsContainer>();
+
+        /// <summary>
+        /// 自動ログイン
+        /// </summary>
+        public static IAutoLogin AutoLogin { get; private set; } = DIFactory.Resolve<IAutoLogin>();
+
+        /// <summary>
+        /// userChrome.css
+        /// </summary>
+        public static IUserChromeHandler UserChromeHandler { get; private set; } = DIFactory.Resolve<IUserChromeHandler>();
+
+        /// <summary>
+        /// テーマ
+        /// </summary>
+        public static IThemehandler Themehandler { get; private set; } = DIFactory.Resolve<IThemehandler>();
+
+        /// <summary>
+        /// 電源管理
+        /// </summary>
+        public static IApplicationPowerManager PowerManager { get; private set; } = DIFactory.Resolve<IApplicationPowerManager>();
+
+        /// <summary>
+        /// クリップボード
+        /// </summary>
+        public static IClipbordManager ClipbordManager { get; private set; } = DIFactory.Resolve<IClipbordManager>();
+
+        /// <summary>
+        /// ローカル情報
+        /// </summary>
+        public static ILocalInfo LocalInfo { get; private set; } = DIFactory.Resolve<ILocalInfo>();
+
+        /// <summary>
+        /// ローカルステート
+        /// </summary>
+        public static ILocalState State { get; private set; } = DIFactory.Resolve<ILocalState>();
+
     }
 }

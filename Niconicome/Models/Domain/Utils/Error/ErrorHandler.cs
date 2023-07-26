@@ -70,7 +70,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             if (this.TryGetAttr(value, out ErrorEnumAttribute? attr))
             {
                 string errorCode = this.ToErrorCode(value, attr);
-                var message = $"[{errorCode}]{this.GetErrorMessage(attr, items ?? new object[0])}";
+                var message = $"[{errorCode}]　{this.GetErrorMessage(attr, items ?? new object[0])}";
 
                 this.WriteLog(attr.ErrorLevel, message);
             }
@@ -82,7 +82,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             {
                 string errorCode = this.ToErrorCode(value, attr);
                 string exMessage = this.GetExceptionMessage(ex);
-                var message = $"[{errorCode}]{this.GetErrorMessage(attr, items ?? new object[0])}{Environment.NewLine}{exMessage}";
+                var message = $"[{errorCode}] {this.GetErrorMessage(attr, items ?? new object[0])}{Environment.NewLine}{exMessage}";
 
                 this.WriteLog(attr.ErrorLevel, message);
             }

@@ -8,9 +8,15 @@ p {
 
 .Alert {
   position: fixed;
+  display: flex;
   top: 8px;
   right: 8px;
   left: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+.Alert .btn.Hide {
+  display: none;
 }
 .Alert.Hide {
   display: none;

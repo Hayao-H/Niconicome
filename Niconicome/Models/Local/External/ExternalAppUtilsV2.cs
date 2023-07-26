@@ -135,7 +135,7 @@ namespace Niconicome.Models.Local.External
         public IAttemptResult SendToAppB(IVideoInfo videoInfo)
         {
 
-            IAttemptResult<ISettingInfo<string>> path = this._settingsContainer.GetSetting(SettingNames.AppUrlParam, "");
+            IAttemptResult<ISettingInfo<string>> path = this._settingsContainer.GetSetting(SettingNames.AppUrlPath, "");
             if (!path.IsSucceeded || path.Data is null)
             {
                 return AttemptResult.Fail(path.Message);

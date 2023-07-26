@@ -73,9 +73,9 @@ namespace Niconicome.ViewModels.Mainpage
                     _ => s1
                 };
             };
-            WS::Mainpage.DownloadSettingsHandler.Resolution.RegisterPropertyChangeHandler(this._handler);
+            WS::Mainpage.DownloadSettingsHandler.Resolution.Subscribe(this._handler);
 
-            this.SelectedResolution.RegisterPropertyChangeHandler(x =>
+            this.SelectedResolution.Subscribe(x =>
             {
                 if (WS::Mainpage.DownloadSettingsHandler.Resolution.Value.Vertical == this.SelectedResolution.Value.Value.Vertical) return;
                 WS::Mainpage.DownloadSettingsHandler.Resolution.Value = x.Value;
@@ -148,7 +148,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         ~DownloadSettingsViewModel()
         {
-            WS::Mainpage.DownloadSettingsHandler.Resolution.UnRegisterPropertyChangeHandler(this._handler);
+            WS::Mainpage.DownloadSettingsHandler.Resolution.UnSubscribe(this._handler);
             this.Dispose();
         }
 

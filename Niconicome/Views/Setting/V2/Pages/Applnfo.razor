@@ -1,0 +1,187 @@
+﻿@page "/settings/appinfo";
+
+@using Niconicome.Views.Setting.V2.Shared;
+@inherits BlazorBase;
+
+@inject IJSRuntime JS;
+@inject VM::Setting.V2.Page.AppInfoViewModel DataContext;
+
+<div class="SettingPage AppInfoPage">
+    <div class="SideMenu">
+        <SideMenu />
+    </div>
+    <div class="Body">
+
+        <h3>アプリ情報</h3>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-circle-info"></i>アプリケーションバージョン</p>
+            <p>@(DataContext.Version)</p>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-link"></i>リンク</p>
+            <div>
+                <a href="https://github.com/Hayao-H/Niconicome">プロジェクトページ</a><br />
+                <a href="https://niconicome.slack.com/join/shared_invite/zt-ob8ff84w-ffXrVh1TDEokbsgahkVAIw#/shared-invite/email">Slack</a><br />
+                <a href="https://twitter.com/NiconicomeD">Twitter</a><br />
+                <a href="https://github.com/Hayao-H/Niconicome/wiki">wiki</a>
+            </div>
+        </div>
+
+        <div class="Detail accordion LicenseList">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#FileFormatDetail">
+                        <i class="Icon fa-solid fa-key"></i>ライセンス情報
+                    </button>
+                </h2>
+                <div id="FileFormatDetail" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+
+                        <div class="LicenseContent">
+                            <a href="http://materialdesigninxaml.net/">
+                                MaterialDesignInXamlToolkit
+                            </a>
+
+                            <a href="https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/blob/master/LICENSE">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://github.com/ilyalozovyy/credentialmanagement">
+                                credentialmanagement
+                            </a>
+
+
+                            <a href="https://github.com/ilyalozovyy/credentialmanagement/blob/master/LICENSE">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://github.com/contre/Windows-API-Code-Pack-1.1">
+                                Windows-API-Code-Pack-1.1
+                            </a>
+
+
+                            <a href="https://github.com/aybe/Windows-API-Code-Pack-1.1/blob/master/LICENCE">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://www.litedb.org/">
+                                LiteDB
+                            </a>
+
+
+                            <a href="https://github.com/mbdavid/LiteDB/blob/master/LICENSE">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://anglesharp.github.io/">
+                                AngleSharp
+                            </a>
+
+
+                            <a href="https://github.com/AngleSharp/AngleSharp/blob/master/LICENSE">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://github.com/dotnet/efcore/">
+                                Microsoft.Data.SQLite
+                            </a>
+
+
+                            <a href="https://github.com/dotnet/efcore/blob/main/LICENSE.txt">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://github.com/PrismLibrary/Prism">
+                                Prism
+                            </a>
+
+
+                            <a href="https://github.com/PrismLibrary/Prism/blob/master/LICENSE">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://github.com/runceel/ReactiveProperty">
+                                ReactiveProperty
+                            </a>
+
+
+                            <a href="https://github.com/runceel/ReactiveProperty/blob/main/LICENSE.txt">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://github.com/microsoft/ClearScript">
+                                ClearScript
+                            </a>
+
+
+                            <a href="https://github.com/microsoft/ClearScript/blob/master/License.txt">
+                                Read license on github.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://getbootstrap.jp/">
+                                Bootstrap
+                            </a>
+
+
+                            <a href="https://getbootstrap.jp/docs/5.0/about/license/">
+                                Read license on Bootstrap Doc
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://fontawesome.com/">
+                                Font Awesome
+                            </a>
+
+
+                            <a href="https://fontawesome.com/license/free">
+                                Read license on fontawesome.com
+                            </a>
+                        </div>
+
+                        <div class="LicenseContent">
+                            <a href="https://videojs.com/">
+                                video.js
+                            </a>
+
+
+                            <a href="https://github.com/videojs/video.js/blob/main/LICENSE">
+                                Read license github.com
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

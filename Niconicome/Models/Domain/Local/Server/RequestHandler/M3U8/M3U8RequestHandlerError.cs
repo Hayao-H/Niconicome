@@ -13,5 +13,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8
         PlaylistDoesNotExist,
         [ErrorEnum(ErrorLevel.Error, "プレイリストファイルへのアクセスに失敗しました。")]
         FailedToAccessPlaylist,
+        [ErrorEnum(ErrorLevel.Log, "Sent {0}")]
+        FileSent,
     }
 }

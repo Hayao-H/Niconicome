@@ -90,7 +90,7 @@ namespace Niconicome.Models.Network.Download
             if (setting.Skip)
             {
                 string fileNameFormat = setting.FileNameFormat;
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo,setting.VerticalResolution, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix);
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.VerticalResolution, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix);
             }
 
             if (!Directory.Exists(setting.FolderPath))
@@ -294,23 +294,24 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         private async Task<IAttemptResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
-            Cdl::ICommentDownloader? v1 = null;
+            //Cdl::ICommentDownloader? v1 = null;
             V2Comment::ICommentDownloader? v2 = null;
 
-            if (settings.EnableExperimentalCommentSafetySystem)
-            {
-                v2 = DIFactory.Provider.GetRequiredService<V2Comment::ICommentDownloader>();
-            }
-            else
-            {
-                v1 = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
-
-            }
+            //if (settings.EnableExperimentalCommentSafetySystem)
+            //{
+            v2 = DIFactory.Provider.GetRequiredService<V2Comment::ICommentDownloader>();
+            //}
+            //else
+            //{
+            //    v1 = DIFactory.Provider.GetRequiredService<Cdl::ICommentDownloader>();
+            //
+            //}
 
             IAttemptResult result;
             try
             {
-                result = v2 is null ? await v1!.DownloadComment(session, settings, onMessage, context, token) : await v2.DownloadCommentAsync(session.Video!.DmcInfo, settings, context, token);
+                //result = v2 is null ? await v1!.DownloadComment(session, settings, onMessage, context, token) : await v2.DownloadCommentAsync(session.Video!.DmcInfo, settings, context, token);
+                result = await v2.DownloadCommentAsync(session.Video!.DmcInfo, settings, context, token);
             }
             catch (Exception e)
             {
