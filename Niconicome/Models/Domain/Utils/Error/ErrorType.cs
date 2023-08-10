@@ -16,6 +16,7 @@ using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
+using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Threadkey;
 using Niconicome.Models.Domain.Niconico.Remote.V2.Error;
 using Niconicome.Models.Domain.Niconico.Watch.V2.Error;
 using Niconicome.Models.Infrastructure.Database.Error;
@@ -80,6 +81,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 39, typeof(DBCleanerError) },
             { 40, typeof(FFmpegManagerError) },
             { 41, typeof(NetworkError) },
+            { 42, typeof(ThreadKeyError) },
         };
     }
 }
