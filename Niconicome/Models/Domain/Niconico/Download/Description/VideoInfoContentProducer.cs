@@ -96,7 +96,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
             data.Thumb.Title = info.Title;
             data.Thumb.Description = info.Description;
             data.Thumb.ThumbnailUrl = info.ThumbInfo.GetSpecifiedThumbnail(ThumbSize.Large);
-            data.Thumb.FirstRetrieve = new DateTimeOffset(info.UploadedOn, TimeSpan.FromHours(9)).ToString("yyyy-MM-ddTHH:mm:sszzz");
+            data.Thumb.FirstRetrieve = new DateTimeOffset(DateTime.SpecifyKind(info.UploadedOn, DateTimeKind.Unspecified), TimeSpan.FromHours(9)).ToString("yyyy-MM-ddTHH:mm:sszzz");
             data.Thumb.Length = $"{Math.Floor((double)info.Duration / 60).ToString().PadLeft(2, '0')}:{info.Duration % 60}";
             data.Thumb.ViewCounter = info.ViewCount;
             data.Thumb.CommentNum = info.CommentCount;

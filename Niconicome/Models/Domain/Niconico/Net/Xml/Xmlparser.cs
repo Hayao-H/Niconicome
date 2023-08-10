@@ -32,10 +32,13 @@ namespace Niconicome.Models.Domain.Niconico.Net.Xml
             var stringWriter = new XmlStringWriter();
             var writer = XmlWriter.Create(stringWriter, settings);
 
+
             serializer.Serialize(writer, data, emptyns);
 
             return stringWriter.ToString();
         }
+
+
 
         /// <summary>
         /// XML形式の文字列をデシリアライズする
