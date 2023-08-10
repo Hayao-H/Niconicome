@@ -36,12 +36,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Threadk
         public async Task<IAttemptResult<string>> GetThreadKeyAsync(string videoID)
         {
             var id = this.GetTrackID();
+            var url = $"https://www.nicovideo.jp/api/watch/v3/{videoID}?actionTrackId={id}";
 
-            HttpResponseMessage res = await this._http.GetAsync(new Uri($"https://www.nicovideo.jp/api/watch/v3/{videoID}?actionTrackId={id}"));
+            HttpResponseMessage res = await this._http.GetAsync(new Uri(url));
 
             if (!res.IsSuccessStatusCode)
             {
-                this._errorHandler.HandleError(ThreadKeyError.FailedToGetData, videoID, (int)res.StatusCode);
+                this._errorHandler.HandleError(ThreadKeyError.FailedToGetData, url, (int)res.StatusCode);
                 return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(ThreadKeyError.FailedToGetData, videoID, (int)res.StatusCode));
             }
 
@@ -57,6 +58,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Threadk
                 this._errorHandler.HandleError(ThreadKeyError.FailedToLoadData, ex.Message);
                 return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(ThreadKeyError.FailedToLoadData, ex.Message));
             }
+
+            this._errorHandler.HandleError(ThreadKeyError.GetThreadKey, videoID, data.Data.Comment.NvComment.ThreadKey);
 
             return AttemptResult<string>.Succeeded(data.Data.Comment.NvComment.ThreadKey);
         }

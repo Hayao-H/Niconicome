@@ -4,18 +4,19 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Niconicome.Extensions.System;
-using Niconicome.Models.Domain.Network;
 using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
+using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Error;
 using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Threadkey;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
-using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Domain.Utils.Error;
+using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Download;
 using Converter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
 using Core = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3;
 using Response = Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.V3.Response;
+using SC = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.CommentStringContent.CommentClientSC;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
 {
@@ -35,13 +36,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
 
     public class CommentClient : ICommentClient
     {
-        public CommentClient(ICommentRequestBuilder requestBuilder, Converter::INetCommentConverter converter, ILogger logger, INicoHttp http, INetWorkHelper helper)
+        public CommentClient(ICommentRequestBuilder requestBuilder, Converter::INetCommentConverter converter, INicoHttp http, IErrorHandler errorHandler, IStringHandler stringHandler)
         {
             this._requestBuilder = requestBuilder;
             this._converter = converter;
-            this._logger = logger;
-            this._helper = helper;
             this._http = http;
+            this._errorHandler = errorHandler;
+            this._stringHandler = stringHandler;
         }
 
         #region field
@@ -55,11 +56,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
 
         private readonly Converter::INetCommentConverter _converter;
 
-        private readonly ILogger _logger;
-
         private readonly INicoHttp _http;
 
-        private readonly INetWorkHelper _helper;
+        private readonly IErrorHandler _errorHandler;
+
+        private readonly IStringHandler _stringHandler;
 
         #endregion
 
@@ -75,8 +76,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
             }
             catch (Exception ex)
             {
-                this._logger.Error("コメント取得でエラーが発生しました。", ex);
-                return AttemptResult<Core::ICommentCollection>.Fail($"コメント取得でエラーが発生しました。（詳細:{ex.Message}）");
+                this._errorHandler.HandleError(CommentClientError.SomeErrorOccured, ex);
+                return AttemptResult<Core::ICommentCollection>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.SomeErrorOccured, ex));
             }
 
             return result;
@@ -113,7 +114,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
             //デフォルトスレッドが存在しない場合はエラー
             if (defaultThread is null)
             {
-                return AttemptResult<Core::ICommentCollection>.Fail("デフォルトスレッドを取得できませんでした。");
+                this._errorHandler.HandleError(CommentClientError.FailedToGetDefaultThread);
+                return AttemptResult<Core::ICommentCollection>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.FailedToGetDefaultThread));
             }
 
             string defaultThreadID = defaultThread.Id;
@@ -122,14 +124,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
 
             while (firstComment?.No is null or > 1)
             {
-                if (threadkey.IsExpired)
-                {
-                    await threadkey.RefreshKeyAsync();
-                }
 
                 //メッセージを送信
                 if (loopIndex > 0)
                 {
+                    context.SendMessage(this._stringHandler.GetContent(SC.FetchingKakoLog, loopIndex + 1, collection.Count));
+
                     if (settings.CommentFetchWaitSpan > 0)
                     {
                         try
@@ -138,11 +138,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
                         }
                         catch (TaskCanceledException)
                         {
-                            return AttemptResult<Core::ICommentCollection>.Fail("ダウンロード処理がキャンセルされました。");
+                            return AttemptResult<Core::ICommentCollection>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.DownloadCanceled));
                         }
                     }
+                }
 
-                    context.SendMessage($"過去ログを取得中（{loopIndex + 1}件目・{collection.Count}コメ取得済み）");
+                if (threadkey.IsExpired)
+                {
+                    await threadkey.RefreshKeyAsync();
                 }
 
                 //過去ログの起点を取得
@@ -187,7 +190,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
                 }
                 else if (loopIndex == 0)
                 {
-                    context.SendMessage("過去ログの取得を開始します。");
+                    context.SendMessage(this._stringHandler.GetContent(SC.StartFetchKakoLog));
                 }
 
                 //最初のコメントを取得
@@ -227,7 +230,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
             int fetchedCountSameFor = 0;
 
             //メッセージを送信
-            context.SendMessage("取得できなかったコメントを再取得します。");
+            context.SendMessage(this._stringHandler.GetContent(SC.StartFetchUnfetched));
 
             foreach (var target in dmcInfo.CommentTargets)
             {
@@ -247,13 +250,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
                         }
                         catch (TaskCanceledException)
                         {
-                            return AttemptResult<Core::ICommentCollection>.Fail("ダウンロード処理がキャンセルされました。");
+                            this._errorHandler.HandleError(CommentClientError.DownloadCanceled);
+                            return AttemptResult<Core::ICommentCollection>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.DownloadCanceled));
                         }
                     }
 
                     int currentFetchedCount = collection.Count;
 
-                    context.SendMessage($"コメントを再取得中（{loopIndex + 1}件目・{currentFetchedCount}コメ取得済み）");
+                    context.SendMessage(this._stringHandler.GetContent(SC.FetchingUnfethed, loopIndex + 1, currentFetchedCount));
 
                     if (currentFetchedCount == fetchedCount)
                     {
@@ -286,7 +290,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
                     }
 
                     //キャンセル処理
-                    token.ThrowIfCancellationRequested();
+                    if (token.IsCancellationRequested)
+                    {
+                        return AttemptResult<Core::ICommentCollection>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.DownloadCanceled));
+                    }
 
                     //コメントを追加
                     foreach (var c in fResult.Data!) collection.Add(c);
@@ -366,10 +373,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
 
             if (!res.IsSuccessStatusCode)
             {
-                string status = this._helper.GetHttpStatusForLog(res);
                 string content = await res.Content.ReadAsStringAsync();
-                this._logger.Error($"コメントサーバーへのリクエストに失敗しました。（{status}）");
-                return AttemptResult<IEnumerable<IComment>>.Fail($"コメントサーバーへのリクエストに失敗しました。（{status}）");
+                this._errorHandler.HandleError(CommentClientError.FailedToFetch, url, (int)res.StatusCode);
+                return AttemptResult<IEnumerable<IComment>>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.FailedToFetch, url, (int)res.StatusCode));
             }
 
             Response::ResponseRoot data;
@@ -381,8 +387,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
             }
             catch (Exception ex)
             {
-                this._logger.Error("コメントの解析に失敗しました。", ex);
-                return AttemptResult<IEnumerable<IComment>>.Fail($"コメントの解析に失敗しました。（詳細:{ex.Message}）");
+                this._errorHandler.HandleError(CommentClientError.FailedToDeserializeData, ex);
+                return AttemptResult<IEnumerable<IComment>>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.FailedToDeserializeData, ex));
             }
 
             var converted = new List<IComment>();

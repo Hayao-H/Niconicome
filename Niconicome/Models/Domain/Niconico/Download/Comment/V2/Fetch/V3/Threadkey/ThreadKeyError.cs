@@ -9,9 +9,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Threadk
 {
     public enum ThreadKeyError
     {
-        [ErrorEnum(ErrorLevel.Error,"APIへのアクセスに失敗しました。(id：{0}, status：{1})")]
+        [ErrorEnum(ErrorLevel.Error,"APIへのアクセスに失敗しました。(url：{0}, status：{1})")]
         FailedToGetData,
         [ErrorEnum(ErrorLevel.Error,"データの解析に失敗しました。(詳細：{0})")]
         FailedToLoadData,
+        [ErrorEnum(ErrorLevel.Log,"スレッドキーを取得しました。（id:{0}, key:{1}）")]
+        GetThreadKey,
     }
 }
