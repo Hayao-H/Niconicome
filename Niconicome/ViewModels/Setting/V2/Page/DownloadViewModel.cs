@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Utils.Reactive;
-using Niconicome.ViewModels.Mainpage.Utils;
-using Niconicome.ViewModels.Setting.Utils;
 using Niconicome.ViewModels.Setting.V2.Utils;
 using WS = Niconicome.Workspaces.SettingPageV2;
 
