@@ -67,6 +67,16 @@
                 <button type="button" class="btn btn-primary ControlButton" 　title="クリップボードから登録" @onclick="DataContext.AddVideoFromClipbordAsync"><i class="fa-solid fa-clipboard"></i></button>
             }
             <button type="button" class="btn btn-primary ControlButton" 　title="検索結果から登録" @onclick="DataContext.OnSearchButtonClick"><i class="fa-solid fa-magnifying-glass"></i></button>
+
+            @if (DataContext.ClipboardViewModel.IsMonitoring.Value)
+            {
+                <button type="button" class="btn btn-primary ControlButton" 　title="クリップボードの監視を停止" @onclick="DataContext.ClipboardViewModel.SwitchMonitoring"><i class="fa-solid fa-xmark"></i></button>
+
+            } else
+            {
+                <button type="button" class="btn btn-primary ControlButton" 　title="クリップボードを監視" @onclick="DataContext.ClipboardViewModel.SwitchMonitoring"><i class="fa-solid fa-clipboard-check"></i></button>
+
+            }
         </div>
     </div>
 

@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Utils.Error;
 
-namespace Niconicome.Models.Local.OS
+namespace Niconicome.Models.Infrastructure.IO
 {
-    public enum ClipboardManagerError
+    public enum WindowsClipboardManagerError
     {
-        [ErrorEnum(ErrorLevel.Error,"クリップボードへの書き込みに失敗しました。")]
+        [ErrorEnum(ErrorLevel.Error, "クリップボードへの書き込みに失敗しました。")]
         FailedToSetDataToClipboard,
-        [ErrorEnum(ErrorLevel.Error,"クリップボードの取得に失敗しました。")]
+        [ErrorEnum(ErrorLevel.Error, "クリップボードの取得に失敗しました。")]
         FailedToGetClipboardData,
         [ErrorEnum(ErrorLevel.Error, "すでにクリップボードを監視しています。")]
         AlreadyMonitoring,

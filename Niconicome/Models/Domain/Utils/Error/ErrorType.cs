@@ -27,7 +27,6 @@ using Niconicome.Models.Infrastructure.IO;
 using Niconicome.Models.Infrastructure.Network;
 using Niconicome.Models.Local.External.Error;
 using Niconicome.Models.Local.External.Playlist;
-using Niconicome.Models.Local.OS;
 using Niconicome.Models.Local.Restore;
 using Niconicome.Models.Network.Video.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
@@ -57,7 +56,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 14, typeof(NetVideosInfomationHandlerError) },
             { 15, typeof(WatchPageInfomationHandlerError) },
             { 16, typeof(ExternalProcessUtilsError) },
-            { 17, typeof(ClipboardManagerError) },
+            { 17, typeof(WindowsClipboardManagerError) },
             { 18, typeof(ExternalAppUtilsV2Error) },
             { 19, typeof(WindowsFileIOError) },
             { 20, typeof(WindowsDirectoryIOError) },
