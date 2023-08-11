@@ -74,6 +74,7 @@ using Software = Niconicome.Models.Domain.Local.External.Software;
 using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
 using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
+using ABI.System.Numerics;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -250,8 +251,12 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Utils::InitializeAwaiter.IInitializeAwaiterHandler, Utils::InitializeAwaiter.InitializeAwaiterHandler>();
             services.AddTransient<AddonAPI::Net.Download.Integrate.IDownloadSettings, AddonAPI::Net.Download.Integrate.DownloadSettings>();
             services.AddTransient<CommentFetch::ICommentClient, CommentFetch::CommentClient>();
+            services.AddTransient<CommentFetch::V3.ICommentClient, CommentFetch::V3.CommentClient>();
             services.AddTransient<CommentFetch::ICommentRequestBuilder, CommentFetch::CommentRequestBuilder>();
+            services.AddTransient<CommentFetch::V3.ICommentRequestBuilder, CommentFetch::V3.CommentRequestBuilder>();
             services.AddTransient<CommentFetch::IOfficialCommentHandler, CommentFetch::OfficialCommentHandler>();
+            services.AddTransient<CommentFetch::V3.Threadkey.IThreadKeyInfo,CommentFetch::V3.Threadkey.ThreadKeyInfo>();
+            services.AddTransient<CommentFetch::V3.Threadkey.IThreadKeyHandler,CommentFetch::V3.Threadkey.ThreadKeyHandler>();
             services.AddTransient<CommentLocal::ICommentLoader, CommentLocal::CommentLoader>();
             services.AddTransient<CommentLocal::ICommentWriter, CommentLocal::CommentWriter>();
             services.AddTransient<CommentIntegrate::ICommentDownloader, CommentIntegrate::CommentDownloader>();
