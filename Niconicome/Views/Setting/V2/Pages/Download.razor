@@ -116,6 +116,13 @@
                 <input class="form-check-input" type="checkbox" id="omitXML" @bind="DataContext.IsOmitXmlDeclarationEnable.Value">
             </div>
         </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="enableNewCommentDL" title="コメントの取りこぼしが最小限になりますが、挙動が不安定になる可能性があります。"><i class="Icon fa-solid fa-flask"></i>実験的なコメントDLシステムを有効にする</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="enableNewCommentDL" @bind="DataContext.IsExperimentalCommentDownloadSystemEnable.Value">
+            </div>
+        </div>
     </div>
 
 </div>

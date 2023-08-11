@@ -63,6 +63,8 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.CommentCountPerBlock = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.CommentCountPerBlock, NetConstant.DefaultCommentCountPerBlock), NetConstant.DefaultCommentCountPerBlock, x => x, x => x is int).AddTo(this.Bindables);
 
+            this.IsExperimentalCommentDownloadSystemEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsExperimentalCommentSafetySystemEnable, false), false).AddTo(this.Bindables);
+
         }
 
         /// <summary>
@@ -154,5 +156,10 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// コメント取得時の待機時間
         /// </summary>
         public IBindableSettingInfo<int> CommentFetchWaitSpan { get; init; }
+
+        /// <summary>
+        /// 実験的なシステム
+        /// </summary>
+        public IBindableSettingInfo<bool> IsExperimentalCommentDownloadSystemEnable { get; init; }
     }
 }
