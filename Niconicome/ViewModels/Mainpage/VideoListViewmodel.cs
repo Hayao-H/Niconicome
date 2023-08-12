@@ -254,37 +254,37 @@ namespace Niconicome.ViewModels.Mainpage
 
             #region クリップボード監視
 
-            this.ClipbordMonitorIcon = WS::Mainpage.ClipbordManager.IsMonitoring
-                .Select(value => value ? MaterialDesign::PackIconKind.ClipboardRemove : MaterialDesign::PackIconKind.ClipboardPulse)
-                .ToReactiveProperty()
-                .AddTo(this.disposables);
-
-            WS::Mainpage.ClipbordManager.IsMonitoring
-                .Skip(1)
-                .Subscribe(value =>
-            {
-                if (value)
-                {
-
-                    WS::Mainpage.SnackbarHandler.Enqueue("クリップボードの監視を開始します。");
-                    WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を開始します。");
-                }
-                else
-                {
-                    WS::Mainpage.SnackbarHandler.Enqueue("クリップボードの監視を終了します。");
-                    WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を終了します。");
-                }
-            }).AddTo(this.disposables);
-
-            this.ClipboardMonitoringToolTip = WS::Mainpage.ClipbordManager.IsMonitoring
-                .Select(value => value ? "クリップボードの監視を終了する" : "クリップボードを監視する")
-                .ToReadOnlyReactiveProperty();
-
-            WS::Mainpage.ClipbordManager.RegisterClipboardChangeHandler(_ =>
-            {
-                SystemSounds.Asterisk.Play();
-                this.AddVideoFromClipboardCommand?.Execute();
-            });
+            ///this.ClipbordMonitorIcon = WS::Mainpage.ClipbordManager.IsMonitoring
+            ///    .Select(value => value ? MaterialDesign::PackIconKind.ClipboardRemove : MaterialDesign::PackIconKind.ClipboardPulse)
+            ///    .ToReactiveProperty()
+            ///    .AddTo(this.disposables);
+            ///
+            ///WS::Mainpage.ClipbordManager.IsMonitoring
+            ///    .Skip(1)
+            ///    .Subscribe(value =>
+            ///{
+            ///    if (value)
+            ///{
+            ///
+            ///    WS::Mainpage.SnackbarHandler.Enqueue("クリップボードの監視を開始します。");
+            ///    WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を開始します。");
+            ///}
+            ///else
+            ///{
+            ///    WS::Mainpage.SnackbarHandler.Enqueue("クリップボードの監視を終了します。");
+            ///    WS::Mainpage.Messagehandler.AppendMessage("クリップボードの監視を終了します。");
+            ///}
+            ///}).AddTo(this.disposables);
+            ///
+            ///this.ClipboardMonitoringToolTip = WS::Mainpage.ClipbordManager.IsMonitoring
+            ///    .Select(value => value ? "クリップボードの監視を終了する" : "クリップボードを監視する")
+            ///    .ToReadOnlyReactiveProperty();
+            ///
+            ///WS::Mainpage.ClipbordManager.RegisterClipboardChangeHandler(_ =>
+            ///{
+            ///    SystemSounds.Asterisk.Play();
+            ///    this.AddVideoFromClipboardCommand?.Execute();
+            ///});
 
             #endregion
 
@@ -1181,7 +1181,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// クリップボード監視
         /// </summary>
-        public ReadOnlyReactiveProperty<string?> ClipboardMonitoringToolTip { get; init; }
+        public ReadOnlyReactiveProperty<string?> ClipboardMonitoringToolTip { get; init; } = new(new ReactiveProperty<string?>());
 
         #endregion
 
@@ -1349,7 +1349,7 @@ namespace Niconicome.ViewModels.Mainpage
 
             if (!result.IsSucceeded || result.Data is null)
             {
-                WS::Mainpage.SnackbarHandler.Enqueue(result.Message?? "動画情報の取得に失敗しました");
+                WS::Mainpage.SnackbarHandler.Enqueue(result.Message ?? "動画情報の取得に失敗しました");
                 return;
             }
 

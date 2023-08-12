@@ -265,7 +265,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<FF::IStoreFirefoxProfileManager, FF::StoreFirefoxProfileManager>();
             services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
             services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
-            services.AddSingleton<OS::IClipbordManager, OS::ClipbordManager>();
+            services.AddSingleton<OS::IClipbordManager, Infla::IO.WindowsClipboardManager>();
             services.AddTransient<VM::Blazor.TransitionViewModel>();
             services.AddSingleton<State::IBlazorPageManager, State::BlazorPageManager>();
             services.AddTransient<AddonsV2::IAddonInstallManager, AddonsV2::AddonInstallManager>();
