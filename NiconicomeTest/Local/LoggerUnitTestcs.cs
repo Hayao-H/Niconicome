@@ -18,7 +18,8 @@ namespace NiconicomeTest.Local.LoggerTest
         public void SetUp()
         {
             this.logstream = new LogstreamStab();
-            this.logger = new Utils::Logger(this.logstream, new Utils::ErrorHandler(), new LocalStateStub { IsDebugMode = true });
+            this.logger = new Utils::Logger(this.logstream, new Utils::ErrorHandler());
+            this.logger.IsDebugMode = true;
         }
 
         [Test]

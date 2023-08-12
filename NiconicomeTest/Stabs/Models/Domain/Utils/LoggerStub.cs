@@ -10,6 +10,8 @@ namespace NiconicomeTest.Stabs.Models.Domain.Utils
 
         public string? LastMessage { get; private set; }
 
+        public bool IsDebugMode { get; set; }
+
         public Exception? LastException { get; private set; }
 
         public void Log(string message)

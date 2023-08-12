@@ -8,6 +8,7 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Download;
 using Core = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core;
 using Fetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
+using FetchV2 = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3;
 using Local = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
@@ -27,10 +28,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
 
     public class CommentDownloader : ICommentDownloader
     {
-        public CommentDownloader(IPathOrganizer path, Fetch::ICommentClient commentClient, Local::ICommentLoader commentLoader, Local::ICommentWriter commentWriter)
+        public CommentDownloader(IPathOrganizer path, Fetch::ICommentClient commentClient, Local::ICommentLoader commentLoader, Local::ICommentWriter commentWriter, FetchV2::ICommentClient commentClientV2)
         {
             this._path = path;
             this._commentClient = commentClient;
+            this._commentClientV2 = commentClientV2;
             this._commentWriter = commentWriter;
             this._commentLoader = commentLoader;
         }
@@ -40,6 +42,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
         private readonly IPathOrganizer _path;
 
         private readonly Fetch::ICommentClient _commentClient;
+
+        private readonly FetchV2::ICommentClient _commentClientV2;
 
         private readonly Local::ICommentLoader _commentLoader;
 
@@ -72,7 +76,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
 
             //コメント取得処理
             var dlOption = new Fetch::CommentClientOption(originationSpecidied, settings.MaxCommentsCount > 0, origination, settings.MaxCommentsCount);
-            IAttemptResult<Core::ICommentCollection> dlResult = await this._commentClient.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
+            //IAttemptResult<Core::ICommentCollection> dlResult = await this._commentClient.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
+            IAttemptResult<Core::V3.ICommentCollection> dlResult = await this._commentClientV2.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
 
             if (!dlResult.IsSucceeded || dlResult.Data is null)
             {

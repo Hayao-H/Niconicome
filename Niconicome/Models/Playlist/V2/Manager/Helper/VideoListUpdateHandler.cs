@@ -52,7 +52,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
     internal class VideoListUpdateHandler : VideoListManagerHelperBase, IVideoListUpdateHandler
     {
-        public VideoListUpdateHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, INetVideosInfomationHandler netVideos, IStringHandler stringHandler, IVideoStore videoStore, ITagStore tagStore, ISettingsContainer settingsContainer) : base(videoStore, tagStore)
+        public VideoListUpdateHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, INetVideosInfomationHandler netVideos, IStringHandler stringHandler, IVideoStore videoStore, ITagStore tagStore,ISettingsContainer settingsContainer) : base(videoStore, tagStore)
         {
             this._container = container;
             this._errorHandler = errorHandler;
@@ -138,6 +138,11 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     playlist.AddVideo(video);
                     addedVideos++;
                 }
+            }
+
+            if (!string.IsNullOrEmpty(result.Data.PlaylistName) && this._settingsContainer.GetOnlyValue(SettingNames.AutoRenamingAfterSetNetworkPlaylist, true).Data)
+            {
+                playlist.Name.Value = result.Data.PlaylistName;
             }
 
             onMessage(this._stringHandler.GetContent(VideoListManagerString.SyncWithRemotePlaylistHasCompleted, addedVideos, removedVideos, videos.Count - addedVideos), ErrorLevel.Log);

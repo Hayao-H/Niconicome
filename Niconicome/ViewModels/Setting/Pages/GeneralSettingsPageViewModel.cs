@@ -18,7 +18,7 @@ namespace Niconicome.ViewModels.Setting.Pages
         public GeneralSettingsPageViewModel()
         {
             #region 自動ログイン
-            this.IsAutologinEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.IsAutologinEnable,false), false);
+            this.IsAutologinEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.IsAutologinEnable, false), false);
 
             var normal = new ComboboxItem<string>(AutoLoginTypeString.Normal, "パスワードログイン");
             var wv2 = new ComboboxItem<string>(AutoLoginTypeString.Webview2, "Webview2とCookieを共有");
@@ -28,7 +28,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.SelectableAutoLoginTypes = new List<ComboboxItem<string>>() { normal, wv2, firefox, storeFirefox };
 
             //自動ログインのタイプ
-            this.SelectedAutoLoginType = new ConvertableSettingInfoViewModel<string, ComboboxItem<string>>(WS::SettingPage.SettingsConainer.GetSetting<string>(SettingNames.AutoLoginMode,AutoLoginTypeString.Normal), normal, x => x switch
+            this.SelectedAutoLoginType = new ConvertableSettingInfoViewModel<string, ComboboxItem<string>>(WS::SettingPage.SettingsConainer.GetSetting<string>(SettingNames.AutoLoginMode, AutoLoginTypeString.Normal), normal, x => x switch
                {
                    AutoLoginTypeString.Normal => normal,
                    AutoLoginTypeString.Webview2 => wv2,
@@ -50,7 +50,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                     this.SelectableFirefoxProfiles.AddRange(WS::SettingPage.AutoLogin.GetFirefoxProfiles(AutoLoginType.StoreFirefox).Select(y => y.ProfileName));
                 }
             });
-            this.SelectedFirefoxProfileName = new ConvertableSettingInfoViewModel<string, string>(WS::SettingPage.SettingsConainer.GetSetting<string>(SettingNames.FirefoxProfileName,""), "", profile => this.SelectableFirefoxProfiles.FirstOrDefault(p => p == profile) ?? "", x => x);
+            this.SelectedFirefoxProfileName = new ConvertableSettingInfoViewModel<string, string>(WS::SettingPage.SettingsConainer.GetSetting<string>(SettingNames.FirefoxProfileName, ""), "", profile => this.SelectableFirefoxProfiles.FirstOrDefault(p => p == profile) ?? "", x => x);
 
             //Firefoxのプロファイル選択肢を表示するかどうか
             this.SelectedAutoLoginType.RegisterPropChangeHandler(value =>
@@ -76,7 +76,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.SelectablefetchSleepInterval = new List<ComboboxItem<int>> { n1, n2, n3, n4, n5 };
             this.SelectableMaxParallelFetch = new List<ComboboxItem<int>>() { n1, n2, n3, n4 };
 
-            this.MaxFetchParallelCount = new ConvertableSettingInfoViewModel<int, ComboboxItem<int>>(WS::SettingPage.SettingsConainer.GetSetting<int>(SettingNames.MaxParallelFetchCount,4), n4, x => x switch
+            this.MaxFetchParallelCount = new ConvertableSettingInfoViewModel<int, ComboboxItem<int>>(WS::SettingPage.SettingsConainer.GetSetting<int>(SettingNames.MaxParallelFetchCount, 4), n4, x => x switch
             {
                 1 => n1,
                 2 => n2,
@@ -85,7 +85,7 @@ namespace Niconicome.ViewModels.Setting.Pages
                 _ => n4,
             }, x => x.Value);
 
-            this.FetchSleepInterval = new ConvertableSettingInfoViewModel<int, ComboboxItem<int>>(WS::SettingPage.SettingsConainer.GetSetting<int>(SettingNames.FetchSleepInterval,4), n4, x => x switch
+            this.FetchSleepInterval = new ConvertableSettingInfoViewModel<int, ComboboxItem<int>>(WS::SettingPage.SettingsConainer.GetSetting<int>(SettingNames.FetchSleepInterval, 4), n4, x => x switch
             {
                 1 => n1,
                 2 => n2,
@@ -95,8 +95,8 @@ namespace Niconicome.ViewModels.Setting.Pages
                 _ => n4,
             }, x => x.Value);
 
-            this.IsSkippingSSLVerificationEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.SkipSSLVerification,false), false);
-            this.IsExpandallPlaylistsEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.ExpandTreeOnStartUp,false), false);
+            this.IsSkippingSSLVerificationEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.SkipSSLVerification, false), false);
+            this.IsExpandallPlaylistsEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.ExpandTreeOnStartUp, false), false);
             this.IsSavePrevPlaylistExpandedStateEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.SaveTreePrevExpandedState, false), false);
             this.IsStoreOnlyNiconicoIDEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.StoreOnlyNiconicoIDOnRegister, false), false);
             this.IsAutoRenamingRemotePlaylistEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.AutoRenamingAfterSetNetworkPlaylist, false), false);
@@ -104,6 +104,7 @@ namespace Niconicome.ViewModels.Setting.Pages
             this.IsConfirmngIfDownloadingEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.ConfirmIfDownloading, false), false);
             this.SnackbarDuration = new ConvertableSettingInfoViewModel<int, int>(WS::SettingPage.SettingsConainer.GetSetting<int>(SettingNames.SnackbarDuration, LocalConstant.DefaultSnackbarDuration), LocalConstant.DefaultSnackbarDuration, value => value <= 0 ? LocalConstant.DefaultSnackbarDuration : value, value => value <= 0 ? LocalConstant.DefaultSnackbarDuration : value);
             this.IsShowingTasksAsTabEnable = new SettingInfoViewModel<bool>(WS::SettingPage.SettingsConainer.GetSetting<bool>(SettingNames.ShowDownloadTasksAsTab, false), false);
+            this.LocalServerPort = new SettingInfoViewModel<int>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.LocalServerPort, NetConstant.DefaultServerPort), NetConstant.DefaultServerPort);
         }
 
         #region Props
@@ -200,6 +201,11 @@ namespace Niconicome.ViewModels.Setting.Pages
         public SettingInfoViewModel<bool> IsSingletonWindowsEnable { get; init; }
 
         /// <summary>
+        /// ローカルサーバーのポート
+        /// </summary>
+        public SettingInfoViewModel<int> LocalServerPort { get; init; }
+
+        /// <summary>
         /// スナックバー表示時間
         /// </summary>
         [RegularExpression(@"^\d$", ErrorMessage = "整数値を入力してください。")]
@@ -229,9 +235,9 @@ namespace Niconicome.ViewModels.Setting.Pages
 
             var ffp = "Hello_World";
             this.SelectableFirefoxProfiles = new List<string>() { ffp };
-            this.SelectedFirefoxProfileName = new  SettingInfoViewModelD<string>(ffp);
+            this.SelectedFirefoxProfileName = new SettingInfoViewModelD<string>(ffp);
 
-            this.MaxFetchParallelCount =new ConvertableSettingInfoViewModelD<ComboboxItem<int>>(n3);
+            this.MaxFetchParallelCount = new ConvertableSettingInfoViewModelD<ComboboxItem<int>>(n3);
             this.FetchSleepInterval = new ConvertableSettingInfoViewModelD<ComboboxItem<int>>(n5);
         }
 
@@ -264,6 +270,8 @@ namespace Niconicome.ViewModels.Setting.Pages
         public SettingInfoViewModelD<bool> IsShowingTasksAsTabEnable { get; init; } = new(true);
 
         public SettingInfoViewModelD<int> SnackbarDuration { get; init; } = new(10000);
+
+        public SettingInfoViewModelD<int> LocalServerPort { get; init; } = new(NetConstant.DefaultServerPort);
 
         public List<ComboboxItem<int>> SelectableMaxParallelFetch { get; init; }
 

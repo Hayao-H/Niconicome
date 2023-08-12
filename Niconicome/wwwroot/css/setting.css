@@ -1,8 +1,10 @@
 .SettingPage {
   display: flex;
+  flex-direction: column;
 }
 .SettingPage .SideMenu {
-  width: 200px;
+  position: fixed;
+  top: 10px;
 }
 .SettingPage .SideMenu .MenuItem {
   padding: 8px;
@@ -26,8 +28,9 @@
 }
 .SettingPage .Body {
   flex: 1;
-  margin-left: 8px;
+  margin-left: 208px;
   min-height: 100%;
+  overflow-y: auto;
 }
 .SettingPage .Body .SettingContent {
   display: flex;
@@ -37,6 +40,13 @@
 }
 .SettingPage .Body .SettingContent.M0 {
   margin-top: 0;
+}
+.SettingPage .Body .SettingContent.SubContent {
+  margin-top: 3px;
+  margin-left: 20px;
+}
+.SettingPage .Body .SettingContent.SubContent .Title {
+  font-size: 15px;
 }
 .SettingPage .Body .SettingContent .Title {
   font-size: 18px;
@@ -48,12 +58,20 @@
 .SettingPage .Body .SettingContent .Icon.Danger {
   color: #ff69b4;
 }
+.SettingPage .Body .SettingContent .Select,
+.SettingPage .Body .SettingContent .Input {
+  width: 40%;
+}
 .SettingPage .Body .ContentWrapper {
   margin-left: 16px;
 }
 .SettingPage .Body .Separator {
   border: 1px solid rgba(87, 86, 86, 0.9058823529);
   margin: 40px 5px;
+}
+
+.FilePage .Detail {
+  margin: 0 20px;
 }
 
 .ImportPage .NiconicomeImport .InputContainer,
@@ -205,4 +223,20 @@
 }
 .RestorePage .DangerZoneContainer .DangerZoneBody {
   margin-left: 16px;
+}
+
+.DebugPage .LogFilePath {
+  margin-left: 20px;
+  margin-top: 8px;
+  background-color: #383638;
+  color: white;
+  padding: 8px;
+}
+
+.AppInfoPage .LicenseList {
+  margin-top: 16px;
+}
+.AppInfoPage .LicenseList .LicenseContent {
+  display: flex;
+  justify-content: space-between;
 }

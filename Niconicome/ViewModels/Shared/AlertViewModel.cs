@@ -13,11 +13,15 @@ namespace Niconicome.ViewModels.Shared
         public AlertViewModel()
         {
             this.AlertVisibilityClass = new BindableProperty<string>("Hide").AddTo(this._alertBindables);
+            this.AlertButtonVisibilityClass = new BindableProperty<string>("Hide").AddTo(this._alertBindables);
             this.AlertTypeClass = new BindableProperty<string>(string.Empty).AddTo(this._alertBindables);
             this.AlertContent = new BindableProperty<string>(string.Empty).AddTo(this._alertBindables);
+            this.AlertButtonContent = new BindableProperty<string>(string.Empty).AddTo(this._alertBindables);
         }
 
         protected Bindables _alertBindables = new();
+
+        private Action? _action;
 
         public IBindableProperty<string> AlertVisibilityClass { get; init; }
 
@@ -25,8 +29,30 @@ namespace Niconicome.ViewModels.Shared
 
         public IBindableProperty<string> AlertContent { get; init; }
 
-        protected void ShowAlert(string content, AlertType type)
+        public IBindableProperty<string> AlertButtonVisibilityClass { get; init; }
+
+        public IBindableProperty<string> AlertButtonContent { get; init; }
+
+        public void ExecuteAlertCommand()
         {
+            if (this._action is null) return;
+            this._action();
+        }
+
+        protected void ShowAlert(string content, AlertType type, Action? action = null, string buttonContent = "")
+        {
+            if (action is not null)
+            {
+                this.AlertButtonVisibilityClass.Value = string.Empty;
+                this._action = action;
+                this.AlertButtonContent.Value = buttonContent;
+            }
+            else
+            {
+                this.AlertButtonVisibilityClass.Value = "Hide";
+                this.AlertButtonContent.Value = string.Empty;
+            }
+
             this.AlertVisibilityClass.Value = string.Empty;
             this.AlertContent.Value = content;
             this.AlertTypeClass.Value = type switch

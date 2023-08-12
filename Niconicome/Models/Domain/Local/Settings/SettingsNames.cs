@@ -139,6 +139,9 @@ namespace Niconicome.Models.Domain.Local.Settings
         //Network.Security
         public static string SkipSSLVerification { get; private set; } = "Network.Security.SkipSSLVerification";
 
+        //Network.LocalServer
+        public static string LocalServerPort { get; private set; } = "Network.LocalServer.LocalServerPort";
+
         //Local
         public static string PlayerAPath { get; private set; } = "Local.PlayerAPath";
 

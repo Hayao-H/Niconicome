@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,6 +72,15 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.InputContextMenuViewModel = new InputContextMenuViewModel(this.InputText);
             this.Bindables.Add(this.InputContextMenuViewModel.Bindables);
+
+            this.ClipboardViewModel = new ClipboardViewModel();
+            this.Bindables.Add(this.ClipboardViewModel.Bindables);
+            this._disposable.Add(this.ClipboardViewModel);
+            this.ClipboardViewModel.ClipboardContent.Subscribe(async x =>
+            {
+                SystemSounds.Asterisk.Play();
+                await this.AddVideoAsync(x);
+            });
         }
 
 
@@ -162,6 +172,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public InputContextMenuViewModel InputContextMenuViewModel { get; init; }
 
+        /// <summary>
+        /// クリップボード
+        /// </summary>
+        public ClipboardViewModel ClipboardViewModel { get; init; }
+
         #endregion
 
         #region Method
@@ -219,13 +234,18 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// 動画を登録する
         /// </summary>
         /// <returns></returns>
-        public async Task AddVideoAsync()
+        public async Task AddVideoAsync(string content = "")
         {
-            if (this.IsProcessing.Value || string.IsNullOrEmpty(this.InputText.Value)) return;
+            if (string.IsNullOrEmpty(content))
+            {
+                content = this.InputText.Value;
+            }
+
+            if (this.IsProcessing.Value || string.IsNullOrEmpty(content)) return;
 
             this.IsProcessing.Value = true;
 
-            IAttemptResult<VideoRegistrationResult> result = await WS::Mainpage.VideoListManager.RegisterVideosAsync(this.InputText.Value, (m, e) => WS::Mainpage.MessageHandler.AppendMessage(m, LocalConstant.SystemMessageDispacher, e));
+            IAttemptResult<VideoRegistrationResult> result = await WS::Mainpage.VideoListManager.RegisterVideosAsync(content, (m, e) => WS::Mainpage.MessageHandler.AppendMessage(m, LocalConstant.SystemMessageDispacher, e));
 
             if (!result.IsSucceeded || result.Data is null)
             {

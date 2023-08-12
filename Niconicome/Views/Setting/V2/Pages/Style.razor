@@ -1,0 +1,57 @@
+﻿@page "/settings/style";
+
+@using Niconicome.Views.Setting.V2.Shared;
+@inherits BlazorBase;
+
+@inject IJSRuntime JS;
+@inject VM::Setting.V2.Page.StyleViewModel DataContext;
+
+<div class="SettingPage ImportPage">
+    <div class="SideMenu">
+        <SideMenu />
+    </div>
+    <div class="Body">
+
+        <h3>スタイル設定</h3>
+
+        <div class="Alert alert @(DataContext.AlertTypeClass.Value) @(DataContext.AlertVisibilityClass.Value)" role="alert">
+            @(DataContext.AlertContent.Value)
+            <button type="button" class="btn btn-primary @(DataContext.AlertButtonVisibilityClass.Value)" @onclick="DataContext.ExecuteAlertCommand">@(DataContext.AlertButtonContent.Value)</button>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-palette"></i>テーマ</p>
+            <select class="form-select Select" @bind="DataContext.SelectedTheme.Value">
+                @foreach (var s in DataContext.SelectableThemes)
+                {
+                    <option value="@s.Value">@s.DidplayValue</option>
+                }
+            </select>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title"><i class="Icon fa-solid fa-file-code"></i>スタイルファイルの書き出し・上書き</label>
+            <button type="button" class="btn btn-primary" @onclick="DataContext.SaveStyleCommand">実行</button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private SynchronizationContext? ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ctx = SynchronizationContext.Current;
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this.ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:root="clr-namespace:Niconicome"
              xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
+             xmlns:blazorweb="clr-namespace:Microsoft.AspNetCore.Components.Web;assembly=Microsoft.AspNetCore.Components.Web"
              mc:Ignorable="d" 
              xmlns:prism="http://prismlibrary.com/"  
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -20,6 +21,7 @@
         <blazor:BlazorWebView x:Name="webview" HostPage="wwwroot/videolist.html" Services="{DynamicResource services}">
             <blazor:BlazorWebView.RootComponents>
                 <blazor:RootComponent Selector="#app" ComponentType="{x:Type root:Main}" />
+                <blazor:RootComponent Selector="head::after" ComponentType="{x:Type blazorweb:HeadOutlet}" />
             </blazor:BlazorWebView.RootComponents>
         </blazor:BlazorWebView>
     </Grid>

@@ -74,6 +74,7 @@ using Software = Niconicome.Models.Domain.Local.External.Software;
 using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
 using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
+using ABI.System.Numerics;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -250,8 +251,12 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Utils::InitializeAwaiter.IInitializeAwaiterHandler, Utils::InitializeAwaiter.InitializeAwaiterHandler>();
             services.AddTransient<AddonAPI::Net.Download.Integrate.IDownloadSettings, AddonAPI::Net.Download.Integrate.DownloadSettings>();
             services.AddTransient<CommentFetch::ICommentClient, CommentFetch::CommentClient>();
+            services.AddTransient<CommentFetch::V3.ICommentClient, CommentFetch::V3.CommentClient>();
             services.AddTransient<CommentFetch::ICommentRequestBuilder, CommentFetch::CommentRequestBuilder>();
+            services.AddTransient<CommentFetch::V3.ICommentRequestBuilder, CommentFetch::V3.CommentRequestBuilder>();
             services.AddTransient<CommentFetch::IOfficialCommentHandler, CommentFetch::OfficialCommentHandler>();
+            services.AddTransient<CommentFetch::V3.Threadkey.IThreadKeyInfo,CommentFetch::V3.Threadkey.ThreadKeyInfo>();
+            services.AddTransient<CommentFetch::V3.Threadkey.IThreadKeyHandler,CommentFetch::V3.Threadkey.ThreadKeyHandler>();
             services.AddTransient<CommentLocal::ICommentLoader, CommentLocal::CommentLoader>();
             services.AddTransient<CommentLocal::ICommentWriter, CommentLocal::CommentWriter>();
             services.AddTransient<CommentIntegrate::ICommentDownloader, CommentIntegrate::CommentDownloader>();
@@ -260,7 +265,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<FF::IStoreFirefoxProfileManager, FF::StoreFirefoxProfileManager>();
             services.AddTransient<Auth::IStoreFirefoxSharedLogin, Auth::StoreFirefoxSharedLogin>();
             services.AddTransient<Cookies::IStoreFirefoxCookieManager, Cookies::StoreFirefoxCookieManager>();
-            services.AddSingleton<OS::IClipbordManager, OS::ClipbordManager>();
+            services.AddSingleton<OS::IClipbordManager, Infla::IO.WindowsClipboardManager>();
             services.AddTransient<VM::Blazor.TransitionViewModel>();
             services.AddSingleton<State::IBlazorPageManager, State::BlazorPageManager>();
             services.AddTransient<AddonsV2::IAddonInstallManager, AddonsV2::AddonInstallManager>();
@@ -338,6 +343,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Server::RequestHandler.NotFound.INotFoundRequestHandler, Server::RequestHandler.NotFound.NotFoundRequestHandler>();
             services.AddSingleton<Server::RequestHandler.UserChrome.IUserChromeRequestHandler, Server::RequestHandler.UserChrome.UserChromeRequestHandler>();
             services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
+            services.AddTransient<Server::Core.IPortHandler, Server::Core.PortHandler>();
+            services.AddTransient<Server::Connection.ITCPConnectionHandler,Infla::Network.TCPConnectionHandler>();
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
@@ -353,6 +360,14 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<SettingsVM::ImportViewModel>();
             services.AddTransient<SettingsVM::SideMenuViewModel>();
             services.AddTransient<SettingsVM::RestoreViewModel>();
+            services.AddTransient<SettingsVM::GeneralViewModel>();
+            services.AddTransient<SettingsVM::FileViewModel>();
+            services.AddTransient<SettingsVM::DownloadViewModel>();
+            services.AddTransient<SettingsVM::ExternalSoftwareViewModel>();
+            services.AddTransient<SettingsVM::VideoListViewModel>();
+            services.AddTransient<SettingsVM::StyleViewModel>();
+            services.AddTransient<SettingsVM::DebugViewModel>();
+            services.AddTransient<SettingsVM::AppInfoViewModel>();
             services.AddTransient<XenoImport::Parser.IXenoDataParser, XenoImport::Parser.XenoDataParser>();
             services.AddTransient<XenoImport::IXenoImportHandler, XenoImport::XenoImportHandler>();
             services.AddTransient<Restore::Import.Xeno.IXenoImportManager, Restore::Import.Xeno.XenoImportManager>();

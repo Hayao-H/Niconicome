@@ -1,0 +1,160 @@
+﻿@page "/settings/general";
+
+@using Niconicome.Views.Setting.V2.Shared;
+@inherits BlazorBase;
+
+@inject IJSRuntime JS;
+@inject VM::Setting.V2.Page.GeneralViewModel DataContext;
+
+<div class="SettingPage ImportPage">
+    <div class="SideMenu">
+        <SideMenu />
+    </div>
+    <div class="Body">
+
+        <h3>一般設定</h3>
+
+        <div class="SettingContent">
+            <label class="Title" for="autoLogin"><i class="Icon fa-solid fa-user"></i>自動ログイン</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="autoLogin" @bind="DataContext.IsAutologinEnable.Value">
+            </div>
+        </div>
+
+        @if (DataContext.IsAutologinEnable.Value)
+        {
+            <div class="SettingContent">
+                <p class="Title"><i class="Icon fa-solid fa-user-check"></i>自動ログインの方式</p>
+                <select class="form-select Select" @bind="DataContext.SelectedAutoLoginType.Value">
+                    @foreach (var s in DataContext.SelectableAutoLoginType)
+                    {
+                        <option value="@s.Value">@s.DidplayValue</option>
+                    }
+                </select>
+            </div>
+
+            @if (DataContext.DisplayFirefoxPrifile.Value)
+            {
+                <div class="SettingContent">
+                    <p class="Title"><i class="Icon fa-brands fa-firefox-browser"></i>Firefoxのプロファイル</p>
+                    <select class="form-select Select" @bind="DataContext.SelectedFirefoxProfileName.Value">
+                        @foreach (var s in DataContext.SelectableFirefoxProfiles)
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    </select>
+                </div>
+            }
+        }
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-circle-info"></i>動画情報取得時の並列取得数</p>
+            <select class="form-select Select" @bind="DataContext.MaxFetchParallelCount.Value">
+                @foreach (var s in DataContext.SelectableMaxParallelFetch)
+                {
+                    <option value="@s.Value">@s.DidplayValue</option>
+                }
+            </select>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-lock"></i>動画情報取得時の待機間隔(動画数)</p>
+            <select class="form-select Select" @bind="DataContext.FetchSleepInterval.Value">
+                @foreach (var s in DataContext.SelectablefetchSleepInterval)
+                {
+                    <option value="@s.Value">@s.DidplayValue</option>
+                }
+            </select>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-clock"></i>スナックバーの表示時間（ミリ秒）</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.SnackbarDuration.Value" placeholder="スナックバーの表示時間（ミリ秒）">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-server"></i>ローカルサーバーのポート番号</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.LocalServerPort.Value" placeholder="ローカルサーバーのポート番号">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="skipSSLVerification"><i class="Icon fa-brands fa-expeditedssl"></i>SSL証明書の検証をスキップする(強く非推奨)</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="skipSSLVerification" @bind="DataContext.IsSkippingSSLVerificationEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="expandallPlaylist"><i class="Icon fa-solid fa-list"></i>起動時にプレイリストをすべて展開する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="expandallPlaylist" @bind="DataContext.IsExpandallPlaylistsEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="savePrevPlaylistExpandedState"><i class="Icon fa-solid fa-list-check"></i>起動時に前回のプレイリスト展開状況を復元する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="savePrevPlaylistExpandedState" @bind="DataContext.IsSavePrevPlaylistExpandedStateEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="storeOnlyNiconicoIDEnable"><i class="Icon fa-solid fa-plus"></i>動画追加時にIDのみを登録する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="storeOnlyNiconicoIDEnable" @bind="DataContext.IsStoreOnlyNiconicoIDEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="autoRenamingRemotePlaylistEnable"><i class="Icon fa-solid fa-wand-magic-sparkles"></i>リモートプレイリストに設定した際に自動でプレイリストをリネームする</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="autoRenamingRemotePlaylistEnable" @bind="DataContext.IsAutoRenamingRemotePlaylistEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="singletonWindow"><i class="Icon fa-solid fa-rectangle-xmark"></i>複数ウィンドウを許可しない</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="singletonWindow" @bind="DataContext.IsSingletonWindowsEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="confirmngIfDownloading"><i class="Icon fa-solid fa-circle-exclamation"></i>DL中は終了前に確認する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="confirmngIfDownloading" @bind="DataContext.IsConfirmngIfDownloadingEnable.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="tasksAsTab"><i class="Icon fa-solid fa-window-restore"></i>ダウンロードタスク一覧をタブで表示する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="tasksAsTab" @bind="DataContext.IsShowingTasksAsTabEnable.Value">
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private SynchronizationContext? ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.ctx = SynchronizationContext.Current;
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this.ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}

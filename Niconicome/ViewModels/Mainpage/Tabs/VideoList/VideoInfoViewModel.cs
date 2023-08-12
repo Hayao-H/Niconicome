@@ -38,7 +38,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
                 this.Base64ThumbData.Value = this._thumbConverter(this._video.ThumbPath.Value);
             };
 
-            video.ThumbPath.RegisterPropertyChangeHandler(this._thumbHandler);
+            video.ThumbPath.Subscribe(this._thumbHandler);
 
             this.IsSelected = video.IsSelected.AddTo(bindable);
             this.IsDownloaded = video.IsDownloaded.AddTo(bindable);
@@ -184,7 +184,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
 
         public void Dispose()
         {
-            this._video.ThumbPath.UnRegisterPropertyChangeHandler(this._thumbHandler);
+            this._video.ThumbPath.UnSubscribe(this._thumbHandler);
             this.Bindable.Dispose();
         }
     }

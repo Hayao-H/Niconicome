@@ -83,14 +83,11 @@ namespace Niconicome.ViewModels.Mainpage
 
                 });
 
-            this.OpenSettingCommand = new ReactiveCommand()
-                .WithSubscribe(() =>
+            this.OpenSettingCommand = new BindableCommand(() =>
             {
-                WS::Mainpage.WindowsHelper.OpenWindow(() => new SettingWindow()
-                {
-                    Owner = Application.Current.MainWindow,
-                });
-            });
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/general", BlazorWindows.Settings);
+                WS::Mainpage.WindowTabHelper.OpenSettingsTab(this.RegionManager);
+            }, new BindableProperty<bool>(true));
 
             this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
@@ -136,11 +133,6 @@ namespace Niconicome.ViewModels.Mainpage
                     WS::Mainpage.WindowTabHelper.OpenAddonManager(this.RegionManager);
                 });
 
-            this.OpenSettingV2Command = new BindableCommand(() =>
-            {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/import", BlazorWindows.Settings);
-                WS::Mainpage.WindowTabHelper.OpenSettingsTab(this.RegionManager);
-            }, new BindableProperty<bool>(true));
 
 
             #region UI系の設定
@@ -196,7 +188,10 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public ReactiveCommand LoginCommand { get; private set; }
 
-        public ReactiveCommand OpenSettingCommand { get; init; }
+        /// <summary>
+        /// 設定を開く
+        /// </summary>
+        public BindableCommand OpenSettingCommand { get; init; }
 
         public ReactiveCommand OpenDownloadTaskWindowsCommand { get; init; }
 
@@ -214,11 +209,6 @@ namespace Niconicome.ViewModels.Mainpage
         /// 再起動
         /// </summary>
         public ReactiveCommand Restart { get; init; }
-
-        /// <summary>
-        /// 設定を開く
-        /// </summary>
-        public BindableCommand OpenSettingV2Command { get; init; }
 
         #endregion
 

@@ -61,7 +61,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter
                 No = comment.No,
                 Vpos = comment.Vpos / 10,
                 Score = comment.Score,
-                Date = new DateTimeOffset(comment.Date, TimeSpan.FromHours(9)).ToUnixTimeSeconds(),
+                Date = new DateTimeOffset(DateTime.SpecifyKind(comment.Date, DateTimeKind.Unspecified), TimeSpan.FromHours(9)).ToUnixTimeSeconds(),
             };
 
             return chat;

@@ -93,8 +93,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
 
         public DateTime Date { get; set; }
 
-        public long UnixDate => (new DateTimeOffset(this.Date, TimeSpan.FromHours(9))).ToUnixTimeSeconds();
+        //public long UnixDate => (new DateTimeOffset(this.Date, TimeSpan.FromHours(9))).ToUnixTimeSeconds();
 
+        public long UnixDate => (new DateTimeOffset(DateTime.SpecifyKind(this.Date, DateTimeKind.Unspecified), TimeSpan.FromHours(9))).ToUnixTimeSeconds();
+        
 
     }
 }

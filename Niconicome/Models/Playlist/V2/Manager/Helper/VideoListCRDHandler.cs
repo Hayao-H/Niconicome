@@ -74,7 +74,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
     public class VideoListCRDHandler : VideoListManagerHelperBase, IVideoListCRDHandler
     {
-        public VideoListCRDHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, ITagStore tagStore, ILocalDirectoryHandler directoryHandler, IStringHandler stringHandler, ISettingsContainer settingsContainer,Utils::INiconicoUtils utils) : base(videoStore, tagStore)
+        public VideoListCRDHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, ITagStore tagStore, ILocalDirectoryHandler directoryHandler, IStringHandler stringHandler, ISettingsContainer settingsContainer, Utils::INiconicoUtils utils) : base(videoStore, tagStore)
         {
             this._container = container;
             this._errorHandler = errorHandler;
@@ -108,12 +108,9 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
         #region Method
 
-
-
         public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoAsync(string inputText, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage)
         {
             InputInfomation info = this._inputTextParser.GetInputInfomation(inputText);
-            var videos = new List<IVideoInfo>();
             VideoRegistrationResult? rResult = null;
 
             //ニコニコのID
@@ -125,15 +122,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, result.Data);
                 if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
-                if (playlist.PlaylistType != PlaylistType.Temporary)
-                {
-                    playlist.AddVideo(vResult.Data);
-                }
-                else
-                {
-                    videos.Add(vResult.Data);
-                }
-
+                this.AddVideoToPlaylist(vResult.Data, playlist);
 
                 if (vResult.Data.ChannelName.IsNullOrEmpty())
                 {
@@ -155,14 +144,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
                     if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
-                    if (playlist.PlaylistType != PlaylistType.Temporary)
-                    {
-                        playlist.AddVideo(vResult.Data);
-                    }
-                    else
-                    {
-                        videos.Add(vResult.Data);
-                    }
+                    this.AddVideoToPlaylist(vResult.Data, playlist);
                 }
 
                 rResult = new VideoRegistrationResult(false, result.Data.Videos.Count, string.Empty, string.Empty);
@@ -175,23 +157,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     return AttemptResult<VideoRegistrationResult>.Fail(result.Message);
                 }
 
-                if (playlist.PlaylistType != PlaylistType.Temporary)
-                {
-                    foreach (var video in result.Data)
-                    {
-                        playlist.AddVideo(video);
-                    }
-                }
-                else
-                {
-                    videos.AddRange(result.Data);
-                }
-            }
-
-            if (this._container.CurrentSelectedPlaylist?.ID == playlist.ID)
-            {
-                //一時プレイリストの場合は特殊処理
-                if (playlist.PlaylistType == PlaylistType.Temporary) this._container.Videos.AddRange(videos);
+                this.AddVideoToPlaylist(result.Data, playlist);
             }
 
             if (rResult is null)
@@ -214,20 +180,12 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
                 if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
-                if (playlist.PlaylistType != PlaylistType.Temporary)
-                {
-                    playlist.AddVideo(vResult.Data);
-                }
-                else
-                {
-                    this._container.Videos.Add(vResult.Data);
-                }
+                this.AddVideoToPlaylist(vResult.Data, playlist);
             }
 
             return AttemptResult.Succeeded();
 
         }
-
 
         public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoFromTextAsync(string content, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage)
         {
@@ -266,20 +224,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     videos.Add(vResult.Data);
                 }
 
-                if (playlist.PlaylistType == PlaylistType.Temporary)
-                {
-                    if (playlist.ID == (this._container.CurrentSelectedPlaylist?.ID ?? -1))
-                    {
-                        this._container.Videos.AddRange(videos);
-                    }
-                }
-                else
-                {
-                    foreach (var video in videos)
-                    {
-                        playlist.AddVideo(video);
-                    }
-                }
+                this.AddVideoToPlaylist(videos, playlist);
 
                 return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, videos.Count, string.Empty, string.Empty));
             }
@@ -295,24 +240,10 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 videos.Add(vResult.Data);
             }
 
-            if (playlist.PlaylistType == PlaylistType.Temporary)
-            {
-                if (playlist.ID == (this._container.CurrentSelectedPlaylist?.ID ?? -1))
-                {
-                    this._container.Videos.AddRange(videos);
-                }
-            }
-            else
-            {
-                foreach (var video in videos)
-                {
-                    playlist.AddVideo(video);
-                }
-            }
+            this.AddVideoToPlaylist(videos, playlist);
 
             return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, videos.Count, string.Empty, string.Empty));
         }
-
 
         public IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID)
         {
@@ -350,7 +281,6 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
         }
 
-
         public IAttemptResult RemoveVideosFromCurrentPlaylist(IReadOnlyList<IVideoInfo> videos)
         {
             if (this._container.CurrentSelectedPlaylist is null)
@@ -374,6 +304,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 {
                     return playlistResult;
                 }
+
             }
 
             return AttemptResult.Succeeded();
@@ -442,6 +373,35 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
 
             return AttemptResult<IImmutableList<IVideoInfo>>.Succeeded(videos.ToImmutableList());
+        }
+
+        /// <summary>
+        /// 複数の動画を登録
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="playlist"></param>
+        private void AddVideoToPlaylist(IEnumerable<IVideoInfo> videos, IPlaylistInfo playlist)
+        {
+            foreach (var video in videos)
+            {
+                this.AddVideoToPlaylist(video, playlist);
+            }
+        }
+
+
+        /// <summary>
+        /// 動画を登録
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="playlist"></param>
+        private void AddVideoToPlaylist(IVideoInfo video, IPlaylistInfo playlist)
+        {
+            if (playlist.Videos.Any(v => v.NiconicoId == video.NiconicoId))
+            {
+                return;
+            }
+
+            playlist.AddVideo(video);
         }
 
         #endregion

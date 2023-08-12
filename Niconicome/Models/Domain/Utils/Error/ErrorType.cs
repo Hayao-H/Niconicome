@@ -16,15 +16,17 @@ using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
+using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Error;
+using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Threadkey;
 using Niconicome.Models.Domain.Niconico.Remote.V2.Error;
 using Niconicome.Models.Domain.Niconico.Watch.V2.Error;
 using Niconicome.Models.Infrastructure.Database.Error;
 using Niconicome.Models.Infrastructure.Database.Json;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Infrastructure.IO;
+using Niconicome.Models.Infrastructure.Network;
 using Niconicome.Models.Local.External.Error;
 using Niconicome.Models.Local.External.Playlist;
-using Niconicome.Models.Local.OS;
 using Niconicome.Models.Local.Restore;
 using Niconicome.Models.Network.Video.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
@@ -54,7 +56,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 14, typeof(NetVideosInfomationHandlerError) },
             { 15, typeof(WatchPageInfomationHandlerError) },
             { 16, typeof(ExternalProcessUtilsError) },
-            { 17, typeof(ClipboardManagerError) },
+            { 17, typeof(WindowsClipboardManagerError) },
             { 18, typeof(ExternalAppUtilsV2Error) },
             { 19, typeof(WindowsFileIOError) },
             { 20, typeof(WindowsDirectoryIOError) },
@@ -78,6 +80,9 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 38, typeof(XenoImportHandlerError) },
             { 39, typeof(DBCleanerError) },
             { 40, typeof(FFmpegManagerError) },
+            { 41, typeof(NetworkError) },
+            { 42, typeof(ThreadKeyError) },
+            { 43, typeof(CommentClientError) },
         };
     }
 }

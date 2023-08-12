@@ -82,5 +82,10 @@ namespace Niconicome.Models.Const
         /// コメントコレクションの1ブロックあたりのコメント数（デフォルト）
         /// </summary>
         public static int DefaultCommentCountPerBlock = 100;
+
+        /// <summary>
+        /// ローカルサーバーのデフォルトポート
+        /// </summary>
+        public static int DefaultServerPort = 2580;
     }
 }

@@ -15,5 +15,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.TS
         VideoDoesNotExist,
         [ErrorEnum(ErrorLevel.Error,"動画ファイルへのアクセスに失敗しました。")]
         FailedToOpenVodeo,
+        [ErrorEnum(ErrorLevel.Log,"Sent {0}")]
+        FileSent,
     }
 }

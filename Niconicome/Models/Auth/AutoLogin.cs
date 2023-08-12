@@ -14,7 +14,7 @@ using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Auth
 {
-    interface IAutoLogin
+    public interface IAutoLogin
     {
         /// <summary>
         /// 自動ログインフラグ
@@ -73,7 +73,7 @@ namespace Niconicome.Models.Auth
 
         public bool IsAUtologinEnable
         {
-            get => this._settingsConainer.GetSetting(SettingNames.IsAutologinEnable,false).Data?.Value ?? false;
+            get => this._settingsConainer.GetSetting(SettingNames.IsAutologinEnable, false).Data?.Value ?? false;
         }
 
         #endregion
@@ -105,13 +105,13 @@ namespace Niconicome.Models.Auth
             }
             else if (type == AutoLoginType.Firefox)
             {
-                var ffProfile = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName,"");
+                var ffProfile = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName, "");
                 if (!ffProfile.IsSucceeded || ffProfile.Data is null) return false;
                 result = await this._firefoxSharedLogin.TryLogin(ffProfile.Data.Value);
             }
             else if (type == AutoLoginType.StoreFirefox)
             {
-                var ffProfile = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName,"");
+                var ffProfile = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName, "");
                 if (!ffProfile.IsSucceeded || ffProfile.Data is null) return false;
                 result = await this._storeFirefoxSharedLogin.TryLogin(ffProfile.Data.Value);
             }
@@ -122,8 +122,8 @@ namespace Niconicome.Models.Auth
 
         private AutoLoginType GetAutoLoginType()
         {
-            IAttemptResult<ISettingInfo<string>> mResult = this._settingsConainer.GetSetting(SettingNames.AutoLoginMode,AutoLoginTypeString.Normal);
-            IAttemptResult<ISettingInfo<string>> pResult = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName,"");
+            IAttemptResult<ISettingInfo<string>> mResult = this._settingsConainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Normal);
+            IAttemptResult<ISettingInfo<string>> pResult = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName, "");
 
             if (!mResult.IsSucceeded || mResult.Data is null)
             {
@@ -177,7 +177,7 @@ namespace Niconicome.Models.Auth
 
     }
 
-    enum AutoLoginType
+    public enum AutoLoginType
     {
         None,
         Normal,

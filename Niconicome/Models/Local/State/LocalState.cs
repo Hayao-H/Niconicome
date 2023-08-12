@@ -1,7 +1,8 @@
-﻿using Niconicome.Models.Domain.Local.Settings;
+﻿using Niconicome.Models.Domain.Local.Server.Core;
+using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Local.Settings;
 
 namespace Niconicome.Models.Local.State
 {
@@ -37,21 +38,35 @@ namespace Niconicome.Models.Local.State
         /// 設定タブ
         /// </summary>
         bool IsSettingTabOpen { get; set; }
+
+        /// <summary>
+        /// ローカルサーバーのポート
+        /// </summary>
+        int Port { get; }
     }
 
     public class LocalState : ILocalState
     {
-        public LocalState(INiconicomeLogger logger)
+        public LocalState(INiconicomeLogger logger, IServer server, ILogger legacyLogger, ISettingsContainer settingsContainer)
         {
             this._logger = logger;
-#if DEBUG
-            this._isDebugMode = true;
-#endif
+            this._server = server;
+            this._legacyLogger = legacyLogger;
+
+            IAttemptResult<ISettingInfo<bool>> result = settingsContainer.GetSetting(SettingNames.IsDebugMode, false);
+            if (result.IsSucceeded&&result.Data is not null)
+            {
+                this.IsDebugMode = result.Data.Value;
+            }
         }
 
         #region field
 
         private readonly INiconicomeLogger _logger;
+
+        private readonly IServer _server;
+
+        private readonly ILogger _legacyLogger;
 
         private bool _isDebugMode;
 
@@ -67,6 +82,7 @@ namespace Niconicome.Models.Local.State
             {
                 this._isDebugMode = value;
                 this._logger.IsDebugMode = value;
+                this._legacyLogger.IsDebugMode = value;
             }
         }
 
@@ -77,6 +93,8 @@ namespace Niconicome.Models.Local.State
         public bool IsTaskWindowOpen { get; set; }
 
         public bool IsSettingTabOpen { get; set; }
+
+        public int Port => this._server.Port;
 
         #endregion
     }

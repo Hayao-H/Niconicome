@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.WindowsAPICodePack.Taskbar;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
@@ -8,11 +11,18 @@ using Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Server.Core
 {
     public interface IServer
     {
+
+        /// <summary>
+        /// ポート番号
+        /// </summary>
+        int Port { get; }
+
         /// <summary>
         /// サーバーを起動
         /// </summary>
@@ -26,7 +36,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class Server : IServer
     {
-        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts,IUserChromeRequestHandler userChrome)
+        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IPortHandler portHandler)
         {
             this._urlHandler = urlHandler;
             this._video = video;
@@ -35,6 +45,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             this._m3U8 = m3U8;
             this._ts = ts;
             this._userChrome = userChrome;
+            this._portHandler = portHandler;
         }
 
         ~Server()
@@ -58,8 +69,19 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         private readonly IErrorHandler _errorHandler;
 
+        private readonly IPortHandler _portHandler;
+
+        private readonly Queue<int> _ports = new();
+
         private bool _isRunning;
 
+        private bool _isShutdowned;
+
+        #endregion
+
+        #region Props
+
+        public int Port { get; private set; }
 
         #endregion
 
@@ -67,7 +89,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         public void Start()
         {
-            if (this._isRunning)
+            if (this._isRunning||this._isShutdowned)
             {
                 return;
             }
@@ -78,13 +100,33 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             {
                 try
                 {
+                    this.Port = this._portHandler.GetSettingValue();
+                    if (!this._portHandler.IsPortAvailable(this.Port))
+                    {
+                        if (this._ports.Count == 0)
+                        {
+
+                            IAttemptResult<IEnumerable<int>> portResult = this._portHandler.GetAvailablePorts();
+                            if (!portResult.IsSucceeded || portResult.Data is null)
+                            {
+                                return;
+                            }
+
+                            foreach (var p in portResult.Data)
+                            {
+                                this._ports.Enqueue(p);
+                            }
+                        }
+                        this.Port = this._ports.Dequeue();
+                    }
+
                     var listnner = new HttpListener();
 
                     listnner.Prefixes.Clear();
-                    listnner.Prefixes.Add(@"http://localhost:2580/");
+                    listnner.Prefixes.Add($"http://localhost:{this.Port}/");
 
                     listnner.Start();
-                    this._errorHandler.HandleError(ServerError.ServerStarted);
+                    this._errorHandler.HandleError(ServerError.ServerStarted, this.Port);
 
                     while (this._isRunning)
                     {
@@ -175,7 +217,10 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                     this._errorHandler.HandleError(ServerError.ServerStoppedWithException, ex);
                     this._isRunning = false;
 
-                    this.Start();
+                    if (!this._isShutdowned)
+                    {
+                        this.Start();
+                    }
                 }
             });
         }
@@ -183,6 +228,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         public void ShutDown()
         {
             this._isRunning = false;
+            this._isShutdowned = true;
         }
 
 
