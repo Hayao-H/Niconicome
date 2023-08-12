@@ -108,8 +108,6 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
         #region Method
 
-
-
         public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoAsync(string inputText, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage)
         {
             InputInfomation info = this._inputTextParser.GetInputInfomation(inputText);
@@ -124,8 +122,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, result.Data);
                 if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
-                playlist.AddVideo(vResult.Data);
-
+                this.AddVideoToPlaylist(vResult.Data, playlist);
 
                 if (vResult.Data.ChannelName.IsNullOrEmpty())
                 {
@@ -147,7 +144,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
                     if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
-                    playlist.AddVideo(vResult.Data);
+                    this.AddVideoToPlaylist(vResult.Data, playlist);
                 }
 
                 rResult = new VideoRegistrationResult(false, result.Data.Videos.Count, string.Empty, string.Empty);
@@ -160,10 +157,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     return AttemptResult<VideoRegistrationResult>.Fail(result.Message);
                 }
 
-                foreach (var video in result.Data)
-                {
-                    playlist.AddVideo(video);
-                }
+                this.AddVideoToPlaylist(result.Data, playlist);
             }
 
             if (rResult is null)
@@ -186,13 +180,12 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 IAttemptResult<IVideoInfo> vResult = this.ConvertToVideoInfo(playlist.ID, video);
                 if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
-                playlist.AddVideo(vResult.Data);
+                this.AddVideoToPlaylist(vResult.Data, playlist);
             }
 
             return AttemptResult.Succeeded();
 
         }
-
 
         public async Task<IAttemptResult<VideoRegistrationResult>> RegisterVideoFromTextAsync(string content, IPlaylistInfo playlist, Action<string, ErrorLevel> onMessage)
         {
@@ -231,10 +224,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     videos.Add(vResult.Data);
                 }
 
-                foreach (var video in videos)
-                {
-                    playlist.AddVideo(video);
-                }
+                this.AddVideoToPlaylist(videos, playlist);
 
                 return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, videos.Count, string.Empty, string.Empty));
             }
@@ -250,14 +240,10 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 videos.Add(vResult.Data);
             }
 
-            foreach (var video in videos)
-            {
-                playlist.AddVideo(video);
-            }
+            this.AddVideoToPlaylist(videos, playlist);
 
             return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, videos.Count, string.Empty, string.Empty));
         }
-
 
         public IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID)
         {
@@ -294,7 +280,6 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             return AttemptResult<IReadOnlyList<IVideoInfo>>.Succeeded(videos);
 
         }
-
 
         public IAttemptResult RemoveVideosFromCurrentPlaylist(IReadOnlyList<IVideoInfo> videos)
         {
@@ -388,6 +373,35 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
 
             return AttemptResult<IImmutableList<IVideoInfo>>.Succeeded(videos.ToImmutableList());
+        }
+
+        /// <summary>
+        /// 複数の動画を登録
+        /// </summary>
+        /// <param name="videos"></param>
+        /// <param name="playlist"></param>
+        private void AddVideoToPlaylist(IEnumerable<IVideoInfo> videos, IPlaylistInfo playlist)
+        {
+            foreach (var video in videos)
+            {
+                this.AddVideoToPlaylist(video, playlist);
+            }
+        }
+
+
+        /// <summary>
+        /// 動画を登録
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="playlist"></param>
+        private void AddVideoToPlaylist(IVideoInfo video, IPlaylistInfo playlist)
+        {
+            if (playlist.Videos.Any(v => v.NiconicoId == video.NiconicoId))
+            {
+                return;
+            }
+
+            playlist.AddVideo(video);
         }
 
         #endregion
