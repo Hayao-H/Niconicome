@@ -211,12 +211,6 @@ namespace Niconicome.Models.Network.Download
                 maxParallelSegmentDownloadCount = NetConstant.DefaultMaxParallelDownloadCount;
             }
 
-            int commentOffset = this._container.GetSetting(SettingNames.CommentOffset, CommentCollection.NumberToThrough).Data!.Value;
-            if (commentOffset <= 0)
-            {
-                commentOffset = CommentCollection.NumberToThrough;
-            }
-
             //履歴系
             bool saveSucceeded = !this._container.GetSetting(SettingNames.DisableDownloadSucceededHistory, false).Data!.Value; ;
             bool saveFailed = !this._container.GetSetting(SettingNames.DisableDownloadFailedHistory, false).Data!.Value; ;
@@ -262,7 +256,6 @@ namespace Niconicome.Models.Network.Download
                 CommentFetchWaitSpan = commentFetchWaitSpan,
                 DeleteExistingEconomyFile = deleteEconomyFile,
                 MaxParallelSegmentDLCount = maxParallelSegmentDownloadCount,
-                CommentOffset = commentOffset,
                 VideoInfoType = videoInfoT,
                 SaveFailedHistory = saveFailed,
                 SaveSucceededHistory = saveSucceeded,
