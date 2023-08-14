@@ -56,6 +56,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch.V2
                 return AttemptResult<IDomainVideoInfo>.Fail(this._errorHandler.GetMessageForResult(WatchPageInfomationHandlerError.PluginNotFount));
             }
 
+            IAttemptResult<dynamic> test = await this._hooks.GetVideoInfoAsync(id);
+
             IAttemptResult<dynamic> parseResult = this._hooks.ParseWatchPage(getResult.Data);
             if (!parseResult.IsSucceeded || parseResult.Data is null) return AttemptResult<IDomainVideoInfo>.Fail(parseResult.Message);
 
