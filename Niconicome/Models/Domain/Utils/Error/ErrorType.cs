@@ -85,6 +85,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 42, typeof(ThreadKeyError) },
             { 43, typeof(CommentClientError) },
             { 44, typeof(HooksManagerError) },
+            { 45, typeof(AppError) },
         };
     }
 }
