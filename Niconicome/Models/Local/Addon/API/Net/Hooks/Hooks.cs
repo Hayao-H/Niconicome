@@ -27,6 +27,13 @@ namespace Niconicome.Models.Local.Addon.API.Net.Hooks
         /// </summary>
         /// <param name="function"></param>
         void registerVideoInfoFunction(ScriptObject function);
+
+        /// <summary>
+        /// 各関数の登録状況を確認
+        /// </summary>
+        /// <param name="hookType"></param>
+        /// <returns></returns>
+        bool isRegistered(string hookType);
     }
 
     class Hooks : IHooks
@@ -59,6 +66,16 @@ namespace Niconicome.Models.Local.Addon.API.Net.Hooks
             this.manager.Register(function, HookType.VIdeoInfoFetcher);
         }
 
+        public bool isRegistered(string hookType)
+        {
+            return hookType switch
+            {
+                "PageAnalyze" => this.manager.IsRegistered(HookType.WatchPageParser),
+                "WatchSession" => this.manager.IsRegistered(HookType.SessionEnsuring),
+                "RemoteInfo" => this.manager.IsRegistered(HookType.VIdeoInfoFetcher),
+                _ => false
+            };
+        }
 
         #endregion
     }
