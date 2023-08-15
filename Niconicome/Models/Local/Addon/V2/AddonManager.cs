@@ -198,11 +198,12 @@ namespace Niconicome.Models.Local.Addon.V2
 
             //Fetch
             var fetch = DIFactory.Provider.GetRequiredService<IFetch>();
+            fetch.Initialize(infomation);
             Func<string, dynamic?, Task<Response>> fetchFunc = (url, optionObj) =>
             {
                 var option = new FetchOption()
                 {
-                    method = optionObj?.method,
+                    method = optionObj?.method is Microsoft.ClearScript.Undefined ? "GET" : optionObj?.method,
                     body = optionObj?.body,
                     credentials = optionObj?.credentials,
                 };

@@ -157,12 +157,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainPlaylist::IPlaylistFileFactory, DomainPlaylist::PlaylistFileFactory>();
             services.AddTransient<Ext.Playlist.IPlaylistCreator, Ext::Playlist.PlaylistCreator>();
             services.AddSingleton<MyApplication::IShutdown, MyApplication::Shutdown>();
-            services.AddTransient<DlComment::ICommentDownloader, DlComment::CommentDownloader>();
-            services.AddTransient<DlComment::ICommentConverter, DlComment::CommentConverter>();
-            services.AddTransient<DlComment::ICommentClient, DlComment::CommentClient>();
-            services.AddTransient<DlComment::ICommentStream, DlComment::CommentStream>();
-            services.AddTransient<DlComment::ICommentRequestBuilder, DlComment::CommentRequestBuilder>();
-            services.AddTransient<DlComment::IOfficialVideoUtils, DlComment::OfficialVideoUtils>();
             services.AddTransient<Playlist::IVideoHandler, Playlist::VideoHandler>();
             services.AddTransient<Channel::IChannelPageHtmlParser, Channel::ChannelPageHtmlParser>();
             services.AddTransient<Channel::IChannelVideoHandler, Channel::ChannelVideoHandler>();

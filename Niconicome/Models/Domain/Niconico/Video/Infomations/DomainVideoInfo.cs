@@ -173,7 +173,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         Owner = this.RawDmcInfo.Owner,
                         OwnerID = this.RawDmcInfo.OwnerID,
                         UserId = this.RawDmcInfo.UserId,
-                        Userkey = this.RawDmcInfo.Userkey,
                         ChannelID = this.RawDmcInfo.ChannelID,
                         ChannelName = this.RawDmcInfo.ChannelName,
                         Description = this.RawDmcInfo.Description,
@@ -199,31 +198,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                     };
 
 
-                    List<dynamic> threads = JsUtils.ToClrArray<dynamic>(this.RawDmcInfo.CommentThreads);
-
-                    foreach (var rawThread in threads)
-                    {
-                        var thread = new Thread()
-                        {
-                            ID = rawThread.ID,
-                            Fork = rawThread.Fork,
-                            IsActive = rawThread.IsActive,
-                            IsDefaultPostTarget = rawThread.IsDefaultPostTarget,
-                            IsEasyCommentPostTarget = rawThread.IsEasyCommentPostTarget,
-                            IsLeafRequired = rawThread.IsLeafRequired,
-                            IsOwnerThread = rawThread.IsOwnerThread,
-                            IsThreadkeyRequired = rawThread.IsThreadkeyRequired,
-                            Threadkey = rawThread.Threadkey,
-                            Is184Forced = rawThread.Is184Forced,
-                            HasNicoscript = rawThread.HasNicoscript,
-                            Label = rawThread.Label,
-                            PostkeyStatus = rawThread.PostkeyStatus,
-                            Server = rawThread.Server,
-                            VideoID = rawThread.VideoID,
-                            ForkLabel = rawThread.ForkLabel,
-                        };
-                        this.cachedDmcInfo.CommentThreads.Add(thread);
-                    }
 
                 }
 

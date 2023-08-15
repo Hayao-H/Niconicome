@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Addons.API.Hooks;
 using Niconicome.Models.Domain.Local.DataBackup;
 using Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Error;
 using Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Error;
@@ -83,6 +84,8 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 41, typeof(NetworkError) },
             { 42, typeof(ThreadKeyError) },
             { 43, typeof(CommentClientError) },
+            { 44, typeof(HooksManagerError) },
+            { 45, typeof(AppError) },
         };
     }
 }

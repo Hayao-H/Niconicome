@@ -21,6 +21,12 @@ namespace Niconicome.Models.Local.Addon.API.Net.Hooks
         /// </summary>
         /// <param name="function"></param>
         void registerSessionEnsuringFunction(ScriptObject function);
+
+        /// <summary>
+        /// 動画情報取得関数を登録する
+        /// </summary>
+        /// <param name="function"></param>
+        void registerVideoInfoFunction(ScriptObject function);
     }
 
     class Hooks : IHooks
@@ -46,6 +52,11 @@ namespace Niconicome.Models.Local.Addon.API.Net.Hooks
         public void registerSessionEnsuringFunction(ScriptObject function)
         {
             this.manager.Register(function, HookType.SessionEnsuring);
+        }
+
+        public void registerVideoInfoFunction(ScriptObject function)
+        {
+            this.manager.Register(function, HookType.VIdeoInfoFetcher);
         }
 
 

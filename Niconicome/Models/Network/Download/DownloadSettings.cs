@@ -213,11 +213,6 @@ namespace Niconicome.Models.Network.Download
         int CommentFetchWaitSpan { get; }
 
         /// <summary>
-        /// コメントのオフセット
-        /// </summary>
-        int CommentOffset { get; }
-
-        /// <summary>
         /// 最大同時セグメントDL数
         /// </summary>
         int MaxParallelSegmentDLCount { get; }
@@ -302,8 +297,6 @@ namespace Niconicome.Models.Network.Download
         public int MaxCommentsCount { get; set; }
 
         public int CommentFetchWaitSpan { get; set; }
-
-        public int CommentOffset { get; set; }
 
         public int MaxParallelSegmentDLCount { get; set; }
 
