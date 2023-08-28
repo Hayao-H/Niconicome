@@ -215,6 +215,10 @@ namespace Niconicome.Models.Network.Download
             bool saveSucceeded = !this._container.GetSetting(SettingNames.DisableDownloadSucceededHistory, false).Data!.Value; ;
             bool saveFailed = !this._container.GetSetting(SettingNames.DisableDownloadFailedHistory, false).Data!.Value; ;
 
+            //外部ダウンローダー系
+            bool useExternalSoftware = this._container.GetOnlyValue(SettingNames.UseExternalSoftware, false).Data;
+            string externalSoftwarePath = this._container.GetOnlyValue(SettingNames.ExternalDLSoftwarePath, string.Empty).Data!;
+            string externalSoftwareParam = this._container.GetOnlyValue(SettingNames.ExternalDLSoftwareParam, string.Empty).Data!;
 
             return new DownloadSettings
             {
@@ -260,6 +264,9 @@ namespace Niconicome.Models.Network.Download
                 SaveFailedHistory = saveFailed,
                 SaveSucceededHistory = saveSucceeded,
                 CommentCountPerBlock = commentCountPerBlock,
+                UseExternalDownloader = useExternalSoftware,
+                ExternalDownloaderParam = externalSoftwareParam,
+                ExternalDownloaderPath = externalSoftwarePath,
             };
         }
 

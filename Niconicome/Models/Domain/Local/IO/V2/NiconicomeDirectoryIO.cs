@@ -17,6 +17,21 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         IAttemptResult CreateDirectory(string path);
 
         /// <summary>
+        /// path配下のディレクトリを取得
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        IAttemptResult<IEnumerable<string>> GetDirectories(string path);
+
+        /// <summary>
+        /// path配下のファイルを取得
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="searchPattern"></param>
+        /// <returns></returns>
+        IAttemptResult<IEnumerable<string>> GetFiles(string path, string searchPattern = "*");
+
+        /// <summary>
         /// ディレクトリを削除
         /// </summary>
         /// <param name="path"></param>

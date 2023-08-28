@@ -40,6 +40,42 @@ namespace Niconicome.Models.Infrastructure.IO
             return AttemptResult.Succeeded();
         }
 
+        public IAttemptResult<IEnumerable<string>> GetDirectories(string path)
+        {
+            string[] dirs;
+
+            try
+            {
+                dirs = Directory.GetDirectories(path);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToGetDirectories, ex, path);
+                return AttemptResult<IEnumerable<string>>.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToGetDirectories, ex, path));
+            }
+
+            return AttemptResult<IEnumerable<string>>.Succeeded(dirs);
+        }
+
+        public IAttemptResult<IEnumerable<string>> GetFiles(string path, string searchPattern = "*")
+        {
+            string[] files;
+
+            try
+            {
+                files = Directory.GetFiles(path, searchPattern);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToGetFiles, ex, path);
+                return AttemptResult<IEnumerable<string>>.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToGetFiles, ex, path));
+            }
+
+            return AttemptResult<IEnumerable<string>>.Succeeded(files);
+        }
+
+
+
         public IAttemptResult Delete(string path, bool recursive = true)
         {
             try

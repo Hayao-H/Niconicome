@@ -128,6 +128,11 @@ namespace Niconicome.Models.Network.Download
         bool OmittingXmlDeclaration { get; }
 
         /// <summary>
+        /// 外部ダウンローダーフラグ
+        /// </summary>
+        bool UseExternalDownloader { get; }
+
+        /// <summary>
         /// 動画ID
         /// </summary>
         string NiconicoId { get; }
@@ -191,6 +196,16 @@ namespace Niconicome.Models.Network.Download
         /// コマンドのフォーマット
         /// </summary>
         string CommandFormat { get; }
+
+        /// <summary>
+        /// 外部ダウンローダーのパス
+        /// </summary>
+        string ExternalDownloaderPath { get; }
+
+        /// <summary>
+        /// 外部ダウンローダーのパラメータ-
+        /// </summary>
+        string ExternalDownloaderParam { get; }
 
         /// <summary>
         /// 解像度
@@ -290,6 +305,8 @@ namespace Niconicome.Models.Network.Download
 
         public bool OmittingXmlDeclaration { get; set; }
 
+        public bool UseExternalDownloader { get; set; }
+
         public uint VerticalResolution { get; set; }
 
         public int PlaylistID { get; set; }
@@ -327,6 +344,10 @@ namespace Niconicome.Models.Network.Download
         public string FilePath { get; set; } = string.Empty;
 
         public string EconomySuffix { get; set; } = String.Empty;
+
+        public string ExternalDownloaderPath { get; set; } = string.Empty;
+
+        public string ExternalDownloaderParam { get; set; } = string.Empty;
 
         public IchibaInfoTypeSettings IchibaInfoType { get; set; }
 

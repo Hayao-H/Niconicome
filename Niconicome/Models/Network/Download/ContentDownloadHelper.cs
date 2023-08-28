@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Domain.Niconico.Download;
 using Niconicome.Models.Domain.Niconico.Download.Ichiba;
-using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
@@ -17,6 +16,8 @@ using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
 using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Domain.Niconico.Download.Video;
+using Niconicome.Models.Domain.Niconico.Watch;
 
 namespace Niconicome.Models.Network.Download
 {

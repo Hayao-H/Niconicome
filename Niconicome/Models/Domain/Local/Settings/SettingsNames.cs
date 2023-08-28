@@ -58,6 +58,14 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string FFmpegFormat { get; private set; } = "Download.Video.FFmpegParameterFormat";
 
+        //Download.Video.ExternalSoftware
+        public static string UseExternalSoftware { get; private set; } = "Download.Video.ExternalSoftware.UseExternalSoftware";
+
+        public static string ExternalDLSoftwarePath { get; private set; } = "Download.Video.ExternalSoftware.Path";
+
+        public static string ExternalDLSoftwareParam { get; private set; } = "Download.Video.ExternalSoftware.Parameter";
+
+
         //Download.Comment
         public static string CommentOffset { get; private set; } = "Download.Comment.Commentoffset";
 
