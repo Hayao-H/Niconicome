@@ -44,6 +44,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS
         /// </summary>
         /// <returns></returns>
         IAttemptResult<IEnumerable<ISegmentDirectoryInfo>> GetAllSegmentDirectoryInfos();
+
+        /// <summary>
+        /// セグメントファイルの保存先ディレクトリのルートを作成
+        /// </summary>
+        /// <returns></returns>
+        IAttemptResult CreateRootDirectotyIfNotExists();
     }
 
     public class SegmentDirectoryHandler : ISegmentDirectoryHandler
@@ -137,6 +143,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS
 
             return AttemptResult<IEnumerable<ISegmentDirectoryInfo>>.Succeeded(infos);
         }
+
+       public IAttemptResult CreateRootDirectotyIfNotExists()
+        {
+            string path = Path.Combine(AppContext.BaseDirectory, FileFolder.SegmentsFolderPath);
+            if (this._directoryIO.Exists(path))
+            {
+                return AttemptResult.Succeeded();
+            }
+
+            return this._directoryIO.CreateDirectory(path);
+        }
+
 
 
         #endregion

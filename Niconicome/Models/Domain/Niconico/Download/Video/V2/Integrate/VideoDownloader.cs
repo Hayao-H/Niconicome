@@ -32,13 +32,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
         /// <param name="videoInfo"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        Task<IAttemptResult> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token);
+        Task<IAttemptResult<uint>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token);
 
     }
 
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore)
+        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore,INiconicomeDirectoryIO directoryIO)
         {
             this._pathOrganizer = pathOrganizer;
             this._segmentDirectory = segmentDirectoryHandler;
@@ -46,6 +46,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             this._videoEncoder = videoEncoader;
             this._fileIO = fileIO;
             this._videoFileStore = fileStore;
+            this._directoryIO = directoryIO;
         }
 
         #region field
@@ -62,11 +63,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
         private readonly IVideoFileStore _videoFileStore;
 
+        private readonly INiconicomeDirectoryIO _directoryIO;
+
         #endregion
 
         #region Method
 
-        public async Task<IAttemptResult> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token)
+        public async Task<IAttemptResult<uint>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token)
         {
             IWatchSession session = DIFactory.Resolve<IWatchSession>();
 
@@ -76,7 +79,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
             if (!sessionResult.IsSucceeded)
             {
-                return sessionResult;
+                return AttemptResult<uint>.Fail(sessionResult.Message);
             }
 
             //ストリーム情報を取得
@@ -84,7 +87,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             IAttemptResult<IStreamsCollection> streamResult = await session.GetAvailableStreamsAsync();
             if (!streamResult.IsSucceeded || streamResult.Data is null)
             {
-                return AttemptResult.Fail(streamResult.Message);
+                return AttemptResult<uint>.Fail(streamResult.Message);
             }
             IStreamInfo stream = streamResult.Data.GetStream(settings.VerticalResolution);
 
@@ -102,7 +105,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                 IAttemptResult<string> segmentResult = this._segmentDirectory.Create(videoInfo.Id, stream.VideoResolution.Vertical);
                 if (!segmentResult.IsSucceeded || segmentResult.Data is null)
                 {
-                    return AttemptResult.Fail(segmentResult.Message);
+                    return AttemptResult<uint>.Fail(segmentResult.Message);
                 }
 
 
@@ -121,7 +124,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             IAttemptResult dlResult = await this.DownloadSegments(targetSegments, folderPath, videoInfo.Id, stream.VideoResolution.Vertical, settings.MaxParallelSegmentDLCount, OnMessage, token);
             if (!dlResult.IsSucceeded)
             {
-                return dlResult;
+                return AttemptResult<uint>.Fail(dlResult.Message);
             }
 
             //エンコード
@@ -140,7 +143,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             IAttemptResult encodeResult = await this._videoEncoder.EncodeAsync(option, OnMessage, token);
             if (!encodeResult.IsSucceeded)
             {
-                return encodeResult;
+                return AttemptResult<uint>.Fail(encodeResult.Message);
             }
 
             //エコノミーファイルを削除
@@ -149,10 +152,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                 this.DeleteEconomyFile(settings.FilePath);
             }
 
+            //ファイル情報を追加
             await this._videoFileStore.AddFileAsync(videoInfo.Id, filePath);
 
+            //一時フォルダーを削除
+            this._directoryIO.Delete(folderPath);
+
+            //セッションを破棄
+            if (session.IsSessionEnsured)
+            {
+                session.Dispose();
+            }
+
             OnMessage(this._stringHandler.GetContent(SC.Completed));
-            return AttemptResult.Succeeded();
+            return AttemptResult<uint>.Succeeded(stream.VideoResolution.Vertical);
         }
 
 
@@ -214,6 +227,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
         /// <returns></returns>
         private IAttemptResult<ResumeInfomation> GetResumeInfomation(IEnumerable<ISegmentURL> source, string videoID, uint verticalResoluiton)
         {
+            if (!this._segmentDirectory.Exists(videoID, verticalResoluiton))
+            {
+                return AttemptResult<ResumeInfomation>.Fail();
+            }
+
             IAttemptResult<ISegmentDirectoryInfo> resumeResult = this._segmentDirectory.GetSegmentDirectoryInfo(videoID, verticalResoluiton);
 
             if (resumeResult.IsSucceeded && resumeResult.Data is not null)

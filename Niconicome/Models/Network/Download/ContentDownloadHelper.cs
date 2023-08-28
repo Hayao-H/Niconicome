@@ -13,11 +13,13 @@ using Niconicome.Models.Playlist;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
-using Vdl = Niconicome.Models.Domain.Niconico.Download.Video;
+using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V2;
 using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Niconico.Download.Video;
 using Niconicome.Models.Domain.Niconico.Watch;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
+using Niconicome.Models.Domain.Niconico.Watch.V2;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -36,11 +38,12 @@ namespace Niconicome.Models.Network.Download
 
     public class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, IDomainModelConverter converter)
+        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation)
         {
             this.localContentHandler = localContentHandler;
             this.converter = converter;
             this.logger = logger;
+            this._watch = watchPageInfomation;
         }
 
         #region DI
@@ -50,6 +53,8 @@ namespace Niconicome.Models.Network.Download
 
         private readonly IDomainModelConverter converter;
 
+        private readonly IWatchPageInfomationHandler _watch;
+
         #endregion
 
         #region Methods
@@ -57,33 +62,21 @@ namespace Niconicome.Models.Network.Download
         public async Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
         {
             var context = new DownloadContext(setting.NiconicoId);
-            var session = DIFactory.Provider.GetRequiredService<IWatchSession>();
 
             context.RegisterMessageHandler(OnMessage);
 
-            await session.GetVideoDataAsync(setting.NiconicoId);
+            IAttemptResult<IDomainVideoInfo> videoInfoResult = await this._watch.GetVideoInfoAsync(videoInfo.NiconicoId);
 
-            if (session.Video is not null)
+            if (!videoInfoResult.IsSucceeded || videoInfoResult.Data is null)
             {
-                this.converter.ConvertDomainVideoInfoToVideoInfo(videoInfo, session.Video);
+                return AttemptResult<IDownloadContext>.Fail(videoInfoResult.Message);
             }
 
+            IDomainVideoInfo domainVideoInfo = videoInfoResult.Data;
 
-            if (session.Video?.DmcInfo.DownloadStartedOn is not null)
-            {
-                session.Video.DmcInfo.DownloadStartedOn = DateTime.Now;
-            }
+            this.converter.ConvertDomainVideoInfoToVideoInfo(videoInfo, videoInfoResult.Data);
 
-            if (session.State != WatchSessionState.GotPage || session.Video is null)
-            {
-                string message = session.State switch
-                {
-                    WatchSessionState.PaymentNeeded => "視聴ページの解析に失敗しました。",
-                    WatchSessionState.HttpRequestOrPageAnalyzingFailure => "視聴ページの取得、または視聴ページの解析に失敗しました。",
-                    _ => "不明なエラーにより、視聴ページの取得に失敗しました。"
-                };
-                return AttemptResult<IDownloadContext>.Fail(message);
-            }
+            domainVideoInfo.DmcInfo.DownloadStartedOn = DateTime.Now;
 
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
 
@@ -91,7 +84,7 @@ namespace Niconicome.Models.Network.Download
             if (setting.Skip)
             {
                 string fileNameFormat = setting.FileNameFormat;
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, session.Video.DmcInfo, setting.VerticalResolution, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix);
+                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, domainVideoInfo.DmcInfo, setting.VerticalResolution, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix);
             }
 
             if (!Directory.Exists(setting.FolderPath))
@@ -122,7 +115,7 @@ namespace Niconicome.Models.Network.Download
                 }
                 else
                 {
-                    var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, session, context, token);
+                    var vResult = await this.TryDownloadVideoAsync(setting, OnMessage, domainVideoInfo, context, token);
                     if (!vResult.IsSucceeded)
                     {
                         OnMessage("DL失敗");
@@ -138,7 +131,7 @@ namespace Niconicome.Models.Network.Download
             {
                 if (!info?.ThumbExist ?? true)
                 {
-                    var tResult = await this.TryDownloadThumbAsync(setting, session);
+                    var tResult = await this.TryDownloadThumbAsync(setting, domainVideoInfo);
 
                     if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
 
@@ -162,7 +155,7 @@ namespace Niconicome.Models.Network.Download
                 if (!info?.CommentExist ?? true)
                 {
 
-                    var cResult = await this.TryDownloadCommentAsync(setting, session, OnMessage, context, token);
+                    var cResult = await this.TryDownloadCommentAsync(setting, domainVideoInfo, OnMessage, context, token);
 
                     if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
 
@@ -185,7 +178,7 @@ namespace Niconicome.Models.Network.Download
             {
                 if (!info?.VideoInfoExist ?? true)
                 {
-                    var iResult = this.TryDownloadDescriptionAsync(setting, session, OnMessage);
+                    var iResult = this.TryDownloadDescriptionAsync(setting, domainVideoInfo, OnMessage);
 
                     if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
 
@@ -205,7 +198,7 @@ namespace Niconicome.Models.Network.Download
 
                 if (!info?.IchibaInfoExist ?? true)
                 {
-                    var iResult = await this.DownloadIchibaInfoAsync(setting, session, OnMessage, context);
+                    var iResult = await this.DownloadIchibaInfoAsync(setting, domainVideoInfo, OnMessage, context);
 
                     if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
 
@@ -221,8 +214,6 @@ namespace Niconicome.Models.Network.Download
                 }
             }
 
-            if (session.IsSessionEnsured) session.Dispose();
-
             return AttemptResult<IDownloadContext>.Succeeded(context);
         }
 
@@ -233,33 +224,35 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// 非同期で動画をダウンロードする
         /// </summary>
-        private async Task<IAttemptResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IWatchSession session, IDownloadContext context, CancellationToken token)
+        private async Task<IAttemptResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IDomainVideoInfo videoInfo, IDownloadContext context, CancellationToken token)
         {
-            var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::IVideoDownloader>();
-            IAttemptResult result;
+            var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::Integrate.IVideoDownloader>();
+            IAttemptResult<uint> result;
             try
             {
-                result = await videoDownloader.DownloadVideoAsync(settings, onMessage, context, session, token);
+                result = await videoDownloader.DownloadVideoAsync(settings, onMessage, videoInfo, token);
             }
             catch (Exception e)
             {
                 this.logger.Error($"動画のダウンロードに失敗しました。({context.GetLogContent()})", e);
                 return AttemptResult.Fail($"動画のダウンロードに失敗しました。(詳細:{e.Message})");
             }
-            return result;
+
+            context.ActualVerticalResolution = result.Data;
+            return AttemptResult.Succeeded();
         }
 
         /// <summary>
         /// 動画情報をダウンロードする
         /// </summary>
-        private IAttemptResult TryDownloadDescriptionAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage)
+        private IAttemptResult TryDownloadDescriptionAsync(IDownloadSettings settings, IDomainVideoInfo videoInfo, Action<string> onMessage)
         {
             var descriptionDownloader = DIFactory.Provider.GetRequiredService<DDL::IDescriptionDownloader>();
 
             IAttemptResult result;
             try
             {
-                result = descriptionDownloader.DownloadVideoInfoAsync(settings, session, onMessage);
+                result = descriptionDownloader.DownloadVideoInfoAsync(settings, videoInfo, onMessage);
             }
             catch (Exception e)
             {
@@ -273,13 +266,13 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// サムネイルをダウンロードする
         /// </summary>
-        private async Task<IAttemptResult> TryDownloadThumbAsync(IDownloadSettings setting, IWatchSession session)
+        private async Task<IAttemptResult> TryDownloadThumbAsync(IDownloadSettings setting, IDomainVideoInfo videoInfo)
         {
             var thumbDownloader = DIFactory.Provider.GetRequiredService<Tdl::IThumbDownloader>();
             IAttemptResult result;
             try
             {
-                result = await thumbDownloader.DownloadThumbnailAsync(setting, session);
+                result = await thumbDownloader.DownloadThumbnailAsync(setting, videoInfo);
             }
             catch (Exception e)
             {
@@ -293,7 +286,7 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// コメントをダウンロードする
         /// </summary>
-        private async Task<IAttemptResult> TryDownloadCommentAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context, CancellationToken token)
+        private async Task<IAttemptResult> TryDownloadCommentAsync(IDownloadSettings settings, IDomainVideoInfo videoInfo, Action<string> onMessage, IDownloadContext context, CancellationToken token)
         {
             //Cdl::ICommentDownloader? v1 = null;
             V2Comment::ICommentDownloader? v2 = null;
@@ -312,7 +305,7 @@ namespace Niconicome.Models.Network.Download
             try
             {
                 //result = v2 is null ? await v1!.DownloadComment(session, settings, onMessage, context, token) : await v2.DownloadCommentAsync(session.Video!.DmcInfo, settings, context, token);
-                result = await v2.DownloadCommentAsync(session.Video!.DmcInfo, settings, context, token);
+                result = await v2.DownloadCommentAsync(videoInfo.DmcInfo, settings, context, token);
             }
             catch (Exception e)
             {
@@ -326,14 +319,14 @@ namespace Niconicome.Models.Network.Download
         /// <summary>
         /// 市場情報をダウンロードする
         /// </summary>
-        private async Task<IAttemptResult> DownloadIchibaInfoAsync(IDownloadSettings settings, IWatchSession session, Action<string> onMessage, IDownloadContext context)
+        private async Task<IAttemptResult> DownloadIchibaInfoAsync(IDownloadSettings settings, IDomainVideoInfo videoInfo, Action<string> onMessage, IDownloadContext context)
         {
 
             var iDownloader = DIFactory.Provider.GetRequiredService<IIchibaInfoDownloader>();
             IAttemptResult result;
             try
             {
-                result = await iDownloader.DownloadIchibaInfo(session, settings, onMessage, context);
+                result = await iDownloader.DownloadIchibaInfo(videoInfo, settings, onMessage, context);
             }
             catch (Exception e)
             {

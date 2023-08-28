@@ -60,7 +60,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
 
             foreach (var childPlaylist in pResult.Data)
             {
-                IAttemptResult<IStreamInfo> result = await this.GetStreamInfoAsync(childPlaylist, baseUrl);
+                IAttemptResult<IStreamInfo> result = await this.GetStreamInfoAsync(childPlaylist);
                 if (result.IsSucceeded && result.Data is not null)
                 {
                     streams.Add(result.Data);
@@ -112,9 +112,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
         /// Stream情報を取得する
         /// </summary>
         /// <param name="playlist"></param>
-        /// <param name="baseURL"></param>
         /// <returns></returns>
-        private async Task<IAttemptResult<IStreamInfo>> GetStreamInfoAsync(IPlaylistInfo playlist, string baseURL)
+        private async Task<IAttemptResult<IStreamInfo>> GetStreamInfoAsync(IPlaylistInfo playlist)
         {
             var res = await this._http.GetAsync(new Uri(playlist.AbsoluteURL));
             if (!res.IsSuccessStatusCode)
@@ -122,6 +121,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
                 this._errorHandler.HandleError(Err.FailedToFetchPlaylist, playlist.AbsoluteURL, (int)res.StatusCode);
                 return AttemptResult<IStreamInfo>.Fail(this._errorHandler.GetMessageForResult(Err.FailedToFetchPlaylist, playlist.AbsoluteURL, (int)res.StatusCode));
             }
+
+            string baseURL = playlist.AbsoluteURL.Substring(0, playlist.AbsoluteURL.LastIndexOf('/') + 1);
 
             string content = await res.Content.ReadAsStringAsync();
 

@@ -41,7 +41,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment
     {
         public SegmentDLResultContainer(int length)
         {
-            this._result = new bool[length];
+            this._result = Enumerable.Range(0, length).Select(_ => true).ToArray();
         }
 
         #region field
