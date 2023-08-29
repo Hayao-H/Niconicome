@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.ClearScript;
 using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
@@ -128,6 +129,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                             PlayerId = rawSesison.PlayerId,
                             TransferPriset = rawSesison.TransferPriset,
                             Priority = rawSesison.Priority,
+                            KeyURL = rawSesison.KeyURL is Undefined ? null : rawSesison.KeyURL,
                         };
                         sessionInfo.Videos.AddRange(JsUtils.ToClrArray<string>(rawSesison.Videos));
                         sessionInfo.Audios.AddRange(JsUtils.ToClrArray<string>(rawSesison.Audios));

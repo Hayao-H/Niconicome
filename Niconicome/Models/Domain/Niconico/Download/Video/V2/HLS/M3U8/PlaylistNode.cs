@@ -132,6 +132,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.M3U8
                 else if (line.StartsWith("#EXT-X-ENDLIST"))
                 {
                     return PlayListNodeType.EndOfList;
+                } else if (line.StartsWith("EXT-X-KEY"))
+                {
+                    return PlayListNodeType.Key;
                 }
                 else
                 {

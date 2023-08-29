@@ -26,6 +26,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
         bool IsSessionExipired { get; }
 
         /// <summary>
+        /// Key
+        /// </summary>
+        string? KeyURL { get; }
+
+        /// <summary>
         /// セッションを確立する
         /// </summary>
         /// <param name="videoInfo"></param>
@@ -44,7 +49,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
     /// </summary>
     public class WatchSession : IWatchSession
     {
-        public WatchSession(IWatchInfohandler watchInfo, INicoHttp http, Utils::ILogger logger, IDmcDataHandler dmchandler, IMasterPlaylisthandler playlisthandler, IHooksManager hooksManager,IErrorHandler errorHandler)
+        public WatchSession(IWatchInfohandler watchInfo, INicoHttp http, Utils::ILogger logger, IDmcDataHandler dmchandler, IMasterPlaylisthandler playlisthandler, IHooksManager hooksManager, IErrorHandler errorHandler)
         {
             this._watchInfo = watchInfo;
             this._http = http;
@@ -79,15 +84,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
 
         #region Props
 
-        /// <summary>
-        /// セッション確立済みフラグ
-        /// </summary>
         public bool IsSessionEnsured { get; private set; }
 
-        /// <summary>
-        /// セッション失効フラグ
-        /// </summary>
         public bool IsSessionExipired { get; private set; }
+
+        public string? KeyURL => string.IsNullOrEmpty(this._session?.KeyURI) ? null : this._session?.KeyURI;
+
 
         #endregion
 

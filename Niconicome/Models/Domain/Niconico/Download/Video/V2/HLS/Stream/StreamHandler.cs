@@ -37,15 +37,35 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
             IEnumerable<IPlaylistNode> nodes = this._handler.Parse(playlist);
             var urls = new List<ISegmentURL>();
             var index = 0;
+            var iv = "";
 
-            foreach (var node in nodes.Where(n => n.NodeType == PlayListNodeType.Uri))
+            foreach (var node in nodes)
             {
-                ISegmentURL sUrl = new SegmentURL(node.Content, baseUrl, index);
-                urls.Add(sUrl);
-                index++;
+                if (node.NodeType == PlayListNodeType.Uri)
+                {
+                    ISegmentURL sUrl = new SegmentURL(node.Content, baseUrl, index);
+                    urls.Add(sUrl);
+                    index++;
+                }
+                else if (node.NodeType == PlayListNodeType.Key)
+                {
+                    var info = new Dictionary<string, string>();
+
+                    foreach (var content in node.Content.Split(","))
+                    {
+                        if (!content.Contains("=")) continue;
+                        var splited = content.Split('=');
+                        info.Add(splited[0], splited[1]);
+                    }
+
+                    if (info.TryGetValue("IV",out string? x))
+                    {
+                        iv = x;
+                    }
+                }
             }
 
-            return new StreamInfo(urls, resolution, bandWidth);
+            return new StreamInfo(urls, resolution, bandWidth, iv);
 
         }
 

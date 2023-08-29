@@ -22,6 +22,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
         /// 帯域
         /// </summary>
         long BandWidth { get; }
+
+        /// <summary>
+        /// IV
+        /// </summary>
+        string IV { get; }
     }
 
     /// <summary>
@@ -30,11 +35,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
     public class StreamInfo : IStreamInfo
     {
 
-        public StreamInfo(IEnumerable<ISegmentURL> segmentURLs, IResolution resolution, long bandWidth)
+        public StreamInfo(IEnumerable<ISegmentURL> segmentURLs, IResolution resolution, long bandWidth, string IV)
         {
             this.SegmentUrls = segmentURLs;
             this.VideoResolution = resolution;
             this.BandWidth = bandWidth;
+            this.IV = IV;
         }
 
         public IEnumerable<ISegmentURL> SegmentUrls { get; init; }
@@ -42,6 +48,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
         public IResolution VideoResolution { get; init; }
 
         public long BandWidth { get; init; }
+
+        public string IV { get; init; }
 
     }
 }

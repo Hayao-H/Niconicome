@@ -40,7 +40,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
 
         public IResolution Resolution { get; init; }
 
-        public long BandWidth { get; set; }
+        public long BandWidth { get; init; }
 
         #endregion
 

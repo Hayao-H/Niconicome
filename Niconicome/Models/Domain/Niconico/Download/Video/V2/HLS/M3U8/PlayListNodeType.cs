@@ -21,6 +21,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.M3U8
         PlaylistUri,
         Uri,
         EndOfList,
+        Key,
         Unknown
     }
 

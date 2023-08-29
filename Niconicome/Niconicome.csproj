@@ -60,8 +60,4 @@
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Models\Domain\Niconico\Download\Video\V2\Fetch\Segment\HLS\" />
-	</ItemGroup>
 </Project>
