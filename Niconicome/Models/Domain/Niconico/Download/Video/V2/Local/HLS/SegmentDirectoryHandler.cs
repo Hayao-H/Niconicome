@@ -80,7 +80,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS
                 return false;
             }
 
-            string? directory = dirResult.Data.FirstOrDefault(p => p.StartsWith($"{niconicoID}-{resolution}-"));
+            string? directory = dirResult.Data.Select(p => Path.GetFileName(p)).FirstOrDefault(p => p.StartsWith($"{niconicoID}-{resolution}-"));
 
             return directory is not null;
         }
@@ -114,7 +114,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS
                 return AttemptResult<ISegmentDirectoryInfo>.Fail(dirResult.Message);
             }
 
-            string directoryName = dirResult.Data.First(p => p.StartsWith($"{niconicoID}-{resolution}-"));
+            string directoryName = dirResult.Data.Select(p => Path.GetFileName(p)).First(p => p.StartsWith($"{niconicoID}-{resolution}-"));
 
             return this.Parse(directoryName);
         }
@@ -130,7 +130,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS
 
             var infos = new List<ISegmentDirectoryInfo>();
 
-            foreach (var dir in dirResult.Data)
+            foreach (var dir in dirResult.Data.Select(p => Path.GetFileName(p)))
             {
                 IAttemptResult<ISegmentDirectoryInfo> result = this.Parse(dir);
                 if (!result.IsSucceeded || result.Data is null)
@@ -144,7 +144,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS
             return AttemptResult<IEnumerable<ISegmentDirectoryInfo>>.Succeeded(infos);
         }
 
-       public IAttemptResult CreateRootDirectotyIfNotExists()
+        public IAttemptResult CreateRootDirectotyIfNotExists()
         {
             string path = Path.Combine(AppContext.BaseDirectory, FileFolder.SegmentsFolderPath);
             if (this._directoryIO.Exists(path))
@@ -188,7 +188,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS
             }
 
 
-            return AttemptResult<ISegmentDirectoryInfo>.Succeeded(new SegmentDirectoryInfo(dirPath, result, filesResult.Data.ToList().AsReadOnly()));
+            return AttemptResult<ISegmentDirectoryInfo>.Succeeded(new SegmentDirectoryInfo(dirPath, result, filesResult.Data.Select(p => Path.GetFileName(p)).ToList().AsReadOnly()));
         }
 
         #endregion

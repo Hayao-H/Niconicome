@@ -38,7 +38,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore,INiconicomeDirectoryIO directoryIO)
+        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore, INiconicomeDirectoryIO directoryIO)
         {
             this._pathOrganizer = pathOrganizer;
             this._segmentDirectory = segmentDirectoryHandler;
@@ -136,7 +136,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                 IsOverrideDTEnable = settings.OverrideVideoFileDateToUploadedDT,
                 IsStoreRawTSFileEnable = settings.SaveWithoutEncode,
                 UploadedOn = videoInfo.DmcInfo.UploadedOn,
-                TsFilePaths = targetSegments.Select(s => Path.Combine(folderPath, s.FileName))
+                TsFilePaths = stream.SegmentUrls.Select(s => Path.Combine(folderPath, s.FileName))
             };
 
             OnMessage(this._stringHandler.GetContent(SC.Encode));
@@ -198,9 +198,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                     var downloader = DIFactory.Resolve<ISegmentDownloader>();
                     downloader.Initialize(info, container);
 
-                    await downloader.DownloadAsync();
-
-                    onMessage(this._stringHandler.GetContent(SC.SegmentDownloadCompleted, container.CompletedCount, container.Length, verticalResoluiton));
+                    IAttemptResult result = await downloader.DownloadAsync();
+                    if (result.IsSucceeded)
+                    {
+                        onMessage(this._stringHandler.GetContent(SC.SegmentDownloadCompleted, container.CompletedCount, container.Length, verticalResoluiton));
+                    }
 
                 }, _ => { });
 
