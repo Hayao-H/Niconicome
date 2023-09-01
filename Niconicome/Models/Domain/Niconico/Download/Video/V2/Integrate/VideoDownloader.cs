@@ -43,7 +43,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore, INiconicomeDirectoryIO directoryIO, IAESInfomationHandler aESInfomationHandler,IExternalDownloaderHandler external)
+        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore, INiconicomeDirectoryIO directoryIO, IAESInfomationHandler aESInfomationHandler, IExternalDownloaderHandler external)
         {
             this._pathOrganizer = pathOrganizer;
             this._segmentDirectory = segmentDirectoryHandler;
@@ -86,9 +86,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             string filePath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, videoInfo.DmcInfo, settings.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
 
             //外部ダウンローダー
-            if (this._external.CheckCondition(videoInfo))
+            if (this._external.CheckCondition(videoInfo, settings))
             {
-                IAttemptResult externalResult = await this._external.DownloadVideoByExtarnalDownloaderAsync(videoInfo.Id, filePath, OnMessage, token);
+                IAttemptResult externalResult = await this._external.DownloadVideoByExtarnalDownloaderAsync(settings, videoInfo.Id, filePath, OnMessage, token);
                 if (!externalResult.IsSucceeded)
                 {
                     return AttemptResult<uint>.Fail(externalResult.Message);
@@ -98,7 +98,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                 if (!resolutionResult.IsSucceeded)
                 {
                     return AttemptResult<uint>.Succeeded(0);
-                } else
+                }
+                else
                 {
                     return AttemptResult<uint>.Succeeded((uint)resolutionResult.Data);
                 }

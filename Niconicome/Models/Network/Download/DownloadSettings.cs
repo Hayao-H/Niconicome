@@ -1,5 +1,6 @@
 ﻿using System;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Local.Settings.Enum;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
@@ -128,11 +129,6 @@ namespace Niconicome.Models.Network.Download
         bool OmittingXmlDeclaration { get; }
 
         /// <summary>
-        /// 外部ダウンローダーフラグ
-        /// </summary>
-        bool UseExternalDownloader { get; }
-
-        /// <summary>
         /// 動画ID
         /// </summary>
         string NiconicoId { get; }
@@ -238,6 +234,11 @@ namespace Niconicome.Models.Network.Download
         int CommentCountPerBlock { get; }
 
         /// <summary>
+        /// 外部ダウンローダー設定
+        /// </summary>
+        ExternalDownloaderConditionSetting ExternalDownloaderConditionSetting { get; }
+
+        /// <summary>
         /// 市場情報の形式
         /// </summary>
         IchibaInfoTypeSettings IchibaInfoType { get; }
@@ -305,8 +306,6 @@ namespace Niconicome.Models.Network.Download
 
         public bool OmittingXmlDeclaration { get; set; }
 
-        public bool UseExternalDownloader { get; set; }
-
         public uint VerticalResolution { get; set; }
 
         public int PlaylistID { get; set; }
@@ -348,6 +347,8 @@ namespace Niconicome.Models.Network.Download
         public string ExternalDownloaderPath { get; set; } = string.Empty;
 
         public string ExternalDownloaderParam { get; set; } = string.Empty;
+
+        public ExternalDownloaderConditionSetting ExternalDownloaderConditionSetting { get; set; }
 
         public IchibaInfoTypeSettings IchibaInfoType { get; set; }
 
