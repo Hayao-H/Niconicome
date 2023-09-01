@@ -8,6 +8,7 @@ namespace Niconicome.Models.Domain.Local.Settings.Enum
 {
     public enum ExternalDownloaderConditionSetting
     {
+        Disable,
         Always,
         Encrypted,
         Official,

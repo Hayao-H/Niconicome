@@ -23,6 +23,7 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Download;
 using Niconicome.Models.Utils.ParallelTaskV2;
 using SC = Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate.VideoDownloaderSC;
+using Niconicome.Models.Domain.Niconico.Download.Video.V2.External;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 {
@@ -42,7 +43,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore, INiconicomeDirectoryIO directoryIO, IAESInfomationHandler aESInfomationHandler)
+        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore, INiconicomeDirectoryIO directoryIO, IAESInfomationHandler aESInfomationHandler,IExternalDownloaderHandler external)
         {
             this._pathOrganizer = pathOrganizer;
             this._segmentDirectory = segmentDirectoryHandler;
@@ -52,6 +53,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             this._videoFileStore = fileStore;
             this._directoryIO = directoryIO;
             this._aESInfomationHandler = aESInfomationHandler;
+            this._external = external;
         }
 
         #region field
@@ -72,12 +74,36 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
         private readonly IAESInfomationHandler _aESInfomationHandler;
 
+        private readonly IExternalDownloaderHandler _external;
+
         #endregion
 
         #region Method
 
         public async Task<IAttemptResult<uint>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token)
         {
+            //ファイルパス
+            string filePath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, videoInfo.DmcInfo, settings.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
+
+            //外部ダウンローダー
+            if (this._external.CheckCondition(videoInfo))
+            {
+                IAttemptResult externalResult = await this._external.DownloadVideoByExtarnalDownloaderAsync(videoInfo.Id, filePath, OnMessage, token);
+                if (!externalResult.IsSucceeded)
+                {
+                    return AttemptResult<uint>.Fail(externalResult.Message);
+                }
+
+                IAttemptResult<int> resolutionResult = await this._fileIO.GetVerticalResolutionAsync(filePath);
+                if (!resolutionResult.IsSucceeded)
+                {
+                    return AttemptResult<uint>.Succeeded(0);
+                } else
+                {
+                    return AttemptResult<uint>.Succeeded((uint)resolutionResult.Data);
+                }
+            }
+
             using IWatchSession session = DIFactory.Resolve<IWatchSession>();
 
             //視聴セッションを確立
@@ -97,9 +123,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                 return AttemptResult<uint>.Fail(streamResult.Message);
             }
             IStreamInfo stream = streamResult.Data.GetStream(settings.VerticalResolution);
-
-
-            string filePath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, videoInfo.DmcInfo, settings.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
 
             //レジューム
             string folderPath;

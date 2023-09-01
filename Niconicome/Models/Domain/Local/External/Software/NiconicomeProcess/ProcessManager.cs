@@ -32,6 +32,18 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<IAttemptResult<IProcessResult>> StartProcessAsync(string filePath, string arg, bool useShell, CancellationToken ct);
+
+        /// <summary>
+        /// プロセスを作成して起動
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="arg"></param>
+        /// <param name="useShell"></param>
+        /// <param name="onMessage"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<IAttemptResult<IProcessResult>> StartProcessAsync(string filePath, string arg, bool useShell, Action<string> onMessage, CancellationToken ct);
+
     }
 
     public class ProcessManager : IProcessManager
@@ -102,7 +114,11 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
 
         public async Task<IAttemptResult<IProcessResult>> StartProcessAsync(string filePath, string arg, bool useShell, CancellationToken ct)
         {
+            return await this.StartProcessAsync(filePath, arg, useShell, _ => { }, ct);
+        }
 
+        public async Task<IAttemptResult<IProcessResult>> StartProcessAsync(string filePath, string arg, bool useShell, Action<string> onMessage, CancellationToken ct)
+        {
             using var process = new Process();
             var stdout = new StringBuilder();
             var stderr = new StringBuilder();
@@ -112,8 +128,22 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardError = true;
 
-            process.OutputDataReceived += (_, e) => { if (e.Data is not null) stdout.AppendLine(e.Data); };
-            process.ErrorDataReceived += (_, e) => { if (e.Data is not null) stderr.AppendLine(e.Data); };
+            process.OutputDataReceived += (_, e) =>
+            {
+                if (e.Data is not null)
+                {
+                    stdout.AppendLine(e.Data);
+                    onMessage(e.Data);
+                }
+            };
+            process.ErrorDataReceived += (_, e) =>
+            {
+                if (e.Data is not null)
+                {
+                    stderr.AppendLine(e.Data);
+                    onMessage(e.Data);
+                }
+            };
 
             var commands = new List<string>();
             if (useShell)
@@ -147,7 +177,6 @@ namespace Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess
                 return AttemptResult<IProcessResult>.Fail(this._errorHandler.GetMessageForResult(ProcessManagerError.FailedToStartProcess, ex));
             }
         }
-
 
 
         #endregion
