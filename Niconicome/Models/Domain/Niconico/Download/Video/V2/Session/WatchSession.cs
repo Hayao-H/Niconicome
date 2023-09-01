@@ -26,11 +26,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
         bool IsSessionExipired { get; }
 
         /// <summary>
-        /// Key
-        /// </summary>
-        string? KeyURL { get; }
-
-        /// <summary>
         /// セッションを確立する
         /// </summary>
         /// <param name="videoInfo"></param>
@@ -87,8 +82,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
         public bool IsSessionEnsured { get; private set; }
 
         public bool IsSessionExipired { get; private set; }
-
-        public string? KeyURL => string.IsNullOrEmpty(this._session?.KeyURI) ? null : this._session?.KeyURI;
 
 
         #endregion
@@ -226,17 +219,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
                     this._errorHandler.HandleError(Err.AddonReturnedInvalidInfomation, video.Id);
                     return AttemptResult<IWatchSessionInfo>.Fail(this._errorHandler.GetMessageForResult(Err.AddonReturnedInvalidInfomation, video.Id));
                 }
-                if (result.Data.KeyURI is not string keyURI)
-                {
-                    keyURI = string.Empty;
-                }
 
                 var info = new WatchSessionInfo()
                 {
                     DmcResponseJsonData = jsonData,
                     ContentUrl = contentUrl,
                     SessionId = sessionID,
-                    KeyURI = keyURI,
                 };
 
                 return new AttemptResult<IWatchSessionInfo>() { IsSucceeded = true, Data = info };

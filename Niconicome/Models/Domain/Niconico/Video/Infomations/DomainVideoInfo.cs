@@ -129,7 +129,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                             PlayerId = rawSesison.PlayerId,
                             TransferPriset = rawSesison.TransferPriset,
                             Priority = rawSesison.Priority,
-                            KeyURL = rawSesison.KeyURL is Undefined ? null : rawSesison.KeyURL,
+                            KeyURL = rawSesison.KeyURL is Undefined ? string.Empty : rawSesison.KeyURL,
                         };
                         sessionInfo.Videos.AddRange(JsUtils.ToClrArray<string>(rawSesison.Videos));
                         sessionInfo.Audios.AddRange(JsUtils.ToClrArray<string>(rawSesison.Audios));

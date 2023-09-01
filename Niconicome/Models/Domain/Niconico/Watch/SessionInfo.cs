@@ -20,7 +20,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         string? ServiceUserId { get; set; }
         string? PlayerId { get; set; }
         string? TransferPriset { get; set; }
-        string? KeyURL { get; set; }
+        string KeyURL { get; set; }
         double Priority { get; set; }
         List<string> Videos { get; }
         List<string> Audios { get; }
@@ -45,7 +45,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 
         public string? TransferPriset { get; set; }
 
-        public string? KeyURL { get; set; }
+        public string KeyURL { get; set; } = string.Empty;
 
         public int ContentKeyTimeout { get; set; }
 
