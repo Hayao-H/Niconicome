@@ -376,6 +376,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideoV2.Local.Encode.IVideoEncoder,DlVideoV2.Local.Encode.VideoEncoder>();
             services.AddTransient<DlVideoV2.Session.IWatchSession,DlVideoV2.Session.WatchSession>();
             services.AddTransient<DlVideoV2.Integrate.IVideoDownloader,DlVideoV2.Integrate.VideoDownloader>();
+            services.AddTransient<DlVideoV2.Fetch.Segment.AES.IAESInfomationHandler,DlVideoV2.Fetch.Segment.AES.AESInfomationHandler>();
+            services.AddTransient<DlVideoV2.Fetch.Segment.AES.IDecryptor,DlVideoV2.Fetch.Segment.AES.Decryptor>();
 
             return services.BuildServiceProvider();
         }

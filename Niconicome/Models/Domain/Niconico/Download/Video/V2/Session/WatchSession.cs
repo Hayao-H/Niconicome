@@ -8,6 +8,7 @@ using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.State.MessageV2;
 using Err = Niconicome.Models.Domain.Niconico.Download.Video.V2.Error.WatchSessionError;
 using Utils = Niconicome.Models.Domain.Utils;
 
@@ -82,7 +83,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
         public bool IsSessionEnsured { get; private set; }
 
         public bool IsSessionExipired { get; private set; }
-
 
         #endregion
 

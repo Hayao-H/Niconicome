@@ -16,6 +16,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         void Initialize(IAddonInfomation addon);
         Task<HttpResponseMessage> GetAsync(Uri uri);
         Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content);
+        Task<HttpResponseMessage> OptionAsync(Uri uri);
     }
 
     public class AddonHttp : IAddonHttp
@@ -59,6 +60,13 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         {
             return await this.client.GetAsync(uri);
         }
+
+        public async Task<HttpResponseMessage> OptionAsync(Uri uri)
+        {
+            var message = new HttpRequestMessage(HttpMethod.Options, uri);
+            return await this.client.SendAsync(message);
+        }
+
 
         public async Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content)
         {

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES.Error;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Local.State.MessageV2;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES
 {
@@ -52,8 +55,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES
 
             try
             {
-                string content = await res.Content.ReadAsStringAsync();
-                key = Convert.FromBase64String(content);
+                string c = await res.Content.ReadAsStringAsync();
+                key = await res.Content.ReadAsByteArrayAsync();
             }
             catch (Exception ex)
             {
@@ -86,7 +89,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES
             for (var i = 2; i < IV.Length; i += 2)
             {
                 string x = IV[i..(i + 2)];
-                converted[index]= Convert.ToByte(x,16);
+                converted[index] = Convert.ToByte(x, 16);
                 index++;
             }
 

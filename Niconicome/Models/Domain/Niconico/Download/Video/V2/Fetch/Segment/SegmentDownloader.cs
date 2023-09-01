@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
@@ -32,12 +33,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment
 
     public class SegmentDownloader : ISegmentDownloader
     {
-        public SegmentDownloader(INicoHttp http,ISegmentWriter writer,IErrorHandler errorHandler,IStringHandler stringHandler)
+        public SegmentDownloader(INicoHttp http, ISegmentWriter writer, IErrorHandler errorHandler, IStringHandler stringHandler, IDecryptor decryptor)
         {
             this._http = http;
             this._writer = writer;
             this._errorHandler = errorHandler;
             this._stringHandler = stringHandler;
+            this._decryptor = decryptor;
         }
 
         #region field
@@ -55,6 +57,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment
         private ISegmentDLResultContainer? _resultContainer;
 
         private ISegmentInfomation? _segmentInfomation;
+
+        private readonly IDecryptor _decryptor;
 
         #endregion
 
@@ -102,8 +106,26 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(Err.Canceled, this._segmentInfomation.NiconicoID));
             }
 
+            byte[] data;
+
+            if (this._segmentInfomation.AES is not null)
+            {
+                IAttemptResult<byte[]> decryptResult = this._decryptor.Decrypt(result.Data, this._segmentInfomation.AES);
+                if (!decryptResult.IsSucceeded || decryptResult.Data is null)
+                {
+                    this._resultContainer!.SetResult(false, this._segmentInfomation.Index);
+                    return AttemptResult.Fail(decryptResult.Message);
+                }
+
+                data = decryptResult.Data;
+            }
+            else
+            {
+                data = result.Data;
+            }
+
             //書き込み
-            IAttemptResult writeResult = this._writer.Write(result.Data, this._segmentInfomation.FilePath);
+            IAttemptResult writeResult = this._writer.Write(data, this._segmentInfomation.FilePath);
 
             if (!writeResult.IsSucceeded)
             {
@@ -118,7 +140,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment
 
         }
 
-        public void Initialize(ISegmentInfomation infomation,ISegmentDLResultContainer container)
+        public void Initialize(ISegmentInfomation infomation, ISegmentDLResultContainer container)
         {
             this._segmentInfomation = infomation;
             this._resultContainer = container;

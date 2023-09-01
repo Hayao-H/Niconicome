@@ -4,10 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ABI.System;
+using System.Windows.Input;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment;
+using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.Encode;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS;
@@ -38,7 +42,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
     public class VideoDownloader : IVideoDownloader
     {
-        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore, INiconicomeDirectoryIO directoryIO)
+        public VideoDownloader(IPathOrganizer pathOrganizer, ISegmentDirectoryHandler segmentDirectoryHandler, IVideoEncoder videoEncoader, INiconicomeFileIO fileIO, IStringHandler stringHandler, IVideoFileStore fileStore, INiconicomeDirectoryIO directoryIO, IAESInfomationHandler aESInfomationHandler)
         {
             this._pathOrganizer = pathOrganizer;
             this._segmentDirectory = segmentDirectoryHandler;
@@ -47,6 +51,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             this._fileIO = fileIO;
             this._videoFileStore = fileStore;
             this._directoryIO = directoryIO;
+            this._aESInfomationHandler = aESInfomationHandler;
         }
 
         #region field
@@ -65,13 +70,15 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
         private readonly INiconicomeDirectoryIO _directoryIO;
 
+        private readonly IAESInfomationHandler _aESInfomationHandler;
+
         #endregion
 
         #region Method
 
         public async Task<IAttemptResult<uint>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token)
         {
-            IWatchSession session = DIFactory.Resolve<IWatchSession>();
+            using IWatchSession session = DIFactory.Resolve<IWatchSession>();
 
             //視聴セッションを確立
             OnMessage(this._stringHandler.GetContent(SC.EnsureSession));
@@ -120,8 +127,21 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                 targetSegments.AddRange(resumeResult.Data.DownloadTargets);
             }
 
+            //AES
+            IAESInfomation? aes = null;
+            if (!string.IsNullOrEmpty(videoInfo.DmcInfo.SessionInfo.KeyURL))
+            {
+                IAttemptResult<IAESInfomation> aesResult = await this._aESInfomationHandler.GetAESInfomationAsync(stream.IV, videoInfo.DmcInfo.SessionInfo.KeyURL);
+                if (!aesResult.IsSucceeded || aesResult.Data is null)
+                {
+                    return AttemptResult<uint>.Fail(aesResult.Message);
+                }
+
+                aes = aesResult.Data;
+            }
+
             //セグメントのDL
-            IAttemptResult dlResult = await this.DownloadSegments(targetSegments, folderPath, videoInfo.Id, stream.VideoResolution.Vertical, settings.MaxParallelSegmentDLCount, OnMessage, token);
+            IAttemptResult dlResult = await this.DownloadSegments(targetSegments, folderPath, videoInfo.Id, stream.VideoResolution.Vertical, settings.MaxParallelSegmentDLCount, OnMessage, token, aes);
             if (!dlResult.IsSucceeded)
             {
                 return AttemptResult<uint>.Fail(dlResult.Message);
@@ -158,12 +178,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             //一時フォルダーを削除
             this._directoryIO.Delete(folderPath);
 
-            //セッションを破棄
-            if (session.IsSessionEnsured)
-            {
-                session.Dispose();
-            }
-
             OnMessage(this._stringHandler.GetContent(SC.Completed));
             return AttemptResult<uint>.Succeeded(stream.VideoResolution.Vertical);
         }
@@ -184,14 +198,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
         /// <param name="onMessage"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        private async Task<IAttemptResult> DownloadSegments(IEnumerable<ISegmentURL> targets, string folderPath, string videoID, uint verticalResoluiton, int parallelDLCount, Action<string> onMessage, CancellationToken token)
+        private async Task<IAttemptResult> DownloadSegments(IEnumerable<ISegmentURL> targets, string folderPath, string videoID, uint verticalResoluiton, int parallelDLCount, Action<string> onMessage, CancellationToken token, IAESInfomation? aes)
         {
             var handler = new ParallelTasksHandler(parallelDLCount);
             var container = new SegmentDLResultContainer(targets.Count());
 
             foreach (var streamURL in targets)
             {
-                var info = new SegmentInfomation(onMessage, streamURL.AbsoluteUrl, streamURL.SequenceZero, Path.Combine(folderPath, streamURL.FileName), verticalResoluiton, videoID, token);
+                var info = new SegmentInfomation(onMessage, streamURL.AbsoluteUrl, streamURL.SequenceZero, Path.Combine(folderPath, streamURL.FileName), verticalResoluiton, videoID, token, aes);
 
                 var task = new ParallelTask(async _ =>
                 {

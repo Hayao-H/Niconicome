@@ -54,14 +54,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES
 
                 aes.Key = AESInfomation.Key;
                 aes.IV = AESInfomation.IV;
-                ;
 
-                using var ms = new MemoryStream();
+                using var ms = new MemoryStream(cipher);
+                using var msPlain = new MemoryStream();
                 using var cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read);
 
-                cs.Read(cipher, 0, cipher.Length);
+                cs.CopyTo(msPlain);
 
-                return AttemptResult<byte[]>.Succeeded(ms.ToArray());
+                return AttemptResult<byte[]>.Succeeded(msPlain.ToArray());
             }
             catch (Exception ex)
             {
