@@ -205,7 +205,7 @@ namespace Niconicome.Models.Local.Addon.V2
                 {
                     method = optionObj?.method is Microsoft.ClearScript.Undefined ? "GET" : optionObj?.method,
                     body = optionObj?.body,
-                    credentials = optionObj?.credentials,
+                    credentials = optionObj?.credentials is Microsoft.ClearScript.Undefined ? "exclude" : "include",
                 };
 
                 return fetch.FetchAsync(url, option);

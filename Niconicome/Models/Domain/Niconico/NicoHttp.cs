@@ -56,7 +56,8 @@ namespace Niconicome.Models.Domain.Niconico
             var version = Assembly.GetExecutingAssembly().GetName().Version;
 
             client.DefaultRequestHeaders.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
+            //client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0");
             client.DefaultRequestHeaders.Add("x-frontend-id", "6");
             client.DefaultRequestHeaders.Add("x-frontend-version", "0");
             client.DefaultRequestHeaders.Add("x-client-os-type", "others");
