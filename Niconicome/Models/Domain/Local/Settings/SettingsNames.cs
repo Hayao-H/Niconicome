@@ -65,7 +65,6 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string ExternalDLSoftwareParam { get; private set; } = "Download.Video.ExternalSoftware.Parameter";
 
-
         //Download.Comment
         public static string CommentOffset { get; private set; } = "Download.Comment.Commentoffset";
 
@@ -138,6 +137,8 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string AutoLoginMode { get; private set; } = "Network.Session.AutoLoginMode";
 
         public static string FirefoxProfileName { get; private set; } = "Network.Session.FirefoxProfileName";
+
+        public static string UserAgent { get; private set; } = "Network.Session.UserAgent";
 
         //Network.Fetch
         public static string MaxParallelFetchCount { get; private set; } = "Network.Fetch.MaxParallelFetchCount";

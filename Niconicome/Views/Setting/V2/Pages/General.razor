@@ -82,6 +82,13 @@
         </div>
 
         <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-globe"></i>ユーザーエージェント</p>
+            <div class="input-group mb-3 Input">
+                <input type="text" class="form-control" @bind="DataContext.UserAgent.Value" placeholder="Mozilla/5.0 ...">
+            </div>
+        </div>
+
+        <div class="SettingContent">
             <label class="Title" for="skipSSLVerification"><i class="Icon fa-brands fa-expeditedssl"></i>SSL証明書の検証をスキップする(強く非推奨)</label>
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="skipSSLVerification" @bind="DataContext.IsSkippingSSLVerificationEnable.Value">
