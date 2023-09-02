@@ -88,7 +88,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// <returns></returns>
         public async Task<IWatchSessionInfo> GetSessionInfoAsync(DmcRequest::DmcPostData dmcPostData)
         {
-
             string json = JsonParser.Serialize(dmcPostData);
 
             var res = await this.http.PostAsync(new Uri("https://api.dmc.nico/api/sessions?_format=json"), new StringContent(json));
@@ -123,10 +122,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// </summary>
         /// <param name="videoinfo"></param>
         /// <returns></returns>
-        public Task<IWatchSessionInfo> GetSessionInfoAsync(IDomainVideoInfo videoinfo)
+        public async Task<IWatchSessionInfo> GetSessionInfoAsync(IDomainVideoInfo videoinfo)
         {
             var postData = this.GetPostData(videoinfo);
-            return this.GetSessionInfoAsync(postData);
+            return await this.GetSessionInfoAsync(postData);
         }
 
         #region private

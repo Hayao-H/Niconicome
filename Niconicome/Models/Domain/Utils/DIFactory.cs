@@ -74,7 +74,8 @@ using Software = Niconicome.Models.Domain.Local.External.Software;
 using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
 using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
-using ABI.System.Numerics;
+using DlVideoV2 = Niconicome.Models.Domain.Niconico.Download.Video.V2;
+
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -249,8 +250,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<CommentFetch::ICommentRequestBuilder, CommentFetch::CommentRequestBuilder>();
             services.AddTransient<CommentFetch::V3.ICommentRequestBuilder, CommentFetch::V3.CommentRequestBuilder>();
             services.AddTransient<CommentFetch::IOfficialCommentHandler, CommentFetch::OfficialCommentHandler>();
-            services.AddTransient<CommentFetch::V3.Threadkey.IThreadKeyInfo,CommentFetch::V3.Threadkey.ThreadKeyInfo>();
-            services.AddTransient<CommentFetch::V3.Threadkey.IThreadKeyHandler,CommentFetch::V3.Threadkey.ThreadKeyHandler>();
+            services.AddTransient<CommentFetch::V3.Threadkey.IThreadKeyInfo, CommentFetch::V3.Threadkey.ThreadKeyInfo>();
+            services.AddTransient<CommentFetch::V3.Threadkey.IThreadKeyHandler, CommentFetch::V3.Threadkey.ThreadKeyHandler>();
             services.AddTransient<CommentLocal::ICommentLoader, CommentLocal::CommentLoader>();
             services.AddTransient<CommentLocal::ICommentWriter, CommentLocal::CommentWriter>();
             services.AddTransient<CommentIntegrate::ICommentDownloader, CommentIntegrate::CommentDownloader>();
@@ -338,7 +339,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Server::RequestHandler.UserChrome.IUserChromeRequestHandler, Server::RequestHandler.UserChrome.UserChromeRequestHandler>();
             services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
             services.AddTransient<Server::Core.IPortHandler, Server::Core.PortHandler>();
-            services.AddTransient<Server::Connection.ITCPConnectionHandler,Infla::Network.TCPConnectionHandler>();
+            services.AddTransient<Server::Connection.ITCPConnectionHandler, Infla::Network.TCPConnectionHandler>();
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
@@ -366,6 +367,18 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<XenoImport::IXenoImportHandler, XenoImport::XenoImportHandler>();
             services.AddTransient<Restore::Import.Xeno.IXenoImportManager, Restore::Import.Xeno.XenoImportManager>();
             services.AddTransient<Store::V2.IStoreCleaner, DB::DBCleaner>();
+            services.AddTransient<DlVideoV2.HLS.M3U8.IM3U8Handler, DlVideoV2.HLS.M3U8.M3U8Handler>();
+            services.AddTransient<DlVideoV2.HLS.Stream.IStreamhandler, DlVideoV2.HLS.Stream.StreamHandler>();
+            services.AddTransient<DlVideoV2.HLS.Stream.IMasterPlaylisthandler, DlVideoV2.HLS.Stream.MasterPlaylistHandler>();
+            services.AddTransient<DlVideoV2.Fetch.Segment.ISegmentDownloader, DlVideoV2.Fetch.Segment.SegmentDownloader>();
+            services.AddTransient<DlVideoV2.Fetch.Segment.ISegmentWriter, DlVideoV2.Fetch.Segment.SegmentWriter>();
+            services.AddTransient<DlVideoV2.Local.HLS.ISegmentDirectoryHandler, DlVideoV2.Local.HLS.SegmentDirectoryHandler>();
+            services.AddTransient<DlVideoV2.Local.Encode.IVideoEncoder, DlVideoV2.Local.Encode.VideoEncoder>();
+            services.AddTransient<DlVideoV2.Session.IWatchSession, DlVideoV2.Session.WatchSession>();
+            services.AddTransient<DlVideoV2.Integrate.IVideoDownloader, DlVideoV2.Integrate.VideoDownloader>();
+            services.AddTransient<DlVideoV2.Fetch.Segment.AES.IAESInfomationHandler, DlVideoV2.Fetch.Segment.AES.AESInfomationHandler>();
+            services.AddTransient<DlVideoV2.Fetch.Segment.AES.IDecryptor, DlVideoV2.Fetch.Segment.AES.Decryptor>();
+            services.AddTransient<DlVideoV2.External.IExternalDownloaderHandler, DlVideoV2.External.ExternalDownloaderHandler>();
 
             return services.BuildServiceProvider();
         }

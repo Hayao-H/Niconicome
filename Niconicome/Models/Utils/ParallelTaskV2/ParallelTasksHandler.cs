@@ -10,7 +10,7 @@ using Windows.ApplicationModel.Contacts;
 namespace Niconicome.Models.Utils.ParallelTaskV2
 {
 
-    public class ParallelTasksHandler<T>
+    public class ParallelTasksHandler
     {
 
         public ParallelTasksHandler(int maxPallarelTasksCount, int waitInterval, int waitSeconds, bool createThread = true, bool untilEmpty = false)
@@ -71,13 +71,13 @@ namespace Niconicome.Models.Utils.ParallelTaskV2
         /// <summary>
         /// 全ての並列タスク
         /// </summary>
-        public virtual Queue<IParallelTask<T>> PallarelTasks { get; init; } = new();
+        public virtual Queue<IParallelTask> PallarelTasks { get; init; } = new();
 
         /// <summary>
         /// タスクを追加する
         /// </summary>
         /// <param name="task"></param>
-        public void AddTaskToQueue(IParallelTask<T> task)
+        public void AddTaskToQueue(IParallelTask task)
         {
             lock (this.lockobj)
             {
@@ -110,7 +110,7 @@ namespace Niconicome.Models.Utils.ParallelTaskV2
         /// 次のタスクを取得する
         /// </summary>
         /// <returns></returns>
-        private IParallelTask<T>? GetNextTask()
+        private IParallelTask? GetNextTask()
         {
             lock (this.lockobj)
             {
@@ -154,7 +154,7 @@ namespace Niconicome.Models.Utils.ParallelTaskV2
             //スレッドを作成して並列実行する
             while (this.PallarelTasks.Count > 0)
             {
-                IParallelTask<T>? task = this.GetNextTask();
+                IParallelTask? task = this.GetNextTask();
 
                 //タスクがnullならキャンセル
                 if (task is null)
@@ -216,7 +216,7 @@ namespace Niconicome.Models.Utils.ParallelTaskV2
 
                     try
                     {
-                        await task.TaskFunction(task.TaskItem, lockobj);
+                        await task.TaskFunction(lockobj);
                     }
                     catch
                     {

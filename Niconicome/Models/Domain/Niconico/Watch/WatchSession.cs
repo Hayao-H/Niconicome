@@ -266,17 +266,12 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 if (result.Data.DmcResponseJsonData is not string jsonData) return new AttemptResult<IWatchSessionInfo>() { Message = $"HeratBeatコンテントが正しくありません。" };
                 if (result.Data.ContentUrl is not string contentUrl) return new AttemptResult<IWatchSessionInfo>() { Message = $"コンテンツURLが正しくありません。" };
                 if (result.Data.SessionId is not string sessionID) return new AttemptResult<IWatchSessionInfo>() { Message = $"セッションIDが正しくありません。" };
-                if (result.Data.KeyURI is not string keyURI)
-                {
-                    keyURI = string.Empty;
-                }
 
                 var info = new WatchSessionInfo()
                 {
                     DmcResponseJsonData = jsonData,
                     ContentUrl = contentUrl,
                     SessionId = sessionID,
-                    KeyURI = keyURI,
                 };
 
                 return new AttemptResult<IWatchSessionInfo>() { IsSucceeded = true, Data = info };

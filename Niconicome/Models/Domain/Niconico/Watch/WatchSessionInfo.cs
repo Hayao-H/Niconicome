@@ -11,7 +11,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         string DmcResponseJsonData { get; }
         string ContentUrl { get; }
         string SessionId { get; }
-        string KeyURI { get; }
 
     }
 
@@ -23,6 +22,5 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public string DmcResponseJsonData { get; set; } = string.Empty;
         public string ContentUrl { get; set; } = string.Empty;
         public string SessionId { get; set; } = string.Empty;
-        public string KeyURI { get; set; } = string.Empty;
     }
 }

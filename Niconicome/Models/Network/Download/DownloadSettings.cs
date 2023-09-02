@@ -1,5 +1,6 @@
 ﻿using System;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Domain.Local.Settings.Enum;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
@@ -193,6 +194,16 @@ namespace Niconicome.Models.Network.Download
         string CommandFormat { get; }
 
         /// <summary>
+        /// 外部ダウンローダーのパス
+        /// </summary>
+        string ExternalDownloaderPath { get; }
+
+        /// <summary>
+        /// 外部ダウンローダーのパラメータ-
+        /// </summary>
+        string ExternalDownloaderParam { get; }
+
+        /// <summary>
         /// 解像度
         /// </summary>
         uint VerticalResolution { get; }
@@ -221,6 +232,11 @@ namespace Niconicome.Models.Network.Download
         /// コメントコレクションの1ブロックあたりのコメント数
         /// </summary>
         int CommentCountPerBlock { get; }
+
+        /// <summary>
+        /// 外部ダウンローダー設定
+        /// </summary>
+        ExternalDownloaderConditionSetting ExternalDownloaderConditionSetting { get; }
 
         /// <summary>
         /// 市場情報の形式
@@ -327,6 +343,12 @@ namespace Niconicome.Models.Network.Download
         public string FilePath { get; set; } = string.Empty;
 
         public string EconomySuffix { get; set; } = String.Empty;
+
+        public string ExternalDownloaderPath { get; set; } = string.Empty;
+
+        public string ExternalDownloaderParam { get; set; } = string.Empty;
+
+        public ExternalDownloaderConditionSetting ExternalDownloaderConditionSetting { get; set; }
 
         public IchibaInfoTypeSettings IchibaInfoType { get; set; }
 

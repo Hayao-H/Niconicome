@@ -38,5 +38,7 @@ namespace Niconicome.Models.Const
         public static string SettingJSONPath = @"data\settings.json";
 
         public static string ExportFolderPath = @"data\export";
+
+        public static string SegmentsFolderPath = @"data\tmp\download";
     }
 }

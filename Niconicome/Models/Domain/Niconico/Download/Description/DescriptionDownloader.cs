@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Niconicome.Models.Domain.Local.IO;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -12,7 +13,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
 
     interface IDescriptionDownloader
     {
-        IAttemptResult DownloadVideoInfoAsync(IDownloadSettings setting, IWatchSession session, Action<string> onMessage);
+        IAttemptResult DownloadVideoInfoAsync(IDownloadSettings setting, IDomainVideoInfo videoInfo, Action<string> onMessage);
     }
 
     class DescriptionDownloader : IDescriptionDownloader
@@ -42,25 +43,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Description
         /// <param name="setting"></param>
         /// <param name="dmcInfo"></param>
         /// <returns></returns>
-        public IAttemptResult DownloadVideoInfoAsync(IDownloadSettings setting, IWatchSession session, Action<string> onMessage)
+        public IAttemptResult DownloadVideoInfoAsync(IDownloadSettings setting, IDomainVideoInfo videoInfo, Action<string> onMessage)
         {
-
-            if (session.Video is null)
-            {
-                return AttemptResult.Fail("動画情報が未取得です。");
-            }
-
             onMessage($"動画情報の保存を開始します。");
-            this._logger.Log($"{session.Video.Id}の動画情報保存を開始");
+            this._logger.Log($"{videoInfo.Id}の動画情報保存を開始");
 
-            string filePath = this._pathOrganizer.GetFilePath(setting.FileNameFormat, session.Video.DmcInfo, setting.VideoInfoExt, setting.FolderPath, setting.IsReplaceStrictedEnable, setting.Overwrite, setting.VideoInfoSuffix);
+            string filePath = this._pathOrganizer.GetFilePath(setting.FileNameFormat, videoInfo.DmcInfo, setting.VideoInfoExt, setting.FolderPath, setting.IsReplaceStrictedEnable, setting.Overwrite, setting.VideoInfoSuffix);
 
 
             string content = setting.VideoInfoType switch
             {
-                VideoInfoTypeSettings.Json => this._producer.GetJsonContent(session.Video.DmcInfo),
-                VideoInfoTypeSettings.Xml => this._producer.GetXmlContent(session.Video.DmcInfo),
-                _ => this._producer.GetContent(session.Video.DmcInfo),
+                VideoInfoTypeSettings.Json => this._producer.GetJsonContent(videoInfo.DmcInfo),
+                VideoInfoTypeSettings.Xml => this._producer.GetXmlContent(videoInfo.DmcInfo),
+                _ => this._producer.GetContent(videoInfo.DmcInfo),
             };
 
             try

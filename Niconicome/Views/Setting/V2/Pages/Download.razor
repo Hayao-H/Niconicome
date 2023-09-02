@@ -1,6 +1,7 @@
 ﻿@page "/settings/download";
 
 @using Niconicome.Views.Setting.V2.Shared;
+@using Models.Domain.Local.Settings.Enum;
 @inherits BlazorBase;
 
 @inject IJSRuntime JS;
@@ -34,6 +35,55 @@
                 <input type="text" class="form-control" @bind="DataContext.CommentCountPerBlock.Value">
             </div>
         </div>
+
+        <div class="SettingContent">
+            <p class="Title"><i class="Icon fa-solid fa-file-export"></i>動画のダウンロードに外部ソフトを使用する</p>
+            <select class="form-select Select" @bind="DataContext.ExternalDownloaderSetting.Value">
+                @foreach (var x in DataContext.SelectableExternalDownloaderSetting)
+                {
+                    <option value="@x.Value">@x.DidplayValue</option>
+                }
+            </select>
+        </div>
+
+        @if (DataContext.ExternalDownloaderSetting.Value != ExternalDownloaderConditionSetting.Disable)
+        {
+            <div class="SettingContent">
+                <label class="Title"><i class="Icon fa-solid fa-arrow-up-right-from-square"></i>外部ダウンローダーのパス</label>
+                <div class="input-group mb-3 Input">
+                    <input class="form-control" type="text" @bind="DataContext.ExternalDownloaderPath.Value">
+                </div>
+            </div>
+
+            <div class="SettingContent">
+                <label class="Title"><i class="Icon fa-solid fa-terminal"></i>外部ダウンローダーのパラメーター</label>
+                <div class="input-group mb-3 Input">
+                    <input class="form-control" type="text" @bind="DataContext.ExternalDownloaderParam.Value">
+                </div>
+            </div>
+
+            <div class="Detail accordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#FileFormatDetail">
+                            外部ダウンローダーについて
+                        </button>
+                    </h2>
+                    <div id="FileFormatDetail" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            実行ファイルパスは実行ファイルの絶対パスを指定してください。(例: C:\downloader\some-downloader.exe)<br />
+                            ただし、実行ファイルのパスが通っている場合は、ファイル名を利用することが出来ます。<br />
+                            ※Windowsの環境変数についての更に詳しい情報は<a href="https://www.atmarkit.co.jp/ait/articles/1805/11/news035.html">＠IT様の記事</a>をご覧ください。<br />
+                            パラメーターは<br />
+                            &lt;NiconicoID&gt;：動画ID<br />
+                            &lt;URL&gt;：視聴ページのURL<br />
+                            &lt;OutputPath&gt;：保存ファイルパス<br />
+                            が置き換え対象の文字列として使用できます。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
 
         <div class="SettingContent">
             <p class="Title" title="大きなすぎる場合、失敗する確率が高くなります"><i class="Icon fa-solid fa-download"></i>最大並列ダウンロード数</p>

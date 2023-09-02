@@ -70,6 +70,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
                 {
                     "GET" => await this.http.NicoHttp.GetAsync(new Uri(url)),
                     "POST" => await this.http.NicoHttp.PostAsync(new Uri(url), content!),
+                    "OPTION" => await this.http.NicoHttp.OptionAsync(new Uri(url)),
                     _ => await this.http.NicoHttp.GetAsync(new Uri(url)),
                 };
             } else
@@ -78,6 +79,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
                 {
                     "GET" => await this.http.GetAsync(new Uri(url)),
                     "POST" => await this.http.PostAsync(new Uri(url), content!),
+                    "OPTION" => await this.http.OptionAsync(new Uri(url)),
                     _ => await this.http.GetAsync(new Uri(url)),
                 };
             }

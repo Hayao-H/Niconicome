@@ -94,6 +94,8 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.SnackbarDuration = new BindableSettingInfo<int>(WS.SettingsContainer.GetSetting(SettingNames.SnackbarDuration, NetConstant.DefaultServerPort), NetConstant.DefaultServerPort, x => x < 0 ? 4000 : x, x => x is int).AddTo(this.Bindables);
 
+            this.UserAgent = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.UserAgent, string.Empty), string.Empty).AddTo(this.Bindables);
+
         }
 
         #region field
@@ -208,6 +210,11 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// スナックバー表示時間
         /// </summary>
         public IBindableSettingInfo<int> SnackbarDuration { get; init; }
+
+        /// <summary>
+        /// UA
+        /// </summary>
+        public IBindableSettingInfo<string> UserAgent { get; }
 
         #endregion
 

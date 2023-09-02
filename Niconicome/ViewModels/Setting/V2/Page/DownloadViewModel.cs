@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using AngleSharp.Common;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Local.Settings.Enum;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Setting.V2.Utils;
@@ -58,6 +60,16 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.IsExperimentalCommentDownloadSystemEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsExperimentalCommentSafetySystemEnable, false), false).AddTo(this.Bindables);
 
+            var ex1 = new SelectBoxItem<ExternalDownloaderConditionSetting>("無効", ExternalDownloaderConditionSetting.Disable);
+            var ex2 = new SelectBoxItem<ExternalDownloaderConditionSetting>("常に", ExternalDownloaderConditionSetting.Always);
+            var ex3 = new SelectBoxItem<ExternalDownloaderConditionSetting>("暗号化された動画の場合", ExternalDownloaderConditionSetting.Encrypted);
+            var ex4 = new SelectBoxItem<ExternalDownloaderConditionSetting>("公式動画の場合", ExternalDownloaderConditionSetting.Official);
+
+            this.SelectableExternalDownloaderSetting = new List<SelectBoxItem<ExternalDownloaderConditionSetting>>() { ex1, ex2, ex3, ex4 };
+            this.ExternalDownloaderSetting = new BindableSettingInfo<ExternalDownloaderConditionSetting>(WS.SettingsContainer.GetSetting(SettingNames.ExternalDownloaderCondition, ExternalDownloaderConditionSetting.Disable), ExternalDownloaderConditionSetting.Disable).AddTo(this.Bindables);
+            this.ExternalDownloaderPath = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.ExternalDLSoftwarePath, string.Empty), string.Empty).AddTo(this.Bindables);
+            this.ExternalDownloaderParam = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.ExternalDLSoftwareParam, string.Empty), string.Empty).AddTo(this.Bindables);
+
         }
 
         /// <summary>
@@ -84,6 +96,11 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 選択可能な市場情報ファイルの保存形式
         /// </summary>
         public List<SelectBoxItem<IchibaInfoTypeSettings>> SelectableIchibaInfoType { get; init; }
+
+        /// <summary>
+        /// 選択可能な外部ダウンローダー設定
+        /// </summary>
+        public List<SelectBoxItem<ExternalDownloaderConditionSetting>> SelectableExternalDownloaderSetting { get; }
 
         /// <summary>
         /// 最大並列DL数
@@ -154,5 +171,20 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 実験的なシステム
         /// </summary>
         public IBindableSettingInfo<bool> IsExperimentalCommentDownloadSystemEnable { get; init; }
+
+        /// <summary>
+        /// 外部ダウンローダー設定
+        /// </summary>
+        public IBindableSettingInfo<ExternalDownloaderConditionSetting> ExternalDownloaderSetting { get; init; }
+
+        /// <summary>
+        /// 外部ダウンローダーのパス
+        /// </summary>
+        public IBindableProperty<string> ExternalDownloaderPath { get; init; }
+
+        /// <summary>
+        /// 外部ダウンローダーのパラメータ
+        /// </summary>
+        public IBindableProperty<string> ExternalDownloaderParam { get; init; }
     }
 }

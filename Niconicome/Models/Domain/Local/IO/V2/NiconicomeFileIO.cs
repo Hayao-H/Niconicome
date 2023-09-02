@@ -26,6 +26,14 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         IAttemptResult Write(string path, string content, Encoding? encoding = null);
 
         /// <summary>
+        /// ファイルに書き込む
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        IAttemptResult Write(string path, byte[] content);
+
+        /// <summary>
         /// ファイルを読み込む
         /// </summary>
         /// <param name="path"></param>
@@ -44,8 +52,9 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// </summary>
         /// <param name="source"></param>
         /// <param name="target"></param>
+        /// <param name="overwrite"></param>
         /// <returns></returns>
-        IAttemptResult Copy(string source, string target);
+        IAttemptResult Copy(string source, string target, bool overwrite = false);
 
         /// <summary>
         /// ファイルを列挙してアクションを実行
@@ -71,5 +80,13 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// <param name="path"></param>
         /// <returns></returns>
         bool Exists(string path);
+
+        /// <summary>
+        /// ファイルの書き込み日時を変更
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        IAttemptResult SetLastWriteTime(string path, DateTime dt);
     }
 }

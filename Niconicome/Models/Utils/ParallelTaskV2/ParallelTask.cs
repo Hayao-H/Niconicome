@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Utils.ParallelTaskV2
 {
-    public interface IParallelTask<T>
+    public interface IParallelTask
     {
         /// <summary>
         /// Inxex(自動割当)
@@ -14,16 +14,10 @@ namespace Niconicome.Models.Utils.ParallelTaskV2
         int Index { get; set; }
 
         /// <summary>
-        /// タスクアイテム
-        /// </summary>
-        T TaskItem { get; }
-
-        /// <summary>
         /// タスク関数
-        /// T:タスクアイテム
         /// object:localObj
         /// </summary>
-        Func<T, object, Task> TaskFunction { get; }
+        Func<object, Task> TaskFunction { get; }
 
         /// <summary>
         /// 待機ハンドラ
@@ -36,20 +30,17 @@ namespace Niconicome.Models.Utils.ParallelTaskV2
         void Cancel();
     }
 
-    public class ParallelTask<T> : IParallelTask<T>
+    public class ParallelTask : IParallelTask
     {
-        public ParallelTask(T taskItem, Func<T, object, Task> taskFunction, Action<int> onWait)
+        public ParallelTask(Func<object, Task> taskFunction, Action<int> onWait)
         {
-            this.TaskItem = taskItem;
             this.TaskFunction = taskFunction;
             this.OnWait = onWait;
         }
 
         public int Index { get; set; }
 
-        public T TaskItem { get; init; }
-
-        public Func<T, object, Task> TaskFunction { get; init; }
+        public Func<object, Task> TaskFunction { get; init; }
 
         public Action<int> OnWait { get; init; }
 

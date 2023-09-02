@@ -5,7 +5,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.Models.Helper.Result;
 using Const = Niconicome.Models.Const;
 
 namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
@@ -16,19 +18,23 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         void Initialize(IAddonInfomation addon);
         Task<HttpResponseMessage> GetAsync(Uri uri);
         Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content);
+        Task<HttpResponseMessage> OptionAsync(Uri uri);
     }
 
     public class AddonHttp : IAddonHttp
     {
-        public AddonHttp(HttpClient client, INicoHttp nicoHttp)
+        public AddonHttp(HttpClient client, INicoHttp nicoHttp, ISettingsContainer settingsContainer)
         {
             this.client = client;
             this.NicoHttp = nicoHttp;
+            this._settingsContainer = settingsContainer;
         }
 
         #region field
 
         private readonly HttpClient client;
+
+        private readonly ISettingsContainer _settingsContainer;
 
         #endregion
 
@@ -44,8 +50,17 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
 
+            IAttemptResult<string> result = this._settingsContainer.GetOnlyValue(SettingNames.UserAgent, string.Empty);
+            if (!result.IsSucceeded || string.IsNullOrEmpty(result.Data))
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build}) Addon");
+            }
+            else
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(result.Data);
+            }
+
             this.client.DefaultRequestHeaders.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
-            this.client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
             this.client.DefaultRequestHeaders.Add("X-Frontend-Id", "6");
             this.client.DefaultRequestHeaders.Add("X-Frontend-Version", "0");
 
@@ -59,6 +74,13 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         {
             return await this.client.GetAsync(uri);
         }
+
+        public async Task<HttpResponseMessage> OptionAsync(Uri uri)
+        {
+            var message = new HttpRequestMessage(HttpMethod.Options, uri);
+            return await this.client.SendAsync(message);
+        }
+
 
         public async Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content)
         {
