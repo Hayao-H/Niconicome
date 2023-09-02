@@ -153,9 +153,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
             //AES
             IAESInfomation? aes = null;
-            if (!string.IsNullOrEmpty(videoInfo.DmcInfo.SessionInfo.KeyURL))
+            if (!string.IsNullOrEmpty(stream.KeyURL))
             {
-                IAttemptResult<IAESInfomation> aesResult = await this._aESInfomationHandler.GetAESInfomationAsync(stream.IV, videoInfo.DmcInfo.SessionInfo.KeyURL);
+                IAttemptResult<IAESInfomation> aesResult = await this._aESInfomationHandler.GetAESInfomationAsync(stream.IV, stream.KeyURL);
                 if (!aesResult.IsSucceeded || aesResult.Data is null)
                 {
                     return AttemptResult<uint>.Fail(aesResult.Message);

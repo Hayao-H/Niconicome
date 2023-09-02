@@ -38,6 +38,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
             var urls = new List<ISegmentURL>();
             var index = 0;
             var iv = "";
+            var key = "";
 
             foreach (var node in nodes)
             {
@@ -58,14 +59,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
                         info.Add(splited[0], splited[1]);
                     }
 
-                    if (info.TryGetValue("IV",out string? x))
+                    if (info.TryGetValue("IV", out string? x))
                     {
                         iv = x;
+                    }
+
+                    if (info.TryGetValue("URI", out string? y))
+                    {
+                        key = y;
                     }
                 }
             }
 
-            return new StreamInfo(urls, resolution, bandWidth, iv);
+            return new StreamInfo(urls, resolution, bandWidth, iv, key);
 
         }
 
