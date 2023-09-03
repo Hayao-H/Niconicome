@@ -9,6 +9,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Type
 {
     public class Playlist
     {
+
         [JsonPropertyName("id")]
         public int Id { get; set; }
 

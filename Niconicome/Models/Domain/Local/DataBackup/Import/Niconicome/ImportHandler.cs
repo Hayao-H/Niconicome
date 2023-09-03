@@ -68,12 +68,6 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
                 return AttemptResult<ImportResult>.Fail(this._errorHandler.GetMessageForResult(ImportError.DataIsInvalid));
             }
 
-            IAttemptResult preResult = this.PreImport();
-            if (!preResult.IsSucceeded)
-            {
-                return AttemptResult<ImportResult>.Fail(preResult.Message);
-            }
-
             Dictionary<int, Type::Playlist> playlists = loadResult.Data.Playlists.ToDictionary(p => p.Id);
             Dictionary<int, Type::Video> videos = loadResult.Data.Videos.ToDictionary(v => v.Id);
             Dictionary<int, Type::Tag> tags = loadResult.Data.Tags.ToDictionary(t => t.Id);
@@ -85,48 +79,6 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
         #endregion
 
         #region private
-
-        /// <summary>
-        /// インポートの前段階
-        /// </summary>
-        /// <returns></returns>
-        private IAttemptResult PreImport()
-        {
-            IAttemptResult vResult = this._videoStore.Clear();
-            if (!vResult.IsSucceeded)
-            {
-                return vResult;
-            }
-
-            IAttemptResult pResult = this._playlistStore.Clear();
-            if (!pResult.IsSucceeded)
-            {
-                return pResult;
-            }
-
-            IAttemptResult tResult = this._tagStore.Clear();
-            if (!tResult.IsSucceeded)
-            {
-                return tResult;
-            }
-
-            //ルートを作成
-            IAttemptResult<int> rootCreationResult = this._playlistStore.Create(LocalConstant.RootPlaylistName);
-            if (!rootCreationResult.IsSucceeded)
-            {
-                return AttemptResult.Fail(rootCreationResult.Message);
-            }
-
-            IAttemptResult<IPlaylistInfo> rootResult = this._playlistStore.GetPlaylist(rootCreationResult.Data);
-            if (!rootResult.IsSucceeded || rootResult.Data is null)
-            {
-                return AttemptResult.Fail(rootResult.Message);
-            }
-
-            rootResult.Data.PlaylistType = PlaylistType.Root;
-
-            return AttemptResult.Succeeded();
-        }
 
         /// <summary>
         /// インポート用のデータを取得

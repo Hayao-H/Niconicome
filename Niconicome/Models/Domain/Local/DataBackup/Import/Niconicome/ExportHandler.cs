@@ -139,6 +139,8 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
             }
 
             var playlists = new List<Type::Playlist>();
+            IReadOnlyList<int> exclude = this.GetExcludePlaylistIDs(pResult.Data);
+
             foreach (var p in pResult.Data)
             {
                 if (!this.CheckWhetherExportablePlaylist(p))
@@ -146,7 +148,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
                     continue;
                 }
 
-                playlists.Add(this._converter.ConvertPlaylist(p));
+                playlists.Add(this._converter.ConvertPlaylist(p, exclude));
             }
 
             var videos = new List<Type::Video>();
@@ -203,6 +205,25 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// エクスポートしないプレイリストのIDを取得
+        /// </summary>
+        /// <param name="playlists"></param>
+        /// <returns></returns>
+        private IReadOnlyList<int> GetExcludePlaylistIDs(IEnumerable<IPlaylistInfo> playlists)
+        {
+            var exclude = new List<int>();
+            foreach (var playlist in playlists)
+            {
+                if (!this.CheckWhetherExportablePlaylist(playlist))
+                {
+                    exclude.Add(playlist.ID);
+                }
+            }
+
+            return exclude.AsReadOnly();
         }
 
         #endregion
