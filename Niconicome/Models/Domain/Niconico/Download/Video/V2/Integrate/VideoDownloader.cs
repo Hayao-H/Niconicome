@@ -127,7 +127,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
             //レジューム
             string folderPath;
-            var targetSegments = new List<ISegmentURL>();
+            IEnumerable<string> existingFileNames;
 
             IAttemptResult<ResumeInfomation> resumeResult = settings.ResumeEnable ? this.GetResumeInfomation(stream.SegmentUrls, videoInfo.Id, stream.VideoResolution.Vertical) : AttemptResult<ResumeInfomation>.Fail();
 
@@ -141,14 +141,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
 
                 folderPath = segmentResult.Data;
-                targetSegments.AddRange(stream.SegmentUrls);
+                existingFileNames = new List<string>();
             }
             else
             {
                 OnMessage(this._stringHandler.GetContent(SC.Resume));
 
                 folderPath = resumeResult.Data.SegmentDirectoryPath;
-                targetSegments.AddRange(resumeResult.Data.DownloadTargets);
+                existingFileNames = resumeResult.Data.ExistingFileNames;
             }
 
             //AES
@@ -165,7 +165,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             }
 
             //セグメントのDL
-            IAttemptResult dlResult = await this.DownloadSegments(targetSegments, folderPath, videoInfo.Id, stream.VideoResolution.Vertical, settings.MaxParallelSegmentDLCount, OnMessage, token, aes);
+            IAttemptResult dlResult = await this.DownloadSegments(stream.SegmentUrls, existingFileNames, folderPath, videoInfo.Id, stream.VideoResolution.Vertical, settings.MaxParallelSegmentDLCount, OnMessage, token, aes);
             if (!dlResult.IsSucceeded)
             {
                 return AttemptResult<uint>.Fail(dlResult.Message);
@@ -222,13 +222,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
         /// <param name="onMessage"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        private async Task<IAttemptResult> DownloadSegments(IEnumerable<ISegmentURL> targets, string folderPath, string videoID, uint verticalResoluiton, int parallelDLCount, Action<string> onMessage, CancellationToken token, IAESInfomation? aes)
+        private async Task<IAttemptResult> DownloadSegments(IEnumerable<ISegmentURL> targets, IEnumerable<string> existingFileNames, string folderPath, string videoID, uint verticalResoluiton, int parallelDLCount, Action<string> onMessage, CancellationToken token, IAESInfomation? aes)
         {
             var handler = new ParallelTasksHandler(parallelDLCount);
             var container = new SegmentDLResultContainer(targets.Count());
 
             foreach (var streamURL in targets)
             {
+                if (existingFileNames.Contains(streamURL.FileName))
+                {
+                    container.SetResult(true, streamURL.SequenceZero);
+                    continue;
+                }
+
                 var info = new SegmentInfomation(onMessage, streamURL.AbsoluteUrl, streamURL.SequenceZero, Path.Combine(folderPath, streamURL.FileName), verticalResoluiton, videoID, token, aes);
 
                 var task = new ParallelTask(async _ =>
@@ -276,8 +282,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
             if (resumeResult.IsSucceeded && resumeResult.Data is not null)
             {
-                var target = source.Where(s => !resumeResult.Data.ExistsFiles.Contains(s.FileName));
-                return AttemptResult<ResumeInfomation>.Succeeded(new ResumeInfomation(target, resumeResult.Data.DirectoryPath));
+                return AttemptResult<ResumeInfomation>.Succeeded(new ResumeInfomation(resumeResult.Data.ExistingFileNames, resumeResult.Data.DirectoryPath));
             }
             else
             {
@@ -297,7 +302,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
         }
 
 
-        private record ResumeInfomation(IEnumerable<ISegmentURL> DownloadTargets, string SegmentDirectoryPath);
+        private record ResumeInfomation(IEnumerable<string> ExistingFileNames, string SegmentDirectoryPath);
 
         #endregion
     }
