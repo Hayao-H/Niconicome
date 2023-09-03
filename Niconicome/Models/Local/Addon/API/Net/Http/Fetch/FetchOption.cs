@@ -11,25 +11,33 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         /// <summary>
         /// メソッド
         /// </summary>
-        string? method { get; set; }
+        string Method { get; }
 
         /// <summary>
         /// 認証情報フラグ
         /// </summary>
-        string? credentials { get; set; }
+        bool IncludeCredentioals { get; }
 
         /// <summary>
         /// body
         /// </summary>
-        dynamic? body { get; set; }
+        string Body { get; }
+
+        /// <summary>
+        /// Header
+        /// </summary>
+        Dictionary<string, string> Headers { get; }
     }
 
     public class FetchOption : IFetchOption
     {
-        public string? method { get; set; }
+        public string Method { get; init; } = string.Empty;
 
-        public string? credentials { get; set; }
+        public bool IncludeCredentioals { get; init; }
 
-        public dynamic? body { get; set; }
+        public string Body { get; init; } = string.Empty;
+
+        public Dictionary<string, string> Headers { get; init; } = new();
+
     }
 }

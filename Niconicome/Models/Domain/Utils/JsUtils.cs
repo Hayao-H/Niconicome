@@ -30,6 +30,12 @@ namespace Niconicome.Models.Domain.Utils
                     }
                     return clrArray;
                 }
+
+                function setPropertyBag(source, propertyBag) {
+                    for (const key of Object.keys(source)) {
+                        propertyBag[key] = source[key];
+                    }
+                }
             ";
 
             executer.AddHostObject("host", new HostFunctions());
@@ -68,6 +74,28 @@ namespace Niconicome.Models.Domain.Utils
             TimeZoneInfo tz = TimeZoneInfo.Local;
             DateTime dt = TimeZoneInfo.ConvertTimeFromUtc(rawDatetime, tz);
             return dt;
+        }
+
+        /// <summary>
+        /// オブジェクトをDictionaryに変換
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static Dictionary<string, string> ToDictionary(dynamic source)
+        {
+            InitializeIfNotInitialized();
+            var bag = new PropertyBag();
+            var dict = new Dictionary<string, string>();
+
+            executer.Script.setPropertyBag(source, bag);
+
+            foreach (var key in bag.Keys)
+            {
+                if (bag[key] is not string item) continue;
+                dict.Add(key, item);
+            }
+
+            return dict;
         }
     }
 }

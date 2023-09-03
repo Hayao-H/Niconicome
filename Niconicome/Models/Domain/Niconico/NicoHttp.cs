@@ -107,7 +107,6 @@ namespace Niconicome.Models.Domain.Niconico
         public async Task<HttpResponseMessage> OptionAsync(Uri uri)
         {
             var message = new HttpRequestMessage(HttpMethod.Options, uri);
-            message.Headers.Add("Access-Control-Request-Method", "GET");
             return await this._client.SendAsync(message);
         }
 
