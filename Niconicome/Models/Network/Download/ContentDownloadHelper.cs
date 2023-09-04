@@ -239,7 +239,13 @@ namespace Niconicome.Models.Network.Download
             }
 
             context.ActualVerticalResolution = result.Data;
-            return AttemptResult.Succeeded();
+            if (result.IsSucceeded)
+            {
+                return AttemptResult.Succeeded();
+            } else
+            {
+                return AttemptResult.Fail(result.Message);
+            }
         }
 
         /// <summary>

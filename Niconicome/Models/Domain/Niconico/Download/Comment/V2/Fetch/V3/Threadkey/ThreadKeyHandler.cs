@@ -5,6 +5,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Net.Json;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
+using Niconicome.Models.Domain.Niconico.Watch.V2;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using API = Niconicome.Models.Domain.Niconico.Net.Json.API.Video.V3;
@@ -23,73 +25,30 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Threadk
 
     public class ThreadKeyHandler : IThreadKeyHandler
     {
-        public ThreadKeyHandler(INicoHttp http, IErrorHandler errorHandler)
+        public ThreadKeyHandler(IWatchPageInfomationHandler handler, IErrorHandler errorHandler)
         {
-            this._http = http;
+            this._handler = handler;
             this._errorHandler = errorHandler;
         }
 
-        private readonly INicoHttp _http;
+        private readonly IWatchPageInfomationHandler _handler;
 
         private readonly IErrorHandler _errorHandler;
 
         public async Task<IAttemptResult<string>> GetThreadKeyAsync(string videoID)
         {
-            var id = this.GetTrackID();
-            var url = $"https://www.nicovideo.jp/api/watch/v3/{videoID}?actionTrackId={id}";
 
-            HttpResponseMessage res = await this._http.GetAsync(new Uri(url));
+            IAttemptResult<IDomainVideoInfo> result = await this._handler.GetVideoInfoAsync(videoID);
 
-            if (!res.IsSuccessStatusCode)
+            if (!result.IsSucceeded||result.Data is null)
             {
-                this._errorHandler.HandleError(ThreadKeyError.FailedToGetData, url, (int)res.StatusCode);
-                return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(ThreadKeyError.FailedToGetData, videoID, (int)res.StatusCode));
+                return AttemptResult<string>.Fail(result.Message);
             }
 
-            API::WatchAPI data;
+            this._errorHandler.HandleError(ThreadKeyError.GetThreadKey, videoID, result.Data.DmcInfo.Threadkey);
 
-            try
-            {
-                var content = await res.Content.ReadAsStringAsync();
-                data = JsonParser.DeSerialize<API::WatchAPI>(content);
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(ThreadKeyError.FailedToLoadData, ex.Message);
-                return AttemptResult<string>.Fail(this._errorHandler.GetMessageForResult(ThreadKeyError.FailedToLoadData, ex.Message));
-            }
-
-            this._errorHandler.HandleError(ThreadKeyError.GetThreadKey, videoID, data.Data.Comment.NvComment.ThreadKey);
-
-            return AttemptResult<string>.Succeeded(data.Data.Comment.NvComment.ThreadKey);
+            return AttemptResult<string>.Succeeded(result.Data.DmcInfo.Threadkey);
         }
-
-        #region private
-
-        private string GetTrackID()
-        {
-            var source = new List<string>();
-            source.AddRange(Enumerable.Range('a', 26).Select(x => ((char)x).ToString()));
-            source.AddRange(Enumerable.Range('A', 26).Select(x => ((char)x).ToString()));
-            source.AddRange(Enumerable.Range(0, 10).Select(x => x.ToString()));
-
-            var ramd = new Random();
-            var id = new StringBuilder();
-
-            foreach (var _ in Enumerable.Range(0, 10))
-            {
-                id.Append(source[ramd.Next(26 + 26 + 10 - 1)]);
-            }
-
-            id.Append("_");
-
-            id.Append(ramd.NextInt64((long)Math.Pow(10, 12), (long)Math.Pow(10, 13)).ToString());
-
-            return id.ToString();
-        }
-
-        #endregion
-
     }
 
 
