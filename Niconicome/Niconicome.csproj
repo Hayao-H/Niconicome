@@ -10,7 +10,7 @@
 		<AnalysisLevel>latest</AnalysisLevel>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<Deterministic>false</Deterministic>
-		<Version>0.13.0</Version>
+		<Version>0.13.1</Version>
 		<PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
 		<Copyright>c2023 Hayao-H</Copyright>
 		<Authors>Hayao-H</Authors>

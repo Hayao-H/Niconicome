@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Local.Settings;
 using Reactive.Bindings;
@@ -20,6 +21,11 @@ namespace Niconicome.Models.Local.State
         /// アプリケーションのバージョン
         /// </summary>
         string ApplicationVersion { get; }
+
+        /// <summary>
+        /// APIバージョン
+        /// </summary>
+        string APIVersion { get; }
     }
 
     public class LocalInfo : ILocalInfo
@@ -50,5 +56,6 @@ namespace Niconicome.Models.Local.State
             }
         }
 
+        public string APIVersion => AddonConstant.APIVersion.ToString();
     }
 }
