@@ -2,6 +2,7 @@
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Local.Settings.Enum;
 using Niconicome.Models.Domain.Niconico.Download.Comment;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
@@ -211,16 +212,14 @@ namespace Niconicome.Models.Network.Download
                 maxParallelSegmentDownloadCount = NetConstant.DefaultMaxParallelDownloadCount;
             }
 
-            int commentOffset = this._container.GetSetting(SettingNames.CommentOffset, CommentCollection.NumberToThrough).Data!.Value;
-            if (commentOffset <= 0)
-            {
-                commentOffset = CommentCollection.NumberToThrough;
-            }
-
             //履歴系
             bool saveSucceeded = !this._container.GetSetting(SettingNames.DisableDownloadSucceededHistory, false).Data!.Value; ;
             bool saveFailed = !this._container.GetSetting(SettingNames.DisableDownloadFailedHistory, false).Data!.Value; ;
 
+            //外部ダウンローダー系
+            ExternalDownloaderConditionSetting externalDownloader = this._container.GetOnlyValue(SettingNames.ExternalDownloaderCondition, ExternalDownloaderConditionSetting.Disable).Data;
+            string externalSoftwarePath = this._container.GetOnlyValue(SettingNames.ExternalDLSoftwarePath, string.Empty).Data!;
+            string externalSoftwareParam = this._container.GetOnlyValue(SettingNames.ExternalDLSoftwareParam, string.Empty).Data!;
 
             return new DownloadSettings
             {
@@ -262,11 +261,13 @@ namespace Niconicome.Models.Network.Download
                 CommentFetchWaitSpan = commentFetchWaitSpan,
                 DeleteExistingEconomyFile = deleteEconomyFile,
                 MaxParallelSegmentDLCount = maxParallelSegmentDownloadCount,
-                CommentOffset = commentOffset,
                 VideoInfoType = videoInfoT,
                 SaveFailedHistory = saveFailed,
                 SaveSucceededHistory = saveSucceeded,
                 CommentCountPerBlock = commentCountPerBlock,
+                ExternalDownloaderParam = externalSoftwareParam,
+                ExternalDownloaderPath = externalSoftwarePath,
+                ExternalDownloaderConditionSetting = externalDownloader,
             };
         }
 

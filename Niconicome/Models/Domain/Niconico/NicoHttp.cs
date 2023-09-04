@@ -2,6 +2,8 @@
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Helper.Result;
 using Windows.Media.Protection.PlayReady;
 using Const = Niconicome.Models.Const;
 
@@ -50,13 +52,21 @@ namespace Niconicome.Models.Domain.Niconico
 
     public class NicoHttp : INicoHttp
     {
-        public NicoHttp(HttpClient client)
+        public NicoHttp(HttpClient client, ISettingsContainer settingsContainer)
         {
 
             var version = Assembly.GetExecutingAssembly().GetName().Version;
 
+            IAttemptResult<string> result = settingsContainer.GetOnlyValue(SettingNames.UserAgent, string.Empty);
+            if (!result.IsSucceeded || string.IsNullOrEmpty(result.Data))
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
+            } else
+            {
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(result.Data);
+            }
+
             client.DefaultRequestHeaders.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
-            client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
             client.DefaultRequestHeaders.Add("x-frontend-id", "6");
             client.DefaultRequestHeaders.Add("x-frontend-version", "0");
             client.DefaultRequestHeaders.Add("x-client-os-type", "others");

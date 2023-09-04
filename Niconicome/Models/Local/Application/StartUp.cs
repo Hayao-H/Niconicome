@@ -18,6 +18,9 @@ using Niconicome.Models.Domain.Utils.NicoLogger;
 using Niconicome.Models.Local.State.Toast;
 using Niconicome.Models.Domain.Local.DataBackup;
 using Niconicome.Models.Domain.Local.Server.Core;
+using Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -31,7 +34,7 @@ namespace Niconicome.Models.Local.Application
     class StartUp : IStartUp
     {
 
-        public StartUp(IBackupManager backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer, IServer server)
+        public StartUp(IBackupManager backuphandler, IAutoLogin autoLogin, IToastHandler snackbarHandler, ILogger logger, Resume::IStreamResumer streamResumer, NicoIO::INicoDirectoryIO nicoDirectoryIO, IAddonManager addonManager, IAddonInstallManager installManager, ISettingsContainer settingsConainer, IServer server,ISegmentDirectoryHandler segmentDirectoryHandler)
         {
             this._backuphandler = backuphandler;
             this._autoLogin = autoLogin;
@@ -43,6 +46,7 @@ namespace Niconicome.Models.Local.Application
             this._installManager = installManager;
             this._settingsConainer = settingsConainer;
             this._server = server;
+            this._segmentDirectoryHandler = segmentDirectoryHandler;
             this.DeleteInvalidbackup();
         }
 
@@ -67,6 +71,8 @@ namespace Niconicome.Models.Local.Application
         private readonly ISettingsContainer _settingsConainer;
 
         private readonly IServer _server;
+
+        private readonly ISegmentDirectoryHandler _segmentDirectoryHandler;
 
         #endregion
 
@@ -94,20 +100,28 @@ namespace Niconicome.Models.Local.Application
         /// </summary>
         private void RemoveTmpFolder()
         {
-            if (this._nicoDirectoryIO.Exists("tmp"))
+            if (this._nicoDirectoryIO.Exists(FileFolder.SegmentsFolderPath))
             {
-                IAttemptResult<ISettingInfo<int>> result = this._settingsConainer.GetSetting<int>(SettingNames.MaxTmpSegmentsDirCount, 20);
-                if (!result.IsSucceeded || result.Data is null) return;
+                IAttemptResult<ISettingInfo<int>> settingResult = this._settingsConainer.GetSetting<int>(SettingNames.MaxTmpSegmentsDirCount, 20);
+                if (!settingResult.IsSucceeded || settingResult.Data is null) return;
 
-                int maxTmp = result.Data.Value;
+                int maxTmp = settingResult.Data.Value;
 
                 if (maxTmp < 0) maxTmp = 20;
-                var infos = this._streamResumer.GetAllSegmentsDirectoryInfo().ToList();
+
+                IAttemptResult<IEnumerable<ISegmentDirectoryInfo>> result = this._segmentDirectoryHandler.GetAllSegmentDirectoryInfos();
+                if (!result.IsSucceeded||result.Data is null)
+                {
+                    return;
+                }
+
+                var infos = result.Data.OrderBy(i => i.DownloadStartedOn).ToList();
+
                 if (infos.Count <= maxTmp) return;
-                infos = infos.OrderBy(i => i.StartedOn).ToList();
+
                 foreach (var i in Enumerable.Range(0, infos.Count - maxTmp))
                 {
-                    this._nicoDirectoryIO.Delete(Path.Combine(AppContext.BaseDirectory, "tmp", infos[i].DirectoryName));
+                    this._nicoDirectoryIO.Delete(infos[i].DirectoryPath);
                 }
 
             }

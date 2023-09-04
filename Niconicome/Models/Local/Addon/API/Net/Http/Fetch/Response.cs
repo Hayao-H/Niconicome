@@ -22,6 +22,8 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
 
         public bool ok => this.message.IsSuccessStatusCode;
 
+        public int status => (int)this.message.StatusCode;
+
         public async Task<string> text()
         {
             return await this.message.Content.ReadAsStringAsync();

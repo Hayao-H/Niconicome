@@ -9,5 +9,5 @@ using Fetch = Niconicome.Models.Local.Addon.API.Net.Http.Fetch;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine
 {
-    public record APIObjectConatainer(API::IAPIEntryPoint APIEntryPoint, Func<string, dynamic?, Task<Fetch::Response>> FetchFunc, IFetch Fetch);
+    public record APIObjectConatainer(API::IAPIEntryPoint APIEntryPoint, Func<string, dynamic, Task<Fetch::Response>> FetchFunc, IFetch Fetch);
 }

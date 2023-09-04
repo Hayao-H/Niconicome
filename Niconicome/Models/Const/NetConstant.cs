@@ -26,7 +26,7 @@ namespace Niconicome.Models.Const
         /// <summary>
         /// ニコニコのURL
         /// </summary>
-        public const string NiconicoBaseURL = @"https://nicovideo.jp";
+        public const string NiconicoBaseURL = @"https://www.nicovideo.jp";
 
         /// <summary>
         /// ニコニコのURL（非SSL）

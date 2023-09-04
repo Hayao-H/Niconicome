@@ -33,6 +33,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
             return AttemptResult.Succeeded();
         }
 
+        public IAttemptResult Write(string path, byte[] content)
+        {
+            return AttemptResult.Succeeded();
+        }
+
         public IAttemptResult<string> Read(string path)
         {
             return AttemptResult<string>.Succeeded(this._readFunc(path));
@@ -43,7 +48,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
             return AttemptResult.Succeeded();
         }
 
-        public IAttemptResult Copy(string source, string target)
+        public IAttemptResult Copy(string source, string target, bool overwrite = false)
         {
             return AttemptResult.Succeeded();
         }
@@ -62,5 +67,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
         {
             return true;
         }
+
+        public IAttemptResult SetLastWriteTime(string path, DateTime dt)
+        {
+            return AttemptResult.Succeeded();
+        }
+
     }
 }

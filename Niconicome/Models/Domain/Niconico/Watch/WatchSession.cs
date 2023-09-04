@@ -18,7 +18,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         Task GetVideoDataAsync(string id);
         bool IsSessionEnsured { get; }
         bool IsSessionExipired { get; }
-        string PlaylistUrl { get; }
         public IDomainVideoInfo? Video { get; }
         WatchSessionState State { get; }
         Task<Dmc::IStreamsCollection> GetAvailableStreamsAsync();
@@ -90,18 +89,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         /// セッション失効フラグ
         /// </summary>
         public bool IsSessionExipired { get; private set; }
-
-        /// <summary>
-        /// プレイリストのURL
-        /// </summary>
-        public string PlaylistUrl
-        {
-            get
-            {
-                if (this.watchSessionInfo is null) throw new InvalidOperationException("セッション情報がnullのため、プレイリストのURLを取得できません。");
-                return this.watchSessionInfo.ContentUrl;
-            }
-        }
 
         /// <summary>
         /// 状態
@@ -215,7 +202,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
             if (this.watchSessionInfo is null) throw new InvalidCastException("セッション情報がnullのため、ストリームの一覧を取得できません。");
             var availableStreams = new List<Dmc::IStreamInfo>();
 
-            await this.GetAvailableStreamsAsync(this.PlaylistUrl, availableStreams);
+            await this.GetAvailableStreamsAsync(this.watchSessionInfo.ContentUrl, availableStreams);
 
             var streams = new Dmc::StreamsCollection();
             streams.AddRange(availableStreams);
@@ -282,9 +269,9 @@ namespace Niconicome.Models.Domain.Niconico.Watch
 
                 var info = new WatchSessionInfo()
                 {
-                    DmcResponseJsonData = result.Data.DmcResponseJsonData,
-                    ContentUrl = result.Data.ContentUrl,
-                    SessionId = result.Data.SessionId,
+                    DmcResponseJsonData = jsonData,
+                    ContentUrl = contentUrl,
+                    SessionId = sessionID,
                 };
 
                 return new AttemptResult<IWatchSessionInfo>() { IsSucceeded = true, Data = info };

@@ -5,9 +5,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ClearScript;
+using Niconicome.Extensions;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
-using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Error = Niconicome.Models.Domain.Local.Addons.API.Hooks.HooksManagerError;
 
 namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
 {
@@ -19,6 +21,13 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
         /// <param name="page"></param>
         /// <returns></returns>
         IAttemptResult<dynamic> ParseWatchPage(string page);
+
+        /// <summary>
+        /// 動画情報を取得する
+        /// </summary>
+        /// <param name="videoID"></param>
+        /// <returns></returns>
+        Task<IAttemptResult<dynamic>> GetVideoInfoAsync(string videoID);
 
         /// <summary>
         /// セッションを確立する
@@ -44,14 +53,15 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
 
     public class HooksManager : IHooksManager
     {
-        public HooksManager(ILogger logger)
+        public HooksManager(IErrorHandler errorHandler)
         {
-            this.logger = logger;
+            this._errorHandler = errorHandler;
         }
 
         #region field
 
-        private readonly ILogger logger;
+
+        private readonly IErrorHandler _errorHandler;
 
         private Dictionary<HookType, ScriptObject> hooks = new();
 
@@ -65,7 +75,8 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
 
             if (function is null)
             {
-                return new AttemptResult<dynamic>() { Message = "視聴ページ解析関数が登録されていません。" };
+                this._errorHandler.HandleError(Error.PageAnalyzeFunctionNotRegistered);
+                return AttemptResult<dynamic>.Fail(this._errorHandler.GetMessageForResult(Error.PageAnalyzeFunctionNotRegistered));
             }
 
             dynamic returnVal;
@@ -73,15 +84,42 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
             {
                 returnVal = function.Invoke(false, page);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                this.logger.Error("視聴ページ解析に失敗しました。", e);
-                return new AttemptResult<dynamic>() { Message = "視聴ページ解析に失敗しました。", Exception = e };
+                this._errorHandler.HandleError(Error.FailedToAnalyzeWatchPage, ex);
+                return AttemptResult<dynamic>.Fail(this._errorHandler.GetMessageForResult(Error.FailedToAnalyzeWatchPage, ex));
             }
 
-            return new AttemptResult<dynamic>() { IsSucceeded = true, Data = returnVal };
-        
+            return AttemptResult<dynamic>.Succeeded(returnVal);
+
         }
+
+        public async Task<IAttemptResult<dynamic>> GetVideoInfoAsync(string videoID)
+        {
+            this.hooks.TryGetValue(HookType.VIdeoInfoFetcher, out ScriptObject? function);
+
+            if (function is null)
+            {
+                this._errorHandler.HandleError(Error.VideoInfoFunctionNotRegistered);
+                return AttemptResult<dynamic>.Fail(this._errorHandler.GetMessageForResult(Error.VideoInfoFunctionNotRegistered));
+            }
+
+            dynamic returnVal;
+            var id = this.GetTrackID();
+
+            try
+            {
+                returnVal = await function.Invoke(false, videoID, id).As<Task<dynamic>>();
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(Error.FailedToAnalyzeWatchPage, ex);
+                return AttemptResult<dynamic>.Fail(this._errorHandler.GetMessageForResult(Error.FailedToFetchVideoInfo, ex));
+            }
+
+            return AttemptResult<dynamic>.Succeeded(returnVal);
+        }
+
 
         public async Task<IAttemptResult<dynamic>> EnsureSessionAsync(dynamic dmcInfo)
         {
@@ -89,7 +127,8 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
 
             if (function is null)
             {
-                return new AttemptResult<dynamic>() { Message = "セッション確立関数が登録されていません。" };
+                this._errorHandler.HandleError(Error.SessionFunctionNotRegistered);
+                return AttemptResult<dynamic>.Fail(this._errorHandler.GetMessageForResult(Error.SessionFunctionNotRegistered));
             }
 
             dynamic returnVal;
@@ -98,13 +137,13 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
             {
                 returnVal = await function.Invoke(false, dmcInfo);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                this.logger.Error("セッションの確立に失敗しました。", e);
-                return new AttemptResult<dynamic>() { Message = "セッションの確立に失敗しました。", Exception = e };
+                this._errorHandler.HandleError(Error.FailedToEnsureSession, ex);
+                return AttemptResult<dynamic>.Fail(this._errorHandler.GetMessageForResult(Error.FailedToEnsureSession, ex));
             }
 
-            return new AttemptResult<dynamic>() { IsSucceeded = true, Data = returnVal };
+            return AttemptResult<dynamic>.Succeeded(returnVal);
         }
 
 
@@ -127,11 +166,37 @@ namespace Niconicome.Models.Domain.Local.Addons.API.Hooks
 
 
         #endregion
+
+        #region private
+        private string GetTrackID()
+        {
+            var source = new List<string>();
+            source.AddRange(Enumerable.Range('a', 26).Select(x => ((char)x).ToString()));
+            source.AddRange(Enumerable.Range('A', 26).Select(x => ((char)x).ToString()));
+            source.AddRange(Enumerable.Range(0, 10).Select(x => x.ToString()));
+
+            var ramd = new Random();
+            var id = new StringBuilder();
+
+            foreach (var _ in Enumerable.Range(0, 10))
+            {
+                id.Append(source[ramd.Next(26 + 26 + 10 - 1)]);
+            }
+
+            id.Append("_");
+
+            id.Append(ramd.NextInt64((long)Math.Pow(10, 12), (long)Math.Pow(10, 13)).ToString());
+
+            return id.ToString();
+        }
+
+        #endregion
     }
 
     public enum HookType
     {
         WatchPageParser,
         SessionEnsuring,
+        VIdeoInfoFetcher,
     }
 }

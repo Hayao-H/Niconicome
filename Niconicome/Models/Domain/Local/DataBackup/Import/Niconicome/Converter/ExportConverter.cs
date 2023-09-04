@@ -15,7 +15,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter
         /// </summary>
         /// <param name="playlist"></param>
         /// <returns></returns>
-        Type::Playlist ConvertPlaylist(IPlaylistInfo playlist);
+        Type::Playlist ConvertPlaylist(IPlaylistInfo playlist, IReadOnlyList<int> exclude);
 
         /// <summary>
         /// 動画データを変換
@@ -34,7 +34,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter
 
     public class ExportConverter : IExportConverter
     {
-        public Type::Playlist ConvertPlaylist(IPlaylistInfo playlist)
+        public Type::Playlist ConvertPlaylist(IPlaylistInfo playlist, IReadOnlyList<int> exclude)
         {
             return new Type::Playlist()
             {
@@ -69,7 +69,7 @@ namespace Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome.Converter
                 },
                 IsExpanded = playlist.IsExpanded.Value,
                 Videos = playlist.Videos.Select(v => v.ID).ToList(),
-                Children = playlist.ChildrenID.ToList(),
+                Children = playlist.ChildrenID.Where(id => !exclude.Contains(id)).ToList(),
             };
         }
 

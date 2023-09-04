@@ -6,6 +6,7 @@ using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Net.Xml;
 using Niconicome.Models.Domain.Niconico.Video.Ichiba;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
@@ -25,7 +26,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
         /// <param name="onMessage"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<IAttemptResult> DownloadIchibaInfo(IWatchSession session, IDownloadSettings settings, Action<string> onMessage, IDownloadContext context);
+        Task<IAttemptResult> DownloadIchibaInfo(IDomainVideoInfo videoInfo, IDownloadSettings settings, Action<string> onMessage, IDownloadContext context);
     }
 
     class IchibaInfoDownloader : IIchibaInfoDownloader
@@ -52,18 +53,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
 
         #region Method
 
-        public async Task<IAttemptResult> DownloadIchibaInfo(IWatchSession session, IDownloadSettings settings, Action<string> onMessage, IDownloadContext context)
+        public async Task<IAttemptResult> DownloadIchibaInfo(IDomainVideoInfo videoInfo, IDownloadSettings settings, Action<string> onMessage, IDownloadContext context)
         {
-            if (session.Video is null)
-            {
-                return new AttemptResult() { Message = "セッション情報のVideoがnullです。" };
-            }
 
-            onMessage($"市場APIへのアクセスを開始します。({session.Video.Id})");
-            var getResult = await this._niconicoIchibaHandler.GetIchibaInfo(session.Video.Id);
+            onMessage($"市場APIへのアクセスを開始します。({videoInfo.Id})");
+            var getResult = await this._niconicoIchibaHandler.GetIchibaInfo(videoInfo.Id);
             if (!getResult.IsSucceeded || getResult.Data is null)
             {
-                onMessage($"市場APIからの情報取得に失敗しました。({session.Video.Id})");
+                onMessage($"市場APIからの情報取得に失敗しました。({videoInfo.Id})");
                 if (getResult.Exception is not null)
                 {
                     this._logger.Error($"市場情報の取得に失敗しました。(詳細:{getResult.Message} ,{context.GetLogContent()})", getResult.Exception);
@@ -75,7 +72,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
                 return new AttemptResult() { Message = getResult.Message };
             }
 
-            onMessage($"市場APIからの情報取得を取得しました。({session.Video.Id})");
+            onMessage($"市場APIからの情報取得を取得しました。({videoInfo.Id})");
 
             string content;
 
@@ -88,7 +85,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
                 catch (Exception e)
                 {
                     this._logger.Error($"市場情報のシリアル化に失敗しました。(詳細:{getResult.Message} ,{context.GetLogContent()})", e);
-                    onMessage($"市場情報のシリアル化に失敗しました。({session.Video.Id})");
+                    onMessage($"市場情報のシリアル化に失敗しました。({videoInfo.Id})");
                     return new AttemptResult() { Message = "市場情報のシリアル化に失敗しました。" };
                 }
             }
@@ -97,18 +94,18 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
 
                 try
                 {
-                    content = this.GetHtmlContent(getResult.Data, session.Video.Id);
+                    content = this.GetHtmlContent(getResult.Data, videoInfo.Id);
                 }
                 catch (Exception e)
                 {
                     this._logger.Error($"市場情報のシリアル化に失敗しました。(詳細:{getResult.Message} ,{context.GetLogContent()})", e);
-                    onMessage($"市場情報のシリアル化に失敗しました。({session.Video.Id})");
+                    onMessage($"市場情報のシリアル化に失敗しました。({videoInfo.Id})");
                     return new AttemptResult() { Message = "市場情報のシリアル化に失敗しました。" };
                 }
             }
 
 
-            string filePath = this._path.GetFilePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.IchibaInfoExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, settings.IchibaInfoSuffix);
+            string filePath = this._path.GetFilePath(settings.FileNameFormat, videoInfo!.DmcInfo, settings.IchibaInfoExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, settings.IchibaInfoSuffix);
 
             try
             {
@@ -117,11 +114,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Ichiba
             catch (Exception e)
             {
                 this._logger.Error($"市場情報ファイルの書き込みに失敗しました。({context.GetLogContent()})", e);
-                onMessage($"市場情報ファイルの書き込みに失敗しました。({session.Video.Id})");
+                onMessage($"市場情報ファイルの書き込みに失敗しました。({videoInfo.Id})");
                 return new AttemptResult() { Message = $"市場情報ファイルの書き込みに失敗しました。(詳細:{e.Message})" };
             }
 
-            onMessage($"市場情報ファイルの保存が完了しました。({session.Video.Id})");
+            onMessage($"市場情報ファイルの保存が完了しました。({videoInfo.Id})");
             return new AttemptResult() { IsSucceeded = true };
 
 

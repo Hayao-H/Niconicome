@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.ClearScript;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Permisson;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Utils;
@@ -15,7 +16,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        Task<Response> FetchAsync(string url, IFetchOption? option);
+        Task<Response> FetchAsync(string url, IFetchOption option);
 
         /// <summary>
         /// 初期化する
@@ -27,7 +28,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
 
     public class Fetch : IFetch
     {
-        public Fetch(IAddonHttp http,IHostPermissionsHandler permissionsHandler)
+        public Fetch(IAddonHttp http, IHostPermissionsHandler permissionsHandler)
         {
             this.http = http;
             this.permissionsHandler = permissionsHandler;
@@ -43,7 +44,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
 
         #endregion
 
-        public async Task<Response> FetchAsync(string url, IFetchOption? option = null)
+        public async Task<Response> FetchAsync(string url, IFetchOption option)
         {
             if (!this.isInitialized)
             {
@@ -55,31 +56,58 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
                 throw new InvalidOperationException($"{url}は許可されていないホストです。");
             }
 
-            HttpContent? content = null;
-            if (option?.method == "POST")
+            if (option.IncludeCredentioals && this.http.NicoHttp is null)
             {
-                if (option.body is null or Undefined or not string) throw new InvalidOperationException("POSTメソッドではbodyをnullにできません。");
-                content = new StringContent(option.body);
+                throw new InvalidOperationException($"{PermissionNames.Session}権限を取得していないため、credentials:includeは無効です。");
             }
 
-            HttpResponseMessage message;
-            if (option?.credentials == "include")
+            HttpContent? content = null;
+            if (option.Method == "POST")
             {
-                if (this.http.NicoHttp is null) throw new InvalidOperationException($"{PermissionNames.Session}権限を取得していないため、credentials:includeは無効です。");
-                message = option?.method switch
+                if (string.IsNullOrEmpty(option.Body)) throw new InvalidOperationException("POSTメソッドではbodyをnullにできません。");
+                content = new StringContent(option.Body);
+            }
+
+            if (this.IsOptionRequestNeeded(url))
+            {
+                var request = new HttpRequestMessage(HttpMethod.Options, url);
+                request.Headers.Add("Access-Control-Request-Method", option.Method);
+                HttpResponseMessage optionResponse;
+                if (option.IncludeCredentioals)
                 {
-                    "GET" => await this.http.NicoHttp.GetAsync(new Uri(url)),
-                    "POST" => await this.http.NicoHttp.PostAsync(new Uri(url), content!),
-                    _ => await this.http.NicoHttp.GetAsync(new Uri(url)),
+                    optionResponse = await this.http.NicoHttp!.SendAsync(request);
+                } else
+                {
+                    optionResponse = await this.http.SendAsync(request);
+                }
+
+                if (!optionResponse.IsSuccessStatusCode)
+                {
+                    throw new InvalidOperationException("CORS Error");
+                }
+            }
+
+
+            HttpResponseMessage message;
+            if (option.IncludeCredentioals)
+            {
+                message = option?.Method switch
+                {
+                    "GET" => await this.http.NicoHttp!.GetAsync(new Uri(url)),
+                    "POST" => await this.http.NicoHttp!.PostAsync(new Uri(url), content!),
+                    _ => await this.http.NicoHttp!.GetAsync(new Uri(url)),
+                };
+            }
+            else
+            {
+                message = option?.Method switch
+                {
+                    "GET" => await this.http.GetAsync(new Uri(url)),
+                    "POST" => await this.http.PostAsync(new Uri(url), content!),
+                    _ => await this.http.GetAsync(new Uri(url)),
                 };
             }
 
-            message = option?.method switch
-            {
-                "GET" => await this.http.GetAsync(new Uri(url)),
-                "POST" => await this.http.PostAsync(new Uri(url), content!),
-                _ => await this.http.GetAsync(new Uri(url)),
-            };
 
             var res = new Response(message);
 
@@ -93,6 +121,11 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
             this.isInitialized = true;
         }
 
+        private bool IsOptionRequestNeeded(string url)
+        {
+            var uri = new Uri(url);
+            return $"{uri.Scheme}://{uri.Host}" != NetConstant.NiconicoBaseURL;
+        }
 
     }
 }

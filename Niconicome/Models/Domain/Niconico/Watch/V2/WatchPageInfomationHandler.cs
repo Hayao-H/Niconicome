@@ -26,7 +26,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch.V2
 
     public class WatchPageInfomationHandler : IWatchPageInfomationHandler
     {
-        public WatchPageInfomationHandler(INicoHttp http,IHooksManager hooks,IErrorHandler errorHandler)
+        public WatchPageInfomationHandler(INicoHttp http, IHooksManager hooks, IErrorHandler errorHandler)
         {
             this._http = http;
             this._hooks = hooks;
@@ -50,13 +50,23 @@ namespace Niconicome.Models.Domain.Niconico.Watch.V2
             IAttemptResult<string> getResult = await this.GetWatchPageAsync(id);
             if (!getResult.IsSucceeded || getResult.Data is null) return AttemptResult<IDomainVideoInfo>.Fail(getResult.Message);
 
-            if (!this._hooks.IsRegistered(HookType.WatchPageParser))
+            if (!this._hooks.IsRegistered(HookType.WatchPageParser) && !this._hooks.IsRegistered(HookType.VIdeoInfoFetcher))
             {
                 this._errorHandler.HandleError(WatchPageInfomationHandlerError.PluginNotFount);
                 return AttemptResult<IDomainVideoInfo>.Fail(this._errorHandler.GetMessageForResult(WatchPageInfomationHandlerError.PluginNotFount));
             }
 
-            IAttemptResult<dynamic> parseResult = this._hooks.ParseWatchPage(getResult.Data);
+            IAttemptResult<dynamic> parseResult;
+
+            if (this._hooks.IsRegistered(HookType.VIdeoInfoFetcher))
+            {
+                parseResult = await this._hooks.GetVideoInfoAsync(id);
+            }
+            else
+            {
+                parseResult = this._hooks.ParseWatchPage(getResult.Data);
+            }
+
             if (!parseResult.IsSucceeded || parseResult.Data is null) return AttemptResult<IDomainVideoInfo>.Fail(parseResult.Message);
 
             return AttemptResult<IDomainVideoInfo>.Succeeded(new DomainVideoInfo() { RawDmcInfo = parseResult.Data });

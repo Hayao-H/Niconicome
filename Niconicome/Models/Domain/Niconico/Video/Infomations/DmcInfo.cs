@@ -12,13 +12,12 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         string Id { get; set; }
         string Owner { get; set; }
         int OwnerID { get; set; }
-        string Userkey { get; }
         string UserId { get; }
+        string Threadkey { get; }
         string ChannelID { get; }
         string ChannelName { get; }
         string Description { get; }
         string CommentServer { get; }
-        string Threadkey { get; }
         string CommentLanguage { get; }
         int ViewCount { get; }
         int CommentCount { get; }
@@ -37,26 +36,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         IThumbInfo ThumbInfo { get; set; }
         ISessionInfo SessionInfo { get; }
         IReadOnlyCollection<ITarget> CommentTargets { get; }
-        List<IThread> CommentThreads { get; }
-    }
-    public interface IThread
-    {
-        long ID { get; }
-        int Fork { get; }
-        bool IsLeafRequired { get; }
-        bool IsOwnerThread { get; }
-        bool IsThreadkeyRequired { get; }
-        bool IsActive { get; }
-        bool IsDefaultPostTarget { get; }
-        bool IsEasyCommentPostTarget { get; }
-        string? Threadkey { get; }
-        bool Is184Forced { get; }
-        bool HasNicoscript { get; }
-        string Label { get; }
-        string ForkLabel { get; }
-        int PostkeyStatus { get; }
-        string Server { get; }
-        string VideoID { get; }
     }
 
     public interface ITarget
@@ -84,8 +63,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         public string Id { get; set; } = string.Empty;
 
         public string Owner { get; set; } = string.Empty;
-
-        public string Userkey { get; set; } = string.Empty;
 
         public string UserId { get; set; } = string.Empty;
 
@@ -153,54 +130,13 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// </summary>
         public IReadOnlyCollection<ITarget> CommentTargets { get; set; } = (new List<ITarget>()).AsReadOnly();
 
-        /// <summary>
-        /// コメントスレッド
-        /// </summary>
-        public List<IThread> CommentThreads { get; set; } = new();
-    }
-
-
-    public class Thread : IThread
-    {
-        public long ID { get; init; }
-
-        public int Fork { get; init; }
-
-        public bool IsActive { get; init; }
-
-        public bool IsDefaultPostTarget { get; init; }
-
-        public bool IsEasyCommentPostTarget { get; init; }
-
-        public bool IsLeafRequired { get; init; }
-
-        public bool IsOwnerThread { get; init; }
-
-        public bool IsThreadkeyRequired { get; init; }
-
-        public string? Threadkey { get; init; }
-
-        public bool Is184Forced { get; init; }
-
-        public bool HasNicoscript { get; init; }
-
-        public int PostkeyStatus { get; init; }
-
-        public string Server { get; init; } = string.Empty;
-
-        public string Label { get; init; } = string.Empty;
-
-        public string ForkLabel { get; init; } = string.Empty;
-
-        public string VideoID { get; init; } = string.Empty;
-
     }
 
     public class Target : ITarget
     {
         public string Id { get; set; } = string.Empty;
 
-        public string Fork { get; set; }= string.Empty;
+        public string Fork { get; set; } = string.Empty;
     }
 
     public class Tag : ITag

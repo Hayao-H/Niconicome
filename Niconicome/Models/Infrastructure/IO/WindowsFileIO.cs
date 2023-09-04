@@ -64,6 +64,22 @@ namespace Niconicome.Models.Infrastructure.IO
             return AttemptResult.Succeeded();
         }
 
+        public IAttemptResult Write(string path, byte[] content)
+        {
+            try
+            {
+                using var fs = File.Create(path);
+                fs.Write(content);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.FailedToWrite, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToWrite, ex, path));
+            }
+
+            return AttemptResult.Succeeded();
+        }
+
         public IAttemptResult<string> Read(string path)
         {
             var content = string.Empty;
@@ -142,11 +158,11 @@ namespace Niconicome.Models.Infrastructure.IO
             return AttemptResult.Succeeded();
         }
 
-        public IAttemptResult Copy(string source, string target)
+        public IAttemptResult Copy(string source, string target, bool overwrite = false)
         {
             try
             {
-                File.Copy(source, target);
+                File.Copy(source, target, overwrite);
             }
             catch (Exception ex)
             {
@@ -156,6 +172,22 @@ namespace Niconicome.Models.Infrastructure.IO
 
             return AttemptResult.Succeeded();
         }
+
+        public IAttemptResult SetLastWriteTime(string path, DateTime dt)
+        {
+            try
+            {
+                File.SetLastWriteTime(path, dt);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.FailedToSetLastWriteTime, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToSetLastWriteTime, ex, path));
+            }
+
+            return AttemptResult.Succeeded();
+        }
+
 
         #endregion
     }

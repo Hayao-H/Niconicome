@@ -13,6 +13,7 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using V1 = Niconicome.Models.Domain.Local.Addons.Manifest.V1;
 using Const = Niconicome.Models.Const;
+using Niconicome.Models.Const;
 
 namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
 {
@@ -162,16 +163,21 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation
                 return new AttemptResult() { Message = $"対応していないマニフェストバージョンです。({manifest.ManifestVersion})" };
             }
 
-            bool result = Version.TryParse(manifest.Version, out Version _);
+            bool result = Version.TryParse(manifest.Version, out Version? _);
             if (!result)
             {
                 return new AttemptResult() { Message = $"バージョンの形式が不正です。({manifest.Version})" };
             }
 
-            bool aResult = Version.TryParse(manifest.TargetAPIVersion, out Version _);
+            bool aResult = Version.TryParse(manifest.TargetAPIVersion, out Version? apiVersion);
             if (!aResult)
             {
                 return new AttemptResult() { Message = $"APIバージョンの形式が不正です。({manifest.TargetAPIVersion})" };
+            }
+
+            if (apiVersion > AddonConstant.APIVersion)
+            {
+                return new AttemptResult() { Message = $"対応していないAPIバージョンです。({apiVersion}, system:{AddonConstant.APIVersion})" };
             }
 
             foreach (string permission in manifest.Permissions)

@@ -29,5 +29,7 @@ namespace Niconicome.Models.Infrastructure.IO
         FailedToDeleteFile,
         [ErrorEnum(ErrorLevel.Error, "ファイルのコピーに失敗しました。(source:{0}, target:{1})")]
         FailedToCopyFile,
+        [ErrorEnum(ErrorLevel.Error,"最終書き込み日時の変更に失敗しました。(path:{0})")]
+        FailedToSetLastWriteTime,
     }
 }

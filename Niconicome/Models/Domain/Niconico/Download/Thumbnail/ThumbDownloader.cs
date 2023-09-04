@@ -12,12 +12,13 @@ using Niconicome.Models.Domain.Utils;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Download;
+using Niconicome.Models.Domain.Niconico.Video.Infomations;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 {
     public interface IThumbDownloader
     {
-        Task<IAttemptResult> DownloadThumbnailAsync(IDownloadSettings settings, IWatchSession session);
+        Task<IAttemptResult> DownloadThumbnailAsync(IDownloadSettings settings, IDomainVideoInfo videoInfo);
     }
 
     public class ThumbDownloader : IThumbDownloader
@@ -43,20 +44,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Thumbnail
 
         #region Method
 
-        public async Task<IAttemptResult> DownloadThumbnailAsync(IDownloadSettings settings, IWatchSession session)
+        public async Task<IAttemptResult> DownloadThumbnailAsync(IDownloadSettings settings, IDomainVideoInfo videoInfo)
         {
-            if (session.Video is null)
-            {
-                return AttemptResult.Fail("動画情報が未取得です。");
-            }
 
-            var filepath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, session.Video!.DmcInfo, settings.ThumbnailExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, settings.ThumbSuffix);
+            var filepath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, videoInfo.DmcInfo, settings.ThumbnailExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite, settings.ThumbSuffix);
 
             string? thumbUrl;
 
             try
             {
-                thumbUrl = session.Video!.DmcInfo.ThumbInfo.GetSpecifiedThumbnail(settings.ThumbSize);
+                thumbUrl = videoInfo.DmcInfo.ThumbInfo.GetSpecifiedThumbnail(settings.ThumbSize);
             }
             catch (Exception e)
             {

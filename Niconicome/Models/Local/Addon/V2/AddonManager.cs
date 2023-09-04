@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Extensions.System.Collections.Generic;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Context;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
@@ -198,13 +200,15 @@ namespace Niconicome.Models.Local.Addon.V2
 
             //Fetch
             var fetch = DIFactory.Provider.GetRequiredService<IFetch>();
-            Func<string, dynamic?, Task<Response>> fetchFunc = (url, optionObj) =>
+            fetch.Initialize(infomation);
+            Func<string, dynamic, Task<Response>> fetchFunc = (url, optionObj) =>
             {
                 var option = new FetchOption()
                 {
-                    method = optionObj?.method,
-                    body = optionObj?.body,
-                    credentials = optionObj?.credentials,
+                    Method = optionObj.method is string ? optionObj.method : "GET",
+                    Body = optionObj.body is string ? optionObj.body : string.Empty,
+                        IncludeCredentioals = optionObj.credentials is Microsoft.ClearScript.Undefined ? false : optionObj.credentials == "include" ? true : false,
+                    Headers = optionObj.headers is Microsoft.ClearScript.Undefined ? new Dictionary<string, string>() : JsUtils.ToDictionary(optionObj.headers),
                 };
 
                 return fetch.FetchAsync(url, option);
