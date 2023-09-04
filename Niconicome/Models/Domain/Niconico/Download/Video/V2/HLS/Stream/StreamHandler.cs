@@ -55,8 +55,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
                     foreach (var content in node.Content.Split(","))
                     {
                         if (!content.Contains("=")) continue;
-                        var splited = content.Split('=');
-                        info.Add(splited[0], splited[1]);
+                        int equalIndex = content.IndexOf("=");
+                        info.Add(content[0..equalIndex], content[(equalIndex + 1)..]);
                     }
 
                     if (info.TryGetValue("IV", out string? x))
@@ -66,7 +66,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
 
                     if (info.TryGetValue("URI", out string? y))
                     {
-                        key = y;
+                        key = y[1..^1];
                     }
                 }
             }

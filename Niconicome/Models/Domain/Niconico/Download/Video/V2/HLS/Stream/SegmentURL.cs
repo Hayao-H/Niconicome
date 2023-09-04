@@ -11,7 +11,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
         string AbsoluteUrl { get; }
         string FileName { get; }
         int SequenceZero { get; }
-        int Sequence { get; }
     }
 
     public class SegmentURL : ISegmentURL
@@ -28,11 +27,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
         public int SequenceZero { get; init; }
 
         /// <summary>
-        /// インデックス
-        /// </summary>
-        public int Sequence { get; init; }
-
-        /// <summary>
         /// ファイル名
         /// </summary>
         public string FileName { get; init; }
@@ -43,7 +37,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream
         {
             this.AbsoluteUrl = string.Concat(UrlBase, uri);
             this.SequenceZero = SequenceZero;
-            this.Sequence = SequenceZero + 1;
             this.FileName = uri.Substring(0, uri.Contains('?') ? uri.IndexOf('?') : uri.Length);
         }
     }

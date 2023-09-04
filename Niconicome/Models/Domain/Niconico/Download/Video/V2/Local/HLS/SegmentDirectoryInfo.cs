@@ -19,12 +19,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Local.HLS
         DateTime DownloadStartedOn { get; }
 
         /// <summary>
-        /// 存在するセグメントファイルのファイル名
+        /// 存在するセグメントファイル名
         /// </summary>
-        IReadOnlyCollection<string> ExistsFiles { get; }
+        IReadOnlyCollection<string> ExistingFileNames { get; }
     }
 
-
-    public record SegmentDirectoryInfo(string DirectoryPath, DateTime DownloadStartedOn, IReadOnlyCollection<string> ExistsFiles) : ISegmentDirectoryInfo;
+    public record SegmentDirectoryInfo(string DirectoryPath, DateTime DownloadStartedOn, IReadOnlyCollection<string> ExistingFileNames) : ISegmentDirectoryInfo;
 
 }
