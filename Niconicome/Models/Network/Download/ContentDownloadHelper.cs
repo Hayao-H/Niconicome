@@ -3,23 +3,20 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Niconico.Download;
+using Niconicome.Models.Domain.Niconico.Download.General;
 using Niconicome.Models.Domain.Niconico.Download.Ichiba;
-using Niconicome.Models.Domain.Utils;
-using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Local.Settings;
-using Niconicome.Models.Network.Watch;
-using Niconicome.Models.Playlist;
-using Cdl = Niconicome.Models.Domain.Niconico.Download.Comment;
-using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
-using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
-using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V2;
-using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
-using Niconicome.Models.Domain.Playlist;
-using Niconicome.Models.Domain.Niconico.Download.Video;
-using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch.V2;
+using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Network.Watch;
+using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
+using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
+using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
+using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V2;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -38,22 +35,25 @@ namespace Niconicome.Models.Network.Download
 
     public class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, ILocalContentHandler localContentHandler, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation)
+        public ContentDownloadHelper(ILogger logger, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation, ILocalFileHandler localFileHandler, IPathOrganizer pathOrganizer)
         {
-            this.localContentHandler = localContentHandler;
             this.converter = converter;
             this.logger = logger;
             this._watch = watchPageInfomation;
+            this._localFileHandler = localFileHandler;
+            this._pathOrganizer = pathOrganizer;
         }
 
         #region DI
         private readonly ILogger logger;
 
-        private readonly ILocalContentHandler localContentHandler;
+        private readonly ILocalFileHandler _localFileHandler;
 
         private readonly IDomainModelConverter converter;
 
         private readonly IWatchPageInfomationHandler _watch;
+
+        private readonly IPathOrganizer _pathOrganizer;
 
         #endregion
 
@@ -80,11 +80,16 @@ namespace Niconicome.Models.Network.Download
 
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
 
-            ILocalContentInfo? info = null;
+            ILocalFileInfo? info = null;
+
             if (setting.Skip)
             {
-                string fileNameFormat = setting.FileNameFormat;
-                info = this.localContentHandler.GetLocalContentInfo(setting.FolderPath, fileNameFormat, domainVideoInfo.DmcInfo, setting.VerticalResolution, setting.IsReplaceStrictedEnable, setting.VideoInfoExt, setting.IchibaInfoExt, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix);
+                IAttemptResult<ILocalFileInfo> localResult = this._localFileHandler.GetLocalContentInfo(setting.FolderPath, videoInfo.NiconicoId, false, setting.VerticalResolution, setting.ThumbnailExt, setting.IchibaInfoSuffix, setting.VideoInfoSuffix, setting.EconomySuffix);
+
+                if (localResult.IsSucceeded && localResult.Data is not null)
+                {
+                    info = localResult.Data;
+                }
             }
 
             if (!Directory.Exists(setting.FolderPath))
@@ -96,14 +101,14 @@ namespace Niconicome.Models.Network.Download
 
             if (setting.Video)
             {
-
-                if (info?.VideoExist ?? false)
+                if (info is not null && info.VideoExists)
                 {
                     OnMessage("動画を保存済みのためスキップしました。");
                 }
-                else if (setting.FromAnotherFolder && (info?.VIdeoExistInOnotherFolder ?? false) && info?.LocalPath is not null)
+                else if (info is not null && setting.FromAnotherFolder && info.VideoExistInOnotherFolder)
                 {
-                    var vResult = this.localContentHandler.MoveDownloadedFile(setting.NiconicoId, info.LocalPath, setting.FolderPath);
+                    string path = this._pathOrganizer.GetFilePath(setting.FileNameFormat, domainVideoInfo.DmcInfo, setting.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt, setting.FolderPath, setting.IsReplaceStrictedEnable, setting.Overwrite);
+                    IAttemptResult vResult = this._localFileHandler.MoveDownloadedVideoFile(info.VideoFilePath, path);
                     if (!vResult.IsSucceeded)
                     {
                         return AttemptResult<IDownloadContext>.Fail(vResult.Message ?? "None");
@@ -129,7 +134,11 @@ namespace Niconicome.Models.Network.Download
             //サムネイル
             if (setting.Thumbnail)
             {
-                if (!info?.ThumbExist ?? true)
+                if (info is not null && info.ThumbExists)
+                {
+                    OnMessage("サムネイルを保存済みのためスキップしました。");
+                }
+                else
                 {
                     var tResult = await this.TryDownloadThumbAsync(setting, domainVideoInfo);
 
@@ -141,10 +150,6 @@ namespace Niconicome.Models.Network.Download
                         return AttemptResult<IDownloadContext>.Fail(tResult.Message ?? "None");
                     }
                 }
-                else if (info?.ThumbExist ?? false)
-                {
-                    OnMessage("サムネイルを保存済みのためスキップしました。");
-                }
             }
 
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
@@ -152,7 +157,11 @@ namespace Niconicome.Models.Network.Download
             //コメント
             if (setting.Comment)
             {
-                if (!info?.CommentExist ?? true)
+                if (info is not null && info.CommentExists)
+                {
+                    OnMessage("コメントを保存済みのためスキップしました。");
+                }
+                else
                 {
 
                     var cResult = await this.TryDownloadCommentAsync(setting, domainVideoInfo, OnMessage, context, token);
@@ -165,10 +174,6 @@ namespace Niconicome.Models.Network.Download
                         return AttemptResult<IDownloadContext>.Fail(cResult.Message ?? "None");
                     }
                 }
-                else if (info?.CommentExist ?? false)
-                {
-                    OnMessage("コメントを保存済みのためスキップしました。");
-                }
             }
 
             if (token.IsCancellationRequested) return this.CancelledDownloadAndGetResult();
@@ -176,7 +181,11 @@ namespace Niconicome.Models.Network.Download
             //動画情報
             if (setting.DownloadVideoInfo)
             {
-                if (!info?.VideoInfoExist ?? true)
+                if (info is not null && info.VideoInfoExist)
+                {
+                    OnMessage("動画情報を保存済みのためスキップしました。");
+                }
+                else
                 {
                     var iResult = this.TryDownloadDescriptionAsync(setting, domainVideoInfo, OnMessage);
 
@@ -195,8 +204,11 @@ namespace Niconicome.Models.Network.Download
             //市場情報
             if (setting.DownloadIchibaInfo)
             {
-
-                if (!info?.IchibaInfoExist ?? true)
+                if (info is not null && info.IchibaInfoExist)
+                {
+                    OnMessage("市場情報を保存済みのためスキップしました。");
+                }
+                else
                 {
                     var iResult = await this.DownloadIchibaInfoAsync(setting, domainVideoInfo, OnMessage, context);
 
@@ -207,10 +219,6 @@ namespace Niconicome.Models.Network.Download
                         OnMessage("DL失敗");
                         return AttemptResult<IDownloadContext>.Fail(iResult.Message ?? "None");
                     }
-                }
-                else
-                {
-                    OnMessage("市場情報を保存済みのためスキップしました。");
                 }
             }
 
@@ -242,7 +250,8 @@ namespace Niconicome.Models.Network.Download
             if (result.IsSucceeded)
             {
                 return AttemptResult.Succeeded();
-            } else
+            }
+            else
             {
                 return AttemptResult.Fail(result.Message);
             }
