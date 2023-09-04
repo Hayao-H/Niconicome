@@ -12,12 +12,19 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         public AppInfoViewModel()
         {
             this.Version = WS.LocalInfo.ApplicationVersion;
+            this.APIVersion = WS.LocalInfo.APIVersion;
         }
 
         /// <summary>
         /// アプリケーションバージョン
         /// </summary>
         public string Version { get; init; }
+
+
+        /// <summary>
+        /// APIバージョン
+        /// </summary>
+        public string APIVersion { get; init; }
 
     }
 }
