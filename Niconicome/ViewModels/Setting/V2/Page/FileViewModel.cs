@@ -24,7 +24,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.ThumbnailSuffix = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.ThumbnailSuffix, Const::Format.DefaultThumbnailSuffix), Const::Format.DefaultThumbnailSuffix).AddTo(this.Bindables);
             this.OwnerCommentSuffix = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.OwnerCommentSuffix, Const::Format.DefaultOwnerCommentSuffix), Const::Format.DefaultOwnerCommentSuffix).AddTo(this.Bindables);
             this.IchibaSuffix = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.IchibaSuffix, Const::Format.DefaultIchibaSuffix), Const::Format.DefaultIchibaSuffix).AddTo(this.Bindables);
-            this.EconomySuffix = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.DeleteExistingEconomyFile, Const::Format.DefaultEconomyVideoSuffix), Const::Format.DefaultEconomyVideoSuffix).AddTo(this.Bindables);
+            this.EconomySuffix = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.EnonomyQualitySuffix, Const::Format.DefaultEconomyVideoSuffix), Const::Format.DefaultEconomyVideoSuffix).AddTo(this.Bindables);
             this.IsSearchingVideosExactEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.SearchVideosExact, false), false).AddTo(this.Bindables);
         }
 
