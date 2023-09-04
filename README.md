@@ -2,7 +2,7 @@
 [![.Net6 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net6%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net6+CI%2FCD%22) 
 [![niconicome-nightly-build](https://github.com/Hayao-H/Niconicome/actions/workflows/nightly.yaml/badge.svg)](https://github.com/Hayao-H/Niconicome/actions/workflows/nightly.yaml)
 [![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
-[![Github Release](https://img.shields.io/badge/release-v0.13.0-blue)](https://github.com/Hayao-H/Niconicome/releases/latest)
+[![Github Release](https://img.shields.io/badge/release-v0.13.1-blue)](https://github.com/Hayao-H/Niconicome/releases/latest)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![X.com Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=X%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
@@ -16,7 +16,7 @@
 
 ## 機能
 - :new: BlazorベースのWeb技術を用いたUI
-- :new: データのエクスポート・インポート（JSON形式）。 
+- データのエクスポート・インポート（JSON形式）。 
 - 動画・サムネイル・コメントのダウンロード。(:new: コメントサーバー移行に対応@[v0.12.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.12.0))
 - 投稿者コメント、かんたんコメント、過去ログをオプションで取捨可能。
 - 暗号化動画（公式アニメ）のコメント・サムネイルダウンロード。
