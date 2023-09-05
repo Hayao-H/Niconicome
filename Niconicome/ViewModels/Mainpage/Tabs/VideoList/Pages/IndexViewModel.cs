@@ -113,6 +113,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public string PlaylistName => WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist?.Name.Value ?? "";
 
         /// <summary>
+        /// プレイリストのID
+        /// </summary>
+        public string PlaylistID => WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist?.ID.ToString() ?? "";
+
+        /// <summary>
         /// 入力値
         /// </summary>
         public IBindableProperty<string> InputText { get; init; }

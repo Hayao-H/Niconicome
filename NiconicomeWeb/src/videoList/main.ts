@@ -5,14 +5,17 @@ import { SelectionHandlerImpl } from "./SelectionHandler/selectionHandler";
 import { SortHandler, SortHandlerImpl } from "./sortHandler/sortHandler";
 import { WidthHandler, WidthHandlerImpl } from "./widthHandler/widthHandler";
 
-export async function initialize(blazorView: DotNetObjectReference) {
+export async function initialize(blazorView: DotNetObjectReference, isFirstRender: boolean) {
     const elmHandler: ElementHandler = new ElementHandlerImpl();
     const styleHandler: StyleHandler = new StyleHandlerImpl(elmHandler);
     const widthHandler: WidthHandler = new WidthHandlerImpl(elmHandler, styleHandler, blazorView);
     const sortHandler: SortHandler = new SortHandlerImpl(elmHandler, blazorView)
 
-    await widthHandler.initialize();
-    sortHandler.initialize();
+    if (isFirstRender) {
+        await widthHandler.initialize();
+    }
+
+    sortHandler.initialize(registeredList);
 }
 
 export async function setWidth(blazorView: DotNetObjectReference) {
@@ -29,3 +32,5 @@ export function getSelectedIOfInput(): string {
 
     return handler.getSelected();
 }
+
+let registeredList: string[] = [];
