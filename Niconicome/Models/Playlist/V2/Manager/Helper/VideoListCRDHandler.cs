@@ -159,6 +159,17 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
                 this.AddVideoToPlaylist(result.Data, playlist);
             }
+            else if (info.InputType == InputType.NiconicoIDList)
+            {
+                IAttemptResult<VideoRegistrationResult> result = await this.RegisterVideoFromTextAsync(inputText, playlist, onMessage);
+                if (!result.IsSucceeded || result.Data is null)
+                {
+                    return result;
+                } else
+                {
+                    rResult = result.Data;
+                }
+            }
 
             if (rResult is null)
             {

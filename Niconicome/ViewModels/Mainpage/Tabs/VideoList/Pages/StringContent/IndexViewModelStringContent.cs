@@ -30,5 +30,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent
         InfomationCopied,
         [StringEnum("動画情報の更新が完了しました。({0}件)")]
         VideoUpdated,
+        [StringEnum("コンテンツがドロップされました。")]
+        ContentDropped,
     }
 }

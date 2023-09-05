@@ -72,7 +72,8 @@
             {
                 <button type="button" class="btn btn-primary ControlButton" 　title="クリップボードの監視を停止" @onclick="DataContext.ClipboardViewModel.SwitchMonitoring"><i class="fa-solid fa-xmark"></i></button>
 
-            } else
+            }
+            else
             {
                 <button type="button" class="btn btn-primary ControlButton" 　title="クリップボードを監視" @onclick="DataContext.ClipboardViewModel.SwitchMonitoring"><i class="fa-solid fa-clipboard-check"></i></button>
 
@@ -143,7 +144,7 @@
         <div class="VideoListBody">
             @foreach (var video in DataContext.Videos)
             {
-                <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" draggable="true">
+                <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" data-playlistID="@(DataContext.PlaylistID)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" draggable="true">
                     <div class="CheckBoxColumn">
                         <input type="checkbox" @bind="@(video.IsSelected.Value)" />
                     </div>
@@ -365,6 +366,12 @@
         DataContext.VideoListWidthViewModel.SetWidth(width, name);
     }
 
+    [JSInvokable]
+    public void OnDrop(string idsList)
+    {
+        DataContext.OnDrop(idsList);
+    }
+
     protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
@@ -415,12 +422,12 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
+        await JS.InvokeVoidAsync("showTooltip");
+        if (this.module is null)
         {
-            await JS.InvokeVoidAsync("showTooltip");
             this.module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/Index/main.js");
-            await this.module.InvokeVoidAsync("initialize", this.refToThis);
         }
+        await this.module.InvokeVoidAsync("initialize", this.refToThis, firstRender);
     }
 
     private void ExecuteInCurrentThread(Action action)

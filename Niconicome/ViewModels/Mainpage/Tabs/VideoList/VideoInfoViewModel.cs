@@ -187,5 +187,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
             this._video.ThumbPath.UnSubscribe(this._thumbHandler);
             this.Bindable.Dispose();
         }
+
+        public override string ToString()
+        {
+            return $"[{this.NiconicoId}]{this.Title}";
+        }
     }
 }

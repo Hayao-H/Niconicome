@@ -3,7 +3,7 @@ import { ElementHandler, ElementHandlerImpl } from "../../shared/ElementHandler"
 import { ElementIDs } from "./elementIDs";
 
 export interface SortHandler {
-    initialize(): void;
+    initialize(registeredList: string[]): void;
 }
 
 export class SortHandlerImpl implements SortHandler {
@@ -23,8 +23,7 @@ export class SortHandlerImpl implements SortHandler {
 
     private _lastOverElement: HTMLElement | null = null;
 
-
-    public initialize(): void {
+    public initialize(registeredList: string[]): void {
         const rowResult = this._elmHandler.GetAll(ElementIDs.VideoListRow);
         if (!rowResult.IsSucceeded || rowResult.Data === null) {
             return;
@@ -33,6 +32,21 @@ export class SortHandlerImpl implements SortHandler {
         rowResult.Data.forEach(elm => {
 
             if (elm instanceof HTMLElement) {
+
+                const niconicoID = elm.dataset['niconicoid'];
+                const playlistID = elm.dataset['playlistid'];
+
+                if (niconicoID === undefined || playlistID === undefined) {
+                    return;
+                }
+
+                const key: string = `${niconicoID}-${playlistID}`;
+                if (registeredList.includes(key)) {
+                    return;
+                } else {
+                    registeredList.push(key);
+                }
+
                 elm.addEventListener('dragstart', e => {
                     if (!(e.target instanceof HTMLElement)) {
                         return;

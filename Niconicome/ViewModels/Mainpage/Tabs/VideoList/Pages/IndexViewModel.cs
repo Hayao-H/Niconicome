@@ -113,6 +113,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public string PlaylistName => WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist?.Name.Value ?? "";
 
         /// <summary>
+        /// プレイリストのID
+        /// </summary>
+        public string PlaylistID => WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist?.ID.ToString() ?? "";
+
+        /// <summary>
         /// 入力値
         /// </summary>
         public IBindableProperty<string> InputText { get; init; }
@@ -302,6 +307,19 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this.IsProcessing.Value = false;
 
+        }
+
+        /// <summary>
+        /// ドロップ操作時
+        /// </summary>
+        /// <param name="idList"></param>
+        public void OnDrop(string idList)
+        {
+            string message = WS.Mainpage.StringHandler.GetContent(IndexViewModelStringContent.ContentDropped);
+            WS.Mainpage.SnackbarHandler.Enqueue(message);
+            WS.Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher);
+
+            _ = this.AddVideoAsync(idList);
         }
 
         /// <summary>
