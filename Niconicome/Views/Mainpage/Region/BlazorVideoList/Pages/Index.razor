@@ -366,6 +366,12 @@
         DataContext.VideoListWidthViewModel.SetWidth(width, name);
     }
 
+    [JSInvokable]
+    public void OnDrop(string idsList)
+    {
+        DataContext.OnDrop(idsList);
+    }
+
     protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();

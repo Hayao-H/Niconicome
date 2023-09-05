@@ -37,6 +37,10 @@ namespace Niconicome.Models.Network.Video
                 {
                     type = InputType.NiconicoID;
                     remoteType = RemoteType.None;
+                } else if (remoteType == RemoteType.NiconicoIDList)
+                {
+                    type = InputType.NiconicoIDList;
+                    remoteType = RemoteType.None;
                 }
             }
 
@@ -89,6 +93,9 @@ namespace Niconicome.Models.Network.Video
             else if (Regex.IsMatch(inputText, @"https?://(www\.)?nicovideo\.jp/series/\d+.*"))
             {
                 return RemoteType.Series;
+            } else if (this.IsNiconicoIDsList(inputText))
+            {
+                return RemoteType.NiconicoIDList;
             }
             else
             {
@@ -113,6 +120,17 @@ namespace Niconicome.Models.Network.Video
             }
         }
 
+        /// <summary>
+        /// 動画IDを含んだテキストであるかどうか判断
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        private bool IsNiconicoIDsList(string text)
+        {
+            var result = Regex.Matches(text, @"(sm|nm|so)?[0-9]+", RegexOptions.Compiled | RegexOptions.Multiline);
+            return result.Count > 0;
+        }
+
         #endregion
     }
 
@@ -120,6 +138,7 @@ namespace Niconicome.Models.Network.Video
     {
         None,
         NiconicoID,
+        NiconicoIDList,
         LocalVideo,
         RemotePlaylist,
     }
@@ -133,7 +152,8 @@ namespace Niconicome.Models.Network.Video
         Series,
         WatchLater,
         UserVideos,
-        Channel
+        Channel,
+        NiconicoIDList,
     }
 
     public record InputInfomation(string Parameter, InputType InputType, RemoteType RemoteType, bool IsRemote);

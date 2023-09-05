@@ -310,6 +310,19 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         }
 
         /// <summary>
+        /// ドロップ操作時
+        /// </summary>
+        /// <param name="idList"></param>
+        public void OnDrop(string idList)
+        {
+            string message = WS.Mainpage.StringHandler.GetContent(IndexViewModelStringContent.ContentDropped);
+            WS.Mainpage.SnackbarHandler.Enqueue(message);
+            WS.Mainpage.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher);
+
+            _ = this.AddVideoAsync(idList);
+        }
+
+        /// <summary>
         /// エンターキー入力時
         /// </summary>
         /// <param name="e"></param>
