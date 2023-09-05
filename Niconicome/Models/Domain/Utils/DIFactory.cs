@@ -75,6 +75,7 @@ using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
 using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
 using DlVideoV2 = Niconicome.Models.Domain.Niconico.Download.Video.V2;
+using DLGeneral = Niconicome.Models.Domain.Niconico.Download.General;
 
 
 namespace Niconicome.Models.Domain.Utils
@@ -379,6 +380,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideoV2.Fetch.Segment.AES.IAESInfomationHandler, DlVideoV2.Fetch.Segment.AES.AESInfomationHandler>();
             services.AddTransient<DlVideoV2.Fetch.Segment.AES.IDecryptor, DlVideoV2.Fetch.Segment.AES.Decryptor>();
             services.AddTransient<DlVideoV2.External.IExternalDownloaderHandler, DlVideoV2.External.ExternalDownloaderHandler>();
+            services.AddTransient<DLGeneral::ILocalFileHandler, DLGeneral::LocalFileHandler>();
 
             return services.BuildServiceProvider();
         }
