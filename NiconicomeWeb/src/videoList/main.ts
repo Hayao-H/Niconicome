@@ -2,17 +2,23 @@ import { DotNetObjectReference } from "../shared/DotNetObjectReference";
 import { ElementHandler, ElementHandlerImpl } from "../shared/ElementHandler";
 import { StyleHandler, StyleHandlerImpl } from "../shared/StyleHandler";
 import { SelectionHandlerImpl } from "./SelectionHandler/selectionHandler";
+import { DropHandler, DropHandlerImpl } from "./dropHandler/drophandler";
 import { SortHandler, SortHandlerImpl } from "./sortHandler/sortHandler";
 import { WidthHandler, WidthHandlerImpl } from "./widthHandler/widthHandler";
 
-export async function initialize(blazorView: DotNetObjectReference) {
+export async function initialize(blazorView: DotNetObjectReference, isFirstRender: boolean) {
     const elmHandler: ElementHandler = new ElementHandlerImpl();
     const styleHandler: StyleHandler = new StyleHandlerImpl(elmHandler);
     const widthHandler: WidthHandler = new WidthHandlerImpl(elmHandler, styleHandler, blazorView);
     const sortHandler: SortHandler = new SortHandlerImpl(elmHandler, blazorView)
+    const dropHandler: DropHandler = new DropHandlerImpl(blazorView);
 
-    await widthHandler.initialize();
-    sortHandler.initialize();
+    if (isFirstRender) {
+        await widthHandler.initialize();
+        dropHandler.Initialize();
+    }
+
+    sortHandler.initialize(registeredList);
 }
 
 export async function setWidth(blazorView: DotNetObjectReference) {
@@ -29,3 +35,5 @@ export function getSelectedIOfInput(): string {
 
     return handler.getSelected();
 }
+
+let registeredList: string[] = [];
