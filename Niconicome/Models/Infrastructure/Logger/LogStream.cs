@@ -59,7 +59,7 @@ namespace Niconicome.Models.Infrastructure.Log
 
         #region Props
 
-        public string LogFilePath { get; private set; } = "ログファイルの作成に失敗しました。";
+        public string LogFilePath { get; private set; } = "出力する内容が無いため、ログファイルが作成されていません。";
 
         #endregion
 
