@@ -381,6 +381,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideoV2.Fetch.Segment.AES.IDecryptor, DlVideoV2.Fetch.Segment.AES.Decryptor>();
             services.AddTransient<DlVideoV2.External.IExternalDownloaderHandler, DlVideoV2.External.ExternalDownloaderHandler>();
             services.AddTransient<DLGeneral::ILocalFileHandler, DLGeneral::LocalFileHandler>();
+            services.AddTransient<DLGeneral::IReplaceHandler, DLGeneral::ReplaceHandler>();
 
             return services.BuildServiceProvider();
         }

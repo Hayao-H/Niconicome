@@ -9,6 +9,7 @@ namespace Niconicome.Models.Const
 {
     class Format
     {
+
         public const string ISO8601 = "yyyy-MM-ddTHH:mm:ssK";
 
         public const string DefaultFileNameFormat = "[<id>]<title>";
@@ -33,5 +34,6 @@ namespace Niconicome.Models.Const
 
         public const string FFprobePath = @"bin\ffprobe.exe";
 
+        public static List<string> DefaultReplaceRules { get; private set; } = new List<string>() { "/to／", ":to：", "*to＊", "?to？", "<to＜", ">to＞", "|to｜", "\"to”", "#to＃", "!to！" };
     }
 }
