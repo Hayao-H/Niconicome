@@ -8,10 +8,19 @@ using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Setting.Utils;
 using WS = Niconicome.Workspaces.SettingPageV2;
 using Const = Niconicome.Models.Const;
+using Niconicome.Models.Domain.Niconico.Download.General;
+using System.Reflection.Emit;
+using System.Collections.ObjectModel;
+using Niconicome.Models.Const;
+using Niconicome.Models.Helper.Result;
+using SC = Niconicome.ViewModels.Setting.V2.Page.StringContent.FileVMSC;
+using Niconicome.Models.Domain.Utils.Error;
+using Niconicome.ViewModels.Shared;
+using Niconicome.Extensions.System.List;
 
 namespace Niconicome.ViewModels.Setting.V2.Page
 {
-    public class FileViewModel
+    public class FileViewModel : AlertViewModel
     {
         public FileViewModel()
         {
@@ -26,9 +35,31 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.IchibaSuffix = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.IchibaSuffix, Const::Format.DefaultIchibaSuffix), Const::Format.DefaultIchibaSuffix).AddTo(this.Bindables);
             this.EconomySuffix = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.EnonomyQualitySuffix, Const::Format.DefaultEconomyVideoSuffix), Const::Format.DefaultEconomyVideoSuffix).AddTo(this.Bindables);
             this.IsSearchingVideosExactEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.SearchVideosExact, false), false).AddTo(this.Bindables);
+
+            this._replaceRules = new ObservableCollection<IReplaceRule>(WS.ReplaceHandler.GetRules().Data ?? WS.ReplaceHandler.Convert(Format.DefaultReplaceRules));
+            this.ReplaceRules = new BindableCollection<ReplaceRuleViewModel, IReplaceRule>(this._replaceRules, r =>
+            {
+                var vm = new ReplaceRuleViewModel(r);
+                this.Bindables.Add(vm.IsSelected);
+                return vm;
+            });
+            this.Bindables.Add(this.ReplaceRules);
+            this.ReplaceFromInput = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
+            this.ReplaceToInput = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
         }
 
+        #region field
+
+        private readonly ObservableCollection<IReplaceRule> _replaceRules;
+
+        #endregion
+
         public Bindables Bindables { get; init; } = new();
+
+        /// <summary>
+        /// 置き換えルール
+        /// </summary>
+        public BindableCollection<ReplaceRuleViewModel, IReplaceRule> ReplaceRules { get; init; }
 
         /// <summary>
         /// デフォルトのDLパス
@@ -85,5 +116,95 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// エコノミー動画の接尾辞
         /// </summary>
         public IBindableSettingInfo<string> EconomySuffix { get; init; }
+
+        /// <summary>
+        /// 置き換え元
+        /// </summary>
+        public IBindableProperty<string> ReplaceToInput { get; init; }
+
+        /// <summary>
+        /// 置き換え元
+        /// </summary>
+        public IBindableProperty<string> ReplaceFromInput { get; init; }
+
+        /// <summary>
+        /// 置き換えルールを追加
+        /// </summary>
+        public void AddReplaceRule()
+        {
+            if (string.IsNullOrEmpty(this.ReplaceFromInput.Value))
+            {
+                return;
+            }
+
+            IAttemptResult result = WS.ReplaceHandler.AddRule(this.ReplaceFromInput.Value, this.ReplaceToInput.Value);
+
+            if (!result.IsSucceeded)
+            {
+                string message = WS.StringHandler.GetContent(SC.FailedToAddRule);
+                string messageD = WS.StringHandler.GetContent(SC.Detail, result.Message);
+                this.ShowAlert(message, AlertType.Error);
+                WS.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+            }
+            else
+            {
+                this._replaceRules.Add(new ReplaceRule(this.ReplaceFromInput.Value, this.ReplaceToInput.Value));
+                this.ReplaceFromInput.Value = string.Empty;
+                this.ReplaceToInput.Value = string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 置き換えルールを削除
+        /// </summary>
+        public void RemoveReplaceRule()
+        {
+            var targets = this.ReplaceRules.Where(r => r.IsSelected.Value);
+            if (targets.Count() == 0)
+            {
+                return;
+            }
+
+            foreach (var target in targets)
+            {
+                IAttemptResult result = WS.ReplaceHandler.RemoveRule(target.ReplaceFrom,target.ReplaceTo);
+
+                if (!result.IsSucceeded)
+                {
+                    string message = WS.StringHandler.GetContent(SC.FailedToRemovedRule);
+                    string messageD = WS.StringHandler.GetContent(SC.Detail, result.Message);
+                    this.ShowAlert(message, AlertType.Error);
+                    WS.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
+                }
+                else
+                {
+                    this._replaceRules.RemoveAll(r => r.ReplaceFrom == target.ReplaceFrom);
+                }
+            }
+        }
+    }
+
+    public class ReplaceRuleViewModel
+    {
+        public ReplaceRuleViewModel(IReplaceRule rule)
+        {
+            this.IsSelected = new BindableProperty<bool>(false);
+            this.ReplaceFrom = rule.ReplaceFrom;
+            this.ReplaceTo = rule.ReplaceTo;
+        }
+
+        /// 選択フラグ
+        /// </summary>
+        public IBindableProperty<bool> IsSelected { get; init; }
+
+        /// <summary>
+        /// 置き換え元
+        /// </summary>
+        public string ReplaceFrom { get; init; }
+
+        /// <summary>
+        /// 置き換え先
+        /// </summary>
+        public string ReplaceTo { get; init; }
     }
 }

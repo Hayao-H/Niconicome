@@ -130,6 +130,7 @@
     }
 }
 
+.FilePage,
 .RestorePage {
     .TitleContainer {
         display: flex;
@@ -141,15 +142,21 @@
         }
     }
 
+    .ReplaceSettingsContainer,
     .BackupSettingsContainer {
         margin-top: 18px;
+        margin-left: 16px;
 
+        .RulesList ,
         .BackupList {
+            .ReplaceListHeader ,
             .BackupListHeader {
                 display: flex;
             }
 
+            .RulesListBody,
             .BackupListBody {
+                .RulesListRow
                 .BackupListRow {
                     display: flex;
                 }

@@ -103,55 +103,149 @@
   padding: 8px;
 }
 
+.FilePage .TitleContainer,
 .RestorePage .TitleContainer {
   display: flex;
   align-items: center;
 }
+.FilePage .TitleContainer .Icon,
 .RestorePage .TitleContainer .Icon {
   margin-right: 8px;
   color: #ff69b4;
 }
+.FilePage .ReplaceSettingsContainer,
+.FilePage .BackupSettingsContainer,
+.RestorePage .ReplaceSettingsContainer,
 .RestorePage .BackupSettingsContainer {
   margin-top: 18px;
+  margin-left: 16px;
 }
+.FilePage .ReplaceSettingsContainer .RulesList .ReplaceListHeader,
+.FilePage .ReplaceSettingsContainer .RulesList .BackupListHeader,
+.FilePage .ReplaceSettingsContainer .BackupList .ReplaceListHeader,
+.FilePage .ReplaceSettingsContainer .BackupList .BackupListHeader,
+.FilePage .BackupSettingsContainer .RulesList .ReplaceListHeader,
+.FilePage .BackupSettingsContainer .RulesList .BackupListHeader,
+.FilePage .BackupSettingsContainer .BackupList .ReplaceListHeader,
+.FilePage .BackupSettingsContainer .BackupList .BackupListHeader,
+.RestorePage .ReplaceSettingsContainer .RulesList .ReplaceListHeader,
+.RestorePage .ReplaceSettingsContainer .RulesList .BackupListHeader,
+.RestorePage .ReplaceSettingsContainer .BackupList .ReplaceListHeader,
+.RestorePage .ReplaceSettingsContainer .BackupList .BackupListHeader,
+.RestorePage .BackupSettingsContainer .RulesList .ReplaceListHeader,
+.RestorePage .BackupSettingsContainer .RulesList .BackupListHeader,
+.RestorePage .BackupSettingsContainer .BackupList .ReplaceListHeader,
 .RestorePage .BackupSettingsContainer .BackupList .BackupListHeader {
   display: flex;
 }
-.RestorePage .BackupSettingsContainer .BackupList .BackupListBody .BackupListRow {
+.FilePage .ReplaceSettingsContainer .RulesList .RulesListBody .RulesListRow .BackupListRow,
+.FilePage .ReplaceSettingsContainer .RulesList .BackupListBody .RulesListRow .BackupListRow,
+.FilePage .ReplaceSettingsContainer .BackupList .RulesListBody .RulesListRow .BackupListRow,
+.FilePage .ReplaceSettingsContainer .BackupList .BackupListBody .RulesListRow .BackupListRow,
+.FilePage .BackupSettingsContainer .RulesList .RulesListBody .RulesListRow .BackupListRow,
+.FilePage .BackupSettingsContainer .RulesList .BackupListBody .RulesListRow .BackupListRow,
+.FilePage .BackupSettingsContainer .BackupList .RulesListBody .RulesListRow .BackupListRow,
+.FilePage .BackupSettingsContainer .BackupList .BackupListBody .RulesListRow .BackupListRow,
+.RestorePage .ReplaceSettingsContainer .RulesList .RulesListBody .RulesListRow .BackupListRow,
+.RestorePage .ReplaceSettingsContainer .RulesList .BackupListBody .RulesListRow .BackupListRow,
+.RestorePage .ReplaceSettingsContainer .BackupList .RulesListBody .RulesListRow .BackupListRow,
+.RestorePage .ReplaceSettingsContainer .BackupList .BackupListBody .RulesListRow .BackupListRow,
+.RestorePage .BackupSettingsContainer .RulesList .RulesListBody .RulesListRow .BackupListRow,
+.RestorePage .BackupSettingsContainer .RulesList .BackupListBody .RulesListRow .BackupListRow,
+.RestorePage .BackupSettingsContainer .BackupList .RulesListBody .RulesListRow .BackupListRow,
+.RestorePage .BackupSettingsContainer .BackupList .BackupListBody .RulesListRow .BackupListRow {
   display: flex;
 }
+.FilePage .ReplaceSettingsContainer .RulesList .ItemColumn,
+.FilePage .ReplaceSettingsContainer .BackupList .ItemColumn,
+.FilePage .BackupSettingsContainer .RulesList .ItemColumn,
+.FilePage .BackupSettingsContainer .BackupList .ItemColumn,
+.RestorePage .ReplaceSettingsContainer .RulesList .ItemColumn,
+.RestorePage .ReplaceSettingsContainer .BackupList .ItemColumn,
+.RestorePage .BackupSettingsContainer .RulesList .ItemColumn,
 .RestorePage .BackupSettingsContainer .BackupList .ItemColumn {
   padding: 8px;
   height: 100%;
   display: inline-block;
 }
+.FilePage .ReplaceSettingsContainer .RulesList .HeaderColumn,
+.FilePage .ReplaceSettingsContainer .BackupList .HeaderColumn,
+.FilePage .BackupSettingsContainer .RulesList .HeaderColumn,
+.FilePage .BackupSettingsContainer .BackupList .HeaderColumn,
+.RestorePage .ReplaceSettingsContainer .RulesList .HeaderColumn,
+.RestorePage .ReplaceSettingsContainer .BackupList .HeaderColumn,
+.RestorePage .BackupSettingsContainer .RulesList .HeaderColumn,
 .RestorePage .BackupSettingsContainer .BackupList .HeaderColumn {
   background-color: #f2f3f5;
   padding: 2px 8px;
 }
+.FilePage .ReplaceSettingsContainer .RulesList .ItemColumn:not(:last-child),
+.FilePage .ReplaceSettingsContainer .BackupList .ItemColumn:not(:last-child),
+.FilePage .BackupSettingsContainer .RulesList .ItemColumn:not(:last-child),
+.FilePage .BackupSettingsContainer .BackupList .ItemColumn:not(:last-child),
+.RestorePage .ReplaceSettingsContainer .RulesList .ItemColumn:not(:last-child),
+.RestorePage .ReplaceSettingsContainer .BackupList .ItemColumn:not(:last-child),
+.RestorePage .BackupSettingsContainer .RulesList .ItemColumn:not(:last-child),
 .RestorePage .BackupSettingsContainer .BackupList .ItemColumn:not(:last-child) {
   border-right: 1px solid rgba(231, 231, 231, 0.9058823529);
 }
+.FilePage .ReplaceSettingsContainer .RulesList .Selected,
+.FilePage .ReplaceSettingsContainer .BackupList .Selected,
+.FilePage .BackupSettingsContainer .RulesList .Selected,
+.FilePage .BackupSettingsContainer .BackupList .Selected,
+.RestorePage .ReplaceSettingsContainer .RulesList .Selected,
+.RestorePage .ReplaceSettingsContainer .BackupList .Selected,
+.RestorePage .BackupSettingsContainer .RulesList .Selected,
 .RestorePage .BackupSettingsContainer .BackupList .Selected {
   width: 30px;
 }
+.FilePage .ReplaceSettingsContainer .RulesList .Name,
+.FilePage .ReplaceSettingsContainer .BackupList .Name,
+.FilePage .BackupSettingsContainer .RulesList .Name,
+.FilePage .BackupSettingsContainer .BackupList .Name,
+.RestorePage .ReplaceSettingsContainer .RulesList .Name,
+.RestorePage .ReplaceSettingsContainer .BackupList .Name,
+.RestorePage .BackupSettingsContainer .RulesList .Name,
 .RestorePage .BackupSettingsContainer .BackupList .Name {
   width: 300px;
 }
+.FilePage .ReplaceSettingsContainer .RulesList .CreatedOn,
+.FilePage .ReplaceSettingsContainer .BackupList .CreatedOn,
+.FilePage .BackupSettingsContainer .RulesList .CreatedOn,
+.FilePage .BackupSettingsContainer .BackupList .CreatedOn,
+.RestorePage .ReplaceSettingsContainer .RulesList .CreatedOn,
+.RestorePage .ReplaceSettingsContainer .BackupList .CreatedOn,
+.RestorePage .BackupSettingsContainer .RulesList .CreatedOn,
 .RestorePage .BackupSettingsContainer .BackupList .CreatedOn {
   width: 400px;
 }
+.FilePage .ReplaceSettingsContainer .RulesList .Size,
+.FilePage .ReplaceSettingsContainer .BackupList .Size,
+.FilePage .BackupSettingsContainer .RulesList .Size,
+.FilePage .BackupSettingsContainer .BackupList .Size,
+.RestorePage .ReplaceSettingsContainer .RulesList .Size,
+.RestorePage .ReplaceSettingsContainer .BackupList .Size,
+.RestorePage .BackupSettingsContainer .RulesList .Size,
 .RestorePage .BackupSettingsContainer .BackupList .Size {
   width: 200px;
 }
+.FilePage .ReplaceSettingsContainer .BackupControlsContainer,
+.FilePage .BackupSettingsContainer .BackupControlsContainer,
+.RestorePage .ReplaceSettingsContainer .BackupControlsContainer,
 .RestorePage .BackupSettingsContainer .BackupControlsContainer {
   margin-top: 30px;
   margin-left: 10px;
 }
+.FilePage .ReplaceSettingsContainer .BackupControlsContainer .Label,
+.FilePage .BackupSettingsContainer .BackupControlsContainer .Label,
+.RestorePage .ReplaceSettingsContainer .BackupControlsContainer .Label,
 .RestorePage .BackupSettingsContainer .BackupControlsContainer .Label {
   margin-right: 8px;
   font-weight: bold;
 }
+.FilePage .ReplaceSettingsContainer .BackupControlsContainer .Input,
+.FilePage .BackupSettingsContainer .BackupControlsContainer .Input,
+.RestorePage .ReplaceSettingsContainer .BackupControlsContainer .Input,
 .RestorePage .BackupSettingsContainer .BackupControlsContainer .Input {
   outline: none;
   border: none;
@@ -159,46 +253,60 @@
   width: 50%;
   margin-right: 8px;
 }
+.FilePage .ReplaceSettingsContainer .BackupControlsContainer .Button,
+.FilePage .BackupSettingsContainer .BackupControlsContainer .Button,
+.RestorePage .ReplaceSettingsContainer .BackupControlsContainer .Button,
 .RestorePage .BackupSettingsContainer .BackupControlsContainer .Button {
   margin-left: 4px;
 }
+.FilePage .DirectorySettingsContainer,
 .RestorePage .DirectorySettingsContainer {
   margin-top: 18px;
 }
+.FilePage .DirectorySettingsContainer .DirectoryList .DirectoryListHeader,
 .RestorePage .DirectorySettingsContainer .DirectoryList .DirectoryListHeader {
   display: flex;
   justify-content: stretch;
 }
+.FilePage .DirectorySettingsContainer .DirectoryList .DirectoryListBody .DirectoryListRow,
 .RestorePage .DirectorySettingsContainer .DirectoryList .DirectoryListBody .DirectoryListRow {
   display: flex;
   justify-content: stretch;
 }
+.FilePage .DirectorySettingsContainer .DirectoryList .ItemColumn,
 .RestorePage .DirectorySettingsContainer .DirectoryList .ItemColumn {
   padding: 8px;
   height: 100%;
   display: inline-block;
 }
+.FilePage .DirectorySettingsContainer .DirectoryList .HeaderColumn,
 .RestorePage .DirectorySettingsContainer .DirectoryList .HeaderColumn {
   background-color: #f2f3f5;
   padding: 2px 8px;
 }
+.FilePage .DirectorySettingsContainer .DirectoryList .ItemColumn:not(:last-child),
 .RestorePage .DirectorySettingsContainer .DirectoryList .ItemColumn:not(:last-child) {
   border-right: 1px solid rgba(231, 231, 231, 0.9058823529);
 }
+.FilePage .DirectorySettingsContainer .DirectoryList .Selected,
 .RestorePage .DirectorySettingsContainer .DirectoryList .Selected {
   width: 30px;
 }
+.FilePage .DirectorySettingsContainer .DirectoryList .Path,
 .RestorePage .DirectorySettingsContainer .DirectoryList .Path {
   flex: 1;
 }
+.FilePage .DirectorySettingsContainer .DirectoryControlsContainer,
 .RestorePage .DirectorySettingsContainer .DirectoryControlsContainer {
   margin-top: 30px;
   margin-left: 10px;
 }
+.FilePage .DirectorySettingsContainer .DirectoryControlsContainer .Label,
 .RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Label {
   margin-right: 8px;
   font-weight: bold;
 }
+.FilePage .DirectorySettingsContainer .DirectoryControlsContainer .Input,
 .RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Input {
   outline: none;
   border: none;
@@ -206,21 +314,26 @@
   width: 50%;
   margin-right: 8px;
 }
+.FilePage .DirectorySettingsContainer .DirectoryControlsContainer .Button,
 .RestorePage .DirectorySettingsContainer .DirectoryControlsContainer .Button {
   margin-left: 4px;
 }
+.FilePage .DirectorySettingsContainer .LoadVideoDescription,
 .RestorePage .DirectorySettingsContainer .LoadVideoDescription {
   margin: 20px 10px;
 }
+.FilePage .DataCleaningDescription,
 .RestorePage .DataCleaningDescription {
   margin: 20px 10px;
 }
+.FilePage .DangerZoneContainer,
 .RestorePage .DangerZoneContainer {
   background-color: #f8d7da;
   color: #842029;
   border-radius: 8px;
   padding: 16px;
 }
+.FilePage .DangerZoneContainer .DangerZoneBody,
 .RestorePage .DangerZoneContainer .DangerZoneBody {
   margin-left: 16px;
 }

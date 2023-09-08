@@ -5,8 +5,11 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using Niconicome.Extensions.System;
+using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Niconico.Download.General;
 using Niconicome.Models.Domain.Niconico.Search;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 
@@ -28,6 +31,17 @@ namespace Niconicome.Models.Domain.Utils
 
     public class NiconicoUtils : INiconicoUtils
     {
+        public NiconicoUtils(IReplaceHandler replaceHandler)
+        {
+            this._replaceHandler = replaceHandler;
+        }
+
+        #region field
+
+        private readonly IReplaceHandler _replaceHandler;
+
+        #endregion
+
         /// <summary>
         /// ニコニコ動画のIDを抽出する
         /// </summary>
@@ -347,15 +361,28 @@ namespace Niconicome.Models.Domain.Utils
 
             if (replaceStricted)
             {
-                filename = filename
-                    .Replace("/", "／")
-                    .Replace(":", "：")
-                    .Replace("*", "＊")
-                    .Replace("?", "？")
-                    .Replace("<", "＜")
-                    .Replace(">", "＞")
-                    .Replace("|", "｜")
-                    .Replace("\"", "”");
+                IEnumerable<IReplaceRule> rules;
+
+                IAttemptResult<IEnumerable<IReplaceRule>> result = this._replaceHandler.GetRules();
+
+                if (!result.IsSucceeded || result.Data is null)
+                {
+                    rules = Format.DefaultReplaceRules.Select(s =>
+                    {
+                        string[] splited = s.Split("to");
+                        return new ReplaceRule(splited[0], splited[1]);
+                    });
+                }
+                else
+                {
+                    rules = result.Data;
+                }
+
+                foreach (var rule in rules)
+                {
+                    filename = filename.Replace(rule.ReplaceFrom,rule.ReplaceTo);
+                }
+
             }
             else
             {

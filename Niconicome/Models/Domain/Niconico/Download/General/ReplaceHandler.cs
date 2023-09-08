@@ -11,7 +11,7 @@ using Err = Niconicome.Models.Domain.Niconico.Download.General.ReplaceHandlerErr
 
 namespace Niconicome.Models.Domain.Niconico.Download.General
 {
-    interface IReplaceHandler
+    public interface IReplaceHandler
     {
         /// <summary>
         /// 置き換えルールを追加
@@ -34,6 +34,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
         /// </summary>
         /// <returns></returns>
         IAttemptResult<IEnumerable<IReplaceRule>> GetRules();
+
+        /// <summary>
+        /// 変換
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        IEnumerable<IReplaceRule> Convert(IEnumerable<string> source);
     }
 
     public interface IReplaceRule
@@ -76,11 +83,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
                 return AttemptResult<IEnumerable<IReplaceRule>>.Fail(result.Message);
             }
 
-            IEnumerable<IReplaceRule> data = result.Data.Select(s =>
-            {
-                string[] splited = s.Split("to");
-                return new ReplaceRule(splited[0], splited[1]);
-            });
+            IEnumerable<IReplaceRule> data = this.Convert(result.Data);
 
             return AttemptResult<IEnumerable<IReplaceRule>>.Succeeded(data);
         }
@@ -125,6 +128,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(Err.DataNotExist, replaceFrom, replaceTo));
             }
         }
+
+        public IEnumerable<IReplaceRule> Convert(IEnumerable<string> source)
+        {
+            return source.Select(s =>
+            {
+                string[] splited = s.Split("to");
+
+                var to = splited.Length == 1 ? string.Empty : splited[1];
+
+                return new ReplaceRule(splited[0], to);
+            });
+        }
+
 
         #endregion
     }
