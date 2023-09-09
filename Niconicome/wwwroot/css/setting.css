@@ -259,6 +259,12 @@
 .RestorePage .BackupSettingsContainer .BackupControlsContainer .Button {
   margin-left: 4px;
 }
+.FilePage .ReplaceSettingsContainer .BackupControlsContainer .ReplaceTo,
+.FilePage .BackupSettingsContainer .BackupControlsContainer .ReplaceTo,
+.RestorePage .ReplaceSettingsContainer .BackupControlsContainer .ReplaceTo,
+.RestorePage .BackupSettingsContainer .BackupControlsContainer .ReplaceTo {
+  margin-right: 8px;
+}
 .FilePage .DirectorySettingsContainer,
 .RestorePage .DirectorySettingsContainer {
   margin-top: 18px;

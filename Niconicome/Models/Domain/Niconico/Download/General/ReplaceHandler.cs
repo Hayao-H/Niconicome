@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
 {
     public interface IReplaceHandler
     {
+        /// <summary>
+        /// 置き換えルール
+        /// </summary>
+        ReadOnlyObservableCollection<IReplaceRule> ReplaceRules { get; }
+
         /// <summary>
         /// 置き換えルールを追加
         /// </summary>
@@ -28,12 +34,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
         /// <param name="replaceTo"></param>
         /// <returns></returns>
         IAttemptResult RemoveRule(string replaceFrom, string replaceTo);
-
-        /// <summary>
-        /// 全ての置き換えルールを取得
-        /// </summary>
-        /// <returns></returns>
-        IAttemptResult<IEnumerable<IReplaceRule>> GetRules();
 
         /// <summary>
         /// 変換
@@ -63,6 +63,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
         {
             this._settingsContainer = settingsContainer;
             this._errorHandler = errorHandler;
+            this.ReplaceRules = new ReadOnlyObservableCollection<IReplaceRule>(this._replaceRules);
+            this.Refresh();
         }
 
         #region private
@@ -71,22 +73,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
 
         private readonly IErrorHandler _errorHandler;
 
+        private readonly ObservableCollection<IReplaceRule> _replaceRules = new();
+
+        #endregion
+
+        #region Props
+
+        public ReadOnlyObservableCollection<IReplaceRule> ReplaceRules { get; init; }
+
         #endregion
 
         #region Method
 
-        public IAttemptResult<IEnumerable<IReplaceRule>> GetRules()
-        {
-            IAttemptResult<List<string>> result = this._settingsContainer.GetOnlyValue(SettingNames.ReplaceRules, Format.DefaultReplaceRules);
-            if (!result.IsSucceeded || result.Data is null)
-            {
-                return AttemptResult<IEnumerable<IReplaceRule>>.Fail(result.Message);
-            }
 
-            IEnumerable<IReplaceRule> data = this.Convert(result.Data);
-
-            return AttemptResult<IEnumerable<IReplaceRule>>.Succeeded(data);
-        }
 
         public IAttemptResult AddRule(string replaceFrom, string replaceTo)
         {
@@ -100,6 +99,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
             data.Add($"{replaceFrom}to{replaceTo}");
 
             result.Data.Value = data;
+
+            this.Refresh();
 
             return AttemptResult.Succeeded();
         }
@@ -120,6 +121,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
             {
                 data.Remove(target);
                 result.Data.Value = data;
+                this.Refresh();
                 return AttemptResult.Succeeded();
             }
             else
@@ -143,6 +145,20 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
 
 
         #endregion
+
+        private void Refresh()
+        {
+            IAttemptResult<List<string>> result = this._settingsContainer.GetOnlyValue(SettingNames.ReplaceRules, Format.DefaultReplaceRules);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return;
+            }
+
+            IEnumerable<IReplaceRule> data = this.Convert(result.Data);
+
+            this._replaceRules.Clear();
+            this._replaceRules.AddRange(data);
+        }
     }
 
     public record ReplaceRule(string ReplaceFrom, string ReplaceTo) : IReplaceRule;

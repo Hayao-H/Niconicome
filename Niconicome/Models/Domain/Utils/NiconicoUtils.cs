@@ -361,24 +361,7 @@ namespace Niconicome.Models.Domain.Utils
 
             if (replaceStricted)
             {
-                IEnumerable<IReplaceRule> rules;
-
-                IAttemptResult<IEnumerable<IReplaceRule>> result = this._replaceHandler.GetRules();
-
-                if (!result.IsSucceeded || result.Data is null)
-                {
-                    rules = Format.DefaultReplaceRules.Select(s =>
-                    {
-                        string[] splited = s.Split("to");
-                        return new ReplaceRule(splited[0], splited[1]);
-                    });
-                }
-                else
-                {
-                    rules = result.Data;
-                }
-
-                foreach (var rule in rules)
+                foreach (var rule in this._replaceHandler.ReplaceRules)
                 {
                     filename = filename.Replace(rule.ReplaceFrom,rule.ReplaceTo);
                 }

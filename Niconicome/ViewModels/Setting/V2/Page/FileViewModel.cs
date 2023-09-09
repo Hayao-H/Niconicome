@@ -36,8 +36,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.EconomySuffix = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.EnonomyQualitySuffix, Const::Format.DefaultEconomyVideoSuffix), Const::Format.DefaultEconomyVideoSuffix).AddTo(this.Bindables);
             this.IsSearchingVideosExactEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.SearchVideosExact, false), false).AddTo(this.Bindables);
 
-            this._replaceRules = new ObservableCollection<IReplaceRule>(WS.ReplaceHandler.GetRules().Data ?? WS.ReplaceHandler.Convert(Format.DefaultReplaceRules));
-            this.ReplaceRules = new BindableCollection<ReplaceRuleViewModel, IReplaceRule>(this._replaceRules, r =>
+            this.ReplaceRules = new BindableCollection<ReplaceRuleViewModel, IReplaceRule>(WS.ReplaceHandler.ReplaceRules, r =>
             {
                 var vm = new ReplaceRuleViewModel(r);
                 this.Bindables.Add(vm.IsSelected);
@@ -47,12 +46,6 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.ReplaceFromInput = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
             this.ReplaceToInput = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
         }
-
-        #region field
-
-        private readonly ObservableCollection<IReplaceRule> _replaceRules;
-
-        #endregion
 
         public Bindables Bindables { get; init; } = new();
 
@@ -148,7 +141,6 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             }
             else
             {
-                this._replaceRules.Add(new ReplaceRule(this.ReplaceFromInput.Value, this.ReplaceToInput.Value));
                 this.ReplaceFromInput.Value = string.Empty;
                 this.ReplaceToInput.Value = string.Empty;
             }
@@ -167,7 +159,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             foreach (var target in targets)
             {
-                IAttemptResult result = WS.ReplaceHandler.RemoveRule(target.ReplaceFrom,target.ReplaceTo);
+                IAttemptResult result = WS.ReplaceHandler.RemoveRule(target.ReplaceFrom, target.ReplaceTo);
 
                 if (!result.IsSucceeded)
                 {
@@ -175,10 +167,6 @@ namespace Niconicome.ViewModels.Setting.V2.Page
                     string messageD = WS.StringHandler.GetContent(SC.Detail, result.Message);
                     this.ShowAlert(message, AlertType.Error);
                     WS.MessageHandler.AppendMessage(message, LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
-                }
-                else
-                {
-                    this._replaceRules.RemoveAll(r => r.ReplaceFrom == target.ReplaceFrom);
                 }
             }
         }

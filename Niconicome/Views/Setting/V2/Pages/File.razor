@@ -135,14 +135,13 @@
                     <input class="Input" @bind="DataContext.ReplaceFromInput.Value" />
                     <span>から</span>
                     <input class="Input" @bind="DataContext.ReplaceToInput.Value" />
-                    <span>に置き換える</span>
+                    <span class="ReplaceTo">に置き換える</span>
 
                     <button class="Button btn btn-primary" @onclick="DataContext.AddReplaceRule">追加</button>
                     <button class="Button btn btn-primary" @onclick="DataContext.RemoveReplaceRule">削除</button>
                 </div>
             </div>
         }
-
         <div class="SettingContent">
             <label class="Title" for="searchExact"><i class="Icon fa-solid fa-magnifying-glass"></i>保存した動画ファイルををフォーマット通りに検索する（非推奨）</label>
             <div class="form-check form-switch">
