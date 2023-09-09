@@ -36,6 +36,8 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string DeleteExistingEconomyFile { get; private set; } = "Download.File.DeleteExistingEconomyFile";
 
+        public static string ReplaceRules { get; private set; } = "Download.File.ReplaceRules";
+
         //Download.General
         public static string MaxParallelDownloadCount { get; private set; } = "Download.General.MaxParallelDownloadCount";
 

@@ -19,6 +19,7 @@ using Niconicome.Models.Domain.Local.Server.RequestHandler.UserChrome;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.Video;
 using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Error;
 using Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Threadkey;
+using Niconicome.Models.Domain.Niconico.Download.General;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Error;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES.Error;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.Error;
@@ -100,6 +101,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 51, typeof(SegmentWriterError) },
             { 52, typeof(AESInfomationHandlerError) },
             { 53, typeof(DecryptorError) },
+            { 54, typeof(ReplaceHandlerError) },
         };
     }
 }

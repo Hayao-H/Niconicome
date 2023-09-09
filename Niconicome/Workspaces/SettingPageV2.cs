@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Niconico.Download.General;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Local.Application;
@@ -89,6 +90,11 @@ namespace Niconicome.Workspaces
         /// ローカルステート
         /// </summary>
         public static ILocalState State { get; private set; } = DIFactory.Resolve<ILocalState>();
+
+        /// <summary>
+        /// ファイル名の置き換え
+        /// </summary>
+        public static IReplaceHandler ReplaceHandler { get; private set; } = DIFactory.Resolve<IReplaceHandler>();
 
     }
 }
