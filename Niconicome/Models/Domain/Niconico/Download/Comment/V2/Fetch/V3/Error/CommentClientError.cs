@@ -15,6 +15,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3.Error
         FailedToGetDefaultThread,
         [ErrorEnum(ErrorLevel.Error, "コメントサーバーへのリクエストに失敗しました。（url:{0}, status:{1}）")]
         FailedToFetch,
+        [ErrorEnum(ErrorLevel.Error, "コメントサーバーへのリクエストに失敗しました。（url:{0}")]
+        ExceptionOccuredWhileFetch,
         [ErrorEnum(ErrorLevel.Error, "コメントの解析に失敗しました。")]
         FailedToDeserializeData,
         [ErrorEnum(ErrorLevel.Error, "ダウンロード処理がキャンセルされました。")]

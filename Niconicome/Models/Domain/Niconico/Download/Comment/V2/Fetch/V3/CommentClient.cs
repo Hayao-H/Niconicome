@@ -302,6 +302,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
                     this._lastFetchedInfo[unfetched.Thread][unfetched.Fork] = new(unfetched.Start.No - 1, settings.CommentCountPerBlock);// this.GetDefaultThreadCommentCount(defaultThreadID, defaultThreadFork, fResult.Data));
 
                     loopIndex++;
+                    fetchedCount = collection.Count;
                 }
             }
 
@@ -369,13 +370,49 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
             string url = dmcInfo.CommentServer + "/v1/threads";
 
             //コメントをダウンロード
-            HttpResponseMessage res = await this._http.PostAsync(new Uri(url), new StringContent(rResult.Data));
+            var retryCount = 0;
+            HttpResponseMessage res;
 
-            if (!res.IsSuccessStatusCode)
+            while (true)
             {
-                string content = await res.Content.ReadAsStringAsync();
-                this._errorHandler.HandleError(CommentClientError.FailedToFetch, url, (int)res.StatusCode);
-                return AttemptResult<IEnumerable<IComment>>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.FailedToFetch, url, (int)res.StatusCode));
+                try
+                {
+                    res = await this._http.PostAsync(new Uri(url), new StringContent(rResult.Data));
+                }
+                catch (Exception ex)
+                {
+                    if (retryCount <= 3)
+                    {
+                        retryCount++;
+                        await Task.Delay(10 * 1000);
+                        continue;
+                    }
+                    else
+                    {
+                        this._errorHandler.HandleError(CommentClientError.ExceptionOccuredWhileFetch, ex, url);
+                        return AttemptResult<IEnumerable<IComment>>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.ExceptionOccuredWhileFetch, ex, url));
+                    }
+                }
+
+                if (res.IsSuccessStatusCode)
+                {
+                    break;
+                }
+                else
+                {
+                    if (retryCount <= 3)
+                    {
+                        retryCount++;
+                        await Task.Delay(10 * 1000);
+                        continue;
+                    }
+                    else
+                    {
+                        var c = await res.Content.ReadAsStringAsync();
+                        this._errorHandler.HandleError(CommentClientError.FailedToFetch, url, (int)res.StatusCode);
+                        return AttemptResult<IEnumerable<IComment>>.Fail(this._errorHandler.GetMessageForResult(CommentClientError.FailedToFetch, url, (int)res.StatusCode));
+                    }
+                }
             }
 
             Response::ResponseRoot data;
