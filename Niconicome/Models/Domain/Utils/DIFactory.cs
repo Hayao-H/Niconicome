@@ -167,7 +167,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainXeno::IXenoVideoNodeParser, DomainXeno::XenoVideoNodeParser>();
             services.AddTransient<DomainXeno::IXenoPlaylistConverter, DomainXeno::XenoPlaylistConverter>();
             services.AddTransient<Store::IVideoDirectoryStoreHandler, Store::VideoDirectoryStoreHandler>();
-            services.AddTransient<Download::ILocalContentHandler, Download::LocalContentHandler>();
             services.AddTransient<DownloadTask::IDownloadTaskPool, DownloadTask::DownloadTaskPool>();
             services.AddSingleton<DownloadTask::IDownloadManager, DownloadTask.DownloadManager>();
             services.AddTransient<DownloadTask::IDownloadTask, DownloadTask::DownloadTask>();

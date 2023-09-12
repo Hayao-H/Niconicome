@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Const
 {
-    class Format
+    public class Format
     {
 
         public const string ISO8601 = "yyyy-MM-ddTHH:mm:ssK";
