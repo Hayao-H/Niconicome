@@ -35,6 +35,19 @@ namespace Niconicome.Models.Utils.Reactive
         /// <returns></returns>
         IReadonlyBindablePperty<T> Subscribe(Action<T> handler);
 
+        /// <summary>
+        /// 購読解除
+        /// </summary>
+        /// <param name="handler"></param>
+        void UnSubscribe(Action<T> handler);
+
+        /// <summary>
+        /// プロパティーを変換
+        /// </summary>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        IReadonlyBindablePperty<U> Select<U>(Func<T, U> selector);
     }
 
 
@@ -87,6 +100,24 @@ namespace Niconicome.Models.Utils.Reactive
             this.RegisterPropertyChangeHandler(handler);
             return this;
         }
+
+        public IReadonlyBindablePperty<U> Select<U>(Func<T, U> selector)
+        {
+            var p = new BindableProperty<U>(selector(this.Value));
+
+            Action<T> subscriber = x => p.Value = selector(x);
+
+            this.Subscribe(subscriber);
+            p.PropertyDisposed += (_, _) => this.UnRegisterPropertyChangeHandler(subscriber);
+
+            return p.AsReadOnly();
+        }
+
+        public void UnSubscribe(Action<T> handler)
+        {
+            this.UnRegisterPropertyChangeHandler(handler);
+        }
+
 
         #endregion
 

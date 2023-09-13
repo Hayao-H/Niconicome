@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
 using Reactive.Bindings;
 using System.Reactive.Linq;
+using Niconicome.Models.Utils.Reactive;
 
 namespace Niconicome.Models.Network.Download.DLTask
 {
@@ -42,12 +43,12 @@ namespace Niconicome.Models.Network.Download.DLTask
         /// <summary>
         /// キャンセル済みを表示
         /// </summary>
-        ReactiveProperty<bool> DisplayCanceled { get; }
+        IBindableProperty<bool> DisplayCanceled { get; }
 
         /// <summary>
         /// 完了済みを表示
         /// </summary>
-        ReactiveProperty<bool> DisplayCompleted { get; }
+        IBindableProperty<bool> DisplayCompleted { get; }
     }
 
     public class DownloadTaskPool : IDownloadTaskPool
@@ -72,9 +73,9 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         public ReadOnlyObservableCollection<IDownloadTask> Tasks { get; init; }
 
-        public ReactiveProperty<bool> DisplayCanceled { get; init; } = new(true);
+        public IBindableProperty<bool> DisplayCanceled { get; init; } = new BindableProperty<bool>(true);
 
-        public ReactiveProperty<bool> DisplayCompleted { get; init; } = new(true);
+        public IBindableProperty<bool> DisplayCompleted { get; init; } = new BindableProperty<bool>(true);
 
         #endregion
 

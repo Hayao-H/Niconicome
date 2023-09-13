@@ -14,13 +14,14 @@ using Niconicome.Models.Network.Download.DLTask.StringContent;
 using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
+using Niconicome.Models.Utils.ParallelTaskV2;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download.DLTask;
 
-public interface IDownloadTask : IParallelTask<IDownloadTask>
+public interface IDownloadTask : IParallelTask
 {
     /// <summary>
     /// メッセージ
@@ -81,7 +82,7 @@ public interface IDownloadTask : IParallelTask<IDownloadTask>
     Task<IAttemptResult> DownloadAsync();
 }
 
-public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownloadTask>
+public class DownloadTask : BindableBase, IDownloadTask
 {
     public DownloadTask(IPlaylistManager playlistManager, IMessageHandler messageHandler, IContentDownloadHelper contentDownloadHelper, IStringHandler stringHandler, IVideoStore videoStore)
     {
@@ -93,7 +94,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         this._videoStore = videoStore;
 
         this.OnWait = _ => { };
-        this.TaskFunction = async (_, _) => await this.DownloadAsync();
+        this.TaskFunction = async _ => await this.DownloadAsync();
 
         this.IsCompleted = new BindableProperty<bool>(false);
         this.IsProcessing = new BindableProperty<bool>(false);
@@ -135,7 +136,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
 
     public int Index { get; set; }
 
-    public Func<IDownloadTask, object, Task> TaskFunction { get; init; }
+    public Func<object, Task> TaskFunction { get; init; }
 
     public Action<int> OnWait { get; private set; }
 
@@ -236,6 +237,8 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
                 this._video.IsDownloaded.Value = true;
             }
 
+            this.IsSuceeded = true;
+
             this._video.IsSelected.Value = false;
 
             this.Message.Value = this._stringHandler.GetContent(DownloadTaskStringContent.DownloadSucceeded, rMessage);
@@ -253,11 +256,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         //DL処理を終了
         this.IsProcessing.Value = false;
         this.IsCompleted.Value = true;
-        if (!this.IsCanceled.Value)
-        {
-            this.IsSuceeded = true;
-        }
-        else
+        if (this.IsCanceled.Value)
         {
             return AttemptResult.Fail(this._stringHandler.GetContent(DownloadTaskStringContent.TaskCancelled));
         }

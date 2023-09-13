@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
@@ -31,38 +32,32 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         {
             this.StagedTasks = WS::Mainpage.DownloadManager.Staged.ToReadOnlyReactiveCollection(t => new DownloadTaskViewModel(t));
             this.Tasks = WS::Mainpage.DownloadManager.Queue.ToReadOnlyReactiveCollection(t => new DownloadTaskViewModel(t));
-            this.DisplayCanceled = WS::Mainpage.DownloadManager.DisplayCanceled.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.DisplayCompleted = WS::Mainpage.DownloadManager.DisplayCompleted.ToReactivePropertyAsSynchronized(x => x.Value);
+            this.DisplayCanceled = WS::Mainpage.DownloadManager.DisplayCanceled;
+            this.DisplayCompleted = WS::Mainpage.DownloadManager.DisplayCompleted;
 
             this.regionManager = regionManager;
             this.RequestClose += _ => { };
 
-            this.StartDownloadCommand = WS::Mainpage.DownloadManager.IsProcessing
-            .Select(x => !x)
-            .ToReactiveCommand()
-            .WithSubscribe(async () =>
-           {
-               await WS::Mainpage.DownloadManager.StartDownloadAsync(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.Queue.Enqueue(m));
-               WS::Mainpage.PostDownloadTasksManager.HandleAction();
-           })
-            .AddTo(this.disposables);
+            this.StartDownloadCommand = new BindableCommand(async () =>
+            {
+                await WS::Mainpage.DownloadManager.StartDownloadAsync(m => WS::Mainpage.Messagehandler.AppendMessage(m), m => this.Queue.Enqueue(m));
+                WS::Mainpage.PostDownloadTasksManager.HandleAction();
+            }, WS::Mainpage.DownloadManager.IsProcessing.Select(x => !x));
 
-            this.CancelDownloadCommand = WS::Mainpage.DownloadManager.IsProcessing
-                .ToReactiveCommand()
-                .WithSubscribe(() =>
+            this.CancelDownloadCommand = new BindableCommand(
+               () =>
                 {
                     WS::Mainpage.DownloadManager.CancelDownload();
                     this.Queue.Enqueue("ユーザーによってダウンロードがキャンセルされました。");
                     WS::Mainpage.Messagehandler.AppendMessage("ユーザーによってダウンロードがキャンセルされました。");
-                })
-            .AddTo(this.disposables);
+                }, WS::Mainpage.DownloadManager.IsProcessing);
 
-            this.ClearStagedCommand = new ReactiveCommand().WithSubscribe(() =>
+            this.ClearStagedCommand = new BindableCommand(() =>
             {
                 WS::Mainpage.DownloadManager.ClearStaged();
-            });
+            }, new BindableProperty<bool>(true));
 
-            this.RemoveStagedTaskCommand = new ReactiveCommand().WithSubscribe(() =>
+            this.RemoveStagedTaskCommand = new BindableCommand(() =>
              {
                  var tasks = this.StagedTasks.Where(t => t.IsChecked.Value);
                  foreach (var task in tasks)
@@ -70,7 +65,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
                      WS::Mainpage.DownloadManager.RemoveFromStaged(task.Task);
                  }
 
-             });
+             }, new BindableProperty<bool>(true));
 
             this.CloseCommand.Subscribe(() =>
             {
@@ -113,32 +108,32 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
         /// <summary>
         /// キャンセル済みを表示
         /// </summary>
-        public ReactiveProperty<bool> DisplayCanceled { get; init; }
+        public IBindableProperty<bool> DisplayCanceled { get; init; }
 
         /// <summary>
         /// 完了済みを表示
         /// </summary>
-        public ReactiveProperty<bool> DisplayCompleted { get; init; }
+        public IBindableProperty<bool> DisplayCompleted { get; init; }
 
         /// <summary>
         /// DLを開始
         /// </summary>
-        public ReactiveCommand StartDownloadCommand { get; init; }
+        public IBindableCommand StartDownloadCommand { get; init; }
 
         /// <summary>
         /// DLを中止
         /// </summary>
-        public ReactiveCommand CancelDownloadCommand { get; init; }
+        public IBindableCommand CancelDownloadCommand { get; init; }
 
         /// <summary>
         /// ステージング済みをクリア
         /// </summary>
-        public ReactiveCommand ClearStagedCommand { get; init; }
+        public IBindableCommand ClearStagedCommand { get; init; }
 
         /// <summary>
         /// 削除する
         /// </summary>
-        public ReactiveCommand RemoveStagedTaskCommand { get; init; }
+        public IBindableCommand RemoveStagedTaskCommand { get; init; }
 
         /// <summary>
         /// メッセージキュー
@@ -205,13 +200,13 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         public ReactivePropertySlim<double> Height { get; private set; } = new(1200);
 
-        public ReactiveCommand StartDownloadCommand { get; init; } = new();
+        public IBindableCommand StartDownloadCommand { get; init; } = BindableCommand.Empty;
 
-        public ReactiveCommand CancelDownloadCommand { get; init; } = new();
+        public IBindableCommand CancelDownloadCommand { get; init; } = BindableCommand.Empty;
 
-        public ReactiveCommand ClearStagedCommand { get; init; } = new();
+        public IBindableCommand ClearStagedCommand { get; init; } = BindableCommand.Empty;
 
-        public ReactiveCommand RemoveStagedTaskCommand { get; init; } = new();
+        public IBindableCommand RemoveStagedTaskCommand { get; init; } = BindableCommand.Empty;
 
         public IToastHandler? Queue { get; init; } = null;
     }
@@ -365,7 +360,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows
 
         public ReactivePropertySlim<bool> IsChecked { get; init; }
 
-        public ReactiveCommand CancelCommand { get; init; } = new();
+        public IBindableCommand CancelCommand { get; init; } = BindableCommand.Empty;
 
         public ReactiveProperty<ComboboxItem<int>> SelectedResolution { get; init; }
 

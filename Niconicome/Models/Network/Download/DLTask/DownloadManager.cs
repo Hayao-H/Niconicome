@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
@@ -15,6 +16,8 @@ using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist.V2;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
+using Niconicome.Models.Utils.ParallelTaskV2;
+using Niconicome.Models.Utils.Reactive;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download.DLTask
@@ -34,22 +37,22 @@ namespace Niconicome.Models.Network.Download.DLTask
         /// <summary>
         /// キャンセル済みを表示
         /// </summary>
-        ReactiveProperty<bool> DisplayCanceled { get; }
+        IBindableProperty<bool> DisplayCanceled { get; }
 
         /// <summary>
         /// 完了済みを表示
         /// </summary>
-        ReactiveProperty<bool> DisplayCompleted { get; }
+        IBindableProperty<bool> DisplayCompleted { get; }
 
         /// <summary>
         /// ダウンロード中
         /// </summary>
-        ReadOnlyReactiveProperty<bool> IsProcessing { get; }
+        IReadonlyBindablePperty<bool> IsProcessing { get; }
 
         /// <summary>
         /// 動画をステージ
         /// </summary>
-        void StageVIdeo();
+        void StageVIdeo(IVideoInfo video);
 
         /// <summary>
         /// ステージ済みタスクをクリア
@@ -77,20 +80,19 @@ namespace Niconicome.Models.Network.Download.DLTask
     public class DownloadManager : IDownloadManager
     {
 
-        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, ILogger logger, ICurrent current)
+        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, ILogger logger)
         {
             this.Queue = this._queuePool.Tasks;
             this.Staged = this._stagedPool.Tasks;
             this.DisplayCanceled = this._queuePool.DisplayCanceled;
             this.DisplayCompleted = this._queuePool.DisplayCompleted;
-            this.IsProcessing = this._isProcessingSource.ToReadOnlyReactiveProperty();
+            this.IsProcessing = this._isProcessingSource.AsReadOnly();
             this._settingsContainer = settingsContainer;
             this._videoListContainer = videoListContainer;
             this._settingsHandler = settingHandler;
             this._logger = logger;
-            this._current = current;
 
-            this.RegisterParallelTasksHandler();
+            this.InitializeParallelTasksHandler();
 
         }
 
@@ -100,21 +102,19 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         private readonly ISettingsContainer _settingsContainer;
 
-        private readonly ICurrent _current;
-
         private readonly IDownloadSettingsHandler _settingsHandler;
 
         private readonly IPlaylistVideoContainer _videoListContainer;
 
         private readonly List<IDownloadTask> _processingTasks = new();
 
-        private readonly ReactiveProperty<bool> _isProcessingSource = new();
+        private readonly IBindableProperty<bool> _isProcessingSource = new BindableProperty<bool>(false);
 
-        private ReactiveProperty<int>? _maxParallelDL;
+        private ISettingInfo<int>? _maxParallelDL;
 
-        private ReactiveProperty<int>? _sleepInterval;
+        private ISettingInfo<int>? _sleepInterval;
 
-        private ParallelTasksHandler<IDownloadTask>? _tasksHandler;
+        private ParallelTasksHandler? _tasksHandler;
 
         private readonly IDownloadTaskPool _queuePool = new DownloadTaskPool();
 
@@ -130,36 +130,31 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         public ReadOnlyObservableCollection<IDownloadTask> Staged { get; init; }
 
-        public ReactiveProperty<bool> DisplayCanceled { get; init; }
+        public IBindableProperty<bool> DisplayCanceled { get; init; }
 
-        public ReactiveProperty<bool> DisplayCompleted { get; init; }
+        public IBindableProperty<bool> DisplayCompleted { get; init; }
 
-        public ReadOnlyReactiveProperty<bool> IsProcessing { get; init; }
+        public IReadonlyBindablePperty<bool> IsProcessing { get; init; }
 
         #endregion
 
         #region Method
 
 
-        public void StageVIdeo()
+        public void StageVIdeo(IVideoInfo video)
         {
+            DownloadSettings settings = this._settingsHandler.CreateDownloadSettings();
 
-            foreach (var video in this._videoListContainer.Videos.Where(v => v.IsSelected.Value).ToList())
-            {
+            //動画固有の情報を設定
+            settings.NiconicoId = video.NiconicoId;
+            settings.IsEconomy = video.IsEconomy;
+            settings.FilePath = video.FilePath;
 
-                DownloadSettings settings = this._settingsHandler.CreateDownloadSettings();
+            //タスクを作成
+            IDownloadTask task = DIFactory.Provider.GetRequiredService<IDownloadTask>();
+            task.Initialize(video, settings);
 
-                //動画固有の情報を設定
-                settings.NiconicoId = video.NiconicoId;
-                settings.IsEconomy = video.IsEconomy;
-                settings.FilePath = video.FilePath;
-
-                //タスクを作成
-                IDownloadTask task = DIFactory.Provider.GetRequiredService<IDownloadTask>();
-                task.Initialize(video, settings);
-
-                this._stagedPool.AddTask(task);
-            }
+            this._stagedPool.AddTask(task);
         }
 
         public void ClearStaged()
@@ -171,8 +166,6 @@ namespace Niconicome.Models.Network.Download.DLTask
         {
             this._stagedPool.RemoveTask(task);
         }
-
-
 
         public async Task StartDownloadAsync(Action<string> onMessage, Action<string> onMessageVerbose)
         {
@@ -192,7 +185,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             //ステージ済みをキューに移動
             this.MoveStagedToQueue();
             var videoCount = this._tasksHandler!.PallarelTasks.Count;
-            this._processingTasks.AddRange(this._tasksHandler.PallarelTasks);
+            this._processingTasks.AddRange(this._queuePool.Tasks);
 
             //タスクが0なら中止
             if (videoCount == 0) return;
@@ -219,7 +212,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             }
 
             //結果判定
-            int succeededCount = this._processingTasks.Select(t => t.IsSuceeded).Count();
+            int succeededCount = this._processingTasks.Where(t => t.IsSuceeded).Count();
 
             if (succeededCount == 0)
             //1件もできなかった
@@ -279,7 +272,7 @@ namespace Niconicome.Models.Network.Download.DLTask
         private void MoveStagedToQueue()
         {
             bool downloadFromAnotherPlaylist = this._settingsContainer.GetSetting(SettingNames.DownloadAllWhenPushDLButton, false).Data?.Value ?? false;
-            int playlistID = this._current.SelectedPlaylist.Value?.Id ?? -1;
+            int playlistID = this._videoListContainer.CurrentSelectedPlaylist?.ID ?? -1;
 
             if (downloadFromAnotherPlaylist || playlistID == -1)
             {
@@ -293,7 +286,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             }
             else
             {
-                foreach (var t in this._stagedPool.Tasks.Where(t => t.PlaylistID == playlistID).ToList())
+                foreach (var t in this._stagedPool.Tasks.Where(t => t.PlaylistID == playlistID))
                 {
                     this._queuePool.AddTask(t);
                     this._tasksHandler!.AddTaskToQueue(t);
@@ -304,9 +297,9 @@ namespace Niconicome.Models.Network.Download.DLTask
 
 
         /// <summary>
-        /// 並行タスクハンドラを設定
+        /// 並行タスクハンドラを初期化
         /// </summary>
-        private void RegisterParallelTasksHandler()
+        private void InitializeParallelTasksHandler()
         {
             IAttemptResult<ISettingInfo<int>> parallelResult = this._settingsContainer.GetSetting(SettingNames.MaxParallelDownloadCount, NetConstant.DefaultMaxParallelDownloadCount);
 
@@ -314,18 +307,22 @@ namespace Niconicome.Models.Network.Download.DLTask
 
             if (this.CheckWhetherGetSettingSucceededOrNot(parallelResult, sleepResult))
             {
-                this._tasksHandler = new ParallelTasksHandler<IDownloadTask>(parallelResult.Data!.Value, sleepResult.Data!.Value, 15, untilEmpty: true);
 
-                this._sleepInterval = sleepResult.Data.ReactiveValue!;
-                this._maxParallelDL = parallelResult.Data.ReactiveValue!;
-
-                Observable.Merge(this._maxParallelDL, this._sleepInterval).Subscribe(_ =>
-                {
-                    if (this._tasksHandler.IsProcessing) return;
-                    this._tasksHandler = new ParallelTasksHandler<IDownloadTask>(this._maxParallelDL.Value, this._sleepInterval.Value, 15, untilEmpty: true);
-                });
+                this.RegisterParallelTasksHandler(parallelResult.Data!.Value, sleepResult.Data!.Value);
+                this._sleepInterval = sleepResult.Data.WithSubscribe(x => this.RegisterParallelTasksHandler(this._maxParallelDL!.Value, x));
+                this._maxParallelDL = parallelResult.Data.WithSubscribe(x => this.RegisterParallelTasksHandler(x, this._sleepInterval!.Value));
             }
+        }
 
+        /// <summary>
+        /// 並行タスクハンドラを設定
+        /// </summary>
+        /// <param name="parallelCount"></param>
+        /// <param name="sleepInterval"></param>
+        private void RegisterParallelTasksHandler(int parallelCount, int sleepInterval)
+        {
+            if (this.IsProcessing.Value) return;
+            this._tasksHandler = new ParallelTasksHandler(parallelCount, sleepInterval, 15, untilEmpty: true);
         }
 
         private bool CheckWhetherGetSettingSucceededOrNot(IAttemptResult<ISettingInfo<int>> parallelResult, IAttemptResult<ISettingInfo<int>> sleepResult)
