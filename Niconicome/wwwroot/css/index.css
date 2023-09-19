@@ -14,6 +14,7 @@
 }
 
 .PageContent {
+  margin: 24px;
   position: relative;
 }
 .PageContent .ControlsContainer {

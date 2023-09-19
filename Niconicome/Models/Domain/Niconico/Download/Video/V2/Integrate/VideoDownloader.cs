@@ -242,11 +242,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                     var downloader = DIFactory.Resolve<ISegmentDownloader>();
                     downloader.Initialize(info, container);
 
-                    IAttemptResult result = await downloader.DownloadAsync();
-                    if (result.IsSucceeded)
-                    {
-                        onMessage(this._stringHandler.GetContent(SC.SegmentDownloadCompleted, container.CompletedCount, container.Length, verticalResoluiton));
-                    }
+                    await downloader.DownloadAsync();
 
                 }, _ => { });
 

@@ -1,3 +1,6 @@
+.SearchPage {
+  margin: 24px;
+}
 .SearchPage .AlertMessageBox {
   margin: 8px 0;
   transition: opacity 1s;

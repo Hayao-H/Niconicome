@@ -76,6 +76,7 @@ using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
 using DlVideoV2 = Niconicome.Models.Domain.Niconico.Download.Video.V2;
 using DLGeneral = Niconicome.Models.Domain.Niconico.Download.General;
+using DLTaskVM = Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask;
 
 
 namespace Niconicome.Models.Domain.Utils
@@ -381,6 +382,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideoV2.External.IExternalDownloaderHandler, DlVideoV2.External.ExternalDownloaderHandler>();
             services.AddTransient<DLGeneral::ILocalFileHandler, DLGeneral::LocalFileHandler>();
             services.AddTransient<DLGeneral::IReplaceHandler, DLGeneral::ReplaceHandler>();
+            services.AddTransient<DLTaskVM::Pages.DownloadViewModel>();
+            services.AddTransient<DLTaskVM::Pages.StageViewModel>();
+            services.AddTransient<DLTaskVM::ToolbarViewModel>();
 
             return services.BuildServiceProvider();
         }

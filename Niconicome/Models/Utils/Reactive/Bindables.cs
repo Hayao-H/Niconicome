@@ -43,6 +43,13 @@ namespace Niconicome.Models.Utils.Reactive
             this._handlers.Remove(handler);
         }
 
+        /// <summary>
+        /// 強制的に発火
+        /// </summary>
+        public void RaiseChange()
+        {
+            this.OnProprtyChange();
+        }
 
         #endregion
 

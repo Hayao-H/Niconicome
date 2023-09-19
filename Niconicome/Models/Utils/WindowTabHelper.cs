@@ -9,6 +9,7 @@ using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 using Niconicome.Views;
 using Niconicome.Views.AddonPage.V2;
+using Niconicome.Views.DownloadTask;
 using Niconicome.Views.Setting.V2;
 using Prism.Ioc;
 using Prism.Regions;
@@ -68,18 +69,11 @@ namespace Niconicome.Models.Utils
                 return;
             }
 
-            if (this._settingHandler.GetBoolSetting(SettingsEnum.ShowTasksAsTab))
-            {
-                IRegion region = regionManager.Regions[LocalConstant.TopTabRegionName];
-                var view = container.Resolve<DownloadTasksWindows>();
-                region.Add(view);
-                region.Activate(view);
-                this._localState.IsTaskWindowOpen = true;
-            }
-            else
-            {
-                dialogService.Show(nameof(DownloadTasksWindows));
-            }
+            IRegion region = regionManager.Regions[LocalConstant.TopTabRegionName];
+            var view = container.Resolve<DownloadTask>();
+            region.Add(view);
+            region.Activate(view);
+            this._localState.IsAddonManagerOpen = true;
         }
 
         public void OpenAddonManager(IRegionManager regionManager)

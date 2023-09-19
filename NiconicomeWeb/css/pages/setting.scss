@@ -1,4 +1,5 @@
 .SettingPage {
+    margin: 24px;
     display: flex;
     flex-direction: column;
 
@@ -147,17 +148,17 @@
         margin-top: 18px;
         margin-left: 16px;
 
-        .RulesList ,
+        .RulesList,
         .BackupList {
-            .ReplaceListHeader ,
+
+            .ReplaceListHeader,
             .BackupListHeader {
                 display: flex;
             }
 
             .RulesListBody,
             .BackupListBody {
-                .RulesListRow
-                .BackupListRow {
+                .RulesListRow .BackupListRow {
                     display: flex;
                 }
             }

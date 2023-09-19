@@ -2,6 +2,8 @@ $videoWidth: 700;
 $VideoInfoWidth: 400;
 
 .VideoDetailPage {
+    margin: 24px;
+    
     .VideotitleContainer {
         margin: 0 auto;
         width:calc(#{$videoWidth}px + #{$VideoInfoWidth}px);

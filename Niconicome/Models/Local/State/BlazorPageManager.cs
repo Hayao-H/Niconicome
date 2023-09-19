@@ -135,5 +135,6 @@ namespace Niconicome.Models.Local.State
         MainPage,
         Addon,
         Settings,
+        DLTask,
     }
 }

@@ -18,6 +18,7 @@ using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
 using Niconicome.Models.Utils.ParallelTaskV2;
 using Niconicome.Models.Utils.Reactive;
+using Niconicome.Models.Utils.Reactive.State;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download.DLTask
@@ -27,27 +28,32 @@ namespace Niconicome.Models.Network.Download.DLTask
         /// <summary>
         /// ダウンロードタスク
         /// </summary>
-        ReadOnlyObservableCollection<IDownloadTask> Queue { get; init; }
+        IReadOnlyCollection<IDownloadTask> Queue { get; init; }
 
         /// <summary>
         /// ステージ済みタスク
         /// </summary>
-        ReadOnlyObservableCollection<IDownloadTask> Staged { get; init; }
+        IReadOnlyCollection<IDownloadTask> Staged { get; init; }
 
         /// <summary>
         /// キャンセル済みを表示
         /// </summary>
-        IBindableProperty<bool> DisplayCanceled { get; }
+        bool DisplayCanceled { get; set; }
 
         /// <summary>
         /// 完了済みを表示
         /// </summary>
-        IBindableProperty<bool> DisplayCompleted { get; }
+        bool DisplayCompleted { get; set; }
 
         /// <summary>
         /// ダウンロード中
         /// </summary>
         IReadonlyBindablePperty<bool> IsProcessing { get; }
+
+        /// <summary>
+        /// 変更監視オブジェクト
+        /// </summary>
+        IStateChangeNotifyer StateChangeNotifyer { get; }
 
         /// <summary>
         /// 動画をステージ
@@ -71,6 +77,11 @@ namespace Niconicome.Models.Network.Download.DLTask
         void CancelDownload();
 
         /// <summary>
+        /// 完了済みのタスクを削除
+        /// </summary>
+        void ClearCompleted();
+
+        /// <summary>
         /// ダウンロードを開始する
         /// </summary>
         /// <returns></returns>
@@ -84,13 +95,14 @@ namespace Niconicome.Models.Network.Download.DLTask
         {
             this.Queue = this._queuePool.Tasks;
             this.Staged = this._stagedPool.Tasks;
-            this.DisplayCanceled = this._queuePool.DisplayCanceled;
-            this.DisplayCompleted = this._queuePool.DisplayCompleted;
             this.IsProcessing = this._isProcessingSource.AsReadOnly();
             this._settingsContainer = settingsContainer;
             this._videoListContainer = videoListContainer;
             this._settingsHandler = settingHandler;
             this._logger = logger;
+
+            this._queuePool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
+            this._stagedPool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
 
             this.InitializeParallelTasksHandler();
 
@@ -126,15 +138,26 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         #region Props
 
-        public ReadOnlyObservableCollection<IDownloadTask> Queue { get; init; }
+        public IReadOnlyCollection<IDownloadTask> Queue { get; init; }
 
-        public ReadOnlyObservableCollection<IDownloadTask> Staged { get; init; }
+        public IReadOnlyCollection<IDownloadTask> Staged { get; init; }
 
-        public IBindableProperty<bool> DisplayCanceled { get; init; }
+        public bool DisplayCanceled
+        {
+            get => this._queuePool.DisplayCanceled;
+            set => this._queuePool.DisplayCanceled = value;
+        }
 
-        public IBindableProperty<bool> DisplayCompleted { get; init; }
+        public bool DisplayCompleted
+        {
+            get => this._queuePool.DisplayCompleted;
+            set => this._queuePool.DisplayCompleted = value;
+        }
 
         public IReadonlyBindablePperty<bool> IsProcessing { get; init; }
+
+        public IStateChangeNotifyer StateChangeNotifyer { get; init; } = new StateChangeNotifyer();
+
 
         #endregion
 
@@ -165,6 +188,15 @@ namespace Niconicome.Models.Network.Download.DLTask
         public void RemoveFromStaged(IDownloadTask task)
         {
             this._stagedPool.RemoveTask(task);
+        }
+
+        public void ClearCompleted()
+        {
+            IDownloadTask[] targets = this._queuePool.Tasks.Where(t => t.IsCompleted.Value).ToArray();
+            foreach (var target in targets)
+            {
+                this._queuePool.RemoveTask(target);
+            }
         }
 
         public async Task StartDownloadAsync(Action<string> onMessage, Action<string> onMessageVerbose)
