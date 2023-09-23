@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:root="clr-namespace:Niconicome"
              xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
-             xmlns:blazorweb="clr-namespace:Microsoft.AspNetCore.Components.Web;assembly=Microsoft.AspNetCore.Components.Web"
              mc:Ignorable="d" 
              xmlns:prism="http://prismlibrary.com/"  
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -18,7 +17,6 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TextBlock>aaaa</TextBlock>
         <blazor:BlazorWebView x:Name="webview" HostPage="wwwroot/downloadtask.html" Services="{DynamicResource services}">
             <blazor:BlazorWebView.RootComponents>
                 <blazor:RootComponent Selector="#app" ComponentType="{x:Type root:Main}" />

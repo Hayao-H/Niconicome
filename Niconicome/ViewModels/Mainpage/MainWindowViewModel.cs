@@ -93,7 +93,7 @@ namespace Niconicome.ViewModels.Mainpage
                 .WithSubscribe(() =>
              {
                  WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/download", BlazorWindows.DLTask);
-                 WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this.RegionManager, this.dialogService);
+                 WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this.RegionManager);
              });
 
             this.Restart = new ReactiveCommand()

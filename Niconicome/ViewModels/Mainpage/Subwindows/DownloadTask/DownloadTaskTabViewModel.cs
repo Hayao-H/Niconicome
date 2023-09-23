@@ -35,7 +35,7 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask
                     }
                 }
 
-                WS::Mainpage.LocalState.IsSettingTabOpen = false;
+                WS::Mainpage.LocalState.IsTaskWindowOpen = false;
             });
         }
 

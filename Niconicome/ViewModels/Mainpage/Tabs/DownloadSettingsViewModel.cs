@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.Models.Utils.Reactive.Command;
@@ -129,7 +130,8 @@ namespace Niconicome.ViewModels.Mainpage
 
                 WS::Mainpage.SnackbarHandler.Enqueue($"選択された動画をステージしました。", "管理画面を開く", () =>
                 {
-                    WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager, this._dialogService);
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/stage", BlazorWindows.DLTask);
+                    WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager);
                 });
             })
             .AddTo(this.disposables);

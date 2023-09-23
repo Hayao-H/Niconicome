@@ -9,7 +9,7 @@ using WS = Niconicome.Workspaces.Mainpage;
 
 namespace Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask
 {
-    public class ToolbarViewModel
+    public class ToolbarViewModel : IDisposable
     {
         public ToolbarViewModel(NavigationManager navigation)
         {
@@ -24,10 +24,16 @@ namespace Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask
             {
                 PageType.Stage => "/downloadtask/stage",
                 _ => "/downloadtask/download",
-            },BlazorWindows.DLTask);
+            }, BlazorWindows.DLTask);
         }
 
         #endregion
+
+
+        public void Dispose()
+        {
+            WS.BlazorPageManager.UnRegisterNavigationManager(BlazorWindows.DLTask);
+        }
     }
 
     public enum PageType
