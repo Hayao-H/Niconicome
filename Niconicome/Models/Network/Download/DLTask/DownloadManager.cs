@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
@@ -10,16 +9,15 @@ using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils;
+using Err = Niconicome.Models.Domain.Utils.Error;
+using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Local.Settings;
-using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist.V2;
-using Niconicome.Models.Playlist.VideoList;
-using Niconicome.Models.Utils;
 using Niconicome.Models.Utils.ParallelTaskV2;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.Models.Utils.Reactive.State;
-using Reactive.Bindings;
+using SC = Niconicome.Models.Network.Download.DLTask.StringContent.DownloadManagerSC;
+using Niconicome.Models.Network.Download.DLTask.Error;
 
 namespace Niconicome.Models.Network.Download.DLTask
 {
@@ -91,7 +89,7 @@ namespace Niconicome.Models.Network.Download.DLTask
     public class DownloadManager : IDownloadManager
     {
 
-        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, ILogger logger)
+        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, IStringHandler stringHandler,Err::IErrorHandler errorHandler)
         {
             this.Queue = this._queuePool.Tasks;
             this.Staged = this._stagedPool.Tasks;
@@ -99,7 +97,8 @@ namespace Niconicome.Models.Network.Download.DLTask
             this._settingsContainer = settingsContainer;
             this._videoListContainer = videoListContainer;
             this._settingsHandler = settingHandler;
-            this._logger = logger;
+            this._stringHandler = stringHandler;
+            this._errorHandler = errorHandler;
 
             this._queuePool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
             this._stagedPool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
@@ -110,7 +109,9 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         #region field
 
-        private readonly ILogger _logger;
+        private readonly Err::IErrorHandler _errorHandler;
+
+        private readonly IStringHandler _stringHandler;
 
         private readonly ISettingsContainer _settingsContainer;
 
@@ -224,8 +225,10 @@ namespace Niconicome.Models.Network.Download.DLTask
 
             //DL開始
             this._isProcessingSource.Value = true;
-            onMessageVerbose($"動画のダウンロードを開始します。({videoCount}件)");
-            onMessage($"動画のダウンロードを開始します。({videoCount}件)");
+
+            string startM = this._stringHandler.GetContent(SC.DownloadHasStarted, videoCount);
+            onMessageVerbose(startM);
+            onMessage(startM);
 
             //トークン生成
             this._cts = new CancellationTokenSource();
@@ -236,9 +239,9 @@ namespace Niconicome.Models.Network.Download.DLTask
             }
             catch (Exception e)
             {
-                this._logger.Error("ダウンロード中にエラーが発生しました", e);
-                onMessageVerbose($"ダウンロード中にエラーが発生しました。(詳細: {e.Message})");
-                onMessage($"ダウンロード中にエラーが発生しました。");
+                this._errorHandler.HandleError(DownloadManagerError.Error, e);
+                onMessageVerbose(this._stringHandler.GetContent(SC.ErrorD, e.Message));
+                onMessage(this._stringHandler.GetContent(SC.Error));
                 Finalize();
                 return;
             }
@@ -249,8 +252,9 @@ namespace Niconicome.Models.Network.Download.DLTask
             if (succeededCount == 0)
             //1件もできなかった
             {
-                onMessageVerbose("動画を1件もダウンロード出来ませんでした。");
-                onMessage("動画を1件もダウンロード出来ませんでした。");
+                string cannotDLM = this._stringHandler.GetContent(SC.CannotDownloadAny);
+                onMessageVerbose(cannotDLM);
+                onMessage(cannotDLM);
             }
             else
             {
@@ -259,19 +263,21 @@ namespace Niconicome.Models.Network.Download.DLTask
                 if (succeededCount > 1)
                 //2件以上DLできた
                 {
-                    onMessageVerbose($"{niconicoID}ほか{succeededCount - 1}件の動画をダウンロードしました。");
-                    onMessage($"{niconicoID}ほか{succeededCount - 1}件の動画をダウンロードしました。");
+                    string succeededMany = this._stringHandler.GetContent(SC.DownloadedMany, succeededCount);
+                    onMessageVerbose(succeededMany);
+                    onMessage(succeededMany);
 
                     if (succeededCount < videoCount)
                     {
-                        onMessageVerbose($"{videoCount - succeededCount}件の動画のダウンロードに失敗しました。");
+                        onMessageVerbose(this._stringHandler.GetContent(SC.SomeDownloadHasFailed, videoCount - succeededCount));
                     }
                 }
                 else if (succeededCount == 1)
                 //1件だけDLできた
                 {
-                    onMessageVerbose($"{niconicoID}をダウンロードしました。");
-                    onMessage($"{niconicoID}をダウンロードしました。");
+                    string succeededOne = this._stringHandler.GetContent(SC.DownloadedOne);
+                    onMessageVerbose(succeededOne);
+                    onMessage(succeededOne);
                 }
             }
 

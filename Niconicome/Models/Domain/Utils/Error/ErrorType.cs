@@ -36,6 +36,7 @@ using Niconicome.Models.Infrastructure.Network;
 using Niconicome.Models.Local.External.Error;
 using Niconicome.Models.Local.External.Playlist;
 using Niconicome.Models.Local.Restore;
+using Niconicome.Models.Network.Download.DLTask.Error;
 using Niconicome.Models.Network.Video.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 
@@ -102,6 +103,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 52, typeof(AESInfomationHandlerError) },
             { 53, typeof(DecryptorError) },
             { 54, typeof(ReplaceHandlerError) },
+            { 55, typeof(DownloadManagerError) },
         };
     }
 }

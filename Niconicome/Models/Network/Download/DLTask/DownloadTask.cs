@@ -157,7 +157,7 @@ public class DownloadTask : ParallelTask, IDownloadTask
         if (this.IsCompleted.Value) return;
         this._cts.Cancel();
         this.IsCanceled.Value = true;
-        this._message.Value = this._stringHandler.GetContent(DownloadTaskStringContent.TaskCancelled);
+        this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.TaskCancelled));
         this.IsProcessing.Value = false;
     }
 
@@ -249,8 +249,12 @@ public class DownloadTask : ParallelTask, IDownloadTask
         {
             this._messageHandler.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailed, this._video.NiconicoId), LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
             this._messageHandler.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailedDetailed, result.Message ?? string.Empty), LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
-            this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailedMessage));
 
+            if (!this.IsCanceled.Value)
+            {
+                this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailed));
+            }
+            
             if (this._settings!.SaveFailedHistory)
             {
                 this.AddVideoToSpecialPlaylist(SpecialPlaylists.DownloadFailedHistory);
@@ -264,6 +268,7 @@ public class DownloadTask : ParallelTask, IDownloadTask
         //DL成功
         {
             var builder = new StringBuilder();
+            builder.Append(this._video!.NiconicoId);
             if (this._settings!.Video || this._settings.Comment) builder.Append("(");
             if (this._settings.Video) builder.Append(this._stringHandler.GetContent(DownloadTaskStringContent.VerticalResolution, result.Data.ActualVerticalResolution));
             if (this._settings.Comment) builder.Append(this._stringHandler.GetContent(DownloadTaskStringContent.CommentCount, result.Data.CommentCount));
