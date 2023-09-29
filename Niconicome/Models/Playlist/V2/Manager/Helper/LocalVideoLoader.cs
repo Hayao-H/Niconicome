@@ -57,6 +57,8 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
         private List<string>? _cachedFiles;
 
+        private List<string>? _cachedFolders;
+
         #endregion
 
         #region Method
@@ -69,6 +71,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             }
 
             this._cachedFiles = null;
+            this._cachedFolders = null;
 
             int playlistID = this._playlistVideoContainer.CurrentSelectedPlaylist.ID;
             string folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.FolderPath;
@@ -175,15 +178,15 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 folderPath = Path.Combine(AppContext.BaseDirectory, folderPath);
             }
 
-            if (this._cachedFiles is null)
+            if (this._cachedFiles is null || this._cachedFolders is null)
             {
                 this._cachedFiles = new List<string>();
+                this._cachedFolders = new List<string>();
                 if (this._directoryIO.Exists(folderPath))
                 {
                     this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.Mp4FileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
                     this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.TsFileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
                 }
-
             }
 
             string? firstMp4 = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));

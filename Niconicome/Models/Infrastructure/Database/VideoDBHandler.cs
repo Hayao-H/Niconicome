@@ -76,6 +76,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsEconomy = data.IsEconomy;
             video.AddedAt = data.AddedAt;
             video.PlaylistID = playlistID;
+            video.FilePath = data.VideoFilePath;
 
             video.IsAutoUpdateEnabled = true;
 
@@ -140,6 +141,7 @@ namespace Niconicome.Models.Infrastructure.Database
                 video.IsEconomy = data.IsEconomy;
                 video.AddedAt = data.AddedAt;
                 video.PlaylistID = data.PlaylistID;
+                video.FilePath = data.VideoFilePath;
 
                 video.IsAutoUpdateEnabled = true;
 
