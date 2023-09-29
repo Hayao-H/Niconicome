@@ -89,7 +89,7 @@ namespace Niconicome.Models.Network.Download.DLTask
     public class DownloadManager : IDownloadManager
     {
 
-        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, IStringHandler stringHandler,Err::IErrorHandler errorHandler)
+        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, IStringHandler stringHandler, Err::IErrorHandler errorHandler)
         {
             this.Queue = this._queuePool.Tasks;
             this.Staged = this._stagedPool.Tasks;
@@ -193,7 +193,7 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         public void ClearCompleted()
         {
-            IDownloadTask[] targets = this._queuePool.Tasks.Where(t => t.IsCompleted.Value).ToArray();
+            IDownloadTask[] targets = this._queuePool.Tasks.Where(t => !t.IsCompleted.Value && !t.IsCanceled.Value).ToArray();
             foreach (var target in targets)
             {
                 this._queuePool.RemoveTask(target);
@@ -218,7 +218,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             //ステージ済みをキューに移動
             this.MoveStagedToQueue();
             var videoCount = this._tasksHandler!.PallarelTasks.Count;
-            this._processingTasks.AddRange(this._queuePool.Tasks.Where(t=>!t.IsCompleted.Value));
+            this._processingTasks.AddRange(this._queuePool.Tasks.Where(t => !t.IsCompleted.Value));
 
             //タスクが0なら中止
             if (videoCount == 0) return;
@@ -275,7 +275,7 @@ namespace Niconicome.Models.Network.Download.DLTask
                 //1件だけDLできた
                 {
                     string niconicoID = this._processingTasks.First().NiconicoID;
-                    string succeededOne = this._stringHandler.GetContent(SC.DownloadedOne,niconicoID);
+                    string succeededOne = this._stringHandler.GetContent(SC.DownloadedOne, niconicoID);
                     onMessageVerbose(succeededOne);
                     onMessage(succeededOne);
                 }
