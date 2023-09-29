@@ -2,6 +2,7 @@ using System.Linq;
 using Niconicome.Models.Domain.Niconico.Remote.Channel;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Playlist;
+using NiconicomeTest.Stabs.Models.Domain.Niconico.Download.General;
 using NiconicomeTest.Stabs.Models.Domain.Utils;
 using NiconicomeTest.Stabs.Models.Playlist;
 using NUnit.Framework;
@@ -16,7 +17,7 @@ namespace NiconicomeTest.NetWork.Niconico.Videos.Channel
         [SetUp]
         public void SetUp()
         {
-            this.parser = new ChannelPageHtmlParser(new LoggerStub(), new NiconicoUtils(), new VideoInfoContainerStab());
+            this.parser = new ChannelPageHtmlParser(new LoggerStub(), new NiconicoUtils(new ReplaceHandlerStub()), new VideoInfoContainerStab());
         }
 
         [Test]

@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Utils.Reactive;
+using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Niconicome.ViewModels.Setting.Utils;
@@ -102,14 +104,10 @@ namespace Niconicome.ViewModels.Mainpage
             this.IsDownloading = new BindableProperty<bool>(false);
             WS::Mainpage.DownloadManager.IsProcessing.Subscribe(x => this.IsDownloading.Value = x);
 
-            this.DownloadCommand =
-                WS::Mainpage.DownloadManager.IsProcessing
-                .Select(x => !x)
-            .ToReactiveCommand()
-            .WithSubscribe(async () => await this.DownloadVideo(null))
-            .AddTo(this.disposables);
+            this.DownloadCommand = new BindableCommand(async () => await this.DownloadVideo(null), WS::Mainpage.DownloadManager.IsProcessing
+                .Select(x => !x)).AddTo(this.disposables);
 
-            this.StageVideosCommand = new ReactiveCommand().WithSubscribe(() =>
+            this.StageVideosCommand = new BindableCommand(() =>
             {
                 if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
                 {
@@ -125,22 +123,24 @@ namespace Niconicome.ViewModels.Mainpage
 
                 if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value && !this.IsDownloadingIchibaInfoEnable.Value) return;
 
-                WS::Mainpage.DownloadManager.StageVIdeo();
+                foreach (var video in WS.Mainpage.PlaylistVideoContainer.Videos.Where(v => v.IsSelected.Value))
+                {
+                    WS::Mainpage.DownloadManager.StageVIdeo(video);
+                }
 
                 WS::Mainpage.SnackbarHandler.Enqueue($"選択された動画をステージしました。", "管理画面を開く", () =>
                 {
-                    WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager, this._dialogService);
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/stage", BlazorWindows.DLTask);
+                    WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager);
                 });
             })
             .AddTo(this.disposables);
 
-            this.CancelCommand = WS::Mainpage.DownloadManager.IsProcessing
-            .ToReactiveCommand()
-            .WithSubscribe(() =>
+            this.CancelCommand = new BindableCommand(() =>
             {
                 WS::Mainpage.DownloadManager.CancelDownload();
-            })
-            .AddTo(this.disposables);
+
+            }, WS::Mainpage.DownloadManager.IsProcessing).AddTo(this.disposables);
 
             //イベントを購読
             ea.GetEvent<PubSubEvent<MVVMEvent<VideoInfoViewModel>>>().Subscribe(this.OnDoubleClick);
@@ -171,17 +171,17 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// 動画をダウンロードする
         /// </summary>
-        public ReactiveCommand DownloadCommand { get; init; }
+        public BindableCommand DownloadCommand { get; init; }
 
         /// <summary>
         /// ダウンロードをキャンセルする
         /// </summary>
-        public ReactiveCommand CancelCommand { get; init; }
+        public BindableCommand CancelCommand { get; init; }
 
         /// <summary>
         /// ステージする
         /// </summary>
-        public ReactiveCommand StageVideosCommand { get; init; }
+        public BindableCommand StageVideosCommand { get; init; }
 
         /// <summary>
         /// 動画ダウンロードフラグ
@@ -308,7 +308,10 @@ namespace Niconicome.ViewModels.Mainpage
 
             if (!this.IsDownloadingVideoEnable.Value && !this.IsDownloadingCommentEnable.Value && !this.IsDownloadingThumbEnable.Value && !this.IsDownloadingVideoInfoEnable.Value && !this.IsDownloadingIchibaInfoEnable.Value) return;
 
-            WS::Mainpage.DownloadManager.StageVIdeo();
+            foreach (var video in WS.Mainpage.PlaylistVideoContainer.Videos.Where(v => v.IsSelected.Value))
+            {
+                WS::Mainpage.DownloadManager.StageVIdeo(video);
+            }
 
             await WS::Mainpage.DownloadManager.StartDownloadAsync(m => WS::Mainpage.SnackbarHandler.Enqueue(m), m => WS::Mainpage.Messagehandler.AppendMessage(m));
             WS::Mainpage.PostDownloadTasksManager.HandleAction();

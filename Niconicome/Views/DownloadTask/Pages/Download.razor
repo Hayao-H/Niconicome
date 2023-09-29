@@ -1,0 +1,106 @@
+﻿@page "/downloadtask/download"
+
+@using Niconicome.Views.Setting.V2.Shared;
+@using Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask.Pages;
+
+@inherits BlazorBase;
+
+@inject Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask.Pages.DownloadViewModel DataContext;
+
+<div class="DownloadTask">
+    <Toolbar></Toolbar>
+    <div class="Content">
+        <h3>ダウンロード中のタスク</h3>
+        <div class="Controls">
+            <div class="DisplayControlWrapper">
+                <div class="form-check">
+                    <input class="form-check-input" id="displayCanceled" type="checkbox" @bind="DataContext.DisplayCanceled">
+                    <label class="form-check-label" for="displayCanceled">
+                        キャンセル済みを表示
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" id="displayCompleted" type="checkbox" @bind="DataContext.DisplayCompleted">
+                    <label class="form-check-label" for="displayCompleted">
+                        完了済みを表示
+                    </label>
+                </div>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary" @onclick="DataContext.ClearCompleted">完了済みタスクを削除</button>
+                <button type="button" class="btn btn-danger" @onclick="DataContext.CancelAll">全て中止</button>
+            </div>
+        </div>
+        <div class="TasksWrapper">
+            <div class="TasksHeader">
+                <div id="IDColumn">ID</div>
+                <div id="TitleColumn">タイトル</div>
+                <div id="StatusColumn">状態</div>
+                <div id="MessageColumn">メッセージ</div>
+                <div id="CancelColumn">キャンセル</div>
+            </div>
+            <div class="TasksBody">
+                @foreach (var task in DataContext.Tasks)
+                {
+                    <div class="TaskRow">
+                        <div class="IDColumn"><a href="https://nico.ms/@task.NiconicoID">@task.NiconicoID</a></div>
+                        <div class="TitleColumn"><span class="info" @onclick="()=>DataContext.TaskInfoViewModel.Open(task)"><i class="fa-solid fa-info"></i></span>@task.Title</div>
+                        <div class="StatusColumn">
+                            @if (task.Status.Value == DLTaskStatus.Pending)
+                            {
+                                <p><i class="fa-regular fa-clock"></i></p>
+                            }
+                            else if (task.Status.Value == DLTaskStatus.Processing)
+                            {
+                                <p><i class="fa-solid fa-spinner fa-spin" style="color: #00036f;"></i></p>
+                            }
+                            else if (task.Status.Value == DLTaskStatus.Canceled)
+                            {
+                                <p><i class="fa-solid fa-exclamation" style="color: #efd310;"></i></p>
+                            }
+                            else if (task.Status.Value == DLTaskStatus.Failed)
+                            {
+                                <p><i class="fa-solid fa-xmark" style="color: #f10e0e;"></i></p>
+                            }
+                            else
+                            {
+                                <p><i class="fa-solid fa-check" style="color: #00c431;"></i></p>
+                            }
+                        </div>
+                        <div class="MessageColumn">@task.Message.Value</div>
+                        <div class="CancelColumn"><button type="button" class="btn btn-danger" @onclick="task.Cancel">中止</button></div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="TaskInfo @(DataContext.TaskInfoViewModel.StateClass.Value)">
+            <div class="Control">
+                <p class="Close" @onclick="DataContext.TaskInfoViewModel.Close"><i class="fa-solid fa-xmark"></i></p>
+            </div>
+            <p class="Title">@DataContext.TaskInfoViewModel.Title</p>
+            <p class="Label">出力</p>
+            <div class="MessageWrapper">
+                @foreach (var message in DataContext.TaskInfoViewModel.FullMessage)
+                {
+                    <div class="MessageRow">@message</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private SynchronizationContext? _ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._ctx = SynchronizationContext.Current;
+
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this._ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+}

@@ -9,7 +9,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.Stri
 {
     public enum SegmentDownloaderSC
     {
-        [StringEnum("完了: {0}/{1} {2}")]
+        [StringEnum("完了: {0}/{1} {2}px")]
         CompletedMessage,
     }
 }

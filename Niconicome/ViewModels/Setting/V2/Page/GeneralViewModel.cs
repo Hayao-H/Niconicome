@@ -62,8 +62,6 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.SelectedFirefoxProfileName = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.FirefoxProfileName, string.Empty), string.Empty).AddTo(this.Bindables);
 
-            this.IsShowingTasksAsTabEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.ShowDownloadTasksAsTab, true), true).AddTo(this.Bindables);
-
             var n1 = new SelectBoxItem<int>("1", 1);
             var n2 = new SelectBoxItem<int>("2", 2);
             var n3 = new SelectBoxItem<int>("3", 3);
@@ -140,11 +138,6 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// Firefoxのプロファイル
         /// </summary>
         public IBindableSettingInfo<string> SelectedFirefoxProfileName { get; init; }
-
-        /// <summary>
-        /// タスク一覧をタブ表示
-        /// </summary>
-        public IBindableSettingInfo<bool> IsShowingTasksAsTabEnable { get; init; }
 
         /// <summary>
         /// 動画情報最大並列取得数

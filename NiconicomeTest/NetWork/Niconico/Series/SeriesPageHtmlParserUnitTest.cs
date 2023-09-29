@@ -7,6 +7,7 @@ using Niconicome.Models.Domain.Niconico.Remote;
 using Niconicome.Models.Domain.Niconico.Remote.Series;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using NiconicomeTest.Stabs.Models.Domain.Niconico.Download.General;
 using NUnit.Framework;
 
 namespace NiconicomeTest.NetWork.Niconico.Series
@@ -18,7 +19,7 @@ namespace NiconicomeTest.NetWork.Niconico.Series
         [SetUp]
         public void SetUp()
         {
-            this.seriesPageHtmlParser = new SeriesPageHtmlParser(new NiconicoUtils());
+            this.seriesPageHtmlParser = new SeriesPageHtmlParser(new NiconicoUtils(new ReplaceHandlerStub()));
         }
 
         [Test]

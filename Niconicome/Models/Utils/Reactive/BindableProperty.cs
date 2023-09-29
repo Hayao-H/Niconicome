@@ -40,6 +40,12 @@ namespace Niconicome.Models.Utils.Reactive
         IBindableProperty<U> Select<U>(Func<T, U> selector);
 
         /// <summary>
+        /// 変更を同期するプロパティーを追加
+        /// </summary>
+        /// <returns></returns>
+        IBindableProperty<T> CreateSyncedProperty();
+
+        /// <summary>
         /// 購読解除
         /// </summary>
         /// <param name="handler"></param>
@@ -96,6 +102,25 @@ namespace Niconicome.Models.Utils.Reactive
 
             return p;
         }
+
+        public IBindableProperty<T> CreateSyncedProperty()
+        {
+            var p = new BindableProperty<T>(this.Value);
+
+            Action<T> subscriber = x =>
+            {
+                if (x?.Equals(p.Value) ?? false) return;
+                p.Value = x;
+            };
+
+            this.Subscribe(subscriber);
+            p.PropertyDisposed += (_, _) => this.UnSubscribe(subscriber);
+
+            p.Subscribe(x => this.Value = x);
+
+            return p;
+        }
+
 
         public void UnSubscribe(Action<T> handler)
         {
