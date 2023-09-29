@@ -252,9 +252,9 @@ public class DownloadTask : ParallelTask, IDownloadTask
 
             if (!this.IsCanceled.Value)
             {
-                this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailed));
+                this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailed, this._video!.NiconicoId));
             }
-            
+
             if (this._settings!.SaveFailedHistory)
             {
                 this.AddVideoToSpecialPlaylist(SpecialPlaylists.DownloadFailedHistory);
