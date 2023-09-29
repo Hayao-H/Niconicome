@@ -45,6 +45,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter
                 Command = chat.Mail?.Split(' ').ToList() ?? new List<string>(),
                 Content = chat.Text,
                 Score = chat.Score,
+                Fork = chat.Fork,
             };
 
             return comment;
@@ -59,6 +60,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter
                 UserId = comment.UserID ?? string.Empty,
                 Thread = comment.Thread,
                 No = comment.No,
+                Fork = comment.Fork,
                 Vpos = comment.Vpos / 10,
                 Score = comment.Score,
                 Date = new DateTimeOffset(DateTime.SpecifyKind(comment.Date, DateTimeKind.Unspecified), TimeSpan.FromHours(9)).ToUnixTimeSeconds(),

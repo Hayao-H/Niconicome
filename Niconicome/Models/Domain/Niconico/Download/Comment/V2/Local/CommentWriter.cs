@@ -61,17 +61,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Local
 
             var data = new V2::PacketElement();
             data.Chat.AddRange(comments.Select(c => this._converter.ConvertCoreCommentToChat(c)).OrderBy(c => c.Vpos));
-            char[] invalidChars = { '\x08', '\x0B', '\x0C', '\x1F' };
+
             for (int i = 0; i < data.Chat.Count; i++)
             {
                 Net.Xml.Comment.V2.ChatElement element = data.Chat[i];
 
-                
-                // Modify the element
-                element.Text = Regex.Replace(element.Text, @"[\x08\x0B\x0C\x1F]", "");
-
-                // Update the modified element back in the collection
-                data.Chat[i] = element;
+                // XML制御文字を修正
+                element.Text = new String(element.Text.Where(c => XmlConvert.IsXmlChar(c)).ToArray());
             }
 
             try
