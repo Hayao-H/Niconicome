@@ -218,7 +218,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             //ステージ済みをキューに移動
             this.MoveStagedToQueue();
             var videoCount = this._tasksHandler!.PallarelTasks.Count;
-            this._processingTasks.AddRange(this._queuePool.Tasks);
+            this._processingTasks.AddRange(this._queuePool.Tasks.Where(t=>!t.IsCompleted.Value));
 
             //タスクが0なら中止
             if (videoCount == 0) return;

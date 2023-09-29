@@ -29,7 +29,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
         /// <param name="context">コンテクスト</param>
         /// <param name="token">トークン</param>
         /// <returns></returns>
-        Task<IAttemptResult<Core::ICommentCollection>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option, IDownloadContext context, CancellationToken token);
+        Task<IAttemptResult<ICommentCollectionShared>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option, IDownloadContext context, CancellationToken token);
     }
 
     public class CommentClient : ICommentClient
@@ -64,9 +64,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
         #region Method
 
-        public async Task<IAttemptResult<Core::ICommentCollection>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option, IDownloadContext context, CancellationToken token)
+        public async Task<IAttemptResult<ICommentCollectionShared>> DownloadCommentAsync(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption option, IDownloadContext context, CancellationToken token)
         {
-            IAttemptResult<Core::ICommentCollection> result;
+            IAttemptResult<ICommentCollectionShared> result;
 
             try
             {
@@ -75,7 +75,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
             catch (Exception ex)
             {
                 this._logger.Error("コメント取得でエラーが発生しました。", ex);
-                return AttemptResult<Core::ICommentCollection>.Fail($"コメント取得でエラーが発生しました。（詳細:{ex.Message}）");
+                return AttemptResult<ICommentCollectionShared>.Fail($"コメント取得でエラーが発生しました。（詳細:{ex.Message}）");
             }
 
             return result;
@@ -92,7 +92,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
         /// <param name="dmcInfo"></param>
         /// <param name="settings"></param>
         /// <returns></returns>
-        private async Task<IAttemptResult<Core::ICommentCollection>> DownloadCommentAsyncInternal(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption clientOption, IDownloadContext context, CancellationToken token)
+        private async Task<IAttemptResult<ICommentCollectionShared>> DownloadCommentAsyncInternal(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption clientOption, IDownloadContext context, CancellationToken token)
         {
             //コレクションを作成
             var collection = new Core::CommentCollection(dmcInfo.CommentCount, settings.CommentCountPerBlock);
@@ -108,7 +108,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
             //デフォルトスレッドが存在しない場合はエラー
             if (defaultThread is null)
             {
-                return AttemptResult<Core::ICommentCollection>.Fail("デフォルトスレッドを取得できませんでした。");
+                return AttemptResult<ICommentCollectionShared>.Fail("デフォルトスレッドを取得できませんでした。");
             }
 
             string defaultThreadID = defaultThread.Id;
@@ -129,7 +129,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                         }
                         catch (TaskCanceledException)
                         {
-                            return AttemptResult<Core::ICommentCollection>.Fail("ダウンロード処理がキャンセルされました。");
+                            return AttemptResult<ICommentCollectionShared>.Fail("ダウンロード処理がキャンセルされました。");
                         }
                     }
 
@@ -160,7 +160,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
                 if (!fResult.IsSucceeded || fResult.Data is null)
                 {
-                    return AttemptResult<Core::ICommentCollection>.Fail(fResult.Message);
+                    return AttemptResult<ICommentCollectionShared>.Fail(fResult.Message);
                 }
 
                 //キャンセル処理
@@ -185,7 +185,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 IAttemptResult<Core::IComment> fiResult = collection.GetFirstComment(defaultThreadID, defaultThreadFork);
                 if (!fiResult.IsSucceeded || fiResult.Data is null)
                 {
-                    return AttemptResult<Core::ICommentCollection>.Fail(fResult.Message);
+                    return AttemptResult<ICommentCollectionShared>.Fail(fResult.Message);
                 }
                 firstComment = fiResult.Data;
 
@@ -206,7 +206,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
             //過去ログをダウンロードしない場合は終了
             if (!settings.DownloadLog)
             {
-                return AttemptResult<Core::ICommentCollection>.Succeeded(collection);
+                return AttemptResult<ICommentCollectionShared>.Succeeded(collection);
             }
 
             //取得できなかったコメントを再取得
@@ -235,7 +235,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                         }
                         catch (TaskCanceledException)
                         {
-                            return AttemptResult<Core::ICommentCollection>.Fail("ダウンロード処理がキャンセルされました。");
+                            return AttemptResult<ICommentCollectionShared>.Fail("ダウンロード処理がキャンセルされました。");
                         }
                     }
 
@@ -250,7 +250,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
                     if (this.CanQuitDownload(fetchedCountSameFor, currentFetchedCount, clientOption))
                     {
-                        return AttemptResult<Core::ICommentCollection>.Succeeded(collection);
+                        return AttemptResult<ICommentCollectionShared>.Succeeded(collection);
                     }
                 }
 
@@ -260,7 +260,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
                 //取得できなかったコメントが存在しないので終了
                 if (unfetched is null)
                 {
-                    return AttemptResult<Core::ICommentCollection>.Succeeded(collection);
+                    return AttemptResult<ICommentCollectionShared>.Succeeded(collection);
                 }
 
                 //取得
@@ -269,7 +269,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch
 
                 if (!fResult.IsSucceeded || fResult.Data is null)
                 {
-                    return AttemptResult<Core::ICommentCollection>.Fail(fResult.Message);
+                    return AttemptResult<ICommentCollectionShared>.Fail(fResult.Message);
                 }
 
                 //キャンセル処理
