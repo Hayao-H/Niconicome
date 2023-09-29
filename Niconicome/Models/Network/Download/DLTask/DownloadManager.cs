@@ -258,7 +258,6 @@ namespace Niconicome.Models.Network.Download.DLTask
             }
             else
             {
-                string niconicoID = this._processingTasks.First().NiconicoID;
 
                 if (succeededCount > 1)
                 //2件以上DLできた
@@ -275,7 +274,8 @@ namespace Niconicome.Models.Network.Download.DLTask
                 else if (succeededCount == 1)
                 //1件だけDLできた
                 {
-                    string succeededOne = this._stringHandler.GetContent(SC.DownloadedOne);
+                    string niconicoID = this._processingTasks.First().NiconicoID;
+                    string succeededOne = this._stringHandler.GetContent(SC.DownloadedOne,niconicoID);
                     onMessageVerbose(succeededOne);
                     onMessage(succeededOne);
                 }
