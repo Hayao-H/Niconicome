@@ -67,7 +67,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             video.ChannelID = source.ChannelID;
             video.Duration = source.Duration;
 
-            if (video.Tags.Count > source.Tags.Count)
+            if (source.Tags.Count > 0)
             {
                 video.ClearTags();
             }
@@ -91,7 +91,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
                 tagResult.Data.IsNicodicExist = tag.IsNicodicExist;
 
-                if (!video.Tags.Any(t=>t.Name== tag.Name))
+                if (!video.Tags.Any(t => t.Name == tag.Name))
                 {
                     video.AddTag(tagResult.Data);
                 }
