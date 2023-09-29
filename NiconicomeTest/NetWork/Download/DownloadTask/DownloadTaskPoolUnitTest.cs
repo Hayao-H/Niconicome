@@ -35,7 +35,7 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         public void 追加イベントをチェックする()
         {
             bool isFired = true;
-            this.downloadTaskPool!.Tasks.CollectionChangedAsObservable().Subscribe(e => isFired = true);
+            this.downloadTaskPool!.StateChangeNotifyer.Subscribe(() => isFired = true);
             var task = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
             this.downloadTaskPool!.AddTask(task);
 
@@ -92,7 +92,7 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void 完了済みフィルターをテスト()
         {
-            this.downloadTaskPool!.DisplayCompleted.Value = false;
+            this.downloadTaskPool!.DisplayCompleted = false;
 
             var task1 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
             var task2 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
@@ -113,7 +113,7 @@ namespace NiconicomeTest.NetWork.Download.DownloadTask
         [Test]
         public void キャンセル済みフィルターをテスト()
         {
-            this.downloadTaskPool!.DisplayCanceled.Value = false;
+            this.downloadTaskPool!.DisplayCanceled = false;
 
             var task1 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
             var task2 = new Download::DownloadTask(new PlaylistManagerStub(), new MessageHandlerStub(), new ContentDownloadHelperStub(), new StringHandler(), new VideoStoreStub());
