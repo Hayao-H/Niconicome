@@ -267,6 +267,7 @@ namespace Niconicome.Models.Infrastructure.Database
                 LargeThumbUrl = video.LargeThumbUrl,
                 ThumbUrl = video.ThumbUrl,
                 Duration = video.Duration,
+                Description = video.Description,
                 IsDeleted = video.IsDeleted,
                 ChannelName = video.ChannelName,
                 ChannelID = video.ChannelID,
@@ -325,6 +326,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsDeleted = sharedData.IsDeleted;
             video.ChannelID = sharedData.ChannelID;
             video.ChannelName = sharedData.ChannelName;
+            video.Description = sharedData.Description;
 
             video.IsAutoUpdateEnabled = true;
 

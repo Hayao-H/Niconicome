@@ -15,6 +15,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         string ChannelID { get; }
         string ChannelName { get; }
         string Owner { get; }
+        string Description { get; }
         int OwnerID { get; }
         int ViewCount { get; }
         int MylistCount { get; }
@@ -93,6 +94,10 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// </summary>
         public int Duration => this.DmcInfo.Duration;
 
+        /// <summary>
+        /// 動画説明文
+        /// </summary>
+        public string Description => this.DmcInfo.Description;
 
         /// <summary>
         /// タグ
