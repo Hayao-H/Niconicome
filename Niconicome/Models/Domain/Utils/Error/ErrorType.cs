@@ -32,6 +32,7 @@ using Niconicome.Models.Infrastructure.Database.Error;
 using Niconicome.Models.Infrastructure.Database.Json;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Infrastructure.IO;
+using Niconicome.Models.Infrastructure.IO.Media.Audio;
 using Niconicome.Models.Infrastructure.Network;
 using Niconicome.Models.Local.External.Error;
 using Niconicome.Models.Local.External.Playlist;
@@ -104,6 +105,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 53, typeof(DecryptorError) },
             { 54, typeof(ReplaceHandlerError) },
             { 55, typeof(DownloadManagerError) },
+            { 56, typeof(NaudioHandlerError) },
         };
     }
 }
