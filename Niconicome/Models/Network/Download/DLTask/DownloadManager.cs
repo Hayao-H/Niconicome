@@ -18,6 +18,7 @@ using Niconicome.Models.Utils.Reactive;
 using Niconicome.Models.Utils.Reactive.State;
 using SC = Niconicome.Models.Network.Download.DLTask.StringContent.DownloadManagerSC;
 using Niconicome.Models.Network.Download.DLTask.Error;
+using Niconicome.Models.Domain.Local.IO.Media.Audio;
 
 namespace Niconicome.Models.Network.Download.DLTask
 {
@@ -89,7 +90,7 @@ namespace Niconicome.Models.Network.Download.DLTask
     public class DownloadManager : IDownloadManager
     {
 
-        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, IStringHandler stringHandler, Err::IErrorHandler errorHandler)
+        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, IStringHandler stringHandler, Err::IErrorHandler errorHandler,IAudioPlayer audioPlayer)
         {
             this.Queue = this._queuePool.Tasks;
             this.Staged = this._stagedPool.Tasks;
@@ -99,6 +100,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             this._settingsHandler = settingHandler;
             this._stringHandler = stringHandler;
             this._errorHandler = errorHandler;
+            this._audioPlayer = audioPlayer;
 
             this._queuePool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
             this._stagedPool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
@@ -122,6 +124,8 @@ namespace Niconicome.Models.Network.Download.DLTask
         private readonly List<IDownloadTask> _processingTasks = new();
 
         private readonly IBindableProperty<bool> _isProcessingSource = new BindableProperty<bool>(false);
+
+        private readonly IAudioPlayer _audioPlayer;
 
         private ISettingInfo<int>? _maxParallelDL;
 
@@ -193,7 +197,7 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         public void ClearCompleted()
         {
-            IDownloadTask[] targets = this._queuePool.Tasks.Where(t => !t.IsCompleted.Value && !t.IsCanceled.Value).ToArray();
+            IDownloadTask[] targets = this._queuePool.Tasks.Where(t => t.IsCompleted.Value && !t.IsCanceled.Value).ToArray();
             foreach (var target in targets)
             {
                 this._queuePool.RemoveTask(target);
@@ -207,6 +211,7 @@ namespace Niconicome.Models.Network.Download.DLTask
                 this._isProcessingSource.Value = false;
                 this._cts = null;
                 this._processingTasks.Clear();
+                this.PlaySound();
             }
 
             //ダウンロード中ならキャンセル
@@ -386,6 +391,20 @@ namespace Niconicome.Models.Network.Download.DLTask
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 完了時にサウンドを再生
+        /// </summary>
+        private void PlaySound()
+        {
+            IAttemptResult<bool> result = this._settingsContainer.GetOnlyValue(SettingNames.PlaySoundAfterDownload, false);
+            if (!result.IsSucceeded || !result.Data) return;
+
+            IAttemptResult<string> path = this._settingsContainer.GetOnlyValue(SettingNames.DownloadCompletionAudioPath, string.Empty);
+            if (!path.IsSucceeded || string.IsNullOrEmpty(path.Data)) return;
+
+            this._audioPlayer.Play(path.Data);
         }
 
         #endregion

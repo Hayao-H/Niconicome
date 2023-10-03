@@ -70,6 +70,9 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.ExternalDownloaderPath = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.ExternalDLSoftwarePath, string.Empty), string.Empty).AddTo(this.Bindables);
             this.ExternalDownloaderParam = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.ExternalDLSoftwareParam, string.Empty), string.Empty).AddTo(this.Bindables);
 
+            this.PlaySoundAfterDownloadCompleted = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.PlaySoundAfterDownload, false), false).AddTo(this.Bindables);
+            this.AudioFilePath = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.DownloadCompletionAudioPath, string.Empty), string.Empty).AddTo(this.Bindables);
+
         }
 
         /// <summary>
@@ -180,11 +183,21 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// <summary>
         /// 外部ダウンローダーのパス
         /// </summary>
-        public IBindableProperty<string> ExternalDownloaderPath { get; init; }
+        public IBindableSettingInfo<string> ExternalDownloaderPath { get; init; }
 
         /// <summary>
         /// 外部ダウンローダーのパラメータ
         /// </summary>
-        public IBindableProperty<string> ExternalDownloaderParam { get; init; }
+        public IBindableSettingInfo<string> ExternalDownloaderParam { get; init; }
+
+        /// <summary>
+        /// DL完了後に音声を再生する
+        /// </summary>
+        public IBindableSettingInfo<bool> PlaySoundAfterDownloadCompleted { get; init; }
+
+        /// <summary>
+        /// 音声ファイルのパス
+        /// </summary>
+        public IBindableSettingInfo<string> AudioFilePath { get; init; }
     }
 }

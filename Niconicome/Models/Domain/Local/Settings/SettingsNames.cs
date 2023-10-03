@@ -49,6 +49,11 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string PostDownloadAction { get; private set; } = "Download.General.PostDownloadAction";
 
+        //Download.General.DownloadCompletionAudio
+        public static string PlaySoundAfterDownload { get; private set; }= "Download.General.DownloadCompletionAudio.Enable";
+
+        public static string DownloadCompletionAudioPath { get; private set; } = "Download.General.DownloadCompletionAudio.Path";
+
         //Download.Video
         public static string IsResumeEnable { get; private set; } = "Download.Video.IsResumeEnable";
 
