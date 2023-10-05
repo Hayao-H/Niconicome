@@ -43,7 +43,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
             return AttemptResult<string>.Succeeded(this._readFunc(path));
         }
 
-        public IAttemptResult Delete(string path)
+        public IAttemptResult Delete(string path, bool resycycle)
         {
             return AttemptResult.Succeeded();
         }

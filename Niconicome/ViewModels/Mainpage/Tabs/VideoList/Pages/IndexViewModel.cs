@@ -712,6 +712,28 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             }
         }
 
+        public async Task RemoveNotRegisteredVideos()
+        {
+            this.HideMenu();
+
+            WS::Mainpage.SnackbarHandler.Enqueue(WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.StartDeleteVideoFile));
+
+            IAttemptResult result = await WS::Mainpage.VideoListManager.DeleteVideoFilesFromCurrentPlaylistAsync(WS::Mainpage.PlaylistVideoContainer.Videos);
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFile);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+            else
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFileFailed);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+        }
+
         public void OpenDownloadDirectory()
         {
             this.HideMenu();

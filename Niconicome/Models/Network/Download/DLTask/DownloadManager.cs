@@ -19,6 +19,8 @@ using Niconicome.Models.Utils.Reactive.State;
 using SC = Niconicome.Models.Network.Download.DLTask.StringContent.DownloadManagerSC;
 using Niconicome.Models.Network.Download.DLTask.Error;
 using Niconicome.Models.Domain.Local.IO.Media.Audio;
+using Niconicome.Models.Local.State.MessageV2;
+using Niconicome.Models.Local.State.Toast;
 
 namespace Niconicome.Models.Network.Download.DLTask
 {
@@ -85,12 +87,19 @@ namespace Niconicome.Models.Network.Download.DLTask
         /// </summary>
         /// <returns></returns>
         Task StartDownloadAsync(Action<string> onMessage, Action<string> onMessageVerbose);
+
+        /// <summary>
+        /// ダウンロードを開始する
+        /// </summary>
+        /// <returns></returns>
+        Task StartDownloadAsync();
+
     }
 
     public class DownloadManager : IDownloadManager
     {
 
-        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, IStringHandler stringHandler, Err::IErrorHandler errorHandler,IAudioPlayer audioPlayer)
+        public DownloadManager(ISettingsContainer settingsContainer, IPlaylistVideoContainer videoListContainer, IDownloadSettingsHandler settingHandler, IStringHandler stringHandler, Err::IErrorHandler errorHandler, IAudioPlayer audioPlayer, IMessageHandler messageHandler, IToastHandler toastHandler)
         {
             this.Queue = this._queuePool.Tasks;
             this.Staged = this._stagedPool.Tasks;
@@ -101,6 +110,8 @@ namespace Niconicome.Models.Network.Download.DLTask
             this._stringHandler = stringHandler;
             this._errorHandler = errorHandler;
             this._audioPlayer = audioPlayer;
+            this._messageHandler = messageHandler;
+            this._toastHandler = toastHandler;
 
             this._queuePool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
             this._stagedPool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
@@ -120,6 +131,10 @@ namespace Niconicome.Models.Network.Download.DLTask
         private readonly IDownloadSettingsHandler _settingsHandler;
 
         private readonly IPlaylistVideoContainer _videoListContainer;
+
+        private readonly IMessageHandler _messageHandler;
+
+        private readonly IToastHandler _toastHandler;
 
         private readonly List<IDownloadTask> _processingTasks = new();
 
@@ -288,6 +303,12 @@ namespace Niconicome.Models.Network.Download.DLTask
 
             Finalize();
         }
+
+        public async Task StartDownloadAsync()
+        {
+            await this.StartDownloadAsync(m => this._messageHandler.AppendMessage(m, LocalConstant.SystemMessageDispacher), m => this._toastHandler.Enqueue(m));
+        }
+
 
         public void CancelDownload()
         {

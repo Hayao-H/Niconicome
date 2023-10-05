@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
@@ -82,6 +84,12 @@ namespace Niconicome.Models.Playlist.V2.Manager
         Task<IAttemptResult> UpdateVideosAsync(ReadOnlyCollection<IVideoInfo> source, Action<string, ErrorLevel> onMessage);
 
         /// <summary>
+        /// 現在のプレイリストに登録されていない実体ファイルを削除
+        /// </summary>
+        /// <returns></returns>
+        Task<IAttemptResult> DeleteVideoFilesFromCurrentPlaylistAsync(IEnumerable<IVideoInfo> except);
+
+        /// <summary>
         /// 動画情報の更新をキャンセル
         /// </summary>
         void CancelUpdate();
@@ -94,7 +102,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class VideoListManager : IVideoListManager
     {
-        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoListUpdateHandler updateHandler, IVideoListCRDHandler cRDHandler, IClipbordManager clipbordManager)
+        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoListUpdateHandler updateHandler, IVideoListCRDHandler cRDHandler, IClipbordManager clipbordManager,ILocalFileRemover localFileRemover)
         {
             this._container = container;
             this._loader = loader;
@@ -103,6 +111,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             this._updateHandler = updateHandler;
             this._CRDHandler = cRDHandler;
             this._clipbordManager = clipbordManager;
+            this._localFileRemover = localFileRemover;
         }
 
         #region field
@@ -120,6 +129,8 @@ namespace Niconicome.Models.Playlist.V2.Manager
         private readonly IVideoListCRDHandler _CRDHandler;
 
         private readonly IClipbordManager _clipbordManager;
+
+        private readonly ILocalFileRemover _localFileRemover;
 
         #endregion
 
@@ -248,6 +259,20 @@ namespace Niconicome.Models.Playlist.V2.Manager
             return await this._updateHandler.UpdateVideosAsync(source, onMessage);
         }
 
+        public async Task<IAttemptResult> DeleteVideoFilesFromCurrentPlaylistAsync(IEnumerable<IVideoInfo> except)
+        {
+            if (this._container.CurrentSelectedPlaylist is null)
+            {
+                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
+            }
+
+            string path = string.IsNullOrEmpty(this._container.CurrentSelectedPlaylist.FolderPath) ? this._container.CurrentSelectedPlaylist.TemporaryFolderPath : this._container.CurrentSelectedPlaylist.FolderPath;
+
+            return await this._localFileRemover.RemoveFilesAsync(path, except.Select(v => v.NiconicoId));
+        }
+
+
         public void CancelUpdate()
         {
             this._updateHandler.CancelUpdate();
@@ -257,6 +282,6 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     }
 
-    public record VideoRegistrationResult(bool IsChannelVideo, int VideosCount, string ChannelName, string ChannelID);
+    public record VideoRegistrationResult(bool IsChannelVideo, int VideosCount, string ChannelName, string ChannelID, IEnumerable<IVideoInfo>? AddedVideo = null);
 
 }

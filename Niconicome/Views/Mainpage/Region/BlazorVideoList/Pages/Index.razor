@@ -270,6 +270,15 @@
                     <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CreatePlaylist(ContextMenuViewModel.PlaylistType.AIMP)">.aimppl4形式のプレイリストを作成する</p>
                 </div>
             </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>実体ファイルの削除</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu One">
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.RemoveNotRegisteredVideos">リストに存在しない動画を削除</p>
+                </div>
+            </div>
         </div>
 
     </div>

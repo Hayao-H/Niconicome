@@ -16,14 +16,14 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
         public VideoListViewModel()
         {
-            var openInPlayerA = new SelectBoxItem<VideodbClickSettings>( "アプリで開く(A)", VideodbClickSettings.OpenInPlayerA);
+            var openInPlayerA = new SelectBoxItem<VideodbClickSettings>("アプリで開く(A)", VideodbClickSettings.OpenInPlayerA);
             var openInPlayerB = new SelectBoxItem<VideodbClickSettings>("アプリで開く(B)", VideodbClickSettings.OpenInPlayerB);
             var sendToAppA = new SelectBoxItem<VideodbClickSettings>("アプリに送る(A)", VideodbClickSettings.SendToAppA);
             var sendToAppB = new SelectBoxItem<VideodbClickSettings>("アプリに送る(B)", VideodbClickSettings.SendToAppB);
             var download = new SelectBoxItem<VideodbClickSettings>("ダウンロードする", VideodbClickSettings.Download);
             var none = new SelectBoxItem<VideodbClickSettings>("何もしない", VideodbClickSettings.NotConfigured);
 
-            this.SelectableVideodbClickAction = new() { openInPlayerA,openInPlayerB,sendToAppA,sendToAppB ,download,none};
+            this.SelectableVideodbClickAction = new() { openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download, none };
             this.VideodbClickAction = new BindableSettingInfo<VideodbClickSettings>(WS.SettingsContainer.GetSetting(SettingNames.VideoListItemdbClickAction, VideodbClickSettings.NotConfigured), VideodbClickSettings.NotConfigured).AddTo(this.Bindables);
 
             this.IsRestoreingColumnWidthDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsRestoringColumnWidthDisabled, false), false).AddTo(this.Bindables);
@@ -33,6 +33,8 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.IsDownloadSucceededHistoryDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.DisableDownloadSucceededHistory, false), false).AddTo(this.Bindables);
 
             this.IsDownloadFailedHistoryDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.DisableDownloadFailedHistory, false), false).AddTo(this.Bindables);
+
+            this.IsAutoDownloadEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.AutomaticalyStartDownloadOnVideoAdded, false), false).AddTo(this.Bindables);
         }
 
         public Bindables Bindables { get; init; } = new();
@@ -66,5 +68,10 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 再生履歴を無効にする
         /// </summary>
         public IBindableSettingInfo<bool> IsPlaybackHistoryDisabled { get; init; }
+
+        /// <summary>
+        /// 追加時の自動ダウンロード
+        /// </summary>
+        public IBindableSettingInfo<bool> IsAutoDownloadEnable { get; init; }
     }
 }

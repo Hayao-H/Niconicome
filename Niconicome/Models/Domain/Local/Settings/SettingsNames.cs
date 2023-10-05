@@ -183,6 +183,8 @@ namespace Niconicome.Models.Domain.Local.Settings
         //Videolist.TextBoxAndButtons
         public static string StoreOnlyNiconicoIDOnRegister { get; private set; } = "Videolist.TextBoxAndButtons.StoreOnlyNiconicoIDOnRegister";
 
+        public static string AutomaticalyStartDownloadOnVideoAdded { get; private set; } = "Videolist.TextBoxAndButtons.AutomaticalyStartDownloadOnVideoAdded";
+
         //Videolist.ListView
 
         public static string ReAllocateIfVideoisNotSaved { get; private set; } = "Videolist.ListView.SwitchOpenInAppCommandToSendToAppCommandWhenNotDownloaded";
