@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Error;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.FFmpeg;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
+using Niconicome.Models.Domain.Local.LocalFile.Error;
 using Niconicome.Models.Domain.Local.Server.Core;
 using Niconicome.Models.Domain.Local.Server.HLS;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
@@ -106,6 +107,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 54, typeof(ReplaceHandlerError) },
             { 55, typeof(DownloadManagerError) },
             { 56, typeof(NaudioHandlerError) },
+            { 57, typeof(LocalFileRemoverError) },
         };
     }
 }

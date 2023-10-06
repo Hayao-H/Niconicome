@@ -373,7 +373,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             }
             else
             {
-                this.ConfirmMessage.Value = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeletionConfitmMessageSingle, selected[0].Title, selected.Count - 1);
+                this.ConfirmMessage.Value = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeletionConfitmMessageMulti, selected[0].Title, selected.Count - 1);
             }
 
             try
@@ -712,18 +712,46 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             }
         }
 
-        public async Task RemoveNotRegisteredVideos()
+        public async Task DeleteNotRegisteredVideoFiles()
         {
             this.HideMenu();
 
             WS::Mainpage.SnackbarHandler.Enqueue(WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.StartDeleteVideoFile));
 
-            IAttemptResult result = await WS::Mainpage.VideoListManager.DeleteVideoFilesFromCurrentPlaylistAsync(WS::Mainpage.PlaylistVideoContainer.Videos);
+            IAttemptResult result = await WS::Mainpage.VideoListManager.DeleteNotRegisteredVideoFilesFromCurrentPlaylistAsync(WS::Mainpage.PlaylistVideoContainer.Videos);
 
             if (result.IsSucceeded)
             {
                 string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFile);
                 WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+            else
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFileFailed);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+        }
+
+        public async Task DeleteFile()
+        {
+            this.HideMenu();
+
+            WS::Mainpage.SnackbarHandler.Enqueue(WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.StartDeleteVideoFile));
+
+            IAttemptResult result = await WS::Mainpage.VideoListManager.DeleteVideoFilesFromCurrentPlaylistAsync(WS::Mainpage.PlaylistVideoContainer.Videos.Where(v=>v.IsSelected.Value));
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFile);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+
+                foreach (var v in WS::Mainpage.PlaylistVideoContainer.Videos.Where(v => v.IsSelected.Value).ToArray())
+                {
+                    v.IsSelected.Value = false;
+                }
+
                 return;
             }
             else

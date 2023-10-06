@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
@@ -122,6 +123,11 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     {
                         video.IsDownloaded.Value = false;
                     }
+                }
+                else
+                {
+                    video.FilePath = string.Empty;
+                    video.IsDownloaded.Value = false;
                 }
 
 

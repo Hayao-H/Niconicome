@@ -6,8 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Domain.Local.IO.V2;
-using Niconicome.Models.Domain.Utils;
+using Utils = Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Err = Niconicome.Models.Domain.Local.LocalFile.Error.LocalFileRemoverError;
+using Niconicome.Models.Domain.Utils.Error;
+using ABI.System;
 
 namespace Niconicome.Models.Domain.Local.LocalFile
 {
@@ -20,15 +23,24 @@ namespace Niconicome.Models.Domain.Local.LocalFile
         /// <param name="exceptID"></param>
         /// <returns></returns>
         Task<IAttemptResult> RemoveFilesAsync(string directoryPath, IEnumerable<string> exceptID);
+
+        /// <summary>
+        /// 指定したIDを含む実体ファイルを削除
+        /// </summary>
+        /// <param name="directoryPath"></param>
+        /// <param name="niconicoID"></param>
+        /// <returns></returns>
+        Task<IAttemptResult> RemoveFileAsync(string directoryPath, string niconicoID);
     }
 
     public class LocalFileRemover : ILocalFileRemover
     {
-        public LocalFileRemover(INiconicomeDirectoryIO directoryIO, INiconicomeFileIO fileIO, INiconicoUtils utils)
+        public LocalFileRemover(INiconicomeDirectoryIO directoryIO, INiconicomeFileIO fileIO, Utils::INiconicoUtils utils,IErrorHandler errorHandler)
         {
             this._directoryIO = directoryIO;
             this._fileIO = fileIO;
             this._utils = utils;
+            this._errorHandler = errorHandler;
         }
 
         #region field
@@ -37,7 +49,9 @@ namespace Niconicome.Models.Domain.Local.LocalFile
 
         private readonly INiconicomeDirectoryIO _directoryIO;
 
-        private readonly INiconicoUtils _utils;
+        private readonly Utils::INiconicoUtils _utils;
+
+        private readonly IErrorHandler _errorHandler;
 
         #endregion
 
@@ -63,12 +77,48 @@ namespace Niconicome.Models.Domain.Local.LocalFile
 
                     if (exceptID.Contains(id)) continue;
 
-                    this._fileIO.Delete(filePath, true);
+                    IAttemptResult result = this._fileIO.Delete(filePath, true);
+                    if (result.IsSucceeded)
+                    {
+                        this._errorHandler.HandleError(Err.RemovedFile, fileName);
+                    }
                 }
 
                 return AttemptResult.Succeeded();
             });
         }
+
+        public Task<IAttemptResult> RemoveFileAsync(string directoryPath, string niconicoID)
+        {
+            return Task.Run(() =>
+            {
+                IAttemptResult<IEnumerable<string>> fResult = this._directoryIO.GetFiles(directoryPath);
+                if (!fResult.IsSucceeded || fResult.Data is null)
+                {
+                    return AttemptResult.Fail(fResult.Message);
+                }
+
+                foreach (var filePath in fResult.Data)
+                {
+                    string? fileName = Path.GetFileName(filePath);
+                    if (fileName is null) continue;
+
+                    string id = this._utils.GetIdFromFIleName(fileName);
+                    if (string.IsNullOrEmpty(id)) continue;
+
+                    if (id != niconicoID) continue;
+
+                    IAttemptResult result = this._fileIO.Delete(filePath, true);
+                    if (result.IsSucceeded)
+                    {
+                        this._errorHandler.HandleError(Err.RemovedFile, fileName);
+                    }
+                }
+
+                return AttemptResult.Succeeded();
+            });
+        }
+
 
 
         #endregion

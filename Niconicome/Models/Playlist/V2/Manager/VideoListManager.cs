@@ -87,7 +87,14 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// 現在のプレイリストに登録されていない実体ファイルを削除
         /// </summary>
         /// <returns></returns>
-        Task<IAttemptResult> DeleteVideoFilesFromCurrentPlaylistAsync(IEnumerable<IVideoInfo> except);
+        Task<IAttemptResult> DeleteNotRegisteredVideoFilesFromCurrentPlaylistAsync(IEnumerable<IVideoInfo> except);
+
+        /// <summary>
+        /// 実体ファイルを削除
+        /// </summary>
+        /// <param name="targets"></param>
+        /// <returns></returns>
+        Task<IAttemptResult> DeleteVideoFilesFromCurrentPlaylistAsync(IEnumerable<IVideoInfo> targets);
 
         /// <summary>
         /// 動画情報の更新をキャンセル
@@ -259,7 +266,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             return await this._updateHandler.UpdateVideosAsync(source, onMessage);
         }
 
-        public async Task<IAttemptResult> DeleteVideoFilesFromCurrentPlaylistAsync(IEnumerable<IVideoInfo> except)
+        public async Task<IAttemptResult> DeleteNotRegisteredVideoFilesFromCurrentPlaylistAsync(IEnumerable<IVideoInfo> except)
         {
             if (this._container.CurrentSelectedPlaylist is null)
             {
@@ -270,6 +277,28 @@ namespace Niconicome.Models.Playlist.V2.Manager
             string path = string.IsNullOrEmpty(this._container.CurrentSelectedPlaylist.FolderPath) ? this._container.CurrentSelectedPlaylist.TemporaryFolderPath : this._container.CurrentSelectedPlaylist.FolderPath;
 
             return await this._localFileRemover.RemoveFilesAsync(path, except.Select(v => v.NiconicoId));
+        }
+
+      public  async Task<IAttemptResult> DeleteVideoFilesFromCurrentPlaylistAsync(IEnumerable<IVideoInfo> targets)
+        {
+            if (this._container.CurrentSelectedPlaylist is null)
+            {
+                this._errorHandler.HandleError(VideoListManagerError.PlaylistIsNotSelected);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(VideoListManagerError.PlaylistIsNotSelected));
+            }
+
+            string path = string.IsNullOrEmpty(this._container.CurrentSelectedPlaylist.FolderPath) ? this._container.CurrentSelectedPlaylist.TemporaryFolderPath : this._container.CurrentSelectedPlaylist.FolderPath;
+
+            foreach (var video in targets)
+            {
+                IAttemptResult result = await this._localFileRemover.RemoveFileAsync(path,video.NiconicoId);
+                if (!result.IsSucceeded)
+                {
+                    return result;
+                }
+            }
+
+            return AttemptResult.Succeeded();
         }
 
 

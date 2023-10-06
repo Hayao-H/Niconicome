@@ -272,11 +272,12 @@
             </div>
             <div class="RootMenu">
                 <div class="ContextMenuItem">
-                    <p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>実体ファイルの削除</p>
+                    <p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>実体ファイルをゴミ箱へ</p>
                     <div class="ContextMenuItemTriangle"></div>
                 </div>
-                <div class="SubMenu One">
-                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.RemoveNotRegisteredVideos">リストに存在しない動画を削除</p>
+                <div class="SubMenu Two">
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.DeleteNotRegisteredVideoFiles">リストに存在しない動画を削除</p>
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.DeleteFile">選択した動画を削除</p>
                 </div>
             </div>
         </div>

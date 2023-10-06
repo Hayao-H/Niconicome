@@ -45,6 +45,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
 
         public IAttemptResult Delete(string path, bool resycycle)
         {
+            this.DeleteMethodCall?.Invoke(this, new NiconicomeFileIOEventArgs() { Path = path });
             return AttemptResult.Succeeded();
         }
 
@@ -73,5 +74,16 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
             return AttemptResult.Succeeded();
         }
 
+        #region Test
+
+        public event EventHandler<NiconicomeFileIOEventArgs>? DeleteMethodCall;
+
+        #endregion
+
+    }
+
+    public class NiconicomeFileIOEventArgs : EventArgs
+    {
+        public string Path { get; init; } = string.Empty;
     }
 }
