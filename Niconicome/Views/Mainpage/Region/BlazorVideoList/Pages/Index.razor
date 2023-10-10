@@ -144,7 +144,7 @@
         <div class="VideoListBody">
             @foreach (var video in DataContext.Videos)
             {
-                <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" data-playlistID="@(DataContext.PlaylistID)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" draggable="true">
+                <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" data-playlistID="@(DataContext.PlaylistID)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" @onmousedown="video.OnClick" @ondblclick="video.OnDBClick" draggable="true">
                     <div class="CheckBoxColumn">
                         <input type="checkbox" @bind="@(video.IsSelected.Value)" />
                     </div>

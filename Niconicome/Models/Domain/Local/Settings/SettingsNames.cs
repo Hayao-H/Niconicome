@@ -191,6 +191,9 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string VideoListItemdbClickAction { get; private set; } = "Videolist.ListView.VideoListItemDoubleClickAction";
 
+        public static string VideoListItemMiddleClickAction { get; private set; } = "Videolist.ListView.VideoListItemMiddleClickAction";
+
+
         public static string IsRestoringColumnWidthDisabled { get; private set; } = "Videolist.ListView.IsRestoringColumnWidthDisabled";
 
         public static string DisableScrollRestore { get; private set; } = "Videolist.ListView.DisableScrollRestore";

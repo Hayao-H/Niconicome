@@ -1,7 +1,7 @@
 ﻿
 namespace Niconicome.Models.Local.Settings.EnumSettingsValue
 {
-    public enum VideodbClickSettings
+    public enum VideoClickSettings
     {
         NotConfigured,
         OpenInPlayerA,

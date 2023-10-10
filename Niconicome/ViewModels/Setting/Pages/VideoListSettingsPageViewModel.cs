@@ -20,21 +20,21 @@ namespace Niconicome.ViewModels.Setting.Pages
         public VideoListSettingsPageViewModel()
         {
             #region ダブルクリック
-            var openInPlayerA = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.OpenInPlayerA, "アプリで開く(A)");
-            var openInPlayerB = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.OpenInPlayerB, "アプリで開く(B)");
-            var sendToAppA = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.SendToAppA, "アプリに送る(A)");
-            var sendToAppB = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.SendToAppB, "アプリに送る(B)");
-            var download = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.Download, "ダウンロードする");
-            var none = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.NotConfigured, "何もしない");
+            var openInPlayerA = new ComboboxItem<VideoClickSettings>(VideoClickSettings.OpenInPlayerA, "アプリで開く(A)");
+            var openInPlayerB = new ComboboxItem<VideoClickSettings>(VideoClickSettings.OpenInPlayerB, "アプリで開く(B)");
+            var sendToAppA = new ComboboxItem<VideoClickSettings>(VideoClickSettings.SendToAppA, "アプリに送る(A)");
+            var sendToAppB = new ComboboxItem<VideoClickSettings>(VideoClickSettings.SendToAppB, "アプリに送る(B)");
+            var download = new ComboboxItem<VideoClickSettings>(VideoClickSettings.Download, "ダウンロードする");
+            var none = new ComboboxItem<VideoClickSettings>(VideoClickSettings.NotConfigured, "何もしない");
 
-            this.SelectableVideodbClickAction = new List<ComboboxItem<VideodbClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download };
-            this.VideodbClickAction = new ConvertableSettingInfoViewModel<VideodbClickSettings, ComboboxItem<VideodbClickSettings>>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.VideoListItemdbClickAction,VideodbClickSettings.NotConfigured), none, x => x switch
+            this.SelectableVideodbClickAction = new List<ComboboxItem<VideoClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download };
+            this.VideodbClickAction = new ConvertableSettingInfoViewModel<VideoClickSettings, ComboboxItem<VideoClickSettings>>(WS::SettingPage.SettingsConainer.GetSetting(SettingNames.VideoListItemdbClickAction,VideoClickSettings.NotConfigured), none, x => x switch
             {
-                VideodbClickSettings.OpenInPlayerA => openInPlayerA,
-                VideodbClickSettings.OpenInPlayerB => openInPlayerB,
-                VideodbClickSettings.SendToAppA => sendToAppA,
-                VideodbClickSettings.SendToAppB => sendToAppB,
-                VideodbClickSettings.Download => download,
+                VideoClickSettings.OpenInPlayerA => openInPlayerA,
+                VideoClickSettings.OpenInPlayerB => openInPlayerB,
+                VideoClickSettings.SendToAppA => sendToAppA,
+                VideoClickSettings.SendToAppB => sendToAppB,
+                VideoClickSettings.Download => download,
                 _ => none,
             }, x => x.Value);
 
@@ -54,12 +54,12 @@ namespace Niconicome.ViewModels.Setting.Pages
         /// <summary>
         /// 選択可能なダブルクリックアクション
         /// </summary>
-        public List<ComboboxItem<VideodbClickSettings>> SelectableVideodbClickAction { get; init; }
+        public List<ComboboxItem<VideoClickSettings>> SelectableVideodbClickAction { get; init; }
 
         /// <summary>
         /// ダブルクリックアクション
         /// </summary>
-        public ConvertableSettingInfoViewModel<VideodbClickSettings, ComboboxItem<VideodbClickSettings>> VideodbClickAction { get; init; }
+        public ConvertableSettingInfoViewModel<VideoClickSettings, ComboboxItem<VideoClickSettings>> VideodbClickAction { get; init; }
 
         /// <summary>
         /// 幅を継承しない
@@ -93,21 +93,21 @@ namespace Niconicome.ViewModels.Setting.Pages
         public VideoListSettingsPageViewModelD()
         {
             #region ダブルクリック
-            var openInPlayerA = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.OpenInPlayerA, "アプリで開く(A)");
-            var openInPlayerB = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.OpenInPlayerB, "アプリで開く(B)");
-            var sendToAppA = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.SendToAppA, "アプリに送る(A)");
-            var sendToAppB = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.SendToAppB, "アプリに送る(B)");
-            var download = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.Download, "ダウンロードする");
-            var none = new ComboboxItem<VideodbClickSettings>(VideodbClickSettings.NotConfigured, "何もしない");
+            var openInPlayerA = new ComboboxItem<VideoClickSettings>(VideoClickSettings.OpenInPlayerA, "アプリで開く(A)");
+            var openInPlayerB = new ComboboxItem<VideoClickSettings>(VideoClickSettings.OpenInPlayerB, "アプリで開く(B)");
+            var sendToAppA = new ComboboxItem<VideoClickSettings>(VideoClickSettings.SendToAppA, "アプリに送る(A)");
+            var sendToAppB = new ComboboxItem<VideoClickSettings>(VideoClickSettings.SendToAppB, "アプリに送る(B)");
+            var download = new ComboboxItem<VideoClickSettings>(VideoClickSettings.Download, "ダウンロードする");
+            var none = new ComboboxItem<VideoClickSettings>(VideoClickSettings.NotConfigured, "何もしない");
 
-            this.SelectableVideodbClickAction = new List<ComboboxItem<VideodbClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download };
+            this.SelectableVideodbClickAction = new List<ComboboxItem<VideoClickSettings>>() { none, openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download };
             this.VideodbClickAction = none;
             #endregion
         }
 
-        public List<ComboboxItem<VideodbClickSettings>> SelectableVideodbClickAction { get; init; }
+        public List<ComboboxItem<VideoClickSettings>> SelectableVideodbClickAction { get; init; }
 
-        public ComboboxItem<VideodbClickSettings> VideodbClickAction { get; set; }
+        public ComboboxItem<VideoClickSettings> VideodbClickAction { get; set; }
 
         public SettingInfoViewModelD<bool> IsRestoreingColumnWidthDisabled { get; init; } = new(false);
 

@@ -96,6 +96,12 @@ namespace Niconicome.Models.Network.Download.DLTask
 
     }
 
+    public enum EventType
+    {
+        DBClick,
+        MiddleClick,
+    }
+
     public class DownloadManager : IDownloadManager
     {
 
@@ -212,7 +218,7 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         public void ClearCompleted()
         {
-            IDownloadTask[] targets = this._queuePool.Tasks.Where(t => t.IsCompleted.Value && !t.IsCanceled.Value).ToArray();
+            IDownloadTask[] targets = this._queuePool.Tasks.Where(t => t.IsCompleted.Value).ToArray();
             foreach (var target in targets)
             {
                 this._queuePool.RemoveTask(target);
