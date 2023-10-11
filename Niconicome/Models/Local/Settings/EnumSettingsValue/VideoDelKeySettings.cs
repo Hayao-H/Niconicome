@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Local.Settings.EnumSettingsValue
 {
-    public enum VideoMiddleClickSetting
+    public enum VideoDelKeySettings
     {
         NotConfigured,
-        OpenInPlayerA,
-        OpenInPlayerB,
-        SendToAppA,
-        SendToAppB,
-        Download,
+        DeleteVideo,
+        DeleteFile,
     }
 }

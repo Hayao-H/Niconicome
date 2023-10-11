@@ -198,6 +198,8 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string DisableScrollRestore { get; private set; } = "Videolist.ListView.DisableScrollRestore";
 
+        public static string IsVideoClickSelectEnable { get; private set; } = "Videolist.ListView.IsVideoClickSelectEnable";
+
         //Videolist.ListView.Width
         public static string VideoListCheckBoxColumnWidth { get; private set; } = "Videolist.ListView.Width.CheckBoxColumnWidth";
 

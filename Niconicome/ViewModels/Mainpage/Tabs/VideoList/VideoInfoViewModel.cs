@@ -192,6 +192,9 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
             if (e.Button == 1)
             {
                 WS.PlaylistEventManager.OnVideoClick(this._video,EventType.MiddleClick);
+            } else if (e.Button == 0)
+            {
+                WS.PlaylistEventManager.OnVideoClick(this._video, EventType.Click);
             }
         }
 

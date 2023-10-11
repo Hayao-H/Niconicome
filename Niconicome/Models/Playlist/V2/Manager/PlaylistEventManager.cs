@@ -24,6 +24,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public enum EventType
     {
+        Click,
         DoubleClick,
         MiddleClick,
     }
@@ -52,8 +53,16 @@ namespace Niconicome.Models.Playlist.V2.Manager
         public void OnVideoClick(IVideoInfo video, EventType eventType)
         {
             VideoClickSettings setting;
+            if (eventType == EventType.Click)
+            {
+                IAttemptResult<bool> result = this._settings.GetOnlyValue(SettingNames.IsVideoClickSelectEnable, false);
+                if (!result.IsSucceeded || !result.Data) return;
 
-            if (eventType == EventType.DoubleClick)
+                video.IsSelected.Value = !video.IsSelected.Value;
+                return;
+
+            }
+            else if (eventType == EventType.DoubleClick)
             {
                 IAttemptResult<VideoClickSettings> result = this._settings.GetOnlyValue(SettingNames.VideoListItemdbClickAction, VideoClickSettings.NotConfigured);
                 if (!result.IsSucceeded || result.Data == VideoClickSettings.NotConfigured) return;

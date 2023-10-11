@@ -38,6 +38,8 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.IsDownloadFailedHistoryDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.DisableDownloadFailedHistory, false), false).AddTo(this.Bindables);
 
             this.IsAutoDownloadEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.AutomaticalyStartDownloadOnVideoAdded, false), false).AddTo(this.Bindables);
+
+            this.IsVideoClickSelectEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsVideoClickSelectEnable, false), false).AddTo(this.Bindables);
         }
 
         public Bindables Bindables { get; init; } = new();
@@ -86,5 +88,11 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 追加時の自動ダウンロード
         /// </summary>
         public IBindableSettingInfo<bool> IsAutoDownloadEnable { get; init; }
+
+
+        /// <summary>
+        /// 動画クリックで選択
+        /// </summary>
+        public IBindableSettingInfo<bool> IsVideoClickSelectEnable { get; set; }
     }
 }
