@@ -86,6 +86,13 @@
             </div>
         </div>
 
+        <div class="SettingContent">
+            <label class="Title" for="disableCOnfirm"><i class="Icon fa-solid fa-circle-question"></i>削除時の確認を無効にする</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="disableCOnfirm" @bind="DataContext.IsDeletionConfirmDisabled.Value">
+            </div>
+        </div>
+
     </div>
 </div>
 

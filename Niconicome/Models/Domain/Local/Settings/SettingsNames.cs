@@ -201,6 +201,8 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string IsVideoClickSelectEnable { get; private set; } = "Videolist.ListView.IsVideoClickSelectEnable";
 
+        public static string IsDeletionConfirmDisabled { get; private set; } = "Videolist.ListView.IsDeletionConfirmDisabled";
+
         //Videolist.ListView.Width
         public static string VideoListCheckBoxColumnWidth { get; private set; } = "Videolist.ListView.Width.CheckBoxColumnWidth";
 

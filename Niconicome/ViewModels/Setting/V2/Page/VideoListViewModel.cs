@@ -41,6 +41,8 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.IsVideoClickSelectEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsVideoClickSelectEnable, false), false).AddTo(this.Bindables);
 
+            this.IsDeletionConfirmDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsDeletionConfirmDisabled, false), false).AddTo(this.Bindables);
+
             var noneD = new SelectBoxItem<VideoDelKeySettings>("何もしない", VideoDelKeySettings.NotConfigured);
             var deleteVideo = new SelectBoxItem<VideoDelKeySettings>("選択された動画をリストから削除", VideoDelKeySettings.DeleteVideo);
             var deleteFile = new SelectBoxItem<VideoDelKeySettings>("選択された動画の実体を削除", VideoDelKeySettings.DeleteFile);
@@ -111,5 +113,10 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 動画クリックで選択
         /// </summary>
         public IBindableSettingInfo<bool> IsVideoClickSelectEnable { get; set; }
+
+        /// <summary>
+        /// 削除時の確認を無効にする
+        /// </summary>
+        public IBindableSettingInfo<bool> IsDeletionConfirmDisabled { get; set; }
     }
 }

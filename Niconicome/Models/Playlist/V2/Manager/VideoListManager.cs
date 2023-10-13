@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.LocalFile;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
@@ -102,6 +103,11 @@ namespace Niconicome.Models.Playlist.V2.Manager
         void CancelUpdate();
 
         /// <summary>
+        /// 削除時の確認が有効かどうか
+        /// </summary>
+        bool IsDeletionConfirmDisabled { get; }
+
+        /// <summary>
         /// 更新フラグ
         /// </summary>
         IBindableProperty<bool> IsUpdating { get; }
@@ -109,7 +115,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class VideoListManager : IVideoListManager
     {
-        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoListUpdateHandler updateHandler, IVideoListCRDHandler cRDHandler, IClipbordManager clipbordManager,ILocalFileRemover localFileRemover)
+        public VideoListManager(IPlaylistVideoContainer container, ILocalVideoLoader loader, IErrorHandler errorHandler, IVideoAndPlayListMigration migration, IVideoListUpdateHandler updateHandler, IVideoListCRDHandler cRDHandler, IClipbordManager clipbordManager,ILocalFileRemover localFileRemover,ISettingsContainer settingsContainer)
         {
             this._container = container;
             this._loader = loader;
@@ -119,6 +125,7 @@ namespace Niconicome.Models.Playlist.V2.Manager
             this._CRDHandler = cRDHandler;
             this._clipbordManager = clipbordManager;
             this._localFileRemover = localFileRemover;
+            this._settingsContainer = settingsContainer;
         }
 
         #region field
@@ -139,11 +146,16 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
         private readonly ILocalFileRemover _localFileRemover;
 
+        private readonly ISettingsContainer _settingsContainer;
+
         #endregion
 
         #region Props
 
         public IBindableProperty<bool> IsUpdating => this._updateHandler.IsUpdating;
+
+        public bool IsDeletionConfirmDisabled => this._settingsContainer.GetOnlyValue(SettingNames.IsDeletionConfirmDisabled, false).Data;
+
 
         #endregion
 

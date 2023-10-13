@@ -364,6 +364,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             this.ContextMenu.RemoveVideo();
 
+            if (WS::Mainpage.VideoListManager.IsDeletionConfirmDisabled)
+            {
+                this.DeleteVideos();
+                return;
+            }
+
             var selected = this.Videos.Where(v => v.IsSelected.Value).ToList();
 
             if (selected.Count == 0)
