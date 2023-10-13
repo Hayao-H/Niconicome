@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Helper.Result;
@@ -20,6 +21,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
         /// <param name="video"></param>
         /// <param name="eventType"></param>
         void OnVideoClick(IVideoInfo video, EventType eventType);
+
+        /// <summary>
+        /// Delキー押下時
+        /// </summary>
+        /// <param name="video"></param>
+        /// <param name="deleteVideoAction"></param>
+        void OnDelKeyDown(Action deleteVideoAction);
     }
 
     public enum EventType
@@ -31,11 +39,13 @@ namespace Niconicome.Models.Playlist.V2.Manager
 
     public class PlaylistEventManager : IPlaylistEventManager
     {
-        public PlaylistEventManager(IExternalAppUtilsV2 externalAppUtils, ISettingsContainer settings, IDownloadManager downloadManager)
+        public PlaylistEventManager(IExternalAppUtilsV2 externalAppUtils, ISettingsContainer settings, IDownloadManager downloadManager,IVideoListManager videoListManager,IPlaylistVideoContainer container)
         {
             this._externalAppUtils = externalAppUtils;
             this._settings = settings;
             this._downloadManaer = downloadManager;
+            this._videoListManager = videoListManager;
+            this._container = container;
         }
 
         #region field
@@ -45,6 +55,10 @@ namespace Niconicome.Models.Playlist.V2.Manager
         private readonly ISettingsContainer _settings;
 
         private readonly IDownloadManager _downloadManaer;
+
+        private readonly IVideoListManager _videoListManager;
+
+        private readonly IPlaylistVideoContainer _container;
 
         #endregion
 
@@ -100,6 +114,22 @@ namespace Niconicome.Models.Playlist.V2.Manager
                 this._downloadManaer.StartDownloadAsync();
             }
         }
+
+       public void OnDelKeyDown(Action deleteVideoAction)
+        {
+            IAttemptResult<VideoDelKeySettings> result = this._settings.GetOnlyValue(SettingNames.VideoListItemDelKeyAction, VideoDelKeySettings.NotConfigured);
+            if (!result.IsSucceeded || result.Data == VideoDelKeySettings.NotConfigured) return;
+
+            if (result.Data == VideoDelKeySettings.DeleteVideo)
+            {
+                deleteVideoAction();
+            } else
+            {
+                var videos = this._container.Videos.Where(v => v.IsSelected.Value).ToArray();
+                this._videoListManager.DeleteVideoFilesFromCurrentPlaylistAsync(videos);
+            }
+        }
+
 
 
         #endregion

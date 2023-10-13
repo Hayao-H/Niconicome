@@ -40,6 +40,13 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.IsAutoDownloadEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.AutomaticalyStartDownloadOnVideoAdded, false), false).AddTo(this.Bindables);
 
             this.IsVideoClickSelectEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsVideoClickSelectEnable, false), false).AddTo(this.Bindables);
+
+            var noneD = new SelectBoxItem<VideoDelKeySettings>("何もしない", VideoDelKeySettings.NotConfigured);
+            var deleteVideo = new SelectBoxItem<VideoDelKeySettings>("選択された動画をリストから削除", VideoDelKeySettings.DeleteVideo);
+            var deleteFile = new SelectBoxItem<VideoDelKeySettings>("選択された動画の実体を削除", VideoDelKeySettings.DeleteFile);
+
+            this.SelectableVideoDelKeyAction = new List<SelectBoxItem<VideoDelKeySettings>>() { noneD, deleteVideo, deleteFile };
+            this.VideoDelKeyAction = new BindableSettingInfo<VideoDelKeySettings>(WS.SettingsContainer.GetSetting(SettingNames.VideoListItemDelKeyAction, VideoDelKeySettings.NotConfigured), VideoDelKeySettings.NotConfigured);
         }
 
         public Bindables Bindables { get; init; } = new();
@@ -55,6 +62,11 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         public List<SelectBoxItem<VideoClickSettings>> SelectableVideoMiddleClickAction { get; init; }
 
         /// <summary>
+        /// 選択可能なDelキーアクション
+        /// </summary>
+        public List<SelectBoxItem<VideoDelKeySettings>> SelectableVideoDelKeyAction { get; init; }
+
+        /// <summary>
         /// ダブルクリックアクション
         /// </summary>
         public IBindableSettingInfo<VideoClickSettings> VideodbClickAction { get; init; }
@@ -63,6 +75,11 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 中クリックアクション
         /// </summary>
         public IBindableSettingInfo<VideoClickSettings> VideoMiddleClickAction { get; init; }
+
+        /// <summary>
+        /// Delキーアクション
+        /// </summary>
+        public IBindableSettingInfo<VideoDelKeySettings> VideoDelKeyAction { get; init; }
 
         /// <summary>
         /// 幅を継承しない

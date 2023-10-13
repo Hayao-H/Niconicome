@@ -193,6 +193,7 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string VideoListItemMiddleClickAction { get; private set; } = "Videolist.ListView.VideoListItemMiddleClickAction";
 
+        public static string VideoListItemDelKeyAction { get; private set; } = "Videolist.ListView.VideoListItemDelKeyAction";
 
         public static string IsRestoringColumnWidthDisabled { get; private set; } = "Videolist.ListView.IsRestoringColumnWidthDisabled";
 

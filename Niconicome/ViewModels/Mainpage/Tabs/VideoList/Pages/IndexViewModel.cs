@@ -318,11 +318,23 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// エンターキー入力時
         /// </summary>
         /// <param name="e"></param>
-        public void OnKeyDown(KeyboardEventArgs e)
+        public void OnKeyDownControl(KeyboardEventArgs e)
         {
             if (e.Code == "Enter")
             {
                 _ = this.AddVideoAsync();
+            } 
+        }
+
+        /// <summary>
+        /// Delキー
+        /// </summary>
+        /// <param name="e"></param>
+        public void OnKeyDownList(KeyboardEventArgs e)
+        {
+            if (e.Code== "Delete")
+            {
+                WS::Mainpage.PlaylistEventManager.OnDelKeyDown(this.ConfirmBeforeDeletion);
             }
         }
 

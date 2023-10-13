@@ -15,7 +15,7 @@
 
     <div class="ControlsContainer">
         <div class="InputBoxWrapper InputContextMenuWrapper">
-            <input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @onmousedown="DataContext.InputContextMenuViewModel.OnClick" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDown" />
+            <input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @onmousedown="DataContext.InputContextMenuViewModel.OnClick" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDownControl" />
             @if (DataContext.IsProcessing.Value)
             {
                 <button type="button" id="RegisterButton" class="btn btn-primary" disabled>登録</button>
@@ -141,7 +141,7 @@
                 <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.LikeCount)">いいね数で並び替え</div>
             </div>
         </div>
-        <div class="VideoListBody">
+        <div class="VideoListBody" @onkeyup="DataContext.OnKeyDownList" tabindex="1">
             @foreach (var video in DataContext.Videos)
             {
                 <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" data-playlistID="@(DataContext.PlaylistID)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" @onmousedown="video.OnClick" @ondblclick="video.OnDBClick" draggable="true">
