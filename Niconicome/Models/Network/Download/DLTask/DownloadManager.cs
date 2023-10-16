@@ -123,7 +123,6 @@ namespace Niconicome.Models.Network.Download.DLTask
             this._stagedPool.StateChangeNotifyer.Subscribe(() => this.StateChangeNotifyer.RaiseChange());
 
             this.InitializeParallelTasksHandler();
-
         }
 
         #region field
@@ -163,6 +162,7 @@ namespace Niconicome.Models.Network.Download.DLTask
         #endregion
 
         #region Props
+
 
         public IReadOnlyCollection<IDownloadTask> Queue { get; init; }
 

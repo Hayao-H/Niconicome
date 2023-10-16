@@ -65,6 +65,12 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string FFmpegFormat { get; private set; } = "Download.Video.FFmpegParameterFormat";
 
+        //Download.Video.Economy
+        public static string SkipEconomyDownloadIfPremiumExists { get; private set; } = "Download.Video.Economy.SkipEconomyDownloadIfPremiumExists";
+
+        public static string AlwaysSkipEconomyDownload { get; private set; } = "Download.Video.Economy.AlwaysSkipEconomyDownload";
+
+
         //Download.Video.ExternalSoftware
         public static string ExternalDownloaderCondition { get; private set; } = "Download.Video.ExternalSoftware.ExternalDownloaderCondition";
 

@@ -129,6 +129,16 @@ namespace Niconicome.Models.Network.Download
         bool OmittingXmlDeclaration { get; }
 
         /// <summary>
+        /// 高画質動画が存在する場合はエコノミー動画をDLしない
+        /// </summary>
+        bool SkipEconomyDownloadIfPremiumExists { get; }
+
+        /// <summary>
+        /// 常にエコノミーをDLしない
+        /// </summary>
+        bool AlwaysSkipEconomyDownload { get; }
+
+        /// <summary>
         /// 動画ID
         /// </summary>
         string NiconicoId { get; }
@@ -305,6 +315,10 @@ namespace Niconicome.Models.Network.Download
         public bool AppendingToLocalComment { get; set; }
 
         public bool OmittingXmlDeclaration { get; set; }
+
+        public bool SkipEconomyDownloadIfPremiumExists { get; set; }
+
+        public bool AlwaysSkipEconomyDownload { get; set; }
 
         public uint VerticalResolution { get; set; }
 
