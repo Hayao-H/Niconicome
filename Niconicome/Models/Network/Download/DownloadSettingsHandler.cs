@@ -164,6 +164,9 @@ namespace Niconicome.Models.Network.Download
             bool experimentalSafety = true;//this._container.GetSetting(SettingNames.IsExperimentalCommentSafetySystemEnable, false).Data!.Value;
             bool deleteEconomyFile = this._container.GetSetting(SettingNames.DeleteExistingEconomyFile, false).Data!.Value;
             bool omitXmlDec = this._container.GetSetting(SettingNames.IsOmittingXmlDeclarationIsEnable, false).Data!.Value;
+            bool skipEco = this._container.GetOnlyValue(SettingNames.AlwaysSkipEconomyDownload, false).Data!;
+            bool skipEcoWhenPremium = this._container.GetOnlyValue(SettingNames.SkipEconomyDownloadIfPremiumExists, false).Data!;
+            
 
             //ファイル系
             string folderPath = this._playlistVideoContainer.CurrentSelectedPlaylist.FolderPath;
@@ -268,6 +271,8 @@ namespace Niconicome.Models.Network.Download
                 ExternalDownloaderParam = externalSoftwareParam,
                 ExternalDownloaderPath = externalSoftwarePath,
                 ExternalDownloaderConditionSetting = externalDownloader,
+                SkipEconomyDownloadIfPremiumExists = skipEcoWhenPremium,
+                AlwaysSkipEconomyDownload = skipEco,
             };
         }
 

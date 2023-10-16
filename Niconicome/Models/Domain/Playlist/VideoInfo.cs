@@ -86,6 +86,11 @@ namespace Niconicome.Models.Domain.Playlist
         string ChannelID { get; set; }
 
         /// <summary>
+        /// 動画説明文
+        /// </summary>
+        string Description { get; set; }
+
+        /// <summary>
         /// サムネURL(大)
         /// </summary>
         string LargeThumbUrl { get; set; }
@@ -200,6 +205,8 @@ namespace Niconicome.Models.Domain.Playlist
         private string _channnelName = string.Empty;
 
         private string _channnelID = string.Empty;
+
+        private string _description = string.Empty;
 
         private int _duration;
 
@@ -374,6 +381,16 @@ namespace Niconicome.Models.Domain.Playlist
             set
             {
                 this._channnelID = value;
+                if (this.IsAutoUpdateEnabled) this.Update(this);
+            }
+        }
+
+        public string Description
+        {
+            get => this._description;
+            set
+            {
+                this._description = value;
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }

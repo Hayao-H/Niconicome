@@ -76,6 +76,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsEconomy = data.IsEconomy;
             video.AddedAt = data.AddedAt;
             video.PlaylistID = playlistID;
+            video.FilePath = data.VideoFilePath;
 
             video.IsAutoUpdateEnabled = true;
 
@@ -140,6 +141,7 @@ namespace Niconicome.Models.Infrastructure.Database
                 video.IsEconomy = data.IsEconomy;
                 video.AddedAt = data.AddedAt;
                 video.PlaylistID = data.PlaylistID;
+                video.FilePath = data.VideoFilePath;
 
                 video.IsAutoUpdateEnabled = true;
 
@@ -265,6 +267,7 @@ namespace Niconicome.Models.Infrastructure.Database
                 LargeThumbUrl = video.LargeThumbUrl,
                 ThumbUrl = video.ThumbUrl,
                 Duration = video.Duration,
+                Description = video.Description,
                 IsDeleted = video.IsDeleted,
                 ChannelName = video.ChannelName,
                 ChannelID = video.ChannelID,
@@ -323,6 +326,7 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsDeleted = sharedData.IsDeleted;
             video.ChannelID = sharedData.ChannelID;
             video.ChannelName = sharedData.ChannelName;
+            video.Description = sharedData.Description;
 
             video.IsAutoUpdateEnabled = true;
 

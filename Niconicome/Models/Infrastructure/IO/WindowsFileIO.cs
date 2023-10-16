@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
+using VB = Microsoft.VisualBasic.FileIO;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Utils;
@@ -143,16 +144,31 @@ namespace Niconicome.Models.Infrastructure.IO
             return File.Exists(IOUtils.GetPrefixedPath(path));
         }
 
-        public IAttemptResult Delete(string path)
+        public IAttemptResult Delete(string path, bool resycycle)
         {
-            try
+            if (resycycle)
             {
-                File.Delete(path);
+                try
+                {
+                    VB::FileSystem.DeleteFile(path, VB::UIOption.AllDialogs, VB::RecycleOption.SendToRecycleBin);
+                }
+                catch (Exception ex)
+                {
+                    this._errorHandler.HandleError(WindowsFileIOError.FailedToDeleteFile, ex, path);
+                    return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToDeleteFile, ex, path));
+                }
             }
-            catch (Exception ex)
+            else
             {
-                this._errorHandler.HandleError(WindowsFileIOError.FailedToDeleteFile, ex, path);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToDeleteFile, ex, path));
+                try
+                {
+                    File.Delete(path);
+                }
+                catch (Exception ex)
+                {
+                    this._errorHandler.HandleError(WindowsFileIOError.FailedToDeleteFile, ex, path);
+                    return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToDeleteFile, ex, path));
+                }
             }
 
             return AttemptResult.Succeeded();

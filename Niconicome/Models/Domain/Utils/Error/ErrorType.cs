@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Local.DataBackup.Import.Xeno.Error;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.FFmpeg;
 using Niconicome.Models.Domain.Local.External.Software.FFmpeg.ffprobe;
 using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
+using Niconicome.Models.Domain.Local.LocalFile.Error;
 using Niconicome.Models.Domain.Local.Server.Core;
 using Niconicome.Models.Domain.Local.Server.HLS;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
@@ -32,6 +33,7 @@ using Niconicome.Models.Infrastructure.Database.Error;
 using Niconicome.Models.Infrastructure.Database.Json;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Infrastructure.IO;
+using Niconicome.Models.Infrastructure.IO.Media.Audio;
 using Niconicome.Models.Infrastructure.Network;
 using Niconicome.Models.Local.External.Error;
 using Niconicome.Models.Local.External.Playlist;
@@ -104,6 +106,8 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 53, typeof(DecryptorError) },
             { 54, typeof(ReplaceHandlerError) },
             { 55, typeof(DownloadManagerError) },
+            { 56, typeof(NaudioHandlerError) },
+            { 57, typeof(LocalFileRemoverError) },
         };
     }
 }

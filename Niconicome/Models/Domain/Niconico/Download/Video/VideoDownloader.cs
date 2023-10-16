@@ -175,7 +175,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
             this.DeleteTmpFolder(segmentDirectoryName, onMessage);
 
 
-            bool isEconomy = session.Video!.DmcInfo.IsEnonomy;
+            bool isEconomy = session.Video!.DmcInfo.IsEconomy;
             if (settings.IsEconomy && settings.DeleteExistingEconomyFile && !isEconomy)
             {
                 this.RemoveEconomyFile(settings.FilePath);
@@ -298,7 +298,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video
 
         private string GetFileName(IWatchSession session, IDownloadSettings settings)
         {
-            string? economySuffix = session.Video!.DmcInfo.IsEnonomy ? settings.EconomySuffix : null;
+            string? economySuffix = session.Video!.DmcInfo.IsEconomy ? settings.EconomySuffix : null;
             string? suffix = economySuffix;
             string ext = settings.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt;
             string format = string.IsNullOrEmpty(settings.FileNameFormat) ? Format.DefaultFileNameFormat : settings.FileNameFormat;

@@ -16,15 +16,18 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
         public VideoListViewModel()
         {
-            var openInPlayerA = new SelectBoxItem<VideodbClickSettings>( "アプリで開く(A)", VideodbClickSettings.OpenInPlayerA);
-            var openInPlayerB = new SelectBoxItem<VideodbClickSettings>("アプリで開く(B)", VideodbClickSettings.OpenInPlayerB);
-            var sendToAppA = new SelectBoxItem<VideodbClickSettings>("アプリに送る(A)", VideodbClickSettings.SendToAppA);
-            var sendToAppB = new SelectBoxItem<VideodbClickSettings>("アプリに送る(B)", VideodbClickSettings.SendToAppB);
-            var download = new SelectBoxItem<VideodbClickSettings>("ダウンロードする", VideodbClickSettings.Download);
-            var none = new SelectBoxItem<VideodbClickSettings>("何もしない", VideodbClickSettings.NotConfigured);
+            var openInPlayerA = new SelectBoxItem<VideoClickSettings>("アプリで開く(A)", VideoClickSettings.OpenInPlayerA);
+            var openInPlayerB = new SelectBoxItem<VideoClickSettings>("アプリで開く(B)", VideoClickSettings.OpenInPlayerB);
+            var sendToAppA = new SelectBoxItem<VideoClickSettings>("アプリに送る(A)", VideoClickSettings.SendToAppA);
+            var sendToAppB = new SelectBoxItem<VideoClickSettings>("アプリに送る(B)", VideoClickSettings.SendToAppB);
+            var download = new SelectBoxItem<VideoClickSettings>("ダウンロードする", VideoClickSettings.Download);
+            var none = new SelectBoxItem<VideoClickSettings>("何もしない", VideoClickSettings.NotConfigured);
 
-            this.SelectableVideodbClickAction = new() { openInPlayerA,openInPlayerB,sendToAppA,sendToAppB ,download,none};
-            this.VideodbClickAction = new BindableSettingInfo<VideodbClickSettings>(WS.SettingsContainer.GetSetting(SettingNames.VideoListItemdbClickAction, VideodbClickSettings.NotConfigured), VideodbClickSettings.NotConfigured).AddTo(this.Bindables);
+            this.SelectableVideodbClickAction = new() { openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download, none };
+            this.VideodbClickAction = new BindableSettingInfo<VideoClickSettings>(WS.SettingsContainer.GetSetting(SettingNames.VideoListItemdbClickAction, VideoClickSettings.NotConfigured), VideoClickSettings.NotConfigured).AddTo(this.Bindables);
+
+            this.SelectableVideoMiddleClickAction = new() { openInPlayerA, openInPlayerB, sendToAppA, sendToAppB, download, none };
+            this.VideoMiddleClickAction = new BindableSettingInfo<VideoClickSettings>(WS.SettingsContainer.GetSetting(SettingNames.VideoListItemMiddleClickAction, VideoClickSettings.NotConfigured), VideoClickSettings.NotConfigured).AddTo(this.Bindables);
 
             this.IsRestoreingColumnWidthDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsRestoringColumnWidthDisabled, false), false).AddTo(this.Bindables);
 
@@ -33,6 +36,19 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.IsDownloadSucceededHistoryDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.DisableDownloadSucceededHistory, false), false).AddTo(this.Bindables);
 
             this.IsDownloadFailedHistoryDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.DisableDownloadFailedHistory, false), false).AddTo(this.Bindables);
+
+            this.IsAutoDownloadEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.AutomaticalyStartDownloadOnVideoAdded, false), false).AddTo(this.Bindables);
+
+            this.IsVideoClickSelectEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsVideoClickSelectEnable, false), false).AddTo(this.Bindables);
+
+            this.IsDeletionConfirmDisabled = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsDeletionConfirmDisabled, false), false).AddTo(this.Bindables);
+
+            var noneD = new SelectBoxItem<VideoDelKeySettings>("何もしない", VideoDelKeySettings.NotConfigured);
+            var deleteVideo = new SelectBoxItem<VideoDelKeySettings>("選択された動画をリストから削除", VideoDelKeySettings.DeleteVideo);
+            var deleteFile = new SelectBoxItem<VideoDelKeySettings>("選択された動画の実体を削除", VideoDelKeySettings.DeleteFile);
+
+            this.SelectableVideoDelKeyAction = new List<SelectBoxItem<VideoDelKeySettings>>() { noneD, deleteVideo, deleteFile };
+            this.VideoDelKeyAction = new BindableSettingInfo<VideoDelKeySettings>(WS.SettingsContainer.GetSetting(SettingNames.VideoListItemDelKeyAction, VideoDelKeySettings.NotConfigured), VideoDelKeySettings.NotConfigured);
         }
 
         public Bindables Bindables { get; init; } = new();
@@ -40,12 +56,32 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// <summary>
         /// 選択可能なダブルクリックアクション
         /// </summary>
-        public List<SelectBoxItem<VideodbClickSettings>> SelectableVideodbClickAction { get; init; }
+        public List<SelectBoxItem<VideoClickSettings>> SelectableVideodbClickAction { get; init; }
+
+        /// <summary>
+        /// 選択可能な中クリックアクション
+        /// </summary>
+        public List<SelectBoxItem<VideoClickSettings>> SelectableVideoMiddleClickAction { get; init; }
+
+        /// <summary>
+        /// 選択可能なDelキーアクション
+        /// </summary>
+        public List<SelectBoxItem<VideoDelKeySettings>> SelectableVideoDelKeyAction { get; init; }
 
         /// <summary>
         /// ダブルクリックアクション
         /// </summary>
-        public IBindableSettingInfo<VideodbClickSettings> VideodbClickAction { get; init; }
+        public IBindableSettingInfo<VideoClickSettings> VideodbClickAction { get; init; }
+
+        /// <summary>
+        /// 中クリックアクション
+        /// </summary>
+        public IBindableSettingInfo<VideoClickSettings> VideoMiddleClickAction { get; init; }
+
+        /// <summary>
+        /// Delキーアクション
+        /// </summary>
+        public IBindableSettingInfo<VideoDelKeySettings> VideoDelKeyAction { get; init; }
 
         /// <summary>
         /// 幅を継承しない
@@ -66,5 +102,21 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 再生履歴を無効にする
         /// </summary>
         public IBindableSettingInfo<bool> IsPlaybackHistoryDisabled { get; init; }
+
+        /// <summary>
+        /// 追加時の自動ダウンロード
+        /// </summary>
+        public IBindableSettingInfo<bool> IsAutoDownloadEnable { get; init; }
+
+
+        /// <summary>
+        /// 動画クリックで選択
+        /// </summary>
+        public IBindableSettingInfo<bool> IsVideoClickSelectEnable { get; set; }
+
+        /// <summary>
+        /// 削除時の確認を無効にする
+        /// </summary>
+        public IBindableSettingInfo<bool> IsDeletionConfirmDisabled { get; set; }
     }
 }

@@ -49,6 +49,11 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string PostDownloadAction { get; private set; } = "Download.General.PostDownloadAction";
 
+        //Download.General.DownloadCompletionAudio
+        public static string PlaySoundAfterDownload { get; private set; }= "Download.General.DownloadCompletionAudio.Enable";
+
+        public static string DownloadCompletionAudioPath { get; private set; } = "Download.General.DownloadCompletionAudio.Path";
+
         //Download.Video
         public static string IsResumeEnable { get; private set; } = "Download.Video.IsResumeEnable";
 
@@ -59,6 +64,12 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string DownloadVideoWithoutEncodeEnable { get; private set; } = "Download.Video.IsDownloadingVideoWithoutEncodingEnabled";
 
         public static string FFmpegFormat { get; private set; } = "Download.Video.FFmpegParameterFormat";
+
+        //Download.Video.Economy
+        public static string SkipEconomyDownloadIfPremiumExists { get; private set; } = "Download.Video.Economy.SkipEconomyDownloadIfPremiumExists";
+
+        public static string AlwaysSkipEconomyDownload { get; private set; } = "Download.Video.Economy.AlwaysSkipEconomyDownload";
+
 
         //Download.Video.ExternalSoftware
         public static string ExternalDownloaderCondition { get; private set; } = "Download.Video.ExternalSoftware.ExternalDownloaderCondition";
@@ -178,15 +189,25 @@ namespace Niconicome.Models.Domain.Local.Settings
         //Videolist.TextBoxAndButtons
         public static string StoreOnlyNiconicoIDOnRegister { get; private set; } = "Videolist.TextBoxAndButtons.StoreOnlyNiconicoIDOnRegister";
 
+        public static string AutomaticalyStartDownloadOnVideoAdded { get; private set; } = "Videolist.TextBoxAndButtons.AutomaticalyStartDownloadOnVideoAdded";
+
         //Videolist.ListView
 
         public static string ReAllocateIfVideoisNotSaved { get; private set; } = "Videolist.ListView.SwitchOpenInAppCommandToSendToAppCommandWhenNotDownloaded";
 
         public static string VideoListItemdbClickAction { get; private set; } = "Videolist.ListView.VideoListItemDoubleClickAction";
 
+        public static string VideoListItemMiddleClickAction { get; private set; } = "Videolist.ListView.VideoListItemMiddleClickAction";
+
+        public static string VideoListItemDelKeyAction { get; private set; } = "Videolist.ListView.VideoListItemDelKeyAction";
+
         public static string IsRestoringColumnWidthDisabled { get; private set; } = "Videolist.ListView.IsRestoringColumnWidthDisabled";
 
         public static string DisableScrollRestore { get; private set; } = "Videolist.ListView.DisableScrollRestore";
+
+        public static string IsVideoClickSelectEnable { get; private set; } = "Videolist.ListView.IsVideoClickSelectEnable";
+
+        public static string IsDeletionConfirmDisabled { get; private set; } = "Videolist.ListView.IsDeletionConfirmDisabled";
 
         //Videolist.ListView.Width
         public static string VideoListCheckBoxColumnWidth { get; private set; } = "Videolist.ListView.Width.CheckBoxColumnWidth";

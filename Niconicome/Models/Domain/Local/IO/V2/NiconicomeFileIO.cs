@@ -44,8 +44,9 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// ファイルを削除
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="resycycle"></param>
         /// <returns></returns>
-        IAttemptResult Delete(string path);
+        IAttemptResult Delete(string path, bool resycycle = false);
 
         /// <summary>
         /// ファイルをコピー

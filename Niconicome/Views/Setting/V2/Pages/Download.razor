@@ -172,7 +172,24 @@
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="enableNewCommentDL" @bind="DataContext.IsExperimentalCommentDownloadSystemEnable.Value">
             </div>
+        </div>        
+        
+        <div class="SettingContent">
+            <label class="Title" for="playSoundAfterDL"><i class="Icon fa-solid fa-circle-play"></i>DL完了時に音声を再生する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="playSoundAfterDL" @bind="DataContext.PlaySoundAfterDownloadCompleted.Value">
+            </div>
         </div>
+
+        @if (DataContext.PlaySoundAfterDownloadCompleted.Value)
+        {
+            <div class="SettingContent">
+                <label class="Title"><i class="Icon fa-solid fa-arrow-up-right-from-square"></i>音声ファイルのパス</label>
+                <div class="input-group Input">
+                    <input class="form-control" type="text" @bind="DataContext.AudioFilePath.Value">
+                </div>
+            </div>
+        }
     </div>
 
 </div>

@@ -811,29 +811,29 @@ namespace Niconicome.ViewModels.Mainpage
                     if (e.Source is not FrameworkElement source) return;
                     if (source.DataContext is not VideoInfoViewModel videoInfo) return;
 
-                    IAttemptResult<ISettingInfo<EnumSettings::VideodbClickSettings>> result = WS::Mainpage.SettingsConainer.GetSetting(Settings::SettingNames.VideoListItemdbClickAction, EnumSettings::VideodbClickSettings.NotConfigured);
+                    IAttemptResult<ISettingInfo<EnumSettings::VideoClickSettings>> result = WS::Mainpage.SettingsConainer.GetSetting(Settings::SettingNames.VideoListItemdbClickAction, EnumSettings::VideoClickSettings.NotConfigured);
 
                     if (!result.IsSucceeded || result.Data is null) return;
 
                     var setting = result.Data.Value;
 
-                    if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerA)
+                    if (setting == EnumSettings::VideoClickSettings.OpenInPlayerA)
                     {
                         this.OpenInPlayerAcommand.Execute(videoInfo);
                     }
-                    else if (setting == EnumSettings::VideodbClickSettings.OpenInPlayerB)
+                    else if (setting == EnumSettings::VideoClickSettings.OpenInPlayerB)
                     {
                         this.OpenInPlayerBcommand.Execute(videoInfo);
                     }
-                    else if (setting == EnumSettings::VideodbClickSettings.SendToAppA)
+                    else if (setting == EnumSettings::VideoClickSettings.SendToAppA)
                     {
                         this.SendToappACommand.Execute(videoInfo);
                     }
-                    else if (setting == EnumSettings::VideodbClickSettings.SendToAppB)
+                    else if (setting == EnumSettings::VideoClickSettings.SendToAppB)
                     {
                         this.SendToappBCommand.Execute(videoInfo);
                     }
-                    else if (setting == EnumSettings::VideodbClickSettings.Download)
+                    else if (setting == EnumSettings::VideoClickSettings.Download)
                     {
                         this.ea.GetEvent<PubSubEvent<MVVMEvent<VideoInfoViewModel>>>().Publish(new MVVMEvent<VideoInfoViewModel>(videoInfo, typeof(DownloadSettingsViewModel), EventType.Download));
                     }

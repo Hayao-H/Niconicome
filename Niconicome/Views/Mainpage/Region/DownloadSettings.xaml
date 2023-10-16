@@ -67,6 +67,12 @@
                 DisplayMemberPath="DisplayValue" 
                 SelectedItem="{Binding SelectedThumbSize.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                  Margin="0 0 5 0"/>
+            <Label Content="エコノミー動画のスキップ:" Margin="0 0 5 0"/>
+            <ComboBox 
+                ItemsSource="{Binding SelectableEconomySettings}" 
+                DisplayMemberPath="DisplayValue" 
+                SelectedItem="{Binding EconomySetting.Value,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0 0 5 0"/>
         </StackPanel>
         <Separator/>
         <Grid Margin="0 5">

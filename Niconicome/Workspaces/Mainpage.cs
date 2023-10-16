@@ -183,5 +183,11 @@ namespace Niconicome.Workspaces
         /// ウィンドウの位置など
         /// </summary>
         public static Style::IWindowStyleManager WindowStyleManager { get; private set; } = DIFactory.Resolve<Style::IWindowStyleManager>();
+
+        /// <summary>
+        /// マウスイベント
+        /// </summary>
+        public static Playlist::Manager.IPlaylistEventManager PlaylistEventManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.IPlaylistEventManager>();
+
     }
 }

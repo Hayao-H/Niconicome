@@ -158,8 +158,15 @@ namespace Niconicome.Models.Domain.Utils
             string filename = Path.GetFileNameWithoutExtension(filenameWithExt) ?? string.Empty;
             if (filename == string.Empty) return "";
 
-            var match = Regex.Match(filenameWithExt, "(sm|nm|so)?[0-9]+");
-            return match.Value;
+            try
+            {
+                var match = Regex.Match(filenameWithExt, "(sm|nm|so)?[0-9]+");
+                return match.Value;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         /// <summary>

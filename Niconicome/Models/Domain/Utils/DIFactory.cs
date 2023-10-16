@@ -385,6 +385,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DLTaskVM::Pages.DownloadViewModel>();
             services.AddTransient<DLTaskVM::Pages.StageViewModel>();
             services.AddTransient<DLTaskVM::ToolbarViewModel>();
+            services.AddTransient<IO::Media.Audio.IAudioPlayer, Infla::IO.Media.Audio.NaudioHandler>();
+            services.AddTransient<LocalFile::ILocalFileRemover, LocalFile::LocalFileRemover>();
+            services.AddTransient<PlaylistV2::Manager.IPlaylistEventManager, PlaylistV2::Manager.PlaylistEventManager>();
 
             return services.BuildServiceProvider();
         }

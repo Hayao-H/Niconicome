@@ -6,7 +6,9 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Helper.Event.Generic;
+using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist;
@@ -81,6 +83,51 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 if (WS::Mainpage.DownloadSettingsHandler.Resolution.Value.Vertical == this.SelectedResolution.Value.Value.Vertical) return;
                 WS::Mainpage.DownloadSettingsHandler.Resolution.Value = x.Value;
+            });
+
+            var e1 = new ComboboxItem<EconomySettins>(EconomySettins.AlwaysDownload, "常にしない");
+            var e2 = new ComboboxItem<EconomySettins>(EconomySettins.SkipWhenPremiumExists, "高画質が存在する場合");
+            var e3 = new ComboboxItem<EconomySettins>(EconomySettins.AlwaysSkip, "常にスキップ");
+
+            this.SelectableEconomySettings = new List<ComboboxItem<EconomySettins>>() { e1, e2, e3 };
+            var alwaysSkip = WS::Mainpage.SettingsConainer.GetOnlyValue(SettingNames.AlwaysSkipEconomyDownload, false).Data;
+            var skipWhenPremiumExists = WS::Mainpage.SettingsConainer.GetOnlyValue(SettingNames.SkipEconomyDownloadIfPremiumExists, false).Data;
+
+            if (alwaysSkip)
+            {
+                this.EconomySetting = new BindableProperty<ComboboxItem<EconomySettins>>(e3);
+            }
+            else if (skipWhenPremiumExists)
+            {
+                this.EconomySetting = new BindableProperty<ComboboxItem<EconomySettins>>(e2);
+            }
+            else
+            {
+                this.EconomySetting = new BindableProperty<ComboboxItem<EconomySettins>>(e1);
+            }
+
+            this.EconomySetting.Subscribe(x =>
+            {
+                IAttemptResult<ISettingInfo<bool>> alwaysSkip = WS::Mainpage.SettingsConainer.GetSetting(SettingNames.AlwaysSkipEconomyDownload, false);
+                IAttemptResult<ISettingInfo<bool>> skipWhenPremiumExists = WS::Mainpage.SettingsConainer.GetSetting(SettingNames.SkipEconomyDownloadIfPremiumExists, false);
+
+                if (!alwaysSkip.IsSucceeded || alwaysSkip.Data is null || !skipWhenPremiumExists.IsSucceeded || skipWhenPremiumExists.Data is null) return;
+
+                if (x.Value == EconomySettins.AlwaysSkip)
+                {
+                    alwaysSkip.Data.Value = true;
+                    skipWhenPremiumExists.Data.Value = false;
+                }
+                else if (x.Value == EconomySettins.SkipWhenPremiumExists)
+                {
+                    alwaysSkip.Data.Value = false;
+                    skipWhenPremiumExists.Data.Value = true;
+                }
+                else if (x.Value == EconomySettins.AlwaysDownload)
+                {
+                    alwaysSkip.Data.Value = false;
+                    skipWhenPremiumExists.Data.Value = false;
+                }
             });
 
             #region サムネ
@@ -260,6 +307,11 @@ namespace Niconicome.ViewModels.Mainpage
         public SettingInfoViewModel<int> MaxCommentsCount { get; init; }
 
         /// <summary>
+        /// エコノミー設定
+        /// </summary>
+        public IBindableProperty<ComboboxItem<EconomySettins>> EconomySetting { get; init; }
+
+        /// <summary>
         /// 選択中の解像度
         /// </summary>
         public IBindableProperty<ComboboxItem<VideoInfo::IResolution>> SelectedResolution { get; init; }
@@ -278,6 +330,11 @@ namespace Niconicome.ViewModels.Mainpage
         /// サムネイルサイズ一覧
         /// </summary>
         public List<ComboboxItem<VideoInfo::ThumbSize>> ThumbSizes { get; init; }
+
+        /// <summary>
+        /// 選択可能なエコノミー設定
+        /// </summary>
+        public List<ComboboxItem<EconomySettins>> SelectableEconomySettings { get; init; }
 
         #region private
 
@@ -351,6 +408,14 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.ThumbSizes = new List<ComboboxItem<VideoInfo.ThumbSize>>() { t1, t2, t3, t4 };
             this.SelectedThumbSize = new ConvertableSettingInfoViewModelD<ComboboxItem<VideoInfo.ThumbSize>>(t1);
+
+            var e1 = new ComboboxItem<EconomySettins>(EconomySettins.AlwaysDownload, "常にしない");
+            var e2 = new ComboboxItem<EconomySettins>(EconomySettins.SkipWhenPremiumExists, "高画質が存在する場合");
+            var e3 = new ComboboxItem<EconomySettins>(EconomySettins.AlwaysSkip, "常にスキップ");
+
+            this.SelectableEconomySettings = new List<ComboboxItem<EconomySettins>>() { e1, e2, e3 };
+            this.EconomySetting = new BindableProperty<ComboboxItem<EconomySettins>>(e1);
+
         }
 
         public BindableProperty<bool> IsDownloading { get; init; } = new(false);
@@ -391,6 +456,8 @@ namespace Niconicome.ViewModels.Mainpage
 
         public SettingInfoViewModelD<int> MaxCommentsCount { get; set; } = new(2000);
 
+        public IBindableProperty<ComboboxItem<EconomySettins>> EconomySetting { get; init; }
+
         public IBindableProperty<ComboboxItem<VideoInfo::IResolution>> SelectedResolution { get; set; }
 
         public List<ComboboxItem<VideoInfo::IResolution>> Resolutions { get; init; }
@@ -399,7 +466,11 @@ namespace Niconicome.ViewModels.Mainpage
 
         public List<ComboboxItem<VideoInfo::ThumbSize>> ThumbSizes { get; init; }
 
+
         public MaterialDesign::ISnackbarMessageQueue SnackbarMessageQueue { get; init; } = new MaterialDesign::SnackbarMessageQueue();
+
+        public List<ComboboxItem<EconomySettins>> SelectableEconomySettings { get; init; }
+
     }
 
     class ResolutionSetting
@@ -413,5 +484,12 @@ namespace Niconicome.ViewModels.Mainpage
         public VideoInfo::IResolution Resolution { get; init; }
 
         public string DisplayValue { get; init; }
+    }
+
+    public enum EconomySettins
+    {
+        AlwaysDownload,
+        SkipWhenPremiumExists,
+        AlwaysSkip
     }
 }
