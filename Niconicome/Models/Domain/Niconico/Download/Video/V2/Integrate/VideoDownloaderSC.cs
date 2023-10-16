@@ -21,5 +21,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
         Encode,
         [StringEnum("動画のダウンロードが完了")]
         Completed,
+        [StringEnum("エコノミー設定によりスキップ")]
+        SkipEconomy,
     }
 }

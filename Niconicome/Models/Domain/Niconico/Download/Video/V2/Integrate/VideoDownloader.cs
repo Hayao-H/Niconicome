@@ -85,6 +85,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             //DLするかどうかを判定
             if (!this.ShouldDownladVideo(videoInfo, settings))
             {
+                OnMessage(this._stringHandler.GetContent(SC.SkipEconomy));
                 return AttemptResult<uint>.Succeeded(0);
             }
 
