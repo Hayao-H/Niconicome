@@ -23,13 +23,13 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Label Content="現在選択されている動画数："/>
-            <Label Content="{Binding SelectedVideosCount.Value}"/>
+            <Label Content="{Binding SelectedVideosCount.Value,UpdateSourceTrigger=PropertyChanged}"/>
             <Label Margin="10 0 0 0" Content="現在の動画数："/>
             <Label Content="{Binding AllVideosCount.Value}"/>
         </StackPanel>
         <DockPanel Grid.Row="1" HorizontalAlignment="Right">
             <Button DockPanel.Dock="Right"
-                    Command="{Binding RefreshCommand}"
+                    Command="{Binding RefreshCommand,UpdateSourceTrigger=PropertyChanged}"
                     Content="情報を更新"
                     Margin="10 0"/>
         </DockPanel>

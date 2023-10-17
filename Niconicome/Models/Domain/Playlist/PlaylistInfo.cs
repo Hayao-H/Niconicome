@@ -140,6 +140,11 @@ namespace Niconicome.Models.Domain.Playlist
         /// </summary>
         /// <param name="names"></param>
         void SetParentNamesList(List<string> names);
+
+        /// <summary>
+        /// 選択した動画数と動画数の情報を更新
+        /// </summary>
+        void RefreshCount();
     }
 
     public class PlaylistInfo : UpdatableInfoBase<IPlaylistStore, IPlaylistInfo>, IPlaylistInfo
@@ -315,11 +320,12 @@ namespace Niconicome.Models.Domain.Playlist
         {
             this._videosCount.Value++;
             video.IsSelected.Subscribe(this.OnSelectedChange);
-            this.SetSelectedVideos();
 
             video.PlaylistID = this.ID;
 
             this._videos.Add(video);
+
+            this.RefreshCount();
 
             if (this.PlaylistType == PlaylistType.Temporary)
             {
@@ -333,9 +339,10 @@ namespace Niconicome.Models.Domain.Playlist
         {
             this._videosCount.Value--;
             video.IsSelected.UnSubscribe(this.OnSelectedChange);
-            this.SetSelectedVideos();
 
             this._videos.RemoveAll(v => v.NiconicoId == video.NiconicoId);
+
+            this.RefreshCount();
 
             if (this.PlaylistType == PlaylistType.Temporary)
             {
@@ -374,6 +381,12 @@ namespace Niconicome.Models.Domain.Playlist
         public void SetParentNamesList(List<string> names)
         {
             this._parentNames = names;
+        }
+
+        public void RefreshCount()
+        {
+            this._selectedVideosCount.Value = this.Videos.Where(v => v.IsSelected.Value).Count();
+            this._videosCount.Value = this.Videos.Count;
         }
 
         #endregion
@@ -438,11 +451,6 @@ namespace Niconicome.Models.Domain.Playlist
             {
                 this._selectedVideosCount.Value--;
             }
-        }
-
-        private void SetSelectedVideos()
-        {
-            this._selectedVideosCount.Value = this.Videos.Select(v => v.IsSelected.Value).Count();
         }
 
         #endregion

@@ -45,7 +45,7 @@ namespace Niconicome.ViewModels.Mainpage
                 IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
                 this.SetCount(playlist);
 
-            }, new BindableProperty<bool>(true));
+            });
 
         }
 
@@ -72,6 +72,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="playlist"></param>
         private void SetCount(IPlaylistInfo playlist)
         {
+            playlist.RefreshCount();
             this.SelectedVideosCount.Value = playlist.SelectedVideosCount.Value.ToString();
             this.AllVideosCount.Value = playlist.VideosCount.Value.ToString();
         }
