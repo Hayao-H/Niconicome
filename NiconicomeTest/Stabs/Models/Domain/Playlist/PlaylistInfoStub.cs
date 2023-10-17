@@ -76,5 +76,10 @@ namespace NiconicomeTest.Stabs.Models.Domain.Playlist
 
         }
 
+        public void RefreshCount()
+        {
+
+        }
+
     }
 }
