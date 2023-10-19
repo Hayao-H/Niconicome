@@ -97,7 +97,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch.V3
         private async Task<IAttemptResult<ICommentCollectionShared>> DownloadCommentAsyncInternal(IDmcInfo dmcInfo, IDownloadSettings settings, ICommentClientOption clientOption, IDownloadContext context, CancellationToken token)
         {
             //コレクションを作成
-            var collection = new CoreV2::CommentCollection(dmcInfo.CommentCount);
+            int count = dmcInfo.CommentCount;
+            if (count < 1500)
+            {
+                count = 1500;
+            }
+            var collection = new CoreV2::CommentCollection(count);
 
             //リクエストビルダーをリセット
             var key = this._requestBuilder.ResetState();
