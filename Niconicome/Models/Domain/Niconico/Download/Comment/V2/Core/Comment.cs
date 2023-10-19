@@ -49,6 +49,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         bool IsPremium { get; }
 
         /// <summary>
+        /// 投コメフラグ
+        /// </summary>
+        bool IsOwnerComment { get; }
+
+        /// <summary>
         /// ニコられ数
         /// </summary>
         int Nicoru { get; }
@@ -86,6 +91,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core
         public int Vpos { get; init; }
 
         public bool IsPremium { get; init; }
+
+        public bool IsOwnerComment => this.Fork == "owner";
 
         public int Nicoru { get; init; }
 
