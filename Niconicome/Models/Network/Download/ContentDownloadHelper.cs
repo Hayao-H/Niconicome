@@ -97,7 +97,7 @@ namespace Niconicome.Models.Network.Download
             }
 
 
-            string directoryName = Path.GetDirectoryName(this.GetVideoFilePath(setting, domainVideoInfo)) ?? /string.Empty;
+            string directoryName = Path.GetDirectoryName(this.GetVideoFilePath(setting, domainVideoInfo)) ?? string.Empty;
             if (!this._directoryIO.Exists(directoryName))
             {
                 IAttemptResult dResult = this._directoryIO.CreateDirectory(directoryName);
