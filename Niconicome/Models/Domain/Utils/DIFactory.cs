@@ -77,6 +77,7 @@ using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
 using DlVideoV2 = Niconicome.Models.Domain.Niconico.Download.Video.V2;
 using DLGeneral = Niconicome.Models.Domain.Niconico.Download.General;
 using DLTaskVM = Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask;
+using DMS = Niconicome.Models.Domain.Niconico.Watch.V2.DMS;
 
 
 namespace Niconicome.Models.Domain.Utils
@@ -388,6 +389,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<IO::Media.Audio.IAudioPlayer, Infla::IO.Media.Audio.NaudioHandler>();
             services.AddTransient<LocalFile::ILocalFileRemover, LocalFile::LocalFileRemover>();
             services.AddTransient<PlaylistV2::Manager.IPlaylistEventManager, PlaylistV2::Manager.PlaylistEventManager>();
+            services.AddTransient<DMS::IStreamInfo, DMS::StreamInfo>();
+            services.AddTransient<DMS::HLS.IM3U8Parser, DMS::HLS.M3U8Parser>();
 
             return services.BuildServiceProvider();
         }

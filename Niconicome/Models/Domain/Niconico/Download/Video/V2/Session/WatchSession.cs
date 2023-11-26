@@ -214,7 +214,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
 
             try
             {
-                if (result.Data.DmcResponseJsonData is not string jsonData || result.Data.ContentUrl is not string contentUrl || result.Data.SessionId is not string sessionID)
+                if (result.Data.DmcResponseJsonData is not string jsonData || result.Data.ContentUrl is not string contentUrl || result.Data.SessionId is not string sessionID || result.Data.IsDMS is not bool isDMS)
                 {
                     this._errorHandler.HandleError(Err.AddonReturnedInvalidInfomation, video.Id);
                     return AttemptResult<IWatchSessionInfo>.Fail(this._errorHandler.GetMessageForResult(Err.AddonReturnedInvalidInfomation, video.Id));
@@ -225,6 +225,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
                     DmcResponseJsonData = jsonData,
                     ContentUrl = contentUrl,
                     SessionId = sessionID,
+                    IsDMS = isDMS,
                 };
 
                 return new AttemptResult<IWatchSessionInfo>() { IsSucceeded = true, Data = info };
