@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xaml.Behaviors;
-using Niconicome.Models.Domain.Niconico.Watch.V2.DMS.Error;
-using Niconicome.Models.Domain.Niconico.Watch.V2.DMS.HLS;
+using Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS.HLS;
+using Niconicome.Models.Domain.Niconico.Download.Video.V3.Error;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 
-namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS
+namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
 {
     public interface IStreamInfo
     {
@@ -193,11 +193,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS
                     var dict = new Dictionary<string, string>();
                     foreach (var info in audioInfo)
                     {
-                        var kv = info.Split("=");
-                        if (kv.Length == 2)
-                        {
-                            dict.Add(kv[0], kv[1]);
-                        }
+                        int equalIndex = info.IndexOf("=");
+                        dict.Add(info[0..equalIndex], info[(equalIndex + 1)..]);
                     }
 
                     key = dict["URI"][1..^1];

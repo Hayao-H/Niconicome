@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS.HLS
+namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS.HLS
 {
     public interface IM3U8Parser
     {
@@ -22,6 +22,10 @@ namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS.HLS
         {
             var nodes = new List<IM3U8Node>();
             var lines = text.Split(Environment.NewLine);
+            if (lines.Length == 1)
+            {
+                lines = text.Split("\n");
+            }
 
             var index = 0;
 
@@ -45,7 +49,8 @@ namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS.HLS
                     var streamInfo = new M3U8Node(M3U8NodeType.Audio, line[(line.IndexOf(":") + 1)..], string.Empty);
                     nodes.Add(streamInfo);
                     index += 1;
-                } else if (line.StartsWith("#EXTINF:"))
+                }
+                else if (line.StartsWith("#EXTINF:"))
                 {
 
                     var streamInfo = new M3U8Node(M3U8NodeType.Segment, line[(line.IndexOf(":") + 1)..], lines[index + 1]);

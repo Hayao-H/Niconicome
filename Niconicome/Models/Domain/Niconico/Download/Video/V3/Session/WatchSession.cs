@@ -3,16 +3,16 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.Addons.API.Hooks;
-using Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream;
+using Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
 using Niconicome.Models.Domain.Niconico.Watch;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State.MessageV2;
-using Err = Niconicome.Models.Domain.Niconico.Download.Video.V2.Error.WatchSessionError;
+using Err = Niconicome.Models.Domain.Niconico.Download.Video.V3.Error.WatchSessionError;
 using Utils = Niconicome.Models.Domain.Utils;
 
-namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
+namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Session
 {
     public interface IWatchSession : IDisposable
     {
@@ -37,7 +37,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
         /// 取得可能なStreamの一覧
         /// </summary>
         /// <returns></returns>
-        Task<IAttemptResult<IStreamsCollection>> GetAvailableStreamsAsync();
+        Task<IAttemptResult<IStreamCollection>> GetAvailableStreamsAsync();
     }
 
     /// <summary>
@@ -45,13 +45,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
     /// </summary>
     public class WatchSession : IWatchSession
     {
-        public WatchSession(IWatchInfohandler watchInfo, INicoHttp http, Utils::ILogger logge, IMasterPlaylisthandler playlisthandler, IHooksManager hooksManager, IErrorHandler errorHandler)
+        public WatchSession(IWatchInfohandler watchInfo, INicoHttp http,IStreamParser streamParser, IHooksManager hooksManager, IErrorHandler errorHandler)
         {
             this._watchInfo = watchInfo;
             this._http = http;
-            this._playlisthandler = playlisthandler;
             this._hooksManager = hooksManager;
             this._errorHandler = errorHandler;
+            this._streamParser = streamParser;
         }
 
         ~WatchSession()
@@ -65,7 +65,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
 
         private readonly IWatchInfohandler _watchInfo;
 
-        private readonly IMasterPlaylisthandler _playlisthandler;
+        private readonly IStreamParser _streamParser;
 
         private readonly INicoHttp _http;
 
@@ -102,13 +102,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
                 }
             }
 
+
             //セッション確立
             if (!this._hooksManager.IsRegistered(HookType.SessionEnsuring))
             {
                 return AttemptResult.Fail(this._errorHandler.HandleError(Err.AddonNotRegistered));
             }
 
-            IAttemptResult<IWatchSessionInfo> result = await this.EnsureSessionWithAddonAsync(videoInfo);
+            IAttemptResult<IWatchSessionInfo> result =await this.EnsureSessionWithAddonAsync(videoInfo);
 
             if (!result.IsSucceeded || result.Data is null)
             {
@@ -121,28 +122,26 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
 
             this.IsSessionEnsured = true;
 
-            this.StartHeartBeat();
-
             this._errorHandler.HandleError(Err.SessionEnsured, videoInfo.Id);
 
             return AttemptResult.Succeeded();
         }
 
-        public async Task<IAttemptResult<IStreamsCollection>> GetAvailableStreamsAsync()
+        public async Task<IAttemptResult<IStreamCollection>> GetAvailableStreamsAsync()
         {
             if (this.IsSessionExipired)
             {
                 this._errorHandler.HandleError(Err.SessionExpired);
-                return AttemptResult<IStreamsCollection>.Fail(this._errorHandler.GetMessageForResult(Err.SessionExpired));
+                return AttemptResult<IStreamCollection>.Fail(this._errorHandler.GetMessageForResult(Err.SessionExpired));
             }
 
             if (this._session is null)
             {
                 this._errorHandler.HandleError(Err.SessionNotEnsured);
-                return AttemptResult<IStreamsCollection>.Fail(this._errorHandler.GetMessageForResult(Err.SessionNotEnsured));
+                return AttemptResult<IStreamCollection>.Fail(this._errorHandler.GetMessageForResult(Err.SessionNotEnsured));
             }
 
-            return await this._playlisthandler.GetStreamInfoAsync(this._session.ContentUrl);
+            return await this._streamParser.ParseAsync(this._session.ContentUrl);
 
         }
 
@@ -205,47 +204,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
                 this._errorHandler.HandleError(Err.AddonReturnedInvalidInfomation, ex, video.Id);
                 return AttemptResult<IWatchSessionInfo>.Fail(this._errorHandler.GetMessageForResult(Err.AddonReturnedInvalidInfomation, ex, video.Id));
             }
-        }
-
-        /// <summary>
-        /// ハートビートを送信する
-        /// </summary>
-        private void StartHeartBeat()
-        {
-            if (this._session is null || this._session.DmcResponseJsonData.IsNullOrEmpty() || this._session.SessionId.IsNullOrEmpty())
-            {
-                throw new InvalidOperationException();
-            }
-            else if (!this.IsSessionEnsured)
-            {
-                throw new InvalidOperationException();
-            }
-
-            Task.Run(async () =>
-            {
-                StringContent content = new StringContent(this._session.DmcResponseJsonData);
-                string url = $"https://api.dmc.nico/api/sessions/{this._session.SessionId}?_format=json&_method=PUT";
-                //ハートビートの間隔(40秒)
-                const int heartbeatInterval = 40 * 1000;
-                await this._http.OptionAsync(new Uri(url));
-
-                while (this.IsSessionEnsured)
-                {
-                    var res = await this._http.PostAsync(new Uri(url), content);
-                    if (!res.IsSuccessStatusCode)
-                    {
-                        this._errorHandler.HandleError(Err.FailedToSendHeartBeat, this._session.SessionId, (int)res.StatusCode);
-                        this.IsSessionEnsured = false;
-                        return;
-                    }
-                    else
-                    {
-                        this._errorHandler.HandleError(Err.SucceededToSendHeartBeat, this._session.SessionId);
-                    }
-
-                    await Task.Delay(heartbeatInterval);
-                }
-            });
         }
 
         #endregion

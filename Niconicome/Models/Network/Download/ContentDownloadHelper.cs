@@ -17,7 +17,7 @@ using Niconicome.Models.Network.Watch;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
-using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V2;
+using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V3;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -245,7 +245,7 @@ namespace Niconicome.Models.Network.Download
         private async Task<IAttemptResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IDomainVideoInfo videoInfo, IDownloadContext context, CancellationToken token)
         {
             var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::Integrate.IVideoDownloader>();
-            IAttemptResult<uint> result;
+            IAttemptResult<int> result;
             try
             {
                 result = await videoDownloader.DownloadVideoAsync(settings, onMessage, videoInfo, token);
@@ -256,7 +256,7 @@ namespace Niconicome.Models.Network.Download
                 return AttemptResult.Fail($"動画のダウンロードに失敗しました。(詳細:{e.Message})");
             }
 
-            context.ActualVerticalResolution = result.Data;
+            context.ActualVerticalResolution = (uint)result.Data;
             if (result.IsSucceeded)
             {
                 return AttemptResult.Succeeded();

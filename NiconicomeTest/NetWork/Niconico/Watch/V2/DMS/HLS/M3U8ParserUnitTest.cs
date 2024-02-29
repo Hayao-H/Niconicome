@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Niconico.Watch.V2.DMS.HLS;
+using Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS.HLS;
 using NUnit.Framework;
 
 namespace NiconicomeTest.NetWork.Niconico.Watch.V2.DMS.HLS

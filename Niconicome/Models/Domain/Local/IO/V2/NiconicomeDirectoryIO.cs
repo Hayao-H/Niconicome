@@ -40,6 +40,14 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         IAttemptResult Delete(string path, bool recursive = true);
 
         /// <summary>
+        /// ディレクトリを移動
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <returns></returns>
+        IAttemptResult Move(string source, string destination);
+
+        /// <summary>
         /// ディレクトリの存在を確認
         /// </summary>
         /// <param name="path"></param>

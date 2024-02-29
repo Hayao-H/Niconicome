@@ -47,7 +47,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Niconico.NicoHttpStabs
             return Task.FromResult(msg);
         }
 
-        public Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content)
+        public Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content, Dictionary<string, string>? headers = null)
         {
 
             var msg = new HttpResponseMessage

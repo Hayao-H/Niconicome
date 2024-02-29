@@ -34,7 +34,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         DateTime UploadedOn { get; set; }
         DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; set; }
-        ISessionInfo SessionInfo { get; }
         IReadOnlyCollection<ITarget> CommentTargets { get; }
     }
 
@@ -119,11 +118,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// サムネイル
         /// </summary>
         public IThumbInfo ThumbInfo { get; set; } = new ThumbInfo();
-
-        /// <summary>
-        /// セッション情報
-        /// </summary>
-        public ISessionInfo SessionInfo { get; init; } = new SessionInfo();
 
         /// <summary>
         /// コメントターゲット

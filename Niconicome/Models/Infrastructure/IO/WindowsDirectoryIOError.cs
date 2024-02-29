@@ -17,5 +17,7 @@ namespace Niconicome.Models.Infrastructure.IO
         FailedToGetDirectories,
         [ErrorEnum(ErrorLevel.Error, "ファイル一覧の取得に失敗しました。(path:{0})")]
         FailedToGetFiles,
+        [ErrorEnum(ErrorLevel.Error, "ディレクトリの移動に失敗しました。(source:{0},destination:{1})")]
+        FailedToMoveDirectory,
     }
 }

@@ -45,4 +45,13 @@ namespace Niconicome.Extensions.System
             return string.IsNullOrEmpty(source);
         }
     }
+
+    public static class BoolExtensions
+    {
+        //boolの値を逆にする
+        public static bool Not(this bool source)
+        {
+            return !source;
+        }
+    }
 }

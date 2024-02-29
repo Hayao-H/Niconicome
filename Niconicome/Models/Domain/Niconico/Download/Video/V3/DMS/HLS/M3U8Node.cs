@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS.HLS
+namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS.HLS
 {
     public interface IM3U8Node
     {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Niconicome.Models.Domain.Niconico.Watch.V2.DMS.Error;
-using Niconicome.Models.Domain.Niconico.Watch.V2.DMS.HLS;
 using Niconicome.Models.Domain.Utils;
 using Error = Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS.HLS;
+using Niconicome.Models.Domain.Niconico.Download.Video.V3.Error;
 
-namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS
+namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
 {
     public interface IStreamParser
     {
@@ -76,7 +76,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS
                     var resolution = this.GetVerticalResolution(dict["RESOLUTION"]);
                     var playlistURL = node.URL;
                     var stream = DIFactory.Resolve<IStreamInfo>();
-                    stream.Initialize(playlistURL, audios[dict["AUDIO"]], resolution,playlistURL.Contains("lowest"));
+                    stream.Initialize(playlistURL, audios[dict["AUDIO"]], resolution, playlistURL.Contains("lowest"));
                     streams.Add(stream);
                 }
                 else if (node.Type == M3U8NodeType.Audio)
@@ -85,8 +85,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch.V2.DMS
                     var dict = new Dictionary<string, string>();
                     foreach (var info in streamInfo)
                     {
-                        var kv = info.Split("=");
-                        dict.Add(kv[0], kv[1]);
+                        dict.Add(info[0..info.IndexOf("=")], info[(info.IndexOf("=") + 1)..]);
                     }
 
                     audios.Add(dict["GROUP-ID"], dict["URI"][1..^1]);
