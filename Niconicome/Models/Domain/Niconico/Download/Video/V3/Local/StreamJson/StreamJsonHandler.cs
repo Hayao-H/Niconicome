@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.IO.V2;
+using Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Helper.Result;
 
@@ -12,7 +13,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Local.StreamJson
 {
     public interface IStreamJsonHandler
     {
-        IAttemptResult AddStream(string folderPath, int resolution, string videoKey, string audioKey, string videoIV, string audioIV);
+        IAttemptResult AddStream(string folderPath, int resolution, string videoKey, string audioKey, string videoIV, string audioIV, IEnumerable<SegmentDuration> videoSegments, IEnumerable<SegmentDuration> audioSegments);
     }
 
     public class StreamJsonHandler : IStreamJsonHandler
@@ -28,7 +29,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Local.StreamJson
 
         #endregion
 
-        public IAttemptResult AddStream(string folderPath, int resolution, string videoKey, string audioKey, string videoIV, string audioIV)
+        public IAttemptResult AddStream(string folderPath, int resolution, string videoKey, string audioKey, string videoIV, string audioIV, IEnumerable<SegmentDuration> videoSegments, IEnumerable<SegmentDuration> audioSegments)
         {
             var path = Path.Combine(folderPath, "stream.json");
             StreamType info;
@@ -65,8 +66,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Local.StreamJson
             stream.AudioKey = audioKey;
             stream.VideoIV = videoIV;
             stream.AudioIV = audioIV;
+            stream.VideoSegments = videoSegments.Select(s => new Segment() { Duration = s.Duration.ToString("N3"), FileName = s.Filename }).ToList();
+            stream.AudioSegments = audioSegments.Select(s => new Segment() { Duration = s.Duration.ToString("N3"), FileName = s.Filename }).ToList();
 
-            return this.fileIO.Write(path,JsonParser.Serialize(info));
+            return this.fileIO.Write(path, JsonParser.Serialize(info));
         }
     }
 }

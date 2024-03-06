@@ -44,8 +44,9 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// </summary>
         /// <param name="source"></param>
         /// <param name="destination"></param>
+        /// <param name="overwrite"></param>
         /// <returns></returns>
-        IAttemptResult Move(string source, string destination);
+        IAttemptResult Move(string source, string destination, bool overwrite = true);
 
         /// <summary>
         /// ディレクトリの存在を確認

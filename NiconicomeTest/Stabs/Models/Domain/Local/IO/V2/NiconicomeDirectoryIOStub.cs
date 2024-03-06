@@ -40,7 +40,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
             return AttemptResult.Succeeded();
         }
 
-        public IAttemptResult Move(string source, string destination)
+        public IAttemptResult Move(string source, string destination, bool overwrite = true)
         {
             return AttemptResult.Succeeded();
         }

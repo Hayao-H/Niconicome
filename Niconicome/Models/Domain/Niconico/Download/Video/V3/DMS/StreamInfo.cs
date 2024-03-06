@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xaml.Behaviors;
 using Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS.HLS;
 using Niconicome.Models.Domain.Niconico.Download.Video.V3.Error;
 using Niconicome.Models.Domain.Utils.Error;
@@ -44,6 +44,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
         IEnumerable<string> AudioSegmentURLs { get; }
 
         /// <summary>
+        /// 動画セグメントの長さ
+        /// </summary>
+        IEnumerable<SegmentDuration> VideoSegmentDurations { get; }
+
+        /// <summary>
+        /// 音声セグメントの長さ
+        /// </summary>
+        IEnumerable<SegmentDuration> AudioSegmentDurations { get; }
+
+        /// <summary>
         /// キーのURL
         /// </summary>
         string VideoKeyURL { get; }
@@ -77,6 +87,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
         Task<IAttemptResult> GetStreamInfo();
     }
 
+    public record SegmentDuration(string Filename, float Duration);
+
     public class StreamInfo : IStreamInfo
     {
         public StreamInfo(INicoHttp httpHandler, IM3U8Parser m3U8Parser, IErrorHandler errorHandler)
@@ -103,6 +115,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
         public IEnumerable<string> VideoSegmentURLs { get; private set; } = new List<string>();
 
         public IEnumerable<string> AudioSegmentURLs { get; private set; } = new List<string>();
+
+        public IEnumerable<SegmentDuration> VideoSegmentDurations { get; private set; } = new List<SegmentDuration>();
+
+        public IEnumerable<SegmentDuration> AudioSegmentDurations { get; private set; } = new List<SegmentDuration>();
 
         public string VideoKeyURL { get; private set; } = string.Empty;
 
@@ -141,6 +157,9 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
             this.AudioSegmentURLs = audio.segmentURL;
             this.VideoSegmentURLs = video.segmentURL;
 
+            this.VideoSegmentDurations = new List<SegmentDuration>(video.segmentDurations.Select((duration, index) => new SegmentDuration(Path.GetFileName(new Uri(video.segmentURL[index]).AbsolutePath), duration)));
+            this.AudioSegmentDurations = new List<SegmentDuration>(audio.segmentDurations.Select((duration, index) => new SegmentDuration(Path.GetFileName(new Uri(audio.segmentURL[index]).AbsolutePath), duration)));
+
             this.VideoKeyURL = video.keyURL;
             this.VideoIV = video.IV;
             this.AudioKeyURL = audio.keyURL;
@@ -178,6 +197,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
         {
             IEnumerable<IM3U8Node> nodes = this._m3U8Parser.Parse(content);
             var streams = new List<string>();
+            var durations = new List<float>();
             string key = string.Empty;
             string IV = string.Empty;
 
@@ -186,6 +206,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
                 if (node.Type == M3U8NodeType.Segment)
                 {
                     streams.Add(node.URL);
+                    if (float.TryParse(node.Value[0..^1], out float duration))
+                    {
+                        durations.Add(duration);
+                    }
+                    else
+                    {
+                        durations.Add(6);
+                    }
                 }
                 else if (node.Type == M3U8NodeType.Key)
                 {
@@ -202,10 +230,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
                 }
             }
 
-            return new SegmentInfo(streams, key, IV);
+            return new SegmentInfo(streams.AsReadOnly(),durations.AsReadOnly(), key, IV);
         }
 
-        private record SegmentInfo(IEnumerable<string> segmentURL, string keyURL, string IV);
+        private record SegmentInfo(IReadOnlyList<string> segmentURL,IReadOnlyList<float> segmentDurations, string keyURL, string IV);
 
 
     }

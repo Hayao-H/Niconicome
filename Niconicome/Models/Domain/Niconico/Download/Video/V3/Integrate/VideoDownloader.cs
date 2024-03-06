@@ -196,7 +196,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
                 return AttemptResult<int>.Fail(keyResult.Message);
             }
 
-            IAttemptResult jsonResult = this._streamJsonHandler.AddStream(filePath, stream.VerticalResolution, keyResult.Data.VideoKey, keyResult.Data.AudioKey, stream.VideoIV, stream.AudioIV);
+            IAttemptResult jsonResult = this._streamJsonHandler.AddStream(filePath, stream.VerticalResolution, keyResult.Data.VideoKey, keyResult.Data.AudioKey, stream.VideoIV, stream.AudioIV,stream.VideoSegmentDurations,stream.AudioSegmentDurations);
             if (!jsonResult.IsSucceeded)
             {
                 return AttemptResult<int>.Fail(jsonResult.Message);
