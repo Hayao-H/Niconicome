@@ -57,6 +57,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS.HLS
                     nodes.Add(streamInfo);
                     index += 2;
                 }
+                else if (line.StartsWith("#EXT-X-MAP"))
+                {
+                    var streamInfo = new M3U8Node(M3U8NodeType.InitializationSection, line[(line.IndexOf("=") + 2)..^1], string.Empty);
+                    nodes.Add(streamInfo);
+                    index += 1;
+                }
                 else
                 {
                     index += 1;

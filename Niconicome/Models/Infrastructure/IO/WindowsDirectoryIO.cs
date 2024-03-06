@@ -125,7 +125,7 @@ namespace Niconicome.Models.Infrastructure.IO
             DirectoryInfo[] dirs = dir.GetDirectories();
 
             // Create the destination directory
-            if (!dir.Exists)
+            if (!this.Exists(destinationDir))
             {
                 Directory.CreateDirectory(destinationDir);
             }

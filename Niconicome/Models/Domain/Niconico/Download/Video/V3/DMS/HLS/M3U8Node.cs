@@ -47,5 +47,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS.HLS
         Audio,
         Key,
         Segment,
+        InitializationSection,
     }
 }

@@ -170,13 +170,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Local.DMS
         {
             string[] splited = directoryName.Split("-");
 
-            if (splited.Length != 6)
+            if (splited.Length != 5)
             {
                 this._errorHandler.HandleError(Err.InvalidDirectoryName, directoryName);
                 return AttemptResult<ISegmentDirectoryInfo>.Fail(this._errorHandler.GetMessageForResult(Err.InvalidDirectoryName, directoryName));
             }
 
-            string dt = $"{splited[3]}-{splited[4]}-{splited[5]}";
+            string dt = $"{splited[2]}-{splited[3]}-{splited[4]}";
             bool parse = DateTime.TryParseExact(dt, "yyyy-MM-dd", null, DateTimeStyles.AssumeLocal, out DateTime result);
 
             if (!parse)

@@ -171,7 +171,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
 
 
             //セグメントのDL
-            IAttemptResult dlResult = await this.DownloadSegments(stream.VideoSegmentURLs, stream.AudioSegmentURLs, existingVideoFileNames, existingAudioFileNames, tempFolderPath, videoInfo.Id, stream.VerticalResolution, settings.MaxParallelSegmentDLCount, OnMessage, token);
+            IAttemptResult dlResult = await this.DownloadSegments(stream.VideoSegmentURLs.Concat([stream.VideoInitializationURL]), stream.AudioSegmentURLs.Concat([stream.AudioInitializationURL]), existingVideoFileNames, existingAudioFileNames, tempFolderPath, videoInfo.Id, stream.VerticalResolution, settings.MaxParallelSegmentDLCount, OnMessage, token);
             if (!dlResult.IsSucceeded)
             {
                 return AttemptResult<int>.Fail(dlResult.Message);
@@ -196,7 +196,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
                 return AttemptResult<int>.Fail(keyResult.Message);
             }
 
-            IAttemptResult jsonResult = this._streamJsonHandler.AddStream(filePath, stream.VerticalResolution, keyResult.Data.VideoKey, keyResult.Data.AudioKey, stream.VideoIV, stream.AudioIV,stream.VideoSegmentDurations,stream.AudioSegmentDurations);
+            IAttemptResult jsonResult = this._streamJsonHandler.AddStream(filePath, stream.VerticalResolution, keyResult.Data.VideoKey, keyResult.Data.AudioKey, stream.VideoIV, stream.AudioIV, stream.VideoSegmentDurations, stream.AudioSegmentDurations);
             if (!jsonResult.IsSucceeded)
             {
                 return AttemptResult<int>.Fail(jsonResult.Message);
@@ -237,7 +237,15 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
             {
                 var fileNameWIthoutExt = Path.GetFileNameWithoutExtension(streamURL);
                 var fileName = Path.GetFileName(new Uri(streamURL).AbsolutePath);
-                var index = int.Parse(fileNameWIthoutExt.TrimStart('0')) - 1;
+                var index = 0;
+                if (!fileNameWIthoutExt.Contains("init"))
+                {
+                    index = int.Parse(fileNameWIthoutExt.TrimStart('0')) - 1;
+                }
+                else
+                {
+                    index = videos.Count() - 1;
+                }
                 string localPath;
 
                 if (streamURL.Contains(".cmfv"))

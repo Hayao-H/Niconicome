@@ -74,6 +74,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
         string AudioIV { get; }
 
         /// <summary>
+        /// 動画の初期化情報URL
+        /// </summary>
+        string VideoInitializationURL { get; }
+
+        /// <summary>
+        /// 恩賜絵の
+        /// </summary>
+        string AudioInitializationURL { get; }
+
+        /// <summary>
         /// 初期化
         /// </summary>
         /// <param name="playlistURL"></param>
@@ -128,6 +138,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
 
         public string AudioIV { get; private set; } = string.Empty;
 
+        public string VideoInitializationURL { get; private set; } = string.Empty;
+
+        public string AudioInitializationURL { get; private set; } = string.Empty;
+
         public void Initialize(string playlistURL, string audioURL, int verticalResolution, bool isLowest)
         {
             this.PlaylistURL = playlistURL;
@@ -164,6 +178,8 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
             this.VideoIV = video.IV;
             this.AudioKeyURL = audio.keyURL;
             this.AudioIV = audio.IV;
+            this.VideoInitializationURL = video.InitializeURL;
+            this.AudioInitializationURL = audio.InitializeURL;
 
             return AttemptResult.Succeeded();
 
@@ -200,6 +216,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
             var durations = new List<float>();
             string key = string.Empty;
             string IV = string.Empty;
+            string initialization = string.Empty;
 
             foreach (var node in nodes)
             {
@@ -228,12 +245,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
                     key = dict["URI"][1..^1];
                     IV = dict["IV"];
                 }
+                else if (node.Type == M3U8NodeType.InitializationSection)
+                {
+                    initialization = node.Value;
+                }
             }
 
-            return new SegmentInfo(streams.AsReadOnly(),durations.AsReadOnly(), key, IV);
+            return new SegmentInfo(streams.AsReadOnly(), durations.AsReadOnly(), initialization, key, IV);
         }
 
-        private record SegmentInfo(IReadOnlyList<string> segmentURL,IReadOnlyList<float> segmentDurations, string keyURL, string IV);
+        private record SegmentInfo(IReadOnlyList<string> segmentURL, IReadOnlyList<float> segmentDurations, string InitializeURL, string keyURL, string IV);
 
 
     }
