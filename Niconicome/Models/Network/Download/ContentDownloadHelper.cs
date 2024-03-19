@@ -18,6 +18,7 @@ using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
 using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V3;
+using VdlLegacy = Niconicome.Models.Domain.Niconico.Download.Video.V2;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -36,7 +37,7 @@ namespace Niconicome.Models.Network.Download
 
     public class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation, ILocalFileHandler localFileHandler, IPathOrganizer pathOrganizer,INiconicomeDirectoryIO directoryIO)
+        public ContentDownloadHelper(ILogger logger, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation, ILocalFileHandler localFileHandler, IPathOrganizer pathOrganizer, INiconicomeDirectoryIO directoryIO)
         {
             this.converter = converter;
             this.logger = logger;
@@ -244,11 +245,18 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         private async Task<IAttemptResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IDomainVideoInfo videoInfo, IDownloadContext context, CancellationToken token)
         {
-            var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::Integrate.IVideoDownloader>();
-            IAttemptResult<int> result;
+            IAttemptResult<uint> result;
             try
             {
-                result = await videoDownloader.DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                if (videoInfo.DmcInfo.IsDMS)
+                {
+                    IAttemptResult<int> resultNew = await DIFactory.Provider.GetRequiredService<Vdl::Integrate.IVideoDownloader>().DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                    result = resultNew.IsSucceeded ? AttemptResult<uint>.Succeeded((uint)resultNew.Data) : AttemptResult<uint>.Fail(resultNew.Message);
+                }
+                else
+                {
+                    result = await DIFactory.Provider.GetRequiredService<VdlLegacy.Integrate.IVideoDownloader>().DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                }
             }
             catch (Exception e)
             {

@@ -192,21 +192,32 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 {
                     this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.Mp4FileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
                     this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.TsFileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
+                    this._cachedFolders.AddRange(this._directoryIO.GetDirectorys(folderPath).Select(p => Path.Combine(folderPath, p)).ToList());
                 }
             }
 
+            //stream.jsonを確認
+            string? firstFolder = this._cachedFolders.FirstOrDefault(p => p.Contains(niconicoID));
+            if (firstFolder is not null)
+            {
+                return AttemptResult<string>.Succeeded(Path.Combine(firstFolder, "stream.json"));
+            }
+
             string? firstMp4 = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
+
             //.mp4ファイルを確認
             if (firstMp4 is not null)
             {
                 return AttemptResult<string>.Succeeded(firstMp4);
             }
-            else
+
+            string? firstTS = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
+            if (firstTS is not null)
             //.tsファイルを確認
             {
-                string? firstTS = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
-                if (firstTS is not null) return AttemptResult<string>.Succeeded(firstTS);
+                return AttemptResult<string>.Succeeded(firstTS);
             }
+
 
             return AttemptResult<string>.Fail();
 
@@ -263,7 +274,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
         /// <returns></returns>
         private bool IsDownloaded(IVideoInfo videoInfo)
         {
-            return this._fileIO.Exists(videoInfo.FilePath);
+            return videoInfo.FilePath.EndsWith(".json") && this._fileIO.Exists(videoInfo.FilePath);
         }
 
         #endregion

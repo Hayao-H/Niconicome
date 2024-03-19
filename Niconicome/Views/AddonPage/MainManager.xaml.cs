@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Web.WebView2.Core;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.ViewModels;
 using Niconicome.ViewModels.Mainpage.Subwindows.AddonManager;
@@ -29,6 +30,13 @@ namespace Niconicome.Views.AddonPage.V2
         {
             InitializeComponent();
             Resources.Add("services", DIFactory.Provider);
+            webview.BlazorWebViewInitializing += (s, e) =>
+            {
+                e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
+                {
+                    AdditionalBrowserArguments = "--disable-web-security"
+                };
+            };
         }
 
         public void Dispose()

@@ -73,10 +73,11 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
                         dict.Add(kv[0], kv[1]);
                     }
 
+                    int bandWidth = int.Parse(dict["BANDWIDTH"]);
                     var resolution = this.GetVerticalResolution(dict["RESOLUTION"]);
                     var playlistURL = node.URL;
                     var stream = DIFactory.Resolve<IStreamInfo>();
-                    stream.Initialize(playlistURL, audios[dict["AUDIO"]], resolution, playlistURL.Contains("lowest"));
+                    stream.Initialize(playlistURL, audios[dict["AUDIO"]], resolution, playlistURL.Contains("lowest"), bandWidth);
                     streams.Add(stream);
                 }
                 else if (node.Type == M3U8NodeType.Audio)

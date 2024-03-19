@@ -78,14 +78,23 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             if (result.Data.IsDownloaded.Value)
             {
-                _ = Task.Run(async () =>
+                if (result.Data.IsDMS)
                 {
-                    IAttemptResult hlsResult = await WS::Mainpage.HLSManager.CreateFilesAsync(niconicoID, playlist.ID);
-                    if (hlsResult.IsSucceeded)
+                    this.CanPlay.Value = true;
+                    this.VideoUrl = $"http://localhost:{port}/niconicome/watch/v1/{playlist.ID}/{niconicoID}/main.m3u8";
+                } else
+                {
+                    _ = Task.Run(async () =>
                     {
-                        this.CanPlay.Value = true;
-                    }
-                });
+                        IAttemptResult hlsResult = await WS::Mainpage.HLSManager.CreateFilesAsync(niconicoID, playlist.ID);
+                        if (hlsResult.IsSucceeded)
+                        {
+                            this.CanPlay.Value = true;
+                            this.VideoUrl = $"http://localhost:{port}/niconicome/hls/playlist.m3u8";
+                        }
+                    });
+                }
+                
             }
 
         }

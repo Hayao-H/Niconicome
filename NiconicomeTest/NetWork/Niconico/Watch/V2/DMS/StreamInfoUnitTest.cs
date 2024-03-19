@@ -100,7 +100,7 @@ https://asset.domand.nicovideo.jp/6556dde7ea7f88d27388965a/video/12345/video-h26
         {
             var http = new NicoHttpStab(new StringContent(this._video), new StringContent(string.Empty));
             this._streamInfo = new StreamInfo(http, new M3U8Parser(), new ErrorHandlerStub());
-            this._streamInfo.Initialize("https://www.nicovideo.jp", "https://www.nicovideo.jp", 1080, false);
+            this._streamInfo.Initialize("https://www.nicovideo.jp", "https://www.nicovideo.jp", 1080, false,50000);
         }
 
         [Test]

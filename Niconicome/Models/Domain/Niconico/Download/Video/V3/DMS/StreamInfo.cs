@@ -84,12 +84,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
         string AudioInitializationURL { get; }
 
         /// <summary>
+        /// 帯域
+        /// </summary>
+        int VideoBandWidth { get; }
+
+        /// <summary>
         /// 初期化
         /// </summary>
         /// <param name="playlistURL"></param>
         /// <param name="audioURL"></param>
         /// <param name="verticalResolution"></param>
-        void Initialize(string playlistURL, string audioURL, int verticalResolution, bool isLowest);
+        void Initialize(string playlistURL, string audioURL, int verticalResolution, bool isLowest,int bandWidth);
 
         /// <summary>
         /// 情報を取得
@@ -142,12 +147,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.DMS
 
         public string AudioInitializationURL { get; private set; } = string.Empty;
 
-        public void Initialize(string playlistURL, string audioURL, int verticalResolution, bool isLowest)
+        public int VideoBandWidth { get; private set; }
+
+
+        public void Initialize(string playlistURL, string audioURL, int verticalResolution, bool isLowest, int bandWidth)
         {
             this.PlaylistURL = playlistURL;
             this.AudioURL = audioURL;
             this.VerticalResolution = verticalResolution;
             this.IsLowest = isLowest;
+            this.VideoBandWidth = bandWidth;
         }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Local.Server.API.Watch.V1.LocalFile;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Local.StreamJson
 {
@@ -23,13 +24,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Local.StreamJson
 
         public string AudioIV { get; set; } = string.Empty;
 
-        public List<Segment> VideoSegments { get; set; } = new();
+        public string VideoMapFileName { get; set; } = string.Empty;
 
-        public List<Segment> AudioSegments { get; set; } = new();
+        public string AudioMapFileName { get; set; } = string.Empty;
+
+        public int VideoBandWidth { get; set; }
+
+        public List<Segment> VideoSegments { get; set; } = new List<Segment>();
+
+        public List<Segment> AudioSegments { get; set; } = new List<Segment>();
 
     }
 
-    public class Segment
+    public class Segment : ISegmentInfo
     {
         public string FileName { get; set; } = string.Empty;
 

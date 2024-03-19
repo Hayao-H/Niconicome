@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -41,6 +42,11 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             if (path == @"/niconicome/css/userChrome.css")
             {
                 return RequestType.UserChrome;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/watch/v1/.+"))
+            {
+                return RequestType.WatchAPI;
             }
 
             return RequestType.None;

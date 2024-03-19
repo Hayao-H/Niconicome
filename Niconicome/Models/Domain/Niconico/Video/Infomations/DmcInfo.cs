@@ -31,6 +31,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         bool IsPremium { get; set; }
         bool IsPeakTime { get; set; }
         bool IsEconomy { get; }
+        bool IsDMS { get;  }
         DateTime UploadedOn { get; set; }
         DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; set; }
@@ -102,6 +103,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         public bool IsPeakTime { get; set; }
 
         public bool IsEconomy => !this.IsPremium && this.IsPeakTime && this.ViewCount >= Const::NetConstant.EconomyAvoidableViewCount;
+
+        public bool IsDMS { get; set; }
 
         /// <summary>
         /// 投稿日時

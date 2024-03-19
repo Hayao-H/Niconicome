@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.IO.V2;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
 using Niconicome.Models.Helper.Result;
 
 namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
@@ -41,6 +43,11 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
         public IAttemptResult<string> Read(string path)
         {
             return AttemptResult<string>.Succeeded(this._readFunc(path));
+        }
+
+        public IAttemptResult<byte[]> ReadByte(string path)
+        {
+            return AttemptResult<byte[]>.Succeeded(new byte[0]);
         }
 
         public IAttemptResult Delete(string path, bool resycycle)

@@ -87,10 +87,10 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/general", BlazorWindows.Settings);
                 WS::Mainpage.WindowTabHelper.OpenSettingsTab(this.RegionManager);
-            }, new BindableProperty<bool>(true));
+            });
 
-            this.OpenDownloadTaskWindowsCommand = new ReactiveCommand()
-                .WithSubscribe(() =>
+            this.OpenDownloadTaskWindowsCommand = new BindableCommand(
+              () =>
              {
                  WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/download", BlazorWindows.DLTask);
                  WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this.RegionManager);
@@ -194,7 +194,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// </summary>
         public BindableCommand OpenSettingCommand { get; init; }
 
-        public ReactiveCommand OpenDownloadTaskWindowsCommand { get; init; }
+        public BindableCommand OpenDownloadTaskWindowsCommand { get; init; }
 
         /// <summary>
         /// アドオンマネージャーを開く
@@ -375,7 +375,7 @@ namespace Niconicome.ViewModels.Mainpage
         private void SetWindowPosition()
         {
             IAttemptResult<Style::WindowStyle> result = WS.Mainpage.WindowStyleManager.GetStyle();
-            if (!result.IsSucceeded||result.Data is null)
+            if (!result.IsSucceeded || result.Data is null)
             {
                 return;
             }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
@@ -36,7 +37,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class Server : IServer
     {
-        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IPortHandler portHandler)
+        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IPortHandler portHandler, IWatchHandler watchHandler, IIPHandler iPHandler)
         {
             this._urlHandler = urlHandler;
             this._video = video;
@@ -46,6 +47,8 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             this._ts = ts;
             this._userChrome = userChrome;
             this._portHandler = portHandler;
+            this._watchHandler = watchHandler;
+            this._iPHandler = iPHandler;
         }
 
         ~Server()
@@ -71,6 +74,10 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         private readonly IPortHandler _portHandler;
 
+        private readonly IWatchHandler _watchHandler;
+
+        private readonly IIPHandler _iPHandler;
+
         private readonly Queue<int> _ports = new();
 
         private bool _isRunning;
@@ -89,7 +96,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         public void Start()
         {
-            if (this._isRunning||this._isShutdowned)
+            if (this._isRunning || this._isShutdowned)
             {
                 return;
             }
@@ -193,6 +200,15 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                             try
                             {
                                 result = this._userChrome.Handle(response);
+                            }
+                            catch { }
+                        }
+
+                        if (type == RequestType.WatchAPI)
+                        {
+                            try
+                            {
+                                result = this._watchHandler.Handle(response, request.Url.ToString(), this.Port);
                             }
                             catch { }
                         }

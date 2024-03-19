@@ -76,8 +76,8 @@ using UVideo = Niconicome.Models.Domain.Niconico.Video;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
+using WatchAPIv1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
-
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -299,7 +299,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<NetworkVideo::IThumbnailUtility, NetworkVideo::ThumbnailUtility>();
             services.AddSingleton<PlaylistV2::IPlaylistVideoContainer, PlaylistV2::PlaylistVideoContainer>();
             services.AddSingleton<PlaylistV2::Manager.Helper.ILocalVideoLoader, PlaylistV2::Manager.Helper.LocalVideoLoader>();
-            services.AddTransient<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
+            services.AddSingleton<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
             services.AddTransient<PlaylistV2::Manager.IVideoListManager, PlaylistV2::Manager.VideoListManager>();
             services.AddTransient<PlaylistV2::Manager.Helper.IVideoListCRDHandler, PlaylistV2::Manager.Helper.VideoListCRDHandler>();
             services.AddTransient<PlaylistV2::Manager.Helper.IVideoListUpdateHandler, PlaylistV2::Manager.Helper.VideoListUpdateHandler>();
@@ -340,6 +340,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
             services.AddTransient<Server::Core.IPortHandler, Server::Core.PortHandler>();
             services.AddTransient<Server::Connection.ITCPConnectionHandler, Infla::Network.TCPConnectionHandler>();
+            services.AddTransient<Server::Core.IIPHandler, Infla::Network.IPHandler>();
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
@@ -398,7 +399,13 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideoV3::Local.DMS.IDMSFileHandler, DlVideoV3::Local.DMS.DMSFileHandler>();
             services.AddTransient<DlVideoV3::Session.IWatchSession, DlVideoV3::Session.WatchSession>();
             services.AddTransient<DlVideoV3::Fetch.Key.IKeyDownlaoder, DlVideoV3::Fetch.Key.KeyDownlaoder>();
-            services.AddTransient<DlVideoV3::Local.StreamJson.IStreamJsonHandler,DlVideoV3.Local.StreamJson.StreamJsonHandler>();
+            services.AddTransient<DlVideoV3::Local.StreamJson.IStreamJsonHandler, DlVideoV3.Local.StreamJson.StreamJsonHandler>();
+            services.AddTransient<WatchAPIv1::HLS.IPlaylistCreator, WatchAPIv1::HLS.PlaylistCreator>();
+            services.AddTransient<WatchAPIv1::LocalFile.ILocalFileInfoHandler, DlVideoV3::Local.StreamJson.StreamJsonHandler>();
+            services.AddSingleton<WatchAPIv1::Session.ISessionManager, WatchAPIv1::Session.SessionManager>();
+            services.AddTransient<WatchAPIv1::IWatchHandler,WatchAPIv1::WatchHandler>();
+            services.AddTransient<WatchAPIv1::HLS.AES.IDecryptor, WatchAPIv1::HLS.AES.Decryptor>();
+
 
             return services.BuildServiceProvider();
         }

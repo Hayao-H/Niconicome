@@ -10,6 +10,7 @@ using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Error = Niconicome.Models.Domain.Utils.Error;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
 
 namespace Niconicome.Models.Infrastructure.IO
 {
@@ -64,7 +65,6 @@ namespace Niconicome.Models.Infrastructure.IO
 
             return AttemptResult.Succeeded();
         }
-
         public IAttemptResult Write(string path, byte[] content)
         {
             try
@@ -76,6 +76,22 @@ namespace Niconicome.Models.Infrastructure.IO
             {
                 this._errorHandler.HandleError(WindowsFileIOError.FailedToWrite, ex, path);
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToWrite, ex, path));
+            }
+
+            return AttemptResult.Succeeded();
+        }
+
+        public IAttemptResult WriteToStream(string path, System.IO.Stream stream)
+        {
+            try
+            {
+                using var video = new FileStream(path, FileMode.Open, FileAccess.Read);
+                video.CopyTo(stream);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.FailedToWrite, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(TSRequestHandlerError.FailedToOpenVodeo, ex));
             }
 
             return AttemptResult.Succeeded();
@@ -97,6 +113,23 @@ namespace Niconicome.Models.Infrastructure.IO
             }
 
             return AttemptResult<string>.Succeeded(content);
+        }
+
+        public IAttemptResult<byte[]> ReadByte(string path)
+        {
+            byte[] content;
+
+            try
+            {
+                content = File.ReadAllBytes(path);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsFileIOError.FailedToRead, ex, path);
+                return AttemptResult<byte[]>.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToRead, ex, path));
+            }
+
+            return AttemptResult<byte[]>.Succeeded(content);
         }
 
         public void EnumerateFiles(string path, string searchPattern, Action<string> enumAction, bool searchSubDirectory)

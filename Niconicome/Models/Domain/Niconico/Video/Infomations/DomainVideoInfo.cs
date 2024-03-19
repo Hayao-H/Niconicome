@@ -172,6 +172,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         Threadkey = this.RawDmcInfo.Threadkey,
                         CommentLanguage = this.RawDmcInfo.CommentLanguage,
                         CommentTargets = clrTargets.AsReadOnly(),
+                        IsDMS = this.RawDmcInfo.IsDMS,
                     };
 
 

@@ -196,7 +196,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
                 return AttemptResult<int>.Fail(keyResult.Message);
             }
 
-            IAttemptResult jsonResult = this._streamJsonHandler.AddStream(filePath, stream.VerticalResolution, keyResult.Data.VideoKey, keyResult.Data.AudioKey, stream.VideoIV, stream.AudioIV, stream.VideoSegmentDurations, stream.AudioSegmentDurations);
+            //動画情報JSON
+
+            string vMap = Path.GetFileName(new Uri(stream.VideoInitializationURL).AbsolutePath);
+            string aMap = Path.GetFileName(new Uri(stream.AudioInitializationURL).AbsolutePath);
+
+
+            IAttemptResult jsonResult = this._streamJsonHandler.AddStream(filePath, stream.VerticalResolution, keyResult.Data.VideoKey, keyResult.Data.AudioKey, stream.VideoIV, stream.AudioIV, stream.VideoSegmentDurations, stream.AudioSegmentDurations, vMap, aMap, stream.VideoBandWidth);
             if (!jsonResult.IsSucceeded)
             {
                 return AttemptResult<int>.Fail(jsonResult.Message);

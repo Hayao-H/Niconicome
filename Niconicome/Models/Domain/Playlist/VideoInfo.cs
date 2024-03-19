@@ -146,6 +146,11 @@ namespace Niconicome.Models.Domain.Playlist
         bool IsEconomy { get; set; }
 
         /// <summary>
+        /// 新サーバーかどうか
+        /// </summary>
+        bool IsDMS { get; }
+
+        /// <summary>
         /// タグを追加
         /// </summary>
         /// <param name="tag"></param>
@@ -432,6 +437,8 @@ namespace Niconicome.Models.Domain.Playlist
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
+
+        public bool IsDMS => !string.IsNullOrEmpty(this.FilePath) && this.FilePath.EndsWith("stream.json");
 
         #endregion
 
