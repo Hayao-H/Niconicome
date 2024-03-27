@@ -67,8 +67,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             if (type == RequestType.Invalid)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.InvalidRequest)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.InvalidRequest), (int)HttpStatusCode.BadRequest, response.OutputStream);
                 return AttemptResult.Succeeded();
             }
             else if (type == RequestType.MasterPlaylist)
@@ -80,28 +80,23 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             IAttemptResult<string> sidResult = this.GetSessionID(url);
             if (!sidResult.IsSucceeded || sidResult.Data is null)
             {
-                response.ContentType = "text/plain";
+                response.ContentType = "text/html";
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.InvalidRequest)));
+                this.WriteMessage(this._stringHandler.GetContent(SC.InvalidRequest), (int)HttpStatusCode.BadRequest, response.OutputStream);
                 return AttemptResult.Succeeded();
             }
 
             if (!this._sessionManager.Exists(sidResult.Data))
             {
-                response.ContentType = "text/plain";
+                response.ContentType = "text/html";
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.SessionNotExist)));
+                this.WriteMessage(this._stringHandler.GetContent(SC.SessionNotExist), (int)HttpStatusCode.BadRequest, response.OutputStream);
                 return AttemptResult.Succeeded();
             }
 
             ISession session = this._sessionManager.GetSession(sidResult.Data);
 
-            if (type == RequestType.VideoKey || type == RequestType.AUdioKey)
-            {
-                this.HandleKey(response, type, session);
-                return AttemptResult.Succeeded();
-            }
-            else if (type == RequestType.VideoPlaylist || type == RequestType.AudioPlaylist)
+            if (type == RequestType.VideoPlaylist || type == RequestType.AudioPlaylist)
             {
                 this.HandlePlaylist(response, type, session);
                 return AttemptResult.Succeeded();
@@ -121,38 +116,6 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
         }
 
         #region private
-
-        private void HandleKey(HttpListenerResponse response, RequestType type, ISession session)
-        {
-            string keyStr;
-            if (type == RequestType.VideoKey)
-            {
-                keyStr = session.VideoKey;
-            }
-            else
-            {
-                keyStr = session.AudioKey;
-            }
-
-            byte[] key = Convert.FromBase64String(keyStr);
-
-            try
-            {
-                response.OutputStream.Write(key);
-            }
-            catch (Exception ex)
-            {
-                this._error.HandleError(Err.FailedToWriteStream, ex);
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToWriteStream)));
-                return;
-            }
-
-            response.ContentType = "application/octet-stream";
-            response.StatusCode = (int)HttpStatusCode.OK;
-        }
-
         private void HandleMaster(HttpListenerResponse response, string url, int port)
         {
             string sid = this._sessionManager.CreateSession();
@@ -161,8 +124,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             if (!videoIDResult.IsSucceeded)
             {
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToExtractVideoID)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.FailedToExtractVideoID), (int)HttpStatusCode.BadRequest, response.OutputStream);
                 return;
             }
 
@@ -170,8 +133,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             if (!playlistResult.IsSucceeded || playlistResult.Data is null)
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.NotFound)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.NotFound), (int)HttpStatusCode.NotFound, response.OutputStream);
                 return;
             }
 
@@ -179,8 +142,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             if (video is null)
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.NotFound)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.NotFound), (int)HttpStatusCode.NotFound, response.OutputStream);
                 return;
             }
 
@@ -188,8 +151,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             if (!fileResult.IsSucceeded || fileResult.Data is null)
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.NotFound)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.NotFound), (int)HttpStatusCode.NotFound, response.OutputStream);
                 return;
             }
 
@@ -198,8 +161,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             {
                 this._error.HandleError(Err.StreamNotFound);
                 response.StatusCode = (int)HttpStatusCode.NotFound;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.NotFound)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.NotFound), (int)HttpStatusCode.NotFound, response.OutputStream);
                 return;
             }
 
@@ -210,18 +173,18 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             this._sessionManager.EditSession(sid, folderPath, stream.VideoSegments, stream.AudioSegments, stream.VideoKey, stream.AudioKey, stream.VideoMapFileName, stream.AudioMapFileName, playlist.Video, playlist.Audio, resolution, stream.VideoIV, stream.AudioIV);
             try
             {
+                response.ContentType = "application/vnd.apple.mpegurl";
                 response.OutputStream.Write(Encoding.UTF8.GetBytes(playlist.Master));
             }
             catch (Exception ex)
             {
                 this._error.HandleError(Err.FailedToWriteStream, ex);
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToWriteStream)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.FailedToWriteStream), (int)HttpStatusCode.InternalServerError, response.OutputStream);
                 return;
             }
 
-            response.ContentType = "application/vnd.apple.mpegurl";
             response.StatusCode = (int)HttpStatusCode.OK;
         }
 
@@ -240,18 +203,18 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
 
             try
             {
+                response.ContentType = "application/vnd.apple.mpegurl";
                 response.OutputStream.Write(Encoding.UTF8.GetBytes(playlistStr));
             }
             catch (Exception ex)
             {
                 this._error.HandleError(Err.FailedToWriteStream, ex);
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToWriteStream)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.FailedToWriteStream), (int)HttpStatusCode.InternalServerError, response.OutputStream);
                 return;
             }
 
-            response.ContentType = "application/vnd.apple.mpegurl";
             response.StatusCode = (int)HttpStatusCode.OK;
         }
 
@@ -277,8 +240,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             if (!readResult.IsSucceeded || readResult.Data is null)
             {
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToReadStream)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.FailedToReadStream), (int)HttpStatusCode.InternalServerError, response.OutputStream);
                 return;
             }
 
@@ -290,8 +253,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             {
                 this._error.HandleError(Err.FailedToWriteStream, ex);
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToWriteStream)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.FailedToWriteStream), (int)HttpStatusCode.InternalServerError, response.OutputStream);
                 return;
             }
 
@@ -326,8 +289,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             if (!readResult.IsSucceeded || readResult.Data is null)
             {
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToReadStream)));
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.FailedToReadStream), (int)HttpStatusCode.InternalServerError, response.OutputStream);
                 return;
             }
 
@@ -336,7 +299,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             if (!decryptResult.IsSucceeded || decryptResult.Data is null)
             {
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/plain";
+                response.ContentType = "text/html";
                 response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToReadStream)));
                 return;
             }
@@ -349,8 +312,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             {
                 this._error.HandleError(Err.FailedToWriteStream, ex);
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/plain";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToWriteStream)));
+                response.ContentType = "text/html";
                 return;
             }
 
@@ -388,14 +350,6 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             else if (Regex.IsMatch(url, @"https?://.+:\d+/niconicome/watch/v1/.+/audio/.+\.cmfa"))
             {
                 return RequestType.AudioSegment;
-            }
-            else if (Regex.IsMatch(url, @"https?://.+:\d+/niconicome/watch/v1/.+/video/key"))
-            {
-                return RequestType.VideoKey;
-            }
-            else if (Regex.IsMatch(url, @"https?://.+:\d+/niconicome/watch/v1/.+/audio/key"))
-            {
-                return RequestType.AUdioKey;
             }
             else
             {
@@ -441,6 +395,24 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             return bs.ToArray();
         }
 
+        private void WriteMessage(string message, int status, Stream output)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("<!DOCTYPE html>");
+            builder.AppendLine("<html>");
+            builder.AppendLine("<head>");
+            builder.AppendLine($"<title>Niconicome | {status}</title>");
+            builder.AppendLine("<meta charset=\"utf-8\">");
+            builder.AppendLine("</head>");
+            builder.AppendLine("<body>");
+            builder.AppendLine(message);
+            builder.AppendLine("</body>");
+            builder.AppendLine("</html>");
+
+            byte[] content = Encoding.UTF8.GetBytes(builder.ToString());
+            output.Write(content, 0, content.Length);
+        }
+
         #endregion
 
         private enum RequestType
@@ -451,8 +423,6 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             VideoPlaylist,
             VideoSegment,
             AudioSegment,
-            VideoKey,
-            AUdioKey,
             VideoMap,
             AudioMap,
         }

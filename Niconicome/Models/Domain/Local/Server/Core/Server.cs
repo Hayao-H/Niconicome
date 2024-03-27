@@ -131,6 +131,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
                     listnner.Prefixes.Clear();
                     listnner.Prefixes.Add($"http://localhost:{this.Port}/");
+                    listnner.Prefixes.Add($"http://127.0.0.1:{this.Port}/");
 
                     listnner.Start();
                     this._errorHandler.HandleError(ServerError.ServerStarted, this.Port);
@@ -139,90 +140,95 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                     {
                         HttpListenerContext context = listnner.GetContext();
 
-                        HttpListenerRequest request = context.Request;
-                        HttpListenerResponse response = context.Response;
-
-                        //CORS
-                        response.Headers.Add("Access-Control-Allow-Origin", "*");
-
-                        if (request.Url is null)
+                        _ = Task.Run(() =>
                         {
-                            context.Response.Close();
-                            continue;
-                        }
+                            HttpListenerRequest request = context.Request;
+                            HttpListenerResponse response = context.Response;
 
-                        if (request.HttpMethod == "OPTIONS")
-                        {
-                            response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
-                            response.StatusCode = (int)HttpStatusCode.OK;
+                            //CORS
+                            response.Headers.Add("Access-Control-Allow-Origin", "*");
+
+                            if (request.Url is null)
+                            {
+                                context.Response.Close();
+                                return;
+                            }
+
+                            if (request.HttpMethod == "OPTIONS")
+                            {
+                                response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
+                                response.StatusCode = (int)HttpStatusCode.OK;
+                                response.Close();
+                                return;
+                            }
+
+                            if (request.HttpMethod != "GET")
+                            {
+                                context.Response.Close();
+                                return;
+                            }
+
+                            RequestType type = this._urlHandler.GetReqyestType(request.Url);
+                            IAttemptResult? result = null;
+
+                            if (type == RequestType.Video)
+                            {
+                                try
+                                {
+                                    result = this._video.Handle(request.Url, response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.M3U8)
+                            {
+                                try
+                                {
+                                    result = this._m3U8.Handle(response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.TS)
+                            {
+                                try
+                                {
+                                    result = this._ts.Handle(request.Url, response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.UserChrome)
+                            {
+                                try
+                                {
+                                    result = this._userChrome.Handle(response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.WatchAPI)
+                            {
+                                try
+                                {
+                                    result = this._watchHandler.Handle(response, request.Url.ToString(), this.Port);
+                                }
+                                catch { }
+                            }
+
+                            if (result is null || !result.IsSucceeded)
+                            {
+                                try
+                                {
+                                    this._notFound.Handle(request.Url, response, result?.Message);
+                                }
+                                catch { }
+                            }
+
                             response.Close();
-                            continue;
-                        }
+                        });
 
-                        if (request.HttpMethod != "GET")
-                        {
-                            context.Response.Close();
-                            continue;
-                        }
 
-                        RequestType type = this._urlHandler.GetReqyestType(request.Url);
-                        IAttemptResult? result = null;
-
-                        if (type == RequestType.Video)
-                        {
-                            try
-                            {
-                                result = this._video.Handle(request.Url, response);
-                            }
-                            catch { }
-                        }
-
-                        if (type == RequestType.M3U8)
-                        {
-                            try
-                            {
-                                result = this._m3U8.Handle(response);
-                            }
-                            catch { }
-                        }
-
-                        if (type == RequestType.TS)
-                        {
-                            try
-                            {
-                                result = this._ts.Handle(request.Url, response);
-                            }
-                            catch { }
-                        }
-
-                        if (type == RequestType.UserChrome)
-                        {
-                            try
-                            {
-                                result = this._userChrome.Handle(response);
-                            }
-                            catch { }
-                        }
-
-                        if (type == RequestType.WatchAPI)
-                        {
-                            try
-                            {
-                                result = this._watchHandler.Handle(response, request.Url.ToString(), this.Port);
-                            }
-                            catch { }
-                        }
-
-                        if (result is null || !result.IsSucceeded)
-                        {
-                            try
-                            {
-                                this._notFound.Handle(request.Url, response, result?.Message);
-                            }
-                            catch { }
-                        }
-
-                        response.Close();
                     }
 
                     listnner.Close();

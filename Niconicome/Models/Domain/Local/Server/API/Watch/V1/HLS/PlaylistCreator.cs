@@ -34,7 +34,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1.HLS
 
             string videoPlaylist = this.GetVideoPlaylist(stream, sessionID, port);
             string audioPlaylist = this.GetAudioPlaylist(stream, sessionID, port);
-            string masterPlaylist = this.GetMasterPlaylist(sessionID, port, stream.VideoBandWidth);
+            string masterPlaylist = this.GetMasterPlaylist(stream, sessionID, port, stream.VideoBandWidth);
 
             return new HLSPlaylist(masterPlaylist, videoPlaylist, audioPlaylist, stream.VideoKey, stream.AudioKey);
 
@@ -45,7 +45,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1.HLS
 
             var builder = new StringBuilder();
             builder.AppendLine("#EXTM3U");
-            builder.AppendLine("#EXT-X-VERSION:3");
+            builder.AppendLine("#EXT-X-VERSION:6");
             builder.AppendLine("#EXT-X-TARGETDURATION:6");
             builder.AppendLine("#EXT-X-MEDIA-SEQUENCE:1");
             builder.AppendLine("#EXT-X-PLAYLIST-TYPE:VOD");
@@ -65,7 +65,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1.HLS
 
             var builder = new StringBuilder();
             builder.AppendLine("#EXTM3U");
-            builder.AppendLine("#EXT-X-VERSION:3");
+            builder.AppendLine("#EXT-X-VERSION:6");
             builder.AppendLine("#EXT-X-TARGETDURATION:6");
             builder.AppendLine("#EXT-X-MEDIA-SEQUENCE:1");
             builder.AppendLine("#EXT-X-PLAYLIST-TYPE:VOD");
@@ -80,18 +80,22 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1.HLS
             return builder.ToString();
         }
 
-        private string GetMasterPlaylist(string sessionID, int port, int bandWidth)
+        private string GetMasterPlaylist(IStreamInfo stream, string sessionID, int port, int bandWidth)
         {
             var builder = new StringBuilder();
             builder.AppendLine("#EXTM3U");
-            builder.AppendLine("#EXT-X-VERSION:3");
+            builder.AppendLine("#EXT-X-VERSION:6");
             builder.AppendLine("#EXT-X-INDEPENDENT-SEGMENTS");
-            builder.AppendLine($"#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"main-adio\",NAME=\"Main Audio\",DEFAULT=YES,URI=\"http://localhost:{port}/niconicome/watch/v1/{sessionID}/audio/playlist.m3u8\"");
-            builder.AppendLine($"#EXT-X-STREAM-INF:BANDWIDTH={bandWidth},AUDIO=\"main-audio\"");
+            builder.AppendLine($"#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"main-audio\",NAME=\"Main Audio\",DEFAULT=YES,URI=\"http://localhost:{port}/niconicome/watch/v1/{sessionID}/audio/playlist.m3u8\"");
+            builder.AppendLine($"#EXT-X-STREAM-INF:BANDWIDTH={bandWidth},AUDIO=\"main-audio\",RESOLUTION=\"{this.GetHorizontalResolution(stream.Resolution)}x{stream.Resolution}\"");
             builder.AppendLine($"http://localhost:{port}/niconicome/watch/v1/{sessionID}/video/playlist.m3u8");
-            builder.AppendLine("#EXT-X-ENDLIST");
 
             return builder.ToString();
+        }
+
+        private int GetHorizontalResolution(int verticalResolution)
+        {
+            return (int)Math.Round(verticalResolution * 16 / 9.0);
         }
 
     }

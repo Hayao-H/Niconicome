@@ -27,6 +27,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1.LocalFile
 
         int VideoBandWidth { get; }
 
+        int Resolution { get;  }
+
         IEnumerable<ISegmentInfo> VideoSegments { get; }
 
         IEnumerable<ISegmentInfo> AudioSegments { get; }
