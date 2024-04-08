@@ -49,6 +49,16 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                 return RequestType.WatchAPI;
             }
 
+            if (Regex.IsMatch(path, @"/niconicome/api/comment/v1/.+"))
+            {
+                return RequestType.CommentAPI;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/api/regacyhls/v1/.+"))
+            {
+                return RequestType.RegacyHLSAPI;
+            }
+
             return RequestType.None;
         }
     }

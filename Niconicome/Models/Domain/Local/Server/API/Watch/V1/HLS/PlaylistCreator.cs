@@ -50,6 +50,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1.HLS
             builder.AppendLine("#EXT-X-MEDIA-SEQUENCE:1");
             builder.AppendLine("#EXT-X-PLAYLIST-TYPE:VOD");
             builder.AppendLine($"#EXT-X-MAP:URI=\"http://localhost:{port}/niconicome/watch/v1/{sessionID}/video/init.cmfv\"");
+            builder.AppendLine($"#EXT-X-KEY:METHOD=AES-128,URI=\"http://localhost:{port}/niconicome/watch/v1/{sessionID}/video/key\",IV=\"{stream.VideoIV}\"");
             foreach (var segment in stream.VideoSegments)
             {
                 builder.AppendLine($"#EXTINF:{segment.Duration},");
@@ -70,6 +71,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1.HLS
             builder.AppendLine("#EXT-X-MEDIA-SEQUENCE:1");
             builder.AppendLine("#EXT-X-PLAYLIST-TYPE:VOD");
             builder.AppendLine($"#EXT-X-MAP:URI=\"http://localhost:{port}/niconicome/watch/v1/{sessionID}/audio/init.cmfa\"");
+            builder.AppendLine($"#EXT-X-KEY:METHOD=AES-128,URI=\"http://localhost:{port}/niconicome/watch/v1/{sessionID}/audio/key\",IV=\"{stream.AudioIV}\"");
             foreach (var segment in stream.AudioSegments)
             {
                 builder.AppendLine($"#EXTINF:{segment.Duration},");

@@ -106,6 +106,11 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
                 this.HandleMap(response, type, session);
                 return AttemptResult.Succeeded();
             }
+            else if (type == RequestType.VideoKey || type == RequestType.AudioKey)
+            {
+                this.HandleKey(response, type, session);
+                return AttemptResult.Succeeded();
+            }
             else
             {
                 this.HandleSegment(response, type, session, url);
@@ -294,19 +299,19 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
                 return;
             }
 
-            IAttemptResult<byte[]> decryptResult = this._decryptor.Decrypt(readResult.Data, new AESInfomation(Convert.FromBase64String(key), this.ToBytes(iv)));
-
-            if (!decryptResult.IsSucceeded || decryptResult.Data is null)
-            {
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.ContentType = "text/html";
-                response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToReadStream)));
-                return;
-            }
+            //IAttemptResult<byte[]> decryptResult = this._decryptor.Decrypt(readResult.Data, new AESInfomation(Convert.FromBase64String(key), this.ToBytes(/iv)));
+            //
+            //if (!decryptResult.IsSucceeded || decryptResult.Data is null)
+            //{
+            //    response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            //    response.ContentType = "text/html";
+            //    response.OutputStream.Write(Encoding.UTF8.GetBytes(this._stringHandler.GetContent(SC.FailedToReadStream)));
+            //    return;
+            //}
 
             try
             {
-                response.OutputStream.Write(decryptResult.Data);
+                response.OutputStream.Write(readResult.Data);
             }
             catch (Exception ex)
             {
@@ -317,6 +322,38 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             }
 
             response.ContentType = contentType;
+            response.StatusCode = (int)HttpStatusCode.OK;
+        }
+
+        private void HandleKey(HttpListenerResponse response, RequestType type, ISession session)
+        {
+            string key;
+
+            if (type == RequestType.VideoKey)
+            {
+                key = session.VideoKey;
+            }
+            else
+            {
+                key = session.AudioKey;
+            }
+
+            byte[] keyBytes = Convert.FromBase64String(key);
+
+            try
+            {
+                response.OutputStream.Write(keyBytes);
+            }
+            catch (Exception ex)
+            {
+                this._error.HandleError(Err.FailedToWriteStream, ex);
+                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                response.ContentType = "text/html";
+                this.WriteMessage(this._stringHandler.GetContent(SC.FailedToWriteStream), (int)HttpStatusCode.InternalServerError, response.OutputStream);
+                return;
+            }
+
+            response.ContentType = "application/octet-stream";
             response.StatusCode = (int)HttpStatusCode.OK;
         }
 
@@ -351,6 +388,14 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             {
                 return RequestType.AudioSegment;
             }
+            else if (Regex.IsMatch(url, @"https?://.+:\d+/niconicome/watch/v1/.+/audio/key"))
+            {
+                return RequestType.AudioKey;
+            } 
+            else if (Regex.IsMatch(url, @"https?://.+:\d+/niconicome/watch/v1/.+/video/key"))
+            {
+                return RequestType.VideoKey;
+            }
             else
             {
                 return RequestType.Invalid;
@@ -377,7 +422,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
 
             if (splited.Length < 5)
             {
-                return AttemptResult<(int, string)>.Fail(this._error.HandleError(Err.CannotExtractSessionID, rawURL));
+                return AttemptResult<(int, string)>.Fail(this._error.HandleError(Err.CannotExtractPlaylistAndVideoID, rawURL));
             }
 
             return AttemptResult<(int, string)>.Succeeded((int.Parse(splited[3]), splited[4]));
@@ -425,6 +470,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
             AudioSegment,
             VideoMap,
             AudioMap,
+            VideoKey,
+            AudioKey,
         }
 
     }

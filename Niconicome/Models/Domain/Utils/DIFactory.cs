@@ -78,6 +78,8 @@ using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
 using WatchAPIv1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
+using CommentAPIV1 = Niconicome.Models.Domain.Local.Server.API.Comment.V1;
+using RegacyHLSAPIV1 = Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -405,6 +407,11 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<WatchAPIv1::Session.ISessionManager, WatchAPIv1::Session.SessionManager>();
             services.AddTransient<WatchAPIv1::IWatchHandler,WatchAPIv1::WatchHandler>();
             services.AddTransient<WatchAPIv1::HLS.AES.IDecryptor, WatchAPIv1::HLS.AES.Decryptor>();
+            services.AddTransient<CommentAPIV1::ICommentRequestHandler, CommentAPIV1::CommentRequestHandler>();
+            services.AddTransient<CommentAPIV1::Local.ICommentRetreiver, CommentAPIV1::Local.CommentRetreiver>();
+            services.AddTransient<CommentAPIV1::Local.ICommentConverter, CommentAPIV1::Local.CommentConverter>();
+            services.AddTransient<RegacyHLSAPIV1::SegmentCreator.IHLSManager, RegacyHLSAPIV1::SegmentCreator.HLSManager>();
+            services.AddTransient<RegacyHLSAPIV1::IRegacyHLSHandler, RegacyHLSAPIV1::RegacyHLSHandler>();
 
 
             return services.BuildServiceProvider();

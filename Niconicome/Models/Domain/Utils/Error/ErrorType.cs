@@ -43,6 +43,8 @@ using Niconicome.Models.Network.Video.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 using VDL3 = Niconicome.Models.Domain.Niconico.Download.Video.V3.Error;
 using WatchAPIV1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1.Error;
+using CommentAPIV1 = Niconicome.Models.Domain.Local.Server.API.Comment.V1.Error;
+using HLSAPIV1 = Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1.Error;
 
 namespace Niconicome.Models.Domain.Utils.Error
 {
@@ -119,6 +121,10 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 64, typeof(VDL3.StreamJsonHandlerError) },
             { 65, typeof(WatchAPIV1.WatchHandlerError) },
             { 66, typeof(WatchAPIV1.DecryptorError) },
+            { 67, typeof(CommentAPIV1::CommentRequestHandlerError) },
+            { 68, typeof(CommentAPIV1::CommentRetreiverError) },
+            { 69, typeof(HLSAPIV1::HLSManagerError) },
+            { 70, typeof(HLSAPIV1::RegacyHLSHandlerError) },
         };
     }
 }

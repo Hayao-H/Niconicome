@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using Niconicome.Models.Domain.Local.Server.API.Comment.V1;
+using Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;
 using Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
@@ -37,17 +39,19 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class Server : IServer
     {
-        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IPortHandler portHandler, IWatchHandler watchHandler, IIPHandler iPHandler)
+        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IErrorHandler errorHandler, IPortHandler portHandler, IWatchHandler watchHandler, ICommentRequestHandler commentRequestHandler, IRegacyHLSHandler regacyHLSHandler, IIPHandler iPHandler)
         {
             this._urlHandler = urlHandler;
             this._video = video;
             this._notFound = notFound;
-            this._errorHandler = errorHandler;
             this._m3U8 = m3U8;
             this._ts = ts;
             this._userChrome = userChrome;
+            this._errorHandler = errorHandler;
             this._portHandler = portHandler;
             this._watchHandler = watchHandler;
+            this._commentRequestHandler = commentRequestHandler;
+            this._regacyHLSHandler = regacyHLSHandler;
             this._iPHandler = iPHandler;
         }
 
@@ -75,6 +79,10 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         private readonly IPortHandler _portHandler;
 
         private readonly IWatchHandler _watchHandler;
+
+        private readonly ICommentRequestHandler _commentRequestHandler;
+
+        private readonly IRegacyHLSHandler _regacyHLSHandler;
 
         private readonly IIPHandler _iPHandler;
 
@@ -140,10 +148,12 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                     {
                         HttpListenerContext context = listnner.GetContext();
 
-                        _ = Task.Run(() =>
+                        _ = Task.Run(async () =>
                         {
                             HttpListenerRequest request = context.Request;
                             HttpListenerResponse response = context.Response;
+
+                            this._errorHandler.HandleError(ServerError.RequestHandled, request.Url!.ToString(), request.UserAgent);
 
                             //CORS
                             response.Headers.Add("Access-Control-Allow-Origin", "*");
@@ -216,6 +226,24 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                                 catch { }
                             }
 
+                            if (type == RequestType.CommentAPI)
+                            {
+                                try
+                                {
+                                    result = this._commentRequestHandler.Handle(request.Url.ToString(), response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.RegacyHLSAPI)
+                            {
+                                try
+                                {
+                                    result = await this._regacyHLSHandler.Handle(request.Url.ToString(), response, this.Port);
+                                }
+                                catch { }
+                            }
+
                             if (result is null || !result.IsSucceeded)
                             {
                                 try
@@ -224,6 +252,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                                 }
                                 catch { }
                             }
+
 
                             response.Close();
                         });

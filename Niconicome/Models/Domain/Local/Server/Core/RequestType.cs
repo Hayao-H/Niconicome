@@ -14,5 +14,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         TS,
         UserChrome,
         WatchAPI,
+        CommentAPI,
+        RegacyHLSAPI,
     }
 }

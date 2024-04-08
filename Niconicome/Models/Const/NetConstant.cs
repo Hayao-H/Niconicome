@@ -87,5 +87,16 @@ namespace Niconicome.Models.Const
         /// ローカルサーバーのデフォルトポート
         /// </summary>
         public static int DefaultServerPort = 2580;
+
+        /// <summary>
+        /// 視聴アドレス
+        /// </summary>
+        public static string WatchAddressV1 = "http://localhost:{0}/niconicome/watch/v1/{1}/{2}/main.m3u8";
+
+        /// <summary>
+        /// コメントアドレス
+        /// </summary>
+        public static string CommentAddressV1 = "http://localhost:{0}/niconicome/api/comment/v1/{1}/{2}/comment.json";
+
     }
 }

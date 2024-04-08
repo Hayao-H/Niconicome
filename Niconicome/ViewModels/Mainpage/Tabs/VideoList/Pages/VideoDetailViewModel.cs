@@ -8,6 +8,8 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Utils.Reactive;
 using WS = Niconicome.Workspaces;
+using Const = Niconicome.Models.Const.NetConstant;
+using Niconicome.Models.Domain.Niconico.Net.Json;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 {
@@ -34,6 +36,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// HLSで動画を再生できるかどうか
         /// </summary>
         public IBindableProperty<bool> CanPlay { get; init; }
+
+        public IBindableProperty<string> JsWatchInfo { get; private set; }
 
         /// <summary>
         /// 変更監視
@@ -73,16 +77,15 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             var port = WS::Mainpage.LocalState.Port;
             this.VideoInfo = new VideoInfoViewModel(result.Data);
-            this.VideoUrl = $"http://localhost:{port}/niconicome/video/{playlist.ID}/{niconicoID}/video.mp4";
-
 
             if (result.Data.IsDownloaded.Value)
             {
                 if (result.Data.IsDMS)
                 {
                     this.CanPlay.Value = true;
-                    this.VideoUrl = $"http://localhost:{port}/niconicome/watch/v1/{playlist.ID}/{niconicoID}/main.m3u8";
-                } else
+                    this.VideoUrl = string.Format(Const.WatchAddressV1, [port, playlist.ID, niconicoID]);
+                }
+                else
                 {
                     _ = Task.Run(async () =>
                     {
@@ -94,7 +97,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                         }
                     });
                 }
-                
+
             }
 
         }
@@ -105,5 +108,32 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         }
 
         #endregion
+
+        private class JsWatchInfo
+        {
+            public Media Media { get; set; } = new();
+
+            public Comment Comment { get; set; } = new();
+        }
+
+        private class Meta
+        {
+            public bool IsDownloaded { get; set;}
+        }
+
+        private class Media
+        {
+            public bool IsDMS { get; set;}
+
+            public string ContentUrl { get; set; } = string.Empty;
+
+            public string CreateUrl { get; set; } = string.Empty;
+        }
+
+        public class Comment
+        {
+            public string ContentUrl { get; set; } = string.Empty;
+        }
+
     }
 }
