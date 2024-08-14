@@ -109,6 +109,11 @@ namespace Niconicome.Models.Const
         public static string CommentAddressV1 = "http://localhost:{0}/niconicome/api/comment/v1/{1}/{2}/comment.json";
 
         /// <summary>
+        /// NGAPIアドレス
+        /// </summary>
+        public static string NGAPIAddressV1 = "http://localhost:{0}/niconicome/api/ng/v1";
+
+        /// <summary>
         /// サムネイルアドレス
         /// 
         /// </summary>

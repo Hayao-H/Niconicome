@@ -233,7 +233,7 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string SearchVideosExact { get; private set; } = "Videolist.File.SearchVideosExact";
 
         //Watch.NG
-        public static string NGUserIds { get; private set; } = "Watch.NG.NGUserIds";
+        public static string NGUsers { get; private set; } = "Watch.NG.NGUsers";
 
         public static string NGWords { get; private set; } = "Watch.NG.NGWords";
 

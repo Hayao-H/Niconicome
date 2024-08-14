@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1.Types
@@ -44,6 +45,9 @@ namespace Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1.Types
     public class Comment
     {
         public string ContentUrl { get; set; } = string.Empty;
+
+
+        public string CommentNGAPIBaseUrl { get; set; } = string.Empty;
     }
 
     public class Thumbnail

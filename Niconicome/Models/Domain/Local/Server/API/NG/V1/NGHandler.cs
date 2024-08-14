@@ -95,7 +95,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.NG.V1
                 var ngs = this._ngWords!.Value;
                 this._ngWords.Value = ngs.AddUnique(requestObject.Value);
             }
-            else if (type == NGType.UserId)
+            else if (type == NGType.User)
             {
                 var ngs = this._ngUsers!.Value;
                 this._ngUsers.Value = ngs.AddUnique(requestObject.Value);
@@ -127,7 +127,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.NG.V1
                 var ngs = this._ngWords!.Value.Where(x => x != requestObject.Value).ToList();
                 this._ngWords.Value = ngs;
             }
-            else if (type == NGType.UserId)
+            else if (type == NGType.User)
             {
                 var ngs = this._ngUsers!.Value.Where(x => x != requestObject.Value).ToList();
                 this._ngUsers.Value = ngs;
@@ -195,7 +195,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.NG.V1
 
             if (this._ngUsers is null)
             {
-                var result = this._settingsContainer.GetSetting(SettingNames.NGUserIds, new List<string>());
+                var result = this._settingsContainer.GetSetting(SettingNames.NGUsers, new List<string>());
                 if (result.IsSucceeded && result.Data is not null)
                 {
                     this._ngUsers = result.Data;
@@ -214,9 +214,9 @@ namespace Niconicome.Models.Domain.Local.Server.API.NG.V1
 
         private NGType GetNGType(Request request)
         {
-            if (request.Type == "userId")
+            if (request.Type == "user")
             {
-                return NGType.UserId;
+                return NGType.User;
             }
             else if (request.Type == "command")
             {
@@ -238,7 +238,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.NG.V1
         private enum NGType
         {
             Word,
-            UserId,
+            User,
             Command,
         }
 

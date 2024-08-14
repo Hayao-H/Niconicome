@@ -140,6 +140,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1
             }
 
             info.Comment.ContentUrl = string.Format(NetConst.CommentAddressV1, port, playlist.ID, video.NiconicoId);
+            info.Comment.CommentNGAPIBaseUrl = string.Format(NetConst.NGAPIAddressV1, port);
             info.Thumbnail.ContentUrl = string.Format(NetConst.ThumbnailAddressV1, port, video.NiconicoId);
 
             info.Video.NiconicoID = video.NiconicoId;
