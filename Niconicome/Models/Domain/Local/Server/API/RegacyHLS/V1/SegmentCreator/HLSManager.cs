@@ -57,6 +57,13 @@ namespace Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1.SegmentCreator
 
         public async Task<IAttemptResult> CreateFilesAsync(string niconicoID, int playlistID)
         {
+            string path = Path.Combine(AppContext.BaseDirectory, "data", "tmp", "hls", playlistID.ToString(), niconicoID, "master.m3u8");
+            if (this._fileIO.Exists(path))
+            {
+                return AttemptResult.Succeeded();
+            }
+
+
             IAttemptResult<IVideoInfo> vResult = this._store.GetVideo(niconicoID, playlistID);
             if (!vResult.IsSucceeded || vResult.Data is null)
             {

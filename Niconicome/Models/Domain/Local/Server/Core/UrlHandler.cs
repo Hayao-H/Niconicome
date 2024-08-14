@@ -59,6 +59,21 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                 return RequestType.RegacyHLSAPI;
             }
 
+            if (Regex.IsMatch(path, @"/niconicome/resource/v1/.+") || path == "/favicon.ico")
+            {
+                return RequestType.ResourceAPI;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/api/videoinfo/v1/.+"))
+            {
+                return RequestType.VideoInfoAPI;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/api/ng/v1/.+"))
+            {
+                return RequestType.NG;
+            }
+
             return RequestType.None;
         }
     }

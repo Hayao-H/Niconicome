@@ -114,6 +114,12 @@ export class CommentBase {
       return;
     }
 
+    //コメントのvposが現在のvposより先の場合、コメントを削除する
+    if (this.vpos > vpos + this.duration) {
+      this.alive = false;
+      return;
+    }
+
     this.life--;
 
     //nakaコメントの場合
@@ -157,7 +163,7 @@ export class CommentBase {
 
   //nakaコメント設定
   private _setNaka() {
-    this.life = defaultConfig.fps * this.duration;
+    this.life = defaultConfig.fps * this.duration / 1000;
     this.left = this.canvasSize.width;
     this.delta = (this.canvasSize.width + this.width) / this.life;
     this.reveal = this.width / this.delta;
@@ -170,7 +176,7 @@ export class CommentBase {
    * @param duration コメント表示時間
    */
   private _setShitaUe() {
-    this.life = defaultConfig.fps * this.duration;
+    this.life = defaultConfig.fps * this.duration / 1000;
     if (this.fixed) {
       this.left = (this.canvasSize.width - this.width) / 2;
       //this.left = this.canvasSize.width / 2;
@@ -750,6 +756,7 @@ class NakaLine {
    */
   clean(): void {
     this.comments = this.comments.filter((comment) => comment.alive);
+    this.lastCommentStream = this.lastCommentStream.filter((comment) =>comment.alive);
   }
 
   /**

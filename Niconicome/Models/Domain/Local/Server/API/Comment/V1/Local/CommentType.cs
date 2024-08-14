@@ -19,6 +19,10 @@ namespace Niconicome.Models.Domain.Local.Server.API.Comment.V1.Local
 
         public required int VposMS { get; init; }
 
+        public required int Number { get; init; }
+
         public required string Mail { get; init; }
+
+        public required DateTime PostedAt { get; init; }
     }
 }

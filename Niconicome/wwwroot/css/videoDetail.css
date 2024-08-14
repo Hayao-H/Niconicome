@@ -1,64 +1,463 @@
-.VideoDetailPage {
-  margin: 24px;
-}
-.VideoDetailPage .VideotitleContainer {
-  margin: 0 auto;
-  width: calc(700px + 400px);
-}
-.VideoDetailPage .VideotitleContainer .DownloadStatus {
-  font-size: 16px;
-  margin-left: 8px;
-}
-.VideoDetailPage .VideotitleContainer .DownloadStatus.Downloaded {
-  color: #7bd889;
-}
-.VideoDetailPage .VideotitleContainer .DownloadStatus.NotDownloaded {
-  color: #ff3300;
-}
-.VideoDetailPage .VideoContentContainer {
-  display: flex;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
-  width: calc(700px + 400px);
-  margin: 16px auto;
-}
-.VideoDetailPage .VideoContentContainer .VideoElement {
-  width: 700px;
-  height: calc(700px / 16 * 9);
-}
-.VideoDetailPage .VideoContentContainer .VideoElement #video-player {
-  width: 100%;
-  height: 100%;
-}
-.VideoDetailPage .VideoContentContainer .VideoInfoContainer {
-  display: flex;
-  flex-direction: column;
-  width: 400px;
-  padding: 8px;
-  background-color: #fff;
-}
-.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-}
-.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow a {
-  color: #069;
+:link {
   text-decoration: none;
+  color: #069;
 }
-.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow a:hover {
+:link:hover {
   text-decoration: underline;
 }
-.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow .UserVideos {
-  border: 1px solid;
-  padding: 3px;
-  border-radius: 5px;
+
+.VideoDetailPage {
+  padding: 24px;
+  background-color: #f4f4f4;
 }
-.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow .VideoInfoIcon {
-  margin-right: 6px;
-  color: #8b888f;
+.VideoDetailPage .contextMenuWrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
 }
-.VideoDetailPage .VideoContentContainer .VideoInfoContainer .VideoInfoRow .VideoInfoIcon.Like {
+.VideoDetailPage .contextMenuWrapper .contextMenu {
+  position: absolute;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid #505050;
+  border-radius: 4px;
+  max-height: 100vh;
+  max-width: 384px;
+}
+.VideoDetailPage .contextMenuWrapper .contextMenu .menuItem {
+  padding: 4px;
+  cursor: pointer;
+}
+.VideoDetailPage .watchWrapper {
+  display: flex;
+}
+.VideoDetailPage .watchWrapper .leftContent {
+  width: 66%;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper {
+  aspect-ratio: 16/9;
+  width: 100%;
+  background-color: #000;
+  position: relative;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .commentWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .commentWrapper .commentCanvas {
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  display: none;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .commentWrapper .commentCanvas.visible {
+  display: block;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .videoOverflow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .videoOverflow .systemMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid #333;
+  color: #fff;
+  padding: 8px;
+  z-index: 11;
+  width: calc(100% - 80px);
+  height: calc(100% - 80px);
+  overflow: auto;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .videoOverflow .systemMessage.hide {
+  display: none;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .videoOverflow .systemMessage .message {
+  display: flex;
+  font-weight: bold;
+  font-size: 14px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .videoOverflow .systemMessage .message.messageBorder {
+  border-top: 1px solid #333;
+  margin-top: 4px;
+  padding-top: 4px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .videoOverflow .systemMessage .message.error {
+  color: #f11e37;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoWrapper .videoOverflow .systemMessage .message .time {
+  margin-right: 32px;
+  text-wrap: nowrap;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler {
+  width: 100%;
+  background-color: #000;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel {
+  padding: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .playControler {
+  color: #fff;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .playControler .playButton {
+  margin: 0 8px;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .timeControler {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  margin: 0 8px;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .timeControler .time {
+  margin: 0 8px;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .generalControler {
+  display: flex;
+  margin: 0 8px;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .generalControler .commentVisibility {
+  margin-left: 10px;
+  color: #666;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .generalControler .commentVisibility.visible {
+  color: #fff;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .generalControler .repeat {
+  color: #fff;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .panel .generalControler .repeat.enable {
+  color: #007cff;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper {
+  height: 15px;
+  position: relative;
+  margin: 0 5px;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .slider {
+  height: 4px;
+  width: 100%;
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #444;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .slider .sliderInner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  transform-origin: left;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .slider .sliderInner.time {
+  background-color: #007cff;
+  z-index: 2;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .slider .sliderInner.buffer {
+  background-color: #fff;
+  z-index: 1;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .sliderHandle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 3;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .sliderHandle .sliderHandleInner {
+  display: none;
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  background-color: #007cff;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper:hover .sliderHandleInner {
+  display: block;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .titleAndOwner {
+  display: flex;
+  padding: 15px;
+  justify-content: space-between;
+  align-items: center;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .titleAndOwner .ownerWrapper {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .titleAndOwner .ownerWrapper .ownerIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .titleAndOwner .ownerWrapper .ownerName {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .majorInfoWrapper {
+  display: flex;
+  align-items: center;
+  color: #657586;
+  height: 20px;
+  line-height: 20px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .majorInfoWrapper .counts {
+  margin-left: 8px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .majorInfoWrapper .counts .icon {
+  margin: 8px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .majorInfoWrapper .counts .icon.like {
   color: #e26775;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper .tag {
+  background-color: #fff;
+  border: 1px solid #e5e8ea;
+  border-radius: 12px;
+  height: 24px;
+  line-height: 24px;
+  margin-bottom: 4px;
+  margin-right: 4px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper .tag .tagName {
+  color: #32475e;
+  font-size: 13px;
+  font-weight: 600;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper .tag .nicodic {
+  margin-left: 4px;
+  color: #b2bac2;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper .tag .nicodic:hover {
+  color: #657586;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper .tag .nicodic.exist {
+  color: #8c0000;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper .tag .nicodic.exist:hover {
+  color: #b20000;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .title {
+  font-size: 25px;
+  font-weight: bold;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper {
+  padding: 10px;
+  border: #e5e8ea solid 1.5px;
+  border-radius: 20px;
+  background-color: #fff;
+  position: relative;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper .description.collapsed {
+  height: 50px;
+  overflow: hidden;
+  color: #99a3ad;
+  cursor: pointer;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper .description.collapsed :link {
+  color: inherit;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper .expandButton {
+  padding: 3px;
+  position: absolute;
+  right: 5px;
+  bottom: -30px;
+  cursor: pointer;
+  color: #1874a2;
+  padding-left: 24px;
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper .expandButton.collapsed {
+  bottom: 10px;
+  background: linear-gradient(90deg, hsla(0, 0%, 96%, 0), #fff 16%);
+}
+.VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper .expandButton:hover {
+  text-decoration: underline;
+}
+.VideoDetailPage .watchWrapper .rightContent {
+  width: 34%;
+  min-width: 400px;
+  margin-left: 8px;
+  position: relative;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper {
+  background-color: #fff;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #e5e8ea;
+  border-radius: 20px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .listControler {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  height: 40px;
+  cursor: pointer;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .autoScroll {
+  display: flex;
+  justify-content: end;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .autoScroll.collapsed {
+  display: none;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList {
+  border-top: 1px solid #e5e8ea;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  height: 400px;
+  width: 100%;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList.collapsed {
+  display: none;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem {
+  display: flex;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem:hover {
+  background-color: #f4f4f4;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem > div {
+  display: flex;
+  justify-content: center;
+  height: 30px;
+  padding: 5px 0;
+  font-size: 15px;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem .commentContent {
+  display: block;
+  width: 200px;
+  flex: 0 0 200px;
+  overflow: hidden;
+  border-right: solid 1px rgba(231, 231, 231, 0.9058823529);
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem .commentTime {
+  width: 100px;
+  flex: 0 0 100px;
+  border-right: solid 1px rgba(231, 231, 231, 0.9058823529);
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem .commentNumber {
+  width: 50px;
+  flex: 0 0 50px;
+  border-right: solid 1px rgba(231, 231, 231, 0.9058823529);
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem .commentPostedAt {
+  width: 200px;
+  flex: 0 0 200px;
+  border-right: solid 1px rgba(231, 231, 231, 0.9058823529);
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentHeader:hover {
+  background-color: #fff;
+}
+.VideoDetailPage .watchWrapper .rightContent .shortcut {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  color: #fff;
+}
+.VideoDetailPage .watchWrapper .rightContent .shortcut.hidden {
+  display: none;
+}
+.VideoDetailPage .watchWrapper .rightContent .shortcut .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #333;
+  height: 50px;
+  padding: 10px;
+}
+.VideoDetailPage .watchWrapper .rightContent .shortcut .header .closeButton {
+  cursor: pointer;
+}
+.VideoDetailPage .watchWrapper .rightContent .shortcut .content {
+  background: rgba(0, 0, 0, 0.9);
+  height: 450px;
+}
+.VideoDetailPage .watchWrapper .rightContent .shortcut .content .section {
+  margin-left: 10px;
+  padding: 10px;
+  border-bottom: 2px solid #666;
+}
+.VideoDetailPage .watchWrapper .rightContent .shortcut .content .item {
+  margin-left: 20px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #666;
+}
+.VideoDetailPage .watchWrapper .rightContent .playlist {
+  margin-top: 16px;
+}
+.VideoDetailPage .watchWrapper .rightContent .playlist .playlistVideo {
+  margin: 8px;
+  display: flex;
+  height: 100px;
+  cursor: pointer;
+}
+.VideoDetailPage .watchWrapper .rightContent .playlist .playlistVideo .thumbnail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30%;
+}
+.VideoDetailPage .watchWrapper .rightContent .playlist .playlistVideo .thumbnail img {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+}
+.VideoDetailPage .watchWrapper .rightContent .playlist .playlistVideo .videoInfo {
+  width: 70%;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.VideoDetailPage .watchWrapper .rightContent .playlist .playlistVideo .videoInfo .title {
+  font-weight: bold;
+}
+.VideoDetailPage .watchWrapper .rightContent .playlist .playlistVideo .videoInfo .other {
+  font-size: 14px;
 }
 .VideoDetailPage .TagContainer {
   width: calc(700px + 400px);
@@ -95,8 +494,12 @@
   color: #b2bac2;
 }
 .VideoDetailPage .ControlsContainer {
-  display: flex;
-  justify-content: center;
-  margin: 0 auto;
-  width: calc(700px + 400px);
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+.VideoDetailPage .ControlsContainer button {
+  border-radius: 50%;
+  height: 60px;
+  width: 60px;
 }

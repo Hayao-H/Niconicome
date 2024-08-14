@@ -24,8 +24,10 @@ namespace Niconicome.Models.Domain.Local.Server.API.Comment.V1.Local
                 {
                     Body = chat.Text,
                     UserID = chat.UserId,
-                    VposMS = chat.Vpos * 1000,
-                    Mail = chat.Mail
+                    VposMS = chat.Vpos * 10,
+                    Mail = chat.Mail,
+                    PostedAt = DateTimeOffset.FromUnixTimeSeconds(chat.Date).ToLocalTime().DateTime,
+                    Number = chat.No,
                 };
                 commentType.Comments.Add(comment);
             }

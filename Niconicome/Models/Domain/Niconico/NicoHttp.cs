@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
+using System.Net.Security;
 using System.Reflection;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Settings;
@@ -101,7 +103,7 @@ namespace Niconicome.Models.Domain.Niconico
 
         public async Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content, Dictionary<string, string>? headers = null)
         {
-            var  message =this.CreateRequest(HttpMethod.Post, uri);
+            var message = this.CreateRequest(HttpMethod.Post, uri);
             message.Content = content;
             if (headers is not null)
             {
@@ -138,6 +140,23 @@ namespace Niconicome.Models.Domain.Niconico
         private readonly HttpClient _client;
 
         #endregion
+    }
+
+    public class NicoHttpClientHandler : HttpClientHandler
+    {
+        private readonly bool _skipSSL;
+
+        public NicoHttpClientHandler(CookieContainer container, bool skip)
+        {
+            this.UseCookies = true;
+            this._skipSSL = skip;
+            this.CookieContainer = container;
+            this.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                    {
+                        if (this._skipSSL) return true;
+                        return sslPolicyErrors == SslPolicyErrors.None;
+                    };
+        }
     }
 
 }

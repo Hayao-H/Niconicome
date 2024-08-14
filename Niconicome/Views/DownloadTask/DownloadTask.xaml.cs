@@ -33,7 +33,7 @@ namespace Niconicome.Views.DownloadTask
             {
                 e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
                 {
-                    AdditionalBrowserArguments = "--disable-web-security"
+                    AdditionalBrowserArguments = string.Join(' ', ["--disable-web-security", "--disable-features=AutoupgradeMixedContent"]),
                 };
             };
         }

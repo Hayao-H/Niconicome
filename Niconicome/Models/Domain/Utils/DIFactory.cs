@@ -80,6 +80,11 @@ using WatchAPIv1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
 using CommentAPIV1 = Niconicome.Models.Domain.Local.Server.API.Comment.V1;
 using RegacyHLSAPIV1 = Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;
+using ResourceAPIV1 = Niconicome.Models.Domain.Local.Server.API.Resource.V1;
+using VideoInfoAPIV1 = Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1;
+using System.Reflection.Metadata;
+using System.Net;
+using NGAPIV1  = Niconicome.Models.Domain.Local.Server.API.NG.V1;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -91,20 +96,12 @@ namespace Niconicome.Models.Domain.Utils
             services.AddWpfBlazorWebView();
             services.AddBlazorWebViewDeveloperTools();
             services.AddHttpClient<Niconico::INicoHttp, Niconico::NicoHttp>()
-                .ConfigureHttpMessageHandlerBuilder(builder =>
+                .ConfigurePrimaryHttpMessageHandler(provider =>
                 {
-                    var shandler = builder.Services.GetRequiredService<Settings::ILocalSettingHandler>();
+                    var shandler = provider.GetRequiredService<Settings::ILocalSettingHandler>();
                     var skip = shandler.GetBoolSetting(Settings::SettingsEnum.SkipSSLVerification);
-                    if (builder.PrimaryHandler is HttpClientHandler handler)
-                    {
-                        handler.CookieContainer = builder.Services.GetRequiredService<Niconico::ICookieManager>().CookieContainer;
-                        handler.UseCookies = true;
-                        handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
-                        {
-                            if (skip) return true;
-                            return sslPolicyErrors == SslPolicyErrors.None;
-                        };
-                    }
+                    CookieContainer container = provider.GetRequiredService<Niconico::ICookieManager>().CookieContainer;
+                    return new Niconico::NicoHttpClientHandler(container, skip);
                 });
             services.AddSingleton<Niconico::ICookieManager, Niconico::CookieManager>();
             services.AddTransient<Auth::ISession, Auth::Session>();
@@ -405,13 +402,16 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<WatchAPIv1::HLS.IPlaylistCreator, WatchAPIv1::HLS.PlaylistCreator>();
             services.AddTransient<WatchAPIv1::LocalFile.ILocalFileInfoHandler, DlVideoV3::Local.StreamJson.StreamJsonHandler>();
             services.AddSingleton<WatchAPIv1::Session.ISessionManager, WatchAPIv1::Session.SessionManager>();
-            services.AddTransient<WatchAPIv1::IWatchHandler,WatchAPIv1::WatchHandler>();
+            services.AddTransient<WatchAPIv1::IWatchHandler, WatchAPIv1::WatchHandler>();
             services.AddTransient<WatchAPIv1::HLS.AES.IDecryptor, WatchAPIv1::HLS.AES.Decryptor>();
             services.AddTransient<CommentAPIV1::ICommentRequestHandler, CommentAPIV1::CommentRequestHandler>();
             services.AddTransient<CommentAPIV1::Local.ICommentRetreiver, CommentAPIV1::Local.CommentRetreiver>();
             services.AddTransient<CommentAPIV1::Local.ICommentConverter, CommentAPIV1::Local.CommentConverter>();
             services.AddTransient<RegacyHLSAPIV1::SegmentCreator.IHLSManager, RegacyHLSAPIV1::SegmentCreator.HLSManager>();
             services.AddTransient<RegacyHLSAPIV1::IRegacyHLSHandler, RegacyHLSAPIV1::RegacyHLSHandler>();
+            services.AddTransient<ResourceAPIV1::IResourceHandler, ResourceAPIV1::ResourceHandler>();
+            services.AddTransient<VideoInfoAPIV1::IVideoInfoHandler, VideoInfoAPIV1::VideoInfoHandler>();
+            services.AddTransient<NGAPIV1::INGHandler, NGAPIV1::NGHandler>();
 
 
             return services.BuildServiceProvider();

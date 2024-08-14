@@ -5,7 +5,10 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using Niconicome.Models.Domain.Local.Server.API.Comment.V1;
+using Niconicome.Models.Domain.Local.Server.API.NG.V1;
 using Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;
+using Niconicome.Models.Domain.Local.Server.API.Resource.V1;
+using Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1;
 using Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
@@ -39,7 +42,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class Server : IServer
     {
-        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IErrorHandler errorHandler, IPortHandler portHandler, IWatchHandler watchHandler, ICommentRequestHandler commentRequestHandler, IRegacyHLSHandler regacyHLSHandler, IIPHandler iPHandler)
+        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IErrorHandler errorHandler, IPortHandler portHandler, IWatchHandler watchHandler, ICommentRequestHandler commentRequestHandler, IRegacyHLSHandler regacyHLSHandler, IIPHandler iPHandler, IResourceHandler resourceHandler, IVideoInfoHandler videoInfoHandler,INGHandler nGHandler)
         {
             this._urlHandler = urlHandler;
             this._video = video;
@@ -52,6 +55,9 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             this._watchHandler = watchHandler;
             this._commentRequestHandler = commentRequestHandler;
             this._regacyHLSHandler = regacyHLSHandler;
+            this._resourceHandler = resourceHandler;
+            this._videoInfoHandler = videoInfoHandler;
+            this._nGHandler = nGHandler;
             this._iPHandler = iPHandler;
         }
 
@@ -83,6 +89,12 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         private readonly ICommentRequestHandler _commentRequestHandler;
 
         private readonly IRegacyHLSHandler _regacyHLSHandler;
+
+        private readonly IResourceHandler _resourceHandler;
+
+        private readonly IVideoInfoHandler _videoInfoHandler;
+
+        private readonly INGHandler _nGHandler;
 
         private readonly IIPHandler _iPHandler;
 
@@ -172,7 +184,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                                 return;
                             }
 
-                            if (request.HttpMethod != "GET")
+                            if (request.HttpMethod != "GET" && request.HttpMethod != "POST")
                             {
                                 context.Response.Close();
                                 return;
@@ -240,6 +252,33 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                                 try
                                 {
                                     result = await this._regacyHLSHandler.Handle(request.Url.ToString(), response, this.Port);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.ResourceAPI)
+                            {
+                                try
+                                {
+                                    result = this._resourceHandler.Handle(request.Url.ToString(), response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.VideoInfoAPI)
+                            {
+                                try
+                                {
+                                    result = this._videoInfoHandler.Handle(this.Port, request.Url.ToString(), response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.NG)
+                            {
+                                try
+                                {
+                                    result = this._nGHandler.Handle(request, response);
                                 }
                                 catch { }
                             }

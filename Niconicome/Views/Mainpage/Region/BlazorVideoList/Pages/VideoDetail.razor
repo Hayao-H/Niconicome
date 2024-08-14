@@ -7,87 +7,10 @@
 @using System.Threading;
 
 <div class="VideoDetailPage">
-    @if (DataContext.VideoInfo is not null)
+    @if (!string.IsNullOrEmpty(DataContext.JsWatchInfo.Value))
     {
-        <div class="VideotitleContainer">
-            @if (DataContext.VideoInfo.IsDownloaded.Value)
-            {
-                <h3>
-                    @(DataContext.VideoInfo.Title)
-                    <span class="DownloadStatus Downloaded"><i class="VideoInfoIcon fa-solid fa-download"></i>ダウンロード済み</span>
-                </h3>
-            }
-            else
-            {
-                <h3>
-                    @(DataContext.VideoInfo.Title)
-                    <span class="DownloadStatus NotDownloaded"><i class="VideoInfoIcon fa-solid fa-download"></i>未ダウンロード</span>
-                </h3>
-            }
-
-        </div>
-
-        <div class="VideoContentContainer">
-            @if (DataContext.CanPlay.Value)
-            {
-                <div class="VideoElement">
-                    <video-js id="video-player" controls>
-                        <source src="@DataContext.VideoUrl" type="application/x-mpegURL" />
-                    </video-js>
-                </div>
-            }
-            else
-            {
-                <img class="VideoElement" src="data:image/jpeg;base64,@(DataContext.VideoInfo.Base64ThumbData.Value)" />
-            }
-            <div class="VideoInfoContainer">
-                <div class="VideoInfoRow">
-                    <p><i class="VideoInfoIcon fa-solid fa-user"></i>投稿者</p>
-                    <p>
-                        <a href="https://www.nicovideo.jp/user/@(DataContext.VideoInfo.OwnerID)">@(DataContext.VideoInfo.OwnerName)さん</a>
-                        <a class="UserVideos" href="https://www.nicovideo.jp/user/@(DataContext.VideoInfo.OwnerID)/video">投稿動画</a>
-                    </p>
-                </div>
-                <div class="VideoInfoRow">
-                    <p><i class="VideoInfoIcon fa-solid fa-calendar"></i>投稿日時</p>
-                    <p>@(DataContext.VideoInfo.UploadedOn)</p>
-                </div>
-                <div class="VideoInfoRow">
-                    <p><i class="VideoInfoIcon fa-solid fa-play"></i>再生回数</p>
-                    <p>@(DataContext.VideoInfo.ViewCount)</p>
-                </div>
-                <div class="VideoInfoRow">
-                    <p><i class="VideoInfoIcon fa-solid fa-message"></i>コメント数</p>
-                    <p>@(DataContext.VideoInfo.CommentCount)</p>
-                </div>
-                <div class="VideoInfoRow">
-                    <p><i class="VideoInfoIcon fa-solid fa-folder"></i>マイリスト数</p>
-                    <p>@(DataContext.VideoInfo.MylistCount)</p>
-                </div>
-                <div class="VideoInfoRow">
-                    <p><i class="VideoInfoIcon Like fa-solid fa-heart"></i>いいね数</p>
-                    <p>@(DataContext.VideoInfo.LikeCount)</p>
-                </div>
-                <div class="VideoInfoRow">
-                    <p><i class="VideoInfoIcon fa-solid fa-globe"></i>動画ID</p>
-                    <p><a href="https://nico.ms/@(DataContext.VideoInfo.NiconicoId)">@(DataContext.VideoInfo.NiconicoId)</a></p>
-                </div>
-            </div>
-        </div>
-
-        <ul class="TagContainer">
-            @foreach (var tag in DataContext.VideoInfo.Tags)
-            {
-                @if (tag.IsNicodicExistthis)
-                {
-                    <li class="Tag"><a class="TagName" href="https://nicovideo.jp/tag/@(tag.Name)">@(tag.Name)</a><a href="https://dic.nicovideo.jp/a/@(tag.Name)"><i class="TagIcon NicoDic fa-solid fa-book"></i></a></li>
-                }
-                else
-                {
-                    <li class="Tag"><a class="TagName" href="https://nicovideo.jp/tag/@(tag.Name)">@(tag.Name)</a><a href="https://dic.nicovideo.jp/a/@(tag.Name)"><i class="TagIcon Question fa-solid fa-circle-question"></i></a></li>
-                }
-            }
-        </ul>
+        <div id="jsWatchInfo" data-js-watch-info="@DataContext.JsWatchInfo.Value" hidden=""></div>
+        <div id="watchApp">読み込み中...</div>
     }
 
     <div class="ControlsContainer">
@@ -102,6 +25,8 @@
 
     private SynchronizationContext? _context;
 
+    private IJSObjectReference? _module;
+
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
@@ -115,14 +40,18 @@
 
         DataContext.Initialize(this.NiconicoID);
 
+
         this.StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (DataContext.CanPlay.Value)
+        await base.OnAfterRenderAsync(firstRender);
+
+        this._module = await JS.InvokeAsync<IJSObjectReference>("import", "/script/Pages/VideoList/detail/main.js");
+        if (firstRender && this._module is not null)
         {
-            await JS.InvokeVoidAsync("initializeVideo");
+            await this._module.InvokeVoidAsync("main");
         }
     }
 }

@@ -1,10 +1,10 @@
 import * as esbuild from "https://deno.land/x/esbuild@v0.19.7/mod.js";
-import "https://deno.land/std@0.208.0/dotenv/load.ts";
+import  "https://deno.land/std@0.222.0/dotenv/load.ts";
 
 const isDevelopment = Deno.args[0] === "development";
-console.log(Deno.env.get("VIDEOLIST_DIR"));
 
-console.log(isDevelopment);
+console.log(`target directory: ${Deno.env.get("VIDEOLIST_DIR")}`);
+console.log(`isDevelopment: ${isDevelopment}`);
 
 try {
   await esbuild.build({
@@ -21,4 +21,4 @@ try {
   Deno.exit(1);
 }
 
-Deno.exit(0);
+esbuild.stop();

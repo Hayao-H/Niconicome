@@ -236,12 +236,19 @@ export default class NicommentJS {
     } else {
       throw new Error(NicoExceptions.LAYER.LAYER_DOES_NOT_EXIST(layer));
     }
+
+    if (this.isDebug){
+      Logger.write(`コメントを追加しました。(${text})`);
+    }
   }
 
   /**
    * 一時停止
    */
   pause(): void {
+    if (this.isDebug){
+      Logger.write("一時停止");
+    }
     this.isPlay = false;
   }
 
@@ -249,6 +256,9 @@ export default class NicommentJS {
    * 再生
    */
   play(): void {
+    if(this.isDebug){
+      Logger.write("再生");
+    }
     this.isPlay = true;
   }
 
@@ -282,6 +292,9 @@ export default class NicommentJS {
     });
     this.ctx.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
     this.layers.clear();
+    if (this.isDebug){
+      Logger.write("全ての処理を終了しました。");
+    }
   }
 
   /**
@@ -516,12 +529,12 @@ const NicoExceptions = {
          * 高さが数字でない
          */
         HEIGHT: (value: string) =>
-          `[ERR]${value} is not a number. "height" mus be a number.`,
+          `[ERR]${value} is not a number. "height" must be a number.`,
         /**
          * 横幅が数字でない
          */
         WIDTH: (value: string) =>
-          `[ERR]${value} is not a number. "width" mus be a number.`,
+          `[ERR]${value} is not a number. "width" must be a number.`,
       },
     },
     /**

@@ -189,5 +189,10 @@ namespace Niconicome.Workspaces
         /// </summary>
         public static Playlist::Manager.IPlaylistEventManager PlaylistEventManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.IPlaylistEventManager>();
 
+        /// <summary>
+        /// 動画情報
+        /// </summary>
+        public static Server::API.VideoInfo.V1.IVideoInfoHandler VideoInfoHandler { get; set; } = DIFactory.Resolve<Server::API.VideoInfo.V1.IVideoInfoHandler>();
+
     }
 }

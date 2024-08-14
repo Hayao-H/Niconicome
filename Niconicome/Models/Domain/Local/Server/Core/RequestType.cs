@@ -16,5 +16,8 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         WatchAPI,
         CommentAPI,
         RegacyHLSAPI,
+        ResourceAPI,
+        VideoInfoAPI,
+        NG,
     }
 }

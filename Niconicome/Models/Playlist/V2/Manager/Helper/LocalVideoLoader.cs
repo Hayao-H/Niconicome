@@ -81,8 +81,8 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             if (string.IsNullOrEmpty(folderPath))
             {
                 folderPath = this.GetDownlaodDirectory(this._playlistVideoContainer.CurrentSelectedPlaylist);
-                this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath = folderPath;
             }
+            this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath = folderPath;
 
             ///削除動画のサムネを保存
             await this._thumbnailUtility.DownloadDeletedVideoThumbAsync();

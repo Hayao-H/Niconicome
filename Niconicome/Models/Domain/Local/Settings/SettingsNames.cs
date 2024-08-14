@@ -50,7 +50,7 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string PostDownloadAction { get; private set; } = "Download.General.PostDownloadAction";
 
         //Download.General.DownloadCompletionAudio
-        public static string PlaySoundAfterDownload { get; private set; }= "Download.General.DownloadCompletionAudio.Enable";
+        public static string PlaySoundAfterDownload { get; private set; } = "Download.General.DownloadCompletionAudio.Enable";
 
         public static string DownloadCompletionAudioPath { get; private set; } = "Download.General.DownloadCompletionAudio.Path";
 
@@ -231,6 +231,13 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         //Videolist.File
         public static string SearchVideosExact { get; private set; } = "Videolist.File.SearchVideosExact";
+
+        //Watch.NG
+        public static string NGUserIds { get; private set; } = "Watch.NG.NGUserIds";
+
+        public static string NGWords { get; private set; } = "Watch.NG.NGWords";
+
+        public static string NGCommands { get; private set; } = "Watch.NG.NGCommands";
 
         //Application
         public static string LimitWindowsToSingleton { get; private set; } = "Application.LimitWindowsToSingleton";
