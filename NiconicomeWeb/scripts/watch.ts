@@ -2,8 +2,8 @@ import * as esbuild from "https://deno.land/x/esbuild@v0.19.7/mod.js";
 import "https://deno.land/std@0.222.0/dotenv/load.ts";
 import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.9.0/mod.ts";
 
-const isDevelopment = Deno.args[0] === "development";
 const isWatch = Deno.args[0] === "watch";
+const isDevelopment = Deno.args[0] === "development" || isWatch;
 
 console.log(`target directory: ${Deno.env.get("VIDEOLIST_DIR")}`);
 console.log(`isDevelopment: ${isDevelopment}`);
@@ -20,7 +20,7 @@ async function createContext() {
         build.onEnd((result) => {
           if (result.errors.length > 0) {
             console.error("Build Error!!");
-           watch();
+            watch();
           } else if (count === 0) {
             count++;
             console.log("First build is done. Watching files");
@@ -34,10 +34,13 @@ async function createContext() {
     entryPoints: ["./NiconicomeWeb/src/watch/ui/main.tsx"],
     minify: false,
     bundle: true,
-    sourcemap: "inline",
+    sourcemap: isDevelopment ? "inline" : false,
     outdir: Deno.env.get("DETAIL_DIR"),
     target: ["edge122"],
     format: "esm",
+    define: {
+      "DEBUG_MODE": isDevelopment ? "true" : "false",
+    },
   });
 }
 
@@ -46,7 +49,7 @@ async function watch() {
     context.dispose();
     context = undefined;
     setTimeout(() => {
-      console.log("Restart watching...")
+      console.log("Restart watching...");
       watch();
     }, 5000);
     return;

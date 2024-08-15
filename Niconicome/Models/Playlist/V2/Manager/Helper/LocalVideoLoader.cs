@@ -274,7 +274,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
         /// <returns></returns>
         private bool IsDownloaded(IVideoInfo videoInfo)
         {
-            return videoInfo.FilePath.EndsWith(".json") && this._fileIO.Exists(videoInfo.FilePath);
+            return this._fileIO.Exists(videoInfo.FilePath);
         }
 
         #endregion

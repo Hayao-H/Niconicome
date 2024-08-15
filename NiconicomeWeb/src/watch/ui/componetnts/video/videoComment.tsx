@@ -2,14 +2,12 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState,
 } from "https://esm.sh/react@18.2.0";
 import { VideoStateContext } from "../../state/videoState.ts";
 import ComDraw from "../../comment/drawer/commentDrawer.ts";
 import { CommentManagerImpl } from "../../comment/manager/commentManager.ts";
 import { CommentFetcherObj } from "../../comment/fetch/commentFetcher.ts";
 import { useResizeHandled } from "../../hooks/useResize.ts";
-import { ManagedComment } from "../../comment/manager/managedComment.ts";
 
 export const VideoComment = () => {
   const { state, dispatch } = useContext(VideoStateContext);
@@ -46,13 +44,17 @@ export const VideoComment = () => {
         (result) => {
           fetching.current = false;
           if (result.IsSucceeded && result.Data !== null) {
-            dispatch({
-              "type": "comments",
-              "payload": {
-                comments: result.Data,
-                niconicoID: jsWatchInfo.video.niconicoID,
+            const filtered = state.ngHandler!.filterNG(result.Data).then(
+              (comments) => {
+                dispatch({
+                  "type": "comments",
+                  "payload": {
+                    comments: comments,
+                    niconicoID: jsWatchInfo.video.niconicoID,
+                  },
+                });
               },
-            });
+            );
           } else {
             dispatch({
               "type": "comments",
@@ -87,7 +89,11 @@ export const VideoComment = () => {
         type: "commentManager",
         payload: manager,
       });
-      manager.load(state.comments.comments, state.video.duration);
+      manager.load(
+        state.comments.comments,
+        state.video.duration,
+        state.comments.niconicoID,
+      );
       if (!state.video.paused) {
         manager.start();
       }

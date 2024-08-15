@@ -80,6 +80,7 @@ class LoggerImpl implements Logger {
   }
 
   debug(message: string): void {
+    if (!DEBUG_MODE) return;
     const log = this.createLog("debug", message);
     this.writeLog(log);
   }

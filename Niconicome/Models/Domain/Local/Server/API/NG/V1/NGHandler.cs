@@ -73,10 +73,11 @@ namespace Niconicome.Models.Domain.Local.Server.API.NG.V1
             this.SetSettings();
 
             var content = JsonParser.Serialize(new { Words = this._ngWords!.Value, Users = this._ngUsers!.Value, Commands = this._ngCommands!.Value });
-            var writer = new StreamWriter(response.OutputStream);
+            var writer = new StreamWriter(response.OutputStream, encoding: Encoding.UTF8);
             writer.Write(content);
             writer.Flush();
             response.StatusCode = (int)HttpStatusCode.OK;
+            response.ContentEncoding = Encoding.UTF8;
             response.ContentType = "application/json";
         }
 
@@ -141,7 +142,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.NG.V1
             Debug.WriteLine(body);
 
             // Do something
-            this.WriteMessage("Hello World!!", (int)HttpStatusCode.OK, response);
+            this.WriteMessage("{\"status\":200,\"message\":\"success\"}", (int)HttpStatusCode.OK, response);
         }
 
         private RequestType GetRequestType(string url)

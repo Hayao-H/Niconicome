@@ -324,7 +324,7 @@
      -moz-user-select: none;
           user-select: none;
 }
-.VideoDetailPage .watchWrapper .rightContent .commentWrapper .listControler {
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper > .listControler {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -335,6 +335,13 @@
 .VideoDetailPage .watchWrapper .rightContent .commentWrapper .autoScroll {
   display: flex;
   justify-content: end;
+  align-items: center;
+  height: 30px;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .autoScroll .ngToggle {
+  margin-left: 16px;
+  color: rgba(78, 78, 78, 0.3058823529);
+  cursor: pointer;
 }
 .VideoDetailPage .watchWrapper .rightContent .commentWrapper .autoScroll.collapsed {
   display: none;
@@ -388,6 +395,79 @@
 }
 .VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentHeader:hover {
   background-color: #fff;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  padding: 8px;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper.collapsed {
+  display: none;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper > .listControler {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  height: 40px;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper > .listControler p {
+  font-weight: bold;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper > .listControler .close {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper > .listControler .close:hover {
+  background-color: rgba(231, 231, 231, 0.9058823529);
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngList {
+  height: 350px;
+  overflow: auto;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngList .ngItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  height: 50px;
+  border-radius: 8px;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngList .ngItem:hover {
+  background-color: rgba(231, 231, 231, 0.9058823529);
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngList .ngItem .content {
+  display: flex;
+  align-items: flex-end;
+  height: 40px;
+  line-height: 40px;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngList .ngItem .content .type {
+  margin-right: 10px;
+  font-size: 14px;
+  color: #a3a3a3;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngList .ngItem .remove {
+  cursor: pointer;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngList .ngItem .remove:hover {
+  color: #f11e37;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngInput {
+  border-top: solid 2px rgba(231, 231, 231, 0.9058823529);
+  margin-top: 16px;
+  padding: 8px;
+}
+.VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngInput .ngSelect {
+  margin-bottom: 8px;
 }
 .VideoDetailPage .watchWrapper .rightContent .shortcut {
   position: absolute;

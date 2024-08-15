@@ -3,6 +3,7 @@ import { Video } from "../video/videoElement.ts";
 import { JsWatchInfo } from "../jsWatchInfo/videoInfo.ts";
 import { CommentManager } from "../comment/manager/commentManager.ts";
 import { ManagedComment } from "../comment/manager/managedComment.ts";
+import { NGHandler } from "../comment/ng/ngHandler.ts";
 
 interface VideoStateData {
   canPlay: boolean;
@@ -15,6 +16,7 @@ interface VideoStateData {
   jsWatchInfo: JsWatchInfo | undefined;
   commentManager: CommentManager | undefined;
   comments: CommentData | undefined;
+  ngHandler: NGHandler | undefined;
 }
 
 export interface VideoState {
@@ -48,6 +50,7 @@ export const InitialData: VideoStateData = {
     left: 0,
     top: 0,
   },
+  ngHandler: undefined,
 };
 
 type VideoStateAction = {

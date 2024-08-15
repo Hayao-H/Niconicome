@@ -51,12 +51,16 @@ namespace Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1.SegmentCreator
 
         private readonly IFFmpegManager _fFmpegManager;
 
+        private bool _isRunnning;
+
         #endregion
 
         #region Method
 
         public async Task<IAttemptResult> CreateFilesAsync(string niconicoID, int playlistID)
         {
+            if (this._isRunnning) return AttemptResult.Fail(this._errorHandler.HandleError(HLSManagerError.AlreadyRunning));
+
             string path = Path.Combine(AppContext.BaseDirectory, "data", "tmp", "hls", playlistID.ToString(), niconicoID, "master.m3u8");
             if (this._fileIO.Exists(path))
             {
@@ -89,7 +93,11 @@ namespace Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1.SegmentCreator
                 return dResult;
             }
 
-            return await this.CreateHLSFilesAsync(video.FilePath, playlistID, niconicoID);
+            _isRunnning = true;
+            var result = await this.CreateHLSFilesAsync(video.FilePath, playlistID, niconicoID);
+            _isRunnning = false;
+
+            return result;
         }
 
 

@@ -14,11 +14,18 @@ import { VideoInfo } from "./componetnts/video/videoInfo/videoInfo.tsx";
 import { Comment } from "./componetnts/comment/comment.tsx";
 import { Controler } from "./componetnts/video/controler/controler.tsx";
 import { Playlist } from "./componetnts/playlist/playlist.tsx";
-import { Logger } from "./state/logger.ts";
 import { ContextMenu } from "./componetnts/videoContextMenu/contextMenu.tsx";
 import { Shortcut } from "./componetnts/shortcut/shortcut.tsx";
+import { NGHandlerImpl } from "./comment/ng/ngHandler.ts";
+import { NGDataFetcherImpl } from "./comment/ng/ngDataFethcer.ts";
+
+declare global {
+  // deno-lint-ignore no-var
+  var DEBUG_MODE: boolean;
+}
 
 export function main() {
+  console.log(DEBUG_MODE);
   const element = document.querySelector("#watchApp");
 
   const handler: JsWatchInfoHandler = new JsWatchInfoHandlerImpl();
@@ -40,6 +47,9 @@ const Main = (
   const [state, dispatch] = useReducer(reduceFunc, {
     ...InitialData,
     jsWatchInfo: jsWatchInfo,
+    ngHandler: new NGHandlerImpl(
+      new NGDataFetcherImpl(jsWatchInfo.comment.commentNGAPIBaseUrl),
+    ),
   });
 
   return (

@@ -6,10 +6,12 @@ import React, {
 } from "https://esm.sh/react@18.2.0";
 import { VideoStateContext } from "../../state/videoState.ts";
 import { CommentItem } from "./commentItem.tsx";
+import { NGList } from "./ng/ngList.tsx";
 
 export const Comment = () => {
   const { state, dispatch } = useContext(VideoStateContext);
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isNGExpanded, setIsNGExpanded] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const currentVideo = useRef("");
   const [isAutoScroll, setIsAutoScroll] = useState(true);
@@ -68,6 +70,8 @@ export const Comment = () => {
         </p>
       </div>
 
+      <NGList isExpanded={isNGExpanded} close={() => setIsNGExpanded(false)} />
+
       <div
         className={`autoScroll form-check form-switch form-check-reverse ${
           isExpanded ? "" : "collapsed"
@@ -84,6 +88,10 @@ export const Comment = () => {
         <label className="form-check-label" htmlFor="commentScrollSwitch">
           自動スクロール
         </label>
+
+        <p className="ngToggle" title="NG設定" onClick={() => setIsNGExpanded(true)}>
+          <i className="fa-regular fa-thumbs-down fa-lg"/> 
+        </p>
       </div>
 
       <div

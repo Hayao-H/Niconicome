@@ -22,6 +22,7 @@ export interface Media {
 
 export interface Comment {
   contentUrl: string;
+  commentNGAPIBaseUrl: string;
 }
 
 export interface Thumbnail {

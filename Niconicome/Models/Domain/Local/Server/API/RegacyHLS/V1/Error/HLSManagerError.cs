@@ -18,6 +18,8 @@ namespace Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1.Error
         [ErrorEnum(ErrorLevel.Error, "プレイリストと動画IDを抽出できませんでした。")]
         CannotExtractPlaylistAndVideoID,
         [ErrorEnum(ErrorLevel.Error, "新サーバーの動画です。(id:{0}, playlist:{1})")]
-        VideoIsDMS
+        VideoIsDMS,
+        [ErrorEnum(ErrorLevel.Error, "現在変換を実行中です。")]
+        AlreadyRunning,
     }
 }
