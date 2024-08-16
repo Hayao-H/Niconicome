@@ -2,6 +2,7 @@ import Hls from "https://esm.sh/hls.js@1.5.8";
 import { JsWatchInfo } from "../jsWatchInfo/videoInfo.ts";
 import { AttemptResult } from "../../../shared/AttemptResult.ts";
 import { AttemptResultImpl } from "../../../shared/AttemptResult.ts";
+import { Logger } from "../state/logger.ts";
 
 export interface Video {
   /**
@@ -35,7 +36,7 @@ export interface Video {
   Initialize(
     source: JsWatchInfo,
     videoElement?: HTMLVideoElement | undefined,
-  ): AttemptResult;
+  ): Promise<AttemptResult>;
 
   /**
    * イベントリスナー登録
@@ -118,10 +119,10 @@ export class VideoImpl implements Video {
     this._videoElement.loop = repeat;
   }
 
-  public Initialize(
+  public async Initialize(
     source: JsWatchInfo,
     videoElement?: HTMLVideoElement | undefined,
-  ): AttemptResult {
+  ): Promise<AttemptResult> {
     if (!Hls.isSupported()) {
       return AttemptResultImpl.Fail("HLS is not supported");
     }
@@ -137,16 +138,18 @@ export class VideoImpl implements Video {
     this._hls = new Hls();
 
     if (!this._source.media.isDMS) {
-      fetch(source.media.createUrl)
-        .then((res) => {
-          if (!res.ok) {
-            return AttemptResultImpl.Fail("Failed to fetch DMS URL");
-          }
-        });
-    }
+      const res = await fetch(source.media.createUrl);
+      if (!res.ok) {
+        return AttemptResultImpl.Fail("Failed to fetch DMS URL");
+      }
 
-    this._hls.loadSource(source.media.contentUrl);
-    this._hls.attachMedia(this._videoElement);
+      Logger.log("HLSメディアファイルを生成しました。");
+      this._hls!.loadSource(source.media.contentUrl);
+      this._hls!.attachMedia(this._videoElement);
+    } else {
+      this._hls.loadSource(source.media.contentUrl);
+      this._hls.attachMedia(this._videoElement);
+    }
 
     return AttemptResultImpl.Succeeded();
   }

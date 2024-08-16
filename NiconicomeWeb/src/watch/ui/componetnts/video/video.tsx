@@ -45,12 +45,13 @@ export const VideoElement = (
       const video = new VideoImpl(
         videoRef.current,
       );
-      const result = video.Initialize(state.jsWatchInfo);
+      video.Initialize(state.jsWatchInfo)
+      .then((result) => {
       if (!result.IsSucceeded) {
         Logger.error(result.Message ?? "動画の読み込みに失敗しました。");
       } else {
         Logger.log(
-          `動画を読み込みました。(${state.jsWatchInfo.media.contentUrl})`,
+          `動画を読み込みました。(${state.jsWatchInfo!.media.contentUrl})`,
         );
         video.on("pause", () => {
           dispatch({
@@ -70,20 +71,21 @@ export const VideoElement = (
           type: "video",
           payload: video,
         });
-      }
+      }});
     } else {
       const video = state.video;
       if (video === undefined) return;
       if (videoRef.current === null) return;
-      const result = video.Initialize(state.jsWatchInfo, videoRef.current);
+      video.Initialize(state.jsWatchInfo, videoRef.current)
+      .then((result) => {
 
       if (!result.IsSucceeded) {
         Logger.error(result.Message ?? "動画の読み込みに失敗しました。");
       } else {
         Logger.log(
-          `動画を読み込みました。(${state.jsWatchInfo.media.contentUrl})`,
+          `動画を読み込みました。(${state.jsWatchInfo!.media.contentUrl})`,
         );
-      }
+      }});
     }
   });
 

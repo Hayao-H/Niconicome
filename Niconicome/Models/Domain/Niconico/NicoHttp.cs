@@ -73,7 +73,7 @@ namespace Niconicome.Models.Domain.Niconico
             }
 
             client.DefaultRequestHeaders.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
-            client.DefaultRequestHeaders.Add("x-frontend-id", "3");
+            client.DefaultRequestHeaders.Add("X-Frontend-id", "6");
             client.DefaultRequestHeaders.Add("x-frontend-version", "0");
             client.DefaultRequestHeaders.Add("x-client-os-type", "others");
 

@@ -2,7 +2,6 @@ import { unique } from "../../../../shared/Collection/unique.ts";
 import { ManagedComment } from "../manager/managedComment.ts";
 import { NGDataFetcher } from "./ngDataFethcer.ts";
 import { Logger } from "../../state/logger.ts";
-import { Dictionary } from "../../../../shared/Collection/dictionary.ts";
 
 export interface NGHandler {
   /**
