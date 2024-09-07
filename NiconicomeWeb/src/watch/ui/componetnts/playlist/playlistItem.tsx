@@ -23,6 +23,7 @@ export const PlaylistItem = (
   }
 
   function handleClick(niconicoID: string) {
+    Logger.clear();
     globalThis.scrollTo(0, 0);
     Logger.log(`${niconicoID}の読み込みを開始します。`, true);
     const url = `${baseURL}${niconicoID}.json`;

@@ -162,6 +162,7 @@
   right: 0;
   bottom: 0;
   background-color: #444;
+  cursor: pointer;
 }
 .VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .slider .sliderInner {
   position: absolute;
@@ -175,10 +176,12 @@
 .VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .slider .sliderInner.time {
   background-color: #007cff;
   z-index: 2;
+  transition: transform 0.5s;
 }
 .VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .slider .sliderInner.buffer {
   background-color: #fff;
   z-index: 1;
+  transition: transform 0.5s;
 }
 .VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper .sliderHandle {
   position: absolute;
@@ -196,6 +199,7 @@
   background-color: #007cff;
   cursor: pointer;
   border-radius: 50%;
+  transition: left 0.5s;
 }
 .VideoDetailPage .watchWrapper .leftContent .controler .sliderWrapper:hover .sliderHandleInner {
   display: block;

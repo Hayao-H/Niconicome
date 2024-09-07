@@ -5,7 +5,7 @@ import { CommentManager } from "../comment/manager/commentManager.ts";
 import { ManagedComment } from "../comment/manager/managedComment.ts";
 import { NGHandler } from "../comment/ng/ngHandler.ts";
 
-interface VideoStateData {
+export interface VideoStateData {
   canPlay: boolean;
   isSystemMessageVisible: boolean;
   contextMenu: ContextMenuState;
@@ -64,7 +64,7 @@ type VideoStateAction = {
     | "comments"
     | "systemMessage"
     | "contextMenu"
-    | "shortcut";
+    | "shortcut"
   payload:
     | boolean
     | Video

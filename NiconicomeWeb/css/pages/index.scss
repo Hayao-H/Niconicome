@@ -17,6 +17,10 @@ $VideoListRowHeight: 100;
     border-radius: 5px;
 }
 
+*:focus {
+    outline: none;
+}
+
 .PageContent {
     margin: 24px;
     position: relative;
@@ -423,6 +427,7 @@ $VideoListRowHeight: 100;
         background-color: #fff;
         overflow-y: auto;
         border-left: 1px solid #e7e7e7e7;
+        z-index: 9999;
 
         .ToolBar {
             display: flex;
@@ -492,6 +497,168 @@ $VideoListRowHeight: 100;
 
     .OutputContainer.Show {
         display: block;
+    }
+
+    .BottomPanelControler {
+        display: flex;
+        justify-content: stretch;
+        align-items: center;
+        border: 1px solid #e7e7e7e7;
+
+        .PanelItem {
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            flex-grow: 1;
+            border-right: 1px solid #e7e7e7e7;
+            cursor: pointer;
+
+            &.selected {
+                background-color: #f2f3f5;
+            }
+        }
+    }
+
+
+    .Panel{
+        &.Download {
+
+            border: 1px solid #e7e7e7e7;
+            padding: 8px;
+    
+            .nc-border {
+                border-bottom: .5px solid #000;
+            }
+    
+            .downloadTarget,
+            .downloadButton {
+                .title {
+                    color: #737575;
+                    font-size: 14px;
+                    margin-top: 16px;
+                }
+    
+                .forms {
+                    display: flex;
+                    align-items: center;
+                    height: 30px;
+    
+                    .form-check {
+                        margin-right: 16px;
+                        user-select: none;
+                    }
+    
+                    .count {
+                        width: 150px;
+                    }
+                }
+            }
+    
+            .downloadSelect {
+                display: flex;
+                align-items: center;
+    
+                .setting {
+                    margin-right: 16px;
+                    display: flex;
+                    align-items: center;
+    
+                    .form-select {
+                        width: 150px;
+                    }
+                }
+            }
+    
+            .downloadButton {
+                .controls {
+                    display: flex;
+                    justify-content: space-between;
+    
+                    .buttons {
+                        .button {
+                            margin-right: 8px;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.Output {
+            padding: 8px;
+
+            border: 1px solid #e7e7e7e7;
+
+            .Controls {
+                margin-bottom: 8px;
+            }
+
+            .Message {
+                height: 180px;
+                overflow: auto;
+            }
+        }
+
+        &.State {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+            height: 250px;
+            border: 1px solid #e7e7e7e7;
+
+            .counts {
+                display: flex;
+                
+                .item {
+                    margin-right: 16px;
+                }
+            }
+
+            .control {
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+
+        &.Timer {
+            padding: 8px;
+
+            .Item {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                height: 40px;
+
+                .Label {
+                    .Icon {
+                        color: #1e90ff;
+                    }
+                }
+
+                .Input {
+                    &.TimerSetting {
+                        display: flex;
+                        .TimeSetting {
+                            display: flex;
+
+                            .Year {
+                                width: 150px;
+                                margin-right: 8px;
+                            }
+
+                            .Month,.Day,.Hour,.Minute {
+                                width: 100px;
+                                margin-right: 8px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        &.collapsed {
+            display: none;
+        }
     }
 
 }

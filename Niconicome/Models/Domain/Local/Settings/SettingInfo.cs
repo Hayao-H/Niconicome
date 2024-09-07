@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Utils.Reactive;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Domain.Local.Settings
 {
-    public interface ISettingInfo<T> where T : notnull
+    public interface ISettingInfo<T> where T :  notnull
     {
         /// <summary>
         /// 設定名
@@ -26,6 +27,11 @@ namespace Niconicome.Models.Domain.Local.Settings
         /// 設定値(RP)
         /// </summary>
         ReactiveProperty<T> ReactiveValue { get; }
+
+        /// <summary>
+        /// 設定値(BP)
+        /// </summary>
+        IBindableProperty<T> Bindablevalue { get; }
 
         /// <summary>
         /// 変更監視
@@ -73,6 +79,16 @@ namespace Niconicome.Models.Domain.Local.Settings
                 this._store.SetSetting(this);
             });
 
+            this.Bindablevalue = new BindableProperty<T>(initialValue);
+            this.Bindablevalue.RegisterPropertyChangeHandler(value =>
+            {
+                if (EqualityComparer<T>.Default.Equals(value, this._value)) return;
+
+                this._value = value;
+                this.OnChange(value);
+                this._store.SetSetting(this);
+            });
+
         }
 
         #region field
@@ -86,6 +102,8 @@ namespace Niconicome.Models.Domain.Local.Settings
         private Func<T, T>? _converter;
 
         private Action<T>? _handlers;
+
+        private Action _nonValueHandlers;
 
         #endregion
 
@@ -108,11 +126,14 @@ namespace Niconicome.Models.Domain.Local.Settings
                 this._value = value;
                 this.OnChange(value);
                 this.ReactiveValue.Value = value;
+                this.Bindablevalue.Value = value;
                 this._store.SetSetting(this);
             }
         }
 
         public ReactiveProperty<T> ReactiveValue { get; init; }
+
+        public IBindableProperty<T> Bindablevalue { get; init; }
 
 
         #endregion

@@ -28,11 +28,11 @@ export const Shortcut = () => {
         </div>
         <div className="item">
           <p>10秒進める</p>
-          <p>→</p>
+          <p>→ / l</p>
         </div>
         <div className="item">
           <p>10秒戻す</p>
-          <p>←</p>
+          <p>← / j</p>
         </div>
         <div className="item">
           <p>動画の最初に移動</p>

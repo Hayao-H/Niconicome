@@ -8,14 +8,18 @@ import { VideoStateContext } from "../../state/videoState.ts";
 import { CommentItem } from "./commentItem.tsx";
 import { NGList } from "./ng/ngList.tsx";
 
+let isCommentScrollEnabled = true;
+
 export const Comment = () => {
   const { state, dispatch } = useContext(VideoStateContext);
   const [isExpanded, setIsExpanded] = useState(true);
   const [isNGExpanded, setIsNGExpanded] = useState(false);
+  const [autoScroll, setIsAutoScroll] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
   const currentVideo = useRef("");
-  const [isAutoScroll, setIsAutoScroll] = useState(true);
   const lastWheelTime = useRef(Date.now());
+
+  isCommentScrollEnabled = autoScroll;
 
   function sourceChanged(): boolean {
     if (currentVideo.current === "") return true;
@@ -24,7 +28,7 @@ export const Comment = () => {
   }
 
   function onWheel() {
-    if (!isAutoScroll) return;
+    if (!isCommentScrollEnabled) return;
 
     lastWheelTime.current = Date.now();
     setIsAutoScroll(false);
@@ -43,7 +47,7 @@ export const Comment = () => {
 
     if (state.commentManager === undefined) return;
     state.commentManager.on("commentAdded", (comment) => {
-      if (!isAutoScroll) return;
+      if (!isCommentScrollEnabled) return;
       let y = 30 * (comment.innnerIndex + 1 - 12);
       if (y < 0) {
         y = 0;
@@ -82,15 +86,19 @@ export const Comment = () => {
           type="checkbox"
           role="switch"
           id="commentScrollSwitch"
-          checked={isAutoScroll}
-          onChange={() => setIsAutoScroll(!isAutoScroll)}
+          checked={autoScroll}
+          onChange={() => setIsAutoScroll(!autoScroll)}
         />
         <label className="form-check-label" htmlFor="commentScrollSwitch">
           自動スクロール
         </label>
 
-        <p className="ngToggle" title="NG設定" onClick={() => setIsNGExpanded(true)}>
-          <i className="fa-regular fa-thumbs-down fa-lg"/> 
+        <p
+          className="ngToggle"
+          title="NG設定"
+          onClick={() => setIsNGExpanded(true)}
+        >
+          <i className="fa-regular fa-thumbs-down fa-lg" />
         </p>
       </div>
 

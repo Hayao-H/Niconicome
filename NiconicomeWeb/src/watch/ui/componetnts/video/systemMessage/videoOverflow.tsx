@@ -20,6 +20,16 @@ export const VideoOverflow = () => {
   function onClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (ref.current === null) return;
     if (e.button !== 2) {
+      if (
+        !state.isSystemMessageVisible && !state.contextMenu.open &&
+        state.video !== undefined
+      ) {
+        if (state.video.paused) {
+          state.video.play();
+        } else {
+          state.video.pause();
+        }
+      }
 
       dispatch({ type: "systemMessage", payload: false });
       return;

@@ -41,14 +41,14 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
                 return;
             }
 
             IAttemptResult<IVideoInfo> result = WS::Mainpage.VideoListManager.GetVideoFromCurrentPlaylist(niconicoID);
             if (!result.IsSucceeded || result.Data is null)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
                 return;
             }
 
@@ -62,7 +62,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public void OnReturnButtonClick()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
         }
 
         #endregion

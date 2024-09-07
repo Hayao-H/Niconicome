@@ -33,18 +33,29 @@ interface Logger {
   debug: (message: string) => void;
 
   /**
+   * ログをクリア
+   */
+  clear(): void;
+
+  /**
    * イベント購読
    * @param event
    * @param listener
    */
-  addEventListner(event: "write", listener: (log: LogItem) => void): void;
+  addEventListner(
+    event: "write" | "clear",
+    listener: (log: LogItem | null) => void,
+  ): void;
 
   /**
    * イベント解除
    * @param event
    * @param listener
    */
-  removeEventListner(event: "write", listener: (log: LogItem) => void): void;
+  removeEventListner(
+    event: "write" | "clear",
+    listener: (log: LogItem | null) => void,
+  ): void;
 }
 
 export interface LogItem {
@@ -56,7 +67,7 @@ export interface LogItem {
 
 //Loggerの実装
 class LoggerImpl implements Logger {
-  private listeners: { [key: string]: ((log: LogItem) => void)[] } = {};
+  private listeners: { [key: string]: ((log: LogItem | null) => void)[] } = {};
 
   _messages: LogItem[] = [];
 
@@ -85,7 +96,17 @@ class LoggerImpl implements Logger {
     this.writeLog(log);
   }
 
-  addEventListner(event: "write", listener: (log: LogItem) => void): void {
+  clear(): void {
+    this._messages.splice(0);
+    if (this.listeners["write"] !== undefined) {
+      this.listeners["write"].forEach((listener) => listener(null));
+    }
+  }
+
+  addEventListner(
+    event: "write" | "clear",
+    listener: (log: LogItem | null) => void,
+  ): void {
     if (this.listeners[event] === undefined) {
       this.listeners[event] = [];
     }
@@ -93,7 +114,10 @@ class LoggerImpl implements Logger {
     this.listeners[event].push(listener);
   }
 
-  removeEventListner(event: "write", listener: (log: LogItem) => void): void {
+  removeEventListner(
+    event: "write" | "clear",
+    listener: (log: LogItem | null) => void,
+  ): void {
     if (this.listeners[event] === undefined) {
       return;
     }

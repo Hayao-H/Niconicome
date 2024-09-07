@@ -7,12 +7,14 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Addons.API.Tab;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.State;
@@ -57,7 +59,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             WS::Mainpage.Themehandler.Initialize();
             WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
 
             this.LoginCommand = new ReactiveCommand()
                 .WithSubscribe(async () =>
@@ -85,15 +86,15 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.OpenSettingCommand = new BindableCommand(() =>
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/general", BlazorWindows.Settings);
-                WS::Mainpage.WindowTabHelper.OpenSettingsTab(this.RegionManager);
+                WS::Mainpage.TabControler.Open(Models.Local.State.Tab.V1.TabType.Settings);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/settings/general");
             });
 
             this.OpenDownloadTaskWindowsCommand = new BindableCommand(
               () =>
              {
-                 WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/download", BlazorWindows.DLTask);
-                 WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this.RegionManager);
+                WS::Mainpage.TabControler.Open(Models.Local.State.Tab.V1.TabType.Download);
+                 WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/download");
              });
 
             this.Restart = new ReactiveCommand()
@@ -124,14 +125,8 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenAddonManagerCommand = new ReactiveCommand()
                 .WithSubscribe(() =>
                 {
-                    ///if (WS::Mainpage.LocalState.IsAddonManagerOpen && !WS::Mainpage.LocalInfo.IsMultiWindowsAllowed)
-                    ///{
-                    ///    return;
-                    ///}
-                    ///dialogService.Show(nameof(AddonManagerWindow));
-
-                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons", BlazorWindows.Addon);
-                    WS::Mainpage.WindowTabHelper.OpenAddonManager(this.RegionManager);
+                    WS::Mainpage.TabControler.Open(Models.Local.State.Tab.V1.TabType.Addon);
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/addons");
                 });
 
 
@@ -338,7 +333,6 @@ namespace Niconicome.ViewModels.Mainpage
             this.AssociatedObject.Loaded += (_, _) =>
             {
                 this.SetWindowPosition();
-                this.CreateTabs();
             };
         }
 

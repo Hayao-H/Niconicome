@@ -16,9 +16,16 @@ export const TimeControler = () => {
     if (state.video === undefined) return "00:00";
     const duration = state.video.duration;
     if (isNaN(duration)) return "00:00";
-    const minute = String(Math.floor(duration / 60)).padStart(2, "0");
-    const second = String(Math.floor(duration % 60)).padStart(2, "0");
-    return `${minute}:${second}`;
+    if (duration > 3600) {
+      const hour = String(Math.floor(duration / 3600)).padStart(2, "0");
+      const minute = String(Math.floor(duration % 3600 / 60)).padStart(2, "0");
+      const second = String(Math.floor(duration % 60)).padStart(2, "0");
+      return `${hour}:${minute}:${second}`;
+    } else {
+      const minute = String(Math.floor(duration / 60)).padStart(2, "0");
+      const second = String(Math.floor(duration % 60)).padStart(2, "0");
+      return `${minute}:${second}`;
+    }
   }, [state.video?.duration]);
 
   useEffect(() => {
@@ -27,9 +34,20 @@ export const TimeControler = () => {
     const onTimeUpdate = () => {
       if (video === undefined) return;
       const currentTime = video.currentTime;
-      const minute = String(Math.floor(currentTime / 60)).padStart(2, "0");
-      const second = String(Math.floor(currentTime % 60)).padStart(2, "0");
-      setCurrentTime(`${minute}:${second}`);
+
+      if (video.duration > 3600) {
+        const hour = String(Math.floor(currentTime / 3600)).padStart(2, "0");
+        const minute = String(Math.floor(currentTime % 3600 / 60)).padStart(
+          2,
+          "0",
+        );
+        const second = String(Math.floor(currentTime % 60)).padStart(2, "0");
+        setCurrentTime(`${hour}:${minute}:${second}`);
+      } else {
+        const minute = String(Math.floor(currentTime / 60)).padStart(2, "0");
+        const second = String(Math.floor(currentTime % 60)).padStart(2, "0");
+        setCurrentTime(`${minute}:${second}`);
+      }
     };
     video.on("timeupdate", onTimeUpdate);
     return () => {
@@ -54,7 +72,7 @@ export const TimeControler = () => {
       <p onClick={() => handleSkip(false)}>
         <i className="fa-solid fa-arrow-rotate-left fa-lg"></i>
       </p>
-      <p className="time">{currentTime}/{duration}</p>
+      <p className="time">{currentTime} / {duration}</p>
       <p onClick={() => handleSkip(true)}>
         <i className="fa-solid fa-arrow-rotate-right fa-lg"></i>
       </p>

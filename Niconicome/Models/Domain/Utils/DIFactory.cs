@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Net.Security;
+﻿using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using AddonsCoreV2 = Niconicome.Models.Domain.Local.Addons.Core.V2;
@@ -9,6 +8,7 @@ using AddonVM = Niconicome.ViewModels.Mainpage.Subwindows.AddonManager;
 using Auth = Niconicome.Models.Auth;
 using Backup = Niconicome.Models.Domain.Local.DataBackup;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
+using CommentAPIV1 = Niconicome.Models.Domain.Local.Server.API.Comment.V1;
 using CommentConverter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
 using CommentFetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
 using CommentIntegrate = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
@@ -49,14 +49,17 @@ using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
 using NetworkVideo = Niconicome.Models.Network.Video;
+using NGAPIV1 = Niconicome.Models.Domain.Local.Server.API.NG.V1;
 using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using OS = Niconicome.Models.Local.OS;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using PlaylistV2 = Niconicome.Models.Playlist.V2;
+using RegacyHLSAPIV1 = Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;
 using Register = Niconicome.Models.Network.Register;
 using RemoteV2 = Niconicome.Models.Domain.Niconico.Remote.V2;
+using ResourceAPIV1 = Niconicome.Models.Domain.Local.Server.API.Resource.V1;
 using Restore = Niconicome.Models.Local.Restore;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
@@ -69,22 +72,18 @@ using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Style = Niconicome.Models.Domain.Local.Style;
+using Tab = Niconicome.Models.Local.State.Tab.V1;
 using TabsVM = Niconicome.ViewModels.Mainpage.Tabs;
 using Timer = Niconicome.Models.Local.Timer;
 using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
+using VideoInfoAPIV1 = Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
 using WatchAPIv1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
-using CommentAPIV1 = Niconicome.Models.Domain.Local.Server.API.Comment.V1;
-using RegacyHLSAPIV1 = Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;
-using ResourceAPIV1 = Niconicome.Models.Domain.Local.Server.API.Resource.V1;
-using VideoInfoAPIV1 = Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1;
-using System.Reflection.Metadata;
-using System.Net;
-using NGAPIV1  = Niconicome.Models.Domain.Local.Server.API.NG.V1;
+using BackgroundTask = Niconicome.Models.Domain.Utils.BackgroundTask;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -223,6 +222,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Event.IEventManager, Event.EventManager>();
             services.AddTransient<Machine::IComPowerManager, Machine::ComPowerManager>();
             services.AddSingleton<DLActions::IPostDownloadActionssManager, DLActions::PostDownloadActionsManager>();
+            services.AddSingleton<DLActions::V2.IPostDownloadActionssManager, DLActions::V2.PostDownloadActionsManager>();
             services.AddSingleton<Timer::IDlTimer, Timer::DlTimer>();
             services.AddTransient<AddonsDomainAPI::Storage.LocalStorage.IStorageHelper, AddonsDomainAPI::Storage.LocalStorage.StorageHelper>();
             services.AddTransient<AddonsDomainAPI::Storage.LocalStorage.IStorageHandler, AddonsDomainAPI::Storage.LocalStorage.StorageHandler>();
@@ -412,7 +412,14 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<ResourceAPIV1::IResourceHandler, ResourceAPIV1::ResourceHandler>();
             services.AddTransient<VideoInfoAPIV1::IVideoInfoHandler, VideoInfoAPIV1::VideoInfoHandler>();
             services.AddTransient<NGAPIV1::INGHandler, NGAPIV1::NGHandler>();
-
+            services.AddSingleton<Tab::ITabControler, Tab::TabControler>();
+            services.AddTransient<VM::Shared.TabViewModel>();
+            services.AddTransient<VM::Mainpage.Tabs.VideoList.BottomPanel.DownloadSettingsViewModel>();
+            services.AddTransient<TabsVM::VideoList.BottomPanel.BottomPanelViewModel>();
+            services.AddTransient<TabsVM::VideoList.BottomPanel.OutputViewModel>();
+            services.AddTransient<TabsVM::VideoList.BottomPanel.StateViewModel>();
+            services.AddTransient<TabsVM::VideoList.BottomPanel.TimerViewModel>();
+            services.AddSingleton<BackgroundTask::IBackgroundTaskManager, BackgroundTask::BackgroundTaskManager>();
 
             return services.BuildServiceProvider();
         }

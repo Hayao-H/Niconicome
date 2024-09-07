@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:vm="clr-namespace:Niconicome.ViewModels.Mainpage"
-        xmlns:tabs="clr-namespace:Niconicome.ViewModels.Mainpage.Tabs"
         xmlns:cv="clr-namespace:Niconicome.Views.Converter"
-        xmlns:tree="clr-namespce:Niconicome.Models.Playlist"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:prism="http://prismlibrary.com/"  
+        xmlns:root="clr-namespace:Niconicome"
+        xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
+        xmlns:blazorweb="clr-namespace:Microsoft.AspNetCore.Components.Web;assembly=Microsoft.AspNetCore.Components.Web"
         mc:Ignorable="d"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -66,12 +67,12 @@
                         </ToolBar>
                     </ToolBarTray>
                     <Grid Grid.Row="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="{Binding TabsHeight.Value}"/>
-                        </Grid.RowDefinitions>
-                        <TabControl Background="{DynamicResource MaterialDesignPaper}" Grid.Row="0" prism:RegionManager.RegionName="TopTabRegion" BorderBrush="#4A4A4A" ItemTemplate="{StaticResource TabItemTemplate}"/>
-                        <TabControl Background="{DynamicResource MaterialDesignPaper}" prism:RegionManager.RegionName="BottomTabResion" BorderBrush="#4A4A4A" Grid.Row="1" ItemTemplate="{StaticResource TabItemTemplate}" />
+                        <blazor:BlazorWebView Grid.Row="0" x:Name="webview" HostPage="wwwroot/videolist.html" Services="{DynamicResource services}">
+                            <blazor:BlazorWebView.RootComponents>
+                                <blazor:RootComponent Selector="#app" ComponentType="{x:Type root:Main}" />
+                                <blazor:RootComponent Selector="head::after" ComponentType="{x:Type blazorweb:HeadOutlet}" />
+                            </blazor:BlazorWebView.RootComponents>
+                        </blazor:BlazorWebView>
 
                     </Grid>
                 </Grid>

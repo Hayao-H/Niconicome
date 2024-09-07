@@ -1,0 +1,144 @@
+﻿@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel.DownloadSettingsViewModel VM;
+@implements IDisposable;
+@using Niconicome.Models.Domain.Niconico.Video.Infomations;
+
+<div class="Panel Download @(IsSelected?"":"collapsed")">
+    <div class="downloadTarget">
+        <p class="title">ダウンロードする項目</p>
+        <div class="forms">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @bind="@VM.DownloadVideo.Value" id="video">
+                <label class="form-check-label" for="video">動画</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox"  @bind="@VM.DownloadComment.Value" id="comment">
+                <label class="form-check-label" for="comment">コメント</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @bind="@VM.DownloadCommentLog.Value" id="past-log">
+                <label class="form-check-label" for="past-log">過去ログ</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @bind="@VM.DownloadEasyComment.Value" id="easy-comment">
+                <label class="form-check-label" for="easy-comment">かんたんコメント</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @bind="@VM.DownloadOwnerComment.Value" id="poster-comment">
+                <label class="form-check-label" for="poster-comment">投稿者コメント</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @bind="@VM.DownloadThumbnail.Value" id="thumbnail">
+                <label class="form-check-label" for="thumbnail">サムネイル</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @bind="@VM.DownloadVideoInfo.Value" id="video-info">
+                <label class="form-check-label" for="video-info">動画情報</label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @bind="VM.IsCommentLimitEnable.Value" id="limit-comment">
+                <label class="form-check-label" for="limit-comment">コメント取得数を制限</label>
+            </div>
+
+            @if (VM.IsCommentLimitEnable.Value)
+            {
+                <div class="input-group count">
+                    <input type="text" class="form-control" placeholder="最大コメント数" @bind="VM.CommentLimit.Value">
+                    <span class="input-group-text">コメ</span>
+                </div>
+
+            }
+        </div>
+
+    </div>
+    <hr class="nc-border"/>
+    <div class="downloadSelect">
+        <div class="setting">
+            <p class="title">優先解像度：</p>
+            <select class="form-select" @bind="VM.Resolution.Value">
+                <option value="1080" selected>1080px</option>
+                <option value="720">720px</option>
+                <option value="480">480px</option>
+                <option value="360">360px</option>
+                <option value="240">240px</option>
+            </select>
+        </div>
+        <div class="setting">
+            <p class="title">サムネイル：</p>
+            <select class="form-select" @bind="VM.ThumbSize.Value">
+                <option value="大">大</option>
+                <option value="中">中</option>
+                <option value="小">普通</option>
+                <option value="プレイヤー">プレイヤー</option>
+            </select>
+        </div>
+    </div>
+    <hr class="nc-border" />
+    <div class="downloadButton">
+        <p class="title">オプション</p>
+        <div class="controls">
+            <div class="forms">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" @bind="VM.OverwriteEnable.Value" id="overwrite">
+                    <label class="form-check-label" for="overwrite">同名時に上書き</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" @bind="VM.SkipDownloaded.Value" id="skip">
+                    <label class="form-check-label" for="skip">ダウンロード済みをスキップ</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" @bind="VM.AppendComment.Value" id="appendComment">
+                    <label class="form-check-label" for="appendComment">コメントを追記する</label>
+                </div>
+            </div>
+            <div class="buttons">
+                <button type="button" class="button btn btn-primary" @onclick="VM.StageVideos">ステージ</button>
+                @if (VM.IsDownloading.Value)
+                {
+                    <button type="button" class="button btn btn-primary" @onclick="VM.Cancel">中断</button>
+                    <button type="button" class="button btn btn-primary" disabled>ダウンロード</button>
+
+                }
+                else
+                {
+
+                    <button type="button" class="button btn btn-primary" disabled>中断</button>
+                    <button type="button" class="button btn btn-primary" @onclick="VM.Download">ダウンロード</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._ctx = SynchronizationContext.Current;
+
+        VM.Bindables.RegisterPropertyChangeHandler(this.OnValueChange);
+    }
+
+    private void OnValueChange()
+    {
+        this._ctx?.Post(_ => StateHasChanged(), null);
+    }
+
+    private SynchronizationContext? _ctx;
+
+    public void Dispose()
+    {
+        VM.Dispose();
+    }
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+}

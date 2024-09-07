@@ -29,6 +29,8 @@ using MessageV2 = Niconicome.Models.Local.State.MessageV2;
 using Niconicome.Models.Local.External.Playlist;
 using Server = Niconicome.Models.Domain.Local.Server;
 using Style = Niconicome.Models.Local.State.Style;
+using Tab = Niconicome.Models.Local.State.Tab.V1;
+using PostDL = Niconicome.Models.Network.Download.Actions.V2;
 
 namespace Niconicome.Workspaces
 {
@@ -193,6 +195,13 @@ namespace Niconicome.Workspaces
         /// 動画情報
         /// </summary>
         public static Server::API.VideoInfo.V1.IVideoInfoHandler VideoInfoHandler { get; set; } = DIFactory.Resolve<Server::API.VideoInfo.V1.IVideoInfoHandler>();
+
+        /// <summary>
+        /// タブ
+        /// </summary>
+        public static Tab::ITabControler TabControler { get; private set; } = DIFactory.Resolve<Tab::ITabControler>();
+
+        public static PostDL::IPostDownloadActionssManager PostDownloadActionsManager { get; private set; } = DIFactory.Resolve<PostDL::IPostDownloadActionssManager>();
 
     }
 }

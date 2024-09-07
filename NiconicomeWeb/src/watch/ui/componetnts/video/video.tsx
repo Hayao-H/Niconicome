@@ -3,15 +3,14 @@ import React, {
   useContext,
   useEffect,
   useRef,
-  useState,
 } from "https://esm.sh/react@18.2.0";
-import { JsWatchInfo } from "../../jsWatchInfo/videoInfo.ts";
 import { VideoStateContext } from "../../state/videoState.ts";
 import { VideoImpl } from "../../video/videoElement.ts";
 import { initialize } from "../../../../videoList/main.ts";
 import { VideoComment } from "./videoComment.tsx";
 import { VideoOverflow } from "./systemMessage/videoOverflow.tsx";
 import { Logger } from "../../state/logger.ts";
+import { handleEvent } from "../../video/videoEventHandler.ts";
 
 export const VideoElement = (
   { videoRef }: {
@@ -45,52 +44,62 @@ export const VideoElement = (
       const video = new VideoImpl(
         videoRef.current,
       );
+      Logger.log("動画の読み込みを開始します。");
+      const start = Date.now();
+
       video.Initialize(state.jsWatchInfo)
-      .then((result) => {
-      if (!result.IsSucceeded) {
-        Logger.error(result.Message ?? "動画の読み込みに失敗しました。");
-      } else {
-        Logger.log(
-          `動画を読み込みました。(${state.jsWatchInfo!.media.contentUrl})`,
-        );
-        video.on("pause", () => {
-          dispatch({
-            type: "isPlaying",
-            payload: false,
-          });
-        });
+        .then((result) => {
+          if (!result.IsSucceeded) {
+            Logger.error(result.Message ?? "動画の読み込みに失敗しました。");
+          } else {
+            Logger.log(
+              `動画を読み込みました。(${Date.now()-start}ms, ${state.jsWatchInfo!.media.contentUrl})`,
+            );
+            video.on("pause", () => {
+              dispatch({
+                type: "isPlaying",
+                payload: false,
+              });
+            });
 
-        video.on("play", () => {
-          dispatch({
-            type: "isPlaying",
-            payload: true,
-          });
-        });
+            video.on("play", () => {
+              dispatch({
+                type: "isPlaying",
+                payload: true,
+              });
+            });
 
-        dispatch({
-          type: "video",
-          payload: video,
+            dispatch({
+              type: "video",
+              payload: video,
+            });
+          }
         });
-      }});
     } else {
       const video = state.video;
       if (video === undefined) return;
       if (videoRef.current === null) return;
-      video.Initialize(state.jsWatchInfo, videoRef.current)
-      .then((result) => {
 
-      if (!result.IsSucceeded) {
-        Logger.error(result.Message ?? "動画の読み込みに失敗しました。");
-      } else {
-        Logger.log(
-          `動画を読み込みました。(${state.jsWatchInfo!.media.contentUrl})`,
-        );
-      }});
+      Logger.log("動画の読み込みを開始します。");
+      const start = Date.now();
+
+      video.Initialize(state.jsWatchInfo, videoRef.current)
+        .then((result) => {
+          if (!result.IsSucceeded) {
+            Logger.error(result.Message ?? "動画の読み込みに失敗しました。");
+          } else {
+            Logger.log(
+              `動画を読み込みました。(${Date.now()-start}ms, ${state.jsWatchInfo!.media.contentUrl})`,
+            );
+          }
+        });
     }
   });
 
   return (
-    <div className="videoWrapper">
+    <div
+      className="videoWrapper"
+    >
       <video
         ref={videoRef}
         id="player"

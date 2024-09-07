@@ -1,0 +1,92 @@
+﻿@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel.TimerViewModel VM;
+@using Niconicome.Models.Network.Download.Actions;
+
+<div class="Panel Timer @(IsSelected?"":"collapsed")">
+    <div class="Item">
+        <div class="Label">
+            <i class="Icon fa-solid fa-check"></i>
+            <label for="timer">DL完了後のアクション</label>
+        </div>
+        <div class="Input">
+            <select class="form-select" @bind="VM.PostDownloadAction.Value">
+                <option value="@(PostDownloadActions.None)">何もしない</option>
+                <option value="@(PostDownloadActions.LogOff)">ログオフ</option>
+                <option value="@(PostDownloadActions.Shutdown)">シャットダウン</option>
+                <option value="@(PostDownloadActions.Sleep)">スリープ</option>
+            </select>
+        </div>
+    </div>
+    <div class="Item">
+        <div class="Label">
+            <i class="Icon fa-regular fa-clock"></i>
+            <label for="timer">DL開始時刻</label>
+        </div>
+        <div class="Input TimerSetting">
+            <div class="TimeSetting">
+                <div class="input-group Year">
+                    <input type="text" class="form-control" @bind="VM.Year.Value">
+                    <span class="input-group-text">年</span>
+                </div>
+                <div class="input-group Month">
+                    <input type="text" class="form-control" @bind="VM.Month.Value">
+                    <span class="input-group-text">月</span>
+                </div>
+                <div class="input-group Day">
+                    <input type="text" class="form-control" @bind="VM.Day.Value">
+                    <span class="input-group-text">日</span>
+                </div>
+                <div class="input-group Hour">
+                    <input type="text" class="form-control" @bind="VM.Hour.Value">
+                    <span class="input-group-text">時</span>
+                </div>
+                <div class="input-group Minute">
+                    <input type="text" class="form-control" @bind="VM.Minute.Value">
+                    <span class="input-group-text">分</span>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" @onclick="VM.OnSetTimerClick">決定</button>
+        </div>
+    </div>
+    <div class="Item">
+        <div class="Label">
+            <i class="Icon fa-solid fa-stopwatch"></i>
+            <label for="timer">指定時刻にDLを開始する</label>
+        </div>
+        <div class="Input">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="timer" @bind="VM.IsTimerEnable.Value">
+            </div>
+        </div>
+    </div>
+    <div class="Item">
+        <div class="Label">
+            <i class="Icon fa-solid fa-clock-rotate-left"></i>
+            <label for="timer24">タイマー処理を設定した日時から24時間毎に行う</label>
+        </div>
+        <div class="Input">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="timer24" @bind="VM.IsRepeatByDayEnable.Value">
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._ctx = SynchronizationContext.Current;
+
+        VM.Bindables.RegisterPropertyChangeHandler(this.OnValueChange);
+    }
+
+    private void OnValueChange()
+    {
+        this._ctx?.Post(_ => StateHasChanged(), null);
+    }
+
+    private SynchronizationContext? _ctx;
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+    }

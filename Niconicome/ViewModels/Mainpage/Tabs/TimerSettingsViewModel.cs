@@ -8,6 +8,7 @@ using System.Windows;
 using Niconicome.Models.Helper.Event.Generic;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Download.Actions;
+using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.ViewModels.Mainpage.Utils;
 using Prism.Events;
@@ -58,8 +59,8 @@ namespace Niconicome.ViewModels.Mainpage
                 WS::Mainpage.Messagehandler.AppendMessage($"タイマーを「{dt}({delta}分後)」に設定しました。（設定：{isEnabled}）"); ;
             }
 
-            this.IsTImerEnabled = WS::Mainpage.DlTimer.IsEnabled.ToReactivePropertyAsSynchronized(x => x.Value);
-            this.IsTImerEnabled.Skip(1).Subscribe(value =>
+            this.IsTImerEnabled = WS::Mainpage.DlTimer.IsEnabled;
+            this.IsTImerEnabled.Subscribe(value =>
             {
                 if (value)
                 {
@@ -104,7 +105,7 @@ namespace Niconicome.ViewModels.Mainpage
 
         public ReactiveProperty<bool> IsTimerEveryDayEnable { get; init; }
 
-        public ReactiveProperty<bool> IsTImerEnabled { get; init; }
+        public IBindableProperty<bool> IsTImerEnabled { get; init; }
 
         #endregion
     }

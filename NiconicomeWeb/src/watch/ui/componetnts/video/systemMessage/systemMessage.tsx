@@ -11,14 +11,21 @@ export const SystemMessage = () => {
   const [message, setMessage] = React.useState<LogItem[]>(Logger.messages);
   const { state, dispatch } = useContext(VideoStateContext);
 
-  const messageHandler = useCallback((log: LogItem) => {
+  const messageHandler = useCallback((log: LogItem | null) => {
+    if (log === null) {
+      setMessage([]);
+      return;
+    }
     setMessage([...message, log]);
   }, []);
 
   useEffect(() => {
     Logger.addEventListner("write", messageHandler);
+    Logger.addEventListner("clear", messageHandler);
+    
     return () => {
       Logger.removeEventListner("write", messageHandler);
+      Logger.removeEventListner("clear", messageHandler);
     };
   }, []);
 

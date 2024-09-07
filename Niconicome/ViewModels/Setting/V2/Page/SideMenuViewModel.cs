@@ -9,13 +9,8 @@ using WS = Niconicome.Workspaces.SettingPageV2;
 
 namespace Niconicome.ViewModels.Setting.V2.Page
 {
-    public class SideMenuViewModel : IDisposable
+    public class SideMenuViewModel
     {
-        public SideMenuViewModel(NavigationManager naviation)
-        {
-            WS.BlazorPageManager.RegisterNavigationManager(BlazorWindows.Settings, naviation);
-        }
-
         public void OnLinkCkick(SettingPages pages)
         {
             string page = pages switch
@@ -33,12 +28,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page
                 _ => "/settings"
             };
 
-            WS.BlazorPageManager.RequestBlazorToNavigate(page, BlazorWindows.Settings);
-        }
-
-        public void Dispose()
-        {
-            WS.BlazorPageManager.UnRegisterNavigationManager(BlazorWindows.Settings);
+            WS.BlazorPageManager.RequestBlazorToNavigate(page);
         }
     }
 

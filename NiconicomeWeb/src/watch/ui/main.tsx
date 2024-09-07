@@ -1,5 +1,5 @@
 import { createRoot } from "https://esm.sh/react-dom@18.2.0/client";
-import { useReducer, useRef } from "https://esm.sh/react@18.2.0";
+import { useContext, useReducer, useRef } from "https://esm.sh/react@18.2.0";
 import {
   JsWatchInfoHandler,
   JsWatchInfoHandlerImpl,
@@ -18,6 +18,8 @@ import { ContextMenu } from "./componetnts/videoContextMenu/contextMenu.tsx";
 import { Shortcut } from "./componetnts/shortcut/shortcut.tsx";
 import { NGHandlerImpl } from "./comment/ng/ngHandler.ts";
 import { NGDataFetcherImpl } from "./comment/ng/ngDataFethcer.ts";
+import { handleEvent } from "./video/videoEventHandler.ts";
+import { LeftContent } from "./leftContent.tsx";
 
 declare global {
   // deno-lint-ignore no-var
@@ -43,7 +45,6 @@ const Main = (
     jsWatchInfo: JsWatchInfo;
   },
 ) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [state, dispatch] = useReducer(reduceFunc, {
     ...InitialData,
     jsWatchInfo: jsWatchInfo,
@@ -56,11 +57,7 @@ const Main = (
     <VideoStateContext.Provider value={{ state, dispatch }}>
       {state.contextMenu.open ? <ContextMenu /> : undefined}
       <div className="watchWrapper">
-        <div className="leftContent">
-          <VideoElement videoRef={videoRef} />
-          <Controler />
-          <VideoInfo />
-        </div>
+        <LeftContent />
         <div className="rightContent">
           <Comment />
           <Shortcut />

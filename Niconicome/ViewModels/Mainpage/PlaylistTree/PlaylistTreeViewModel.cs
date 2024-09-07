@@ -57,7 +57,7 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
 
             this.EditPlaylist = new BindableCommand<int>(id =>
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{id}", BlazorWindows.MainPage);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{id}");
             });
 
             this.Refresh = new BindableCommand(() =>

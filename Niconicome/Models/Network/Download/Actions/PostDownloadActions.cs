@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Niconicome.Models.Network.Download.Actions
 {
-    enum PostDownloadActions
+    public enum PostDownloadActions
     {
         None,
         Shutdown,

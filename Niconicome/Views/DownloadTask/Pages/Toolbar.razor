@@ -1,16 +1,8 @@
 ﻿@using Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask;
 
-@implements IDisposable;
 @inject Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask.ToolbarViewModel DataContext;
 
 <div class="Toolbar">
     <p @onclick="()=>DataContext.Navigate(PageType.Stage)"><i class="Icon fa-solid fa-cloud-arrow-down"></i></p>
     <p @onclick="()=>DataContext.Navigate(PageType.Download)"><i class="Icon fa-solid fa-download"></i></p>
 </div>
-
-@code {
-    public void Dispose()
-    {
-        DataContext.Dispose();
-    }
-}

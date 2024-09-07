@@ -177,7 +177,7 @@ namespace Niconicome.ViewModels.Mainpage
 
                 WS::Mainpage.SnackbarHandler.Enqueue($"選択された動画をステージしました。", "管理画面を開く", () =>
                 {
-                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/stage", BlazorWindows.DLTask);
+                    WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/stage");
                     WS::Mainpage.WindowTabHelper.OpenDownloadTaskWindow(this._regionManager);
                 });
             })

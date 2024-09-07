@@ -157,6 +157,9 @@ export class NGHandlerImpl implements NGHandler {
 
     Logger.log(`NGフィルタリングを実行しました。${comments.length}件中${hit}件がフィルタリングされました。`);
 
-    return filtered;
+    return filtered.map((comment,i) => {
+      comment.innnerIndex = i;
+      return comment;
+    });
   }
 }
