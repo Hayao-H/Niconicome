@@ -194,7 +194,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel
             }
 
             await WS.DownloadManager.StartDownloadAsync(m => WS.SnackbarHandler.Enqueue(m), m => WS.Messagehandler.AppendMessage(m));
-            WS.PostDownloadTasksManager.HandleAction();
+            WS.PostDownloadActionsManager.HandleAction();
         }
 
         public void Cancel()

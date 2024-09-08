@@ -78,6 +78,13 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string ExternalDLSoftwareParam { get; private set; } = "Download.Video.ExternalSoftware.Parameter";
 
+        //Download.Video.Modification
+        public static string IsVideoModificationEnable { get; private set; } = "Download.Video.Modification.IsVideoModificationEnable";
+
+        public static string VideoModificationSoftwarePath { get; private set; } = "Download.Video.Modification.VideoModificationSoftwarePath";
+
+        public static string VideoModificationSoftwareParam { get; private set; } = "Download.Video.Modification.VideoModificationParameter";
+
         //Download.Comment
         public static string CommentOffset { get; private set; } = "Download.Comment.Commentoffset";
 

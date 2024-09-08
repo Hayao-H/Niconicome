@@ -20,7 +20,7 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// path配下のディレクトリを取得
         /// </summary>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns>ディレクトリの完全パス一覧</returns>
         IAttemptResult<IEnumerable<string>> GetDirectories(string path);
 
         /// <summary>

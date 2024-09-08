@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.IO.V2;
@@ -62,9 +63,16 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
                 return AttemptResult<ILocalFileInfo>.Fail(filesResult.Message);
             }
 
-            IEnumerable<string> files = filesResult.Data.Where(f=>f.Contains(niconicoID));
+            IAttemptResult<IEnumerable<string>> dirResult = this._directoryIO.GetDirectories(folderPath);
+            if (!dirResult.IsSucceeded || dirResult.Data is null)
+            {
+                return AttemptResult<ILocalFileInfo>.Fail(dirResult.Message);
+            }
 
-            bool videoExist = files.Any(f => this.GetFileType(f, thumbnailExt, ichibaSuffix, videoInfosuffix) == FileType.Video);
+            IEnumerable<string> files = filesResult.Data.Where(f=>f.Contains(niconicoID));
+            IEnumerable<string> dirs = dirResult.Data.Where(d=>d.Contains(niconicoID));
+
+            bool videoExist = dirs.Any(f => this.IsVideoExists(f,verticalResolution));
             bool commentExist = files.Any(f => this.GetFileType(f, thumbnailExt, ichibaSuffix, videoInfosuffix) == FileType.Comment);
             bool ichibaInfoExist = files.Any(f => this.GetFileType(f, thumbnailExt, ichibaSuffix, videoInfosuffix) == FileType.Ichiba);
             bool videoInfoExist = files.Any(f => this.GetFileType(f, thumbnailExt, ichibaSuffix, videoInfosuffix) == FileType.VideoInfo);
@@ -140,6 +148,17 @@ namespace Niconicome.Models.Domain.Niconico.Download.General
             {
                 return FileType.Unknown;
             }
+        }
+
+        /// <summary>
+        /// 動画が存在するかどうか(DMS)
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="verticalResolution"></param>
+        /// <returns></returns>
+        private bool IsVideoExists(string folderPath,uint verticalResolution)
+        {
+            return this._directoryIO.Exists(Path.Combine(folderPath, verticalResolution.ToString()));
         }
 
         private enum FileType

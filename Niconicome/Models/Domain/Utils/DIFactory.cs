@@ -84,6 +84,7 @@ using Watch = Niconicome.Models.Network.Watch;
 using WatchAPIv1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
 using BackgroundTask = Niconicome.Models.Domain.Utils.BackgroundTask;
+using Modify = Niconicome.Models.Network.Download.Modification;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -420,6 +421,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<TabsVM::VideoList.BottomPanel.StateViewModel>();
             services.AddTransient<TabsVM::VideoList.BottomPanel.TimerViewModel>();
             services.AddSingleton<BackgroundTask::IBackgroundTaskManager, BackgroundTask::BackgroundTaskManager>();
+            services.AddTransient<DomainNet::INetWorkState, DomainNet::NetWorkState>();
+            services.AddTransient<Modify::Video.IVideoModificationManager, Modify::Video.VideoModificationManager>();
 
             return services.BuildServiceProvider();
         }

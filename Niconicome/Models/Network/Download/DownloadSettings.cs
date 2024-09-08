@@ -139,6 +139,11 @@ namespace Niconicome.Models.Network.Download
         bool AlwaysSkipEconomyDownload { get; }
 
         /// <summary>
+        /// DLの後処理を行うかどうか
+        /// </summary>
+        bool IsModifyVideoEnable { get; }
+
+        /// <summary>
         /// 動画ID
         /// </summary>
         string NiconicoId { get; }
@@ -319,6 +324,8 @@ namespace Niconicome.Models.Network.Download
         public bool SkipEconomyDownloadIfPremiumExists { get; set; }
 
         public bool AlwaysSkipEconomyDownload { get; set; }
+
+        public bool IsModifyVideoEnable { get; set; }
 
         public uint VerticalResolution { get; set; }
 
