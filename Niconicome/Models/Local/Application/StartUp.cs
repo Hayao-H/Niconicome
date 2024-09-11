@@ -9,7 +9,6 @@ using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using NicoIO = Niconicome.Models.Domain.Local.IO;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Addon;
-using Niconicome.Models.Utils.InitializeAwaiter;
 using Niconicome.Models.Local.Addon.V2;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Helper.Result;

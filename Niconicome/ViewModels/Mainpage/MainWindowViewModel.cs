@@ -1,31 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using Microsoft.AspNetCore.Components;
 using Microsoft.Xaml.Behaviors;
 using Niconicome.Extensions;
 using Niconicome.Models.Auth;
-using Niconicome.Models.Const;
-using Niconicome.Models.Domain.Local.Addons.API.Tab;
 using Niconicome.Models.Domain.Niconico;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
-using Niconicome.Models.Local.State;
-using Niconicome.Models.Utils.InitializeAwaiter;
-using Niconicome.Models.Utils.Reactive;
 using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Controls;
-using Niconicome.ViewModels.Mainpage.Tabs;
 using Niconicome.Views;
-using Niconicome.Views.Mainpage.Region;
-using Niconicome.Views.Setting;
 using Prism.Ioc;
 using Prism.Regions;
 using Prism.Services.Dialogs;
@@ -138,8 +126,6 @@ namespace Niconicome.ViewModels.Mainpage
 
             #endregion
 
-
-            this.RegisterTabHandlers();
         }
 
         #region field
@@ -224,58 +210,6 @@ namespace Niconicome.ViewModels.Mainpage
             this.LoginBtnTooltip.Value = "ログアウトする";
             this.Username.Value = this.user.Nickname;
             this.UserImage.Value = this.user.UserImage;
-        }
-
-        /// <summary>
-        /// タブハンドラを登録
-        /// </summary>
-        private void RegisterTabHandlers()
-        {
-            WS::Mainpage.TabHandler.RegisterAddHandler(e =>
-            {
-
-                if (this.ctx is null) throw new InvalidOperationException($"{typeof(SynchronizationContext)}がnullのため、タブを追加できません。");
-
-                string regionName = e.TabType switch
-                {
-                    TabType.Top => LocalConstant.TopTabRegionName,
-                    _ => LocalConstant.BottomTabRegionName,
-                };
-
-                this.ctx.Post(_ =>
-                {
-                    var vm = new TabViewModel(e.TabItem);
-                    var control = new Tab(vm);
-                    IRegion region = this.RegionManager.Regions[regionName];
-                    region.Add(control);
-                    region.Activate(control);
-                }, null);
-
-            });
-
-            WS::Mainpage.TabHandler.RegisterRemoveHandler(e =>
-            {
-                string regionName = e.TabType switch
-                {
-                    TabType.Top => LocalConstant.TopTabRegionName,
-                    _ => LocalConstant.BottomTabRegionName,
-                };
-
-                IEnumerable<object> viewToRemove = this.RegionManager.Regions[regionName].Views.Where(v =>
-                {
-                    if (v is not UserControl control) return false; ;
-                    if (control.DataContext is not TabViewModelBase vm) return false;
-                    return vm.ID == e.TabID;
-                });
-
-                foreach (var view in viewToRemove)
-                {
-                    this.RegionManager.Regions[regionName].Remove(view);
-                }
-
-            });
-
-            WS::Mainpage.InitializeAwaiterHandler.NotifyCompletedStep(AwaiterNames.Addon, this.GetType());
         }
 
         #endregion
@@ -395,27 +329,6 @@ namespace Niconicome.ViewModels.Mainpage
             {
                 this.AssociatedObject.Height = style.Height;
             }
-        }
-
-        private void CreateTabs()
-        {
-            if (this.AssociatedObject.DataContext is not MainWindowViewModel vm) return;
-            if (Application.Current is not PrismApplication application) return;
-
-            IContainerProvider containerProvider = application.Container;
-            IRegionManager regionManager = vm.RegionManager;
-
-            IRegion bottomTabRegion = regionManager.Regions[LocalConstant.BottomTabRegionName];
-            bottomTabRegion.Add(containerProvider.Resolve<DownloadSettings>());
-            bottomTabRegion.Add(containerProvider.Resolve<Output>());
-            //bottomTabRegion.Add(containerProvider.Resolve<VideoSortSetting>());
-            bottomTabRegion.Add(containerProvider.Resolve<VideoListState>());
-            bottomTabRegion.Add(containerProvider.Resolve<TimerSettings>());
-
-            IRegion topTabRegion = regionManager.Regions[LocalConstant.TopTabRegionName];
-            var videoListView = containerProvider.Resolve<MainVideoList>();
-            topTabRegion.Add(videoListView);
-            topTabRegion.Activate(videoListView);
         }
     }
 }

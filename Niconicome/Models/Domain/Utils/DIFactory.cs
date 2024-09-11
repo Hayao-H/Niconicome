@@ -178,6 +178,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Cookies::IChromeCookieDecryptor, Cookies::ChromeCookieDecryptor>();
             services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
             services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
+            services.AddTransient<Cookies::IChromeCookieManager, Cookies::ChromeCookieManager>();
+            services.AddTransient<Auth::IChromeSharedLogin, Auth::ChromeSharedLogin>();
             services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
             services.AddTransient<Auth::IFirefoxSharedLogin, Auth::FirefoxSharedLogin>();
             services.AddTransient<LocalFile::ILocalDirectoryHandler, LocalFile::LocalDirectoryHandler>();
@@ -240,10 +242,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Fetch::IOnlineVideoRefreshManager, Fetch::OnlineVideoRefreshManager>();
             services.AddTransient<PlaylistPlaylist::IVideosUnchecker, PlaylistPlaylist::VideosUnchecker>();
             services.AddTransient<Register::IVideoRegistrationHandler, Register::VideoRegistrationHandler>();
-            services.AddTransient<Utils::IWindowTabHelper, Utils::WindowTabHelper>();
             services.AddTransient<Playlist::SharedUtils.IVideoPlaylistConverter, Playlist::SharedUtils.VideoPlaylistConverter>();
             services.AddSingleton<PlaylistPlaylist::IPlaylistInfoContainer, PlaylistPlaylist::PlaylistInfoContainer>();
-            services.AddSingleton<Utils::InitializeAwaiter.IInitializeAwaiterHandler, Utils::InitializeAwaiter.InitializeAwaiterHandler>();
             services.AddTransient<AddonAPI::Net.Download.Integrate.IDownloadSettings, AddonAPI::Net.Download.Integrate.DownloadSettings>();
             services.AddTransient<CommentFetch::ICommentClient, CommentFetch::CommentClient>();
             services.AddTransient<CommentFetch::V3.ICommentClient, CommentFetch::V3.CommentClient>();

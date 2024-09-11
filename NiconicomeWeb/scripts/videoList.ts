@@ -8,7 +8,7 @@ console.log(`isDevelopment: ${isDevelopment}`);
 
 try {
   await esbuild.build({
-    entryPoints: ["./src/videoList/main.ts"],
+    entryPoints: ["./NiconicomeWeb/src/videoList/main.ts"],
     minify: !isDevelopment,
     bundle: true,
     sourcemap: isDevelopment ? "inline" : false,

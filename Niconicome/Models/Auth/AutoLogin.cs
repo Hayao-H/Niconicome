@@ -43,7 +43,7 @@ namespace Niconicome.Models.Auth
 
     class AutoLogin : IAutoLogin
     {
-        public AutoLogin(ISession session, IAccountManager accountManager, IWebview2SharedLogin webview2SharedLogin, IFirefoxSharedLogin firefoxSharedLogin, IStoreFirefoxSharedLogin storeFirefoxSharedLogin, ISettingsContainer settingsConainer)
+        public AutoLogin(ISession session, IAccountManager accountManager, IWebview2SharedLogin webview2SharedLogin, IFirefoxSharedLogin firefoxSharedLogin, IStoreFirefoxSharedLogin storeFirefoxSharedLogin, ISettingsContainer settingsConainer,IChromeSharedLogin chromeSharedLogin)
         {
             this._session = session;
             this._accountManager = accountManager;
@@ -51,6 +51,7 @@ namespace Niconicome.Models.Auth
             this._firefoxSharedLogin = firefoxSharedLogin;
             this._storeFirefoxSharedLogin = storeFirefoxSharedLogin;
             this._settingsConainer = settingsConainer;
+            this._chromeSharedLogin = chromeSharedLogin;
         }
 
         #region field
@@ -66,6 +67,8 @@ namespace Niconicome.Models.Auth
         private readonly IFirefoxSharedLogin _firefoxSharedLogin;
 
         private readonly IStoreFirefoxSharedLogin _storeFirefoxSharedLogin;
+
+        private readonly IChromeSharedLogin _chromeSharedLogin;
 
         #endregion
 
@@ -102,6 +105,9 @@ namespace Niconicome.Models.Auth
             else if (type == AutoLoginType.Webview2)
             {
                 result = await this._webview2SharedLogin.TryLogin();
+            } else if (type == AutoLoginType.Chrome)
+            {
+                result = await this._chromeSharedLogin.TryLogin();
             }
             else if (type == AutoLoginType.Firefox)
             {
@@ -147,6 +153,10 @@ namespace Niconicome.Models.Auth
             {
                 bool canLoginWithWebview2 = this._webview2SharedLogin.CanLogin();
                 if (canLoginWithWebview2) return AutoLoginType.Webview2;
+            } else if (mode == AutoLoginTypeString.Chrome)
+            {
+                bool canLoginWithChrome = this._chromeSharedLogin.CanLogin();
+                if (canLoginWithChrome) return AutoLoginType.Chrome;
             }
             else if (mode == AutoLoginTypeString.Firefox && ffProfile is not null)
             {
@@ -184,6 +194,7 @@ namespace Niconicome.Models.Auth
         Webview2,
         Firefox,
         StoreFirefox,
+        Chrome,
     }
 
     static class AutoLoginTypeString
@@ -195,5 +206,7 @@ namespace Niconicome.Models.Auth
         public const string Firefox = "Firefox";
 
         public const string StoreFirefox = "StoreFirefox";
+
+        public const string Chrome = "Chrome";
     }
 }

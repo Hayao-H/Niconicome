@@ -77,6 +77,9 @@ if (isWatch) {
       outdir: Deno.env.get("DETAIL_DIR"),
       target: ["edge122"],
       format: "esm",
+      define: {
+        "DEBUG_MODE": isDevelopment ? "true" : "false",
+      },
     });
   } catch (e) {
     console.error(e);

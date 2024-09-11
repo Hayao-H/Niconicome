@@ -19,7 +19,6 @@ using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Utils;
-using Niconicome.Models.Utils.InitializeAwaiter;
 using Ext = Niconicome.Models.Local.External;
 using VideoList = Niconicome.Models.Playlist.VideoList;
 using Playlist = Niconicome.Models.Playlist.V2;
@@ -80,16 +79,6 @@ namespace Niconicome.Workspaces
         /// ローカル情報
         /// </summary>
         public static ILocalState LocalState { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalState>();
-
-        /// <summary>
-        /// ウィンドウ
-        /// </summary>
-        public static IWindowTabHelper WindowTabHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowTabHelper>();
-
-        /// <summary>
-        /// 初期化ヘルパー
-        /// </summary>
-        public static IInitializeAwaiterHandler InitializeAwaiterHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IInitializeAwaiterHandler>();
 
         /// <summary>
         /// ダウンロードを一括管理
