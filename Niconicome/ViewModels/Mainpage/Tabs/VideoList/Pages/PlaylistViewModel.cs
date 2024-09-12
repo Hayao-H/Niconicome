@@ -98,16 +98,14 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             if (!int.TryParse(playlistID, out int id))
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
-                this._navigation.NavigateTo("/videos");
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
                 return;
             }
 
             IAttemptResult<IPlaylistInfo> pResult = WS::Mainpage.PlaylistManager.GetPlaylist(id);
             if (!pResult.IsSucceeded || pResult.Data is null)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
-                this._navigation.NavigateTo("/videos");
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
                 return;
             }
 
@@ -129,8 +127,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             if (this._playlist is null)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
-                this._navigation.NavigateTo("/videos");
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
                 return;
             }
 
@@ -146,8 +143,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public void ReurnToIndex()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
-            this._navigation.NavigateTo("/videos");
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
         }
 
         #endregion

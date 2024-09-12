@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,11 +42,19 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         IAttemptResult<string> Read(string path);
 
         /// <summary>
-        /// ファイルを削除
+        /// ファイルを読み込む
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        IAttemptResult Delete(string path);
+        IAttemptResult<byte[]> ReadByte(string path);
+
+        /// <summary>
+        /// ファイルを削除
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="resycycle"></param>
+        /// <returns></returns>
+        IAttemptResult Delete(string path, bool resycycle = false);
 
         /// <summary>
         /// ファイルをコピー

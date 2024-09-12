@@ -116,16 +116,6 @@
         </div>
 
         <div class="SettingContent">
-            <p class="Title"><i class="Icon fa-solid fa-basket-shopping"></i>市場情報ファイルの保存形式</p>
-            <select class="form-select Select" @bind="DataContext.IchibaInfoType.Value">
-                @foreach (var x in DataContext.SelectableIchibaInfoType)
-                {
-                    <option value="@x.Value">@x.DidplayValue</option>
-                }
-            </select>
-        </div>
-
-        <div class="SettingContent">
             <label class="Title" for="downloadAll" title="無効にすると現在のプレイリストの動画のみDLします"><i class="Icon fa-solid fa-list"></i>メインページのダウンロードボタンでキューのタスク全てをDLする</label>
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="downloadAll" @bind="DataContext.IsDownloadFromQueueEnable.Value">
@@ -173,6 +163,71 @@
                 <input class="form-check-input" type="checkbox" id="enableNewCommentDL" @bind="DataContext.IsExperimentalCommentDownloadSystemEnable.Value">
             </div>
         </div>
+
+        <div class="SettingContent">
+            <label class="Title" for="playSoundAfterDL"><i class="Icon fa-solid fa-circle-play"></i>DL完了時に音声を再生する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="playSoundAfterDL" @bind="DataContext.PlaySoundAfterDownloadCompleted.Value">
+            </div>
+        </div>
+
+        @if (DataContext.PlaySoundAfterDownloadCompleted.Value)
+        {
+            <div class="SettingContent">
+                <label class="Title"><i class="Icon fa-solid fa-arrow-up-right-from-square"></i>音声ファイルのパス</label>
+                <div class="input-group Input">
+                    <input class="form-control" type="text" @bind="DataContext.AudioFilePath.Value">
+                </div>
+            </div>
+        }
+
+        <div class="SettingContent">
+            <label class="Title" for="modifyVideo"><i class="Icon fa-solid fa-industry"></i>動画をDL後に外部ソフトで処理する</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="modifyVideo" @bind="DataContext.IsVideoModificationEnable.Value">
+            </div>
+        </div>
+
+        @if (DataContext.IsVideoModificationEnable.Value)
+        {
+            <div class="SettingContent">
+                <label class="Title"><i class="Icon fa-solid fa-gear"></i>外部ソフトウェアのパス</label>
+                <div class="input-group Input">
+                    <input class="form-control" type="text" @bind="DataContext.VideoModificationSoftwarePath.Value">
+                </div>
+            </div>
+
+            <div class="SettingContent">
+                <label class="Title"><i class="Icon fa-solid fa-gears"></i>外部ソフトウェアのパラメーター</label>
+                <div class="input-group Input">
+                    <input class="form-control" type="text" @bind="DataContext.VideoModificationSoftwareParam.Value">
+                </div>
+            </div>
+
+
+            <div class="Detail accordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#VideoModificationDetail">
+                            外部ソフトウェアについて
+                        </button>
+                    </h2>
+                    <div id="VideoModificationDetail" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            実行ファイルパスは実行ファイルの絶対パスを指定してください。(例: C:\downloader\some-downloader.exe)<br />
+                            ただし、実行ファイルのパスが通っている場合は、ファイル名を利用することが出来ます。<br />
+                            ※Windowsの環境変数についての更に詳しい情報は<a href="https://www.atmarkit.co.jp/ait/articles/1805/11/news035.html">＠IT様の記事</a>をご覧ください。<br />
+                            パラメーターは<br />
+                            &lt;ServerURL&gt;：内部サーバー上のURL(m3u8ファイル)<br />
+                            &lt;FilePath&gt;：Mp4ファイルの保存パス(ファイル名のフォーマットで設置した形式)<br />
+                            が置き換え対象の文字列として使用できます。<br />
+                            例えば、<a href="https://streamlink.github.io/">streamlink</a>などが利用できます。<br />
+                            ※ニコニコが採用しているHLS+AES(実際はAWS MediaConvertの機能？)方式で配信される動画を復号・保存することが技術的保護手段(<a href="https://laws.e-gov.go.jp/law/345AC0000000048#Mp-Ch_2-Se_3-Ss_5-At_30">著作権法第三十条1号二項</a>)に該当するかどうかは、判例が出るまでは分かりませんが、本ソフトウェアで従来のようにmp4ファイルを直接保存する機能を提供する予定はありません。mp4ファイルを保存したい場合は、この設定を用いて自己責任で行ってください。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 
 </div>

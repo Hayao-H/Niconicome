@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Niconicome.Models.Domain.Utils.Error;
 
 namespace Niconicome.Models.Helper.Result

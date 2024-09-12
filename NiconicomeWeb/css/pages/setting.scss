@@ -1,10 +1,11 @@
 .SettingPage {
+    margin: 24px;
     display: flex;
     flex-direction: column;
 
     .SideMenu {
         position: fixed;
-        top: 10px;
+        top: 50px;
 
         .MenuItem {
             padding: 8px;
@@ -130,6 +131,7 @@
     }
 }
 
+.FilePage,
 .RestorePage {
     .TitleContainer {
         display: flex;
@@ -141,16 +143,22 @@
         }
     }
 
+    .ReplaceSettingsContainer,
     .BackupSettingsContainer {
         margin-top: 18px;
+        margin-left: 16px;
 
+        .RulesList,
         .BackupList {
+
+            .ReplaceListHeader,
             .BackupListHeader {
                 display: flex;
             }
 
+            .RulesListBody,
             .BackupListBody {
-                .BackupListRow {
+                .RulesListRow .BackupListRow {
                     display: flex;
                 }
             }
@@ -207,6 +215,11 @@
             .Button {
                 margin-left: 4px;
             }
+
+            .ReplaceTo {
+                margin-right: 8px;
+            }
+
         }
     }
 

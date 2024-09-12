@@ -19,5 +19,7 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Error
         DataAnalysisFailed,
         [ErrorEnum(ErrorLevel.Log, "{0}件の動画を「{1}」から取得しました。")]
         RetrievingHasCompleted,
+        [ErrorEnum(ErrorLevel.Error, "ユーザーIDの取得に失敗しました。(series:{0})")]
+        FailedToGetUserID,
     }
 }

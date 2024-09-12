@@ -1,0 +1,35 @@
+﻿@inject Niconicome.ViewModels.Shared.TabViewModel DataContext;
+@inherits BlazorBase;
+@implements IDisposable
+
+<div class="tabContainer">
+    @foreach (var tab in DataContext.Tabs)
+    {
+        <div class="tab" @onclick="tab.OnClick">
+            <div class="name">@tab.Name</div>
+            <div class="close" @onclick:stopPropagation="true" @onclick="tab.Close"><i class="fa-solid fa-x"></i></div>
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._ctx = SynchronizationContext.Current;
+
+        DataContext.Tabs.RegisterPropertyChangeHandler(() =>
+        {
+            this._ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        DataContext.Dispose();
+    }
+
+    private SynchronizationContext? _ctx;
+}

@@ -36,6 +36,8 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string DeleteExistingEconomyFile { get; private set; } = "Download.File.DeleteExistingEconomyFile";
 
+        public static string ReplaceRules { get; private set; } = "Download.File.ReplaceRules";
+
         //Download.General
         public static string MaxParallelDownloadCount { get; private set; } = "Download.General.MaxParallelDownloadCount";
 
@@ -46,6 +48,11 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string IsDlTImerEveryDayEnable { get; private set; } = "Download.General.IsDlTImerEveryDayEnable";
 
         public static string PostDownloadAction { get; private set; } = "Download.General.PostDownloadAction";
+
+        //Download.General.DownloadCompletionAudio
+        public static string PlaySoundAfterDownload { get; private set; } = "Download.General.DownloadCompletionAudio.Enable";
+
+        public static string DownloadCompletionAudioPath { get; private set; } = "Download.General.DownloadCompletionAudio.Path";
 
         //Download.Video
         public static string IsResumeEnable { get; private set; } = "Download.Video.IsResumeEnable";
@@ -58,12 +65,25 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         public static string FFmpegFormat { get; private set; } = "Download.Video.FFmpegParameterFormat";
 
+        //Download.Video.Economy
+        public static string SkipEconomyDownloadIfPremiumExists { get; private set; } = "Download.Video.Economy.SkipEconomyDownloadIfPremiumExists";
+
+        public static string AlwaysSkipEconomyDownload { get; private set; } = "Download.Video.Economy.AlwaysSkipEconomyDownload";
+
+
         //Download.Video.ExternalSoftware
         public static string ExternalDownloaderCondition { get; private set; } = "Download.Video.ExternalSoftware.ExternalDownloaderCondition";
 
         public static string ExternalDLSoftwarePath { get; private set; } = "Download.Video.ExternalSoftware.Path";
 
         public static string ExternalDLSoftwareParam { get; private set; } = "Download.Video.ExternalSoftware.Parameter";
+
+        //Download.Video.Modification
+        public static string IsVideoModificationEnable { get; private set; } = "Download.Video.Modification.IsVideoModificationEnable";
+
+        public static string VideoModificationSoftwarePath { get; private set; } = "Download.Video.Modification.VideoModificationSoftwarePath";
+
+        public static string VideoModificationSoftwareParam { get; private set; } = "Download.Video.Modification.VideoModificationParameter";
 
         //Download.Comment
         public static string CommentOffset { get; private set; } = "Download.Comment.Commentoffset";
@@ -176,15 +196,25 @@ namespace Niconicome.Models.Domain.Local.Settings
         //Videolist.TextBoxAndButtons
         public static string StoreOnlyNiconicoIDOnRegister { get; private set; } = "Videolist.TextBoxAndButtons.StoreOnlyNiconicoIDOnRegister";
 
+        public static string AutomaticalyStartDownloadOnVideoAdded { get; private set; } = "Videolist.TextBoxAndButtons.AutomaticalyStartDownloadOnVideoAdded";
+
         //Videolist.ListView
 
         public static string ReAllocateIfVideoisNotSaved { get; private set; } = "Videolist.ListView.SwitchOpenInAppCommandToSendToAppCommandWhenNotDownloaded";
 
         public static string VideoListItemdbClickAction { get; private set; } = "Videolist.ListView.VideoListItemDoubleClickAction";
 
+        public static string VideoListItemMiddleClickAction { get; private set; } = "Videolist.ListView.VideoListItemMiddleClickAction";
+
+        public static string VideoListItemDelKeyAction { get; private set; } = "Videolist.ListView.VideoListItemDelKeyAction";
+
         public static string IsRestoringColumnWidthDisabled { get; private set; } = "Videolist.ListView.IsRestoringColumnWidthDisabled";
 
         public static string DisableScrollRestore { get; private set; } = "Videolist.ListView.DisableScrollRestore";
+
+        public static string IsVideoClickSelectEnable { get; private set; } = "Videolist.ListView.IsVideoClickSelectEnable";
+
+        public static string IsDeletionConfirmDisabled { get; private set; } = "Videolist.ListView.IsDeletionConfirmDisabled";
 
         //Videolist.ListView.Width
         public static string VideoListCheckBoxColumnWidth { get; private set; } = "Videolist.ListView.Width.CheckBoxColumnWidth";
@@ -208,6 +238,13 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         //Videolist.File
         public static string SearchVideosExact { get; private set; } = "Videolist.File.SearchVideosExact";
+
+        //Watch.NG
+        public static string NGUsers { get; private set; } = "Watch.NG.NGUsers";
+
+        public static string NGWords { get; private set; } = "Watch.NG.NGWords";
+
+        public static string NGCommands { get; private set; } = "Watch.NG.NGCommands";
 
         //Application
         public static string LimitWindowsToSingleton { get; private set; } = "Application.LimitWindowsToSingleton";

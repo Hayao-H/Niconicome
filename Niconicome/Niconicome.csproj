@@ -2,15 +2,15 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
-		<AssemblyVersion>0.13.3.*</AssemblyVersion>
+		<AssemblyVersion>0.14.0.*</AssemblyVersion>
 		<FileVersion>0.0.0.0</FileVersion>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<Deterministic>false</Deterministic>
-		<Version>0.13.3</Version>
+		<Version>0.14.0</Version>
 		<PackageProjectUrl>https://github.com/Hayao-H/Niconicome</PackageProjectUrl>
 		<Copyright>c2023 Hayao-H</Copyright>
 		<Authors>Hayao-H</Authors>
@@ -21,22 +21,24 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AngleSharp" Version="1.0.1" />
+		<PackageReference Include="AngleSharp" Version="1.0.4" />
+		<PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />
 		<PackageReference Include="CredentialManagement" Version="1.0.2" />
-		<PackageReference Include="LiteDB" Version="5.0.15" />
+		<PackageReference Include="LiteDB" Version="5.0.17" />
 		<PackageReference Include="MaterialDesignColors" Version="2.1.1" />
 		<PackageReference Include="MaterialDesignThemes" Version="4.7.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.552" />
-		<PackageReference Include="Microsoft.ClearScript" Version="7.3.7" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.2" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="8.0.20" />
+		<PackageReference Include="Microsoft.ClearScript" Version="7.4.3" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.11" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2420.47" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="Prism.Unity" Version="8.1.97" />
-		<PackageReference Include="ReactiveProperty" Version="8.2.0" />
-		<PackageReference Include="ReactiveProperty.WPF" Version="8.2.0" />
+		<PackageReference Include="ReactiveProperty" Version="9.3.2" />
+		<PackageReference Include="ReactiveProperty.WPF" Version="9.3.2" />
 		<PackageReference Include="System.Security.Permissions" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 		<PackageReference Include="Microsoft.Expression.Interactions" Version="1.0.0" />
@@ -59,5 +61,10 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Models\Domain\Niconico\Download\Video\V3\DMS\Error\" />
+	  <Folder Include="wwwroot\script\Pages\VideoList\deail\" />
 	</ItemGroup>
 </Project>

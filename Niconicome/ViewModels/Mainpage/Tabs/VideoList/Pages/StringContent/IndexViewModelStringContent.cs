@@ -32,5 +32,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent
         VideoUpdated,
         [StringEnum("コンテンツがドロップされました。")]
         ContentDropped,
+        [StringEnum("実体ファイルの削除を開始しました。")]
+        StartDeleteVideoFile,
+        [StringEnum("実体ファイルを削除しました。")]
+        DeleteVideoFile,
+        [StringEnum("実体ファイルの削除に失敗しました。")]
+        DeleteVideoFileFailed,
     }
 }

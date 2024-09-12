@@ -19,7 +19,6 @@ using Niconicome.Models.Network.Watch;
 using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.Playlist;
 using Niconicome.Models.Utils;
-using Niconicome.Models.Utils.InitializeAwaiter;
 using Ext = Niconicome.Models.Local.External;
 using VideoList = Niconicome.Models.Playlist.VideoList;
 using Playlist = Niconicome.Models.Playlist.V2;
@@ -29,12 +28,15 @@ using MessageV2 = Niconicome.Models.Local.State.MessageV2;
 using Niconicome.Models.Local.External.Playlist;
 using Server = Niconicome.Models.Domain.Local.Server;
 using Style = Niconicome.Models.Local.State.Style;
+using Tab = Niconicome.Models.Local.State.Tab.V1;
+using PostDL = Niconicome.Models.Network.Download.Actions.V2;
+using Cookie = Niconicome.Models.Auth.Cookie;
+using Niconico = Niconicome.Models.Domain.Niconico;
 
 namespace Niconicome.Workspaces
 {
     static class Mainpage
     {
-        public static ISession Session { get; private set; } = DIFactory.Provider.GetRequiredService<ISession>();
         public static IPlaylistHandler PlaylistHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
         public static IVideoHandler VideoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoHandler>();
         public static IWatch Watch { get; private set; } = DIFactory.Provider.GetRequiredService<IWatch>();
@@ -78,16 +80,6 @@ namespace Niconicome.Workspaces
         /// ローカル情報
         /// </summary>
         public static ILocalState LocalState { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalState>();
-
-        /// <summary>
-        /// ウィンドウ
-        /// </summary>
-        public static IWindowTabHelper WindowTabHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowTabHelper>();
-
-        /// <summary>
-        /// 初期化ヘルパー
-        /// </summary>
-        public static IInitializeAwaiterHandler InitializeAwaiterHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IInitializeAwaiterHandler>();
 
         /// <summary>
         /// ダウンロードを一括管理
@@ -183,5 +175,35 @@ namespace Niconicome.Workspaces
         /// ウィンドウの位置など
         /// </summary>
         public static Style::IWindowStyleManager WindowStyleManager { get; private set; } = DIFactory.Resolve<Style::IWindowStyleManager>();
+
+        /// <summary>
+        /// マウスイベント
+        /// </summary>
+        public static Playlist::Manager.IPlaylistEventManager PlaylistEventManager { get; private set; } = DIFactory.Resolve<Playlist::Manager.IPlaylistEventManager>();
+
+        /// <summary>
+        /// 動画情報
+        /// </summary>
+        public static Server::API.VideoInfo.V1.IVideoInfoHandler VideoInfoHandler { get; set; } = DIFactory.Resolve<Server::API.VideoInfo.V1.IVideoInfoHandler>();
+
+        /// <summary>
+        /// タブ
+        /// </summary>
+        public static Tab::ITabControler TabControler { get; private set; } = DIFactory.Resolve<Tab::ITabControler>();
+
+        /// <summary>
+        /// DL後の処理
+        /// </summary>
+        public static PostDL::IPostDownloadActionssManager PostDownloadActionsManager { get; private set; } = DIFactory.Resolve<PostDL::IPostDownloadActionssManager>();
+
+        /// <summary>
+        /// Cookie管理
+        /// </summary>
+        public static Cookie::INiconicoCookieManager NiconicoCookieManager { get; private set; } = DIFactory.Resolve<Cookie::INiconicoCookieManager>();
+
+        /// <summary>
+        /// セッション管理
+        /// </summary>
+        public static Niconico::INiconicoContext NiconicoContext { get; private set; } = DIFactory.Resolve<Niconico::INiconicoContext>();
     }
 }

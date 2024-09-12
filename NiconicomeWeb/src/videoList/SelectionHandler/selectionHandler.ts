@@ -1,4 +1,4 @@
-import { ElementHandler } from "../../shared/ElementHandler";
+import { ElementHandler } from "../../shared/ElementHandler.ts";
 
 export interface SelectionHandler {
 

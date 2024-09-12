@@ -1,0 +1,73 @@
+﻿@page "/downloadtask/stage"
+
+@using Niconicome.Views.Setting.V2.Shared;
+@using Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask.Pages;
+
+@inherits BlazorBase;
+
+@inject Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask.Pages.StageViewModel DataContext;
+
+<div class="DownloadTask">
+    <Toolbar></Toolbar>
+    <div class="Content">
+        <h3>ステージング済みのタスク</h3>
+        <div class="Controls Stage">
+            <button type="button" class="btn btn-primary" @onclick="DataContext.StartDownload">ダウンロードを開始</button>
+            <button type="button" class="btn btn-danger" @onclick="DataContext.RemoveSelected">選択したタスクを削除</button>
+            <button type="button" class="btn btn-danger" @onclick="DataContext.ClearStaged">全てのタスクを削除</button>
+        </div>
+        <div class="TasksWrapper">
+            <div class="TasksHeader">
+                <div id="CheckColumn">選択</div>
+                <div id="IDColumn">ID</div>
+                <div id="TitleColumn">タイトル</div>
+                <div id="SettingColumn">設定</div>
+            </div>
+            <div class="TasksBody">
+                @foreach (var task in DataContext.Tasks)
+                {
+                    <div class="TaskRow">
+                        <div class="CheckColumn"><input class="form-check-input" type="checkbox" @bind="task.IsSelected.Value"></div>
+                        <div class="IDColumn"><a href="https://nico.ms/@task.NiconicoID">@task.NiconicoID</a></div>
+                        <div class="TitleColumn">@task.Title</div>
+                        <div class="SettingColumn"><button type="button" class="btn btn-primary" @onclick="()=>DataContext.TaskInfoViewModel.Open(task)">DL設定</button></div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="TaskInfo @(DataContext.TaskInfoViewModel.StateClass.Value)">
+            <div class="Control">
+                <p class="Close" @onclick="DataContext.TaskInfoViewModel.Close"><i class="fa-solid fa-xmark"></i></p>
+            </div>
+            <p class="Title">@DataContext.TaskInfoViewModel.Title</p>
+            <p class="Label">解像度</p>
+            <select class="form-select Select" @bind="DataContext.TaskInfoViewModel.Resolution">
+                <option value="1080">1080p</option>
+                <option value="720">720p</option>
+                <option value="480">480p</option>
+                <option value="360">360p</option>
+                <option value="240">240p</option>
+            </select>
+            <p class="Label">保存先ディレクトリ</p>
+            <input type="text" class="Input form-control" @bind="DataContext.TaskInfoViewModel.DirectoryPath" />
+            <p class="Label">ファイル名のフォーマット</p>
+            <input type="text" class="Input form-control" @bind="DataContext.TaskInfoViewModel.FIleNameFormat" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private SynchronizationContext? _ctx;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._ctx = SynchronizationContext.Current;
+
+        DataContext.Bindables.RegisterPropertyChangeHandler(() =>
+        {
+            this._ctx?.Post(_ => this.StateHasChanged(), null);
+        });
+    }
+}

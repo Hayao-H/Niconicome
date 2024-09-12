@@ -45,11 +45,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
     /// </summary>
     public class WatchSession : IWatchSession
     {
-        public WatchSession(IWatchInfohandler watchInfo, INicoHttp http, Utils::ILogger logger, IDmcDataHandler dmchandler, IMasterPlaylisthandler playlisthandler, IHooksManager hooksManager, IErrorHandler errorHandler)
+        public WatchSession(IWatchInfohandler watchInfo, INicoHttp http, Utils::ILogger logge, IMasterPlaylisthandler playlisthandler, IHooksManager hooksManager, IErrorHandler errorHandler)
         {
             this._watchInfo = watchInfo;
             this._http = http;
-            this._dmchandler = dmchandler;
             this._playlisthandler = playlisthandler;
             this._hooksManager = hooksManager;
             this._errorHandler = errorHandler;
@@ -63,8 +62,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
         #region field
 
         private readonly IErrorHandler _errorHandler;
-
-        private readonly IDmcDataHandler _dmchandler;
 
         private readonly IWatchInfohandler _watchInfo;
 
@@ -106,16 +103,12 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
             }
 
             //セッション確立
-            IAttemptResult<IWatchSessionInfo> result;
+            if (!this._hooksManager.IsRegistered(HookType.SessionEnsuring))
+            {
+                return AttemptResult.Fail(this._errorHandler.HandleError(Err.AddonNotRegistered));
+            }
 
-            if (this._hooksManager.IsRegistered(HookType.SessionEnsuring))
-            {
-                result = await this.EnsureSessionWithAddonAsync(videoInfo);
-            }
-            else
-            {
-                result = await this.EnsureSessionDefaultAsync(videoInfo);
-            }
+            IAttemptResult<IWatchSessionInfo> result = await this.EnsureSessionWithAddonAsync(videoInfo);
 
             if (!result.IsSucceeded || result.Data is null)
             {
@@ -168,29 +161,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
         #region private
 
         /// <summary>
-        /// セッションを確立する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <returns></returns>
-        private async Task<IAttemptResult<IWatchSessionInfo>> EnsureSessionDefaultAsync(IDomainVideoInfo video)
-        {
-            IWatchSessionInfo sessionInfo;
-
-            try
-            {
-                sessionInfo = await this._dmchandler.GetSessionInfoAsync(video);
-            }
-            catch (Exception ex)
-            {
-                this._errorHandler.HandleError(Err.SessionEnsuringFailure, ex, video.Id);
-                return AttemptResult<IWatchSessionInfo>.Fail(this._errorHandler.GetMessageForResult(Err.SessionEnsuringFailure, ex, video.Id));
-            }
-
-            return AttemptResult<IWatchSessionInfo>.Succeeded(sessionInfo);
-
-        }
-
-        /// <summary>
         /// アドオンでセッションを確立する
         /// </summary>
         /// <param name="video"></param>
@@ -214,7 +184,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
 
             try
             {
-                if (result.Data.DmcResponseJsonData is not string jsonData || result.Data.ContentUrl is not string contentUrl || result.Data.SessionId is not string sessionID)
+                if (result.Data.DmcResponseJsonData is not string jsonData || result.Data.ContentUrl is not string contentUrl || result.Data.SessionId is not string sessionID || result.Data.IsDMS is not bool isDMS)
                 {
                     this._errorHandler.HandleError(Err.AddonReturnedInvalidInfomation, video.Id);
                     return AttemptResult<IWatchSessionInfo>.Fail(this._errorHandler.GetMessageForResult(Err.AddonReturnedInvalidInfomation, video.Id));
@@ -225,6 +195,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Session
                     DmcResponseJsonData = jsonData,
                     ContentUrl = contentUrl,
                     SessionId = sessionID,
+                    IsDMS = isDMS,
                 };
 
                 return new AttemptResult<IWatchSessionInfo>() { IsSucceeded = true, Data = info };

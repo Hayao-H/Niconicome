@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Niconicome.Models.Domain.Local.External;
 
 namespace Niconicome.Models.Domain.Local.SQLite
@@ -34,13 +35,14 @@ namespace Niconicome.Models.Domain.Local.SQLite
             return type switch
             {
                 CookieType.Webview2 => @"Niconicome.exe.WebView2\EBWebView\Default\Network\Cookies",
+                CookieType.Chrome => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Google\Chrome\User Data\Default\Network\Cookies"),
                 _ => throw new InvalidOperationException("そのような種別のCookieには対応していません。"),
             };
         }
 
         /// <summary>
         /// 指定したブラウザーの形式に合わせてSQL分を発行しCookieを取得する
-        /// 対応ブラウザー：Firefox 90, Webview2
+        /// 対応ブラウザー：Firefox 90, Webview2, Google Chrome 128
         /// </summary>
         /// <param name="path"></param>
         /// <param name="cookieType"></param>
@@ -113,6 +115,7 @@ namespace Niconicome.Models.Domain.Local.SQLite
     public enum CookieType
     {
         Webview2,
-        Firefox
+        Firefox,
+        Chrome,
     }
 }

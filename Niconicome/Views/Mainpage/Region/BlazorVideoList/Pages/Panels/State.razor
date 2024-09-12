@@ -1,0 +1,31 @@
+﻿@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel.StateViewModel VM;
+
+<div class="Panel State @(IsSelected?"":"collapsed")">
+    <div class="counts">
+        <p class="item">現在選択されている動画数：@VM.SelectedVideosCount.Value</p>
+        <p class="item">現在の動画数：@VM.AllVideosCount.Value</p>
+    </div>
+    <div class="control">
+        <button type="button" class="button btn btn-primary" >情報を更新</button>
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._ctx = SynchronizationContext.Current;
+
+        VM.Bindables.RegisterPropertyChangeHandler(this.OnValueChange);
+    }
+
+    private void OnValueChange()
+    {
+        this._ctx?.Post(_ => StateHasChanged(), null);
+    }
+
+    private SynchronizationContext? _ctx;
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+}

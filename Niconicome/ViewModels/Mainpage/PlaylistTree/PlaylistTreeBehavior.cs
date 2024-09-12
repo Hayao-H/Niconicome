@@ -25,11 +25,6 @@ namespace Niconicome.ViewModels.Mainpage.PlaylistTree
         }
 
         /// <summary>
-        /// プレイリストの並び替えタイプ
-        /// </summary>
-        private InsertType insertType = InsertType.None;
-
-        /// <summary>
         /// 選択したアイテムが変更されたとき
         /// </summary>
         /// <param name="sender"></param>

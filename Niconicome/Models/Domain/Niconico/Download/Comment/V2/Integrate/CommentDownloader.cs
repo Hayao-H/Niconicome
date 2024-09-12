@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;
@@ -76,16 +77,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
 
             //コメント取得処理
             var dlOption = new Fetch::CommentClientOption(originationSpecidied, settings.MaxCommentsCount > 0, origination, settings.MaxCommentsCount);
-            //IAttemptResult<Core::ICommentCollection> dlResult = await this._commentClient.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
-            IAttemptResult<Core::V3.ICommentCollection> dlResult = await this._commentClientV2.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
+
+            IAttemptResult<Core::ICommentCollectionShared> dlResult = settings.EnableExperimentalCommentSafetySystem ? await this._commentClientV2.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token) : await this._commentClient.DownloadCommentAsync(dmcInfo, settings, dlOption, context, token);
 
             if (!dlResult.IsSucceeded || dlResult.Data is null)
             {
                 return AttemptResult.Fail(dlResult.Message);
             }
-
-            //キャンセル処理
-            token.ThrowIfCancellationRequested();
 
             //コメント統合処理
             var collection = dlResult.Data;
@@ -94,15 +92,33 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate
                 foreach (var comment in oldComments) collection.Add(comment);
             }
 
+            //キャンセル処理
+            token.ThrowIfCancellationRequested();
+
+
             //コメント書き込み処理
             string path = this._path.GetFilePath(settings.FileNameFormat, dmcInfo, ".xml", settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
             var writerOption = new Local::CommentWriterOption(path, settings.OmittingXmlDeclaration, dmcInfo.Id);
 
-            IAttemptResult writeResult = this._commentWriter.WriteComment(collection.Comments, writerOption);
+            IAttemptResult writeResult = this._commentWriter.WriteComment(collection.Comments.Where(c => !c.IsOwnerComment), writerOption);
 
             if (!writeResult.IsSucceeded)
             {
                 return writeResult;
+            }
+
+            //投コメ
+            IEnumerable<Core::IComment> owner = collection.Comments.Where(c => c.IsOwnerComment);
+            if (owner.Any())
+            {
+                string ownerPath = this._path.GetFilePath(settings.FileNameFormat, dmcInfo, ".xml", settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite,settings.OwnerComSuffix);
+                var ownerWriterOption = new Local::CommentWriterOption(ownerPath, settings.OmittingXmlDeclaration, dmcInfo.Id);
+
+                IAttemptResult ownerWriteResult = this._commentWriter.WriteComment(owner, ownerWriterOption);
+                if (!ownerWriteResult.IsSucceeded)
+                {
+                    return ownerWriteResult;
+                }
             }
 
             //キャンセル処理

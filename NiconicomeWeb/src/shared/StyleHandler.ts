@@ -1,5 +1,5 @@
-import { AttemptResultWidthData, AttemptResultWidthDataImpl } from "./AttemptResult";
-import { ElementHandler } from "./ElementHandler";
+import { AttemptResultWidthData, AttemptResultWidthDataImpl } from "./AttemptResult.ts";
+import { ElementHandler } from "./ElementHandler.ts";
 
 export interface StyleHandler {
     /**

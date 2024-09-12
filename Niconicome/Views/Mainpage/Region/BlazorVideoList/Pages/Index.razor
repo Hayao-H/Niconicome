@@ -15,7 +15,7 @@
 
     <div class="ControlsContainer">
         <div class="InputBoxWrapper InputContextMenuWrapper">
-            <input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @onmousedown="DataContext.InputContextMenuViewModel.OnClick" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDown" />
+            <input id="InputBox" placeholder="ID・URL・検索キーワードなど" spellcheck="false" @onmousedown="DataContext.InputContextMenuViewModel.OnClick" @bind="@(DataContext.InputText.Value)" @onkeyup="DataContext.OnKeyDownControl" />
             @if (DataContext.IsProcessing.Value)
             {
                 <button type="button" id="RegisterButton" class="btn btn-primary" disabled>登録</button>
@@ -141,10 +141,10 @@
                 <div class="MenuItem" @onclick="()=>DataContext.SortViewModel.OnHeaderClick(SortType.LikeCount)">いいね数で並び替え</div>
             </div>
         </div>
-        <div class="VideoListBody">
+        <div class="VideoListBody" @onkeyup="DataContext.OnKeyDownList" tabindex="1">
             @foreach (var video in DataContext.Videos)
             {
-                <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" data-playlistID="@(DataContext.PlaylistID)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" draggable="true">
+                <div class="VideoListRow" id="@(video.NiconicoId)" data-niconicoID="@(video.NiconicoId)" data-playlistID="@(DataContext.PlaylistID)" @onmouseup="async e=>DataContext.ContextMenu.OnClick(e,video.NiconicoId,await GetBodyHeight())" @onmousedown="video.OnClick" @ondblclick="video.OnDBClick" draggable="true">
                     <div class="CheckBoxColumn">
                         <input type="checkbox" @bind="@(video.IsSelected.Value)" />
                     </div>
@@ -270,6 +270,16 @@
                     <p class="ContextMenuItem Clickable" @onclick="()=>DataContext.ContextMenu.CreatePlaylist(ContextMenuViewModel.PlaylistType.AIMP)">.aimppl4形式のプレイリストを作成する</p>
                 </div>
             </div>
+            <div class="RootMenu">
+                <div class="ContextMenuItem">
+                    <p><i class="fa-solid fa-trash fa-sm ContextMenuIcon"></i>実体ファイルをゴミ箱へ</p>
+                    <div class="ContextMenuItemTriangle"></div>
+                </div>
+                <div class="SubMenu Two">
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.DeleteNotRegisteredVideoFiles">リストに存在しない動画を削除</p>
+                    <p class="ContextMenuItem Clickable" @onclick="DataContext.ContextMenu.DeleteFile">選択した動画を削除</p>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -340,6 +350,8 @@
             }
         </div>
     }
+
+    <BottomPanel />
 
 </div>
 

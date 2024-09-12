@@ -1,0 +1,41 @@
+﻿@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel.OutputViewModel VM;
+@implements IDisposable;
+
+<div class="Panel Output @(IsSelected?"":"collapsed")">
+    <div class="Controls">
+        <button type="button" class="button btn btn-primary" @onclick="VM.OnCopyButtonClick">コピー</button>
+        <button type="button" class="button btn btn-primary" @onclick="VM.OnClearButtonClick">クリア</button>
+        <button type="button" class="button btn btn-primary" @onclick="VM.OnOpenLogWindowButtonClick">新規ウィンドウで開く</button>
+    </div>
+    <div class="Message">
+        @foreach (var message in VM.Messages)
+        {
+            <p>@message</p>
+        }
+    </div>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._ctx = SynchronizationContext.Current;
+
+        VM.Bindables.RegisterPropertyChangeHandler(this.OnValueChange);
+    }
+
+    private void OnValueChange()
+    {
+        this._ctx?.Post(_ => StateHasChanged(), null);
+    }
+
+    private SynchronizationContext? _ctx;
+
+    public void Dispose()
+    {
+        VM.Dispose();
+    }
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+}

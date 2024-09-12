@@ -12,6 +12,7 @@ using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.External.Error;
+using Niconicome.Models.Local.State;
 using Niconicome.Models.Playlist.V2.Manager;
 
 namespace Niconicome.Models.Local.External
@@ -56,13 +57,14 @@ namespace Niconicome.Models.Local.External
 
     public class ExternalAppUtilsV2 : IExternalAppUtilsV2
     {
-        public ExternalAppUtilsV2(IErrorHandler errorHandler, ICommandExecuter commandExecuter, ISettingsContainer settingsContainer, IVideoStore videoStore, IPlaylistManager playlistManager)
+        public ExternalAppUtilsV2(IErrorHandler errorHandler, ICommandExecuter commandExecuter, ISettingsContainer settingsContainer, IVideoStore videoStore, IPlaylistManager playlistManager,ILocalState localState)
         {
             this._errorHandler = errorHandler;
             this._commandExecuter = commandExecuter;
             this._settingsContainer = settingsContainer;
             this._videoStore = videoStore;
             this._playlistManager = playlistManager;
+            this._localState = localState;
         }
 
 
@@ -77,6 +79,8 @@ namespace Niconicome.Models.Local.External
         private readonly IVideoStore _videoStore;
 
         private readonly IPlaylistManager _playlistManager;
+
+        private readonly ILocalState _localState;
 
         #endregion
 
@@ -184,7 +188,16 @@ namespace Niconicome.Models.Local.External
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ExternalAppUtilsV2Error.VideoIsNotDownloaded, videoInfo.NiconicoId));
             }
 
-            var path = videoInfo.FilePath.Replace(@"\\?\", string.Empty);
+            string path;
+
+            if (videoInfo.IsDMS)
+            {
+                path = $"http://localhost:{this._localState.Port}/niconicome/watch/v1/{videoInfo.PlaylistID}/{videoInfo.NiconicoId}/main.m3u8";
+            }
+            else
+            {
+                path = videoInfo.FilePath.Replace(@"\\?\", string.Empty);
+            }
 
             this.AddVideoToHistory(videoInfo.NiconicoId, path);
 
@@ -204,6 +217,7 @@ namespace Niconicome.Models.Local.External
                 .Replace("<url>", NetConstant.NiconicoWatchUrl + videoInfo.NiconicoId)
                 .Replace("<url:short>", NetConstant.NiconicoShortUrl + videoInfo.NiconicoId)
                 .Replace("<id>", videoInfo.NiconicoId)
+                .Replace("<url:watch>", $"http://localhost:{this._localState.Port}/niconicome/watch/v1/{videoInfo.PlaylistID}/{videoInfo.NiconicoId}/main.m3u8")
                 ;
 
             return this._commandExecuter.Execute(appPath, constructedArg);

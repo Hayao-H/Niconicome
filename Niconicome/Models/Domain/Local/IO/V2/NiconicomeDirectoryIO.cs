@@ -20,7 +20,7 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// path配下のディレクトリを取得
         /// </summary>
         /// <param name="path"></param>
-        /// <returns></returns>
+        /// <returns>ディレクトリの完全パス一覧</returns>
         IAttemptResult<IEnumerable<string>> GetDirectories(string path);
 
         /// <summary>
@@ -38,6 +38,15 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// <param name="recursive"></param>
         /// <returns></returns>
         IAttemptResult Delete(string path, bool recursive = true);
+
+        /// <summary>
+        /// ディレクトリを移動
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="overwrite"></param>
+        /// <returns></returns>
+        IAttemptResult Move(string source, string destination, bool overwrite = true);
 
         /// <summary>
         /// ディレクトリの存在を確認

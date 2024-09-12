@@ -75,7 +75,7 @@ namespace Niconicome.Models.Playlist.V2.Utils
                 return true;
             }
 
-            if (video.OwnerName.Contains(keyword))
+            if (video.OwnerName?.Contains(keyword) ?? false)
             {
                 return true;
             }

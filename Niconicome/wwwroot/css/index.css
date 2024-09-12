@@ -13,7 +13,12 @@
   border-radius: 5px;
 }
 
+*:focus {
+  outline: none;
+}
+
 .PageContent {
+  margin: 24px;
   position: relative;
 }
 .PageContent .ControlsContainer {
@@ -349,6 +354,7 @@
   background-color: #fff;
   overflow-y: auto;
   border-left: 1px solid rgba(231, 231, 231, 0.9058823529);
+  z-index: 9999;
 }
 .PageContent .OutputContainer .ToolBar {
   display: flex;
@@ -404,6 +410,130 @@
 }
 .PageContent .OutputContainer.Show {
   display: block;
+}
+.PageContent .BottomPanelControler {
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.PageContent .BottomPanelControler .PanelItem {
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  flex-grow: 1;
+  border-right: 1px solid rgba(231, 231, 231, 0.9058823529);
+  cursor: pointer;
+}
+.PageContent .BottomPanelControler .PanelItem.selected {
+  background-color: #f2f3f5;
+}
+.PageContent .Panel.Download {
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+  padding: 8px;
+}
+.PageContent .Panel.Download .nc-border {
+  border-bottom: 0.5px solid #000;
+}
+.PageContent .Panel.Download .downloadTarget .title,
+.PageContent .Panel.Download .downloadButton .title {
+  color: #737575;
+  font-size: 14px;
+  margin-top: 16px;
+}
+.PageContent .Panel.Download .downloadTarget .forms,
+.PageContent .Panel.Download .downloadButton .forms {
+  display: flex;
+  align-items: center;
+  height: 30px;
+}
+.PageContent .Panel.Download .downloadTarget .forms .form-check,
+.PageContent .Panel.Download .downloadButton .forms .form-check {
+  margin-right: 16px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+.PageContent .Panel.Download .downloadTarget .forms .count,
+.PageContent .Panel.Download .downloadButton .forms .count {
+  width: 150px;
+}
+.PageContent .Panel.Download .downloadSelect {
+  display: flex;
+  align-items: center;
+}
+.PageContent .Panel.Download .downloadSelect .setting {
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+}
+.PageContent .Panel.Download .downloadSelect .setting .form-select {
+  width: 150px;
+}
+.PageContent .Panel.Download .downloadButton .controls {
+  display: flex;
+  justify-content: space-between;
+}
+.PageContent .Panel.Download .downloadButton .controls .buttons .button {
+  margin-right: 8px;
+}
+.PageContent .Panel.Output {
+  padding: 8px;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.PageContent .Panel.Output .Controls {
+  margin-bottom: 8px;
+}
+.PageContent .Panel.Output .Message {
+  height: 180px;
+  overflow: auto;
+}
+.PageContent .Panel.State {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px;
+  height: 250px;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+}
+.PageContent .Panel.State .counts {
+  display: flex;
+}
+.PageContent .Panel.State .counts .item {
+  margin-right: 16px;
+}
+.PageContent .Panel.State .control {
+  display: flex;
+  justify-content: flex-end;
+}
+.PageContent .Panel.Timer {
+  padding: 8px;
+}
+.PageContent .Panel.Timer .Item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  height: 40px;
+}
+.PageContent .Panel.Timer .Item .Label .Icon {
+  color: #1e90ff;
+}
+.PageContent .Panel.Timer .Item .Input.TimerSetting {
+  display: flex;
+}
+.PageContent .Panel.Timer .Item .Input.TimerSetting .TimeSetting {
+  display: flex;
+}
+.PageContent .Panel.Timer .Item .Input.TimerSetting .TimeSetting .Year {
+  width: 150px;
+  margin-right: 8px;
+}
+.PageContent .Panel.Timer .Item .Input.TimerSetting .TimeSetting .Month, .PageContent .Panel.Timer .Item .Input.TimerSetting .TimeSetting .Day, .PageContent .Panel.Timer .Item .Input.TimerSetting .TimeSetting .Hour, .PageContent .Panel.Timer .Item .Input.TimerSetting .TimeSetting .Minute {
+  width: 100px;
+  margin-right: 8px;
+}
+.PageContent .Panel.collapsed {
+  display: none;
 }
 
 .ContextMenuWrapper {

@@ -4,12 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ABI.System;
-using System.Windows.Input;
 using Niconicome.Models.Const;
-using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Niconico.Download.Video.V2.External;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream;
@@ -23,7 +21,6 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Download;
 using Niconicome.Models.Utils.ParallelTaskV2;
 using SC = Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate.VideoDownloaderSC;
-using Niconicome.Models.Domain.Niconico.Download.Video.V2.External;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 {
@@ -82,6 +79,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 
         public async Task<IAttemptResult<uint>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token)
         {
+            //DLするかどうかを判定
+            if (!this.ShouldDownladVideo(videoInfo, settings))
+            {
+                OnMessage(this._stringHandler.GetContent(SC.SkipEconomy));
+                return AttemptResult<uint>.Succeeded(0);
+            }
+
             //ファイルパス
             string filePath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, videoInfo.DmcInfo, settings.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
 
@@ -191,7 +195,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             }
 
             //エコノミーファイルを削除
-            if (settings.DeleteExistingEconomyFile && !videoInfo.DmcInfo.IsEnonomy)
+            if (settings.DeleteExistingEconomyFile && !videoInfo.DmcInfo.IsEconomy)
             {
                 this.DeleteEconomyFile(settings.FilePath);
             }
@@ -242,11 +246,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
                     var downloader = DIFactory.Resolve<ISegmentDownloader>();
                     downloader.Initialize(info, container);
 
-                    IAttemptResult result = await downloader.DownloadAsync();
-                    if (result.IsSucceeded)
-                    {
-                        onMessage(this._stringHandler.GetContent(SC.SegmentDownloadCompleted, container.CompletedCount, container.Length, verticalResoluiton));
-                    }
+                    await downloader.DownloadAsync();
 
                 }, _ => { });
 
@@ -299,6 +299,27 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
             if (!this._fileIO.Exists(path)) return;
 
             this._fileIO.Delete(path);
+        }
+
+        /// <summary>
+        /// DLするかどうかを判定する
+        /// </summary>
+        /// <param name="videoInfo"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        private  bool ShouldDownladVideo(IDomainVideoInfo videoInfo,IDownloadSettings settings)
+        {
+            if (!videoInfo.DmcInfo.IsEconomy) return true;
+
+            if (string.IsNullOrEmpty(settings.FilePath)) return true;
+
+            if (!this._fileIO.Exists(settings.FilePath)) return true;
+
+            if (settings.SkipEconomyDownloadIfPremiumExists && !settings.FilePath.Contains(settings.EconomySuffix)) return false;
+
+            if (settings.AlwaysSkipEconomyDownload) return false;
+
+            return true;
         }
 
 

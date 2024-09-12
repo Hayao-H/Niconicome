@@ -2,10 +2,6 @@ p {
     margin-bottom: 0 !important;
 }
 
-.Content {
-    margin: 24px;
-}
-
 .Alert {
     position: fixed;
     display: flex;
@@ -23,4 +19,33 @@ p {
         display: none;
     }
 
+}
+
+.tabContainer {
+    display: flex;
+    align-items: center;
+    margin: 8px;
+    border-bottom: 1px solid #e7e7e7e7;
+    height: 40px;
+
+    .tab {
+        width: 150px;
+        padding: 4px;
+        border: 1px solid #e7e7e7e7;
+        border-radius: 4px;
+        margin-right: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        display: flex;
+        justify-content: space-between;
+
+        .close {
+            color: red;
+
+            &:hover {
+                color: darkred;
+            }
+        }
+    }
 }

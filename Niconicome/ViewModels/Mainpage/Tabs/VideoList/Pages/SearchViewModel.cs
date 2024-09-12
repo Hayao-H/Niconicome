@@ -153,12 +153,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.IsRegisterIsProcessing.Value= true;
             await WS.SearchManager.RegisterVideosAsync(this._title, this.Videos.Where(v => v.IsSelected).Select(v => v.Video).ToList());
 
-            WS.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+            WS.BlazorPageManager.RequestBlazorToNavigate("/videos");
         }
 
         public void OnBackButtonClick()
         {
-            WS.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+            WS.BlazorPageManager.RequestBlazorToNavigate("/videos");
         }
 
         #endregion

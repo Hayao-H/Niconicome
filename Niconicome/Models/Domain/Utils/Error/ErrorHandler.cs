@@ -19,7 +19,7 @@ namespace Niconicome.Models.Domain.Utils.Error
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
         /// <param name="items"></param>
-        void HandleError<T>(T value, params object[]? items) where T : struct, Enum;
+        string HandleError<T>(T value, params object[]? items) where T : struct, Enum;
 
         /// <summary>
         /// 例外情報を伴うエラー処理を行う
@@ -28,7 +28,7 @@ namespace Niconicome.Models.Domain.Utils.Error
         /// <param name="value"></param>
         /// <param name="ex"></param>
         /// <param name="items"></param>
-        void HandleError<T>(T value, Exception ex, params object[]? items) where T : struct, Enum;
+        string HandleError<T>(T value, Exception ex, params object[]? items) where T : struct, Enum;
 
         /// <summary>
         /// 例外情報を文字列で取得する
@@ -65,7 +65,7 @@ namespace Niconicome.Models.Domain.Utils.Error
 
         #region Method
 
-        public void HandleError<T>(T value, params object[]? items) where T : struct, Enum
+        public string HandleError<T>(T value, params object[]? items) where T : struct, Enum
         {
             if (this.TryGetAttr(value, out ErrorEnumAttribute? attr))
             {
@@ -73,10 +73,16 @@ namespace Niconicome.Models.Domain.Utils.Error
                 var message = $"[{errorCode}]　{this.GetErrorMessage(attr, items ?? new object[0])}";
 
                 this.WriteLog(attr.ErrorLevel, message);
+
+                return this.GetMessageForResult(value, items);
+            }
+            else
+            {
+                return string.Empty;
             }
         }
 
-        public void HandleError<T>(T value, Exception ex, params object[]? items) where T : struct, Enum
+        public string HandleError<T>(T value, Exception ex, params object[]? items) where T : struct, Enum
         {
             if (this.TryGetAttr(value, out ErrorEnumAttribute? attr))
             {
@@ -85,6 +91,12 @@ namespace Niconicome.Models.Domain.Utils.Error
                 var message = $"[{errorCode}] {this.GetErrorMessage(attr, items ?? new object[0])}{Environment.NewLine}{exMessage}";
 
                 this.WriteLog(attr.ErrorLevel, message);
+
+                return this.GetMessageForResult(value, ex, items);
+            }
+            else
+            {
+                return string.Empty;
             }
         }
 

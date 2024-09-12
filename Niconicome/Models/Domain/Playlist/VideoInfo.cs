@@ -86,6 +86,11 @@ namespace Niconicome.Models.Domain.Playlist
         string ChannelID { get; set; }
 
         /// <summary>
+        /// 動画説明文
+        /// </summary>
+        string Description { get; set; }
+
+        /// <summary>
         /// サムネURL(大)
         /// </summary>
         string LargeThumbUrl { get; set; }
@@ -139,6 +144,11 @@ namespace Niconicome.Models.Domain.Playlist
         /// エコノミーフラグ
         /// </summary>
         bool IsEconomy { get; set; }
+
+        /// <summary>
+        /// 新サーバーかどうか
+        /// </summary>
+        bool IsDMS { get; }
 
         /// <summary>
         /// タグを追加
@@ -200,6 +210,8 @@ namespace Niconicome.Models.Domain.Playlist
         private string _channnelName = string.Empty;
 
         private string _channnelID = string.Empty;
+
+        private string _description = string.Empty;
 
         private int _duration;
 
@@ -378,6 +390,16 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
+        public string Description
+        {
+            get => this._description;
+            set
+            {
+                this._description = value;
+                if (this.IsAutoUpdateEnabled) this.Update(this);
+            }
+        }
+
         public IBindableProperty<string> Message { get; init; } = new BindableProperty<string>(string.Empty);
 
         public int Duration
@@ -415,6 +437,8 @@ namespace Niconicome.Models.Domain.Playlist
                 if (this.IsAutoUpdateEnabled) this.Update(this);
             }
         }
+
+        public bool IsDMS => !string.IsNullOrEmpty(this.FilePath) && this.FilePath.EndsWith("stream.json");
 
         #endregion
 

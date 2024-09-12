@@ -40,12 +40,11 @@ namespace Niconicome.Models.Domain.Niconico.Watch
     /// </summary>
     public class WatchSession : IWatchSession
     {
-        public WatchSession(IWatchInfohandler watchInfo, INicoHttp http, Utils::ILogger logger, IDmcDataHandler dmchandler, IWatchPlaylisthandler playlisthandler, IHooksManager hooksManager)
+        public WatchSession(IWatchInfohandler watchInfo, INicoHttp http, Utils::ILogger logger, IWatchPlaylisthandler playlisthandler, IHooksManager hooksManager)
         {
             this.watchInfo = watchInfo;
             this.http = http;
             this.logger = logger;
-            this.dmchandler = dmchandler;
             this.playlisthandler = playlisthandler;
             this.hooksManager = hooksManager;
         }
@@ -58,8 +57,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         #region field
 
         private readonly Utils::ILogger logger;
-
-        private readonly IDmcDataHandler dmchandler;
 
         private readonly IWatchInfohandler watchInfo;
 
@@ -164,16 +161,15 @@ namespace Niconicome.Models.Domain.Niconico.Watch
                 return;
             }
 
-            IAttemptResult<IWatchSessionInfo> result;
 
-            if (this.hooksManager.IsRegistered(HookType.SessionEnsuring))
+            if (!this.hooksManager.IsRegistered(HookType.SessionEnsuring))
             {
-                result = await this.EnsureSessionWithAddonAsync(this.Video);
+                this.State = WatchSessionState.SessionEnsuringFailure;
+                return;
             }
-            else
-            {
-                result = await this.EnsureSessionDefaultAsync(this.Video);
-            }
+
+            IAttemptResult<IWatchSessionInfo> result = await this.EnsureSessionWithAddonAsync(this.Video);
+
 
             if (!result.IsSucceeded || result.Data is null)
             {
@@ -224,29 +220,6 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         #endregion
 
         #region private
-
-        /// <summary>
-        /// セッションを確立する
-        /// </summary>
-        /// <param name="video"></param>
-        /// <returns></returns>
-        private async Task<IAttemptResult<IWatchSessionInfo>> EnsureSessionDefaultAsync(IDomainVideoInfo video)
-        {
-            IWatchSessionInfo sessionInfo;
-
-            try
-            {
-                sessionInfo = await this.dmchandler.GetSessionInfoAsync(video);
-            }
-            catch (Exception e)
-            {
-                this.logger.Error("セッションの確立に失敗しました。", e);
-                return new AttemptResult<IWatchSessionInfo>() { Message = "セッションの確立に失敗しました。", Exception = e };
-            }
-
-            return new AttemptResult<IWatchSessionInfo>() { IsSucceeded = true, Data = sessionInfo };
-
-        }
 
         /// <summary>
         /// アドオンでセッションを確立する

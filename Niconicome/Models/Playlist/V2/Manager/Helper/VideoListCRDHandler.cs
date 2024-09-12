@@ -14,6 +14,7 @@ using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Domain.Utils.StringHandler;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Network.Download.DLTask;
 using Niconicome.Models.Network.Video;
 using Niconicome.Models.Playlist.V2.Manager.Error;
 using Niconicome.Models.Playlist.V2.Manager.StringContent;
@@ -74,7 +75,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
     public class VideoListCRDHandler : VideoListManagerHelperBase, IVideoListCRDHandler
     {
-        public VideoListCRDHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, ITagStore tagStore, ILocalDirectoryHandler directoryHandler, IStringHandler stringHandler, ISettingsContainer settingsContainer, Utils::INiconicoUtils utils) : base(videoStore, tagStore)
+        public VideoListCRDHandler(IPlaylistVideoContainer container, IErrorHandler errorHandler, IVideoStore videoStore, INetVideosInfomationHandler netVideos, IInputTextParser inputTextParser, ITagStore tagStore, ILocalDirectoryHandler directoryHandler, IStringHandler stringHandler, ISettingsContainer settingsContainer, Utils::INiconicoUtils utils,IDownloadManager downloadManager) : base(videoStore, tagStore)
         {
             this._container = container;
             this._errorHandler = errorHandler;
@@ -83,6 +84,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             this._directoryHandler = directoryHandler;
             this._stringHandler = stringHandler;
             this._settingsContainer = settingsContainer;
+            this._downloadManager = downloadManager;
             this._utils = utils;
         }
 
@@ -102,6 +104,8 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
         private readonly ISettingsContainer _settingsContainer;
 
+        private readonly IDownloadManager _downloadManager;
+
         private readonly Utils::INiconicoUtils _utils;
 
         #endregion
@@ -113,6 +117,8 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             InputInfomation info = this._inputTextParser.GetInputInfomation(inputText);
             VideoRegistrationResult? rResult = null;
 
+            List<IVideoInfo> videos = new();
+
             //ニコニコのID
             if (info.InputType == InputType.NiconicoID)
             {
@@ -123,6 +129,8 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
                 this.AddVideoToPlaylist(vResult.Data, playlist);
+
+                videos.Add(vResult.Data);
 
                 if (vResult.Data.ChannelName.IsNullOrEmpty())
                 {
@@ -145,7 +153,9 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                     if (!vResult.IsSucceeded || vResult.Data is null) return AttemptResult<VideoRegistrationResult>.Fail(vResult.Message);
 
                     this.AddVideoToPlaylist(vResult.Data, playlist);
+                    videos.Add(vResult.Data);
                 }
+
 
                 rResult = new VideoRegistrationResult(false, result.Data.Videos.Count, string.Empty, string.Empty);
             }
@@ -158,6 +168,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 }
 
                 this.AddVideoToPlaylist(result.Data, playlist);
+                videos.AddRange(result.Data);
             }
             else if (info.InputType == InputType.NiconicoIDList)
             {
@@ -165,11 +176,18 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 if (!result.IsSucceeded || result.Data is null)
                 {
                     return result;
-                } else
+                }
+                else
                 {
                     rResult = result.Data;
+                    if (result.Data.AddedVideo is not null)
+                    {
+                        videos.AddRange(result.Data.AddedVideo);
+                    }
                 }
             }
+
+            this.HandleAutoDownload(videos);
 
             if (rResult is null)
             {
@@ -253,7 +271,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
             this.AddVideoToPlaylist(videos, playlist);
 
-            return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, videos.Count, string.Empty, string.Empty));
+            return AttemptResult<VideoRegistrationResult>.Succeeded(new VideoRegistrationResult(false, videos.Count, string.Empty, string.Empty, videos));
         }
 
         public IAttemptResult<IVideoInfo> GetVideoFromCurrentPlaylist(string niconicoID)
@@ -413,6 +431,23 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             }
 
             playlist.AddVideo(video);
+        }
+
+        /// <summary>
+        /// 自動ダウンロード処理
+        /// </summary>
+        /// <param name="videos"></param>
+        private void HandleAutoDownload(IEnumerable<IVideoInfo> videos)
+        {
+            IAttemptResult<bool> result = this._settingsContainer.GetOnlyValue(SettingNames.AutomaticalyStartDownloadOnVideoAdded,false);
+            if (!result.IsSucceeded || !result.Data) return;
+
+            foreach (var video in videos)
+            {
+                this._downloadManager.StageVIdeo(video);
+            }
+
+            this._downloadManager.StartDownloadAsync();
         }
 
         #endregion

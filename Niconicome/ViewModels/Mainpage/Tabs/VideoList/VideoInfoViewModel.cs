@@ -4,9 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Web;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Playlist;
+using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Utils.Reactive;
+using WS = Niconicome.Workspaces.Mainpage;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
 {
@@ -179,6 +182,31 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// DLフラグ
         /// </summary>
         public IBindableProperty<bool> IsDownloaded { get; init; }
+
+        /// <summary>
+        /// 新サーバーフラグ
+        /// </summary>
+        public bool IsDMS => this._video.IsDMS;
+
+        #endregion
+
+        #region Method
+
+        public void OnClick(MouseEventArgs e)
+        {
+            if (e.Button == 1)
+            {
+                WS.PlaylistEventManager.OnVideoClick(this._video,EventType.MiddleClick);
+            } else if (e.Button == 0)
+            {
+                WS.PlaylistEventManager.OnVideoClick(this._video, EventType.Click);
+            }
+        }
+
+        public void OnDBClick(MouseEventArgs _)
+        {
+            WS.PlaylistEventManager.OnVideoClick(this._video, EventType.DoubleClick);
+        }
 
         #endregion
 

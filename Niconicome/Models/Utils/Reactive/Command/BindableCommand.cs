@@ -9,16 +9,25 @@ using System.Windows.Input;
 namespace Niconicome.Models.Utils.Reactive.Command
 {
 
-    public interface IBindableCommand : ICommand
+    public interface IBindableCommand : ICommand, IDisposable
     {
 
     }
 
     public class BindableCommand : IBindableCommand
     {
+        public BindableCommand(Action command)
+        {
+            this._source = new List<IBindableProperty<bool>>() { new BindableProperty<bool>(true) }.AsReadOnly();
+            this._sourceRO = new List<IReadonlyBindablePperty<bool>>().AsReadOnly();
+            this._command = command;
+            this.Initialize();
+        }
+
         public BindableCommand(Action command, IBindableProperty<bool> source)
         {
             this._source = new List<IBindableProperty<bool>>() { source }.AsReadOnly();
+            this._sourceRO = new List<IReadonlyBindablePperty<bool>>().AsReadOnly();
             this._command = command;
             this.Initialize();
         }
@@ -26,6 +35,23 @@ namespace Niconicome.Models.Utils.Reactive.Command
         public BindableCommand(Action command, params IBindableProperty<bool>[] source)
         {
             this._source = new List<IBindableProperty<bool>>(source).AsReadOnly();
+            this._sourceRO = new List<IReadonlyBindablePperty<bool>>().AsReadOnly();
+            this._command = command;
+            this.Initialize();
+        }
+
+        public BindableCommand(Action command, IReadonlyBindablePperty<bool> source)
+        {
+            this._source = new List<IBindableProperty<bool>>().AsReadOnly();
+            this._sourceRO = new List<IReadonlyBindablePperty<bool>>() { source }.AsReadOnly();
+            this._command = command;
+            this.Initialize();
+        }
+
+        public BindableCommand(Action command, params IReadonlyBindablePperty<bool>[] source)
+        {
+            this._source = new List<IBindableProperty<bool>>().AsReadOnly();
+            this._sourceRO = new List<IReadonlyBindablePperty<bool>>(source).AsReadOnly();
             this._command = command;
             this.Initialize();
         }
@@ -40,11 +66,14 @@ namespace Niconicome.Models.Utils.Reactive.Command
 
         public void Execute(object? parameter)
         {
-            try
+            this._ctx?.Post(_ =>
             {
-                this._command();
-            }
-            catch { }
+                try
+                {
+                    this._command?.Invoke();
+                }
+                catch { }
+            }, null);
         }
 
         #endregion
@@ -52,6 +81,8 @@ namespace Niconicome.Models.Utils.Reactive.Command
         #region field
 
         private readonly IReadOnlyCollection<IBindableProperty<bool>> _source;
+
+        private readonly IReadOnlyCollection<IReadonlyBindablePperty<bool>> _sourceRO;
 
         private Action _command;
 
@@ -66,6 +97,11 @@ namespace Niconicome.Models.Utils.Reactive.Command
         private void Initialize()
         {
             foreach (var source in this._source)
+            {
+                source.Subscribe(this.OnChange);
+            }
+
+            foreach (var source in this._sourceRO)
             {
                 source.Subscribe(this.OnChange);
             }
@@ -105,5 +141,20 @@ namespace Niconicome.Models.Utils.Reactive.Command
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            foreach (var source in this._source)
+            {
+                source.UnSubscribe(this.OnChange);
+            }
+
+            foreach (var source in this._sourceRO)
+            {
+                source.UnSubscribe(this.OnChange);
+            }
+
+            this._canExecute.Dispose();
+        }
     }
 }

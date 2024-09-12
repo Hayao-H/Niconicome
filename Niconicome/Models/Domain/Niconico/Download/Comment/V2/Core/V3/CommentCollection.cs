@@ -7,26 +7,8 @@ using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
 {
-    public interface ICommentCollection
+    public interface ICommentCollection : ICommentCollectionShared
     {
-
-        /// <summary>
-        /// コメント数を取得
-        /// </summary>
-        int Count { get; }
-
-        /// <summary>
-        /// 全てのコメントを取得する
-        /// </summary>
-        IEnumerable<IComment> Comments { get; }
-
-        /// <summary>
-        /// コメントを追加
-        /// </summary>
-        /// <param name="comment"></param>
-        /// <returns></returns>
-        IAttemptResult Add(IComment comment);
-
         /// <summary>
         /// 指定したコメントを取得
         /// </summary>

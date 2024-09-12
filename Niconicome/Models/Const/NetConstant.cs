@@ -46,7 +46,7 @@ namespace Niconicome.Models.Const
         /// <summary>
         /// ニコニコのログアウトURL
         /// </summary>
-        public const string NiconicoLogoutURL = @"https://account.nicovideo.jp/logout";
+        public const string NiconicoLogoutURL = @"https://account.nicovideo.jp/logout?site=niconico";
 
         /// <summary>
         /// ニコニコのドメイン
@@ -87,5 +87,37 @@ namespace Niconicome.Models.Const
         /// ローカルサーバーのデフォルトポート
         /// </summary>
         public static int DefaultServerPort = 2580;
+
+        /// <summary>
+        /// 視聴アドレス
+        /// </summary>
+        public static string WatchAddressV1 = "http://localhost:{0}/niconicome/watch/v1/{1}/{2}/main.m3u8";
+
+        /// <summary>
+        /// 視聴アドレス(HLS)
+        /// </summary>
+        public static string HLSAddressV1 = "http://localhost:{0}/niconicome/api/regacyhls/v1/{1}/{2}/master.m3u8";
+
+        /// <summary>
+        /// HLS作成アドレス
+        /// </summary>
+        public static string HLSCreateAddressV1 = "http://localhost:{0}/niconicome/api/regacyhls/v1/{1}/{2}/create";
+
+        /// <summary>
+        /// コメントアドレス
+        /// </summary>
+        public static string CommentAddressV1 = "http://localhost:{0}/niconicome/api/comment/v1/{1}/{2}/comment.json";
+
+        /// <summary>
+        /// NGAPIアドレス
+        /// </summary>
+        public static string NGAPIAddressV1 = "http://localhost:{0}/niconicome/api/ng/v1";
+
+        /// <summary>
+        /// サムネイルアドレス
+        /// 
+        /// </summary>
+        public static string ThumbnailAddressV1 = "http://localhost:{0}/niconicome/resource/v1/thumb/{1}/thumb.jpg";
+
     }
 }

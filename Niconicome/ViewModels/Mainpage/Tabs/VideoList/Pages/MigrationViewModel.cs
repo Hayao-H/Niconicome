@@ -76,7 +76,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         public void OnDone()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos",BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
             this._navigation.NavigateTo("/videos");
         }
 

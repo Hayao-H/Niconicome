@@ -38,6 +38,8 @@ namespace NiconicomeTest.Stabs.Models.Domain.Playlist
 
         public string ChannelName { get; set; } = string.Empty;
 
+        public string Description { get; set; } = string.Empty;
+
         public string ChannelID { get; set; } = string.Empty;
 
         public string LargeThumbUrl { get; set; } = string.Empty;
@@ -63,6 +65,8 @@ namespace NiconicomeTest.Stabs.Models.Domain.Playlist
         public bool IsEconomy { get; set; }
 
         public bool IsAutoUpdateEnabled { get; set; }
+
+        public bool IsDMS { get; set; }
 
         public void AddTag(ITagInfo tag)
         {

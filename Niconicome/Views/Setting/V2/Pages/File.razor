@@ -11,6 +11,9 @@
         <SideMenu />
     </div>
     <div class="Body">
+        <div class="Alert alert @(DataContext.AlertTypeClass.Value) @(DataContext.AlertVisibilityClass.Value)" role="alert">
+            @(DataContext.AlertContent.Value)
+        </div>
 
         <h3>ファイル設定</h3>
 
@@ -67,13 +70,6 @@
         </div>
 
         <div class="SettingContent">
-            <p class="Title"><i class="Icon fa-solid fa-basket-shopping"></i>市場情報ファイルの接尾辞</p>
-            <div class="input-group mb-3 Input">
-                <input type="text" class="form-control" @bind="DataContext.IchibaSuffix.Value">
-            </div>
-        </div>
-
-        <div class="SettingContent">
             <p class="Title"><i class="Icon fa-solid fa-circle-info"></i>動画情報ファイルの接尾辞</p>
             <div class="input-group mb-3 Input">
                 <input type="text" class="form-control" @bind="DataContext.VideoInfoSuffix.Value">
@@ -108,6 +104,37 @@
             </div>
         </div>
 
+        @if (DataContext.IsReplaceSBToSBEnable.Value)
+        {
+            <div class="ReplaceSettingsContainer">
+                <div class="RulesList">
+                    <div class="ReplaceListHeader">
+                        <span class="ItemColumn HeaderColumn Selected">&nbsp;</span>
+                        <span class="ItemColumn HeaderColumn Name">置き換え元</span>
+                        <span class="ItemColumn HeaderColumn CreatedOn">置き換え先</span>
+                    </div>
+                    <div class="RulesListBody">
+                        @foreach (var rule in DataContext.ReplaceRules)
+                        {
+                            <div class="RulesListRow">
+                                <span class="ItemColumn Selected"><input type="checkbox" @bind="rule.IsSelected.Value" /></span>
+                                <span class="ItemColumn Name">@(rule.ReplaceFrom)</span>
+                                <span class="ItemColumn CreatedOn">@(rule.ReplaceTo)</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="RulesControlsContainer">
+                    <input class="Input" @bind="DataContext.ReplaceFromInput.Value" />
+                    <span>から</span>
+                    <input class="Input" @bind="DataContext.ReplaceToInput.Value" />
+                    <span class="ReplaceTo">に置き換える</span>
+
+                    <button class="Button btn btn-primary" @onclick="DataContext.AddReplaceRule">追加</button>
+                    <button class="Button btn btn-primary" @onclick="DataContext.RemoveReplaceRule">削除</button>
+                </div>
+            </div>
+        }
         <div class="SettingContent">
             <label class="Title" for="searchExact"><i class="Icon fa-solid fa-magnifying-glass"></i>保存した動画ファイルををフォーマット通りに検索する（非推奨）</label>
             <div class="form-check form-switch">

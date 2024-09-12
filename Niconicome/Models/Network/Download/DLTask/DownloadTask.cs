@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
+using AngleSharp.Common;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico.Download;
@@ -14,18 +17,24 @@ using Niconicome.Models.Network.Download.DLTask.StringContent;
 using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
+using Niconicome.Models.Utils.ParallelTaskV2;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 
 namespace Niconicome.Models.Network.Download.DLTask;
 
-public interface IDownloadTask : IParallelTask<IDownloadTask>
+public interface IDownloadTask : IParallelTask, IDisposable
 {
     /// <summary>
     /// メッセージ
     /// </summary>
-    IBindableProperty<string> Message { get; }
+    IReadonlyBindablePperty<string> Message { get; }
+
+    /// <summary>
+    /// 全てのメッセージ
+    /// </summary>
+    IReadOnlyCollection<string> FullMessage { get; }
 
     /// <summary>
     /// キャンセルフラグ
@@ -63,9 +72,24 @@ public interface IDownloadTask : IParallelTask<IDownloadTask>
     string Title { get; }
 
     /// <summary>
+    /// 保存先パス（個別設定用）
+    /// </summary>
+    string DirectoryPath { get; set; }
+
+    /// <summary>
+    /// ファイル名のフォーマット（個別設定用）
+    /// </summary>
+    string FileNameFormat { get; set; }
+
+    /// <summary>
     /// 解像度（個別設定用）
     /// </summary>
-    IBindableProperty<uint> Resolution { get; }
+    uint Resolution { get; set; }
+
+    /// <summary>
+    /// 変更監視オブジェクト
+    /// </summary>
+    Bindables Bindables { get; }
 
     /// <summary>
     /// 初期化する
@@ -81,9 +105,9 @@ public interface IDownloadTask : IParallelTask<IDownloadTask>
     Task<IAttemptResult> DownloadAsync();
 }
 
-public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownloadTask>
+public class DownloadTask : ParallelTask, IDownloadTask
 {
-    public DownloadTask(IPlaylistManager playlistManager, IMessageHandler messageHandler, IContentDownloadHelper contentDownloadHelper, IStringHandler stringHandler, IVideoStore videoStore)
+    public DownloadTask(IPlaylistManager playlistManager, IMessageHandler messageHandler, IContentDownloadHelper contentDownloadHelper, IStringHandler stringHandler, IVideoStore videoStore) : base(_ => Task.CompletedTask, _ => { })
     {
         this._cts = new CancellationTokenSource();
         this._messageHandler = messageHandler;
@@ -92,26 +116,17 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         this._stringHandler = stringHandler;
         this._videoStore = videoStore;
 
-        this.OnWait = _ => { };
-        this.TaskFunction = async (_, _) => await this.DownloadAsync();
+        this.TaskFunction = async _ => await this.DownloadAsync();
 
-        this.IsCompleted = new BindableProperty<bool>(false);
-        this.IsProcessing = new BindableProperty<bool>(false);
-        this.IsCanceled = new BindableProperty<bool>(false);
-        this.Message = new BindableProperty<string>(string.Empty);
+        this.IsCompleted = new BindableProperty<bool>(false).AddTo(this.Bindables);
+        this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
+        this.IsCanceled = new BindableProperty<bool>(false).AddTo(this.Bindables);
 
-        this.Resolution.Subscribe(value =>
-        {
-            if (this._settings is not null)
-            {
-                this._settings.VerticalResolution = value;
-            }
-        });
+        this.FullMessage = this._fullMessage.AsReadOnly();
+        this.Message = this._message.AsReadOnly();
     }
 
-
     #region field
-
 
     private IVideoInfo? _video;
 
@@ -129,22 +144,20 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
 
     private readonly IStringHandler _stringHandler;
 
+    private readonly List<string> _fullMessage = new();
+
+    private readonly IBindableProperty<string> _message = new BindableProperty<string>(string.Empty);
+
     #endregion
 
     #region IParallelTask
 
-    public int Index { get; set; }
-
-    public Func<IDownloadTask, object, Task> TaskFunction { get; init; }
-
-    public Action<int> OnWait { get; private set; }
-
-    public void Cancel()
+    public override void Cancel()
     {
         if (this.IsCompleted.Value) return;
         this._cts.Cancel();
         this.IsCanceled.Value = true;
-        this.Message.Value = this._stringHandler.GetContent(DownloadTaskStringContent.TaskCancelled);
+        this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.TaskCancelled));
         this.IsProcessing.Value = false;
     }
 
@@ -152,15 +165,47 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
 
     #region Props
 
-    public IBindableProperty<string> Message { get; private set; }
+    public IReadonlyBindablePperty<string> Message { get; init; }
 
-    public IBindableProperty<uint> Resolution { get; init; } = new BindableProperty<uint>(0);
+    public IReadOnlyCollection<string> FullMessage { get; init; }
 
     public IBindableProperty<bool> IsCanceled { get; init; }
 
     public IBindableProperty<bool> IsProcessing { get; init; }
 
     public IBindableProperty<bool> IsCompleted { get; init; }
+
+    public Bindables Bindables { get; init; } = new();
+
+    public string DirectoryPath
+    {
+        get => this._settings?.FolderPath ?? string.Empty;
+        set
+        {
+            if (this._settings is null) return;
+            this._settings.FolderPath = value;
+        }
+    }
+
+    public string FileNameFormat
+    {
+        get => this._settings?.FileNameFormat ?? string.Empty;
+        set
+        {
+            if (this._settings is null) return;
+            this._settings.FileNameFormat = value;
+        }
+    }
+
+    public uint Resolution
+    {
+        get => this._settings?.VerticalResolution ?? 1080;
+        set
+        {
+            if (this._settings is null) return;
+            this._settings.VerticalResolution = value;
+        }
+    }
 
     public bool IsSuceeded { get; private set; }
 
@@ -179,9 +224,8 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
     {
         this._video = video;
         this._settings = settings;
-        this.Resolution.Value = settings.VerticalResolution;
-        this.Message.Subscribe(m => this._video.Message.Value = m);
-        this.Message.Value = this._stringHandler.GetContent(DownloadTaskStringContent.IsWaiting);
+        this.Message.Subscribe(x => this._video.Message.Value = x);
+        this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.IsWaiting));
     }
 
     public async Task<IAttemptResult> DownloadAsync()
@@ -197,7 +241,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         this._messageHandler.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadStarted, this._video!.NiconicoId), LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
         this.IsProcessing.Value = true;
 
-        IAttemptResult<IDownloadContext> result = await this._contentDownloadHelper.TryDownloadContentAsync(this._video, this._settings!, msg => this.Message.Value = msg, this._cts.Token);
+        IAttemptResult<IDownloadContext> result = await this._contentDownloadHelper.TryDownloadContentAsync(this._video, this._settings!, msg => this.AppendMessage(msg), this._cts.Token);
 
 
         //DL失敗
@@ -205,7 +249,11 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         {
             this._messageHandler.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailed, this._video.NiconicoId), LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
             this._messageHandler.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailedDetailed, result.Message ?? string.Empty), LocalConstant.SystemMessageDispacher, ErrorLevel.Error);
-            this.Message.Value = this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailedMessage);
+
+            if (!this.IsCanceled.Value)
+            {
+                this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadFailed, this._video!.NiconicoId));
+            }
 
             if (this._settings!.SaveFailedHistory)
             {
@@ -220,6 +268,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         //DL成功
         {
             var builder = new StringBuilder();
+            builder.Append(this._video!.NiconicoId);
             if (this._settings!.Video || this._settings.Comment) builder.Append("(");
             if (this._settings.Video) builder.Append(this._stringHandler.GetContent(DownloadTaskStringContent.VerticalResolution, result.Data.ActualVerticalResolution));
             if (this._settings.Comment) builder.Append(this._stringHandler.GetContent(DownloadTaskStringContent.CommentCount, result.Data.CommentCount));
@@ -236,9 +285,11 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
                 this._video.IsDownloaded.Value = true;
             }
 
+            this.IsSuceeded = true;
+
             this._video.IsSelected.Value = false;
 
-            this.Message.Value = this._stringHandler.GetContent(DownloadTaskStringContent.DownloadSucceeded, rMessage);
+            this.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadSucceeded, rMessage));
 
             if (this._settings.SaveSucceededHistory)
             {
@@ -253,11 +304,7 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         //DL処理を終了
         this.IsProcessing.Value = false;
         this.IsCompleted.Value = true;
-        if (!this.IsCanceled.Value)
-        {
-            this.IsSuceeded = true;
-        }
-        else
+        if (this.IsCanceled.Value)
         {
             return AttemptResult.Fail(this._stringHandler.GetContent(DownloadTaskStringContent.TaskCancelled));
         }
@@ -279,6 +326,12 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
         return this._video is not null && this._settings is not null;
     }
 
+    /// <summary>
+    /// 動画を特殊プレイリストに登録
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     private IAttemptResult AddVideoToSpecialPlaylist(SpecialPlaylists type)
     {
 
@@ -318,7 +371,23 @@ public class DownloadTask : BindableBase, IDownloadTask, IParallelTask<IDownload
 
     }
 
+    /// <summary>
+    /// メッセージを追記
+    /// </summary>
+    /// <param name="message"></param>
+    private void AppendMessage(string message)
+    {
+        this._message.Value = message;
+        this._fullMessage.Add(message);
+        this.Bindables.RaiseChange();
+    }
+
     #endregion
+
+    public void Dispose()
+    {
+        this.Bindables.Dispose();
+    }
 
 }
 

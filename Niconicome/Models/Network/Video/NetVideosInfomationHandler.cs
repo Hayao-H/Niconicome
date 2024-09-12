@@ -165,11 +165,12 @@ namespace Niconicome.Models.Network.Video
                 LikeCount = result.Data.LikeCount,
                 MylistCount = result.Data.MylistCount,
                 ChannelID = result.Data.ChannelID,
+                Description = result.Data.Description,
                 ChannelName = result.Data.ChannelName,
                 AddedAt = DateTime.Now,
                 Duration = result.Data.Duration,
                 Tags = result.Data.Tags.Select(t => new Remote::Tag() { IsNicodicExist = t.IsNicodicExist, Name = t.Name }).ToList().AsReadOnly(),
-            });
+            }); 
         }
 
         public async Task<IAttemptResult<Remote::RemotePlaylistInfo>> GetVideoInfoAsync(IEnumerable<string> source, Action<string, ErrorLevel> onMessage, CancellationToken ct = default)

@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
+using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.DMC.Request;
 using Niconicome.Models.Domain.Utils;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Parameters;
 
 namespace Niconicome.Models.Domain.Local.Cookies
 {
@@ -52,15 +56,17 @@ namespace Niconicome.Models.Domain.Local.Cookies
         /// <returns></returns>
         public byte[] DecryptCookie(byte[] cipherRaw, byte[] key)
         {
-            var cipher = cipherRaw[15..^16];
-            var nonce = cipherRaw[3..15];
-            var tag = cipherRaw[^16..^0];
-            var plainText = new byte[cipher.Length];
-            var aes = new AesGcm(key);
+            var encrypted = cipherRaw[15..];
+            var iv = cipherRaw[3..15];
 
-            aes.Decrypt(nonce, cipher, tag, plainText, null);
+            var cipher = new GcmBlockCipher(new AesEngine());
+            var parameters = new AeadParameters(new KeyParameter(key), 128, iv, null);
+            cipher.Init(false, parameters);
+            var plainBytes = new byte[cipher.GetOutputSize(encrypted.Length)];
+            int retLen = cipher.ProcessBytes(encrypted, 0, encrypted.Length, plainBytes, 0);
+            cipher.DoFinal(plainBytes, retLen);
 
-            return plainText;
+            return plainBytes;
         }
 
         /// <summary>

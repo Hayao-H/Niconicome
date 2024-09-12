@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Const;
+using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Niconico.Download;
 using Niconicome.Models.Domain.Niconico.Download.General;
 using Niconicome.Models.Domain.Niconico.Download.Ichiba;
@@ -12,11 +13,13 @@ using Niconicome.Models.Domain.Niconico.Watch.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Network.Download.Modification.Video;
 using Niconicome.Models.Network.Watch;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
-using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V2;
+using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V3;
+using VdlLegacy = Niconicome.Models.Domain.Niconico.Download.Video.V2;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -35,13 +38,15 @@ namespace Niconicome.Models.Network.Download
 
     public class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation, ILocalFileHandler localFileHandler, IPathOrganizer pathOrganizer)
+        public ContentDownloadHelper(ILogger logger, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation, ILocalFileHandler localFileHandler, IPathOrganizer pathOrganizer, INiconicomeDirectoryIO directoryIO, IVideoModificationManager videoModificationManager)
         {
             this.converter = converter;
             this.logger = logger;
             this._watch = watchPageInfomation;
             this._localFileHandler = localFileHandler;
             this._pathOrganizer = pathOrganizer;
+            this._directoryIO = directoryIO;
+            this._videoModificationManager = videoModificationManager;
         }
 
         #region DI
@@ -55,12 +60,17 @@ namespace Niconicome.Models.Network.Download
 
         private readonly IPathOrganizer _pathOrganizer;
 
+        private readonly INiconicomeDirectoryIO _directoryIO;
+
+        private readonly IVideoModificationManager _videoModificationManager;
+
         #endregion
 
         #region Methods
 
         public async Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
-        {
+        {;
+
             var context = new DownloadContext(setting.NiconicoId);
 
             context.RegisterMessageHandler(OnMessage);
@@ -92,9 +102,15 @@ namespace Niconicome.Models.Network.Download
                 }
             }
 
-            if (!Directory.Exists(setting.FolderPath))
+
+            string directoryName = Path.GetDirectoryName(this.GetVideoFilePath(setting, domainVideoInfo)) ?? string.Empty;
+            if (!this._directoryIO.Exists(directoryName))
             {
-                Directory.CreateDirectory(setting.FolderPath);
+                IAttemptResult dResult = this._directoryIO.CreateDirectory(directoryName);
+                if (!dResult.IsSucceeded)
+                {
+                    return AttemptResult<IDownloadContext>.Fail(dResult.Message ?? "None");
+                }
             }
 
             //動画
@@ -107,7 +123,7 @@ namespace Niconicome.Models.Network.Download
                 }
                 else if (info is not null && setting.FromAnotherFolder && info.VideoExistInOnotherFolder)
                 {
-                    string path = this._pathOrganizer.GetFilePath(setting.FileNameFormat, domainVideoInfo.DmcInfo, setting.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt, setting.FolderPath, setting.IsReplaceStrictedEnable, setting.Overwrite);
+                    string path = this.GetVideoFilePath(setting, domainVideoInfo);
                     IAttemptResult vResult = this._localFileHandler.MoveDownloadedVideoFile(info.VideoFilePath, path);
                     if (!vResult.IsSucceeded)
                     {
@@ -234,11 +250,18 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         private async Task<IAttemptResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IDomainVideoInfo videoInfo, IDownloadContext context, CancellationToken token)
         {
-            var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::Integrate.IVideoDownloader>();
             IAttemptResult<uint> result;
             try
             {
-                result = await videoDownloader.DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                if (videoInfo.DmcInfo.IsDMS)
+                {
+                    IAttemptResult<int> resultNew = await DIFactory.Provider.GetRequiredService<Vdl::Integrate.IVideoDownloader>().DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                    result = resultNew.IsSucceeded ? AttemptResult<uint>.Succeeded((uint)resultNew.Data) : AttemptResult<uint>.Fail(resultNew.Message);
+                }
+                else
+                {
+                    result = await DIFactory.Provider.GetRequiredService<VdlLegacy.Integrate.IVideoDownloader>().DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                }
             }
             catch (Exception e)
             {
@@ -249,12 +272,27 @@ namespace Niconicome.Models.Network.Download
             context.ActualVerticalResolution = result.Data;
             if (result.IsSucceeded)
             {
+                await this.ModifyVideo(settings, videoInfo, onMessage, token);
                 return AttemptResult.Succeeded();
             }
             else
             {
                 return AttemptResult.Fail(result.Message);
             }
+        }
+
+        /// <summary>
+        /// DL後処理を行う
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="videoInfo"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        private async Task ModifyVideo(IDownloadSettings settings, IDomainVideoInfo videoInfo, Action<string> onMessage, CancellationToken ct)
+        {
+            if (!settings.IsModifyVideoEnable) return;
+            string filePath = this.GetVideoFilePath(settings, videoInfo);
+            await this._videoModificationManager.ModifyVideo(videoInfo.Id, settings.PlaylistID.ToString(), filePath, onMessage, ct);
         }
 
         /// <summary>
@@ -358,6 +396,18 @@ namespace Niconicome.Models.Network.Download
         private IAttemptResult<IDownloadContext> CancelledDownloadAndGetResult()
         {
             return AttemptResult<IDownloadContext>.Fail("キャンセルされました。");
+        }
+
+        /// <summary>
+        /// 動画の保存先を取得する
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="videoInfo"></param>
+        /// <returns></returns>
+        private string GetVideoFilePath(IDownloadSettings settings, IDomainVideoInfo videoInfo)
+        {
+            string path = this._pathOrganizer.GetFilePath(settings.FileNameFormat, videoInfo.DmcInfo, settings.SaveWithoutEncode ? FileFolder.TsFileExt : FileFolder.Mp4FileExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
+            return path;
         }
         #endregion
     }

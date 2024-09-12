@@ -1,32 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Media;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using MS.WindowsAPICodePack.Internal;
-using Niconicome.Extensions;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Playlist;
-using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Local.State.Style;
 using Niconicome.Models.Local.State.Toast;
-using Niconicome.Models.Playlist;
 using Niconicome.Models.Playlist.V2.Manager;
 using Niconicome.Models.Playlist.V2.Utils;
 using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.StringContent;
 using Niconicome.ViewModels.Shared;
-using Windows.Networking.Vpn;
 using ExternalPlaylist = Niconicome.Models.Domain.Local.Playlist;
 using WS = Niconicome.Workspaces;
 
@@ -38,7 +30,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             this._disposable = new Disposable();
 
-            WS::Mainpage.BlazorPageManager.RegisterNavigationManager(BlazorWindows.MainPage, navigation);
+            WS::Mainpage.BlazorPageManager.RegisterNavigationManager(navigation);
             this.InputText = new BindableProperty<string>("").AddTo(this.Bindables);
             this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
             this.ConfirmMessage = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
@@ -220,7 +212,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             if (WS::Mainpage.VideoAndPlayListMigration.IsMigrationNeeded)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/migration/videos", BlazorWindows.MainPage);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/migration/videos");
             }
 
             WS::Mainpage.SnackbarHandler.RegisterToastHandler(this.ToastMessageChangeHandler);
@@ -326,11 +318,23 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// エンターキー入力時
         /// </summary>
         /// <param name="e"></param>
-        public void OnKeyDown(KeyboardEventArgs e)
+        public void OnKeyDownControl(KeyboardEventArgs e)
         {
             if (e.Code == "Enter")
             {
                 _ = this.AddVideoAsync();
+            } 
+        }
+
+        /// <summary>
+        /// Delキー
+        /// </summary>
+        /// <param name="e"></param>
+        public void OnKeyDownList(KeyboardEventArgs e)
+        {
+            if (e.Code== "Delete")
+            {
+                WS::Mainpage.PlaylistEventManager.OnDelKeyDown(this.ConfirmBeforeDeletion);
             }
         }
 
@@ -342,7 +346,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null) return;
             var playlistID = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist.ID;
 
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{playlistID}", BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{playlistID}");
         }
 
         /// <summary>
@@ -350,7 +354,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public void OnSearchButtonClick()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/search", BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/search");
         }
 
         /// <summary>
@@ -359,6 +363,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public void ConfirmBeforeDeletion()
         {
             this.ContextMenu.RemoveVideo();
+
+            if (WS::Mainpage.VideoListManager.IsDeletionConfirmDisabled)
+            {
+                this.DeleteVideos();
+                return;
+            }
 
             var selected = this.Videos.Where(v => v.IsSelected.Value).ToList();
 
@@ -381,7 +391,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             }
             else
             {
-                this.ConfirmMessage.Value = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeletionConfitmMessageSingle, selected[0].Title, selected.Count - 1);
+                this.ConfirmMessage.Value = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeletionConfitmMessageMulti, selected[0].Title, selected.Count - 1);
             }
 
             try
@@ -487,7 +497,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <param name="niconicoID"></param>
         public void OnVideoDetailButtonClick(string niconicoID)
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/video/{niconicoID}/", BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/video/{niconicoID}/");
         }
 
         #endregion
@@ -717,6 +727,56 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             }))
             {
                 video.IsSelected.Value = false;
+            }
+        }
+
+        public async Task DeleteNotRegisteredVideoFiles()
+        {
+            this.HideMenu();
+
+            WS::Mainpage.SnackbarHandler.Enqueue(WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.StartDeleteVideoFile));
+
+            IAttemptResult result = await WS::Mainpage.VideoListManager.DeleteNotRegisteredVideoFilesFromCurrentPlaylistAsync(WS::Mainpage.PlaylistVideoContainer.Videos);
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFile);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+            else
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFileFailed);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
+            }
+        }
+
+        public async Task DeleteFile()
+        {
+            this.HideMenu();
+
+            WS::Mainpage.SnackbarHandler.Enqueue(WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.StartDeleteVideoFile));
+
+            IAttemptResult result = await WS::Mainpage.VideoListManager.DeleteVideoFilesFromCurrentPlaylistAsync(WS::Mainpage.PlaylistVideoContainer.Videos.Where(v=>v.IsSelected.Value));
+
+            if (result.IsSucceeded)
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFile);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+
+                foreach (var v in WS::Mainpage.PlaylistVideoContainer.Videos.Where(v => v.IsSelected.Value).ToArray())
+                {
+                    v.IsSelected.Value = false;
+                }
+
+                return;
+            }
+            else
+            {
+                string message = WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.DeleteVideoFileFailed);
+                WS::Mainpage.SnackbarHandler.Enqueue(message);
+                return;
             }
         }
 

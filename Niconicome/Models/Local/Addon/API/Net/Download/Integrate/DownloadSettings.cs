@@ -5,6 +5,7 @@ using Microsoft.ClearScript;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Download;
 using Niconicome.Models.Network.Download.DLTask;
+using Niconicome.Models.Playlist.V2;
 using Niconicome.Models.Playlist.VideoList;
 using Info = Niconicome.Models.Domain.Niconico.Video.Infomations;
 
@@ -55,13 +56,11 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
 
     public class DownloadSettings : IDownloadSettings
     {
-        public DownloadSettings(IDownloadSettingsHandler downloadSettingsHandler, ICurrent current, IDownloadManager manager)
+        public DownloadSettings(IDownloadSettingsHandler downloadSettingsHandler, IDownloadManager manager,IPlaylistVideoContainer playlistVideo)
         {
             this._downloadSettings = downloadSettingsHandler;
-            this._current = current;
             this._manager = manager;
-
-
+            this._playlistVideo = playlistVideo;
         }
 
         #region field
@@ -70,7 +69,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
 
         private readonly IDownloadManager _manager;
 
-        private readonly ICurrent _current;
+        private readonly IPlaylistVideoContainer _playlistVideo;
 
         private static string canDownloadChangeEventName = "canDownloadChange";
 
@@ -209,7 +208,7 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
 
         public async Task startDownload(ScriptObject onMessage, ScriptObject onMessageVerbose)
         {
-            if (this._current.SelectedPlaylist.Value is null) return;
+            if (this._playlistVideo.CurrentSelectedPlaylist is null) return;
 
             await this._manager.StartDownloadAsync(m =>
            {
@@ -220,12 +219,12 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
                catch { };
            }, m =>
              {
-               try
-               {
-                   onMessageVerbose.Invoke(false, m);
-               }
-               catch { };
-           });
+                 try
+                 {
+                     onMessageVerbose.Invoke(false, m);
+                 }
+                 catch { };
+             });
         }
 
         public void cancelDownload()
@@ -235,7 +234,10 @@ namespace Niconicome.Models.Local.Addon.API.Net.Download.Integrate
 
         public void stageSelectedVideos()
         {
-            this._manager.StageVIdeo();
+            foreach (var video in this._playlistVideo.Videos)
+            {
+                this._manager.StageVIdeo(video);
+            }
         }
 
         #endregion

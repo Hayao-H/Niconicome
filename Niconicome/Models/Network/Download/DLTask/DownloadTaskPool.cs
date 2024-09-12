@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Niconicome.Extensions.System.List;
 using Reactive.Bindings;
 using System.Reactive.Linq;
+using Niconicome.Models.Utils.Reactive;
+using Niconicome.Models.Utils.Reactive.State;
 
 namespace Niconicome.Models.Network.Download.DLTask
 {
@@ -15,7 +17,7 @@ namespace Niconicome.Models.Network.Download.DLTask
         /// <summary>
         /// タスク一覧
         /// </summary>
-        ReadOnlyObservableCollection<IDownloadTask> Tasks { get; }
+        IReadOnlyCollection<IDownloadTask> Tasks { get; }
 
         /// <summary>
         /// タスクを追加する
@@ -42,21 +44,24 @@ namespace Niconicome.Models.Network.Download.DLTask
         /// <summary>
         /// キャンセル済みを表示
         /// </summary>
-        ReactiveProperty<bool> DisplayCanceled { get; }
+        bool DisplayCanceled { get; set; }
 
         /// <summary>
         /// 完了済みを表示
         /// </summary>
-        ReactiveProperty<bool> DisplayCompleted { get; }
+        bool DisplayCompleted { get; set; }
+
+        /// <summary>
+        /// 変更監視オブジェクト
+        /// </summary>
+        IStateChangeNotifyer StateChangeNotifyer { get; }
     }
 
     public class DownloadTaskPool : IDownloadTaskPool
     {
         public DownloadTaskPool()
         {
-            this.Tasks = new ReadOnlyObservableCollection<IDownloadTask>(this._tasksSource);
-            this.DisplayCanceled.Subscribe(_ => this.Refresh());
-            this.DisplayCompleted.Subscribe(_ => this.Refresh());
+            this.Tasks = this._tasksSource.AsReadOnly();
         }
 
 
@@ -64,17 +69,39 @@ namespace Niconicome.Models.Network.Download.DLTask
 
         private readonly List<IDownloadTask> _innerList = new();
 
-        private readonly ObservableCollection<IDownloadTask> _tasksSource = new();
+        private readonly List<IDownloadTask> _tasksSource = new();
+
+        private bool _displayCanceled = true;
+
+        private bool _displayCompleted = true;
 
         #endregion
 
         #region Props
 
-        public ReadOnlyObservableCollection<IDownloadTask> Tasks { get; init; }
+        public IReadOnlyCollection<IDownloadTask> Tasks { get; init; }
 
-        public ReactiveProperty<bool> DisplayCanceled { get; init; } = new(true);
+        public bool DisplayCanceled
+        {
+            get => this._displayCanceled;
+            set
+            {
+                this._displayCanceled = value;
+                this.Refresh();
+            }
+        }
 
-        public ReactiveProperty<bool> DisplayCompleted { get; init; } = new(true);
+        public bool DisplayCompleted
+        {
+            get => this._displayCompleted;
+            set
+            {
+                this._displayCompleted = value;
+                this.Refresh();
+            }
+        }
+
+        public IStateChangeNotifyer StateChangeNotifyer { get; init; } = new StateChangeNotifyer();
 
         #endregion
 
@@ -89,10 +116,12 @@ namespace Niconicome.Models.Network.Download.DLTask
             task.IsCompleted.Subscribe(_ => this.Refresh());
 
             //設定を参照してコレクションに追加するかどうか判断
-            if (!this.DisplayCanceled.Value && task.IsCanceled.Value) return;
-            if (!this.DisplayCompleted.Value && task.IsCompleted.Value) return;
+            if (!this.DisplayCanceled && task.IsCanceled.Value) return;
+            if (!this.DisplayCompleted && task.IsCompleted.Value) return;
 
             this._tasksSource.Add(task);
+
+            this.StateChangeNotifyer.RaiseChange();
 
         }
 
@@ -106,13 +135,16 @@ namespace Niconicome.Models.Network.Download.DLTask
             if (this._tasksSource.Contains(task))
             {
                 this._tasksSource.Remove(task);
+                this.StateChangeNotifyer.RaiseChange();
             }
+
         }
 
         public void Clear()
         {
             this._innerList.Clear();
             this._tasksSource.Clear();
+            this.StateChangeNotifyer.RaiseChange();
         }
 
 
@@ -120,11 +152,11 @@ namespace Niconicome.Models.Network.Download.DLTask
         {
             List<IDownloadTask> tasks = this._innerList.Where(t =>
             {
-                if (!this.DisplayCanceled.Value && t.IsCanceled.Value)
+                if (!this.DisplayCanceled && t.IsCanceled.Value)
                 {
                     return false;
                 }
-                else if (!this.DisplayCompleted.Value && t.IsCompleted.Value)
+                else if (!this.DisplayCompleted && t.IsCompleted.Value)
                 {
                     return false;
                 }
@@ -136,8 +168,9 @@ namespace Niconicome.Models.Network.Download.DLTask
             }).ToList();
 
             this._tasksSource.Clear();
-            this._tasksSource.Addrange(tasks);
+            this._tasksSource.AddRange(tasks);
 
+            this.StateChangeNotifyer.RaiseChange();
         }
         #endregion
     }

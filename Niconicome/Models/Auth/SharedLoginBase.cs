@@ -4,23 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Auth
 {
     public class SharedLoginBase
     {
-        public SharedLoginBase(INicoHttp http, ICookieManager cookieManager, INiconicoContext context)
+        public SharedLoginBase(INiconicoContext context)
         {
-            this.cookieManager = cookieManager;
-            this.http = http;
             this.context = context;
         }
 
         #region DIされるクラス
-        private readonly INicoHttp http;
-
-        protected readonly ICookieManager cookieManager;
-
         protected readonly INiconicoContext context;
         #endregion
 
@@ -29,16 +24,9 @@ namespace Niconicome.Models.Auth
         /// ログインしていない場合、ログインページにリダイレクトされるためLocationヘッダーが指定されるハズ
         /// </summary>
         /// <returns></returns>
-        protected async Task<bool> CheckIfLoginSucceeded()
+        protected async Task<IAttemptResult> LoginAndSaveCookieAsync(string userSession,string userSessionSecure)
         {
-            var result = await this.http.GetAsync(new Uri(@"https://www.nicovideo.jp/my"));
-
-            if (result.Headers.Contains("Location"))
-            {
-                return false;
-            }
-
-            return true;
+            return await this.context.LoginAndSaveCookieAsync(userSession, userSessionSecure);
         }
     }
 }

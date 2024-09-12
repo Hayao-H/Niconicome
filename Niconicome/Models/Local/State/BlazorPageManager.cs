@@ -14,28 +14,14 @@ namespace Niconicome.Models.Local.State
         /// </summary>
         /// <param name="url"></param>
         /// <param name="window"></param>
-        void RequestBlazorToNavigate(string url, BlazorWindows window);
+        void RequestBlazorToNavigate(string url);
 
         /// <summary>
         /// NavigationManagerを登録
         /// </summary>
         /// <param name="window"></param>
         /// <param name="navigationManager"></param>
-        void RegisterNavigationManager(BlazorWindows window, NavigationManager navigationManager);
-
-        /// <summary>
-        /// NavigationManagerを登録解除
-        /// </summary>
-        /// <param name="window"></param>
-        /// <param name="navigationManager"></param>
-        void UnRegisterNavigationManager(BlazorWindows window);
-
-        /// <summary>
-        /// 遷移すべきページを取得
-        /// </summary>
-        /// <param name="window"></param>
-        /// <returns></returns>
-        string GetPageToNavigate(BlazorWindows window);
+        void RegisterNavigationManager(NavigationManager navigationManager);
 
         /// <summary>
         /// リロードが要求された場合
@@ -55,63 +41,22 @@ namespace Niconicome.Models.Local.State
 
         private readonly Dictionary<BlazorWindows, string> _pages = new();
 
-        private readonly Dictionary<BlazorWindows, NavigationManager> _navigations = new();
+        private NavigationManager? _navigation;
 
         #endregion
 
         #region Method
 
-        public void RequestBlazorToNavigate(string url, BlazorWindows window)
+        public void RequestBlazorToNavigate(string url)
         {
-            if (this._pages.ContainsKey(window))
-            {
-                this._pages[window] = url;
-            }
-            else
-            {
-                this._pages.Add(window, url);
-            }
-
-            if (this._navigations.ContainsKey(window))
-            {
-                this._navigations[window].NavigateTo(url);
-            }
-
+            this._navigation?.NavigateTo(url);
             this.CurrentRequestedPage = url;
         }
 
-        public string GetPageToNavigate(BlazorWindows window)
+
+        public void RegisterNavigationManager(NavigationManager navigation)
         {
-            if (this._pages.TryGetValue(window, out string? page))
-            {
-                return page;
-            }
-            else
-            {
-                this._pages.Add(window, "/");
-                return "/";
-            }
-        }
-
-        public void RegisterNavigationManager(BlazorWindows window, NavigationManager navigation)
-        {
-            if (this._navigations.ContainsKey(window))
-            {
-                this._navigations[window] = navigation;
-                return;
-            }
-
-            this._navigations.Add(window, navigation);
-        }
-
-        public void UnRegisterNavigationManager(BlazorWindows window)
-        {
-            if (!this._navigations.ContainsKey(window))
-            {
-                return;
-            }
-
-            this._navigations.Remove(window);
+            this._navigation = navigation;
         }
 
 
@@ -125,7 +70,7 @@ namespace Niconicome.Models.Local.State
 
         #region Props
 
-        public string CurrentRequestedPage { get; private set; } = "/";
+        public string CurrentRequestedPage { get; private set; } = "/videos";
 
         #endregion
     }
@@ -135,5 +80,6 @@ namespace Niconicome.Models.Local.State
         MainPage,
         Addon,
         Settings,
+        DLTask,
     }
 }

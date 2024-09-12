@@ -13,5 +13,11 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         M3U8,
         TS,
         UserChrome,
+        WatchAPI,
+        CommentAPI,
+        RegacyHLSAPI,
+        ResourceAPI,
+        VideoInfoAPI,
+        NG,
     }
 }

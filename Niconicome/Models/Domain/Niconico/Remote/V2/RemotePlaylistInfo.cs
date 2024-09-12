@@ -31,6 +31,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2
 
         public string ChannelID { get; set; } = string.Empty;
 
+        public string Description { get; set; } = string.Empty;
+
         public DateTime UploadedDT { get; set; } = DateTime.Now;
 
         public DateTime AddedAt { get; set; } = DateTime.Now;

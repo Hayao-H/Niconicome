@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.IO.V2;
+using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
 using Niconicome.Models.Helper.Result;
 
 namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
@@ -43,8 +45,14 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
             return AttemptResult<string>.Succeeded(this._readFunc(path));
         }
 
-        public IAttemptResult Delete(string path)
+        public IAttemptResult<byte[]> ReadByte(string path)
         {
+            return AttemptResult<byte[]>.Succeeded(new byte[0]);
+        }
+
+        public IAttemptResult Delete(string path, bool resycycle)
+        {
+            this.DeleteMethodCall?.Invoke(this, new NiconicomeFileIOEventArgs() { Path = path });
             return AttemptResult.Succeeded();
         }
 
@@ -73,5 +81,16 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
             return AttemptResult.Succeeded();
         }
 
+        #region Test
+
+        public event EventHandler<NiconicomeFileIOEventArgs>? DeleteMethodCall;
+
+        #endregion
+
+    }
+
+    public class NiconicomeFileIOEventArgs : EventArgs
+    {
+        public string Path { get; init; } = string.Empty;
     }
 }

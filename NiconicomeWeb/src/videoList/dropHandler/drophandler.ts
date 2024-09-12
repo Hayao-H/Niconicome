@@ -54,8 +54,6 @@ export class DropHandlerImpl implements DropHandler {
             
             const result = distinct.join(' ')
 
-            console.log('Something dropped!!');
-            console.log(distinct);
             this._dotnet.invokeMethodAsync('OnDrop', result);
         });
     }

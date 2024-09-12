@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "build": "deno task build-list&&deno task build-watch",
+    "build:dev": "deno task build-list:dev&&deno task build-watch:dev",
+    "build-list": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net ./NiconicomeWeb/scripts/videoList.ts",
+    "build-list:dev": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net ./NiconicomeWeb/scripts/videoList.ts development",
+    "build-watch": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net ./NiconicomeWeb/scripts/watch.ts",
+    "build-watch:dev": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net ./NiconicomeWeb/scripts/watch.ts development",
+    "build-watch:watch": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net ./NiconicomeWeb/scripts/watch.ts watch"
+  }
+}

@@ -24,14 +24,13 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.IsAutologinEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsAutologinEnable, false), false).AddTo(this.Bindables);
 
-            var normal = new SelectBoxItem<string>("パスワードログイン", AutoLoginTypeString.Normal);
             var wv2 = new SelectBoxItem<string>("Webview2とCookieを共有", AutoLoginTypeString.Webview2);
             var firefox = new SelectBoxItem<string>("FirefoxとCookieを共有", AutoLoginTypeString.Firefox);
             var storeFirefox = new SelectBoxItem<string>("Store版FirefoxとCookieを共有", AutoLoginTypeString.StoreFirefox);
 
-            this.SelectableAutoLoginType.AddRange(new[] { normal, wv2, firefox, storeFirefox });
+            this.SelectableAutoLoginType.AddRange(new[] {  wv2, firefox, storeFirefox });
 
-            this.SelectedAutoLoginType = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Normal), AutoLoginTypeString.Normal).AddTo(this.Bindables);
+            this.SelectedAutoLoginType = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Webview2), AutoLoginTypeString.Webview2).AddTo(this.Bindables);
 
             this.DisplayFirefoxPrifile = this.SelectedAutoLoginType.Select(t => t == AutoLoginTypeString.Firefox || t == AutoLoginTypeString.StoreFirefox).AsReadOnly().AddTo(this.Bindables);
 
@@ -61,8 +60,6 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.DisplayFirefoxPrifile.Subscribe(action);
 
             this.SelectedFirefoxProfileName = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.FirefoxProfileName, string.Empty), string.Empty).AddTo(this.Bindables);
-
-            this.IsShowingTasksAsTabEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.ShowDownloadTasksAsTab, true), true).AddTo(this.Bindables);
 
             var n1 = new SelectBoxItem<int>("1", 1);
             var n2 = new SelectBoxItem<int>("2", 2);
@@ -140,11 +137,6 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// Firefoxのプロファイル
         /// </summary>
         public IBindableSettingInfo<string> SelectedFirefoxProfileName { get; init; }
-
-        /// <summary>
-        /// タスク一覧をタブ表示
-        /// </summary>
-        public IBindableSettingInfo<bool> IsShowingTasksAsTabEnable { get; init; }
 
         /// <summary>
         /// 動画情報最大並列取得数
