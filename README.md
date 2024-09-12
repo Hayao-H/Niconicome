@@ -1,8 +1,8 @@
 # Niconicome(α)
-[![.Net6 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net6%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net6+CI%2FCD%22) 
+[![.Net8 CI/CD](https://github.com/Hayao-H/Niconicome/workflows/.Net8%20CI/CD/badge.svg)](https://github.com/Hayao-H/Niconicome/actions?query=workflow%3A%22.Net8+CI%2FCD%22) 
 [![niconicome-nightly-build](https://github.com/Hayao-H/Niconicome/actions/workflows/nightly.yaml/badge.svg)](https://github.com/Hayao-H/Niconicome/actions/workflows/nightly.yaml)
 [![GitHub license](https://img.shields.io/github/license/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/blob/main/LICENSE)
-[![Github Release](https://img.shields.io/badge/release-v0.13.3-blue)](https://github.com/Hayao-H/Niconicome/releases/latest)
+[![Github Release](https://img.shields.io/badge/release-v0.14.0-blue)](https://github.com/Hayao-H/Niconicome/releases/latest)
 [![GitHub stars](https://img.shields.io/github/stars/Hayao-H/Niconicome)](https://github.com/Hayao-H/Niconicome/stargazers)
 [![X.com Follow](https://img.shields.io/twitter/follow/NiconicomeD?label=X%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AD%E3%83%BC&style=social)](https://twitter.com/intent/follow?screen_name=niconicomeD)
 
@@ -15,6 +15,7 @@
 ---
 
 ## 機能
+- :new: 帰ってきたニコニコ動画に対応@[v0.14.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.14.0)
 - :new: BlazorベースのWeb技術を用いたUI
 - データのエクスポート・インポート（JSON形式）。 
 - 動画・サムネイル・コメントのダウンロード。(:new: コメントサーバー移行に対応@[v0.12.0](https://github.com/Hayao-H/Niconicome/releases/tag/v0.12.0))
@@ -39,10 +40,8 @@
 同梱のffmpegは64bit版となっております。ご自分の責任の下に32bit版のffmpegのバイナリに差し替えてください。  
 [「ffmpeg windows 32bit」のGoogle検索結果](https://www.google.com/search?q=ffmpeg+windows+32bit)
 
-## 二段階認証及びOAuth(外部ログイン提携)をご利用の方へ【重要】
-- 現在のNiconicomeの標準ログイン機能では二段階認証などに対応できません。
-- 二段階認証・OAuthを利用する場合、ログインウィンドウの「ブラウザーでログイン」をクリックして表示されるウィンドウでログインする必要があります。
-- この際に[WebView2](#webview2について)が必要になります。
+## ブラウザCookie取得以外でのログイン：パスワードログイン、二段階認証及びOAuth(外部ログイン提携)をご利用の方へ【重要】
+- ログインの際に[WebView2](#webview2について)が必要になります。
 - 詳しくは[こちら](https://github.com/Hayao-H/Niconicome/wiki/操作#ブラウザーでログイン)をご覧ください。
 
 ---
@@ -51,18 +50,15 @@
 #### インストール
 [Wiki](https://github.com/Hayao-H/Niconicome/wiki/Niconicome%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E3%81%BF%E3%82%8B)をご覧ください。
 #### アンインストール
-現在、レジストリは使用していませんが、パスワードの保存にWIndowsの資格情報マネージャーの機能を使っています。パスワードを保存している場合は、「コントロールパネル>>資格情報マネージャー>>Windows資格情報」で「https://nicovideo.jp」を削除してください。  
-**※他のアプリケーションがこの項目を使用している可能性があります。資格情報の削除は、影響を充分に理解した上で行ってください。**
+現在、レジストリは使用していません。このため、実行ファイルを削除するだけでアンインストールできます。
 ### WebView2について
-- 「ブラウザーでログイン」機能の利用には、WebView2 86.0.616.0以上のインストールが必要です。
+- ログインの際に、WebView2 86.0.616.0以上のインストールが必要です。
 [こちら](https://go.microsoft.com/fwlink/p/?LinkId=2124703)(ブートストラップリンク)からダウンロードしてください。また、ダウンロードページは[こちら](https://developer.microsoft.com/ja-jp/microsoft-edge/webview2/)です。
 
 ---
 
 ## 対応OS
-WPFと.NET6を用いて開発しています。したがって、対応OSはそちらのサポートに依存します。現在、
-- Windows 7 SP1 ESU
-- Windows 8.1
+WPFと.NET8を用いて開発しています。したがって、対応OSはそちらのサポートに依存します。現在、
 - Windows10
 - Windows11
 
@@ -72,7 +68,7 @@ WPFと.NET6を用いて開発しています。したがって、対応OSはそ�
 ---
 
 ## 開発環境
-- .NET6 & WPF
+- .NET8 & WPF
 - Visual Studio Community 2022
 - VS Code
 

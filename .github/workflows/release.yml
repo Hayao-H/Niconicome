@@ -1,4 +1,4 @@
-name: .Net6 CI/CD
+name: .Net8 CI/CD
 on: 
   push:
     tags:
