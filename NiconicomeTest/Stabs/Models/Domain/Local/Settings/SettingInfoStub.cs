@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Utils.Reactive;
 using Reactive.Bindings;
 
 namespace NiconicomeTest.Stabs.Models.Domain.Local.Settings
@@ -15,6 +16,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Settings
             this.SettingName = settingName;
             this.Value = value;
             this.ReactiveValue = new ReactiveProperty<T>(value);
+            this.Bindablevalue = new BindableProperty<T>(value);
         }
 
         public string SettingName { get; init; }
@@ -22,6 +24,8 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.Settings
         public T Value { get; set; }
 
         public ReactiveProperty<T> ReactiveValue { get; init; }
+
+        public IBindableProperty<T> Bindablevalue { get; init; }
 
         public ISettingInfo<T> WithSubscribe(Action<T> handler)
         {
