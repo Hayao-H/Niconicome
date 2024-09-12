@@ -91,6 +91,22 @@ namespace Niconicome.Models.Infrastructure.IO
             return AttemptResult.Succeeded();
         }
 
+        public IAttemptResult Move(string source, string destination, bool overwrite = true)
+        {
+            try
+            {
+                this.CopyDirectory(source, destination, overwrite);
+            }
+            catch (Exception ex)
+            {
+                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToMoveDirectory, ex, source, destination);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToMoveDirectory, ex, source, destination));
+            }
+
+            return this.Delete(source);
+        }
+
+
 
         public bool Exists(string path)
         {
@@ -99,5 +115,34 @@ namespace Niconicome.Models.Infrastructure.IO
 
 
         #endregion
+
+        private void CopyDirectory(string sourceDir, string destinationDir, bool overwrite)
+        {
+            // Get information about the source directory
+            var dir = new DirectoryInfo(sourceDir);
+
+            // Cache directories before we start copying
+            DirectoryInfo[] dirs = dir.GetDirectories();
+
+            // Create the destination directory
+            if (!this.Exists(destinationDir))
+            {
+                Directory.CreateDirectory(destinationDir);
+            }
+
+            // Get the files in the source directory and copy to the destination directory
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                string targetFilePath = Path.Combine(destinationDir, file.Name);
+                file.CopyTo(targetFilePath,overwrite);
+            }
+
+            // If recursive and copying subdirectories, recursively call this method
+            foreach (DirectoryInfo subDir in dirs)
+            {
+                string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
+                CopyDirectory(subDir.FullName, newDestinationDir,overwrite);
+            }
+        }
     }
 }

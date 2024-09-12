@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -41,6 +42,36 @@ namespace Niconicome.Models.Domain.Local.Server.Core
             if (path == @"/niconicome/css/userChrome.css")
             {
                 return RequestType.UserChrome;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/watch/v1/.+"))
+            {
+                return RequestType.WatchAPI;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/api/comment/v1/.+"))
+            {
+                return RequestType.CommentAPI;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/api/regacyhls/v1/.+"))
+            {
+                return RequestType.RegacyHLSAPI;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/resource/v1/.+") || path == "/favicon.ico")
+            {
+                return RequestType.ResourceAPI;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/api/videoinfo/v1/.+"))
+            {
+                return RequestType.VideoInfoAPI;
+            }
+
+            if (Regex.IsMatch(path, @"/niconicome/api/ng/v1/.+"))
+            {
+                return RequestType.NG;
             }
 
             return RequestType.None;

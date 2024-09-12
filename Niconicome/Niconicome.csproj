@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<Nullable>enable</Nullable>
 		<AssemblyVersion>0.13.3.*</AssemblyVersion>
@@ -22,16 +22,17 @@
 
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="1.0.4" />
+		<PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />
 		<PackageReference Include="CredentialManagement" Version="1.0.2" />
 		<PackageReference Include="LiteDB" Version="5.0.17" />
 		<PackageReference Include="MaterialDesignColors" Version="2.1.1" />
 		<PackageReference Include="MaterialDesignThemes" Version="4.7.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.553" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="8.0.20" />
 		<PackageReference Include="Microsoft.ClearScript" Version="7.4.3" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.11" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2045.28" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2420.47" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
@@ -60,5 +61,10 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Models\Domain\Niconico\Download\Video\V3\DMS\Error\" />
+	  <Folder Include="wwwroot\script\Pages\VideoList\deail\" />
 	</ItemGroup>
 </Project>

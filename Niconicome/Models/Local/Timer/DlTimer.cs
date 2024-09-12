@@ -1,8 +1,11 @@
 ﻿using System;
+using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Domain.Utils.BackgroundTask;
 using Niconicome.Models.Domain.Utils.Event;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Network.Download;
+using Niconicome.Models.Utils.Reactive;
 using Niconicome.ViewModels;
 using Reactive.Bindings;
 
@@ -13,7 +16,12 @@ namespace Niconicome.Models.Local.Timer
         /// <summary>
         /// 有効フラグ
         /// </summary>
-        ReactiveProperty<bool> IsEnabled { get; }
+        IBindableProperty<bool> IsEnabled { get; }
+
+        /// <summary>
+        /// 24時間ごとに繰り返すかどうか
+        /// </summary>
+        IBindableProperty<bool> IsRepeatByDayEnable { get; }
 
         /// <summary>
         /// イベント発火時刻
@@ -29,36 +37,53 @@ namespace Niconicome.Models.Local.Timer
 
     class DlTimer : BindableBase, IDlTimer
     {
-        public DlTimer(IEventManager manager, ILogger logger, ILocalSettingsContainer settingsContainer)
+        public DlTimer(ISettingsContainer settingsContainer, IBackgroundTaskManager backgroundTaskManager)
         {
-            this.manager = manager;
-            this.logger = logger;
+            this._backgroundTaskManager = backgroundTaskManager;
             this.settingsContainer = settingsContainer;
-            this.IsEnabled.Subscribe(value => this.ChangeState(value));
 
+            this.IsEnabled.Subscribe(value => this.ChangeState(value));
+            this.IsRepeatByDayEnable = new BindableProperty<bool>(this.settingsContainer.GetOnlyValue(SettingNames.IsDlTImerEveryDayEnable, false).Data)
+                .Subscribe(value =>
+                {
+                    if (this._isRepeatByDayEnable is null)
+                    {
+                        var result = this.settingsContainer.GetSetting(SettingNames.IsDlTImerEveryDayEnable, false);
+                        if (!result.IsSucceeded || result.Data is null) return;
+                        this._isRepeatByDayEnable = result.Data;
+                    }
+
+                    if (this._isRepeatByDayEnable.Value == value) return;
+
+                    this._isRepeatByDayEnable.Value = value;
+
+                    this.IsRepeatByDayEnable!.Value = value;
+                });
         }
 
         #region field
 
-        private readonly IEventManager manager;
+        private readonly IBackgroundTaskManager _backgroundTaskManager;
 
-        private readonly ILogger logger;
+        private readonly ISettingsContainer settingsContainer;
 
-        private readonly ILocalSettingsContainer settingsContainer;
+        private ISettingInfo<bool>? _isRepeatByDayEnable;
 
-        private string? eventID;
+        private BackgroundTask? _task;
 
         private DateTime dt = DateTime.Now;
 
-        private Action? dlAction;
+        private Action? _dlAction;
 
         #endregion
 
         #region Props
 
-        public ReactiveProperty<bool> IsEnabled { get; init; } = new();
+        public IBindableProperty<bool> IsEnabled { get; init; } = new BindableProperty<bool>(false);
 
         public DateTime TrigggeredDT => this.dt;
+
+        public IBindableProperty<bool> IsRepeatByDayEnable { get; init; }
 
         #endregion
 
@@ -67,7 +92,7 @@ namespace Niconicome.Models.Local.Timer
         public void Set(DateTime dt, Action dlAction)
         {
             this.dt = dt;
-            this.dlAction = dlAction;
+            this._dlAction = dlAction;
             this.Reset();
             this.ChangeState(this.IsEnabled.Value);
         }
@@ -82,7 +107,7 @@ namespace Niconicome.Models.Local.Timer
         /// <param name="isEnabled"></param>
         private void ChangeState(bool isEnabled)
         {
-            if (this.dlAction is null)
+            if (this._dlAction is null)
             {
                 return;
             }
@@ -94,25 +119,24 @@ namespace Niconicome.Models.Local.Timer
                     this.dt = DateTime.Now + TimeSpan.FromDays(1);
                 }
 
-                this.eventID = this.manager.Regster(() =>
+                this._task = this._backgroundTaskManager.AddTimerTask(() =>
                 {
-                    this.dlAction();
+                    this._dlAction();
 
-                    if (this.settingsContainer.GetReactiveBoolSetting(SettingsEnum.DlTimerEveryDay).Value)
+                    if (this.IsRepeatByDayEnable.Value)
                     {
-                        this.Set(this.dt + TimeSpan.FromDays(1), this.dlAction);
-                    } else
+                        this.Set(this.dt + TimeSpan.FromDays(1), this._dlAction);
+                    }
+                    else
                     {
                         this.IsEnabled.Value = false;
                     }
-                }, this.dt, ex =>
-                {
-                    this.logger.Error("タイマーDLに失敗しました。", ex);
-                });
+                }, this.dt);
             }
-            else if (this.eventID is not null)
+            else if (this._task is not null)
             {
-                this.manager.Cancel(this.eventID);
+                this._backgroundTaskManager.CancelTask(this._task.TaskID);
+                this._task = null;
             }
         }
 
@@ -121,10 +145,10 @@ namespace Niconicome.Models.Local.Timer
         /// </summary>
         private void Reset()
         {
-            if (this.eventID is not null)
-            {
-                this.manager.Cancel(this.eventID);
-            }
+            if (this._task is null) return;
+
+            this._backgroundTaskManager.CancelTask(this._task.TaskID);
+            this._task = null;
         }
 
         #endregion

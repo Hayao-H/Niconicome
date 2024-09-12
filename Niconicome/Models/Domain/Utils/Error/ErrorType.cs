@@ -41,6 +41,15 @@ using Niconicome.Models.Local.Restore;
 using Niconicome.Models.Network.Download.DLTask.Error;
 using Niconicome.Models.Network.Video.Error;
 using Niconicome.Models.Playlist.V2.Manager.Error;
+using VDL3 = Niconicome.Models.Domain.Niconico.Download.Video.V3.Error;
+using WatchAPIV1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1.Error;
+using CommentAPIV1 = Niconicome.Models.Domain.Local.Server.API.Comment.V1.Error;
+using HLSAPIV1 = Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1.Error;
+using ResourceAPIV1 = Niconicome.Models.Domain.Local.Server.API.Resource.V1.Error;
+using VideoInfoAPIV1 = Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1.Error;
+using PostDL = Niconicome.Models.Network.Download.Actions.V2;
+using Auth = Niconicome.Models.Auth.Error;
+using Niconico = Niconicome.Models.Domain.Niconico;
 
 namespace Niconicome.Models.Domain.Utils.Error
 {
@@ -108,6 +117,25 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 55, typeof(DownloadManagerError) },
             { 56, typeof(NaudioHandlerError) },
             { 57, typeof(LocalFileRemoverError) },
+            { 58, typeof(VDL3.StreamParserError) },
+            { 59, typeof(VDL3.SegmentDownloaderError) },
+            { 60, typeof(VDL3.SegmentDirectoryHandlerError) },
+            { 61, typeof(VDL3.SegmentWriterError) },
+            { 62, typeof(VDL3.WatchSessionError) },
+            { 63, typeof(VDL3.KeyDownlaoderError) },
+            { 64, typeof(VDL3.StreamJsonHandlerError) },
+            { 65, typeof(WatchAPIV1.WatchHandlerError) },
+            { 66, typeof(WatchAPIV1.DecryptorError) },
+            { 67, typeof(CommentAPIV1::CommentRequestHandlerError) },
+            { 68, typeof(CommentAPIV1::CommentRetreiverError) },
+            { 69, typeof(HLSAPIV1::HLSManagerError) },
+            { 70, typeof(HLSAPIV1::RegacyHLSHandlerError) },
+            { 71, typeof(ResourceAPIV1::ResourceHandlerError) },
+            { 72, typeof(VideoInfoAPIV1::VideoInfoHandlerError) },
+            { 73, typeof(PostDL::PostDownloadActionsManagerError) },
+            { 74, typeof(Auth::ChromeSharedLoginError) },
+            { 75, typeof(CookieDBHandlerError) },
+            { 76, typeof(Niconico::NiconicoContextError) },
         };
     }
 }

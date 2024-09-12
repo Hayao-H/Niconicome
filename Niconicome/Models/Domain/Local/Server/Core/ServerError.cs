@@ -15,5 +15,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
         ServerStoppedWithException,
         [ErrorEnum(ErrorLevel.Log, "ローカルサーバーをシャットダウンしました。")]
         ServerStopped,
+        [ErrorEnum(ErrorLevel.Log, "リクエストを処理しました。(url:{0} ua:{1})")]
+        RequestHandled,
     }
 }

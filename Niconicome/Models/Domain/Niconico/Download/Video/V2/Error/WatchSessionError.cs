@@ -27,5 +27,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Error
         SucceededToSendHeartBeat,
         [ErrorEnum(ErrorLevel.Error,"アドオンが不正な情報を返却しました。(id:{0})")]
         AddonReturnedInvalidInfomation,
+        [ErrorEnum(ErrorLevel.Error, "セッション確立アドオンが登録されていません。")]
+        AddonNotRegistered,
     }
 }

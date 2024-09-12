@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Addons.Core.V2.Engine.Infomation;
@@ -19,7 +20,7 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
         /// </summary>
         /// <param name="infomation"></param>
         /// <returns></returns>
-        Task<IAttemptResult<UpdateCheckInfomation>> CheckForUpdate(IAddonInfomation infomation);
+        Task<IAttemptResult<UpdateCheckInfomation>> CheckForUpdate(IAddonInfomation infomation, int retry = 0);
     }
 
     public class AddonUpdateChecker : IAddonUpdateChecker
@@ -42,14 +43,28 @@ namespace Niconicome.Models.Domain.Local.Addons.Core.V2.Update
         #endregion
 
         #region Method
-        public async Task<IAttemptResult<UpdateCheckInfomation>> CheckForUpdate(IAddonInfomation infomation)
+        public async Task<IAttemptResult<UpdateCheckInfomation>> CheckForUpdate(IAddonInfomation infomation, int retry = 0)
         {
             if (!Uri.IsWellFormedUriString(infomation.UpdateJsonURL, UriKind.Absolute))
             {
                 return AttemptResult<UpdateCheckInfomation>.Fail("URLが不正です。");
             }
 
-            var res = await this._http.GetAsync(new Uri(infomation.UpdateJsonURL));
+            HttpResponseMessage res;
+            try
+            {
+                res = await this._http.GetAsync(new Uri(infomation.UpdateJsonURL));
+            }
+            catch
+            {
+                if (retry <= 3)
+                {
+                    return await this.CheckForUpdate(infomation, retry + 1);
+                } else
+                {
+                    return AttemptResult<UpdateCheckInfomation>.Fail("アップデート情報の取得に失敗しました。");
+                }
+            }
             var content = "";
 
             if (res.IsSuccessStatusCode)

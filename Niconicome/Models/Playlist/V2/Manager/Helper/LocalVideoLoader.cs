@@ -81,8 +81,8 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
             if (string.IsNullOrEmpty(folderPath))
             {
                 folderPath = this.GetDownlaodDirectory(this._playlistVideoContainer.CurrentSelectedPlaylist);
-                this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath = folderPath;
             }
+            this._playlistVideoContainer.CurrentSelectedPlaylist.TemporaryFolderPath = folderPath;
 
             ///削除動画のサムネを保存
             await this._thumbnailUtility.DownloadDeletedVideoThumbAsync();
@@ -192,21 +192,32 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 {
                     this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.Mp4FileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
                     this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.TsFileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
+                    this._cachedFolders.AddRange(this._directoryIO.GetDirectorys(folderPath).Select(p => Path.Combine(folderPath, p)).ToList());
                 }
             }
 
+            //stream.jsonを確認
+            string? firstFolder = this._cachedFolders.FirstOrDefault(p => p.Contains(niconicoID));
+            if (firstFolder is not null)
+            {
+                return AttemptResult<string>.Succeeded(Path.Combine(firstFolder, "stream.json"));
+            }
+
             string? firstMp4 = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
+
             //.mp4ファイルを確認
             if (firstMp4 is not null)
             {
                 return AttemptResult<string>.Succeeded(firstMp4);
             }
-            else
+
+            string? firstTS = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
+            if (firstTS is not null)
             //.tsファイルを確認
             {
-                string? firstTS = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
-                if (firstTS is not null) return AttemptResult<string>.Succeeded(firstTS);
+                return AttemptResult<string>.Succeeded(firstTS);
             }
+
 
             return AttemptResult<string>.Fail();
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 using Niconicome.Models.Domain.Local.Cookies;
+using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Domain.Utils;
 
@@ -14,16 +16,12 @@ namespace Niconicome.Models.Auth
 
     class Webview2SharedLogin : SharedLoginBase, IWebview2SharedLogin
     {
-        public Webview2SharedLogin(IWebview2LocalCookieManager webview2LocalCookieManager, ILogger logger, INicoHttp http, ICookieManager cookieManager, INiconicoContext context) : base(http, cookieManager, context)
+        public Webview2SharedLogin(INiconicoContext context,IWebview2LocalCookieManager webview2LocalCookieManager) : base(context)
         {
-            this.webview2LocalCookieManager = webview2LocalCookieManager;
-            this.logger = logger;
-
+            this._webview2LocalCookieManager = webview2LocalCookieManager;
         }
 
-        private readonly IWebview2LocalCookieManager webview2LocalCookieManager;
-
-        private readonly ILogger logger;
+        private readonly IWebview2LocalCookieManager _webview2LocalCookieManager;
 
 
         /// <summary>
@@ -32,31 +30,21 @@ namespace Niconicome.Models.Auth
         /// <returns></returns>
         public async Task<bool> TryLogin()
         {
-            IUserCookieInfo cookie;
-
-            try
+            if (!this.CanLogin())
             {
-                cookie = this.webview2LocalCookieManager.GetCookieInfo();
-            }
-            catch (Exception e)
-            {
-                this.logger.Error("Webview2からのクッキーの取得に失敗しました。", e);
                 return false;
             }
 
-            if (cookie.UserSession is null || cookie.UserSessionSecure is null) return false;
+            IUserCookieInfo cookieInfo = this._webview2LocalCookieManager.GetCookieInfo();
 
-            this.cookieManager.AddCookie("user_session", cookie.UserSession);
-            this.cookieManager.AddCookie("user_session_secure", cookie.UserSessionSecure);
-
-            var result = await this.CheckIfLoginSucceeded();
-
-            if (result)
+            if (cookieInfo.UserSession is null||cookieInfo.UserSessionSecure is null)
             {
-                await this.context.RefreshUser();
+                return false;
             }
 
-            return result;
+            var result = await this.context.LoginAndSaveCookieAsync(cookieInfo.UserSession, cookieInfo.UserSessionSecure);
+
+            return result.IsSucceeded;
         }
 
         /// <summary>
@@ -65,7 +53,7 @@ namespace Niconicome.Models.Auth
         /// <returns></returns>
         public bool CanLogin()
         {
-            return this.webview2LocalCookieManager.CanLoginWithWebview2();
+            return this._webview2LocalCookieManager.CanLoginWithWebview2();
         }
     }
 }

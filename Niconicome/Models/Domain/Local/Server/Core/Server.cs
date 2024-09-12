@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using Niconicome.Models.Domain.Local.Server.API.Comment.V1;
+using Niconicome.Models.Domain.Local.Server.API.NG.V1;
+using Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;
+using Niconicome.Models.Domain.Local.Server.API.Resource.V1;
+using Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1;
+using Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.M3U8;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.NotFound;
 using Niconicome.Models.Domain.Local.Server.RequestHandler.TS;
@@ -36,16 +42,23 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
     public class Server : IServer
     {
-        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IErrorHandler errorHandler, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IPortHandler portHandler)
+        public Server(IUrlHandler urlHandler, IVideoRequestHandler video, INotFoundRequestHandler notFound, IM3U8RequestHandler m3U8, ITSRequestHandler ts, IUserChromeRequestHandler userChrome, IErrorHandler errorHandler, IPortHandler portHandler, IWatchHandler watchHandler, ICommentRequestHandler commentRequestHandler, IRegacyHLSHandler regacyHLSHandler, IIPHandler iPHandler, IResourceHandler resourceHandler, IVideoInfoHandler videoInfoHandler,INGHandler nGHandler)
         {
             this._urlHandler = urlHandler;
             this._video = video;
             this._notFound = notFound;
-            this._errorHandler = errorHandler;
             this._m3U8 = m3U8;
             this._ts = ts;
             this._userChrome = userChrome;
+            this._errorHandler = errorHandler;
             this._portHandler = portHandler;
+            this._watchHandler = watchHandler;
+            this._commentRequestHandler = commentRequestHandler;
+            this._regacyHLSHandler = regacyHLSHandler;
+            this._resourceHandler = resourceHandler;
+            this._videoInfoHandler = videoInfoHandler;
+            this._nGHandler = nGHandler;
+            this._iPHandler = iPHandler;
         }
 
         ~Server()
@@ -71,6 +84,20 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         private readonly IPortHandler _portHandler;
 
+        private readonly IWatchHandler _watchHandler;
+
+        private readonly ICommentRequestHandler _commentRequestHandler;
+
+        private readonly IRegacyHLSHandler _regacyHLSHandler;
+
+        private readonly IResourceHandler _resourceHandler;
+
+        private readonly IVideoInfoHandler _videoInfoHandler;
+
+        private readonly INGHandler _nGHandler;
+
+        private readonly IIPHandler _iPHandler;
+
         private readonly Queue<int> _ports = new();
 
         private bool _isRunning;
@@ -89,7 +116,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
         public void Start()
         {
-            if (this._isRunning||this._isShutdowned)
+            if (this._isRunning || this._isShutdowned)
             {
                 return;
             }
@@ -124,6 +151,7 @@ namespace Niconicome.Models.Domain.Local.Server.Core
 
                     listnner.Prefixes.Clear();
                     listnner.Prefixes.Add($"http://localhost:{this.Port}/");
+                    listnner.Prefixes.Add($"http://127.0.0.1:{this.Port}/");
 
                     listnner.Start();
                     this._errorHandler.HandleError(ServerError.ServerStarted, this.Port);
@@ -132,81 +160,143 @@ namespace Niconicome.Models.Domain.Local.Server.Core
                     {
                         HttpListenerContext context = listnner.GetContext();
 
-                        HttpListenerRequest request = context.Request;
-                        HttpListenerResponse response = context.Response;
-
-                        //CORS
-                        response.Headers.Add("Access-Control-Allow-Origin", "*");
-
-                        if (request.Url is null)
+                        _ = Task.Run(async () =>
                         {
-                            context.Response.Close();
-                            continue;
-                        }
+                            HttpListenerRequest request = context.Request;
+                            HttpListenerResponse response = context.Response;
 
-                        if (request.HttpMethod == "OPTIONS")
-                        {
-                            response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
-                            response.StatusCode = (int)HttpStatusCode.OK;
+                            this._errorHandler.HandleError(ServerError.RequestHandled, request.Url!.ToString(), request.UserAgent);
+
+                            //CORS
+                            response.Headers.Add("Access-Control-Allow-Origin", "*");
+
+                            if (request.Url is null)
+                            {
+                                context.Response.Close();
+                                return;
+                            }
+
+                            if (request.HttpMethod == "OPTIONS")
+                            {
+                                response.Headers.Add("Access-Control-Allow-Methods", "GET, OPTIONS");
+                                response.StatusCode = (int)HttpStatusCode.OK;
+                                response.Close();
+                                return;
+                            }
+
+                            if (request.HttpMethod != "GET" && request.HttpMethod != "POST")
+                            {
+                                context.Response.Close();
+                                return;
+                            }
+
+                            RequestType type = this._urlHandler.GetReqyestType(request.Url);
+                            IAttemptResult? result = null;
+
+                            if (type == RequestType.Video)
+                            {
+                                try
+                                {
+                                    result = this._video.Handle(request.Url, response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.M3U8)
+                            {
+                                try
+                                {
+                                    result = this._m3U8.Handle(response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.TS)
+                            {
+                                try
+                                {
+                                    result = this._ts.Handle(request.Url, response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.UserChrome)
+                            {
+                                try
+                                {
+                                    result = this._userChrome.Handle(response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.WatchAPI)
+                            {
+                                try
+                                {
+                                    result = this._watchHandler.Handle(response, request.Url.ToString(), this.Port);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.CommentAPI)
+                            {
+                                try
+                                {
+                                    result = this._commentRequestHandler.Handle(request.Url.ToString(), response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.RegacyHLSAPI)
+                            {
+                                try
+                                {
+                                    result = await this._regacyHLSHandler.Handle(request.Url.ToString(), response, this.Port);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.ResourceAPI)
+                            {
+                                try
+                                {
+                                    result = this._resourceHandler.Handle(request.Url.ToString(), response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.VideoInfoAPI)
+                            {
+                                try
+                                {
+                                    result = this._videoInfoHandler.Handle(this.Port, request.Url.ToString(), response);
+                                }
+                                catch { }
+                            }
+
+                            if (type == RequestType.NG)
+                            {
+                                try
+                                {
+                                    result = this._nGHandler.Handle(request, response);
+                                }
+                                catch { }
+                            }
+
+                            if (result is null || !result.IsSucceeded)
+                            {
+                                try
+                                {
+                                    this._notFound.Handle(request.Url, response, result?.Message);
+                                }
+                                catch { }
+                            }
+
+
                             response.Close();
-                            continue;
-                        }
+                        });
 
-                        if (request.HttpMethod != "GET")
-                        {
-                            context.Response.Close();
-                            continue;
-                        }
 
-                        RequestType type = this._urlHandler.GetReqyestType(request.Url);
-                        IAttemptResult? result = null;
-
-                        if (type == RequestType.Video)
-                        {
-                            try
-                            {
-                                result = this._video.Handle(request.Url, response);
-                            }
-                            catch { }
-                        }
-
-                        if (type == RequestType.M3U8)
-                        {
-                            try
-                            {
-                                result = this._m3U8.Handle(response);
-                            }
-                            catch { }
-                        }
-
-                        if (type == RequestType.TS)
-                        {
-                            try
-                            {
-                                result = this._ts.Handle(request.Url, response);
-                            }
-                            catch { }
-                        }
-
-                        if (type == RequestType.UserChrome)
-                        {
-                            try
-                            {
-                                result = this._userChrome.Handle(response);
-                            }
-                            catch { }
-                        }
-
-                        if (result is null || !result.IsSucceeded)
-                        {
-                            try
-                            {
-                                this._notFound.Handle(request.Url, response, result?.Message);
-                            }
-                            catch { }
-                        }
-
-                        response.Close();
                     }
 
                     listnner.Close();

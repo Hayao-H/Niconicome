@@ -20,7 +20,7 @@ namespace Niconicome.Models.Auth
 
     public class FirefoxSharedLogin : SharedLoginBase, IFirefoxSharedLogin
     {
-        public FirefoxSharedLogin(IFirefoxCookieManager firefoxCookieManager, ILogger logger, INicoHttp http, INiconicoContext context, ICookieManager cookieManager, IFirefoxProfileManager firefoxProfileManager) : base(http, cookieManager, context)
+        public FirefoxSharedLogin(IFirefoxCookieManager firefoxCookieManager, ILogger logger,  INiconicoContext context, IFirefoxProfileManager firefoxProfileManager) : base( context)
         {
             this.firefoxCookieManager = firefoxCookieManager;
             this.logger = logger;
@@ -60,17 +60,9 @@ namespace Niconicome.Models.Auth
 
             if (cookie.UserSession is null || cookie.UserSessionSecure is null) return false;
 
-            this.cookieManager.AddCookie("user_session", cookie.UserSession);
-            this.cookieManager.AddCookie("user_session_secure", cookie.UserSessionSecure);
+            IAttemptResult result = await this.LoginAndSaveCookieAsync(cookie.UserSession, cookie.UserSessionSecure);
 
-            var result = await this.CheckIfLoginSucceeded();
-
-            if (result)
-            {
-                await this.context.RefreshUser();
-            }
-
-            return result;
+            return result.IsSucceeded;
         }
 
         /// <summary>

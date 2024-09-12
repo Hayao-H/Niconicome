@@ -13,11 +13,13 @@ using Niconicome.Models.Domain.Niconico.Watch.V2;
 using Niconicome.Models.Domain.Playlist;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
+using Niconicome.Models.Network.Download.Modification.Video;
 using Niconicome.Models.Network.Watch;
 using DDL = Niconicome.Models.Domain.Niconico.Download.Description;
 using Tdl = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using V2Comment = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
-using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V2;
+using Vdl = Niconicome.Models.Domain.Niconico.Download.Video.V3;
+using VdlLegacy = Niconicome.Models.Domain.Niconico.Download.Video.V2;
 
 namespace Niconicome.Models.Network.Download
 {
@@ -36,7 +38,7 @@ namespace Niconicome.Models.Network.Download
 
     public class ContentDownloadHelper : IContentDownloadHelper
     {
-        public ContentDownloadHelper(ILogger logger, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation, ILocalFileHandler localFileHandler, IPathOrganizer pathOrganizer,INiconicomeDirectoryIO directoryIO)
+        public ContentDownloadHelper(ILogger logger, IDomainModelConverter converter, IWatchPageInfomationHandler watchPageInfomation, ILocalFileHandler localFileHandler, IPathOrganizer pathOrganizer, INiconicomeDirectoryIO directoryIO, IVideoModificationManager videoModificationManager)
         {
             this.converter = converter;
             this.logger = logger;
@@ -44,6 +46,7 @@ namespace Niconicome.Models.Network.Download
             this._localFileHandler = localFileHandler;
             this._pathOrganizer = pathOrganizer;
             this._directoryIO = directoryIO;
+            this._videoModificationManager = videoModificationManager;
         }
 
         #region DI
@@ -59,12 +62,15 @@ namespace Niconicome.Models.Network.Download
 
         private readonly INiconicomeDirectoryIO _directoryIO;
 
+        private readonly IVideoModificationManager _videoModificationManager;
+
         #endregion
 
         #region Methods
 
         public async Task<IAttemptResult<IDownloadContext>> TryDownloadContentAsync(IVideoInfo videoInfo, IDownloadSettings setting, Action<string> OnMessage, CancellationToken token)
-        {
+        {;
+
             var context = new DownloadContext(setting.NiconicoId);
 
             context.RegisterMessageHandler(OnMessage);
@@ -244,11 +250,18 @@ namespace Niconicome.Models.Network.Download
         /// </summary>
         private async Task<IAttemptResult> TryDownloadVideoAsync(IDownloadSettings settings, Action<string> onMessage, IDomainVideoInfo videoInfo, IDownloadContext context, CancellationToken token)
         {
-            var videoDownloader = DIFactory.Provider.GetRequiredService<Vdl::Integrate.IVideoDownloader>();
             IAttemptResult<uint> result;
             try
             {
-                result = await videoDownloader.DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                if (videoInfo.DmcInfo.IsDMS)
+                {
+                    IAttemptResult<int> resultNew = await DIFactory.Provider.GetRequiredService<Vdl::Integrate.IVideoDownloader>().DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                    result = resultNew.IsSucceeded ? AttemptResult<uint>.Succeeded((uint)resultNew.Data) : AttemptResult<uint>.Fail(resultNew.Message);
+                }
+                else
+                {
+                    result = await DIFactory.Provider.GetRequiredService<VdlLegacy.Integrate.IVideoDownloader>().DownloadVideoAsync(settings, onMessage, videoInfo, token);
+                }
             }
             catch (Exception e)
             {
@@ -259,12 +272,27 @@ namespace Niconicome.Models.Network.Download
             context.ActualVerticalResolution = result.Data;
             if (result.IsSucceeded)
             {
+                await this.ModifyVideo(settings, videoInfo, onMessage, token);
                 return AttemptResult.Succeeded();
             }
             else
             {
                 return AttemptResult.Fail(result.Message);
             }
+        }
+
+        /// <summary>
+        /// DL後処理を行う
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="videoInfo"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        private async Task ModifyVideo(IDownloadSettings settings, IDomainVideoInfo videoInfo, Action<string> onMessage, CancellationToken ct)
+        {
+            if (!settings.IsModifyVideoEnable) return;
+            string filePath = this.GetVideoFilePath(settings, videoInfo);
+            await this._videoModificationManager.ModifyVideo(videoInfo.Id, settings.PlaylistID.ToString(), filePath, onMessage, ct);
         }
 
         /// <summary>

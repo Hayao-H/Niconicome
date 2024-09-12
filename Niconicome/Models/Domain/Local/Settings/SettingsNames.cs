@@ -50,7 +50,7 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string PostDownloadAction { get; private set; } = "Download.General.PostDownloadAction";
 
         //Download.General.DownloadCompletionAudio
-        public static string PlaySoundAfterDownload { get; private set; }= "Download.General.DownloadCompletionAudio.Enable";
+        public static string PlaySoundAfterDownload { get; private set; } = "Download.General.DownloadCompletionAudio.Enable";
 
         public static string DownloadCompletionAudioPath { get; private set; } = "Download.General.DownloadCompletionAudio.Path";
 
@@ -77,6 +77,13 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string ExternalDLSoftwarePath { get; private set; } = "Download.Video.ExternalSoftware.Path";
 
         public static string ExternalDLSoftwareParam { get; private set; } = "Download.Video.ExternalSoftware.Parameter";
+
+        //Download.Video.Modification
+        public static string IsVideoModificationEnable { get; private set; } = "Download.Video.Modification.IsVideoModificationEnable";
+
+        public static string VideoModificationSoftwarePath { get; private set; } = "Download.Video.Modification.VideoModificationSoftwarePath";
+
+        public static string VideoModificationSoftwareParam { get; private set; } = "Download.Video.Modification.VideoModificationParameter";
 
         //Download.Comment
         public static string CommentOffset { get; private set; } = "Download.Comment.Commentoffset";
@@ -231,6 +238,13 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         //Videolist.File
         public static string SearchVideosExact { get; private set; } = "Videolist.File.SearchVideosExact";
+
+        //Watch.NG
+        public static string NGUsers { get; private set; } = "Watch.NG.NGUsers";
+
+        public static string NGWords { get; private set; } = "Watch.NG.NGWords";
+
+        public static string NGCommands { get; private set; } = "Watch.NG.NGCommands";
 
         //Application
         public static string LimitWindowsToSingleton { get; private set; } = "Application.LimitWindowsToSingleton";

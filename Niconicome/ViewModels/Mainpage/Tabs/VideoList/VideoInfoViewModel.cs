@@ -183,6 +183,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList
         /// </summary>
         public IBindableProperty<bool> IsDownloaded { get; init; }
 
+        /// <summary>
+        /// 新サーバーフラグ
+        /// </summary>
+        public bool IsDMS => this._video.IsDMS;
+
         #endregion
 
         #region Method

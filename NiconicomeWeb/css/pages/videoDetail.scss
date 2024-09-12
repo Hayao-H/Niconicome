@@ -1,91 +1,677 @@
 $videoWidth: 700;
 $VideoInfoWidth: 400;
 
-.VideoDetailPage {
-    margin: 24px;
-    
-    .VideotitleContainer {
-        margin: 0 auto;
-        width:calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
-    
-        .DownloadStatus {
-            font-size: 16px;
-            margin-left: 8px;
-    
-            &.Downloaded {
-                color: #7bd889;
-    
-            }
-    
-            &.NotDownloaded {
-                color: #ff3300;
-    
-            }
-        }
-    
+:link {
+    text-decoration: none;
+    color: #069;
+
+    &:hover {
+        text-decoration: underline;
     }
-    
-    .VideoContentContainer {
-        display: flex;
-        box-shadow: 0 1px 8px rgba(0, 0, 0, .1);
-        width: calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
-        margin: 16px auto;
-    
-    
-        .VideoElement {
-            width: #{$videoWidth}px;
-            height: calc(#{$videoWidth}px / 16 * 9);
-    
-            #video-player {
-                width: 100%;
-                height: 100%;
+}
+
+
+.VideoDetailPage {
+    padding: 24px;
+    background-color: #f4f4f4;
+
+    .contextMenuWrapper {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+
+        .contextMenu {
+            position: absolute;
+            color: #fff;
+            background: rgba(0, 0, 0, .9);
+            border: 1px solid #505050;
+            border-radius: 4px;
+            max-height: 100vh;
+            max-width: 384px;
+
+            .menuItem {
+                padding: 4px;
+                cursor: pointer;
             }
         }
-    
-        .VideoInfoContainer {
-            display: flex;
-            flex-direction: column;
-            width: #{$VideoInfoWidth}px;
-            padding: 8px;
-            background-color: #fff;
-    
-            .VideoInfoRow {
-                display: flex;
-                justify-content: space-between;
-                padding: 8px 0;
-    
-                a {
-                    color: #069;
-                    text-decoration: none;
+    }
+
+    .watchWrapper {
+        display: flex;
+
+        .leftContent {
+
+            width: 66%;
+
+            .videoWrapper {
+                aspect-ratio: 16 / 9;
+                width: 100%;
+                background-color: #000;
+                position: relative;
+
+                video {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    height: 100%;
+                    width: 100%;
                 }
-    
-                a:hover {
-                    text-decoration: underline;
+
+                .commentWrapper {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+
+                    .commentCanvas {
+                        width: 100%;
+                        height: 100%;
+                        z-index: 999;
+                        display: none;
+
+                        &.visible {
+                            display: block;
+                        }
+                    }
                 }
-    
-                .UserVideos {
-                    border: 1px solid;
-                    padding: 3px;
-                    border-radius: 5px;
+
+                .videoOverflow {
+
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 10;
+
+                    .systemMessage {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0, 0, 0, .9);
+                        border: 1px solid #333;
+                        color: #fff;
+                        padding: 8px;
+                        z-index: 11;
+                        width: calc(100% - 80px);
+                        height: calc(100% - 80px);
+                        overflow: auto;
+
+                        &.hide {
+                            display: none;
+                        }
+
+                        .message {
+                            display: flex;
+                            font-weight: bold;
+                            font-size: 14px;
+
+                            &.messageBorder {
+                                border-top: 1px solid #333;
+                                margin-top: 4px;
+                                padding-top: 4px;
+                            }
+
+                            &.error {
+                                color: #f11e37;
+                            }
+
+                            .time {
+                                margin-right: 32px;
+                                text-wrap: nowrap;
+                            }
+                        }
+                    }
                 }
-    
-                .VideoInfoIcon {
-                    margin-right: 6px;
-                    color: #8b888f;
-    
-                    &.Like {
-                        color: #e26775;
+            }
+
+            .controler {
+                width: 100%;
+                background-color: #000;
+
+                .panel {
+                    padding: 4px;
+                    display: flex;
+                    justify-content: space-between;
+
+                    .playControler {
+                        color: #fff;
+
+                        .playButton {
+                            margin: 0 8px;
+                        }
+                    }
+
+                    .timeControler {
+                        color: #fff;
+                        display: flex;
+                        align-items: center;
+                        margin: 0 8px;
+
+                        .time {
+                            margin: 0 8px;
+                        }
+                    }
+
+                    .generalControler {
+                        display: flex;
+                        margin: 0 8px;
+
+                        .commentVisibility {
+                            margin-left: 10px;
+                            color: #666;
+
+                            &.visible {
+                                color: #fff;
+                            }
+                        }
+
+                        .repeat {
+                            color: #fff;
+
+                            &.enable {
+                                color: #007cff;
+                            }
+                        }
+                    }
+                }
+
+                .sliderWrapper {
+                    height: 15px;
+                    position: relative;
+                    margin: 0 5px;
+
+                    .slider {
+                        height: 4px;
+                        width: 100%;
+                        position: absolute;
+                        top: 5px;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: #444;
+                        cursor: pointer;
+
+                        .sliderInner {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            width: 100%;
+                            transform-origin: left;
+
+                            &.time {
+                                background-color: #007cff;
+                                z-index: 2;
+                                transition: transform 0.5s;
+                            }
+
+                            &.buffer {
+                                background-color: #fff;
+                                z-index: 1;
+                                transition: transform 0.5s;
+                            }
+                        }
+                    }
+
+                    .sliderHandle {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        z-index: 3;
+
+                        .sliderHandleInner {
+                            display: none;
+                            position: absolute;
+                            left: 0;
+                            width: 16px;
+                            height: 16px;
+                            background-color: #007cff;
+                            cursor: pointer;
+                            border-radius: 50%;
+                            transition: left 0.5s;
+                        }
+                    }
+
+                    &:hover {
+                        .sliderHandleInner {
+                            display: block;
+                        }
+                    }
+                }
+            }
+
+            .videoInfoWrapper {
+                .titleAndOwner {
+                    display: flex;
+                    padding: 15px;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    .ownerWrapper {
+                        height: 30px;
+                        display: flex;
+                        align-items: center;
+                        margin-left: 8px;
+
+                        .ownerIcon {
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 50%;
+                        }
+
+                        .ownerName {
+                            display: flex;
+                            align-items: center;
+                            margin-left: 8px;
+                        }
+                    }
+                }
+
+                .majorInfoWrapper {
+                    display: flex;
+                    align-items: center;
+                    color: #657586;
+                    height: 20px;
+                    line-height: 20px;
+
+                    .counts {
+                        margin-left: 8px;
+
+                        .icon {
+                            margin: 8px;
+
+                            &.like {
+                                color: #e26775;
+                            }
+                        }
+                    }
+                }
+
+                .tagWrapper {
+                    display: flex;
+                    flex-wrap: wrap;
+                    margin: 16px 0;
+
+
+                    .tag {
+                        background-color: #fff;
+                        border: 1px solid #e5e8ea;
+                        border-radius: 12px;
+                        height: 24px;
+                        line-height: 24px;
+                        margin-bottom: 4px;
+                        margin-right: 4px;
+                        padding-left: 12px;
+                        padding-right: 12px;
+
+                        .tagName {
+                            color: #32475e;
+                            font-size: 13px;
+                            font-weight: 600
+                        }
+
+                        .nicodic {
+                            margin-left: 4px;
+                            color: #b2bac2;
+
+                            &:hover {
+                                color: #657586;
+                            }
+
+                            &.exist {
+                                color: #8c0000;
+
+                                &:hover {
+                                    color: #b20000;
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                .title {
+                    font-size: 25px;
+                    font-weight: bold;
+                }
+
+                .descriptionWrapper {
+                    padding: 10px;
+                    border: #e5e8ea solid 1.5px;
+                    border-radius: 20px;
+                    background-color: #fff;
+                    position: relative;
+
+                    .description {
+                        &.collapsed {
+                            height: 50px;
+                            overflow: hidden;
+                            color: #99a3ad;
+                            cursor: pointer;
+
+                            :link {
+                                color: inherit;
+                            }
+                        }
+                    }
+
+                    .expandButton {
+                        padding: 3px;
+                        position: absolute;
+                        right: 5px;
+                        bottom: -30px;
+                        cursor: pointer;
+                        color: #1874a2;
+                        padding-left: 24px;
+
+                        &.collapsed {
+                            bottom: 10px;
+                            background: linear-gradient(90deg, hsla(0, 0%, 96%, 0), #fff 16%);
+                        }
+
+                        &:hover {
+                            text-decoration: underline;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        .rightContent {
+            width: 34%;
+            min-width: 400px;
+            margin-left: 8px;
+            position: relative;
+
+
+            .commentWrapper {
+                background-color: #fff;
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #e5e8ea;
+                border-radius: 20px;
+                user-select: none;
+
+                >.listControler {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px;
+                    height: 40px;
+                    cursor: pointer;
+                }
+
+                .autoScroll {
+                    display: flex;
+                    justify-content: end;
+                    align-items: center;
+                    height: 30px;
+
+                    .ngToggle {
+                        margin-left: 16px;
+                        color: #4e4e4e4e;
+                        cursor: pointer;
+                    }
+
+                    &.collapsed {
+                        display: none;
+                    }
+                }
+
+                .commentList {
+                    border-top: 1px solid #e5e8ea;
+                    padding: 8px;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: auto;
+                    height: 400px;
+                    width: 100%;
+
+                    &.collapsed {
+                        display: none;
+                    }
+
+                    .commentItem {
+
+                        display: flex;
+
+                        &:hover {
+                            background-color: #f4f4f4;
+                        }
+
+                        >div {
+                            display: flex;
+                            justify-content: center;
+                            height: 30px;
+                            padding: 5px 0;
+                            font-size: 15px;
+                        }
+
+                        .commentContent {
+                            display: block;
+                            width: 200px;
+                            flex: 0 0 200px;
+                            overflow: hidden;
+                            border-right: solid 1px #e7e7e7e7;
+                        }
+
+                        .commentTime {
+                            width: 100px;
+                            flex: 0 0 100px;
+                            border-right: solid 1px #e7e7e7e7;
+                        }
+
+                        .commentNumber {
+                            width: 50px;
+                            flex: 0 0 50px;
+                            border-right: solid 1px #e7e7e7e7;
+                        }
+
+                        .commentPostedAt {
+                            width: 200px;
+                            flex: 0 0 200px;
+                            border-right: solid 1px #e7e7e7e7;
+                        }
+                    }
+
+                    .commentHeader:hover {
+                        background-color: #fff;
+                    }
+                }
+
+                .ngWrapper {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background-color: #fff;
+                    padding: 8px;
+
+                    &.collapsed {
+                        display: none;
+                    }
+
+                    >.listControler {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 8px;
+                        height: 40px;
+
+                        p {
+                            font-weight: bold;
+                        }
+
+                        .close {
+                            border-radius: 50%;
+                            width: 40px;
+                            height: 40px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            cursor: pointer;
+
+                            &:hover {
+                                background-color: #e7e7e7e7;
+                            }
+                        }
+
+
+
+                    }
+
+                    .ngList {
+                        height: 350px;
+                        overflow: auto;
+
+                        .ngItem {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 8px;
+                            height: 50px;
+                            border-radius: 8px;
+
+                            &:hover {
+                                background-color: #e7e7e7e7;
+                            }
+
+                            .content {
+                                display: flex;
+                                align-items: flex-end;
+                                height: 40px;
+                                line-height: 40px;
+
+                                .type {
+                                    margin-right: 10px;
+                                    font-size: 14px;
+                                    color: #a3a3a3;
+                                }
+                            }
+
+                            .remove {
+                                cursor: pointer;
+
+                                &:hover {
+                                    color: #f11e37;
+                                }
+                            }
+                        }
+                    }
+
+                    .ngInput {
+                        border-top: solid 2px #e7e7e7e7;
+                        margin-top: 16px;
+                        padding: 8px;
+
+                        .ngSelect {
+                            margin-bottom: 8px;
+                        }
+                    }
+                }
+            }
+
+            .shortcut {
+                position: absolute;
+                top: 0;
+                right: 0;
+                left: 0;
+                color: #fff;
+
+                &.hidden {
+                    display: none;
+                }
+
+                .header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    background: #333;
+                    height: 50px;
+                    padding: 10px;
+
+                    .closeButton {
+                        cursor: pointer;
+                    }
+                }
+
+                .content {
+                    background: rgba(0, 0, 0, .9);
+                    height: 450px;
+
+
+                    .section {
+                        margin-left: 10px;
+                        padding: 10px;
+                        border-bottom: 2px solid #666;
+                    }
+
+                    .item {
+                        margin-left: 20px;
+                        padding: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        border-bottom: 1px solid #666;
+
+                    }
+                }
+            }
+
+            .playlist {
+                margin-top: 16px;
+
+                .playlistVideo {
+                    margin: 8px;
+                    display: flex;
+                    height: 100px;
+                    cursor: pointer;
+
+                    .thumbnail {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 30%;
+
+                        img {
+                            height: 100%;
+                            width: 100%;
+                            border-radius: 10px;
+                        }
+                    }
+
+                    .videoInfo {
+                        width: 70%;
+                        padding: 8px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+
+                        .title {
+                            font-weight: bold;
+                        }
+
+                        .other {
+                            font-size: 14px;
+                        }
                     }
                 }
             }
         }
     }
-    
+
     .TagContainer {
         width: calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
         margin: 16px auto;
         overflow: hidden;
-    
+
         .Tag {
             margin-right: 16px;
             margin-bottom: 8px;
@@ -96,36 +682,41 @@ $VideoInfoWidth: 400;
             height: 24px;
             line-height: 24px;
             float: left;
-    
+
             .TagName {
                 color: #32475e;
                 font-weight: 600;
                 font-size: 13px;
                 text-decoration: none;
             }
-    
+
             .TagName:hover {
                 text-decoration: underline;
             }
-    
+
             .TagIcon {
                 margin-left: 4px;
-    
+
                 &.NicoDic {
                     color: #b20000;
                 }
-    
+
                 &.Question {
                     color: #b2bac2;
                 }
             }
         }
     }
-    
+
     .ControlsContainer {
-        display: flex;
-        justify-content: center;
-        margin: 0 auto;
-        width:calc(#{$videoWidth}px + #{$VideoInfoWidth}px);
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+
+        button {
+            border-radius: 50%;
+            height: 60px;
+            width: 60px;
+        }
     }
 }

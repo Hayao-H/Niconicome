@@ -43,7 +43,6 @@ namespace Niconicome
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterDialog<CommonMessageBox>(nameof(CommonMessageBox));
-            containerRegistry.RegisterDialog<MainManager>(nameof(MainManager));
         }
 
         /// <summary>

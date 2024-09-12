@@ -30,7 +30,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             this._disposable = new Disposable();
 
-            WS::Mainpage.BlazorPageManager.RegisterNavigationManager(BlazorWindows.MainPage, navigation);
+            WS::Mainpage.BlazorPageManager.RegisterNavigationManager(navigation);
             this.InputText = new BindableProperty<string>("").AddTo(this.Bindables);
             this.IsProcessing = new BindableProperty<bool>(false).AddTo(this.Bindables);
             this.ConfirmMessage = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
@@ -212,7 +212,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         {
             if (WS::Mainpage.VideoAndPlayListMigration.IsMigrationNeeded)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/migration/videos", BlazorWindows.MainPage);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/migration/videos");
             }
 
             WS::Mainpage.SnackbarHandler.RegisterToastHandler(this.ToastMessageChangeHandler);
@@ -346,7 +346,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null) return;
             var playlistID = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist.ID;
 
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{playlistID}", BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/playlist/{playlistID}");
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// </summary>
         public void OnSearchButtonClick()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/search", BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/search");
         }
 
         /// <summary>
@@ -497,7 +497,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <param name="niconicoID"></param>
         public void OnVideoDetailButtonClick(string niconicoID)
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/video/{niconicoID}/", BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate($"/video/{niconicoID}/");
         }
 
         #endregion

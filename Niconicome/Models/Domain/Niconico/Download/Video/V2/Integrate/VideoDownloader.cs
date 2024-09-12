@@ -4,12 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ABI.System;
-using System.Windows.Input;
 using Niconicome.Models.Const;
-using Niconicome.Models.Domain.Local.External.Software.NiconicomeProcess;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Niconico.Download.Video.V2.External;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.Fetch.Segment.AES;
 using Niconicome.Models.Domain.Niconico.Download.Video.V2.HLS.Stream;
@@ -23,7 +21,6 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Download;
 using Niconicome.Models.Utils.ParallelTaskV2;
 using SC = Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate.VideoDownloaderSC;
-using Niconicome.Models.Domain.Niconico.Download.Video.V2.External;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Video.V2.Integrate
 {

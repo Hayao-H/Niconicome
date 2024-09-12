@@ -114,36 +114,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                 if (this.cachedDmcInfo is null)
                 {
                     dynamic rawhumb = this.RawDmcInfo.ThumbInfo;
-                    dynamic rawSesison = this.RawDmcInfo.SessionInfo;
-
-                    ISessionInfo sessionInfo;
-
-                    if (this.RawDmcInfo.IsDownloadable)
-                    {
-
-                        sessionInfo = new SessionInfo()
-                        {
-                            RecipeId = rawSesison.RecipeId,
-                            ContentId = rawSesison.ContentId,
-                            HeartbeatLifetime = rawSesison.HeartbeatLifetime,
-                            Token = rawSesison.Token,
-                            Signature = rawSesison.Signature,
-                            AuthType = rawSesison.AuthType,
-                            ContentKeyTimeout = rawSesison.ContentKeyTimeout,
-                            ServiceUserId = rawSesison.ServiceUserId,
-                            PlayerId = rawSesison.PlayerId,
-                            TransferPriset = rawSesison.TransferPriset,
-                            Priority = rawSesison.Priority,
-                            KeyURL = rawSesison.KeyURL is Undefined ? string.Empty : rawSesison.KeyURL,
-                            EncryptedKey = rawSesison.EncryptedKey is Undefined ? string.Empty : rawSesison.EncryptedKey,
-                        };
-                        sessionInfo.Videos.AddRange(JsUtils.ToClrArray<string>(rawSesison.Videos));
-                        sessionInfo.Audios.AddRange(JsUtils.ToClrArray<string>(rawSesison.Audios));
-                    }
-                    else
-                    {
-                        sessionInfo = new SessionInfo();
-                    }
 
 
                     List<dynamic> tags = JsUtils.ToClrArray<dynamic>(this.RawDmcInfo.Tags);
@@ -195,7 +165,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         UploadedOn = JsUtils.ToLocalDateTime(this.RawDmcInfo.UploadedOn),
                         DownloadStartedOn = JsUtils.ToLocalDateTime(this.RawDmcInfo.DownloadStartedOn),
                         ThumbInfo = new ThumbInfo(rawhumb.large, rawhumb.middle, rawhumb.normal, rawhumb.player),
-                        SessionInfo = sessionInfo,
                         IsPremium = this.RawDmcInfo.IsPremium,
                         IsPeakTime = this.RawDmcInfo.IsPeakTime,
                         Tags = clrTags,
@@ -203,6 +172,7 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
                         Threadkey = this.RawDmcInfo.Threadkey,
                         CommentLanguage = this.RawDmcInfo.CommentLanguage,
                         CommentTargets = clrTargets.AsReadOnly(),
+                        IsDMS = this.RawDmcInfo.IsDMS,
                     };
 
 

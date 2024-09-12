@@ -1,5 +1,6 @@
 ﻿<Router AppAssembly="@typeof(Main).Assembly">
 	<Found Context="routeData">
+		<Niconicome.Views.Shared.TabContainer/>		
 		<RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
 	</Found>

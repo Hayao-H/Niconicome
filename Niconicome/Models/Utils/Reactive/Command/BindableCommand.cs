@@ -66,11 +66,14 @@ namespace Niconicome.Models.Utils.Reactive.Command
 
         public void Execute(object? parameter)
         {
-            try
+            this._ctx?.Post(_ =>
             {
-                this._command();
-            }
-            catch { }
+                try
+                {
+                    this._command?.Invoke();
+                }
+                catch { }
+            }, null);
         }
 
         #endregion

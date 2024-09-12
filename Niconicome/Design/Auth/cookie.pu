@@ -1,0 +1,56 @@
+@startuml
+hide empty members
+
+title Cookieローカル保管システム
+
+
+interface ICookieInfo
+class CookieInfo
+interface ICookieStore
+class CookieDBHAndler
+interface IAttemptResult
+interface INiconicoCookieManager
+class NiconicoCookieManager
+class WebViewBehavior
+
+interface IWebview2SharedLogin
+interface ICoreWebview2Handler
+
+class V
+class VM
+
+interface ICookieInfo {
+    +string UserSession 
+    +string UserSessionSecure
+    +Task<bool> CheckCookie()
+}
+
+interface ICookieStore {
+    +IAttemptResult<ICookieInfo> GetCookieInfo();
+    +IAttemptResult DeleteCookieInfo();
+    +IAttemptResult Update(ICookieInfo cookie);
+}
+
+interface INiconicoCookieManager {
+    +void Wire(ICoreWebview2Handler handler)
+    +void UnWire()
+    +void HandleNavigate()
+    +bool IsLoggedIn()
+}
+
+class NiconicoCookieManager {
+    -ICoreWebview2Handler handler
+}
+
+ICookieInfo <|.. CookieInfo
+ICookieStore <|.. CookieDBHAndler
+INiconicoCookieManager <|.. NiconicoCookieManager
+ICookieStore o-- ICookieInfo
+ICookieStore <.. INiconicoCookieManager
+
+ICookieStore <.. IWebview2SharedLogin
+V *-- WebViewBehavior
+INiconicoCookieManager <.. WebViewBehavior
+
+
+@enduml

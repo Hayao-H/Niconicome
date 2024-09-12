@@ -31,10 +31,10 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         bool IsPremium { get; set; }
         bool IsPeakTime { get; set; }
         bool IsEconomy { get; }
+        bool IsDMS { get;  }
         DateTime UploadedOn { get; set; }
         DateTime DownloadStartedOn { get; set; }
         IThumbInfo ThumbInfo { get; set; }
-        ISessionInfo SessionInfo { get; }
         IReadOnlyCollection<ITarget> CommentTargets { get; }
     }
 
@@ -104,6 +104,8 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
 
         public bool IsEconomy => !this.IsPremium && this.IsPeakTime && this.ViewCount >= Const::NetConstant.EconomyAvoidableViewCount;
 
+        public bool IsDMS { get; set; }
+
         /// <summary>
         /// 投稿日時
         /// </summary>
@@ -119,11 +121,6 @@ namespace Niconicome.Models.Domain.Niconico.Video.Infomations
         /// サムネイル
         /// </summary>
         public IThumbInfo ThumbInfo { get; set; } = new ThumbInfo();
-
-        /// <summary>
-        /// セッション情報
-        /// </summary>
-        public ISessionInfo SessionInfo { get; init; } = new SessionInfo();
 
         /// <summary>
         /// コメントターゲット

@@ -1,0 +1,39 @@
+﻿@inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel.DownloadSettingsViewModel DownloadSettingsViewModel;
+@implements IDisposable;
+@using Niconicome.Views.Mainpage.Region.BlazorVideoList.Pages.Panels;
+@using Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel;
+@inject BottomPanelViewModel VM;
+
+<div class="BottomPanelControler">
+    <div class="PanelItem @(VM.IsDownloadSelected.Value?"selected":"")" @onclick="()=>VM.OnPanelSelected(PanelType.Download)">ダウンロード</div>
+    <div class="PanelItem @(VM.IsOutputSelected.Value?"selected":"")" @onclick=" ()=>VM.OnPanelSelected(PanelType.Output)">出力</div>
+    <div class="PanelItem @(VM.IsStateSelected.Value?"selected":"")" @onclick=" ()=>VM.OnPanelSelected(PanelType.State)">状態</div>
+    <div class="PanelItem @(VM.IsTimerSelected.Value?"selected":"")" @onclick=" ()=>VM.OnPanelSelected(PanelType.Timer)">タイマー</div>
+</div>
+<div class="PanelContainer">
+    <Download IsSelected="@VM.IsDownloadSelected.Value" />
+    <Output IsSelected="@VM.IsOutputSelected.Value" />
+    <State IsSelected="@VM.IsStateSelected.Value" />
+    <Timer IsSelected="@VM.IsTimerSelected.Value" />
+</div>
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this._ctx = SynchronizationContext.Current;
+
+        DownloadSettingsViewModel.Bindables.RegisterPropertyChangeHandler(this.OnValueChange);
+    }
+
+    private void OnValueChange()
+    {
+        this._ctx?.Post(_ => StateHasChanged(), null);
+    }
+
+    private SynchronizationContext? _ctx;
+
+    public void Dispose()
+    {
+        DownloadSettingsViewModel.Dispose();
+    }
+}

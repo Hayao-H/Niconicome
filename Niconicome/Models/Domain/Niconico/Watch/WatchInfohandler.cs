@@ -52,7 +52,7 @@ namespace Niconicome.Models.Domain.Niconico.Watch
         public async Task<IAttemptResult<IDomainVideoInfo>> GetVideoInfoAsync(string id)
         {
             string source;
-            Uri url = NiconicoContext.Context.GetPageUri(id);
+            Uri url = new Uri("https://nicovideo.jp");
 
             try
             {

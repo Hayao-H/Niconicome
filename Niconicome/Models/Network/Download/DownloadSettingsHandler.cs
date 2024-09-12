@@ -166,6 +166,7 @@ namespace Niconicome.Models.Network.Download
             bool omitXmlDec = this._container.GetSetting(SettingNames.IsOmittingXmlDeclarationIsEnable, false).Data!.Value;
             bool skipEco = this._container.GetOnlyValue(SettingNames.AlwaysSkipEconomyDownload, false).Data!;
             bool skipEcoWhenPremium = this._container.GetOnlyValue(SettingNames.SkipEconomyDownloadIfPremiumExists, false).Data!;
+            bool modifyVideo = this._container.GetOnlyValue(SettingNames.IsVideoModificationEnable, false).Data!;
             
 
             //ファイル系
@@ -273,6 +274,7 @@ namespace Niconicome.Models.Network.Download
                 ExternalDownloaderConditionSetting = externalDownloader,
                 SkipEconomyDownloadIfPremiumExists = skipEcoWhenPremium,
                 AlwaysSkipEconomyDownload = skipEco,
+                IsModifyVideoEnable = modifyVideo,
             };
         }
 

@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
+using System.Net.Security;
 using System.Reflection;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.Settings;
+using Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Windows.Media.Protection.PlayReady;
 using Const = Niconicome.Models.Const;
@@ -32,7 +37,7 @@ namespace Niconicome.Models.Domain.Niconico
         /// <param name="uri"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content);
+        Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content, Dictionary<string, string>? headers = null);
 
         /// <summary>
         /// Option
@@ -61,13 +66,14 @@ namespace Niconicome.Models.Domain.Niconico
             if (!result.IsSucceeded || string.IsNullOrEmpty(result.Data))
             {
                 client.DefaultRequestHeaders.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
-            } else
+            }
+            else
             {
                 client.DefaultRequestHeaders.UserAgent.ParseAdd(result.Data);
             }
 
             client.DefaultRequestHeaders.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
-            client.DefaultRequestHeaders.Add("x-frontend-id", "6");
+            client.DefaultRequestHeaders.Add("X-Frontend-id", "6");
             client.DefaultRequestHeaders.Add("x-frontend-version", "0");
             client.DefaultRequestHeaders.Add("x-client-os-type", "others");
 
@@ -79,12 +85,8 @@ namespace Niconicome.Models.Domain.Niconico
         public HttpRequestMessage CreateRequest(HttpMethod method, Uri url)
         {
             var m = new HttpRequestMessage(method, url);
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            m.Headers.UserAgent.ParseAdd($"Mozilla/5.0 (Niconicome/{version?.Major}.{version?.Minor}.{version?.Build})");
             m.Headers.Referrer = new Uri(Const::NetConstant.NiconicoBaseURL);
-            m.Headers.Add("x-frontend-id", "6");
-            m.Headers.Add("x-frontend-version", "0");
-            m.Headers.Add("x-client-os-type", "others");
+            m.Headers.UserAgent.ParseAdd(this._client.DefaultRequestHeaders.UserAgent.ToString());
 
             return m;
         }
@@ -99,9 +101,20 @@ namespace Niconicome.Models.Domain.Niconico
             return await this._client.GetAsync(uri);
         }
 
-        public async Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content)
+        public async Task<HttpResponseMessage> PostAsync(Uri uri, HttpContent content, Dictionary<string, string>? headers = null)
         {
-            return await this._client.PostAsync(uri, content);
+            var message = this.CreateRequest(HttpMethod.Post, uri);
+            message.Content = content;
+            if (headers is not null)
+            {
+                foreach (var key in headers.Keys)
+                {
+                    message.Headers.Add(key, headers[key]);
+                }
+            }
+            var cookie = DIFactory.Resolve<ICookieManager>();
+            Debug.WriteLine(message);
+            return await this._client.SendAsync(message);
         }
 
         public async Task<HttpResponseMessage> OptionAsync(Uri uri)
@@ -127,6 +140,23 @@ namespace Niconicome.Models.Domain.Niconico
         private readonly HttpClient _client;
 
         #endregion
+    }
+
+    public class NicoHttpClientHandler : HttpClientHandler
+    {
+        private readonly bool _skipSSL;
+
+        public NicoHttpClientHandler(CookieContainer container, bool skip)
+        {
+            this.UseCookies = true;
+            this._skipSSL = skip;
+            this.CookieContainer = container;
+            this.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                    {
+                        if (this._skipSSL) return true;
+                        return sslPolicyErrors == SslPolicyErrors.None;
+                    };
+        }
     }
 
 }

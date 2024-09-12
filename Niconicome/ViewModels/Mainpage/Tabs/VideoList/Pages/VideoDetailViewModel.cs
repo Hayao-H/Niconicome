@@ -8,6 +8,8 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State;
 using Niconicome.Models.Utils.Reactive;
 using WS = Niconicome.Workspaces;
+using Const = Niconicome.Models.Const.NetConstant;
+using Niconicome.Models.Domain.Niconico.Net.Json;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 {
@@ -15,35 +17,17 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
     {
         public VideoDetailViewModel()
         {
-            this.CanPlay = new BindableProperty<bool>(false).AddTo(this.Bindables);
+            this.JsWatchInfo = new BindableProperty<string>("").AddTo(this.Bindables);
         }
 
         #region Props
 
-        /// <summary>
-        /// 動画情報
-        /// </summary>
-        public VideoInfoViewModel? VideoInfo { get; private set; }
-
-        /// <summary>
-        /// 動画URL
-        /// </summary>
-        public string VideoUrl { get; private set; } = string.Empty;
-
-        /// <summary>
-        /// HLSで動画を再生できるかどうか
-        /// </summary>
-        public IBindableProperty<bool> CanPlay { get; init; }
+        public IBindableProperty<string> JsWatchInfo { get; init; }
 
         /// <summary>
         /// 変更監視
         /// </summary>
         public Bindables Bindables { get; init; } = new();
-
-        /// <summary>
-        /// ローカルサーバーのポート
-        /// </summary>
-        public int ServerPort => WS::Mainpage.LocalState.Port;
 
         #endregion
 
@@ -53,48 +37,37 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// 初期化
         /// </summary>
         /// <param name="niconicoID"></param>
-        /// <param name="playlistID"></param>
         public void Initialize(string niconicoID)
         {
             if (WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
                 return;
             }
 
             IAttemptResult<IVideoInfo> result = WS::Mainpage.VideoListManager.GetVideoFromCurrentPlaylist(niconicoID);
             if (!result.IsSucceeded || result.Data is null)
             {
-                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+                WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
                 return;
             }
 
             IPlaylistInfo playlist = WS::Mainpage.PlaylistVideoContainer.CurrentSelectedPlaylist;
+            int port = WS::Mainpage.LocalState.Port;
 
-            var port = WS::Mainpage.LocalState.Port;
-            this.VideoInfo = new VideoInfoViewModel(result.Data);
-            this.VideoUrl = $"http://localhost:{port}/niconicome/video/{playlist.ID}/{niconicoID}/video.mp4";
-
-
-            if (result.Data.IsDownloaded.Value)
-            {
-                _ = Task.Run(async () =>
-                {
-                    IAttemptResult hlsResult = await WS::Mainpage.HLSManager.CreateFilesAsync(niconicoID, playlist.ID);
-                    if (hlsResult.IsSucceeded)
-                    {
-                        this.CanPlay.Value = true;
-                    }
-                });
-            }
+            string info = WS.Mainpage.VideoInfoHandler.GetVideoInfoJson(port, niconicoID, playlist.ID);
+            this.JsWatchInfo.Value = info;
 
         }
 
         public void OnReturnButtonClick()
         {
-            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos", BlazorWindows.MainPage);
+            WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/videos");
         }
 
         #endregion
+
+
+
     }
 }

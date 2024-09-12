@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Net.Security;
+﻿using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using AddonsCoreV2 = Niconicome.Models.Domain.Local.Addons.Core.V2;
@@ -9,6 +8,7 @@ using AddonVM = Niconicome.ViewModels.Mainpage.Subwindows.AddonManager;
 using Auth = Niconicome.Models.Auth;
 using Backup = Niconicome.Models.Domain.Local.DataBackup;
 using Channel = Niconicome.Models.Domain.Niconico.Remote.Channel;
+using CommentAPIV1 = Niconicome.Models.Domain.Local.Server.API.Comment.V1;
 using CommentConverter = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.Converter;
 using CommentFetch = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Fetch;
 using CommentIntegrate = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Integrate;
@@ -17,11 +17,14 @@ using Cookies = Niconicome.Models.Domain.Local.Cookies;
 using DataBase = Niconicome.Models.Domain.Local;
 using DB = Niconicome.Models.Infrastructure.Database;
 using DLActions = Niconicome.Models.Network.Download.Actions;
-using DlComment = Niconicome.Models.Domain.Niconico.Download.Comment;
 using DlDescription = Niconicome.Models.Domain.Niconico.Download.Description;
+using DLGeneral = Niconicome.Models.Domain.Niconico.Download.General;
 using DlIchiba = Niconicome.Models.Domain.Niconico.Download.Ichiba;
+using DLTaskVM = Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask;
 using DlThumb = Niconicome.Models.Domain.Niconico.Download.Thumbnail;
 using DlVideo = Niconicome.Models.Domain.Niconico.Download.Video;
+using DlVideoV2 = Niconicome.Models.Domain.Niconico.Download.Video.V2;
+using DlVideoV3 = Niconicome.Models.Domain.Niconico.Download.Video.V3;
 using Dmc = Niconicome.Models.Domain.Niconico.Dmc;
 using DomainExt = Niconicome.Models.Domain.Local.External;
 using DomainNet = Niconicome.Models.Domain.Network;
@@ -46,38 +49,44 @@ using MyApplication = Niconicome.Models.Local.Application;
 using Mylist = Niconicome.Models.Domain.Niconico.Remote.Mylist;
 using Net = Niconicome.Models.Network;
 using NetworkVideo = Niconicome.Models.Network.Video;
+using NGAPIV1 = Niconicome.Models.Domain.Local.Server.API.NG.V1;
+using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using OS = Niconicome.Models.Local.OS;
 using Playlist = Niconicome.Models.Playlist;
 using PlaylistPlaylist = Niconicome.Models.Playlist.Playlist;
 using PlaylistV2 = Niconicome.Models.Playlist.V2;
+using RegacyHLSAPIV1 = Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;
 using Register = Niconicome.Models.Network.Register;
 using RemoteV2 = Niconicome.Models.Domain.Niconico.Remote.V2;
+using ResourceAPIV1 = Niconicome.Models.Domain.Local.Server.API.Resource.V1;
 using Restore = Niconicome.Models.Local.Restore;
 using Resume = Niconicome.Models.Domain.Niconico.Download.Video.Resume;
 using Search = Niconicome.Models.Domain.Niconico.Remote.Search;
 using Series = Niconicome.Models.Domain.Niconico.Remote.Series;
 using Server = Niconicome.Models.Domain.Local.Server;
 using Settings = Niconicome.Models.Local.Settings;
+using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
+using Software = Niconicome.Models.Domain.Local.External.Software;
 using SQlite = Niconicome.Models.Domain.Local.SQLite;
 using State = Niconicome.Models.Local.State;
 using Store = Niconicome.Models.Domain.Local.Store;
 using Style = Niconicome.Models.Domain.Local.Style;
+using Tab = Niconicome.Models.Local.State.Tab.V1;
 using TabsVM = Niconicome.ViewModels.Mainpage.Tabs;
 using Timer = Niconicome.Models.Local.Timer;
 using Utils = Niconicome.Models.Utils;
 using UVideo = Niconicome.Models.Domain.Niconico.Video;
+using VideoInfoAPIV1 = Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1;
 using VList = Niconicome.Models.Playlist.VideoList;
 using VM = Niconicome.ViewModels;
 using Watch = Niconicome.Models.Network.Watch;
-using Software = Niconicome.Models.Domain.Local.External.Software;
-using NicoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Niconicome;
-using SettingsVM = Niconicome.ViewModels.Setting.V2.Page;
+using WatchAPIv1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
-using DlVideoV2 = Niconicome.Models.Domain.Niconico.Download.Video.V2;
-using DLGeneral = Niconicome.Models.Domain.Niconico.Download.General;
-using DLTaskVM = Niconicome.ViewModels.Mainpage.Subwindows.DownloadTask;
-
+using BackgroundTask = Niconicome.Models.Domain.Utils.BackgroundTask;
+using Modify = Niconicome.Models.Network.Download.Modification;
+using UserAuth = Niconicome.Models.Domain.Niconico.UserAuth;
+using Cookie = Niconicome.Models.Auth.Cookie;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -89,23 +98,14 @@ namespace Niconicome.Models.Domain.Utils
             services.AddWpfBlazorWebView();
             services.AddBlazorWebViewDeveloperTools();
             services.AddHttpClient<Niconico::INicoHttp, Niconico::NicoHttp>()
-                .ConfigureHttpMessageHandlerBuilder(builder =>
+                .ConfigurePrimaryHttpMessageHandler(provider =>
                 {
-                    var shandler = builder.Services.GetRequiredService<Settings::ILocalSettingHandler>();
+                    var shandler = provider.GetRequiredService<Settings::ILocalSettingHandler>();
                     var skip = shandler.GetBoolSetting(Settings::SettingsEnum.SkipSSLVerification);
-                    if (builder.PrimaryHandler is HttpClientHandler handler)
-                    {
-                        handler.CookieContainer = builder.Services.GetRequiredService<Niconico::ICookieManager>().CookieContainer;
-                        handler.UseCookies = true;
-                        handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
-                        {
-                            if (skip) return true;
-                            return sslPolicyErrors == SslPolicyErrors.None;
-                        };
-                    }
+                    CookieContainer container = provider.GetRequiredService<Niconico::ICookieManager>().CookieContainer;
+                    return new Niconico::NicoHttpClientHandler(container, skip);
                 });
             services.AddSingleton<Niconico::ICookieManager, Niconico::CookieManager>();
-            services.AddTransient<Auth::ISession, Auth::Session>();
             services.AddSingleton<Niconico::INiconicoContext, Niconico::NiconicoContext>();
             services.AddTransient<IErrorHandler, ErrorHandler>();
             services.AddTransient<ILogger, Logger>();
@@ -131,7 +131,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Net::INetworkVideoHandler, Net::NetworkVideoHandler>();
             services.AddSingleton<State::IMessageHandler, State::MessageHandler>();
             services.AddTransient<Niconico::IAccountManager, Niconico::AccountManager>();
-            services.AddTransient<DomainWatch::IDmcDataHandler, DomainWatch::DmcDataHandler>();
             services.AddTransient<DomainWatch::IWatchSession, DomainWatch::WatchSession>();
             services.AddTransient<DomainWatch::IWatchPlaylisthandler, DomainWatch::WatchPlaylistHandler>();
             services.AddTransient<Dmc::IStreamhandler, Dmc::StreamHandler>();
@@ -180,8 +179,10 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<Cookies::IChromeCookieDecryptor, Cookies::ChromeCookieDecryptor>();
             services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
             services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
+            services.AddTransient<Cookies::IChromeCookieManager, Cookies::ChromeCookieManager>();
             services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
             services.AddTransient<Auth::IFirefoxSharedLogin, Auth::FirefoxSharedLogin>();
+            services.AddTransient<Auth::IStoredCookieLogin,Auth::StoredCookieLogin>();
             services.AddTransient<LocalFile::ILocalDirectoryHandler, LocalFile::LocalDirectoryHandler>();
             services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
             services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();
@@ -225,6 +226,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Event.IEventManager, Event.EventManager>();
             services.AddTransient<Machine::IComPowerManager, Machine::ComPowerManager>();
             services.AddSingleton<DLActions::IPostDownloadActionssManager, DLActions::PostDownloadActionsManager>();
+            services.AddSingleton<DLActions::V2.IPostDownloadActionssManager, DLActions::V2.PostDownloadActionsManager>();
             services.AddSingleton<Timer::IDlTimer, Timer::DlTimer>();
             services.AddTransient<AddonsDomainAPI::Storage.LocalStorage.IStorageHelper, AddonsDomainAPI::Storage.LocalStorage.StorageHelper>();
             services.AddTransient<AddonsDomainAPI::Storage.LocalStorage.IStorageHandler, AddonsDomainAPI::Storage.LocalStorage.StorageHandler>();
@@ -241,10 +243,8 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Fetch::IOnlineVideoRefreshManager, Fetch::OnlineVideoRefreshManager>();
             services.AddTransient<PlaylistPlaylist::IVideosUnchecker, PlaylistPlaylist::VideosUnchecker>();
             services.AddTransient<Register::IVideoRegistrationHandler, Register::VideoRegistrationHandler>();
-            services.AddTransient<Utils::IWindowTabHelper, Utils::WindowTabHelper>();
             services.AddTransient<Playlist::SharedUtils.IVideoPlaylistConverter, Playlist::SharedUtils.VideoPlaylistConverter>();
             services.AddSingleton<PlaylistPlaylist::IPlaylistInfoContainer, PlaylistPlaylist::PlaylistInfoContainer>();
-            services.AddSingleton<Utils::InitializeAwaiter.IInitializeAwaiterHandler, Utils::InitializeAwaiter.InitializeAwaiterHandler>();
             services.AddTransient<AddonAPI::Net.Download.Integrate.IDownloadSettings, AddonAPI::Net.Download.Integrate.DownloadSettings>();
             services.AddTransient<CommentFetch::ICommentClient, CommentFetch::CommentClient>();
             services.AddTransient<CommentFetch::V3.ICommentClient, CommentFetch::V3.CommentClient>();
@@ -300,7 +300,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<NetworkVideo::IThumbnailUtility, NetworkVideo::ThumbnailUtility>();
             services.AddSingleton<PlaylistV2::IPlaylistVideoContainer, PlaylistV2::PlaylistVideoContainer>();
             services.AddSingleton<PlaylistV2::Manager.Helper.ILocalVideoLoader, PlaylistV2::Manager.Helper.LocalVideoLoader>();
-            services.AddTransient<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
+            services.AddSingleton<PlaylistV2::Manager.IPlaylistManager, PlaylistV2::Manager.PlaylistManager>();
             services.AddTransient<PlaylistV2::Manager.IVideoListManager, PlaylistV2::Manager.VideoListManager>();
             services.AddTransient<PlaylistV2::Manager.Helper.IVideoListCRDHandler, PlaylistV2::Manager.Helper.VideoListCRDHandler>();
             services.AddTransient<PlaylistV2::Manager.Helper.IVideoListUpdateHandler, PlaylistV2::Manager.Helper.VideoListUpdateHandler>();
@@ -341,6 +341,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<Server::HLS.IHLSManager, Server::HLS.HLSManager>();
             services.AddTransient<Server::Core.IPortHandler, Server::Core.PortHandler>();
             services.AddTransient<Server::Connection.ITCPConnectionHandler, Infla::Network.TCPConnectionHandler>();
+            services.AddTransient<Server::Core.IIPHandler, Infla::Network.IPHandler>();
             services.AddTransient<State::Style.IUserChromeHandler, State::Style.UserChromeHandler>();
             services.AddTransient<Software::NiconicomeProcess.IProcessManager, Software::NiconicomeProcess.ProcessManager>();
             services.AddTransient<Software::FFmpeg.ffprobe.IFFprobeHandler, Software::FFmpeg.ffprobe.FFprobeHandler>();
@@ -371,11 +372,11 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DlVideoV2.HLS.M3U8.IM3U8Handler, DlVideoV2.HLS.M3U8.M3U8Handler>();
             services.AddTransient<DlVideoV2.HLS.Stream.IStreamhandler, DlVideoV2.HLS.Stream.StreamHandler>();
             services.AddTransient<DlVideoV2.HLS.Stream.IMasterPlaylisthandler, DlVideoV2.HLS.Stream.MasterPlaylistHandler>();
-            services.AddTransient<DlVideoV2.Fetch.Segment.ISegmentDownloader, DlVideoV2.Fetch.Segment.SegmentDownloader>();
+            services.AddTransient<DlVideoV2::Fetch.Segment.ISegmentDownloader, DlVideoV2::Fetch.Segment.SegmentDownloader>();
             services.AddTransient<DlVideoV2.Fetch.Segment.ISegmentWriter, DlVideoV2.Fetch.Segment.SegmentWriter>();
             services.AddTransient<DlVideoV2.Local.HLS.ISegmentDirectoryHandler, DlVideoV2.Local.HLS.SegmentDirectoryHandler>();
             services.AddTransient<DlVideoV2.Local.Encode.IVideoEncoder, DlVideoV2.Local.Encode.VideoEncoder>();
-            services.AddTransient<DlVideoV2.Session.IWatchSession, DlVideoV2.Session.WatchSession>();
+            services.AddTransient<DlVideoV2::Session.IWatchSession, DlVideoV2::Session.WatchSession>();
             services.AddTransient<DlVideoV2.Integrate.IVideoDownloader, DlVideoV2.Integrate.VideoDownloader>();
             services.AddTransient<DlVideoV2.Fetch.Segment.AES.IAESInfomationHandler, DlVideoV2.Fetch.Segment.AES.AESInfomationHandler>();
             services.AddTransient<DlVideoV2.Fetch.Segment.AES.IDecryptor, DlVideoV2.Fetch.Segment.AES.Decryptor>();
@@ -388,6 +389,44 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<IO::Media.Audio.IAudioPlayer, Infla::IO.Media.Audio.NaudioHandler>();
             services.AddTransient<LocalFile::ILocalFileRemover, LocalFile::LocalFileRemover>();
             services.AddTransient<PlaylistV2::Manager.IPlaylistEventManager, PlaylistV2::Manager.PlaylistEventManager>();
+            services.AddTransient<DlVideoV3::DMS.IStreamInfo, DlVideoV3::DMS.StreamInfo>();
+            services.AddTransient<DlVideoV3::DMS.HLS.IM3U8Parser, DlVideoV3::DMS.HLS.M3U8Parser>();
+            services.AddTransient<DlVideoV3.DMS.IStreamParser, DlVideoV3.DMS.StreamParser>();
+            services.AddTransient<DlVideoV3.External.IExternalDownloaderHandler, DlVideoV3.External.ExternalDownloaderHandler>();
+            services.AddTransient<DlVideoV3::Fetch.Segment.ISegmentDownloader, DlVideoV3::Fetch.Segment.SegmentDownloader>();
+            services.AddTransient<DlVideoV3::Fetch.Segment.ISegmentWriter, DlVideoV3::Fetch.Segment.SegmentWriter>();
+            services.AddTransient<DlVideoV3::Integrate.IVideoDownloader, DlVideoV3::Integrate.VideoDownloader>();
+            services.AddTransient<DlVideoV3::Local.DMS.ISegmentDirectoryHandler, DlVideoV3::Local.DMS.SegmentDirectoryHandler>();
+            services.AddTransient<DlVideoV3::Local.DMS.IDMSFileHandler, DlVideoV3::Local.DMS.DMSFileHandler>();
+            services.AddTransient<DlVideoV3::Session.IWatchSession, DlVideoV3::Session.WatchSession>();
+            services.AddTransient<DlVideoV3::Fetch.Key.IKeyDownlaoder, DlVideoV3::Fetch.Key.KeyDownlaoder>();
+            services.AddTransient<DlVideoV3::Local.StreamJson.IStreamJsonHandler, DlVideoV3.Local.StreamJson.StreamJsonHandler>();
+            services.AddTransient<WatchAPIv1::HLS.IPlaylistCreator, WatchAPIv1::HLS.PlaylistCreator>();
+            services.AddTransient<WatchAPIv1::LocalFile.ILocalFileInfoHandler, DlVideoV3::Local.StreamJson.StreamJsonHandler>();
+            services.AddSingleton<WatchAPIv1::Session.ISessionManager, WatchAPIv1::Session.SessionManager>();
+            services.AddTransient<WatchAPIv1::IWatchHandler, WatchAPIv1::WatchHandler>();
+            services.AddTransient<WatchAPIv1::HLS.AES.IDecryptor, WatchAPIv1::HLS.AES.Decryptor>();
+            services.AddTransient<CommentAPIV1::ICommentRequestHandler, CommentAPIV1::CommentRequestHandler>();
+            services.AddTransient<CommentAPIV1::Local.ICommentRetreiver, CommentAPIV1::Local.CommentRetreiver>();
+            services.AddTransient<CommentAPIV1::Local.ICommentConverter, CommentAPIV1::Local.CommentConverter>();
+            services.AddTransient<RegacyHLSAPIV1::SegmentCreator.IHLSManager, RegacyHLSAPIV1::SegmentCreator.HLSManager>();
+            services.AddTransient<RegacyHLSAPIV1::IRegacyHLSHandler, RegacyHLSAPIV1::RegacyHLSHandler>();
+            services.AddTransient<ResourceAPIV1::IResourceHandler, ResourceAPIV1::ResourceHandler>();
+            services.AddTransient<VideoInfoAPIV1::IVideoInfoHandler, VideoInfoAPIV1::VideoInfoHandler>();
+            services.AddTransient<NGAPIV1::INGHandler, NGAPIV1::NGHandler>();
+            services.AddSingleton<Tab::ITabControler, Tab::TabControler>();
+            services.AddTransient<VM::Shared.TabViewModel>();
+            services.AddTransient<VM::Mainpage.Tabs.VideoList.BottomPanel.DownloadSettingsViewModel>();
+            services.AddTransient<TabsVM::VideoList.BottomPanel.BottomPanelViewModel>();
+            services.AddTransient<TabsVM::VideoList.BottomPanel.OutputViewModel>();
+            services.AddTransient<TabsVM::VideoList.BottomPanel.StateViewModel>();
+            services.AddTransient<TabsVM::VideoList.BottomPanel.TimerViewModel>();
+            services.AddSingleton<BackgroundTask::IBackgroundTaskManager, BackgroundTask::BackgroundTaskManager>();
+            services.AddTransient<DomainNet::INetWorkState, DomainNet::NetWorkState>();
+            services.AddTransient<Modify::Video.IVideoModificationManager, Modify::Video.VideoModificationManager>();
+            services.AddTransient<UserAuth::ICookieInfo, UserAuth::CookieInfo>();
+            services.AddTransient<Store::V2.ICookieStore, DB::CookieDBHandler>();
+            services.AddSingleton<Cookie::INiconicoCookieManager, Cookie::NiconicoCookieManager>();
 
             return services.BuildServiceProvider();
         }

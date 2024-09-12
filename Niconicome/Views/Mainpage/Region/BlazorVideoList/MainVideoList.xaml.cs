@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.AspNetCore.Components.WebView;
+using Microsoft.Web.WebView2.Core;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.ViewModels;
 using Niconicome.ViewModels.Mainpage.Tabs.VideoList;
@@ -28,6 +30,14 @@ namespace Niconicome.Views.Mainpage.Region
         {
             InitializeComponent();
             Resources.Add("services", DIFactory.Provider);
+            webview.BlazorWebViewInitializing += (s, e) =>
+            {
+                e.EnvironmentOptions = new CoreWebView2EnvironmentOptions()
+                {
+                    AdditionalBrowserArguments = string.Join(' ', ["--disable-web-security", "--disable-features=AutoupgradeMixedContent"]),
+
+                };
+            };
         }
     }
 }

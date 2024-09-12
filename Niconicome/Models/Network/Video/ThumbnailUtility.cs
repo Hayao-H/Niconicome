@@ -12,7 +12,6 @@ using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Network.Video.Error;
-using Niconicome.Models.Utils.InitializeAwaiter;
 using Windows.Networking.Proximity;
 
 namespace Niconicome.Models.Network.Video

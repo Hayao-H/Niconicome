@@ -73,6 +73,10 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.PlaySoundAfterDownloadCompleted = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.PlaySoundAfterDownload, false), false).AddTo(this.Bindables);
             this.AudioFilePath = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.DownloadCompletionAudioPath, string.Empty), string.Empty).AddTo(this.Bindables);
 
+            this.IsVideoModificationEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsVideoModificationEnable, false), false).AddTo(this.Bindables);
+            this.VideoModificationSoftwarePath = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.VideoModificationSoftwarePath, string.Empty), string.Empty).AddTo(this.Bindables);
+            this.VideoModificationSoftwareParam = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.VideoModificationSoftwareParam, string.Empty), string.Empty).AddTo(this.Bindables);
+
         }
 
         /// <summary>
@@ -199,5 +203,20 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 音声ファイルのパス
         /// </summary>
         public IBindableSettingInfo<string> AudioFilePath { get; init; }
+
+        /// <summary>
+        /// 動画の後処理を行うかどうか
+        /// </summary>
+        public IBindableSettingInfo<bool> IsVideoModificationEnable { get; init; }
+
+        /// <summary>
+        /// 動画の後処理ソフトウェアのパス
+        /// </summary>
+        public IBindableSettingInfo<string> VideoModificationSoftwarePath { get; init; }
+
+        /// <summary>
+        /// 動画の後処理ソフトウェアのパラメータ
+        /// </summary>
+        public IBindableSettingInfo<string> VideoModificationSoftwareParam { get; init; }
     }
 }

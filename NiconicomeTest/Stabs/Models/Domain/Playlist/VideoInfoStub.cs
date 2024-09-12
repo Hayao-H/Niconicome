@@ -66,6 +66,8 @@ namespace NiconicomeTest.Stabs.Models.Domain.Playlist
 
         public bool IsAutoUpdateEnabled { get; set; }
 
+        public bool IsDMS { get; set; }
+
         public void AddTag(ITagInfo tag)
         {
 

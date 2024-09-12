@@ -17,3 +17,28 @@ p {
 .Alert.Hide {
   display: none;
 }
+
+.tabContainer {
+  display: flex;
+  align-items: center;
+  margin: 8px;
+  border-bottom: 1px solid rgba(231, 231, 231, 0.9058823529);
+  height: 40px;
+}
+.tabContainer .tab {
+  width: 150px;
+  padding: 4px;
+  border: 1px solid rgba(231, 231, 231, 0.9058823529);
+  border-radius: 4px;
+  margin-right: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  justify-content: space-between;
+}
+.tabContainer .tab .close {
+  color: red;
+}
+.tabContainer .tab .close:hover {
+  color: darkred;
+}

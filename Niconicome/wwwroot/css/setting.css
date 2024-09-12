@@ -5,7 +5,7 @@
 }
 .SettingPage .SideMenu {
   position: fixed;
-  top: 10px;
+  top: 50px;
 }
 .SettingPage .SideMenu .MenuItem {
   padding: 8px;

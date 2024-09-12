@@ -33,6 +33,7 @@ namespace Niconicome.Models.Domain.Local.LocalFile
             return type switch
             {
                 CookieType.Webview2 => @"Niconicome.exe.WebView2\EBWebView\Local State",
+                CookieType.Chrome => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Google\Chrome\User Data\Local State"),
                 _ => throw new InvalidOperationException("そのような種別のcookieには対応していません。")
             };
         }

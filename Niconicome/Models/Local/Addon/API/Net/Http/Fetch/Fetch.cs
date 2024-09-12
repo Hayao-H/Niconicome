@@ -76,7 +76,8 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
                 if (option.IncludeCredentioals)
                 {
                     optionResponse = await this.http.NicoHttp!.SendAsync(request);
-                } else
+                }
+                else
                 {
                     optionResponse = await this.http.SendAsync(request);
                 }
@@ -91,10 +92,11 @@ namespace Niconicome.Models.Local.Addon.API.Net.Http.Fetch
             HttpResponseMessage message;
             if (option.IncludeCredentioals)
             {
+
                 message = option?.Method switch
                 {
                     "GET" => await this.http.NicoHttp!.GetAsync(new Uri(url)),
-                    "POST" => await this.http.NicoHttp!.PostAsync(new Uri(url), content!),
+                    "POST" => await this.http.NicoHttp!.PostAsync(new Uri(url), content!, option.Headers),
                     _ => await this.http.NicoHttp!.GetAsync(new Uri(url)),
                 };
             }
