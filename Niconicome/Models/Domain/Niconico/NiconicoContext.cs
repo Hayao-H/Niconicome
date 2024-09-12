@@ -82,6 +82,7 @@ namespace Niconicome.Models.Domain.Niconico
             if (!this.IsLogin.Value) return;
             await this._http.GetAsync(new Uri(Const::NetConstant.NiconicoLogoutURL));
             this._cookieManager.DeleteAllCookies();
+            this._cookieStore.DeleteCookieInfo();
             this.User = null;
             this.IsLogin.Value = false;
         }

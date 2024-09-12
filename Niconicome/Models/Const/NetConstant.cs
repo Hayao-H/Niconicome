@@ -46,7 +46,7 @@ namespace Niconicome.Models.Const
         /// <summary>
         /// ニコニコのログアウトURL
         /// </summary>
-        public const string NiconicoLogoutURL = @"https://account.nicovideo.jp/logout";
+        public const string NiconicoLogoutURL = @"https://account.nicovideo.jp/logout?site=niconico";
 
         /// <summary>
         /// ニコニコのドメイン
