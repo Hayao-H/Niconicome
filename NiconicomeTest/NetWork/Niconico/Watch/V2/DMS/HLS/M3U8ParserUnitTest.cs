@@ -127,11 +127,12 @@ https://asset.domand.nicovideo.jp/6556dde7ea7f88d27388965a/video/12345/video-h26
         {
             var result = this._parser!.Parse(_video).ToList();
 
-            Assert.That(result.Count, Is.EqualTo(34));
-            Assert.That(result[0].Type, Is.EqualTo(M3U8NodeType.Key));
-            Assert.That(result[1].Type, Is.EqualTo(M3U8NodeType.Segment));
-            Assert.That(result[1].Value, Is.EqualTo("6.000000,"));
-            Assert.That(result[1].URL, Is.EqualTo("https://asset.domand.nicovideo.jp/6556dde7ea7f88d27388965a/video/12345/video-h264-360p-lowest/01.cmfv"));
+            Assert.That(result.Count, Is.EqualTo(35));
+            Assert.That(result[0].Type, Is.EqualTo(M3U8NodeType.InitializationSection));
+            Assert.That(result[1].Type, Is.EqualTo(M3U8NodeType.Key));
+            Assert.That(result[2].Type, Is.EqualTo(M3U8NodeType.Segment));
+            Assert.That(result[2].Value, Is.EqualTo("6.000000,"));
+            Assert.That(result[2].URL, Is.EqualTo("https://asset.domand.nicovideo.jp/6556dde7ea7f88d27388965a/video/12345/video-h264-360p-lowest/01.cmfv"));
         }
     }
 }
