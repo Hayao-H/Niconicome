@@ -24,14 +24,13 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.IsAutologinEnable = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.IsAutologinEnable, false), false).AddTo(this.Bindables);
 
-            var normal = new SelectBoxItem<string>("パスワードログイン", AutoLoginTypeString.Normal);
             var wv2 = new SelectBoxItem<string>("Webview2とCookieを共有", AutoLoginTypeString.Webview2);
             var firefox = new SelectBoxItem<string>("FirefoxとCookieを共有", AutoLoginTypeString.Firefox);
             var storeFirefox = new SelectBoxItem<string>("Store版FirefoxとCookieを共有", AutoLoginTypeString.StoreFirefox);
 
-            this.SelectableAutoLoginType.AddRange(new[] { normal, wv2, firefox, storeFirefox });
+            this.SelectableAutoLoginType.AddRange(new[] {  wv2, firefox, storeFirefox });
 
-            this.SelectedAutoLoginType = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Normal), AutoLoginTypeString.Normal).AddTo(this.Bindables);
+            this.SelectedAutoLoginType = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Webview2), AutoLoginTypeString.Webview2).AddTo(this.Bindables);
 
             this.DisplayFirefoxPrifile = this.SelectedAutoLoginType.Select(t => t == AutoLoginTypeString.Firefox || t == AutoLoginTypeString.StoreFirefox).AsReadOnly().AddTo(this.Bindables);
 

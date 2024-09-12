@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using Niconicome.Models.Domain.Utils.BackgroundTask;
 using Niconicome.Models.Local.State.MessageV2;
 using Niconicome.Models.Domain.Network;
+using Niconicome.Models.Domain.Local.Store.V2;
+using Niconicome.Models.Domain.Utils.Error;
 
 namespace Niconicome.Models.Local.Application
 {
@@ -164,7 +166,7 @@ namespace Niconicome.Models.Local.Application
             if (!await this._netWorkState.IsNetWorkAvailable()) return;
             if (!this._autoLogin.Canlogin())
             {
-                this._snackbarHandler.Enqueue("自動ログインが出来ません。");
+                this._messageHandler.AppendMessage("自動ログインが出来ません。",LocalConstant.SystemMessageDispacher,ErrorLevel.Warning);
                 return;
             }
 
@@ -177,18 +179,18 @@ namespace Niconicome.Models.Local.Application
             catch (Exception e)
             {
                 this._logger.Error("自動ログインに失敗しました。", e);
-                this._snackbarHandler.Enqueue("自動ログインに失敗しました。");
+                this._messageHandler.AppendMessage("自動ログインに失敗しました。", LocalConstant.SystemMessageDispacher,ErrorLevel.Error);
                 return;
             }
 
             if (!result)
             {
-                this._snackbarHandler.Enqueue("自動ログインに失敗しました。");
+                this._messageHandler.AppendMessage("自動ログインに失敗しました。", LocalConstant.SystemMessageDispacher,ErrorLevel.Error);
                 return;
             }
             else
             {
-                this._snackbarHandler.Enqueue("自動ログインに成功しました。");
+                this._messageHandler.AppendMessage("自動ログインに成功しました。", LocalConstant.SystemMessageDispacher,ErrorLevel.Log);
                 this.RaiseLoginSucceeded();
             }
         }

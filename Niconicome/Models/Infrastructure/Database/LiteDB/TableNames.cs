@@ -19,5 +19,7 @@ namespace Niconicome.Models.Infrastructure.Database.LiteDB
         public static string Tag = "v2_tag";
 
         public static string VideoFile = "v2_videofile";
+
+        public static string Cookie = "cookie";
     }
 }

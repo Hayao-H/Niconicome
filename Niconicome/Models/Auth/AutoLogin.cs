@@ -9,6 +9,7 @@ using Niconicome.Models.Domain.Local.External.Software.Mozilla.Firefox;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Niconico;
+using Niconicome.Models.Domain.Niconico.UserAuth;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 
@@ -43,22 +44,18 @@ namespace Niconicome.Models.Auth
 
     class AutoLogin : IAutoLogin
     {
-        public AutoLogin(ISession session, IAccountManager accountManager, IWebview2SharedLogin webview2SharedLogin, IFirefoxSharedLogin firefoxSharedLogin, IStoreFirefoxSharedLogin storeFirefoxSharedLogin, ISettingsContainer settingsConainer,IChromeSharedLogin chromeSharedLogin)
+        public AutoLogin(IWebview2SharedLogin webview2SharedLogin, IFirefoxSharedLogin firefoxSharedLogin, IStoreFirefoxSharedLogin storeFirefoxSharedLogin, ISettingsContainer settingsConainer,IStoredCookieLogin storedCookieLogin)
         {
-            this._session = session;
-            this._accountManager = accountManager;
             this._webview2SharedLogin = webview2SharedLogin;
             this._firefoxSharedLogin = firefoxSharedLogin;
             this._storeFirefoxSharedLogin = storeFirefoxSharedLogin;
             this._settingsConainer = settingsConainer;
-            this._chromeSharedLogin = chromeSharedLogin;
+            this._storedCookieLogin = storedCookieLogin;
         }
 
         #region field
 
-        private readonly ISession _session;
-
-        private readonly IAccountManager _accountManager;
+        private readonly IStoredCookieLogin _storedCookieLogin;
 
         private readonly ISettingsContainer _settingsConainer;
 
@@ -67,8 +64,6 @@ namespace Niconicome.Models.Auth
         private readonly IFirefoxSharedLogin _firefoxSharedLogin;
 
         private readonly IStoreFirefoxSharedLogin _storeFirefoxSharedLogin;
-
-        private readonly IChromeSharedLogin _chromeSharedLogin;
 
         #endregion
 
@@ -97,17 +92,16 @@ namespace Niconicome.Models.Auth
             bool result = false;
             var type = this.GetAutoLoginType();
 
-            if (type == AutoLoginType.Normal)
+            //保存されているCookieでのログインを優先する
+            if (this._storedCookieLogin.CanLogin())
             {
-                var cred = this._accountManager.GetUserCredential();
-                result = await this._session.Login(cred);
+                result = await this._storedCookieLogin.TryLogin();
+                if (result) return true;
             }
-            else if (type == AutoLoginType.Webview2)
+
+             if (type == AutoLoginType.Webview2)
             {
                 result = await this._webview2SharedLogin.TryLogin();
-            } else if (type == AutoLoginType.Chrome)
-            {
-                result = await this._chromeSharedLogin.TryLogin();
             }
             else if (type == AutoLoginType.Firefox)
             {
@@ -128,7 +122,7 @@ namespace Niconicome.Models.Auth
 
         private AutoLoginType GetAutoLoginType()
         {
-            IAttemptResult<ISettingInfo<string>> mResult = this._settingsConainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Normal);
+            IAttemptResult<ISettingInfo<string>> mResult = this._settingsConainer.GetSetting(SettingNames.AutoLoginMode, AutoLoginTypeString.Webview2);
             IAttemptResult<ISettingInfo<string>> pResult = this._settingsConainer.GetSetting(SettingNames.FirefoxProfileName, "");
 
             if (!mResult.IsSucceeded || mResult.Data is null)
@@ -141,22 +135,13 @@ namespace Niconicome.Models.Auth
                 return AutoLoginType.None;
             }
 
-            var mode = mResult.Data.Value.IsNullOrEmpty() ? AutoLoginTypeString.Normal : mResult.Data.Value;
+            var mode = mResult.Data.Value.IsNullOrEmpty() ? AutoLoginTypeString.Webview2 : mResult.Data.Value;
             var ffProfile = pResult.Data.Value;
 
-            if (mode == AutoLoginTypeString.Normal)
-            {
-                bool isCredencialSaved = this._accountManager.IsPasswordSaved;
-                if (isCredencialSaved) return AutoLoginType.Normal;
-            }
-            else if (mode == AutoLoginTypeString.Webview2)
+             if (mode == AutoLoginTypeString.Webview2)
             {
                 bool canLoginWithWebview2 = this._webview2SharedLogin.CanLogin();
                 if (canLoginWithWebview2) return AutoLoginType.Webview2;
-            } else if (mode == AutoLoginTypeString.Chrome)
-            {
-                bool canLoginWithChrome = this._chromeSharedLogin.CanLogin();
-                if (canLoginWithChrome) return AutoLoginType.Chrome;
             }
             else if (mode == AutoLoginTypeString.Firefox && ffProfile is not null)
             {
@@ -190,23 +175,17 @@ namespace Niconicome.Models.Auth
     public enum AutoLoginType
     {
         None,
-        Normal,
         Webview2,
         Firefox,
         StoreFirefox,
-        Chrome,
     }
 
     static class AutoLoginTypeString
     {
-        public const string Normal = "Normal";
-
         public const string Webview2 = "Webview2";
 
         public const string Firefox = "Firefox";
 
         public const string StoreFirefox = "StoreFirefox";
-
-        public const string Chrome = "Chrome";
     }
 }

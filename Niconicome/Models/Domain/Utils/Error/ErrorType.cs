@@ -49,6 +49,7 @@ using ResourceAPIV1 = Niconicome.Models.Domain.Local.Server.API.Resource.V1.Erro
 using VideoInfoAPIV1 = Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1.Error;
 using PostDL = Niconicome.Models.Network.Download.Actions.V2;
 using Auth = Niconicome.Models.Auth.Error;
+using Niconico = Niconicome.Models.Domain.Niconico;
 
 namespace Niconicome.Models.Domain.Utils.Error
 {
@@ -133,6 +134,8 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 72, typeof(VideoInfoAPIV1::VideoInfoHandlerError) },
             { 73, typeof(PostDL::PostDownloadActionsManagerError) },
             { 74, typeof(Auth::ChromeSharedLoginError) },
+            { 75, typeof(CookieDBHandlerError) },
+            { 76, typeof(Niconico::NiconicoContextError) },
         };
     }
 }

@@ -38,5 +38,7 @@ namespace Niconicome.Models.Const
 
         public const string SettingTabID = "C3C14FDE-B307-4805-BA69-8095E992B75E";
 
+        public const string AppKey = "Niconicome2525++";
+
     }
 }

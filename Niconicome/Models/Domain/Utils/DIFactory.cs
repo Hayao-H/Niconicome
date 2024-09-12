@@ -85,6 +85,8 @@ using WatchAPIv1 = Niconicome.Models.Domain.Local.Server.API.Watch.V1;
 using XenoImport = Niconicome.Models.Domain.Local.DataBackup.Import.Xeno;
 using BackgroundTask = Niconicome.Models.Domain.Utils.BackgroundTask;
 using Modify = Niconicome.Models.Network.Download.Modification;
+using UserAuth = Niconicome.Models.Domain.Niconico.UserAuth;
+using Cookie = Niconicome.Models.Auth.Cookie;
 
 namespace Niconicome.Models.Domain.Utils
 {
@@ -104,7 +106,6 @@ namespace Niconicome.Models.Domain.Utils
                     return new Niconico::NicoHttpClientHandler(container, skip);
                 });
             services.AddSingleton<Niconico::ICookieManager, Niconico::CookieManager>();
-            services.AddTransient<Auth::ISession, Auth::Session>();
             services.AddSingleton<Niconico::INiconicoContext, Niconico::NiconicoContext>();
             services.AddTransient<IErrorHandler, ErrorHandler>();
             services.AddTransient<ILogger, Logger>();
@@ -179,9 +180,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<LocalFile::ICookieJsonLoader, LocalFile::CookieJsonLoader>();
             services.AddTransient<Cookies::IWebview2LocalCookieManager, Cookies::Webview2LocalCookieManager>();
             services.AddTransient<Cookies::IChromeCookieManager, Cookies::ChromeCookieManager>();
-            services.AddTransient<Auth::IChromeSharedLogin, Auth::ChromeSharedLogin>();
             services.AddTransient<Auth::IWebview2SharedLogin, Auth::Webview2SharedLogin>();
             services.AddTransient<Auth::IFirefoxSharedLogin, Auth::FirefoxSharedLogin>();
+            services.AddTransient<Auth::IStoredCookieLogin,Auth::StoredCookieLogin>();
             services.AddTransient<LocalFile::ILocalDirectoryHandler, LocalFile::LocalDirectoryHandler>();
             services.AddTransient<Net::IVideoIDHandler, Net::VideoIDHandler>();
             services.AddTransient<DlDescription::IDescriptionDownloader, DlDescription::DescriptionDownloader>();
@@ -423,6 +424,9 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<BackgroundTask::IBackgroundTaskManager, BackgroundTask::BackgroundTaskManager>();
             services.AddTransient<DomainNet::INetWorkState, DomainNet::NetWorkState>();
             services.AddTransient<Modify::Video.IVideoModificationManager, Modify::Video.VideoModificationManager>();
+            services.AddTransient<UserAuth::ICookieInfo, UserAuth::CookieInfo>();
+            services.AddTransient<Store::V2.ICookieStore, DB::CookieDBHandler>();
+            services.AddSingleton<Cookie::INiconicoCookieManager, Cookie::NiconicoCookieManager>();
 
             return services.BuildServiceProvider();
         }

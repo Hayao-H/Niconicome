@@ -103,8 +103,6 @@ namespace Niconicome.Models.Domain.Local.Settings
 
         private Action<T>? _handlers;
 
-        private Action _nonValueHandlers;
-
         #endregion
 
         #region Props

@@ -14,6 +14,6 @@ namespace Niconicome.Models.Auth
 
     public class StoreFirefoxSharedLogin : FirefoxSharedLogin, IStoreFirefoxSharedLogin
     {
-        public StoreFirefoxSharedLogin(IStoreFirefoxCookieManager firefoxCookie, ILogger logger, INicoHttp http, INiconicoContext context, ICookieManager cookieManager, IStoreFirefoxProfileManager profileManager) : base(firefoxCookie, logger, http, context, cookieManager, profileManager) { }
+        public StoreFirefoxSharedLogin(IStoreFirefoxCookieManager firefoxCookie, ILogger logger, INiconicoContext context, IStoreFirefoxProfileManager profileManager) : base(firefoxCookie, logger, context, profileManager) { }
     }
 }

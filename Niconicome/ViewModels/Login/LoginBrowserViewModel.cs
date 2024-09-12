@@ -12,23 +12,13 @@ using Handlers = Niconicome.Models.Domain.Local.Handlers;
 using Utils = Niconicome.Models.Domain.Utils;
 using System.Threading.Tasks;
 using Niconicome.ViewModels.Controls;
+using WS = Niconicome.Workspaces.Mainpage;
 
 namespace Niconicome.ViewModels.Login
 {
     class LoginBrowserViewModel
     {
-        /// <summary>
-        /// ログイン成功イベント
-        /// </summary>
-        public event EventHandler? LoginSucceeded;
-
-        /// <summary>
-        /// ログイン成功イベントを発行
-        /// </summary>
-        public void RaiseLoginSucceeded()
-        {
-            this.LoginSucceeded?.Invoke(this, EventArgs.Empty);
-        }
+        
     }
 
     class WebViewBehavior : Behavior<WebView2>
@@ -73,12 +63,9 @@ namespace Niconicome.ViewModels.Login
                 return;
             }
 
-            var cookies = await this.handler.GetCookiesAsync(@"https://nicovideo.jp");
-
-
-            if (cookies.Any(cookie => cookie.Name == "user_session"))
+            if (await WS.NiconicoCookieManager.HandleNavigate())
             {
-                await this.SetCookiesAndExitAsync(cookies);
+                this.Exit();
             }
         }
 
@@ -86,33 +73,27 @@ namespace Niconicome.ViewModels.Login
         {
             this.handler.Initialize(this.AssociatedObject.CoreWebView2);
 
-            var cookies = await this.handler.GetCookiesAsync(@"https://nicovideo.jp");
+            WS.NiconicoCookieManager.Wire(this.handler);
 
-            if (cookies.Any(cookie => cookie.Name == "user_session" && cookie.Expires > DateTime.Now))
+            if (await WS.NiconicoCookieManager.IsLoggedIn())
             {
                 var result = await MaterialMessageBox.Show("有効なセッションが存在します。ログインをスキップしますか？", MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxIcons.Question);
 
                 if (result == MaterialMessageBoxResult.Yes)
                 {
-                    await this.SetCookiesAndExitAsync(cookies);
+                    this.Exit();
                     return;
                 }
             }
 
-            await this.handler.DeleteBrowserCookiesAsync( @"https://nicovideo.jp");
+            await this.handler.DeleteBrowserCookiesAsync(@"https://nicovideo.jp");
 
             this.isInitializeCompleted = true;
         }
 
-        private async Task SetCookiesAndExitAsync(List<CoreWebView2Cookie> cookies)
+        private void Exit()
         {
-            var cookieManager = DIFactory.Provider.GetRequiredService<ICookieManager>();
-            foreach (var cookie in cookies)
-            {
-                cookieManager.AddCookie(cookie.Name, cookie.Value);
-            }
-            await NiconicoContext.Context.RefreshUser();
-            (this.AssociatedObject.DataContext as LoginBrowserViewModel)?.RaiseLoginSucceeded();
+            WS.NiconicoCookieManager.UnWire();
             this.Window?.Close();
         }
     }

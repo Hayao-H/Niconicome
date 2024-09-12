@@ -173,7 +173,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel
                 return;
             }
 
-            if (!WS.Session.IsLogin.Value)
+            if (!WS.NiconicoContext.IsLogin.Value)
             {
                 WS.SnackbarHandler.Enqueue("動画をダウンロードするにはログインが必要です。");
                 return;

@@ -30,12 +30,13 @@ using Server = Niconicome.Models.Domain.Local.Server;
 using Style = Niconicome.Models.Local.State.Style;
 using Tab = Niconicome.Models.Local.State.Tab.V1;
 using PostDL = Niconicome.Models.Network.Download.Actions.V2;
+using Cookie = Niconicome.Models.Auth.Cookie;
+using Niconico = Niconicome.Models.Domain.Niconico;
 
 namespace Niconicome.Workspaces
 {
     static class Mainpage
     {
-        public static ISession Session { get; private set; } = DIFactory.Provider.GetRequiredService<ISession>();
         public static IPlaylistHandler PlaylistHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistHandler>();
         public static IVideoHandler VideoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IVideoHandler>();
         public static IWatch Watch { get; private set; } = DIFactory.Provider.GetRequiredService<IWatch>();
@@ -190,7 +191,19 @@ namespace Niconicome.Workspaces
         /// </summary>
         public static Tab::ITabControler TabControler { get; private set; } = DIFactory.Resolve<Tab::ITabControler>();
 
+        /// <summary>
+        /// DL後の処理
+        /// </summary>
         public static PostDL::IPostDownloadActionssManager PostDownloadActionsManager { get; private set; } = DIFactory.Resolve<PostDL::IPostDownloadActionssManager>();
 
+        /// <summary>
+        /// Cookie管理
+        /// </summary>
+        public static Cookie::INiconicoCookieManager NiconicoCookieManager { get; private set; } = DIFactory.Resolve<Cookie::INiconicoCookieManager>();
+
+        /// <summary>
+        /// セッション管理
+        /// </summary>
+        public static Niconico::INiconicoContext NiconicoContext { get; private set; } = DIFactory.Resolve<Niconico::INiconicoContext>();
     }
 }

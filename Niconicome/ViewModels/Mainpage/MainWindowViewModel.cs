@@ -46,31 +46,30 @@ namespace Niconicome.ViewModels.Mainpage
             this.UserImage = new ReactiveProperty<Uri>(new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg"));
 
             WS::Mainpage.Themehandler.Initialize();
-            WS::Mainpage.Session.IsLogin.Subscribe(_ => this.OnLogin());
+            WS::Mainpage.NiconicoContext.IsLogin.Subscribe(x => { if (x) this.OnLogin(); });
 
-            this.LoginCommand = new ReactiveCommand()
-                .WithSubscribe(async () =>
+            this.LoginCommand = new BindableCommand(async () =>
+            {
+
+                if (!WS::Mainpage.NiconicoContext.IsLogin.Value)
+                {
+                    WS::Mainpage.WindowsHelper.OpenWindow(() => new LoginBrowser()
+                    {
+                        Owner = Application.Current.MainWindow,
+                        ShowInTaskbar = true
+                    });
+                }
+                else
                 {
 
-                    if (!WS::Mainpage.Session.IsLogin.Value)
-                    {
-                        WS::Mainpage.WindowsHelper.OpenWindow(() => new Loginxaml
-                        {
-                            Owner = Application.Current.MainWindow,
-                            ShowInTaskbar = true
-                        });
-                    }
-                    else
-                    {
-                        ISession session = WS::Mainpage.Session;
-                        await session.Logout();
-                        this.LoginBtnVal.Value = "ログイン";
-                        this.Username.Value = "未ログイン";
-                        this.LoginBtnTooltip.Value = "ログイン画面を表示する";
-                        this.UserImage.Value = new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg");
-                    }
+                    await WS::Mainpage.NiconicoContext.LogoutAsync();
+                    this.LoginBtnVal.Value = "ログイン";
+                    this.Username.Value = "未ログイン";
+                    this.LoginBtnTooltip.Value = "ログイン画面を表示する";
+                    this.UserImage.Value = new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg");
+                }
 
-                });
+            });
 
             this.OpenSettingCommand = new BindableCommand(() =>
             {
@@ -81,7 +80,7 @@ namespace Niconicome.ViewModels.Mainpage
             this.OpenDownloadTaskWindowsCommand = new BindableCommand(
               () =>
              {
-                WS::Mainpage.TabControler.Open(Models.Local.State.Tab.V1.TabType.Download);
+                 WS::Mainpage.TabControler.Open(Models.Local.State.Tab.V1.TabType.Download);
                  WS::Mainpage.BlazorPageManager.RequestBlazorToNavigate("/downloadtask/download");
              });
 
@@ -168,7 +167,7 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// ログインコマンド
         /// </summary>
-        public ReactiveCommand LoginCommand { get; private set; }
+        public BindableCommand LoginCommand { get; private set; }
 
         /// <summary>
         /// 設定を開く
@@ -204,8 +203,8 @@ namespace Niconicome.ViewModels.Mainpage
         /// <param name="e"></param>
         private void OnLogin()
         {
-            if (WS::Mainpage.Session.User.Value is null) return;
-            this.user = WS::Mainpage.Session.User.Value;
+            if (WS::Mainpage.NiconicoContext.User is null) return;
+            this.user = WS::Mainpage.NiconicoContext.User;
             this.LoginBtnVal.Value = "ログアウト";
             this.LoginBtnTooltip.Value = "ログアウトする";
             this.Username.Value = this.user.Nickname;
