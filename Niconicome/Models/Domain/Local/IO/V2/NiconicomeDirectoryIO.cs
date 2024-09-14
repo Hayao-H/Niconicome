@@ -37,7 +37,7 @@ namespace Niconicome.Models.Domain.Local.IO.V2
         /// <param name="path"></param>
         /// <param name="recursive"></param>
         /// <returns></returns>
-        IAttemptResult Delete(string path, bool recursive = true);
+        IAttemptResult Delete(string path, bool recursive = true, bool recycle = false);
 
         /// <summary>
         /// ディレクトリを移動

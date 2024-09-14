@@ -32,7 +32,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
     public class LocalVideoLoader : ILocalVideoLoader
     {
-        public LocalVideoLoader(INicoDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler, INiconicomeFileIO fileIO)
+        public LocalVideoLoader(INiconicomeDirectoryIO directoryIO, IThumbnailUtility thumbnailUtility, ISettingsContainer settingsConainer, IPlaylistVideoContainer playlistVideoContainer, IErrorHandler errorHandler, INiconicomeFileIO fileIO)
         {
             this._directoryIO = directoryIO;
             this._fileIO = fileIO;
@@ -44,7 +44,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
 
         #region field
 
-        private readonly INicoDirectoryIO _directoryIO;
+        private readonly INiconicomeDirectoryIO _directoryIO;
 
         private readonly INiconicomeFileIO _fileIO;
 
@@ -190,15 +190,15 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 this._cachedFolders = new List<string>();
                 if (this._directoryIO.Exists(folderPath))
                 {
-                    this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.Mp4FileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
-                    this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.TsFileExt}", true).Select(p => Path.Combine(folderPath, p)).ToList());
-                    this._cachedFolders.AddRange(this._directoryIO.GetDirectorys(folderPath).Select(p => Path.Combine(folderPath, p)).ToList());
+                    this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.Mp4FileExt}").Data?.Select(p => Path.Combine(folderPath, p))?.ToList() ?? new List<string>());
+                    this._cachedFiles.AddRange(this._directoryIO.GetFiles(folderPath, $"*{FileFolder.TsFileExt}").Data?.Select(p => Path.Combine(folderPath, p)).ToList() ?? new List<string>());
+                    this._cachedFolders.AddRange(this._directoryIO.GetDirectories(folderPath).Data?.Select(p => Path.Combine(folderPath, p)).ToList() ?? new List<string>());
                 }
             }
 
             //stream.jsonを確認
             string? firstFolder = this._cachedFolders.FirstOrDefault(p => p.Contains(niconicoID));
-            if (firstFolder is not null)
+            if (firstFolder is not null && this._fileIO.Exists(Path.Combine(firstFolder, "stream.json")))
             {
                 return AttemptResult<string>.Succeeded(Path.Combine(firstFolder, "stream.json"));
             }
