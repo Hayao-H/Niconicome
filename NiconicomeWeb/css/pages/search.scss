@@ -1,5 +1,6 @@
 .SearchPage {
     margin: 24px;
+
     .AlertMessageBox {
         margin: 8px 0;
         transition: opacity 1s;
@@ -43,7 +44,31 @@
             flex: 3;
             margin-right: 5px;
         }
+
+
     }
+
+    .SearchPageControlerContainer {
+
+        display: flex;
+        justify-content: center;
+        margin-top: 16px;
+
+        .SearchPageControler {
+            display: flex;
+            height: 100%;
+            margin-right: 5px;
+            align-items: center;
+            justify-content: center;
+    
+            .input-group {
+                margin: 0 16px;
+                width: 150px;
+            }
+        }
+    }
+
+   
 
     .ResultHeader {
         display: flex;

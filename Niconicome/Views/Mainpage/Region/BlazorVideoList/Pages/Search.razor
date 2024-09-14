@@ -36,6 +36,18 @@
         </select>
     </div>
 
+    <div class="SearchPageControlerContainer">
+        <div class="SearchPageControler">
+            <button type="button" class="btn btn-primary" @onclick="DataContext.OnPreviousButtonClick"><i class="fa-solid fa-angle-left"></i></button>
+            <div class="input-group">
+                <input type="text" class="form-control" @bind="@DataContext.Page.Value">
+                <span class="input-group-text" id="basic-addon2">ページ目</span>
+            </div>
+            <button type="button" class="btn btn-primary" @onclick=DataContext.OnNextButtonClick><i class="fa-solid fa-angle-right"></i></button>
+        </div>
+    </div>
+
+
     <div class="AlertMessageBox alert alert-danger @(DataContext.IsAlertShwon.Value? "": "Hide")" role="alert">
         @(DataContext.AlertMessage.Value)
     </div>

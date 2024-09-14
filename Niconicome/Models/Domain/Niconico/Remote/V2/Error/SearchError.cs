@@ -11,6 +11,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Error
     {
         [ErrorEnum(ErrorLevel.Error, "スナップショット検索APIへのアクセスに失敗しました。(url:{0}, status:{1})")]
         FailedToRetrievingData,
+        [ErrorEnum(ErrorLevel.Error, "nvapiへのアクセスに失敗しました。(url:{0}, status:{1})")]
+        FailedToRetrievingData2,
         [ErrorEnum(ErrorLevel.Error, "検索結果の解析に失敗しました。")]
         FailedToAnalysisOfData,
     }

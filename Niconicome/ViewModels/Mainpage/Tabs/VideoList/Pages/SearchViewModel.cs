@@ -26,6 +26,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.IsAlertShwon = new BindableProperty<bool>(false).AddTo(this.Bindables);
             this.AlertMessage = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
             this.InputText = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
+            this.Page = new BindableProperty<int>(1).AddTo(this.Bindables);
             this.Videos = new BindableCollection<RemoteVideoViewModel, Remote.VideoInfo>(this._videos, v => new RemoteVideoViewModel(v));
             this.Bindables.Add(this.Videos);
         }
@@ -80,6 +81,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public IBindableProperty<string> InputText { get; set; }
 
         /// <summary>
+        /// ページ
+        /// </summary>
+        public IBindableProperty<int> Page { get; set; }
+
+        /// <summary>
         /// アラートの表示・非表示
         /// </summary>
         public IBindableProperty<bool> IsAlertShwon { get; init; }
@@ -128,7 +134,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             Remote::Search.Genre genre = this.ConvertToGenre(this.SelectedGenre);
             Remote::Search.SearchType searchType = this.SelectedSearchType == "タグ" ? Remote::Search.SearchType.Tag : Remote::Search.SearchType.Keyword;
 
-            IAttemptResult<Remote::RemotePlaylistInfo> result = await WS.SearchManager.SearchVideosAsync(new Remote.Search.SearchQuery(searchType, genre, sort, this.InputText.Value));
+            IAttemptResult<Remote::RemotePlaylistInfo> result = await WS.SearchManager.SearchVideosAsync(new Remote.Search.SearchQuery(searchType, genre, sort, this.InputText.Value, Page: this.Page.Value));
 
             if (!result.IsSucceeded || result.Data is null)
             {
@@ -150,7 +156,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
                 return;
             }
 
-            this.IsRegisterIsProcessing.Value= true;
+            this.IsRegisterIsProcessing.Value = true;
             await WS.SearchManager.RegisterVideosAsync(this._title, this.Videos.Where(v => v.IsSelected).Select(v => v.Video).ToList());
 
             WS.BlazorPageManager.RequestBlazorToNavigate("/videos");
@@ -159,6 +165,23 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         public void OnBackButtonClick()
         {
             WS.BlazorPageManager.RequestBlazorToNavigate("/videos");
+        }
+
+        public void OnPreviousButtonClick()
+        {
+            if (this.Page.Value == 1)
+            {
+                return;
+            }
+
+            this.Page.Value--;
+            _ = this.OnSearchButtonClick();
+        }
+
+        public void OnNextButtonClick()
+        {
+            this.Page.Value++;
+            _ = this.OnSearchButtonClick();
         }
 
         #endregion
