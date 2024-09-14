@@ -35,7 +35,7 @@ namespace NiconicomeTest.Stabs.Models.Domain.Local.IO.V2
             return AttemptResult<IEnumerable<string>>.Succeeded(this._files);
         }
 
-        public IAttemptResult Delete(string path, bool recursive = true)
+        public IAttemptResult Delete(string path, bool recursive = true, bool recycle = false)
         {
             return AttemptResult.Succeeded();
         }

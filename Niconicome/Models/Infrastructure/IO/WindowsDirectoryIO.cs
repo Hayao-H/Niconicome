@@ -64,7 +64,7 @@ namespace Niconicome.Models.Infrastructure.IO
 
             try
             {
-                files = Directory.GetFiles(path, searchPattern);
+                files = Directory.GetFiles(path, searchPattern,SearchOption.AllDirectories);
             }
             catch (Exception ex)
             {
