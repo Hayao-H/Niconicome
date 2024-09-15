@@ -93,6 +93,10 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
                 return AttemptResult.Fail("コメントのThreadまたはForkがコレクションのThreadまたはForkと一致しません。");
             }
 
+            if (comment.No > this._comment.Length)
+            {
+                return AttemptResult.Fail("コメント番号が範囲外です。");
+            }
 
             this._comment[comment.No - 1] = comment;
 
