@@ -36,16 +36,35 @@
         </select>
     </div>
 
+    <div class="SearchPageControlerContainer">
+        <div class="SearchPageControler">
+            <button type="button" class="btn btn-primary" @onclick="DataContext.OnPreviousButtonClick"><i class="fa-solid fa-angle-left"></i></button>
+            <div class="input-group">
+                <input type="text" class="form-control" @bind="@DataContext.Page.Value">
+                <span class="input-group-text" id="basic-addon2">ページ目</span>
+            </div>
+            <button type="button" class="btn btn-primary" @onclick=DataContext.OnNextButtonClick><i class="fa-solid fa-angle-right"></i></button>
+        </div>
+    </div>
+
+
     <div class="AlertMessageBox alert alert-danger @(DataContext.IsAlertShwon.Value? "": "Hide")" role="alert">
         @(DataContext.AlertMessage.Value)
     </div>
 
     <div class="ResultHeader">
-        <h4>検索結果（@(DataContext.Videos.Count)件）</h4>
+        @if (DataContext.Videos.Count > 0)
+        {
+            <h4>検索結果（@(DataContext.TotalCount.Value) 件中 @(DataContext.Videos.Count * (DataContext.Page.Value - 1) +1)～@(DataContext.Videos.Count * DataContext.Page.Value)件)</h4>
+        } else
+        {
+            <h4>検索結果 (0件)</h4>
+        }
         @if (DataContext.IsRegisterIsProcessing.Value)
         {
             <button class="Button btn btn-primary" disabled>登録して戻る</button>
-        } else
+        }
+        else
         {
             <button class="Button btn btn-primary" @onclick="DataContext.OnRegisterButtonClick">登録して戻る</button>
         }
@@ -57,7 +76,7 @@
         {
             <div class="VideoListRow">
                 <div class="CheckBoxWrapper">
-                    <input type="checkbox" @bind="video.IsSelected"/>
+                    <input type="checkbox" @bind="video.IsSelected" />
                 </div>
                 <div class="ThumbnailWrapper">
                     <img src="@(video.ThumbUrl)" />

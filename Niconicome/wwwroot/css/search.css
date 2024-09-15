@@ -39,6 +39,22 @@
   flex: 3;
   margin-right: 5px;
 }
+.SearchPage .SearchPageControlerContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+.SearchPage .SearchPageControlerContainer .SearchPageControler {
+  display: flex;
+  height: 100%;
+  margin-right: 5px;
+  align-items: center;
+  justify-content: center;
+}
+.SearchPage .SearchPageControlerContainer .SearchPageControler .input-group {
+  margin: 0 16px;
+  width: 150px;
+}
 .SearchPage .ResultHeader {
   display: flex;
   align-items: center;

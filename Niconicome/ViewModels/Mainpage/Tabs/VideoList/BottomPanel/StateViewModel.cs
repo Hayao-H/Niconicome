@@ -33,7 +33,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel
 
         }
 
-        private readonly List<int> _watched = new(); 
+        private readonly List<int> _watched = new();
 
         public Bindables Bindables { get; init; } = new();
 
@@ -60,6 +60,16 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.BottomPanel
         {
             this.SelectedVideosCount.Value = playlist.SelectedVideosCount.Value;
             this.AllVideosCount.Value = playlist.VideosCount.Value;
+        }
+
+        public void OnRefreshButtonClick()
+        {
+            if (WS.PlaylistVideoContainer.CurrentSelectedPlaylist is null)
+            {
+                return;
+            }
+
+            this.SetCount(WS.PlaylistVideoContainer.CurrentSelectedPlaylist);
         }
     }
 }
