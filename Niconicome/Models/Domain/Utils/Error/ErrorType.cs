@@ -50,6 +50,7 @@ using VideoInfoAPIV1 = Niconicome.Models.Domain.Local.Server.API.VideoInfo.V1.Er
 using PostDL = Niconicome.Models.Network.Download.Actions.V2;
 using Auth = Niconicome.Models.Auth.Error;
 using Niconico = Niconicome.Models.Domain.Niconico;
+using CommentCollection = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3.Error;
 
 namespace Niconicome.Models.Domain.Utils.Error
 {
@@ -136,6 +137,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 74, typeof(Auth::ChromeSharedLoginError) },
             { 75, typeof(CookieDBHandlerError) },
             { 76, typeof(Niconico::NiconicoContextError) },
+            { 77, typeof(CommentCollection::ChildCommentCollectionError) },
         };
     }
 }

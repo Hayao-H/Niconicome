@@ -35,7 +35,7 @@ namespace Niconicome.Models.Domain.Local.LocalFile
 
     public class LocalFileRemover : ILocalFileRemover
     {
-        public LocalFileRemover(INiconicomeDirectoryIO directoryIO, INiconicomeFileIO fileIO, Utils::INiconicoUtils utils,IErrorHandler errorHandler)
+        public LocalFileRemover(INiconicomeDirectoryIO directoryIO, INiconicomeFileIO fileIO, Utils::INiconicoUtils utils, IErrorHandler errorHandler)
         {
             this._directoryIO = directoryIO;
             this._fileIO = fileIO;
@@ -67,6 +67,12 @@ namespace Niconicome.Models.Domain.Local.LocalFile
                     return AttemptResult.Fail(fResult.Message);
                 }
 
+                IAttemptResult<IEnumerable<string>> dResult = this._directoryIO.GetDirectories(directoryPath);
+                if (!dResult.IsSucceeded || dResult.Data is null)
+                {
+                    return AttemptResult.Fail(dResult.Message);
+                }
+
                 foreach (var filePath in fResult.Data)
                 {
                     string? fileName = Path.GetFileName(filePath);
@@ -78,6 +84,24 @@ namespace Niconicome.Models.Domain.Local.LocalFile
                     if (exceptID.Contains(id)) continue;
 
                     IAttemptResult result = this._fileIO.Delete(filePath, true);
+                    if (result.IsSucceeded)
+                    {
+                        this._errorHandler.HandleError(Err.RemovedFile, fileName);
+                    }
+                }
+
+
+                foreach (var filePath in dResult.Data)
+                {
+                    string? fileName = Path.GetFileName(filePath);
+                    if (fileName is null) continue;
+
+                    string id = this._utils.GetIdFromFIleName(fileName);
+                    if (string.IsNullOrEmpty(id)) continue;
+
+                    if (exceptID.Contains(id)) continue;
+
+                    IAttemptResult result = this._directoryIO.Delete(filePath, true, true);
                     if (result.IsSucceeded)
                     {
                         this._errorHandler.HandleError(Err.RemovedFile, fileName);
@@ -98,6 +122,12 @@ namespace Niconicome.Models.Domain.Local.LocalFile
                     return AttemptResult.Fail(fResult.Message);
                 }
 
+                IAttemptResult<IEnumerable<string>> dResult = this._directoryIO.GetDirectories(directoryPath);
+                if (!dResult.IsSucceeded || dResult.Data is null)
+                {
+                    return AttemptResult.Fail(dResult.Message);
+                }
+
                 foreach (var filePath in fResult.Data)
                 {
                     string? fileName = Path.GetFileName(filePath);
@@ -109,6 +139,23 @@ namespace Niconicome.Models.Domain.Local.LocalFile
                     if (id != niconicoID) continue;
 
                     IAttemptResult result = this._fileIO.Delete(filePath, true);
+                    if (result.IsSucceeded)
+                    {
+                        this._errorHandler.HandleError(Err.RemovedFile, fileName);
+                    }
+                }
+
+                foreach (var filePath in dResult.Data)
+                {
+                    string? fileName = Path.GetFileName(filePath);
+                    if (fileName is null) continue;
+
+                    string id = this._utils.GetIdFromFIleName(fileName);
+                    if (string.IsNullOrEmpty(id)) continue;
+
+                    if (id != niconicoID) continue;
+
+                    IAttemptResult result = this._directoryIO.Delete(filePath, true,true);
                     if (result.IsSucceeded)
                     {
                         this._errorHandler.HandleError(Err.RemovedFile, fileName);

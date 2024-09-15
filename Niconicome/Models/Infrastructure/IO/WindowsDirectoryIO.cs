@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Niconicome.Models.Domain.Local.IO.V2;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using VB = Microsoft.VisualBasic.FileIO;
 
 namespace Niconicome.Models.Infrastructure.IO
 {
@@ -33,8 +34,8 @@ namespace Niconicome.Models.Infrastructure.IO
             }
             catch (Exception ex)
             {
-                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToCreateDirectory, ex);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToCreateDirectory, ex));
+                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToCreateDirectory, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToCreateDirectory, ex, path));
             }
 
             return AttemptResult.Succeeded();
@@ -63,7 +64,7 @@ namespace Niconicome.Models.Infrastructure.IO
 
             try
             {
-                files = Directory.GetFiles(path, searchPattern);
+                files = Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories);
             }
             catch (Exception ex)
             {
@@ -76,16 +77,31 @@ namespace Niconicome.Models.Infrastructure.IO
 
 
 
-        public IAttemptResult Delete(string path, bool recursive = true)
+        public IAttemptResult Delete(string path, bool recursive = true, bool recycle = false)
         {
-            try
+            if (recycle)
             {
-                Directory.Delete(path, recursive);
+                try
+                {
+                    VB::FileSystem.DeleteDirectory(path, VB::UIOption.AllDialogs, VB::RecycleOption.SendToRecycleBin);
+                }
+                catch (Exception ex)
+                {
+                    this._errorHandler.HandleError(WindowsFileIOError.FailedToDeleteFile, ex, path);
+                    return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToDeleteFile, ex, path));
+                }
             }
-            catch (Exception ex)
+            else
             {
-                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToDeleteDirectory, ex, path);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToDeleteDirectory, ex, path));
+                try
+                {
+                    Directory.Delete(path, recursive);
+                }
+                catch (Exception ex)
+                {
+                    this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToDeleteDirectory, ex, path);
+                    return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToDeleteDirectory, ex, path));
+                }
             }
 
             return AttemptResult.Succeeded();
@@ -134,14 +150,14 @@ namespace Niconicome.Models.Infrastructure.IO
             foreach (FileInfo file in dir.GetFiles())
             {
                 string targetFilePath = Path.Combine(destinationDir, file.Name);
-                file.CopyTo(targetFilePath,overwrite);
+                file.CopyTo(targetFilePath, overwrite);
             }
 
             // If recursive and copying subdirectories, recursively call this method
             foreach (DirectoryInfo subDir in dirs)
             {
                 string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
-                CopyDirectory(subDir.FullName, newDestinationDir,overwrite);
+                CopyDirectory(subDir.FullName, newDestinationDir, overwrite);
             }
         }
     }

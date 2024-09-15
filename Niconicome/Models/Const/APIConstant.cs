@@ -15,5 +15,7 @@ namespace Niconicome.Models.Const
         public const string SeriesUrl = @"https://www.nicovideo.jp/series/";
 
         public const string CommentAPI = @"https://nvcomment.nicovideo.jp/legacy/api.json";
+
+        public const string NVAPIV2 = @"https://nvapi.nicovideo.jp/v2/";
     }
 }

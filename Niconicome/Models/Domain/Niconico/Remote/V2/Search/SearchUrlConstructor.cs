@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Web;
+using Niconicome.Extensions.System.Text;
 using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 
@@ -16,6 +19,13 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Search
         /// <param name="query"></param>
         /// <returns></returns>
         string GetUrl(SearchQuery query);
+
+        /// <summary>
+        /// NVAPIの検索URLを取得する
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        string GetUrlV2(SearchQuery query);
     }
 
     public class SearchUrlConstructor : ISearchUrlConstructor
@@ -110,7 +120,41 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Search
             list.Add($"_offset={50 * (query.Page - 1)}");
 
 
+
             return APIConstant.SnapshotAPIV2 + "?" + string.Join("&", list);
+        }
+
+        public string GetUrlV2(SearchQuery query)
+        {
+            var builder = new StringBuilder();
+            var collection = new NameValueCollection();
+
+            if (query.SearchType == SearchType.Tag)
+            {
+                collection.Add("tag", query.Query);
+            }
+            else
+            {
+                collection.Add("keyword", query.Query);
+            }
+
+            collection.Add("sortKey", query.SortOption.Sort.GetQuery());
+            collection.Add("sortOrder", query.SortOption.IsAscending ? "asc" : "desc");
+
+            if (query.Genre != Genre.All)
+            {
+                collection.Add("genres", query.Genre.GetQuery());
+            }
+
+            if (query.Page > 1)
+            {
+                collection.Add("page", query.Page.ToString());
+            }
+
+
+            return builder.Append($"{APIConstant.NVAPIV2}search/video")
+                .AddQuery(collection)
+                .ToString();
         }
 
     }

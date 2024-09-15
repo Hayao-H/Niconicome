@@ -356,7 +356,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             }
             else
             {
-                foreach (var t in this._stagedPool.Tasks.Where(t => t.PlaylistID == playlistID))
+                foreach (var t in this._stagedPool.Tasks.Where(t => t.PlaylistID == playlistID).ToList())
                 {
                     this._queuePool.AddTask(t);
                     this._tasksHandler!.AddTaskToQueue(t);

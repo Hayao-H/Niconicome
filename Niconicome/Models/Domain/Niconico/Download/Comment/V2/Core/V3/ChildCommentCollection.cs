@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
+using Err = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3.Error.ChildCommentCollectionError;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
 {
@@ -59,16 +61,19 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
 
     public class ChildCommentCollection : IChildCommentCollection
     {
-        public ChildCommentCollection(int commentCount, string thread, string fork)
+        public ChildCommentCollection(int commentCount, string thread, string fork, IErrorHandler errorHandler)
         {
             this.Fork = fork;
             this.Thread = thread;
             this._comment = new IComment[commentCount];
+            this._errorHandler = errorHandler;
         }
 
         #region field
 
         private readonly IComment[] _comment;
+
+        private readonly IErrorHandler _errorHandler;
 
         #endregion
 
@@ -90,9 +95,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
         {
             if (comment.Thread != this.Thread || comment.Fork != this.Fork)
             {
-                return AttemptResult.Fail("コメントのThreadまたはForkがコレクションのThreadまたはForkと一致しません。");
+                return AttemptResult.Fail(this._errorHandler.HandleError(Err.InvalidAddParameter));
             }
 
+            if (comment.No > this._comment.Length)
+            {
+                return AttemptResult.Fail(this._errorHandler.HandleError(Err.CommentIndexOutOfRange));
+            }
 
             this._comment[comment.No - 1] = comment;
 
@@ -106,7 +115,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
 
             if (comment is null)
             {
-                return AttemptResult<IComment>.Fail("指定されたコメントが存在しません");
+                return AttemptResult<IComment>.Fail(this._errorHandler.HandleError(Err.CommentNotFound, no));
             }
             else
             {
@@ -180,7 +189,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
 
             if (first is null)
             {
-                return AttemptResult<IComment>.Fail("最初のコメントを取得できませんでした。コメント画からの可能性があります。");
+                return AttemptResult<IComment>.Fail(this._errorHandler.HandleError(Err.CannotGetFirstComment));
             }
             else
             {

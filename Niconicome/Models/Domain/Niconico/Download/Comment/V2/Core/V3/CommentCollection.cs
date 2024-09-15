@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Niconicome.Models.Domain.Utils;
+using Err = Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 
 namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
@@ -113,7 +115,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3
         {
             if (!this._children.Any(c => c.Thread == thread && c.Fork == fork))
             {
-                this._children.Add(new ChildCommentCollection(this._commentCount, thread, fork));
+                this._children.Add(new ChildCommentCollection(this._commentCount, thread, fork, DIFactory.Resolve<Err::IErrorHandler>()));
             }
         }
 
