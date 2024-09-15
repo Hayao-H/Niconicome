@@ -20,6 +20,9 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Search.V2
         [JsonPropertyName("items")]
         public List<Item> Items { get; set; } = new List<Item>();
 
+        [JsonPropertyName("totalCount")]
+        public int TotalCount { get; set; }
+
     }
 
 

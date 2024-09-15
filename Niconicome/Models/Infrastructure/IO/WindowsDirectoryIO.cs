@@ -34,8 +34,8 @@ namespace Niconicome.Models.Infrastructure.IO
             }
             catch (Exception ex)
             {
-                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToCreateDirectory, ex);
-                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToCreateDirectory, ex));
+                this._errorHandler.HandleError(WindowsDirectoryIOError.FailedToCreateDirectory, ex, path);
+                return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsDirectoryIOError.FailedToCreateDirectory, ex, path));
             }
 
             return AttemptResult.Succeeded();
@@ -64,7 +64,7 @@ namespace Niconicome.Models.Infrastructure.IO
 
             try
             {
-                files = Directory.GetFiles(path, searchPattern,SearchOption.AllDirectories);
+                files = Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories);
             }
             catch (Exception ex)
             {
@@ -90,7 +90,8 @@ namespace Niconicome.Models.Infrastructure.IO
                     this._errorHandler.HandleError(WindowsFileIOError.FailedToDeleteFile, ex, path);
                     return AttemptResult.Fail(this._errorHandler.GetMessageForResult(WindowsFileIOError.FailedToDeleteFile, ex, path));
                 }
-            } else
+            }
+            else
             {
                 try
                 {
@@ -149,14 +150,14 @@ namespace Niconicome.Models.Infrastructure.IO
             foreach (FileInfo file in dir.GetFiles())
             {
                 string targetFilePath = Path.Combine(destinationDir, file.Name);
-                file.CopyTo(targetFilePath,overwrite);
+                file.CopyTo(targetFilePath, overwrite);
             }
 
             // If recursive and copying subdirectories, recursively call this method
             foreach (DirectoryInfo subDir in dirs)
             {
                 string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
-                CopyDirectory(subDir.FullName, newDestinationDir,overwrite);
+                CopyDirectory(subDir.FullName, newDestinationDir, overwrite);
             }
         }
     }

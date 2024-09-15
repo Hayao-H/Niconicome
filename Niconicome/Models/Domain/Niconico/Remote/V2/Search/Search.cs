@@ -78,7 +78,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2.Search
                     SearchType.Tag => SearchStringContent.ResultTitleTag,
                     _ => SearchStringContent.ResultTitleKw
                 }, query.Query),
-                Videos = videos
+                Videos = videos,
+                TotalCount = searchResult.Data.Data.TotalCount,
             });
         }
 

@@ -15,6 +15,8 @@ namespace Niconicome.Models.Domain.Niconico.Remote.V2
         public IImmutableList<string> FailedVideos { get; init; } = (new List<string>()).ToImmutableList();
 
         public string PlaylistName { get; set; } = string.Empty;
+
+        public int TotalCount { get; set; }
     }
 
     public class VideoInfo

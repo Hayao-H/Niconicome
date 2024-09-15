@@ -53,11 +53,18 @@
     </div>
 
     <div class="ResultHeader">
-        <h4>検索結果（@(DataContext.Videos.Count)件）</h4>
+        @if (DataContext.Videos.Count > 0)
+        {
+            <h4>検索結果（@(DataContext.TotalCount.Value) 件中 @(DataContext.Videos.Count * (DataContext.Page.Value - 1) +1)～@(DataContext.Videos.Count * DataContext.Page.Value)件)</h4>
+        } else
+        {
+            <h4>検索結果 (0件)</h4>
+        }
         @if (DataContext.IsRegisterIsProcessing.Value)
         {
             <button class="Button btn btn-primary" disabled>登録して戻る</button>
-        } else
+        }
+        else
         {
             <button class="Button btn btn-primary" @onclick="DataContext.OnRegisterButtonClick">登録して戻る</button>
         }
@@ -69,7 +76,7 @@
         {
             <div class="VideoListRow">
                 <div class="CheckBoxWrapper">
-                    <input type="checkbox" @bind="video.IsSelected"/>
+                    <input type="checkbox" @bind="video.IsSelected" />
                 </div>
                 <div class="ThumbnailWrapper">
                     <img src="@(video.ThumbUrl)" />

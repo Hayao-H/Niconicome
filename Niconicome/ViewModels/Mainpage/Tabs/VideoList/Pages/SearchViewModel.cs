@@ -27,6 +27,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             this.AlertMessage = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
             this.InputText = new BindableProperty<string>(string.Empty).AddTo(this.Bindables);
             this.Page = new BindableProperty<int>(1).AddTo(this.Bindables);
+            this.TotalCount = new BindableProperty<int>(0).AddTo(this.Bindables);
             this.Videos = new BindableCollection<RemoteVideoViewModel, Remote.VideoInfo>(this._videos, v => new RemoteVideoViewModel(v));
             this.Bindables.Add(this.Videos);
         }
@@ -83,7 +84,12 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <summary>
         /// ページ
         /// </summary>
-        public IBindableProperty<int> Page { get; set; }
+        public IBindableProperty<int> Page { get; init; }
+
+        /// <summary>
+        /// 総動画数
+        /// </summary>
+        public IBindableProperty<int> TotalCount { get; init; }
 
         /// <summary>
         /// アラートの表示・非表示
@@ -145,6 +151,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             this._title = result.Data.PlaylistName;
             this._videos.AddRange(result.Data.Videos);
+            this.TotalCount.Value = result.Data.TotalCount;
             this._isSearching = false;
         }
 
@@ -175,12 +182,14 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             }
 
             this.Page.Value--;
+            if (string.IsNullOrEmpty(this.InputText.Value)) return;
             _ = this.OnSearchButtonClick();
         }
 
         public void OnNextButtonClick()
         {
             this.Page.Value++;
+            if (string.IsNullOrEmpty(this.InputText.Value)) return;
             _ = this.OnSearchButtonClick();
         }
 
