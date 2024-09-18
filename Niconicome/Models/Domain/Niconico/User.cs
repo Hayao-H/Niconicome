@@ -51,12 +51,12 @@ namespace Niconicome.Models.Domain.Niconico
             }
         }
 
-        public User(string nickname, string id, bool isPremium)
+        public User(string nickname, string id, bool isPremium, string iconURL)
         {
             this.Nickname = nickname;
             this.ID = id;
             this.IsPremium = isPremium;
-            this.UserImage = new Uri($"https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/{Math.Floor(double.Parse(id) / 10000)}/{id}.jpg");
+            this.UserImage = new Uri(iconURL);
         }
     }
 

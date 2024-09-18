@@ -18,6 +18,6 @@ namespace Niconicome.Models.Const
 
         public const string NVAPIV2 = @"https://nvapi.nicovideo.jp/v2/";
 
-        public const string NVAPIV1 = @"https://nvapi.nicovideo.jp/v2/";
+        public const string NVAPIV1 = @"https://nvapi.nicovideo.jp/v1/";
     }
 }

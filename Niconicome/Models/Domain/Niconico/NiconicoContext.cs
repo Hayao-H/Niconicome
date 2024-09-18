@@ -127,7 +127,7 @@ namespace Niconicome.Models.Domain.Niconico
                 return AttemptResult.Fail(userDataResult.Message);
             }
 
-            this.User = new User(userDataResult.Data.Nickname, userID,userDataResult.Data.IsPremium);
+            this.User = new User(userDataResult.Data.Nickname, userID, userDataResult.Data.IsPremium, userDataResult.Data.IconURL);
 
             this.IsLogin.Value = true;
 
@@ -149,7 +149,7 @@ namespace Niconicome.Models.Domain.Niconico
 
             try
             {
-                response = await this._http.GetAsync(new Uri($"{APIConstant.NVAPIV2}users/{id}"));
+                response = await this._http.GetAsync(new Uri($"{APIConstant.NVAPIV1}users/{id}"));
             }
             catch (Exception ex)
             {
@@ -169,12 +169,12 @@ namespace Niconicome.Models.Domain.Niconico
                 return AttemptResult<UserData>.Fail(this._errorHandler.HandleError(NiconicoContextError.NotMe));
             }
 
-            return AttemptResult<UserData>.Succeeded(new UserData(data.Data.User.Nickname, data.Data.User.IsPremium));
+            return AttemptResult<UserData>.Succeeded(new UserData(data.Data.User.Nickname, data.Data.User.IsPremium, data.Data.User.Icons.Large));
         }
 
         #endregion
 
-        private record UserData(string Nickname, bool IsPremium);
+        private record UserData(string Nickname, bool IsPremium, string IconURL);
 
     }
 
@@ -188,7 +188,7 @@ namespace Niconicome.Models.Domain.Niconico
         FailedToGetUserName,
         [ErrorEnum(ErrorLevel.Error, "ユーザー情報の取得に失敗しました。")]
         FailedToGetUserData,
-        [ErrorEnum(ErrorLevel.Error,"ユーザー情報がログインしているユーザーのものではありません。")]
+        [ErrorEnum(ErrorLevel.Error, "ユーザー情報がログインしているユーザーのものではありません。")]
         NotMe,
     }
 }

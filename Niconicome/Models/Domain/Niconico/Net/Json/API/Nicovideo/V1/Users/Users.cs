@@ -41,6 +41,18 @@ namespace Niconicome.Models.Domain.Niconico.Net.Json.API.Nicovideo.V1.Users
 
         [JsonPropertyName("nickname")] 
         public string Nickname { get; set; } = string.Empty;
+
+        [JsonPropertyName("icons")]
+        public Icon Icons { get; set; } = new Icon();
+    }
+
+    public class Icon
+    {
+        [JsonPropertyName("small")]
+        public string Small { get; set; } = string.Empty;
+
+        [JsonPropertyName("large")]
+        public string Large { get; set; } = string.Empty;
     }
 
 }
