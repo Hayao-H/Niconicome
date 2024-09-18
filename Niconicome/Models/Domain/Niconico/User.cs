@@ -11,7 +11,7 @@ namespace Niconicome.Models.Domain.Niconico
     /// <summary>
     /// ユーザー情報クラス
     /// </summary>
-    public class User:IStorable
+    public class User : IStorable
     {
         public static string TableName { get; } = "users";
 
@@ -36,6 +36,11 @@ namespace Niconicome.Models.Domain.Niconico
         public Uri UserImage { get; private set; }
 
         /// <summary>
+        /// プレミアム会員
+        /// </summary>
+        public bool IsPremium { get; private set; }
+
+        /// <summary>
         /// ユーザーページ
         /// </summary>
         public string UserPage
@@ -46,10 +51,11 @@ namespace Niconicome.Models.Domain.Niconico
             }
         }
 
-        public User(string nickname, string id)
+        public User(string nickname, string id, bool isPremium)
         {
             this.Nickname = nickname;
             this.ID = id;
+            this.IsPremium = isPremium;
             this.UserImage = new Uri($"https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/{Math.Floor(double.Parse(id) / 10000)}/{id}.jpg");
         }
     }
