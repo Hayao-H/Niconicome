@@ -4,8 +4,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Niconicome.Models.Const;
 using Niconicome.Models.Domain.Local.Store.V2;
 using Niconicome.Models.Domain.Network;
+using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Net.Xml;
 using Niconicome.Models.Domain.Niconico.UserAuth;
 using Niconicome.Models.Domain.Utils.Error;
@@ -14,6 +16,7 @@ using Niconicome.Models.Utils.Reactive;
 using Reactive.Bindings;
 using Const = Niconicome.Models.Const;
 using DI = Niconicome.Models.Domain.Utils.DIFactory;
+using UserResponse = Niconicome.Models.Domain.Niconico.Net.Json.API.Nicovideo.V1.Users;
 
 namespace Niconicome.Models.Domain.Niconico
 {
@@ -118,14 +121,13 @@ namespace Niconicome.Models.Domain.Niconico
 
             string userID = userSession.Split("_")[2];
 
-            IAttemptResult<string> userNameResult = await this.GetUserNameAsync(userID);
-
-            if (!userNameResult.IsSucceeded || userNameResult.Data is null)
+            IAttemptResult<UserData> userDataResult = await this.GetUserDataAsync(userID);
+            if (!userDataResult.IsSucceeded || userDataResult.Data is null)
             {
-                return AttemptResult.Fail(userNameResult.Message);
+                return AttemptResult.Fail(userDataResult.Message);
             }
 
-            this.User = new User(userNameResult.Data, userID);
+            this.User = new User(userDataResult.Data.Nickname, userID, userDataResult.Data.IsPremium, userDataResult.Data.IconURL);
 
             this.IsLogin.Value = true;
 
@@ -136,54 +138,43 @@ namespace Niconicome.Models.Domain.Niconico
         #endregion
 
         #region private
-
         /// <summary>
-        /// ニコニコ静画のAPIを使ってユーザー名を取得する
+        /// NicovideoAPIからユーザー情報を取得する
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private async Task<IAttemptResult<string>> GetUserNameAsync(string id)
+        private async Task<IAttemptResult<UserData>> GetUserDataAsync(string id)
         {
-            HttpResponseMessage result;
+            HttpResponseMessage response;
 
             try
             {
-                result = await this._http.GetAsync(new Uri($"{this.UserNameAPI}{id}"));
+                response = await this._http.GetAsync(new Uri($"{APIConstant.NVAPIV1}users/{id}"));
             }
             catch (Exception ex)
             {
-                return AttemptResult<string>.Fail(this._errorHandler.HandleError(NiconicoContextError.FailedToGetUserName, ex));
+                return AttemptResult<UserData>.Fail(this._errorHandler.HandleError(NiconicoContextError.FailedToGetUserData, ex));
             }
 
-            if (result.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                var response = await result.Content.ReadAsStringAsync();
-                Response? xmlData;
-
-                try
-                {
-                    xmlData = Xmlparser.Deserialize<Response>(response);
-                }
-                catch (Exception ex)
-                {
-                    return AttemptResult<string>.Fail(this._errorHandler.HandleError(NiconicoContextError.FailedToGetUserName, ex));
-                }
-
-                if (xmlData is null)
-                {
-                    return AttemptResult<string>.Fail(this._errorHandler.HandleError(NiconicoContextError.FailedToGetUserName));
-                }
-
-                return AttemptResult<string>.Succeeded(xmlData.User.Nickname);
-
+                return AttemptResult<UserData>.Fail(this._errorHandler.HandleError(NiconicoContextError.FailedToGetUserData));
             }
-            else
+
+            var content = await response.Content.ReadAsStringAsync();
+            var data = JsonParser.DeSerialize<UserResponse.Response>(content);
+
+            if (!data.Data.Relationships.IsMe)
             {
-                return AttemptResult<string>.Fail(this._errorHandler.HandleError(NiconicoContextError.FailedToGetUserName));
+                return AttemptResult<UserData>.Fail(this._errorHandler.HandleError(NiconicoContextError.NotMe));
             }
+
+            return AttemptResult<UserData>.Succeeded(new UserData(data.Data.User.Nickname, data.Data.User.IsPremium, data.Data.User.Icons.Large));
         }
 
         #endregion
+
+        private record UserData(string Nickname, bool IsPremium, string IconURL);
 
     }
 
@@ -195,5 +186,9 @@ namespace Niconicome.Models.Domain.Niconico
         FailedToCheckLoginStatus,
         [ErrorEnum(ErrorLevel.Error, "ユーザー名の取得に失敗しました。")]
         FailedToGetUserName,
+        [ErrorEnum(ErrorLevel.Error, "ユーザー情報の取得に失敗しました。")]
+        FailedToGetUserData,
+        [ErrorEnum(ErrorLevel.Error, "ユーザー情報がログインしているユーザーのものではありません。")]
+        NotMe,
     }
 }

@@ -11,6 +11,7 @@ using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Niconico;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
+using Niconicome.Models.Utils.Reactive;
 using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
@@ -40,10 +41,11 @@ namespace Niconicome.ViewModels.Mainpage
 
             this.RegionManager.RegisterViewWithRegion<Tree::PlaylistTree>("PlaylistTree");
 
-            this.LoginBtnVal = new ReactiveProperty<string>("ログイン");
-            this.Username = new ReactiveProperty<string>("未ログイン");
-            this.LoginBtnTooltip = new ReactiveProperty<string>("ログイン画面を表示する");
-            this.UserImage = new ReactiveProperty<Uri>(new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg"));
+            this.LoginBtnVal = new BindableProperty<string>("ログイン");
+            this.Username = new BindableProperty<string>("未ログイン");
+            this.LoginBtnTooltip = new BindableProperty<string>("ログイン画面を表示する");
+            this.UserImage = new BindableProperty<Uri>(new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg"));
+            this.UserBorderColor = new BindableProperty<string>("#f5f5f5");
 
             WS::Mainpage.Themehandler.Initialize();
             WS::Mainpage.NiconicoContext.IsLogin.Subscribe(x => { if (x) this.OnLogin(); });
@@ -143,22 +145,27 @@ namespace Niconicome.ViewModels.Mainpage
         /// <summary>
         /// ユーザー名
         /// </summary>
-        public ReactiveProperty<string> Username { get; init; }
+        public IBindableProperty<string> Username { get; init; }
 
         /// <summary>
         /// ユーザー画像
         /// </summary>
-        public ReactiveProperty<Uri> UserImage { get; init; }
+        public IBindableProperty<Uri> UserImage { get; init; }
 
         /// <summary>
         /// ログインボタンのツールチップ
         /// </summary>
-        public ReactiveProperty<string> LoginBtnTooltip { get; init; }
+        public IBindableProperty<string> LoginBtnTooltip { get; init; }
 
         /// <summary>
         /// ログインボタンの表示文字
         /// </summary>
-        public ReactiveProperty<string> LoginBtnVal { get; init; }
+        public IBindableProperty<string> LoginBtnVal { get; init; }
+
+        /// <summary>
+        /// ユーザーアイコンの縁取り色
+        /// </summary>
+        public IBindableProperty<string> UserBorderColor { get; init; }
 
         #endregion
 
@@ -209,6 +216,10 @@ namespace Niconicome.ViewModels.Mainpage
             this.LoginBtnTooltip.Value = "ログアウトする";
             this.Username.Value = this.user.Nickname;
             this.UserImage.Value = this.user.UserImage;
+            if (this.user.IsPremium)
+            {
+                this.UserBorderColor.Value = "#dfaf20";
+            }
         }
 
         #endregion
