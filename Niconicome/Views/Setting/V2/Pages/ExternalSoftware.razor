@@ -53,6 +53,13 @@
         </div>
 
         <div class="SettingContent">
+            <label class="Title" for="priMp4"><i class="Icon fa-solid fa-terminal"></i>MP4ファイルが存在する場合、優先して開く</label>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="priMp4" @bind="DataContext.PrioritizeMp4.Value">
+            </div>
+        </div>
+
+        <div class="SettingContent">
             <p class="Title"><i class="Icon fa-solid fa-share-from-square"></i>「アプリに送る(A)」のパス</p>
             <div class="input-group mb-3 Input">
                 <input type="text" class="form-control" @bind="DataContext.AppAPath.Value">

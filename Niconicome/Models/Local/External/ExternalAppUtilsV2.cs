@@ -188,9 +188,15 @@ namespace Niconicome.Models.Local.External
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(ExternalAppUtilsV2Error.VideoIsNotDownloaded, videoInfo.NiconicoId));
             }
 
+            bool prioritizeMp4 = this._settingsContainer.GetOnlyValue(SettingNames.PrioritizeMp4, true).Data;
+
             string path;
 
-            if (videoInfo.IsDMS)
+            if (prioritizeMp4 && !string.IsNullOrEmpty(videoInfo.Mp4FilePath))
+            {
+                path = videoInfo.Mp4FilePath.Replace(@"\\?\", videoInfo.Mp4FilePath);
+            }
+            else if (videoInfo.IsDMS)
             {
                 path = $"http://localhost:{this._localState.Port}/niconicome/watch/v1/{videoInfo.PlaylistID}/{videoInfo.NiconicoId}/main.m3u8";
             }
