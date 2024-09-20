@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -152,7 +152,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
                 return;
             }
 
-            IAttemptResult<ILocalFileInfo> fileResult = this._localFileInfoHandler.GetLocalFileInfo(video.FilePath);
+            IAttemptResult<ILocalFileInfo> fileResult = this._localFileInfoHandler.GetLocalFileInfo(video.StreamFilePath);
             if (!fileResult.IsSucceeded || fileResult.Data is null)
             {
                 response.StatusCode = (int)HttpStatusCode.NotFound;
@@ -171,7 +171,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.Watch.V1
                 return;
             }
 
-            string folderPath = Path.GetDirectoryName(video.FilePath)!;
+            string folderPath = Path.GetDirectoryName(video.StreamFilePath)!;
             var (resolution, stream) = file.Streams.OrderByDescending(s => s.Key).First();
             HLSPlaylist playlist = this._playlistCreator.GetPlaylist(stream, sid, port);
 

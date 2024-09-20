@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -63,7 +64,11 @@ namespace Niconicome.Models.Network.Download.Modification.Video
                 .Replace("<ServerURL>", url)
                 .Replace("<FilePath>", videoFilePath);
 
-            await this._processManager.StartProcessAsync(softwarePathResult.Data, arg, false, onMessage, ct);
+            var result = await this._processManager.StartProcessAsync(softwarePathResult.Data, arg, false, onMessage, ct);
+            if (result.Data is not null && result.Data.ExitCode != 0)
+            {
+                Debug.WriteLine(result.Data.ExitCode);
+            }
         }
     }
 }

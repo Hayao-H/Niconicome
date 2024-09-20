@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -81,7 +81,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1.SegmentCreator
                 return AttemptResult.Fail(this._errorHandler.GetMessageForResult(HLSManagerError.VideoIsNotDownloaded, niconicoID, playlistID));
             }
 
-            if (video.FilePath.EndsWith(".json"))
+            if (video.IsDMS)
             {
                 return AttemptResult.Fail(this._errorHandler.HandleError(HLSManagerError.VideoIsDMS, niconicoID, playlistID));
             }
@@ -94,7 +94,7 @@ namespace Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1.SegmentCreator
             }
 
             _isRunnning = true;
-            var result = await this.CreateHLSFilesAsync(video.FilePath, playlistID, niconicoID);
+            var result = await this.CreateHLSFilesAsync(video.Mp4FilePath, playlistID, niconicoID);
             _isRunnning = false;
 
             return result;

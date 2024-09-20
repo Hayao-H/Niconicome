@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -76,7 +76,6 @@ namespace Niconicome.Models.Infrastructure.Database
             video.IsEconomy = data.IsEconomy;
             video.AddedAt = data.AddedAt;
             video.PlaylistID = playlistID;
-            video.FilePath = data.VideoFilePath;
 
             video.IsAutoUpdateEnabled = true;
 
@@ -141,7 +140,6 @@ namespace Niconicome.Models.Infrastructure.Database
                 video.IsEconomy = data.IsEconomy;
                 video.AddedAt = data.AddedAt;
                 video.PlaylistID = data.PlaylistID;
-                video.FilePath = data.VideoFilePath;
 
                 video.IsAutoUpdateEnabled = true;
 
@@ -285,7 +283,6 @@ namespace Niconicome.Models.Infrastructure.Database
                 IsSelected = video.IsSelected.Value,
                 IsDownloaded = video.IsDownloaded.Value,
                 IsEconomy = video.IsEconomy,
-                VideoFilePath = video.FilePath,
                 AddedAt = video.AddedAt,
             };
 
