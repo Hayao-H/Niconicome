@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +9,6 @@ using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Infrastructure.Database.LiteDB;
 using Niconicome.Models.Network;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using STypes = Niconicome.Models.Domain.Local.Store.Types;
 
 namespace Niconicome.Models.Domain.Local.Store

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using AddonAPI = Niconicome.Models.Local.Addon.API;
 using AddonsCoreV2 = Niconicome.Models.Domain.Local.Addons.Core.V2;
@@ -130,7 +130,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<DomainNet::ICacheStraem, DomainNet::CacheStream>();
             services.AddSingleton<Net::INetworkVideoHandler, Net::NetworkVideoHandler>();
             services.AddSingleton<State::IMessageHandler, State::MessageHandler>();
-            services.AddTransient<Niconico::IAccountManager, Niconico::AccountManager>();
             services.AddTransient<DomainWatch::IWatchSession, DomainWatch::WatchSession>();
             services.AddTransient<DomainWatch::IWatchPlaylisthandler, DomainWatch::WatchPlaylistHandler>();
             services.AddTransient<Dmc::IStreamhandler, Dmc::StreamHandler>();

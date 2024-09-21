@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.WindowsAPICodePack.Taskbar;
 using Niconicome.Models.Domain.Local.Server.API.Comment.V1;
 using Niconicome.Models.Domain.Local.Server.API.NG.V1;
 using Niconicome.Models.Domain.Local.Server.API.RegacyHLS.V1;

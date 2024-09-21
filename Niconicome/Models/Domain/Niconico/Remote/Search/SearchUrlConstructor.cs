@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Niconicome.Models.Domain.Niconico.Net.Json.WatchPage.V2;
 using System.Xml.Linq;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Const;
 using System.Web;

@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.ClearScript;
-using MS.WindowsAPICodePack.Internal;
 using Niconicome.Extensions.System;
 using Niconicome.Models.Domain.Local.LocalFile;
 using Niconicome.Models.Domain.Local.Settings;

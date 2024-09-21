@@ -3,7 +3,6 @@ using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
-using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
 using Niconicome.Models.Utils.Reactive;
 using Err = Niconicome.Models.Local.Application.Error.ThemeHandlerError;
