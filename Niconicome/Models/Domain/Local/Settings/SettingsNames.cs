@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -183,6 +183,8 @@ namespace Niconicome.Models.Domain.Local.Settings
         public static string AppUrlParam { get; private set; } = "Local.SendToAppBParam";
 
         public static string AppIdParam { get; private set; } = "Local.SendToAppAParam";
+
+        public static string PrioritizeMp4 { get; private set; } = "Local.PrioritizeMp4";
 
         public static string VideoSearchDirectories { get; private set; } = "Local.VideoSearchDirectories";
 

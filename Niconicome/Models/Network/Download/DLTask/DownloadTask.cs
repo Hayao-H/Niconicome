@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
@@ -15,6 +15,7 @@ using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.State.MessageV2;
 using Niconicome.Models.Network.Download.DLTask.StringContent;
 using Niconicome.Models.Playlist.V2.Manager;
+using Niconicome.Models.Playlist.V2.Manager.Helper;
 using Niconicome.Models.Playlist.VideoList;
 using Niconicome.Models.Utils;
 using Niconicome.Models.Utils.ParallelTaskV2;
@@ -276,14 +277,6 @@ public class DownloadTask : ParallelTask, IDownloadTask
             string rMessage = builder.ToString();
 
             this._messageHandler.AppendMessage(this._stringHandler.GetContent(DownloadTaskStringContent.DownloadSucceeded, this._video.NiconicoId), LocalConstant.SystemMessageDispacher, ErrorLevel.Log);
-
-            //ファイル情報を更新
-            //他のプレイリストを開いていると書き換えでエラーが起きるかもなのでちゃんと戻す
-            if (!string.IsNullOrEmpty(result.Data.FileName))
-            {
-                this._video.FilePath = result.Data.FileName;
-                this._video.IsDownloaded.Value = true;
-            }
 
             this.IsSuceeded = true;
 

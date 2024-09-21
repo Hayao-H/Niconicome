@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Niconicome.Models.Domain.Playlist;
@@ -74,7 +74,7 @@ namespace Niconicome.Models.Domain.Local.Playlist
                 PlaylistName = name,
             };
 
-            playlist.AddRange(videos.Select(v => new Video(v.FilePath, v.Title, v.OwnerName)));
+            playlist.AddRange(videos.Where(v => !string.IsNullOrEmpty(v.Mp4FilePath)).Select(v => new Video(v.Mp4FilePath, v.Title, v.OwnerName)));
 
             if (playlist.Count == 0)
             {

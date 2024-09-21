@@ -54,8 +54,12 @@
                     <ToolBarTray>
                         <ToolBar ClipToBounds="False"
                                      Style="{StaticResource MaterialDesignToolBar}">
-                            <Image Source="{Binding UserImage.Value}" Height="40" Width="40"/>
-                            <TextBlock Text="{Binding Username.Value}" VerticalAlignment="Center" Margin="2 0"/>
+                            <Border BorderBrush="{Binding UserBorderColor.Value}" BorderThickness="1" Height="41" Width="41" CornerRadius="50">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{Binding UserImage.Value}"/>
+                                </Border.Background>
+                            </Border>
+                            <TextBlock Text="{Binding Username.Value}" VerticalAlignment="Center" Margin="5 0"/>
                             <Button Content="{Binding LoginBtnVal.Value}" Command="{Binding LoginCommand}"/>
                             <Separator />
                             <Button Content="{materialDesign:PackIcon Kind=Restart}" Command="{Binding Restart}" ToolTip="再起動"/>

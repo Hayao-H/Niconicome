@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,7 +37,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
         /// <param name="videoInfo"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        Task<IAttemptResult<int>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token);
+        Task<IAttemptResult<VideoDownloadResult>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token);
 
     }
 
@@ -77,13 +77,13 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
 
         #region Method
 
-        public async Task<IAttemptResult<int>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token)
+        public async Task<IAttemptResult<VideoDownloadResult>> DownloadVideoAsync(IDownloadSettings settings, Action<string> OnMessage, IDomainVideoInfo videoInfo, CancellationToken token)
         {
             //DLするかどうかを判定
             if (!this.ShouldDownladVideo(videoInfo, settings))
             {
                 OnMessage(this._stringHandler.GetContent(SC.SkipEconomy));
-                return AttemptResult<int>.Succeeded(0);
+                return AttemptResult<VideoDownloadResult>.Succeeded(new VideoDownloadResult(0, false, string.Empty));
             }
 
             //ファイルパス
@@ -97,20 +97,22 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
             //外部ダウンローダー
             if (this._external.CheckCondition(videoInfo, settings))
             {
+                filePath = this._pathOrganizer.GetFilePath(settings.FileNameFormat, videoInfo.DmcInfo, FileFolder.Mp4FileExt, settings.FolderPath, settings.IsReplaceStrictedEnable, settings.Overwrite);
+
                 IAttemptResult externalResult = await this._external.DownloadVideoByExtarnalDownloaderAsync(settings, videoInfo.Id, filePath, OnMessage, token);
                 if (!externalResult.IsSucceeded)
                 {
-                    return AttemptResult<int>.Fail(externalResult.Message);
+                    return AttemptResult<VideoDownloadResult>.Fail(externalResult.Message);
                 }
 
                 IAttemptResult<int> resolutionResult = await this._fileIO.GetVerticalResolutionAsync(filePath);
                 if (!resolutionResult.IsSucceeded)
                 {
-                    return AttemptResult<int>.Succeeded(0);
+                    return AttemptResult<VideoDownloadResult>.Succeeded(new VideoDownloadResult(0, false, filePath));
                 }
                 else
                 {
-                    return AttemptResult<int>.Succeeded(resolutionResult.Data);
+                    return AttemptResult<VideoDownloadResult>.Succeeded(new VideoDownloadResult(resolutionResult.Data, false, filePath));
                 }
             }
 
@@ -122,7 +124,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
 
             if (!sessionResult.IsSucceeded)
             {
-                return AttemptResult<int>.Fail(sessionResult.Message);
+                return AttemptResult<VideoDownloadResult>.Fail(sessionResult.Message);
             }
 
             //ストリーム情報を取得
@@ -130,14 +132,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
             IAttemptResult<IStreamCollection> streamResult = await session.GetAvailableStreamsAsync();
             if (!streamResult.IsSucceeded || streamResult.Data is null)
             {
-                return AttemptResult<int>.Fail(streamResult.Message);
+                return AttemptResult<VideoDownloadResult>.Fail(streamResult.Message);
             }
             IStreamInfo stream = streamResult.Data.GetStream((int)settings.VerticalResolution);
 
             IAttemptResult streamInfoResult = await stream.GetStreamInfo();
             if (!streamInfoResult.IsSucceeded)
             {
-                return AttemptResult<int>.Fail(streamInfoResult.Message);
+                return AttemptResult<VideoDownloadResult>.Fail(streamInfoResult.Message);
             }
 
             //レジューム
@@ -152,7 +154,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
                 IAttemptResult<string> segmentResult = this._segmentDirectory.Create(videoInfo.Id, stream.VerticalResolution);
                 if (!segmentResult.IsSucceeded || segmentResult.Data is null)
                 {
-                    return AttemptResult<int>.Fail(segmentResult.Message);
+                    return AttemptResult<VideoDownloadResult>.Fail(segmentResult.Message);
                 }
 
 
@@ -174,7 +176,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
             IAttemptResult dlResult = await this.DownloadSegments(stream.VideoSegmentURLs.Concat([stream.VideoInitializationURL]), stream.AudioSegmentURLs.Concat([stream.AudioInitializationURL]), existingVideoFileNames, existingAudioFileNames, tempFolderPath, videoInfo.Id, stream.VerticalResolution, settings.MaxParallelSegmentDLCount, OnMessage, token);
             if (!dlResult.IsSucceeded)
             {
-                return AttemptResult<int>.Fail(dlResult.Message);
+                return AttemptResult<VideoDownloadResult>.Fail(dlResult.Message);
             }
 
             //ファイルを移動
@@ -186,14 +188,14 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
             IAttemptResult moveResult = this.MoveFiles(tempFolderPath, Path.Combine(filePath, stream.VerticalResolution.ToString()));
             if (!moveResult.IsSucceeded)
             {
-                return AttemptResult<int>.Fail(moveResult.Message);
+                return AttemptResult<VideoDownloadResult>.Fail(moveResult.Message);
             }
 
             //キー
             IAttemptResult<KeyInfomation> keyResult = await this._keyDownlaoder.DownloadKeyASync(stream.VideoKeyURL, stream.AudioKeyURL);
             if (!keyResult.IsSucceeded || keyResult.Data is null)
             {
-                return AttemptResult<int>.Fail(keyResult.Message);
+                return AttemptResult<VideoDownloadResult>.Fail(keyResult.Message);
             }
 
             //動画情報JSON
@@ -205,7 +207,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
             IAttemptResult jsonResult = this._streamJsonHandler.AddStream(filePath, stream.VerticalResolution, keyResult.Data.VideoKey, keyResult.Data.AudioKey, stream.VideoIV, stream.AudioIV, stream.VideoSegmentDurations, stream.AudioSegmentDurations, vMap, aMap, stream.VideoBandWidth);
             if (!jsonResult.IsSucceeded)
             {
-                return AttemptResult<int>.Fail(jsonResult.Message);
+                return AttemptResult<VideoDownloadResult>.Fail(jsonResult.Message);
             }
 
 
@@ -213,7 +215,7 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
             this._directoryIO.Delete(tempFolderPath);
 
             OnMessage(this._stringHandler.GetContent(SC.Completed));
-            return AttemptResult<int>.Succeeded(stream.VerticalResolution);
+            return AttemptResult<VideoDownloadResult>.Succeeded(new VideoDownloadResult(stream.VerticalResolution,true,Path.Join(filePath,"stream.json")));
         }
 
 
@@ -366,4 +368,6 @@ namespace Niconicome.Models.Domain.Niconico.Download.Video.V3.Integrate
 
         #endregion
     }
+
+    public record VideoDownloadResult(int VerticalResolution, bool IsDMS, string FilePath);
 }

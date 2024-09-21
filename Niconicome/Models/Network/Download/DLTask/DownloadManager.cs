@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
@@ -197,7 +197,7 @@ namespace Niconicome.Models.Network.Download.DLTask
             //動画固有の情報を設定
             settings.NiconicoId = video.NiconicoId;
             settings.IsEconomy = video.IsEconomy;
-            settings.FilePath = video.FilePath;
+            settings.FilePath = video.IsDMS ? video.StreamFilePath : video.Mp4FilePath;
 
             //タスクを作成
             IDownloadTask task = DIFactory.Provider.GetRequiredService<IDownloadTask>();
