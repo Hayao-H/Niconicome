@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Niconicome.Models.Auth;
 using Niconicome.Models.Domain.Local.Settings;
 using Niconicome.Models.Domain.Utils;
@@ -58,7 +58,6 @@ namespace Niconicome.Workspaces
         public static ISortInfoHandler SortInfoHandler { get; private set; } = DIFactory.Provider.GetRequiredService<ISortInfoHandler>();
         public static IPlaylistTreeHandler PlaylistTreeHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IPlaylistTreeHandler>();
         public static IWindowsHelper WindowsHelper { get; private set; } = DIFactory.Provider.GetRequiredService<IWindowsHelper>();
-        public static IThemehandler Themehandler { get; private set; } = DIFactory.Provider.GetRequiredService<IThemehandler>();
         public static IApplicationPowerManager ApplicationPower { get; private set; } = DIFactory.Provider.GetRequiredService<IApplicationPowerManager>();
         public static IStyleHandler StyleHandler { get; private set; } = DIFactory.Provider.GetRequiredService<IStyleHandler>();
         public static ILocalSettingsContainer SettingsContainer { get; private set; } = DIFactory.Provider.GetRequiredService<ILocalSettingsContainer>();
@@ -205,5 +204,11 @@ namespace Niconicome.Workspaces
         /// セッション管理
         /// </summary>
         public static Niconico::INiconicoContext NiconicoContext { get; private set; } = DIFactory.Resolve<Niconico::INiconicoContext>();
+
+        /// <summary>
+        /// アプリケーションのテーマ管理
+        /// </summary>
+        public static IThemehandler Themehandler { get; private set; } = DIFactory.Provider.GetRequiredService<IThemehandler>();
+
     }
 }

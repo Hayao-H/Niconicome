@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,9 +28,8 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             var inherit = new SelectBoxItem<ApplicationThemeSettings>(WS.StringHandler.GetContent(SC.Inherit), ApplicationThemeSettings.Inherit);
             this.SelectableThemes = new() { inherit, light, dark };
 
-            this.SelectedTheme = new BindableProperty<ApplicationThemeSettings>(WS.Themehandler.GetTheme()).Subscribe(value =>
+            this.SelectedTheme = WS.Themehandler.ApplicationTheme.Subscribe(value =>
             {
-                WS.Themehandler.SetTheme(value);
                 if (value == ApplicationThemeSettings.Inherit)
                 {
                     string message = WS.StringHandler.GetContent(SC.NeedRestart);

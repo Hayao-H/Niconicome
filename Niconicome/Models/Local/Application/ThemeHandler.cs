@@ -1,58 +1,57 @@
-﻿using System;
+using System;
 using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Domain.Local.Settings;
-using Niconicome.Models.Domain.Utils;
+using Niconicome.Models.Domain.Utils.Error;
 using Niconicome.Models.Helper.Result;
 using Niconicome.Models.Local.Settings;
 using Niconicome.Models.Local.Settings.EnumSettingsValue;
+using Niconicome.Models.Utils.Reactive;
+using Err = Niconicome.Models.Local.Application.Error.ThemeHandlerError;
 
 namespace Niconicome.Models.Local.Application
 {
     public interface IThemehandler
     {
-        ApplicationThemeSettings GetTheme();
-        void SetTheme(ApplicationThemeSettings theme);
+        /// <summary>
+        /// テーマモード
+        /// </summary>
+        /// <returns></returns>
+        IBindableProperty<ApplicationThemeSettings> ApplicationTheme { get; }
+
+        /// <summary>
+        /// 初期化
+        /// </summary>
         void Initialize();
     }
 
     public class ThemeHandler : IThemehandler
     {
-        public ThemeHandler(ISettingsContainer settingsConainer, ILogger logger)
+        public ThemeHandler(ISettingsContainer settingsConainer, IErrorHandler errorHandler)
         {
-            this.logger = logger;
             this._settingsConainer = settingsConainer;
+            this._errorHandler = errorHandler;
+
+            this.ApplicationTheme.Subscribe((theme) =>
+            {
+                this.SetTheme(theme);
+            });
         }
 
         #region field
 
         private readonly ISettingsContainer _settingsConainer;
 
-        private readonly ILogger logger;
+        private readonly IErrorHandler _errorHandler;
 
         #endregion
 
-        /// <summary>
-        /// テーマを取得する
-        /// </summary>
-        /// <returns></returns>
-        public ApplicationThemeSettings GetTheme()
-        {
-            IAttemptResult<ISettingInfo<ApplicationThemeSettings>> result = this._settingsConainer.GetSetting(SettingNames.ApplicationTheme, ApplicationThemeSettings.Inherit);
-            if (!result.IsSucceeded || result.Data is null)
-            {
-                return ApplicationThemeSettings.Inherit;
-            }
-            else
-            {
-                return result.Data.Value;
-            }
-        }
+        public IBindableProperty<ApplicationThemeSettings> ApplicationTheme { get; init; } = new BindableProperty<ApplicationThemeSettings>(ApplicationThemeSettings.Inherit);
 
         /// <summary>
         /// テーマを取得する
         /// </summary>
         /// <param name="setting"></param>
-        public void SetTheme(ApplicationThemeSettings setting)
+        private void SetTheme(ApplicationThemeSettings setting)
         {
             IAttemptResult<ISettingInfo<ApplicationThemeSettings>> result = this._settingsConainer.GetSetting(SettingNames.ApplicationTheme, ApplicationThemeSettings.Inherit);
             if (!result.IsSucceeded || result.Data is null)
@@ -72,7 +71,7 @@ namespace Niconicome.Models.Local.Application
             }
             catch (Exception e)
             {
-                this.logger.Error($"IThemeの取得に失敗しました。（{setting}）", e);
+                this._errorHandler.HandleError(Err.FailedToGetITheme, e);
                 return;
             }
 
@@ -89,7 +88,7 @@ namespace Niconicome.Models.Local.Application
                 }
                 catch (Exception e)
                 {
-                    this.logger.Error($"テーマの変更に失敗しました。（{setting}）", e);
+                    this._errorHandler.HandleError(Err.FailedToSetITheme, e);
                 }
             }
             else
@@ -101,21 +100,25 @@ namespace Niconicome.Models.Local.Application
                 }
                 catch (Exception e)
                 {
-                    this.logger.Error($"テーマの変更に失敗しました。（{setting}）", e);
+                    this._errorHandler.HandleError(Err.FailedToSetITheme, e);
+                    return;
                 }
             }
 
-            this.logger.Log($"テーマを変更しました。（{setting}）");
+            this._errorHandler.HandleError(Err.ThemeChanged, setting.ToString());
 
         }
 
-        /// <summary>
-        /// 初期化
-        /// </summary>
         public void Initialize()
         {
-            var theme = this.GetTheme();
-            this.SetTheme(theme);
+            IAttemptResult<ISettingInfo<ApplicationThemeSettings>> result = this._settingsConainer.GetSetting(SettingNames.ApplicationTheme, ApplicationThemeSettings.Inherit);
+            if (!result.IsSucceeded || result.Data is null)
+            {
+                return;
+            }
+
+            var theme = result.Data.Value;
+            this.ApplicationTheme.Value = theme;
         }
 
     }
