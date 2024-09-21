@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Linq;
@@ -18,6 +18,8 @@ namespace Niconicome.Models.Domain.Local.Store.Types
         public Playlist(Playlist parent)
         {
             this.ParentPlaylist = parent;
+            this.CustomVideoSequence = new List<int>();
+            this.Videos = new List<Video>();
         }
 
         public static string TableName { get; } = "playlists";
