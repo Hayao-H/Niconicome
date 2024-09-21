@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -106,10 +106,14 @@ namespace Niconicome.Models.Domain.Playlist
         IBindableProperty<string> ThumbPath { get; set; }
 
         /// <summary>
-        /// ファイルパス
+        /// .mp4ファイルのパス
         /// </summary>
-        string FilePath { get; set; }
+        string Mp4FilePath { get; set; }
 
+        /// <summary>
+        /// stream.jsonのパス
+        /// </summary>
+        string StreamFilePath { get; set; }
         /// <summary>
         /// メッセージ
         /// </summary>
@@ -438,7 +442,12 @@ namespace Niconicome.Models.Domain.Playlist
             }
         }
 
-        public bool IsDMS => !string.IsNullOrEmpty(this.FilePath) && this.FilePath.EndsWith("stream.json");
+        public bool IsDMS => !string.IsNullOrEmpty(this.StreamFilePath);
+
+        public string Mp4FilePath { get; set; } = string.Empty;
+
+       public string StreamFilePath { get; set; } = string.Empty;
+
 
         #endregion
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -101,15 +101,16 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 }
                 else if (CheckWhetherSetDownloadPathOrNot(quick, video))
                 {
-                    IAttemptResult<string> pathResult = this.GetFilePath(video.NiconicoId, folderPath);
+                    IAttemptResult<LocalFileInfo> pathResult = this.GetFilePath(video.NiconicoId, folderPath);
                     if (pathResult.IsSucceeded && pathResult.Data is not null)
                     {
-                        video.FilePath = pathResult.Data;
+                        video.Mp4FilePath = pathResult.Data.Mp4Path;
+                        video.StreamFilePath = pathResult.Data.StreamPath;
                         video.IsDownloaded.Value = true;
 
                         if (!economy.IsNullOrEmpty())
                         {
-                            if (pathResult.Data.Contains(economy))
+                            if (pathResult.Data.Mp4Path.Contains(economy))
                             {
                                 video.IsEconomy = true;
                             }
@@ -126,7 +127,8 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 }
                 else
                 {
-                    video.FilePath = string.Empty;
+                    video.Mp4FilePath = string.Empty;
+                    video.StreamFilePath = string.Empty;
                     video.IsDownloaded.Value = false;
                 }
 
@@ -176,7 +178,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
         /// <param name="niconicoID"></param>
         /// <param name="folderPath"></param>
         /// <returns></returns>
-        private IAttemptResult<string> GetFilePath(string niconicoID, string folderPath)
+        private IAttemptResult<LocalFileInfo> GetFilePath(string niconicoID, string folderPath)
         {
 
             if (!Path.IsPathRooted(folderPath))
@@ -196,30 +198,27 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 }
             }
 
+            string streamPath = string.Empty;
+            string mp4Path = string.Empty;
+
             //stream.jsonを確認
             string? firstFolder = this._cachedFolders.FirstOrDefault(p => p.Contains(niconicoID));
             if (firstFolder is not null && this._fileIO.Exists(Path.Combine(firstFolder, "stream.json")))
             {
-                return AttemptResult<string>.Succeeded(Path.Combine(firstFolder, "stream.json"));
+                streamPath = Path.Combine(firstFolder, "stream.json");
             }
 
-            string? firstMp4 = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
+            mp4Path = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID)) ?? "";
 
-            //.mp4ファイルを確認
-            if (firstMp4 is not null)
+            if (string.IsNullOrEmpty(mp4Path) && string.IsNullOrEmpty(streamPath))
             {
-                return AttemptResult<string>.Succeeded(firstMp4);
+                return AttemptResult<LocalFileInfo>.Fail();
             }
-
-            string? firstTS = this._cachedFiles.FirstOrDefault(p => p.Contains(niconicoID));
-            if (firstTS is not null)
-            //.tsファイルを確認
+            else
             {
-                return AttemptResult<string>.Succeeded(firstTS);
+                return AttemptResult<LocalFileInfo>.Succeeded(new LocalFileInfo(streamPath, mp4Path));
             }
 
-
-            return AttemptResult<string>.Fail();
 
         }
 
@@ -258,7 +257,7 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
                 return false;
             }
 
-            if (string.IsNullOrEmpty(videoInfo.FilePath))
+            if (string.IsNullOrEmpty(videoInfo.Mp4FilePath) && string.IsNullOrEmpty(videoInfo.StreamFilePath))
             {
                 return true;
             }
@@ -274,9 +273,26 @@ namespace Niconicome.Models.Playlist.V2.Manager.Helper
         /// <returns></returns>
         private bool IsDownloaded(IVideoInfo videoInfo)
         {
-            return this._fileIO.Exists(videoInfo.FilePath);
+            if (string.IsNullOrEmpty(videoInfo.Mp4FilePath) || string.IsNullOrEmpty(videoInfo.StreamFilePath))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(videoInfo.Mp4FilePath))
+            {
+                return this._fileIO.Exists(videoInfo.Mp4FilePath);
+            }
+
+            if (!string.IsNullOrEmpty(videoInfo.StreamFilePath))
+            {
+                return this._fileIO.Exists(videoInfo.StreamFilePath);
+            }
+
+            return false;
         }
 
         #endregion
+
+        private record LocalFileInfo(string StreamPath, string Mp4Path);
     }
 }

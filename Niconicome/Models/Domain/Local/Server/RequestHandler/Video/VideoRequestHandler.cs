@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -71,7 +71,7 @@ namespace Niconicome.Models.Domain.Local.Server.RequestHandler.Video
             }
 
             res.ContentType = "video/mp4";
-            IAttemptResult wResult = this.WriteToStream(res.OutputStream, video.FilePath);
+            IAttemptResult wResult = this.WriteToStream(res.OutputStream, video.Mp4FilePath);
 
             if (!wResult.IsSucceeded)
             {

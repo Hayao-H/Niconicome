@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -73,7 +73,14 @@ namespace Niconicome.Models.Local.External.Playlist
             int allVideos = videos.Count;
             List<PlaylistV2::IVideoInfo> existingVideos = new();
 
-            existingVideos = videos.Where(p => this._fileIO.Exists(p.FilePath)).ToList();
+            existingVideos = videos.Where(p => this._fileIO.Exists(p.Mp4FilePath)).ToList();
+
+            if (existingVideos.Count == 0)
+            {
+                this._errorHandler.HandleError(PlaylistCreatorError.DownloadedVideoDoesNotExist);
+                return AttemptResult<int>.Fail(this._errorHandler.GetMessageForResult(PlaylistCreatorError.DownloadedVideoDoesNotExist));
+            }
+
             IAttemptResult<string> result = this._fileFactory.GetPlaylist(existingVideos, playlistName, type);
 
             if (!result.IsSucceeded||result.Data  is null)

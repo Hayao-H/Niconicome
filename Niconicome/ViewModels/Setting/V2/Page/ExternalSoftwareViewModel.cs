@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +36,8 @@ namespace Niconicome.ViewModels.Setting.V2.Page
             this.FFprovePath = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.FFprobePath, Const::Format.FFprobePath), Const::Format.FFprobePath).AddTo(this.Bindables);
 
             this.FFmpegFormat = new BindableSettingInfo<string>(WS.SettingsContainer.GetSetting(SettingNames.FFmpegFormat, Const::Format.DefaultFFmpegFormat), Const::Format.DefaultFFmpegFormat).AddTo(this.Bindables);
+
+            this.PrioritizeMp4 = new BindableSettingInfo<bool>(WS.SettingsContainer.GetSetting(SettingNames.PrioritizeMp4, true), true).AddTo(this.Bindables);
         }
 
         /// <summary>
@@ -97,5 +99,10 @@ namespace Niconicome.ViewModels.Setting.V2.Page
         /// 保存されていない動画の場合再割り当てを行う
         /// </summary>
         public IBindableSettingInfo<bool> ReAllocateCommands { get; init; }
+
+        /// <summary>
+        /// 動画を開く場合、MP4がある場合はそちらを開く
+        /// </summary>
+        public IBindableSettingInfo<bool> PrioritizeMp4 { get; init; }
     }
 }

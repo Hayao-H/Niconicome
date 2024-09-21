@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,8 +22,6 @@ namespace Niconicome.Models.Infrastructure.Database.Types
         public bool IsDownloaded { get; set; }
 
         public bool IsEconomy { get; set; }
-
-        public string VideoFilePath { get; set; } = string.Empty;
 
         public DateTime AddedAt { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -67,6 +67,12 @@ namespace NiconicomeTest.Stabs.Models.Domain.Playlist
         public bool IsAutoUpdateEnabled { get; set; }
 
         public bool IsDMS { get; set; }
+
+        public string Mp4FilePath { get; set; } = string.Empty;
+
+        public string LocalServerURL { get; set; } = string.Empty;
+
+        public string StreamFilePath { get; set; } = string.Empty;
 
         public void AddTag(ITagInfo tag)
         {

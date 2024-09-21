@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -78,7 +78,7 @@ namespace Niconicome.Models.Domain.Local.Server.HLS
                 return dResult;
             }
 
-            return await this.CreateHLSFilesAsync(video.FilePath);
+            return await this.CreateHLSFilesAsync(video.Mp4FilePath);
         }
 
 
