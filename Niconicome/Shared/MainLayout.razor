@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject Niconicome.ViewModels.Shared.ThemeViewModel ThemeViewModel;
+@inject IJSRuntime JSRuntime;
 
 <HeadContent>
     <link rel="stylesheet" href="http://localhost:@Niconicome.Workspaces.Mainpage.LocalState.Port/niconicome/css/userChrome.css" />
@@ -6,3 +8,32 @@
 <div class="Content">
     @Body
 </div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        this._ctx = SynchronizationContext.Current;
+
+        await JSRuntime.InvokeVoidAsync("setTheme", ThemeViewModel.DarkModeClass.Value);
+
+        ThemeViewModel.Bindables.RegisterPropertyChangeHandler(() => this.ExecuteInCurrentThread(async () =>
+        {
+            await JSRuntime.InvokeVoidAsync("setTheme", ThemeViewModel.DarkModeClass.Value);
+            this.StateHasChanged();
+        }));
+    }
+
+
+    private void ExecuteInCurrentThread(Action action)
+    {
+        this._ctx?.Post(_ =>
+        {
+            action();
+        }
+        , null);
+    }
+
+    private SynchronizationContext? _ctx;
+}

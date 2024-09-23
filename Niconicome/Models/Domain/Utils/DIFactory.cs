@@ -426,6 +426,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<UserAuth::ICookieInfo, UserAuth::CookieInfo>();
             services.AddTransient<Store::V2.ICookieStore, DB::CookieDBHandler>();
             services.AddSingleton<Cookie::INiconicoCookieManager, Cookie::NiconicoCookieManager>();
+            services.AddTransient<VM::Shared.ThemeViewModel>();
 
             return services.BuildServiceProvider();
         }

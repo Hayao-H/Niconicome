@@ -12,7 +12,7 @@ namespace Niconicome.ViewModels.Shared
     {
         public ThemeViewModel()
         {
-            this.DarkModeClass = WS.Themehandler.IsDarkMode.Select((isDark) => isDark ? "dark" : string.Empty).AddTo(this.Bindables);
+            this.DarkModeClass = WS.Themehandler.IsDarkMode.Select((isDark) => isDark ? "dark" : "light").AddTo(this.Bindables);
         }
 
         public Bindables Bindables { get; init; } = new();

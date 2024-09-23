@@ -24,7 +24,7 @@ using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 {
-    public class IndexViewModel : ThemeViewModel, IDisposable
+    public class IndexViewModel :  IDisposable
     {
         public IndexViewModel(NavigationManager navigation)
         {
@@ -91,6 +91,11 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         #endregion
 
         #region Props
+
+        /// <summary>
+        /// 変更監視オブジェクト
+        /// </summary>
+        public Bindables Bindables { get; init; } = new();
 
         public List<VideoInfoViewModel> Videos { get; init; } = new List<VideoInfoViewModel>();
 
@@ -571,10 +576,8 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         #endregion
 
-        public override void Dispose()
+        public void Dispose()
         {
-            base.Dispose();
-
             this._disposable.Dispose();
 
             if (this._playlistChangeEventHandler is not null)

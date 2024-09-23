@@ -142,6 +142,7 @@ namespace Niconicome.Models.Local.Application
                 {
                     this._errorHandler.HandleError(Err.FailedToSetITheme, e);
                 }
+                this.IsDarkMode.Value = false;
             }
             else
             {
