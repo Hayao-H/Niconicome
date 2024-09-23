@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -24,7 +24,7 @@ using WS = Niconicome.Workspaces;
 
 namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 {
-    public class IndexViewModel : IDisposable
+    public class IndexViewModel : ThemeViewModel, IDisposable
     {
         public IndexViewModel(NavigationManager navigation)
         {
@@ -93,11 +93,6 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         #region Props
 
         public List<VideoInfoViewModel> Videos { get; init; } = new List<VideoInfoViewModel>();
-
-        /// <summary>
-        /// 変更監視オブジェクト
-        /// </summary>
-        public Bindables Bindables { get; init; } = new();
 
         /// <summary>
         /// プレイリスト名
@@ -323,7 +318,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
             if (e.Code == "Enter")
             {
                 _ = this.AddVideoAsync();
-            } 
+            }
         }
 
         /// <summary>
@@ -332,7 +327,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
         /// <param name="e"></param>
         public void OnKeyDownList(KeyboardEventArgs e)
         {
-            if (e.Code== "Delete")
+            if (e.Code == "Delete")
             {
                 WS::Mainpage.PlaylistEventManager.OnDelKeyDown(this.ConfirmBeforeDeletion);
             }
@@ -576,8 +571,10 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
         #endregion
 
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
+
             this._disposable.Dispose();
 
             if (this._playlistChangeEventHandler is not null)
@@ -758,7 +755,7 @@ namespace Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages
 
             WS::Mainpage.SnackbarHandler.Enqueue(WS::Mainpage.StringHandler.GetContent(IndexViewModelStringContent.StartDeleteVideoFile));
 
-            IAttemptResult result = await WS::Mainpage.VideoListManager.DeleteVideoFilesFromCurrentPlaylistAsync(WS::Mainpage.PlaylistVideoContainer.Videos.Where(v=>v.IsSelected.Value));
+            IAttemptResult result = await WS::Mainpage.VideoListManager.DeleteVideoFilesFromCurrentPlaylistAsync(WS::Mainpage.PlaylistVideoContainer.Videos.Where(v => v.IsSelected.Value));
 
             if (result.IsSucceeded)
             {

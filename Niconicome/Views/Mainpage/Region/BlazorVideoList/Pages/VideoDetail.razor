@@ -2,6 +2,7 @@
 @inject Niconicome.ViewModels.Mainpage.Tabs.VideoList.Pages.VideoDetailViewModel DataContext;
 @inject IJSRuntime JS;
 @inject NavigationManager nm;
+@implements IAsyncDisposable;
 
 
 @using System.Threading;
@@ -54,4 +55,13 @@
             await this._module.InvokeVoidAsync("main");
         }
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (this._module is not null)
+        {
+            await this._module.DisposeAsync();
+        }
+    }
+
 }

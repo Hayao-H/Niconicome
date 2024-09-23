@@ -23,7 +23,7 @@ namespace Niconicome.Models.Local.Application
         /// ダークモードならdarkを返す
         /// それ以外なら空の文字列
         /// </summary>
-        IBindableProperty<string> DarkMode { get; }
+        IBindableProperty<bool> IsDarkMode { get; }
 
         /// <summary>
         /// システム設定に従えるかどうか」
@@ -67,7 +67,7 @@ namespace Niconicome.Models.Local.Application
 
         public IBindableProperty<ApplicationThemeSettings> ApplicationTheme { get; init; } = new BindableProperty<ApplicationThemeSettings>(ApplicationThemeSettings.Inherit);
 
-        public IBindableProperty<string> DarkMode { get; init; } = new BindableProperty<string>(string.Empty);
+        public IBindableProperty<bool> IsDarkMode { get; init; } = new BindableProperty<bool>(false);
 
         public bool CanUseInheritOption => this._oSThemeHandler.FunctionHasCompatibility;
 
@@ -155,7 +155,7 @@ namespace Niconicome.Models.Local.Application
                     this._errorHandler.HandleError(Err.FailedToSetITheme, e);
                     return;
                 }
-                this.DarkMode.Value = "dark";
+                this.IsDarkMode.Value = true;
             }
 
             this._errorHandler.HandleError(Err.ThemeChanged, setting.ToString());
