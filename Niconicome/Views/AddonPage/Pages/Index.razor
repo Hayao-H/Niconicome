@@ -2,7 +2,7 @@
 @namespace Niconicome.Views.AddonPage.V2.Pages
 @inject Niconicome.ViewModels.Mainpage.Subwindows.AddonManager.Pages.IndexViewModel DataContext;
 @inject IJSRuntime JS;
-@inherits BlazorBase;
+
 
 <div class="PageContainer">
 	<div class="alert @(DataContext.AlertTypeClass) @(DataContext.DisplayAlertMessage? "d-block":"d-none")" role="alert">

@@ -2,7 +2,7 @@
 
 @using Niconicome.Views.Setting.V2.Shared;
 @inject VM::Setting.V2.Page.RestoreViewModel DataContext;
-@inherits BlazorBase;
+
 @implements IDisposable;
 
 <div class="SettingPage RestorePage">
@@ -191,9 +191,8 @@
         });
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
-        base.Dispose();
         DataContext.Dispose();
     }
 }

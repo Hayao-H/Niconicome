@@ -1,5 +1,5 @@
 ﻿@inject Niconicome.ViewModels.Shared.TabViewModel DataContext;
-@inherits BlazorBase;
+
 @implements IDisposable
 
 <div class="tabContainer">
@@ -25,9 +25,8 @@
 
     }
 
-    public override void Dispose()
+    public  void Dispose()
     {
-        base.Dispose();
         DataContext.Dispose();
     }
 

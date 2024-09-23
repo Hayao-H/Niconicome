@@ -71,7 +71,7 @@ namespace Niconicome.ViewModels.Mainpage
                     this.UserImage.Value = new Uri("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank.jpg");
                 }
 
-            });
+            }, WS.Mainpage.NiconicoContext.IsLogin);
 
             this.OpenSettingCommand = new BindableCommand(() =>
             {

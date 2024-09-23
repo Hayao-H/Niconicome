@@ -322,7 +322,6 @@ namespace Niconicome.Models.Domain.Utils
             services.AddSingleton<NetworkVideo::INetVideosInfomationHandler, NetworkVideo::NetVideosInfomationHandler>();
             services.AddTransient<StringHandler.IStringHandler, StringHandler.StringHandler>();
             services.AddTransient<DomainWatchV2::IWatchPageInfomationHandler, DomainWatchV2::WatchPageInfomationHandler>();
-            services.AddTransient<VM::Blazor.BlazorBaseViewModel>();
             services.AddTransient<Ext::IExternalProcessUtils, Ext::ExternalProcessUtils>();
             services.AddSingleton<State::MessageV2.IMessageHandler, State::MessageV2.MessageHandler>();
             services.AddTransient<Ext::IExternalAppUtilsV2, Ext::ExternalAppUtilsV2>();
