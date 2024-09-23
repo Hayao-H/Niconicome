@@ -1,3 +1,4 @@
+@use "theme.scss" as theme;
 $videoWidth: 700;
 $VideoInfoWidth: 400;
 
@@ -7,6 +8,58 @@ $VideoInfoWidth: 400;
 
     &:hover {
         text-decoration: underline;
+    }
+}
+
+.dark:root {
+
+    .VideoDetailPage {
+        background-color: theme.$dark;
+        color: #fff;
+
+        .watchWrapper {
+            .leftContent {
+                .videoInfoWrapper {
+                    .majorInfoWrapper {
+                        color: #fff;
+                    }
+
+                    .tagWrapper {
+                        .tag {
+                            background-color: theme.$dark;
+
+                            .tagName {
+                                color: #fff;
+                            }
+                        }
+                    }
+
+                    .descriptionWrapper {
+                        background-color: theme.$dark;
+
+                        .expandButton {
+                            color: #1874a2;
+
+                            &.collapsed {
+                                background: theme.$dark;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .rightContent {
+                .commentWrapper {
+                    background-color: theme.$dark;
+
+                    .commentList {
+                        .commentItem:hover {
+                            background-color: theme.$dark_selected;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

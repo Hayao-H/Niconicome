@@ -38,3 +38,12 @@ function initializeVideo() {
         preload: 'auto',
     });
 }
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-bs-theme', theme);
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+}

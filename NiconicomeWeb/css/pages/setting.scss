@@ -1,3 +1,5 @@
+@use "./theme.scss" as theme;
+
 .SettingPage {
     margin: 24px;
     display: flex;
@@ -82,6 +84,66 @@
         .Separator {
             border: 1px solid #575656e7;
             margin: 40px 5px;
+        }
+    }
+}
+
+.dark {
+    .SettingPage {
+        color: #fff;
+
+        .SideMenu {
+            .MenuItem:hover {
+                background-color: theme.$dark_selected;
+            }
+        }
+
+        .ReplaceSettingsContainer,
+        .BackupSettingsContainer {
+    
+            .RulesList,
+            .BackupList {
+    
+                .HeaderColumn {
+                    background-color: theme.$dark;
+                }
+            }
+        }
+    
+        .DirectorySettingsContainer {
+    
+            .DirectoryList {
+    
+                .HeaderColumn {
+                    background-color: theme.$dark;
+                }
+            }
+    
+            .DirectoryControlsContainer {
+                margin-top: 30px;
+                margin-left: 10px;
+    
+                .Label {
+                    margin-right: 8px;
+                    font-weight: bold;
+                }
+    
+                .Input {
+                    outline: none;
+                    border: none;
+                    border-bottom: 2px solid #e7e7e7e7;
+                    width: 50%;
+                    margin-right: 8px;
+                }
+    
+                .Button {
+                    margin-left: 4px;
+                }
+            }
+    
+            .LoadVideoDescription {
+                margin: 20px 10px;
+            }
         }
     }
 }

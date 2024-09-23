@@ -1,3 +1,39 @@
+@use "./theme.scss" as theme;
+
+.dark:root {
+    .DownloadTask {
+        .Content {
+            .TasksWrapper {
+                .TasksHeader {
+                    background-color: theme.$dark_selected;
+                    color: #fff;
+
+                }
+            }
+
+            .TaskInfo {
+                background-color: theme.$dark;
+                color: #fff;
+            }
+        }
+
+        .Toolbar {
+            background-color: theme.$dark;
+            border-right: 1px solid theme.$border_color_dark;
+
+            p {
+                .Icon {
+                    color: #fff;
+                }
+
+                &:hover {
+                    background-color: theme.$dark_selected;
+                }
+            }
+        }
+    }
+}
+
 .DownloadTask {
 
     .Toolbar {
@@ -97,7 +133,7 @@
                 #SettingColumn {
                     flex: .5;
                 }
-                
+
                 #CheckColumn {
                     flex: .5;
                 }

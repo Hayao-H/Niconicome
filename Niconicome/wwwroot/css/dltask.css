@@ -1,3 +1,22 @@
+.dark:root .DownloadTask .Content .TasksWrapper .TasksHeader {
+  background-color: #353535;
+  color: #fff;
+}
+.dark:root .DownloadTask .Content .TaskInfo {
+  background-color: #212121;
+  color: #fff;
+}
+.dark:root .DownloadTask .Toolbar {
+  background-color: #212121;
+  border-right: 1px solid #3b3b3b;
+}
+.dark:root .DownloadTask .Toolbar p .Icon {
+  color: #fff;
+}
+.dark:root .DownloadTask .Toolbar p:hover {
+  background-color: #353535;
+}
+
 .DownloadTask .Toolbar {
   position: fixed;
   top: 50px;
@@ -37,9 +56,7 @@
   display: flex;
 }
 .DownloadTask .Content .Controls .DisplayControlWrapper > div {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
+  user-select: none;
   margin-right: 8px;
 }
 .DownloadTask .Content .Controls > button {

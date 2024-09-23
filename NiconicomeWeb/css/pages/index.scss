@@ -1,4 +1,5 @@
 @use "sass:math";
+@use "./theme.scss" as theme;
 
 $VideoListRowHeight: 100;
 
@@ -9,7 +10,7 @@ $VideoListRowHeight: 100;
 
 ::-webkit-scrollbar-track {
     border-radius: 5px;
-    box-shadow: inset 0 0 6px #e7e7e7e7;
+    box-shadow: inset 0 0 6px theme.$border_color;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -19,6 +20,92 @@ $VideoListRowHeight: 100;
 
 *:focus {
     outline: none;
+}
+
+.dark:root {
+
+    * {
+        border-color: theme.$border_color_dark !important;
+    }
+
+    background-color: theme.$dark;
+    color: #fff;
+
+    body {
+        background-color: theme.$dark;
+
+        .PageContent {
+            color: #fff;
+
+            .VideoList {
+                #VideoListHeader {
+                    .HeaderItem {
+                        background-color: theme.$dark;
+                        color: #fff;
+                    }
+                }
+
+                .VideoListBody {
+                    .VideoListRow {
+                        &:hover {
+                            background: theme.$dark_selected;
+                        }
+
+                        .ThumbnailColumn {
+                            .Duration {
+                                background: theme.$dark_selected;
+                            }
+                        }
+
+                        .TitleColumn {
+                            .VideoInfoLinkWrapper:hover {
+                                background-color: theme.$dark;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .BottomPanelControler {
+                .PanelItem {
+                    background-color: theme.$dark;
+                    color: #fff;
+
+                    &.selected {
+                        background-color: theme.$dark_selected;
+                    }
+                }
+            }
+
+            .OutputContainer {
+                background-color: theme.$dark;
+
+                .ToolBar {
+                    background-color: theme.$dark;
+                }
+            }
+        }
+
+        .ContextMenuWrapper {
+            .ContextMenu {
+                background: theme.$dark;
+                color: #fff;
+
+                .ContextMenuItem {
+                    background: theme.$dark;
+                    color: #fff;
+
+                    .ContextMenuItemTriangle {
+                        border-left: 6px solid theme.$dark;
+                    }
+                }
+
+                .ContextMenuItem:hover {
+                    background: #222222;
+                }
+            }
+        }
+    }
 }
 
 .PageContent {
@@ -45,7 +132,7 @@ $VideoListRowHeight: 100;
                 border-top: none;
                 border-left: none;
                 border-right: none;
-                border-bottom: solid 2px #e7e7e7e7;
+                border-bottom: solid 2px theme.$border_color;
                 padding: 5px 0;
                 outline: none;
                 display: inline-block;
@@ -84,6 +171,7 @@ $VideoListRowHeight: 100;
             position: relative;
             height: $HeaderHeight;
             color: #001835;
+            border: 1px solid theme.$border_color;
 
             .HeaderItem {
                 display: inline-block;
@@ -130,62 +218,62 @@ $VideoListRowHeight: 100;
                 display: flex;
                 justify-content: center;
                 width: #{$CheckBoxWidth}px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
                 padding: 0;
             }
 
             #ThumbnailColumn {
                 width: #{$ThumbWidth}px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
 
             #TitleColumn {
                 width: #{$TitleWidth}px;
                 padding-left: 8px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
 
             #UploadedDateTimeColumn {
                 width: #{$UploadedDateTimeWidth}px;
                 padding-left: 8px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
 
             #IsDownloadedColumn {
                 width: #{$IsDownloadedColumnWidth}px;
                 padding-left: 8px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
 
             #ViewCountColumn {
                 width: #{$CountColumnWidth}px;
                 height: 100%;
                 padding-left: 8px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
 
             #CommentCountColumn {
                 width: #{$CountColumnWidth}px;
                 padding-left: 8px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
 
             #MylistCountColumn {
                 width: #{$CountColumnWidth}px;
                 padding-left: 8px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
 
             #LikeCountColumn {
                 width: #{$CountColumnWidth}px;
                 padding-left: 8px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
 
             #MessageColumn {
                 width: #{$MessageColumnWidth}px;
                 padding-left: 8px;
-                border-right: 1px solid #e5e8ea;
+                border-right: 1px solid theme.$border_color;
             }
         }
 
@@ -196,7 +284,7 @@ $VideoListRowHeight: 100;
                 display: none;
                 position: absolute;
                 top: 0;
-                background-color: #2d2c2d;
+                background-color: theme.$dark;
                 z-index: 9999;
 
                 &.Show {
@@ -214,7 +302,7 @@ $VideoListRowHeight: 100;
                 .Separator {
                     height: 0;
                     width: 200px;
-                    border: 1px solid #e7e7e7e7;
+                    border: 1px solid theme.$border_color;
                 }
 
                 .OptionMenu {
@@ -239,7 +327,7 @@ $VideoListRowHeight: 100;
 
         .VideoListBody {
             display: inline-block;
-            border: solid 1px #e5e8ea;
+            border: solid 1px theme.$border_color;
             height: #{$VideoListRowHeight * 4}px;
             position: relative;
 
@@ -248,7 +336,7 @@ $VideoListRowHeight: 100;
             .VideoListRow {
                 display: flex;
                 height: #{$VideoListRowHeight}px;
-                border-bottom: 1px solid #e5e8ea;
+                border-bottom: 1px solid theme.$border_color;
                 user-select: none;
                 width: auto;
 
@@ -262,7 +350,7 @@ $VideoListRowHeight: 100;
                     align-items: center;
                     height: 100%;
                     width: #{$CheckBoxWidth}px;
-                    border-right: 1px solid #e5e8ea;
+                    border-right: 1px solid theme.$border_color;
                     flex-shrink: 0;
                 }
 
@@ -271,7 +359,7 @@ $VideoListRowHeight: 100;
                     position: relative;
                     height: 100%;
                     width: #{$ThumbWidth}px;
-                    border-right: 1px solid #e5e8ea;
+                    border-right: 1px solid theme.$border_color;
                     padding: 8px;
                     flex-shrink: 0;
 
@@ -311,7 +399,7 @@ $VideoListRowHeight: 100;
                         align-items: start;
                         width: 700px;
                         padding-left: 8px;
-                        border-right: 1px solid #e5e8ea;
+                        border-right: 1px solid theme.$border_color;
 
                         &:hover {
                             .VideoInfoLinkWrapper {
@@ -342,14 +430,14 @@ $VideoListRowHeight: 100;
                     .UploadedDateTimeColumn {
                         width: 250px;
                         padding-left: 8px;
-                        border-right: 1px solid #e5e8ea;
+                        border-right: 1px solid theme.$border_color;
                     }
 
                     .IsDownloadedColumn {
                         color: #7bd889;
                         width: #{$IsDownloadedColumnWidth}px;
                         padding-right: 8px;
-                        border-right: 1px solid #e5e8ea;
+                        border-right: 1px solid theme.$border_color;
 
                         .NotDownloaded {
                             color: #ff3300;
@@ -359,29 +447,29 @@ $VideoListRowHeight: 100;
                     .ViewCountColumn {
                         width: #{$CountColumnWidth}px;
                         padding-right: 8px;
-                        border-right: 1px solid #e5e8ea;
+                        border-right: 1px solid theme.$border_color;
                     }
 
                     .CommentCountColumn {
                         width: #{$CountColumnWidth}px;
                         padding-right: 8px;
-                        border-right: 1px solid #e5e8ea;
+                        border-right: 1px solid theme.$border_color;
                     }
 
                     .MylistCountColumn {
                         width: #{$CountColumnWidth}px;
                         padding-right: 8px;
-                        border-right: 1px solid #e5e8ea;
+                        border-right: 1px solid theme.$border_color;
                     }
 
                     .LikeCountColumn {
                         width: #{$CountColumnWidth}px;
                         padding-right: 8px;
-                        border-right: 1px solid #e5e8ea;
+                        border-right: 1px solid theme.$border_color;
                     }
 
                     .MessageColumn {
-                        border-right: 1px solid #e5e8ea;
+                        border-right: 1px solid theme.$border_color;
                         width: #{$MessageColumnWidth}px;
                     }
 
@@ -426,7 +514,7 @@ $VideoListRowHeight: 100;
         width: 400px;
         background-color: #fff;
         overflow-y: auto;
-        border-left: 1px solid #e7e7e7e7;
+        border-left: 1px solid theme.$border_color;
         z-index: 9999;
 
         .ToolBar {
@@ -457,7 +545,7 @@ $VideoListRowHeight: 100;
             .MessageRow {
                 display: flex;
                 padding: 3px;
-                border-bottom: 1px solid #e7e7e7e7;
+                border-bottom: 1px solid theme.$border_color;
                 word-wrap: break-word;
 
                 .MessageIcon {
@@ -503,14 +591,14 @@ $VideoListRowHeight: 100;
         display: flex;
         justify-content: stretch;
         align-items: center;
-        border: 1px solid #e7e7e7e7;
+        border: 1px solid theme.$border_color;
 
         .PanelItem {
             height: 30px;
             line-height: 30px;
             text-align: center;
             flex-grow: 1;
-            border-right: 1px solid #e7e7e7e7;
+            border-right: 1px solid theme.$border_color;
             cursor: pointer;
 
             &.selected {
@@ -519,17 +607,16 @@ $VideoListRowHeight: 100;
         }
     }
 
-
-    .Panel{
+    .Panel {
         &.Download {
 
-            border: 1px solid #e7e7e7e7;
+            border: 1px solid theme.$border_color;
             padding: 8px;
-    
+
             .nc-border {
                 border-bottom: .5px solid #000;
             }
-    
+
             .downloadTarget,
             .downloadButton {
                 .title {
@@ -537,43 +624,43 @@ $VideoListRowHeight: 100;
                     font-size: 14px;
                     margin-top: 16px;
                 }
-    
+
                 .forms {
                     display: flex;
                     align-items: center;
                     height: 30px;
-    
+
                     .form-check {
                         margin-right: 16px;
                         user-select: none;
                     }
-    
+
                     .count {
                         width: 150px;
                     }
                 }
             }
-    
+
             .downloadSelect {
                 display: flex;
                 align-items: center;
-    
+
                 .setting {
                     margin-right: 16px;
                     display: flex;
                     align-items: center;
-    
+
                     .form-select {
                         width: 150px;
                     }
                 }
             }
-    
+
             .downloadButton {
                 .controls {
                     display: flex;
                     justify-content: space-between;
-    
+
                     .buttons {
                         .button {
                             margin-right: 8px;
@@ -586,7 +673,7 @@ $VideoListRowHeight: 100;
         &.Output {
             padding: 8px;
 
-            border: 1px solid #e7e7e7e7;
+            border: 1px solid theme.$border_color;
 
             .Controls {
                 margin-bottom: 8px;
@@ -604,11 +691,11 @@ $VideoListRowHeight: 100;
             justify-content: space-between;
             padding: 8px;
             height: 250px;
-            border: 1px solid #e7e7e7e7;
+            border: 1px solid theme.$border_color;
 
             .counts {
                 display: flex;
-                
+
                 .item {
                     margin-right: 16px;
                 }
@@ -638,6 +725,7 @@ $VideoListRowHeight: 100;
                 .Input {
                     &.TimerSetting {
                         display: flex;
+
                         .TimeSetting {
                             display: flex;
 
@@ -646,7 +734,10 @@ $VideoListRowHeight: 100;
                                 margin-right: 8px;
                             }
 
-                            .Month,.Day,.Hour,.Minute {
+                            .Month,
+                            .Day,
+                            .Hour,
+                            .Minute {
                                 width: 100px;
                                 margin-right: 8px;
                             }
@@ -675,7 +766,7 @@ $VideoListRowHeight: 100;
         z-index: 9999;
         background: #fff;
         padding: 5px;
-        border: 1px solid #e7e7e7e7;
+        border: 1px solid theme.$border_color;
 
         .ContextMenuItem {
             display: flex;
@@ -687,7 +778,7 @@ $VideoListRowHeight: 100;
             font-size: 13px;
             background: #fff;
             z-index: 9999;
-            border-bottom: 1px solid #e7e7e7e7;
+            border-bottom: 1px solid theme.$border_color;
 
             .ContextMenuIcon {
                 margin-right: 8px;
@@ -717,7 +808,7 @@ $VideoListRowHeight: 100;
                 display: none;
                 position: absolute;
                 left: 100%;
-                border: 1px solid #e7e7e7e7;
+                border: 1px solid theme.$border_color;
 
                 &.One {
                     top: 0;

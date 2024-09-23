@@ -18,6 +18,11 @@ p {
   display: none;
 }
 
+.dark .tabContainer {
+  background-color: #212121;
+  color: #fff;
+}
+
 .tabContainer {
   display: flex;
   align-items: center;

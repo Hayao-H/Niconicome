@@ -1,3 +1,4 @@
+@use "./theme.scss" as theme;
 p {
     margin-bottom: 0 !important;
 }
@@ -13,7 +14,7 @@ p {
 
     .btn.Hide {
         display: none;
-    } 
+    }
 
     &.Hide {
         display: none;
@@ -21,17 +22,25 @@ p {
 
 }
 
+.dark {
+    .tabContainer {
+        background-color: theme.$dark;
+        color: #fff;
+    }
+}
+
+
 .tabContainer {
     display: flex;
     align-items: center;
     margin: 8px;
-    border-bottom: 1px solid #e7e7e7e7;
+    border-bottom: 1px solid theme.$border_color;
     height: 40px;
 
     .tab {
         width: 150px;
         padding: 4px;
-        border: 1px solid #e7e7e7e7;
+        border: 1px solid theme.$border_color;
         border-radius: 4px;
         margin-right: 4px;
         cursor: pointer;

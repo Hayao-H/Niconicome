@@ -13,9 +13,7 @@
   align-items: center;
   font-size: 18px;
   border-radius: 6px;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
+  user-select: none;
   cursor: pointer;
 }
 .SettingPage .SideMenu .MenuItem.NotImpl {
@@ -69,6 +67,43 @@
 .SettingPage .Body .Separator {
   border: 1px solid rgba(87, 86, 86, 0.9058823529);
   margin: 40px 5px;
+}
+
+.dark .SettingPage {
+  color: #fff;
+}
+.dark .SettingPage .SideMenu .MenuItem:hover {
+  background-color: #353535;
+}
+.dark .SettingPage .ReplaceSettingsContainer .RulesList .HeaderColumn,
+.dark .SettingPage .ReplaceSettingsContainer .BackupList .HeaderColumn,
+.dark .SettingPage .BackupSettingsContainer .RulesList .HeaderColumn,
+.dark .SettingPage .BackupSettingsContainer .BackupList .HeaderColumn {
+  background-color: #212121;
+}
+.dark .SettingPage .DirectorySettingsContainer .DirectoryList .HeaderColumn {
+  background-color: #212121;
+}
+.dark .SettingPage .DirectorySettingsContainer .DirectoryControlsContainer {
+  margin-top: 30px;
+  margin-left: 10px;
+}
+.dark .SettingPage .DirectorySettingsContainer .DirectoryControlsContainer .Label {
+  margin-right: 8px;
+  font-weight: bold;
+}
+.dark .SettingPage .DirectorySettingsContainer .DirectoryControlsContainer .Input {
+  outline: none;
+  border: none;
+  border-bottom: 2px solid rgba(231, 231, 231, 0.9058823529);
+  width: 50%;
+  margin-right: 8px;
+}
+.dark .SettingPage .DirectorySettingsContainer .DirectoryControlsContainer .Button {
+  margin-left: 4px;
+}
+.dark .SettingPage .DirectorySettingsContainer .LoadVideoDescription {
+  margin: 20px 10px;
 }
 
 .FilePage .Detail {

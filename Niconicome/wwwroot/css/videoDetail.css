@@ -6,6 +6,35 @@
   text-decoration: underline;
 }
 
+.dark:root .VideoDetailPage {
+  background-color: #212121;
+  color: #fff;
+}
+.dark:root .VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .majorInfoWrapper {
+  color: #fff;
+}
+.dark:root .VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper .tag {
+  background-color: #212121;
+}
+.dark:root .VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .tagWrapper .tag .tagName {
+  color: #fff;
+}
+.dark:root .VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper {
+  background-color: #212121;
+}
+.dark:root .VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper .expandButton {
+  color: #1874a2;
+}
+.dark:root .VideoDetailPage .watchWrapper .leftContent .videoInfoWrapper .descriptionWrapper .expandButton.collapsed {
+  background: #212121;
+}
+.dark:root .VideoDetailPage .watchWrapper .rightContent .commentWrapper {
+  background-color: #212121;
+}
+.dark:root .VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem:hover {
+  background-color: #353535;
+}
+
 .VideoDetailPage {
   padding: 24px;
   background-color: #f4f4f4;
@@ -324,9 +353,7 @@
   padding: 8px;
   border: 1px solid #e5e8ea;
   border-radius: 20px;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
+  user-select: none;
 }
 .VideoDetailPage .watchWrapper .rightContent .commentWrapper > .listControler {
   display: flex;

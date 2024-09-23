@@ -77,21 +77,21 @@ export const Comment = () => {
       <NGList isExpanded={isNGExpanded} close={() => setIsNGExpanded(false)} />
 
       <div
-        className={`autoScroll form-check form-switch form-check-reverse ${
-          isExpanded ? "" : "collapsed"
-        }`}
+        className={`autoScroll ${isExpanded ? "" : "collapsed"}`}
       >
-        <input
-          className="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="commentScrollSwitch"
-          checked={autoScroll}
-          onChange={() => setIsAutoScroll(!autoScroll)}
-        />
-        <label className="form-check-label" htmlFor="commentScrollSwitch">
-          自動スクロール
-        </label>
+        <div className="form-check form-switch form-check-reverse">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="commentScrollSwitch"
+            checked={autoScroll}
+            onChange={() => setIsAutoScroll(!autoScroll)}
+          />
+          <label className="form-check-label" htmlFor="commentScrollSwitch">
+            自動スクロール
+          </label>
+        </div>
 
         <p
           className="ngToggle"
