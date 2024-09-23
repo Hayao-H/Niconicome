@@ -57,6 +57,28 @@ $VideoInfoWidth: 400;
                             background-color: theme.$dark_selected;
                         }
                     }
+
+                    .ngWrapper {
+                        background-color: theme.$dark;
+
+                        .ngList {
+                            .ngItem:hover {
+                                background-color: theme.$dark_selected;
+                            }
+                        }
+
+                        >.listControler{
+                            .close:hover {
+                                background-color: theme.$dark_selected;
+                            }
+                        }
+                    }
+
+                    .autoScroll {
+                        .ngToggle {
+                            color: #fff;
+                        }
+                    }
                 }
             }
         }
@@ -469,7 +491,7 @@ $VideoInfoWidth: 400;
                     height: 30px;
 
                     .ngToggle {
-                        margin-left: 16px;
+                        margin: 0 16px;
                         color: #4e4e4e4e;
                         cursor: pointer;
                     }

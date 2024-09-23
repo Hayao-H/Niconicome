@@ -34,6 +34,18 @@
 .dark:root .VideoDetailPage .watchWrapper .rightContent .commentWrapper .commentList .commentItem:hover {
   background-color: #353535;
 }
+.dark:root .VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper {
+  background-color: #212121;
+}
+.dark:root .VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper .ngList .ngItem:hover {
+  background-color: #353535;
+}
+.dark:root .VideoDetailPage .watchWrapper .rightContent .commentWrapper .ngWrapper > .listControler .close:hover {
+  background-color: #353535;
+}
+.dark:root .VideoDetailPage .watchWrapper .rightContent .commentWrapper .autoScroll .ngToggle {
+  color: #fff;
+}
 
 .VideoDetailPage {
   padding: 24px;
@@ -370,7 +382,7 @@
   height: 30px;
 }
 .VideoDetailPage .watchWrapper .rightContent .commentWrapper .autoScroll .ngToggle {
-  margin-left: 16px;
+  margin: 0 16px;
   color: rgba(78, 78, 78, 0.3058823529);
   cursor: pointer;
 }
