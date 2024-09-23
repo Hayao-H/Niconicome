@@ -207,6 +207,7 @@ namespace Niconicome.Models.Domain.Utils
             services.AddTransient<PlaylistPlaylist::IPlaylistSettingsHandler, PlaylistPlaylist::PlaylistSettingsHandler>();
             services.AddSingleton<Utils::IWindowsHelper, Utils::WindowsHelper>();
             services.AddSingleton<MyApplication::IThemehandler, MyApplication::ThemeHandler>();
+            services.AddSingleton<MyApplication::IOSThemeHandler, Infla::UI.WindowsThemeHandler>();
             services.AddTransient<MyApplication::IApplicationPowerManager, MyApplication::ApplicationPowerManager>();
             services.AddTransient<Style::IUserChromeHandler, Style::UserChromeHandler>();
             services.AddSingleton<State::IStyleHandler, State::StyleHandler>();

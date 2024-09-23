@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Media;
@@ -8,7 +8,7 @@ using System.Windows.Media;
 using MaterialDesignThemes.Wpf;
 using Niconicome.Models.Domain.Utils;
 using Niconicome.Views.Controls.MVVM;
-using Prism.Services.Dialogs;
+using Prism.Dialogs;
 using Reactive.Bindings;
 
 namespace Niconicome.ViewModels.Controls
@@ -37,7 +37,7 @@ namespace Niconicome.ViewModels.Controls
                 _ => ButtonResult.None
             };
             var dialogResult = new DialogResult(result);
-            this.RequestClose?.Invoke(dialogResult);
+            this.RequestClose.Invoke(dialogResult);
         }
 
         #endregion
@@ -46,7 +46,7 @@ namespace Niconicome.ViewModels.Controls
 
         public string Title { get; private set; } = "メッセージ";
 
-        public event Action<IDialogResult>? RequestClose;
+        public DialogCloseListener RequestClose { get; init; } = new DialogCloseListener();
 
         public bool CanCloseDialog()
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +10,6 @@ using Utils = Niconicome.Models.Domain.Utils;
 using Niconicome.Models.Helper.Result;
 using Err = Niconicome.Models.Domain.Local.LocalFile.Error.LocalFileRemoverError;
 using Niconicome.Models.Domain.Utils.Error;
-using ABI.System;
 
 namespace Niconicome.Models.Domain.Local.LocalFile
 {

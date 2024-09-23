@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,6 +51,7 @@ using PostDL = Niconicome.Models.Network.Download.Actions.V2;
 using Auth = Niconicome.Models.Auth.Error;
 using Niconico = Niconicome.Models.Domain.Niconico;
 using CommentCollection = Niconicome.Models.Domain.Niconico.Download.Comment.V2.Core.V3.Error;
+using Application = Niconicome.Models.Local.Application.Error;
 
 namespace Niconicome.Models.Domain.Utils.Error
 {
@@ -138,6 +139,7 @@ namespace Niconicome.Models.Domain.Utils.Error
             { 75, typeof(CookieDBHandlerError) },
             { 76, typeof(Niconico::NiconicoContextError) },
             { 77, typeof(CommentCollection::ChildCommentCollectionError) },
+            { 78, typeof(Application::ThemeHandlerError) },
         };
     }
 }

@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using ABI.System.Numerics;
 using Niconicome.Models.Domain.Niconico.Net.Json;
 using Niconicome.Models.Domain.Niconico.Net.Json.API.Comment.V2;
 using Niconicome.Models.Domain.Niconico.Video.Infomations;

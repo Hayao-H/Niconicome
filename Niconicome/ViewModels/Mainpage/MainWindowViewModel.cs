@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Reactive.Linq;
 using System.Threading;
@@ -15,9 +15,9 @@ using Niconicome.Models.Utils.Reactive;
 using Niconicome.Models.Utils.Reactive.Command;
 using Niconicome.ViewModels.Controls;
 using Niconicome.Views;
+using Prism.Dialogs;
 using Prism.Ioc;
-using Prism.Regions;
-using Prism.Services.Dialogs;
+using Prism.Navigation.Regions;
 using Prism.Unity;
 using Reactive.Bindings;
 using Style = Niconicome.Models.Local.State.Style;

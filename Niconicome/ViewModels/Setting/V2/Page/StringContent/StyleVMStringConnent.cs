@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,5 +25,7 @@ namespace Niconicome.ViewModels.Setting.V2.Page.StringContent
         NeedRestart,
         [StringEnum("再起動")]
         Restart,
+        [StringEnum("現在のOSバージョンはでは、このオプションを選択できません。")]
+        NoCompatibility,
     }
 }

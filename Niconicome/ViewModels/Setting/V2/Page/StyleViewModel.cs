@@ -30,11 +30,10 @@ namespace Niconicome.ViewModels.Setting.V2.Page
 
             this.SelectedTheme = WS.Themehandler.ApplicationTheme.Subscribe(value =>
             {
-                if (value == ApplicationThemeSettings.Inherit)
+                if (value == ApplicationThemeSettings.Inherit && !WS.Themehandler.CanUseInheritOption)
                 {
-                    string message = WS.StringHandler.GetContent(SC.NeedRestart);
-                    string restart = WS.StringHandler.GetContent(SC.Restart);
-                    this.ShowAlert(message, AlertType.Info, () => WS.PowerManager.Restart(), restart);
+                    string message = WS.StringHandler.GetContent(SC.NoCompatibility);
+                    this.ShowAlert(message, AlertType.Error);
                 }
             }).AddTo(this.Bindables);
         }
